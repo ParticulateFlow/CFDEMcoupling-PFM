@@ -14,12 +14,10 @@ Defined in couplingProperties dictionary.
 locateModel turboEngine;
 turboEngineProps
 \{
-    faceDecomp switch1;
-    treeSearch switch2;
+    treeSearch switch1;
 \} :pre
 
-{switch1} = time to start the averaging (default 0) :ulb,l
-{switch2} = names of the finite volume scalar fields to be temporally averaged :l
+{switch1} = switch to use tree search algorithm :ulb,l
 :ule
 
 [Examples:]
@@ -27,7 +25,6 @@ turboEngineProps
 locateModel turboEngine;
 turboEngineProps
 \{
-    faceDecomp false;
     treeSearch false;
 \} :pre
 
