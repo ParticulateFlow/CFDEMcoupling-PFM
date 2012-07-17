@@ -434,6 +434,7 @@ listing below of styles within certain commands.
 "locateModel_engineSearch"_locateModel_engineSearch.html,
 "locateModel_engineSearchIB"_locateModel_engineSearchIB.html,
 "locateModel_standardSearch"_locateModel_standardSearch.html,
+"locateModel_turboEngineSearch"_locateModel_turboEngineSearch.html,
 "meshMotionModel"_meshMotionModel.html,
 "meshMotionModel_noMeshMotion"_meshMotionModel_noMeshMotion.html,
 "momCoupleModel"_momCoupleModel.html,
