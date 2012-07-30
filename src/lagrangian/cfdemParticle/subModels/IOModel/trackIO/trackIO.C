@@ -31,7 +31,7 @@ Description
 
 #include "error.H"
 
-#include "basicIO.H"
+#include "trackIO.H"
 #include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -41,12 +41,12 @@ namespace Foam
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-defineTypeNameAndDebug(basicIO, 0);
+defineTypeNameAndDebug(trackIO, 0);
 
 addToRunTimeSelectionTable
 (
     IOModel,
-    basicIO,
+    trackIO,
     dictionary
 );
 
@@ -54,7 +54,7 @@ addToRunTimeSelectionTable
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 // Construct from components
-basicIO::basicIO
+trackIO::trackIO
 (
     const dictionary& dict,
     cfdemCloud& sm
@@ -62,7 +62,7 @@ basicIO::basicIO
 :
     IOModel(dict,sm),
     //propsDict_(dict.subDict(typeName + "Props")),
-    dirName_("particles"),
+    dirName_(""),
     path_("dev/null"),
     lagPath_("dev/null")
 {
@@ -71,10 +71,9 @@ basicIO::basicIO
 
 }
 
-
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-basicIO::~basicIO()
+trackIO::~trackIO()
 {}
 
 
@@ -82,53 +81,62 @@ basicIO::~basicIO()
 
 // Public Member Functions
 
-void basicIO::dumpDEMdata() const
+void trackIO::dumpDEMdata() const
 {
     if (time_.outputTime())
     {
         // make time directory
         lagPath_=createTimeDir(path_);
-        lagPath_=createTimeDir(fileName(lagPath_/"lagrangian"));
+        lagPath_=createLagrangianDir(fileName(lagPath_));
 
         // stream data to file
-        streamDataToPath(lagPath_, particleCloud_.positions(), particleCloud_.numberOfParticles(), "positions","vector","Cloud<passiveParticle>","0");
+        streamDataToPath(lagPath_, particleCloud_.positions(), particleCloud_.numberOfParticles(), "positions","position","Cloud<passiveParticle>","0");
         streamDataToPath(lagPath_, particleCloud_.velocities(), particleCloud_.numberOfParticles(), "v","vector","vectorField","");
+        streamDataToPath(lagPath_, particleCloud_.velocities(), particleCloud_.numberOfParticles(), "origId","label","labelField","");
+        streamDataToPath(lagPath_, particleCloud_.velocities(), particleCloud_.numberOfParticles(), "origProcId","origProcId","labelField","");
         streamDataToPath(lagPath_, particleCloud_.radii(), particleCloud_.numberOfParticles(), "r","scalar","scalarField","");
     }
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 // Private Member Functions
 
-fileName basicIO::buildFilePath(word dirName) const
+fileName trackIO::buildFilePath(word dirName) const
 {
     // create file structure
     fileName path("."/dirName);
-    mkDir(path,0777);
-    mkDir(fileName(path/"constant"),0777);
     OFstream* stubFile = new OFstream(fileName(path/"particles.foam"));
     delete stubFile;
     return path;
 }
 
-void basicIO::streamDataToPath(fileName path, double** array,int n,word name,word type,word className,word finaliser) const
+void trackIO::streamDataToPath(fileName path, double** array,int n,word name,word type,word className,word finaliser) const
 {
     vector vec;
     OFstream* fileStream = new OFstream(fileName(path/name));
     *fileStream << "FoamFile\n";
     *fileStream << "{version 2.0; format ascii;class "<< className << "; location 0;object  "<< name <<";}\n";
     *fileStream << n <<"\n";
-    *fileStream << "(\n";
+    if(type!="origProcId")*fileStream << "(\n";
+    else if(type=="origProcId")*fileStream <<"{0}"<< "\n";
 
     for(int index = 0;index < n; ++index)
     {
         if (type=="scalar"){
-            *fileStream << array[index][0] << " \n";
-        }else {
+            *fileStream << array[index][0] << finaliser << " \n";
+        }else if (type=="position"){
             for(int i=0;i<3;i++) vec[i] = array[index][i];
+//          You may need to use these two lines if you have cyclics
+//		    if(vec[0]<0)vec[0]+=0.12;if(vec[0]>0.12)vec[0]-=0.12;
+//		    if(vec[1]<0)vec[1]+=0.06;if(vec[1]>0.06)vec[1]-=0.06;
             *fileStream <<"( "<< vec[0] <<" "<<vec[1]<<" "<<vec[2]<<" ) "<< finaliser << " \n";
+        }else if (type=="label"){
+            *fileStream << index << finaliser << " \n";
+        }else  if (type=="vector"){
+            for(int i=0;i<3;i++)  vec[i] = array[index][i]; 
+            *fileStream <<"( "<< vec[0] <<" "<<vec[1]<<" "<<vec[2]<<" ) " << finaliser << " \n";
         }
     }
-    *fileStream << ")\n";
+    if(type!="origProcId")*fileStream << ")\n";
     delete fileStream;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -29,18 +29,18 @@ Description
     and OpenFOAM(R). Note: this code is not part of OpenFOAM(R) (see DISCLAIMER).
 
 Class
-    basicIO
+    trackIO
 
 SourceFiles
-    basicIO.C
+    trackIO.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef basicIO_H
-#define basicIO_H
+#ifndef trackIO_H
+#define trackIO_H
 
 #include "IOModel.H"
-
+#include "interpolationCellPoint.H"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -50,7 +50,7 @@ namespace Foam
                            Class noDrag Declaration
 \*---------------------------------------------------------------------------*/
 
-class basicIO
+class trackIO
 :
     public IOModel
 {
@@ -74,13 +74,13 @@ protected:
 public:
 
     //- Runtime type information
-    TypeName("basicIO");
+    TypeName("trackIO");
 
 
     // Constructors
 
         //- Construct from components
-        basicIO
+        trackIO
         (
             const dictionary& dict,
             cfdemCloud& sm
@@ -88,7 +88,7 @@ public:
 
     // Destructor
 
-        ~basicIO();
+        ~trackIO();
 
 
     // Member Functions
