@@ -1,0 +1,5 @@
+fvPatchFields = fields/fvPatchFields
+derivedFvPatchFields = $(fvPatchFields)/derived
+$(derivedFvPatchFields)/uniformFixedValueVoidfraction/uniformFixedValueVoidfractionFvPatchFields.C
+
+LIB = $(FOAM_USER_LIBBIN)/libfiniteVolumeCFDEM
