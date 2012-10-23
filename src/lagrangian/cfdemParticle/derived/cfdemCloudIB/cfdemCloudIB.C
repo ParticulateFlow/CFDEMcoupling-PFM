@@ -141,7 +141,8 @@ void Foam::cfdemCloudIB::calcVelocityCorrection
 (
     volScalarField& p,
     volVectorField& U,
-    volScalarField& phiIB
+    volScalarField& phiIB,
+    volScalarField& voidfraction
 )
 {
     label cellI=0;
@@ -174,7 +175,7 @@ void Foam::cfdemCloudIB::calcVelocityCorrection
     }
 
     // make field divergence free
-    solve(fvm::laplacian(phiIB) == fvc::div(U));
+    solve(fvm::laplacian(phiIB) == fvc::div(U) + fvc::ddt(voidfraction));
 
     U=U-fvc::grad(phiIB);
     U.correctBoundaryConditions();

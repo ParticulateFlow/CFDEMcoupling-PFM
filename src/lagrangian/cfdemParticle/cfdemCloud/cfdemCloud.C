@@ -372,34 +372,41 @@ bool Foam::cfdemCloud::evolve
             Info << "\n Coupling..." << endl;
             doCouple=true;
 
+            clockM().start(5,"defineRegion");
             if(verbose_) Info << "- defineRegion()" << endl;
             regionM().defineRegion();
             if(verbose_) Info << "defineRegion done." << endl;
+            clockM().stop("defineRegion");
 
             // reset vol Fields
+            clockM().start(6,"resetVolFields");
             if(verbose_) Info << "- resetVolFields()" << endl;
             regionM().resetVolFields(Us);
             if(verbose_) Info << "resetVolFields done." << endl;
+            clockM().stop("resetVolFields");
 
             if(verbose_) Info << "- getDEMdata()" << endl;
-            clockM().start(4,"getDEMdata");
+            clockM().start(7,"getDEMdata");
             getDEMdata();
-            clockM().stop();
+            clockM().stop("getDEMdata");
             if(verbose_) Info << "- getDEMdata done." << endl;
 
             // search cellID of particles
-            clockM().start(5,"findCell");
+            clockM().start(8,"findCell");
             if(verbose_) Info << "- findCell()" << endl;
             findCells();
             if(verbose_) Info << "findCell done." << endl;
             clockM().stop("findCell");
 
             // set void fraction field
+            clockM().start(9,"setvoidFraction");
             if(verbose_) Info << "- setvoidFraction()" << endl;
             voidFractionM().setvoidFraction(regionM().inRegion(),voidfractions_,particleWeights_,particleVolumes_);
             if(verbose_) Info << "setvoidFraction done." << endl;
+            clockM().stop("setvoidFraction");
 
             // set particles velocity field
+            clockM().start(10,"setVectorAverage");
             if(verbose_) Info << "- setVectorAverage(Us,velocities_,weights_)" << endl;
             averagingM().setVectorAverage
             (
@@ -410,15 +417,18 @@ bool Foam::cfdemCloud::evolve
                 regionM().inRegion()
             );
             if(verbose_) Info << "setVectorAverage done." << endl;
+            clockM().stop("setVectorAverage");
 
             // set particles forces
+            clockM().start(11,"setForce");
             if(verbose_) Info << "- setForce(forces_)" << endl;
             setForces();
             if(verbose_) Info << "setForce done." << endl;
+            clockM().stop("setForce");
 
             // get next force field
+            clockM().start(12,"setParticleForceField");
             if(verbose_) Info << "- setParticleForceField()" << endl;
-
             averagingM().setVectorSum
             (
                 forceM(0).impParticleForces(),
@@ -433,12 +443,12 @@ bool Foam::cfdemCloud::evolve
                 particleWeights_,
                 regionM().inRegion()
             );
-
             if(verbose_) Info << "- setParticleForceField done." << endl;
+            clockM().stop("setParticleForceField");
 
             // write DEM data
             if(verbose_) Info << " -giveDEMdata()" << endl;
-            clockM().start(6,"giveDEMdata");
+            clockM().start(13,"giveDEMdata");
             giveDEMdata();
             clockM().stop("giveDEMdata");
 
@@ -450,6 +460,7 @@ bool Foam::cfdemCloud::evolve
         }//end dataExchangeM().couple()
         Info << "\n timeStepFraction() = " << dataExchangeM().timeStepFraction() << endl;
 
+        clockM().start(14,"interpolateEulerFields");
         // update voidFractionField
         alpha.internalField() = voidFractionM().voidFractionInterp();
         alpha.correctBoundaryConditions();
@@ -457,12 +468,16 @@ bool Foam::cfdemCloud::evolve
         // update particle velocity Field
         Us.internalField() = averagingM().UsInterp();
         Us.correctBoundaryConditions();
+        clockM().stop("interpolateEulerFields");
 
         if(verbose_){
             #include "debugInfo.H"
         }
+
+        clockM().start(15,"dumpDEMdata");
         // do particle IO
         IOM().dumpDEMdata();
+        clockM().stop("dumpDEMdata");
 
     }//end ignore
     return doCouple;

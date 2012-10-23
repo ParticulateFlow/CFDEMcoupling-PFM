@@ -24,4 +24,4 @@ LIB_LIBS = \
     -llagrangian \
     -lmpi_cxx \
     -L$(CFDEM_LIGGGHTS_SRC_DIR) \
-    -l$(CFDEM_LIGGGHTS_LIB_NAME) \
+    -l$(CFDEM_LIGGGHTS_LIB_NAME)

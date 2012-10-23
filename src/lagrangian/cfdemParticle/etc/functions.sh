@@ -18,6 +18,7 @@ compileLib()
     logfileName="$2"
     casePath="$3"
     headerText="$4"
+    #doClean="$5"
     #--------------------------------------------------------------------------------#
 
     #- clean up old log file
@@ -36,8 +37,10 @@ compileLib()
     echo 2>&1 | tee -a $logpath/$logfileName
 
     #- wclean and wmake
-    rmdepall 2>&1 | tee -a $logpath/$logfileName
-    wclean 2>&1 | tee -a $logpath/$logfileName
+    #if [ $doClean != "noClean" ]; then
+        rmdepall 2>&1 | tee -a $logpath/$logfileName
+        wclean 2>&1 | tee -a $logpath/$logfileName
+    #fi
     wmake libso 2>&1 | tee -a $logpath/$logfileName
 
     #- keep terminal open
@@ -56,6 +59,7 @@ compileSolver()
     logfileName="$2"
     casePath="$3"
     headerText="$4"
+    #doClean="$5"
     #--------------------------------------------------------------------------------#
 
     #- clean up old log file
@@ -74,8 +78,10 @@ compileSolver()
     echo 2>&1 | tee -a $logpath/$logfileName
 
     #- wclean and wmake
-    rmdepall 2>&1 | tee -a $logpath/$logfileName
-    wclean 2>&1 | tee -a $logpath/$logfileName
+    #if [ $doClean != "noClean" ]; then
+        rmdepall 2>&1 | tee -a $logpath/$logfileName
+        wclean 2>&1 | tee -a $logpath/$logfileName
+    #fi
     wmake 2>&1 | tee -a $logpath/$logfileName
 
     #- keep terminal open
@@ -119,6 +125,47 @@ compileLIGGGHTS()
 #==================================#
 
 #==================================#
+#- function to compile a lammps lib
+
+compileLMPlib()
+{
+    #--------------------------------------------------------------------------------#
+    #- define variables
+    logpath="$1"
+    logfileName="$2"
+    headerText="$3"
+    makeFileName="$4"
+    libraryPath="$5"
+    #--------------------------------------------------------------------------------#
+
+    #- clean up old log file
+    rm $logpath/$logfileName
+
+    #- change path
+    cd $libraryPath
+
+    #- header
+    echo 2>&1 | tee -a $logpath/$logfileName
+    echo "//   $headerText   //" 2>&1 | tee -a $logpath/$logfileName
+    echo 2>&1 | tee -a $logpath/$logfileName
+
+    #- write path
+    pwd 2>&1 | tee -a $logpath/$logfileName
+    echo 2>&1 | tee -a $logpath/$logfileName
+
+    #- clean up
+    echo "make clean" 2>&1 | tee -a $logpath/$logfileName
+    echo 2>&1 | tee -a $logpath/$logfileName
+    make -f $makeFileName clean 2>&1 | tee -a $logpath/$logfileName
+
+    #- compile
+    echo "make" 2>&1 | tee -a $logpath/$logfileName
+    echo 2>&1 | tee -a $logpath/$logfileName
+    make -f $makeFileName 2>&1 | tee -a $logpath/$logfileName
+}
+#==================================#
+
+#==================================#
 #- function to run a DEM case
 
 DEMrun()
@@ -150,6 +197,50 @@ DEMrun()
     #- run applictaion
     #liggghts < $solverName 2>&1 | tee -a $logpath/$logfileName
     $CFDEM_LIGGGHTS_SRC_DIR/$CFDEM_LIGGGHTS_LIB_NAME < $solverName 2>&1 | tee -a $logpath/$logfileName
+
+    #- keep terminal open (if started in new terminal)
+    #read
+}
+#==================================#
+
+#==================================#
+#- function to run a DEM case in parallel
+
+parDEMrun()
+{
+    #--------------------------------------------------------------------------------#
+    #- define variables
+    logpath="$1"
+    logfileName="$2"
+    casePath="$3"
+    headerText="$4"
+    solverName="$5"
+    nrProcs="$6"
+    machineFileName="$7"
+    debugMode="$8"
+    #--------------------------------------------------------------------------------#
+
+    #- clean up old log file
+    rm $logpath/$logfileName
+
+    #- change path
+    cd $casePath/DEM
+
+    #- header
+    echo 2>&1 | tee -a $logpath/$logfileName
+    echo "//   $headerText   //" 2>&1 | tee -a $logpath/$logfileName
+    echo 2>&1 | tee -a $logpath/$logfileName
+
+    #- write path
+    pwd 2>&1 | tee -a $logpath/$logfileName
+    echo 2>&1 | tee -a $logpath/$logfileName
+
+    #- run applictaion
+    if [ $machineFileName == "none" ]; then
+        mpirun -np $nrProcs $debugMode $CFDEM_LIGGGHTS_SRC_DIR/$CFDEM_LIGGGHTS_LIB_NAME < $solverName 2>&1 | tee -a $logpath/$logfileName
+    else
+        mpirun -machinefile $machineFileName -np $nrProcs $debugMode $CFDEM_LIGGGHTS_SRC_DIR/$CFDEM_LIGGGHTS_LIB_NAME < $solverName 2>&1 | tee -a $logpath/$logfileName
+    fi
 
     #- keep terminal open (if started in new terminal)
     #read

@@ -47,6 +47,19 @@ setenv CFDEM_LIB_NAME lagrangianCFDEM-$CFDEM_VERSION-$WM_PROJECT_VERSION
 setenv CFDEM_TEST_HARNESS_PATH $CFDEM_PROJECT_USER_DIR/log/logFilesCFDEM-$CFDEM_VERSION-$WM_PROJECT_VERSION
 
 #------------------------------------------------------------------------------
+#- settings for lpp postproc tool
+#------------------------------------------------------------------------------
+
+#- nr of procs for lpp tool
+setenv CFDEM_LPP_NPROCS 4
+
+#- nr of procs for lpp tool
+setenv CFDEM_LPP_CHUNKSIZE 1
+
+#- shortcut to run lpp
+alias lpp 'python -i $CFDEM_LPP_DIR/lpp.py --cpunum $CFDEM_LPP_NPROCS --chunksize $CFDEM_LPP_CHUNKSIZE \!:1'
+
+#------------------------------------------------------------------------------
 #- aliases for easy navigation (no changes necessary)
 #------------------------------------------------------------------------------
 #- shortcut to cfdem path

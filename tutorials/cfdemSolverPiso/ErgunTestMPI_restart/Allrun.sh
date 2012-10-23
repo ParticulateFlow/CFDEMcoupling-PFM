@@ -98,6 +98,8 @@ fi
 
 #- clean up case
 rm -rf $casePath/CFD/0.*
+rm -r $casePath/CFD/callgrind.*
+rm -r $casePath/CFD/*.out
 rm -r $casePath/CFD/clockData
 rm -rf $casePath/CFD/processor*
 rm -r $casePath/CFD/VTK

@@ -267,7 +267,9 @@ bool Foam::twoWayMPI::couple() const
         setNumberOfParticles(newNpart);
 
         // re-allocate arrays of cloud
+        particleCloud_.clockM().start(4,"LIGGGHTS_reallocArrays");
         particleCloud_.reAllocArrays();
+        particleCloud_.clockM().stop("LIGGGHTS_reallocArrays");
     }
 
     return coupleNow;

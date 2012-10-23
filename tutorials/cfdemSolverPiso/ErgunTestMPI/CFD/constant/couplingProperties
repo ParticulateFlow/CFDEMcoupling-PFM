@@ -49,8 +49,8 @@ clockModel standardClock;//off;
 forceModels
 (
     //GidaspowDrag
-    DiFeliceDrag
-    //KochHillDrag
+    //DiFeliceDrag
+    KochHillDrag
     gradPForce
     viscForce
     //Archimedes
@@ -132,6 +132,7 @@ KochHillDragProps
 {
     velFieldName "U";
     densityFieldName "rho";
+    voidfractionFieldName "voidfraction";
 }
 
 virtualMassForceProps

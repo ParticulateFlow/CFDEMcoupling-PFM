@@ -1,0 +1,177 @@
+/*---------------------------------------------------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.4                                   |
+|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+
+    root            "";
+    case            "";
+    instance        "";
+    local           "";
+
+    class           dictionary;
+    object          couplingProperties;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+//===========================================================================//
+// sub-models & settings
+verbose;
+
+modelType B; // A or B
+
+couplingInterval 100;
+
+voidFractionModel dividedMS;
+
+locateModel engine;
+
+meshMotionModel noMeshMotion;
+
+regionModel allRegion;
+
+IOModel basicIO;
+
+dataExchangeModel twoWayMPI;//twoWayFiles;//oneWayVTK;//
+
+averagingModel dense;//dilute;//
+
+clockModel off;
+
+forceModels
+(
+    off
+    Archimedes
+    volWeightedAverage
+);
+
+forceModelsMS
+(
+    DiFeliceDragMS
+);
+
+momCoupleModels
+(
+    implicitCouple
+);
+
+turbulenceModelType RASProperties;//LESProperties;//
+
+//===========================================================================//
+// sub-model properties
+
+implicitCoupleProps
+{
+    velFieldName "U";
+    granVelFieldName "Us";
+    voidfractionFieldName "voidfraction";
+}
+
+ArchimedesProps
+{
+    densityFieldName "rho";
+    gravityFieldName "g";
+}
+gradPForceProps
+{
+    pFieldName "p";
+    densityFieldName "rho";
+    velocityFieldName "U";
+    interpolation;
+}
+
+viscForceProps
+{
+    velocityFieldName "U";
+    densityFieldName "rho";
+    interpolation;
+}
+volWeightedAverageProps
+{
+    scalarFieldNames
+    (
+        voidfraction
+    );
+    vectorFieldNames
+    (
+    );
+    upperThreshold 0.999;
+    lowerThreshold 0;
+    verbose;
+}
+totalMomentumExchangeProps
+{
+    implicitMomExFieldName "Ksl";
+    explicitMomExFieldName "none";
+    fluidVelFieldName "U";
+    granVelFieldName "Us";
+    densityFieldName "rho";
+}
+
+DiFeliceDragMSProps
+{
+    velFieldName "U";
+    densityFieldName "rho";
+    voidfractionFieldName "voidfraction";
+    hydraulicDiameter 0.002;
+    verbose;
+}
+
+oneWayVTKProps
+{
+    couplingFilename "vtk_out%4.4d.vtk";
+    maxNumberOfParticles 30000;
+}
+
+twoWayFilesProps
+{
+    maxNumberOfParticles 10100;
+}
+
+centreProps
+{
+    alphaMin 0.10;
+}
+
+dividedMSProps
+{
+    alphaMin 0.05;
+    scaleUpVol 1.0;
+    clumpVol 1.8433e-9; // this is particles volume, not clump!
+    nrigid 10;
+}
+
+bigParticleProps
+{
+    alphaMin 0.05;
+    scaleUpVol 50.0;
+    maxCellsPerParticle 1000;
+}
+
+GaussProps
+{
+    maxCellsPerParticle 5000;
+    alphaMin 0.05;
+    scaleUpVol 10.0;
+}
+
+engineProps
+{
+    treeSearch true;
+}
+
+twoWayMPIProps
+{
+    maxNumberOfParticles 101000;
+    liggghtsPath "../DEM/in.liggghts_init";
+}
+// ************************************************************************* //
