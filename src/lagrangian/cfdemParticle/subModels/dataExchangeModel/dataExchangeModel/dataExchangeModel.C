@@ -126,6 +126,38 @@ void Foam::dataExchangeModel::allocateArray
 }
 //====
 
+//====
+// int *
+void Foam::dataExchangeModel::allocateArray
+(
+    int*& array,
+    int initVal,
+    int length
+) const
+{
+    // allocate and init double array
+    array = new int[length];
+    for (int i=0; i<length; i++)
+        array[i] = initVal;
+}
+//====
+
+//====
+// double *
+void Foam::dataExchangeModel::allocateArray
+(
+    double*& array,
+    double initVal,
+    int length
+) const
+{
+    // allocate and init double array
+    array = new double[length];
+    for (int i=0; i<length; i++)
+        array[i] = initVal;
+}
+//====
+
 
 bool Foam::dataExchangeModel::couple() const
 {

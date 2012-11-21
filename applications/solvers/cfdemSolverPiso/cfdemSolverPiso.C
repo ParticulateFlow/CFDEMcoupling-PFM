@@ -80,7 +80,7 @@ int main(int argc, char *argv[])
         #include "solverDebugInfo.H"
         particleCloud.clockM().stop("Coupling");
 
-        particleCloud.clockM().start(16,"Flow");
+        particleCloud.clockM().start(26,"Flow");
         // Pressure-velocity PISO corrector
         {
             // Momentum predictor

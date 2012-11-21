@@ -167,6 +167,16 @@ public:
         virtual void allocateArray(int**&, int, int, const char* ="nparticles") const;
         //====
 
+        //====
+        // int *
+        virtual void allocateArray(int*&, int, int) const;
+        //====
+
+        //====
+        // double *
+        virtual void allocateArray(double*&, double, int) const;
+        //====
+
         virtual bool couple() const;
 
         virtual scalar timeStepFraction() const;
@@ -214,6 +224,19 @@ public:
 
         virtual int getNumberOfParticles() const;
         virtual int getNumberOfClumps() const;
+
+        inline void setPositions(label n,double* pos) const
+        {
+            for (int i=0;i<n;i++)
+                for (int j=0;j<3;j++)
+                    particleCloud_.positions_[i][j]=pos[i*3+j];
+        };
+        inline void setCellIDs(label n,int* ID) const
+        {
+            for (int i=0;i<n;i++)
+                particleCloud_.cellIDs_[i][0]=ID[i];
+        };
+
 };
 
 

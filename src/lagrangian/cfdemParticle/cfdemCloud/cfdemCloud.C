@@ -244,9 +244,9 @@ Foam::cfdemCloud::~cfdemCloud()
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
 void Foam::cfdemCloud::getDEMdata()
 {
+    dataExchangeM().getData("radius","scalar-atom",radii_);
     dataExchangeM().getData("x","vector-atom",positions_);
     dataExchangeM().getData("v","vector-atom",velocities_);
-    dataExchangeM().getData("radius","scalar-atom",radii_);
 }
 
 void Foam::cfdemCloud::giveDEMdata()
@@ -372,41 +372,41 @@ bool Foam::cfdemCloud::evolve
             Info << "\n Coupling..." << endl;
             doCouple=true;
 
-            clockM().start(5,"defineRegion");
+            clockM().start(15,"defineRegion");
             if(verbose_) Info << "- defineRegion()" << endl;
             regionM().defineRegion();
             if(verbose_) Info << "defineRegion done." << endl;
             clockM().stop("defineRegion");
 
             // reset vol Fields
-            clockM().start(6,"resetVolFields");
+            clockM().start(16,"resetVolFields");
             if(verbose_) Info << "- resetVolFields()" << endl;
             regionM().resetVolFields(Us);
             if(verbose_) Info << "resetVolFields done." << endl;
             clockM().stop("resetVolFields");
 
             if(verbose_) Info << "- getDEMdata()" << endl;
-            clockM().start(7,"getDEMdata");
+            clockM().start(17,"getDEMdata");
             getDEMdata();
             clockM().stop("getDEMdata");
             if(verbose_) Info << "- getDEMdata done." << endl;
 
             // search cellID of particles
-            clockM().start(8,"findCell");
+            clockM().start(18,"findCell");
             if(verbose_) Info << "- findCell()" << endl;
             findCells();
             if(verbose_) Info << "findCell done." << endl;
             clockM().stop("findCell");
 
             // set void fraction field
-            clockM().start(9,"setvoidFraction");
+            clockM().start(19,"setvoidFraction");
             if(verbose_) Info << "- setvoidFraction()" << endl;
             voidFractionM().setvoidFraction(regionM().inRegion(),voidfractions_,particleWeights_,particleVolumes_);
             if(verbose_) Info << "setvoidFraction done." << endl;
             clockM().stop("setvoidFraction");
 
             // set particles velocity field
-            clockM().start(10,"setVectorAverage");
+            clockM().start(20,"setVectorAverage");
             if(verbose_) Info << "- setVectorAverage(Us,velocities_,weights_)" << endl;
             averagingM().setVectorAverage
             (
@@ -420,14 +420,14 @@ bool Foam::cfdemCloud::evolve
             clockM().stop("setVectorAverage");
 
             // set particles forces
-            clockM().start(11,"setForce");
+            clockM().start(21,"setForce");
             if(verbose_) Info << "- setForce(forces_)" << endl;
             setForces();
             if(verbose_) Info << "setForce done." << endl;
             clockM().stop("setForce");
 
             // get next force field
-            clockM().start(12,"setParticleForceField");
+            clockM().start(22,"setParticleForceField");
             if(verbose_) Info << "- setParticleForceField()" << endl;
             averagingM().setVectorSum
             (
@@ -448,7 +448,7 @@ bool Foam::cfdemCloud::evolve
 
             // write DEM data
             if(verbose_) Info << " -giveDEMdata()" << endl;
-            clockM().start(13,"giveDEMdata");
+            clockM().start(23,"giveDEMdata");
             giveDEMdata();
             clockM().stop("giveDEMdata");
 
@@ -460,7 +460,7 @@ bool Foam::cfdemCloud::evolve
         }//end dataExchangeM().couple()
         Info << "\n timeStepFraction() = " << dataExchangeM().timeStepFraction() << endl;
 
-        clockM().start(14,"interpolateEulerFields");
+        clockM().start(24,"interpolateEulerFields");
         // update voidFractionField
         alpha.internalField() = voidFractionM().voidFractionInterp();
         alpha.correctBoundaryConditions();
@@ -474,7 +474,7 @@ bool Foam::cfdemCloud::evolve
             #include "debugInfo.H"
         }
 
-        clockM().start(15,"dumpDEMdata");
+        clockM().start(25,"dumpDEMdata");
         // do particle IO
         IOM().dumpDEMdata();
         clockM().stop("dumpDEMdata");

@@ -32,7 +32,7 @@ couplingInterval 100;
 
 voidFractionModel divided;
 
-locateModel engine;
+locateModel engine;//
 
 meshMotionModel noMeshMotion;
 
@@ -49,8 +49,8 @@ clockModel standardClock;//off;
 forceModels
 (
     //GidaspowDrag
-    //DiFeliceDrag
-    KochHillDrag
+    DiFeliceDrag
+    //KochHillDrag
     gradPForce
     viscForce
     //Archimedes
@@ -169,6 +169,11 @@ dividedProps
 }
 
 twoWayMPIProps
+{
+    //maxNumberOfParticles 10100;
+    liggghtsPath "../DEM/in.liggghts_resume";
+}
+twoWayM2MProps
 {
     maxNumberOfParticles 10100;
     liggghtsPath "../DEM/in.liggghts_resume";

@@ -124,7 +124,7 @@ void SchillerNaumannDrag::setForce
                     Rep = ds*magUr/nuf;
 
                     // calc fluid drag Coeff
-                    Cd = 24.0/Rep*(1.0+0.15*pow(Rep,0.687));
+                    Cd = max(0.44,24.0/Rep*(1.0+0.15*pow(Rep,0.687)));
 
                     // calc particle's drag
                     drag = 0.125*Cd*rho*M_PI*ds*ds*magUr*Ur;

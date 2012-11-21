@@ -43,6 +43,9 @@ export CFDEM_LIGGGHTS_LIB_NAME=lmp_$CFDEM_LIGGGHTS_MAKEFILE_NAME
 #- CFDEM lib name
 export CFDEM_LIB_NAME=lagrangianCFDEM-$CFDEM_VERSION-$WM_PROJECT_VERSION
 
+#- LMP M2M lib path
+export CFDEM_M2MLIB_PATH=$CFDEM_SRC_DIR/subModels/dataExchangeModel/twoWayM2M/library
+
 #- path to test harness
 export CFDEM_TEST_HARNESS_PATH=$CFDEM_PROJECT_USER_DIR/log/logFilesCFDEM-$CFDEM_VERSION-$WM_PROJECT_VERSION
 
@@ -97,6 +100,9 @@ alias cfdemCompLIG='bash $CFDEM_SRC_DIR/etc/compileLIGGGHTS.sh'
 
 #- shortcut to compile CFDEMcoupling
 alias cfdemCompCFDEM='bash $CFDEM_SRC_DIR/etc/compileCFDEMcoupling.sh'
+
+#- shortcut to compile couple library
+alias cfdemCompM2M='bash $CFDEM_SRC_DIR/etc/compileM2Mlib.sh'
 
 #- shortcut to test basic tutorials
 alias cfdemTestTUT='bash $CFDEM_SRC_DIR/etc/testTutorials.sh'
