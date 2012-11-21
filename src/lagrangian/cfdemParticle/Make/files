@@ -20,33 +20,18 @@ $(forceModels)/forceModel/forceModel.C
 $(forceModels)/forceModel/newForceModel.C
 $(forceModels)/noDrag/noDrag.C
 $(forceModels)/DiFeliceDrag/DiFeliceDrag.C
-$(forceModels)/DiFeliceDragNLift/DiFeliceDragNLift.C
 $(forceModels)/GidaspowDrag/GidaspowDrag.C
 $(forceModels)/SchillerNaumannDrag/SchillerNaumannDrag.C
 $(forceModels)/Archimedes/Archimedes.C
 $(forceModels)/ArchimedesIB/ArchimedesIB.C
 $(forceModels)/interface/interface.C
 $(forceModels)/ShirgaonkarIB/ShirgaonkarIB.C
-$(forceModels)/fieldTimeAverage/fieldTimeAverage.C
-$(forceModels)/fieldBound/fieldBound.C
-$(forceModels)/volWeightedAverage/volWeightedAverage.C
-$(forceModels)/totalMomentumExchange/totalMomentumExchange.C
 $(forceModels)/KochHillDrag/KochHillDrag.C
-$(forceModels)/BeetstraDrag/multiphaseFlowBasic/multiphaseFlowBasic.C
-$(forceModels)/BeetstraDrag/BeetstraDrag.C
-$(forceModels)/LaEuScalarLiquid/LaEuScalarLiquid.C
 $(forceModels)/LaEuScalarTemp/LaEuScalarTemp.C
-$(forceModels)/LaEuScalarDust/LaEuScalarDust.C
 $(forceModels)/virtualMassForce/virtualMassForce.C
 $(forceModels)/gradPForce/gradPForce.C
-$(forceModels)/gradULiftForce/gradULiftForce.C
 $(forceModels)/viscForce/viscForce.C
 $(forceModels)/MeiLift/MeiLift.C
-$(forceModels)/KochHillDragNLift/KochHillDragNLift.C
-$(forceModels)/solidsPressureForce/solidsPressureForce.C
-$(forceModels)/periodicPressure/periodicPressure.C
-$(forceModels)/periodicPressureControl/periodicPressureControl.C
-$(forceModels)/averageSlipVel/averageSlipVel.C
 
 $(forceModelsMS)/forceModelMS/forceModelMS.C
 $(forceModelsMS)/forceModelMS/newForceModelMS.C
@@ -57,7 +42,6 @@ $(IOModels)/IOModel/newIOModel.C
 $(IOModels)/noIO/noIO.C
 $(IOModels)/basicIO/basicIO.C
 $(IOModels)/trackIO/trackIO.C
-$(IOModels)/sophIO/sophIO.C
 
 $(voidFractionModels)/voidFractionModel/voidFractionModel.C
 $(voidFractionModels)/voidFractionModel/newVoidFractionModel.C
@@ -73,25 +57,22 @@ $(locateModels)/locateModel/newLocateModel.C
 $(locateModels)/standardSearch/standardSearch.C
 $(locateModels)/engineSearch/engineSearch.C
 $(locateModels)/turboEngineSearch/turboEngineSearch.C
-$(locateModels)/turboEngineSearchM2M/turboEngineSearchM2M.C
 $(locateModels)/engineSearchIB/engineSearchIB.C
+
 
 $(meshMotionModels)/meshMotionModel/meshMotionModel.C
 $(meshMotionModels)/meshMotionModel/newMeshMotionModel.C
 $(meshMotionModels)/noMeshMotion/noMeshMotion.C
-$(meshMotionModels)/DEMdrivenMeshMotion/DEMdrivenMeshMotion.C
 
 $(momCoupleModels)/momCoupleModel/momCoupleModel.C
 $(momCoupleModels)/momCoupleModel/newMomCoupleModel.C
 $(momCoupleModels)/explicitCouple/explicitCouple.C
-$(momCoupleModels)/explicitCoupleSource/explicitCoupleSource.C
 $(momCoupleModels)/implicitCouple/implicitCouple.C
 $(momCoupleModels)/noCouple/noCouple.C
 
 $(regionModels)/regionModel/regionModel.C
 $(regionModels)/regionModel/newRegionModel.C
 $(regionModels)/allRegion/allRegion.C
-$(regionModels)/differentialRegion/differentialRegion.C
 
 $(dataExchangeModels)/dataExchangeModel/dataExchangeModel.C
 $(dataExchangeModels)/dataExchangeModel/newDataExchangeModel.C
@@ -99,7 +80,6 @@ $(dataExchangeModels)/oneWayVTK/oneWayVTK.C
 $(dataExchangeModels)/twoWayFiles/twoWayFiles.C
 $(dataExchangeModels)/noDataExchange/noDataExchange.C
 $(dataExchangeModels)/twoWayMPI/twoWayMPI.C
-$(dataExchangeModels)/twoWayM2M/twoWayM2M.C
 
 $(averagingModels)/averagingModel/averagingModel.C
 $(averagingModels)/averagingModel/newAveragingModel.C
