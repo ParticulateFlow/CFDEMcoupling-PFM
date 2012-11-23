@@ -1,0 +1,58 @@
+<HTML>
+<CENTER><A HREF = "http://www.cfdem.com">CFDEMproject WWW Site</A> - <A HREF = "CFDEMcoupling_Manual.html#comm">CFDEM Commands</A> 
+</CENTER>
+
+
+
+
+<HR>
+
+<H3>locateModel_turboEngineM2MSearch command 
+</H3>
+<P><B>Syntax:</B>
+</P>
+<P>Defined in couplingProperties dictionary.
+</P>
+<PRE>locateModel turboEngineM2M;
+turboEngineM2MProps
+{
+    turboEngineProps
+    {
+        treeSearch switch1;
+    }
+} 
+</PRE>
+<UL><LI><I>switch1</I> = switch to use tree search algorithm 
+
+
+</UL>
+<P><B>Examples:</B>
+</P>
+<PRE>locateModel turboEngineM2M;
+turboEngineM2MProps
+{
+    turboEngineProps
+    {
+        treeSearch false;
+    }
+} 
+</PRE>
+<P><B>Description:</B>
+</P>
+<P>The locateModel "turboEngineM2M" locates the CFD cell and cellID corresponding to a given position. The algorithm is improved compared to engine search to show better parallel performance.
+</P>
+<P>The turboEngineM2MSearch locate Model can be used with different settings to use different algorithms:
+</P>
+<UL><LI>faceDecomp false; treeSearch false;     will execute some geometric (linear) search using the last known cellID (recommended) 
+
+<LI>faceDecomp false; treeSearch true;      will use a recursive tree structure to find the cell. 
+
+
+</UL>
+<P><B>Restrictions:</B> This model can only be used with many to many data exchange model!
+</P>
+<P><B>Related commands:</B>
+</P>
+<P><A HREF = "locateModel.html">locateModel</A>
+</P>
+</HTML>
