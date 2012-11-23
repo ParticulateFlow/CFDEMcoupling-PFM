@@ -67,14 +67,12 @@ elseif (ReMF>=1000)
     Umf = sqrt(dp*(rhoP-rhoG)*g/(1.75*rhoG)*epsilon^3*phip);
     ReMF = Umf*dp*rhoG/muG;
 end
-Umf
-ReMF
 
 dpUmf= L * (
                 150*((1-epsilon)^2/epsilon^3)*((muG.*Umf)/(phip*dp)^2) 
               +1.75*((1-epsilon)/epsilon^3)*((rhoG.*Umf.^2)/(phip*dp))
         )/10000/rhoG;
-
+%dpUmf2=(L*(1-epsilon)*(rhoP-rhoG)*g+pHydr)/10000
 %====================================%
 % plot data
 %====================================%
