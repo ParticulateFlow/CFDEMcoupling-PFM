@@ -458,6 +458,7 @@ listing below of styles within certain commands.
 "dataExchangeModel_noDataExchange"_dataExchangeModel_noDataExchange.html,
 "dataExchangeModel_oneWayVTK"_dataExchangeModel_oneWayVTK.html,
 "dataExchangeModel_twoWayFiles"_dataExchangeModel_twoWayFiles.html,
+"dataExchangeModel_twoWayM2M"_dataExchangeModel_twoWayM2M.html,
 "dataExchangeModel_twoWayMPI"_dataExchangeModel_twoWayMPI.html,
 "forceModel"_forceModel.html,
 "forceModel_Archimedes"_forceModel_Archimedes.html,
