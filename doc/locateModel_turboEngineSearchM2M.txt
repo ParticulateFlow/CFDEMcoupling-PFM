@@ -30,7 +30,7 @@ turboEngineM2MProps
 \{
     turboEngineProps
     \{
-        treeSearch false;
+        treeSearch true;
     \}
 \} :pre
 

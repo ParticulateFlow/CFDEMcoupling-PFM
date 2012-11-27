@@ -89,12 +89,13 @@ private:
     dictionary propsDict_;
 
     // new vars
+    mutable bool firstRun_;
     mutable Many2Many *lmp2foam_;
     mutable Many2Many *lmp2foam_vec_;
     mutable Many2Many *foam2lmp_vec_;
     mutable int nlocal_lammps_;
     mutable int *id_lammps_;
-    mutable int *id_lammpsComm_;
+    //mutable int *id_lammpsComm_;
     mutable int *id_lammps_vec_;
     mutable int nlocal_foam_;
     mutable int *id_foam_;
@@ -109,9 +110,6 @@ private:
     mutable double *lost_pos_all;
     mutable int *cellID_foam_;
     mutable double *pos_foam_;
-
-    // optimization
-    //mutable int *idHashTable_;
 
     // variables
     int me;

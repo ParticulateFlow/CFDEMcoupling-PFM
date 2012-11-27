@@ -112,16 +112,18 @@ twoWayM2M::twoWayM2M
     checkTSsize();
 
     // m2m stuff
+    firstRun_=true;
     lmp2foam_ = new Many2Many(MPI_COMM_WORLD);
     lmp2foam_vec_ = new Many2Many(MPI_COMM_WORLD);
     foam2lmp_vec_ = new Many2Many(MPI_COMM_WORLD);
     nlocal_lammps_ = -1;
     id_lammps_ = NULL;
-    id_lammpsComm_ = NULL;
+    //id_lammpsComm_ = NULL;
     id_lammps_vec_ = NULL;
     nlocal_foam_ = -1;
     id_foam_ = NULL;
     id_foam_vec_ = NULL;
+    pos_lammps_=NULL;
     nlocal_foam_lost_ = -1;
     id_foam_lost_ = NULL;
     id_foam_lost_all = NULL;
@@ -130,7 +132,6 @@ twoWayM2M::twoWayM2M
     lost_pos_all = NULL;
     cellID_foam_ = NULL;
     pos_foam_ = NULL;
-    //Foam::dataExchangeModel::allocateArray(idHashTable_,0,100000);//liggghts_get_maxtag(lmp));    // define idHashTable
 }
 
 
@@ -139,7 +140,7 @@ twoWayM2M::twoWayM2M
 twoWayM2M::~twoWayM2M()
 {
     free(id_lammps_);
-    delete[] id_lammpsComm_;
+    //delete[] id_lammpsComm_;
     delete[] id_lammps_vec_;
     delete[] id_foam_vec_;
     delete[] id_foam_;
@@ -170,7 +171,7 @@ void twoWayM2M::getData
 ) const
 {
     char* charName = wordToChar(name);
-    if ( type == "vector-atom" && name != "x")
+    if ( type == "vector-atom")// && name != "x")
     {
         //if (nlocal_lammps_>0){        
             double **tata_ = (double **) lammps_extract_atom(lmp,charName);
@@ -181,8 +182,9 @@ void twoWayM2M::getData
             lmp2foam_vec_->exchange(tata_, &(field[0][0]));
         }*/
         //for (int i = 0; i < nlocal_foam_; i++)
+        //    Pout << "hihi getData: " << name <<"=" << field[i][0]<<","<<field[i][1]<<","<<field[i][2] <<endl;
         //    Pout << name <<"=" << tata_[i][0]<<","<<tata_[i][1]<<","<<tata_[i][2] <<endl;
-    }else if (name != "x"){
+    }else {//if (name != "x"){
         tmp_ = (double *) lammps_extract_atom(lmp,charName);
         lmp2foam_->exchange(tmp_, &(field[0][0]));
         //for (int i = 0; i < nlocal_foam_; i++)
@@ -320,6 +322,7 @@ bool Foam::twoWayM2M::couple() const
         // m2m stuff
         particleCloud_.clockM().start(4,"CoupleSyncIDs()");
         syncIDs();
+        firstRun_=false;
         particleCloud_.clockM().stop("CoupleSyncIDs()");
 
         // give nr of particles to cloud
@@ -349,54 +352,180 @@ int Foam::twoWayM2M::getNumberOfClumps() const
 
 void Foam::twoWayM2M::syncIDs() const
 {
+    //MPI_Barrier(MPI_COMM_WORLD);
+    //Pout << "== syncIDs  " << endl;
+
     particleCloud_.clockM().start(5,"recv_DEM_ids");
     // get data from lammps
+    int nlocal_lammps_old=nlocal_lammps_;
     nlocal_lammps_ = *((int *) lammps_extract_global(lmp,"nlocal"));
-    id_lammps_ = (int *) lammps_extract_atom(lmp,"id");
+
+    // weak form to detect lmp proc change - this will cause problems!!!
+    //bool comRun=false;
+    //if(nlocal_lammps_old != nlocal_lammps_) comRun=true;
+    //MPI_Allreduce(&comRun, &firstRun_, 1, MPI_INT, MPI_MAX, MPI_COMM_WORLD);
+
+    int*  id_lammps_sync;
+    double** pos_lammps_sync;
+    if(firstRun_)  // do not forget iterator !
+    {
+        // IDs for vectors
+        id_lammps_ = (int *) lammps_extract_atom(lmp,"id");
+
+        delete [] id_lammps_vec_;
+        Foam::dataExchangeModel::allocateArray(id_lammps_vec_,0,nlocal_lammps_*3);
+        for (int i = 0; i < nlocal_lammps_; i++)
+            for (int j=0;j<3;j++)
+                id_lammps_vec_[i*3+j] = id_lammps_[i]*3+j;
+        
+        Foam::dataExchangeModel::allocateArray(pos_lammps_,-1.,3,nlocal_lammps_);  // do I need this???
+        pos_lammps_ = (double **) lammps_extract_atom(lmp,"x");
+
+        //for (int i = 0; i < nlocal_lammps_; i++){
+        //    vector pp;
+        //    for (int j = 0; j < 3; j++) pp[j]=pos_lammps_[i][j];
+        //    Pout << "pp=" << pp << endl;
+        //}
+                
+    }else
+    {
+       // re-arrange data using map
+        Foam::dataExchangeModel::allocateArray(id_lammps_sync,-1.,nlocal_lammps_);
+        id_lammps_sync = (int *) lammps_extract_atom(lmp,"id");
+
+        delete [] id_lammps_vec_;
+        Foam::dataExchangeModel::allocateArray(id_lammps_vec_,0,nlocal_lammps_*3);
+        for (int i = 0; i < nlocal_lammps_; i++)
+            for (int j=0;j<3;j++)
+                id_lammps_vec_[i*3+j] = id_lammps_sync[i]*3+j;
+
+        // make setup of m2m
+        lmp2foam_->setup(nlocal_lammps_,id_lammps_sync,nlocal_foam_,id_foam_);
+        lmp2foam_vec_->setup(nlocal_lammps_*3,id_lammps_vec_,nlocal_foam_*3,id_foam_vec_);
+        foam2lmp_vec_->setup(nlocal_foam_*3,id_foam_vec_,nlocal_lammps_*3,id_lammps_vec_);
+
+        Foam::dataExchangeModel::allocateArray(id_lammps_,-1,nlocal_foam_);  // probably not necessary
+        lmp2foam_->exchange(id_lammps_sync, id_lammps_);
+
+
+        Foam::dataExchangeModel::allocateArray(pos_lammps_sync,-1.,3,nlocal_lammps_);  // probably not necessary
+        pos_lammps_sync = (double **) lammps_extract_atom(lmp,"x");
+
+        // find better solution here!!!
+        double** gugu;
+        Foam::dataExchangeModel::allocateArray(gugu,-1.,3*nlocal_foam_,1);
+        Foam::dataExchangeModel::allocateArray(pos_lammps_,-1.,3,nlocal_foam_);
+        lmp2foam_vec_->exchange(&(pos_lammps_sync[0][0]), &(gugu[0][0]));
+
+        // try the same with getData
+        //double** gugu;
+        //Foam::dataExchangeModel::allocateArray(gugu,-1.,3,nlocal_foam_);
+        //Foam::dataExchangeModel::allocateArray(pos_lammps_,-1.,3,nlocal_foam_);
+        //getData("x","vector-atom",gugu,1);
+
+        // conversion of array (should not be necessary if above problem is solved)
+        for (int i = 0; i < nlocal_foam_; i++)
+            for (int j = 0; j < 3; j++)
+                pos_lammps_[i][j]=gugu[0][i*3+j];
+
+        /*// test communication - works!!!
+        int* llv;
+        int* ovv;
+        Many2Many* l2f = new Many2Many(MPI_COMM_WORLD);
+        double** gaga;
+        if(Pstream::myProcNo()==0)
+        {
+            Foam::dataExchangeModel::allocateArray(llv,0,6);
+            Foam::dataExchangeModel::allocateArray(ovv,0,1);
+            for(int i=0;i<6;i++)
+                llv[i]=i+1;
+            ovv[0]=-1;
+            l2f->setup(6,llv,0,ovv);
+            l2f->exchange(&(pos_lammps_sync[0][0]), &(gaga[0][0]));
+        }else{
+            Foam::dataExchangeModel::allocateArray(llv,0,1);
+            Foam::dataExchangeModel::allocateArray(ovv,0,6);
+            for(int i=0;i<6;i++)
+                ovv[i]=i+1;
+            llv[0]=-1;
+            l2f->setup(0,llv,6,ovv);
+
+            double** gugu;
+            Foam::dataExchangeModel::allocateArray(gaga,-1.,3,2);
+            Foam::dataExchangeModel::allocateArray(gugu,-1.,3,2);
+            l2f->exchange(&(pos_lammps_sync[0][0]), &(gugu[0][0]));
+
+            // this does not work! -conversion needed!
+            //for (int i = 0; i < 2; i++)
+            //    Pout << "getDataXX: " << "v" <<"=" << gugu[i][0]<<","<< gugu[i][1]<<","<< gugu[i][2]<<endl;
+
+            // conversion of array
+            for (int i = 0; i < 2; i++)
+                for (int j = 0; j < 3; j++)
+                    gaga[i][j]=gugu[0][i*3+j];
+
+            // output
+            for (int i = 0; i < 2; i++)
+                Pout << "getData3: " << "v" <<"=" << gaga[i][0]<<","<< gaga[i][1]<<","<< gaga[i][2]<<endl;
+        }*/
+
+    }
+    particleCloud_.clockM().stop("recv_DEM_ids");
 
     // make a copy of liggghts ID array
-    delete [] id_lammpsComm_;
+    /*delete [] id_lammpsComm_;
     Foam::dataExchangeModel::allocateArray(id_lammpsComm_,0,nlocal_lammps_);
-    for(int i=0;i<nlocal_lammps_;i++) id_lammpsComm_[i]=id_lammps_[i];
-    
-    Foam::dataExchangeModel::allocateArray(pos_lammps_,-1.,3,nlocal_lammps_);  // is this the right allocate???
-    pos_lammps_ = (double **) lammps_extract_atom(lmp,"x");
-    particleCloud_.clockM().stop("recv_DEM_ids");
+    for(int i=0;i<nlocal_lammps_;i++) id_lammpsComm_[i]=id_lammps_[i];*/
 
     particleCloud_.clockM().start(6,"locateParticle()");
     locateParticle();
     particleCloud_.clockM().stop("locateParticle()");
 
+        //for (int i = 0; i < nlocal_lammps_; i++)
+        //    Pout << "getData3: " << "v" <<"=" << pos_lammps_[i][0]<<","<<pos_lammps_[i][1]<<","<<pos_lammps_[i][2] <<endl;
+
         // output
         /*Info << "LAMMPS " << endl;
         for (int i = 0; i < nlocal_lammps_; i++)
         {
-            Pout << "id_lammps_[" << i << "]=" << id_lammps_[i] << "  -  "<<endl;
-            //Pout << "pos_lammps_ radius [" << i << "]=" << pos_lammps_[i] << endl;
+            if(firstRun_)
+            {
+                Pout << "id_lammps_[" << i << "]=" << id_lammps_[i] << "  -  "<<endl;
+            }else{
+                Pout << "id_lammps_sync[" << i << "]=" << id_lammps_sync[i] << "  -  "<<endl;
+            }
         }*/
         /*for (int i = 0; i < nlocal_lammps_*3; i++)
         {
             Pout << "id_lammps_vec_[" << i << "]=" << id_lammps_vec_[i] << "  -  "<<endl;
         }*/
-
         /*Info << "FOAM "<< endl;
         for (int i = 0; i < nlocal_foam_; i++)
         {
             Pout << "id_foam_[" << i << "]=" << id_foam_[i] << "  -  "<<endl;
-            //Pout << "pos_foam_ radius [" << i << "]=" << pos_foam_[i] << endl;
         }*/
         /*for (int i = 0; i < nlocal_foam_*3; i++)
         {
             Pout << "id_foam_vec_[" << i << "]=" << id_foam_vec_[i] << "  -  "<<endl;
         }*/
-        Pout << "nlocal_lammps_=" << nlocal_lammps_ << endl;
-        Pout << "nlocal_foam_=" << nlocal_foam_ << endl;
+        Pout << couplingStep_ << "st nlocal_lammps_=" << nlocal_lammps_ << endl;
+        Pout << couplingStep_ << "st nlocal_foam_=" << nlocal_foam_ << endl;
 
     // communicate lmp->foam
     particleCloud_.clockM().start(11,"setup_Comm");
-    lmp2foam_->setup(nlocal_lammps_,id_lammpsComm_,nlocal_foam_,id_foam_);
-    lmp2foam_vec_->setup(nlocal_lammps_*3,id_lammps_vec_,nlocal_foam_*3,id_foam_vec_);
-    foam2lmp_vec_->setup(nlocal_foam_*3,id_foam_vec_,nlocal_lammps_*3,id_lammps_vec_);
+    if(firstRun_)
+    {
+        //lmp2foam_->setup(nlocal_lammps_,id_lammpsComm_,nlocal_foam_,id_foam_);
+        lmp2foam_->setup(nlocal_lammps_,id_lammps_,nlocal_foam_,id_foam_);
+        lmp2foam_vec_->setup(nlocal_lammps_*3,id_lammps_vec_,nlocal_foam_*3,id_foam_vec_);
+        foam2lmp_vec_->setup(nlocal_foam_*3,id_foam_vec_,nlocal_lammps_*3,id_lammps_vec_);
+    }else
+    {
+        //lmp2foam_->setup(nlocal_lammps_,id_lammpsComm_,nlocal_foam_,id_foam_);
+        lmp2foam_->setup(nlocal_lammps_,id_lammps_sync,nlocal_foam_,id_foam_);
+        lmp2foam_vec_->setup(nlocal_lammps_*3,id_lammps_vec_,nlocal_foam_*3,id_foam_vec_);
+        foam2lmp_vec_->setup(nlocal_foam_*3,id_foam_vec_,nlocal_lammps_*3,id_lammps_vec_);
+    }
     particleCloud_.clockM().stop("setup_Comm");
 }
 
@@ -428,9 +557,6 @@ void Foam::twoWayM2M::locateParticle() const
         delete [] id_foam_vec_;
         Foam::dataExchangeModel::allocateArray(id_foam_vec_,0,nop*3);
 
-        delete [] id_lammps_vec_;
-        Foam::dataExchangeModel::allocateArray(id_lammps_vec_,0,nop*3);
-
         delete [] cellID_foam_;
         Foam::dataExchangeModel::allocateArray(cellID_foam_,0,nop);
         delete [] pos_foam_;
@@ -446,10 +572,11 @@ void Foam::twoWayM2M::locateParticle() const
         }
     }
 
-    // if global nr of particles changed:
-    // realloc idHashTable_
-
     // loop all lmp particles
+    int iterate;
+    if(firstRun_) iterate=nlocal_lammps_;
+    else iterate=nlocal_foam_;
+
     nlocal_foam_ = 0;
     nlocal_foam_lost_ = 0;
     vector pos;
@@ -457,16 +584,15 @@ void Foam::twoWayM2M::locateParticle() const
     label searchCellID;
 
     particleCloud_.clockM().start(7,"locate_Stage1");
-    for (int i = 0; i < nlocal_lammps_; i++)
+
+    for (int i = 0; i < iterate; i++)
     {
         pos = vector(pos_lammps_[i][0],pos_lammps_[i][1],pos_lammps_[i][2]);
-        searchCellID = -1;//idHashTable_[id_lammps_[i]];
+        searchCellID = -1;
+        //Pout << "stage1 looking for particle pos="<< pos << endl;
+
         cellID = particleCloud_.locateM().findSingleCell(pos,searchCellID);
     
-        // IDs for vectors
-        for (int j=0;j<3;j++)
-            id_lammps_vec_[i*3+j] = id_lammps_[i]*3+j;
-
         // found particle on cfd proc
         if (cellID >= 0)
         {
@@ -481,11 +607,8 @@ void Foam::twoWayM2M::locateParticle() const
             }
             cellID_foam_[nlocal_foam_] = cellID;
 
-            // cell id hash table
-            //idHashTable_[id_lammps_[i]]=cellID;
-
             nlocal_foam_ += 1;
-            //Pout << "found particle at pos=" << pos << endl;
+            //Pout << "stage1 found particle at pos=" << pos << endl;
         }
         else
         {
@@ -502,14 +625,23 @@ void Foam::twoWayM2M::locateParticle() const
 
     // using allgather to allreduce lost particles
     particleCloud_.clockM().start(8,"locate_Stage2");
+
+    // we could add this here - but some arrays must be init
+    //int lost_all;
+    //MPI_Allreduce(&nlocal_foam_lost_, &lost_all, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+    //if(lost_all>0)
+
+
     int nlocal_foam_lost_all = LAMMPS_NS::MPI_Allgather_Vector(lost_pos_, nlocal_foam_lost_*3, lost_pos_all, MPI_COMM_WORLD)/3;
     LAMMPS_NS::MPI_Allgather_Vector(id_foam_lost_, nlocal_foam_lost_, id_foam_lost_all, MPI_COMM_WORLD);
+    Info << couplingStep_ << "st nlocal_foam_lost_all=" << nlocal_foam_lost_all << endl;
 
     // locate lost particles
     for (int i = 0; i < nlocal_foam_lost_all; i++)
     {
         pos = vector(lost_pos_all[i*3+0],lost_pos_all[i*3+1],lost_pos_all[i*3+2]);
-        searchCellID = -1;//idHashTable_[id_foam_lost_all[i]];
+        //Pout << "stage2 looking for particle pos="<< pos << endl;
+        searchCellID = -1;
         particleCloud_.clockM().start(9,"findSingleCell");   
         cellID = particleCloud_.locateM().findSingleCell(pos,searchCellID);
         particleCloud_.clockM().stop("findSingleCell");
@@ -531,10 +663,8 @@ void Foam::twoWayM2M::locateParticle() const
             // mark that ID was finally found
             id_foam_lost_all[i]=-1;
 
-            // cell id hash table
-            //idHashTable_[id_foam_lost_all[i]]=cellID;
-
             nlocal_foam_ += 1;
+            //Pout << "stage2 found particle at pos=" << pos << endl;
         }
     }
     particleCloud_.clockM().stop("locate_Stage2");
@@ -560,7 +690,7 @@ void Foam::twoWayM2M::locateParticle() const
                     // re-arrange IDs for vectors
                     for (int k=0;k<3;k++)
                     {
-                        id_lammps_vec_[j*3+k] = id_lammps_vec_[(nlocal_lammps_-1)*3+k];
+                        id_lammps_vec_[j*3+k] = id_lammps_vec_[nlocal_lammps_*3+k];
                     }
                 
                     nlocal_lammps_ -= 1;
@@ -570,7 +700,7 @@ void Foam::twoWayM2M::locateParticle() const
         }
         i++;
     }
-    particleCloud_.clockM().stop("locate_Stage3");*/
+    particleCloud_.clockM().stop("locate_Stage3");*/    
 
 /*int gaga;
 MPI_Allreduce(&nlocal_foam_, &gaga, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
