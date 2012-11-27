@@ -32,7 +32,7 @@ couplingInterval 100;
 
 voidFractionModel divided;
 
-locateModel engine;//
+locateModel engine;//turboEngineM2M;//
 
 meshMotionModel noMeshMotion;
 
@@ -40,7 +40,7 @@ regionModel allRegion;
 
 IOModel "off";
 
-dataExchangeModel twoWayMPI;//twoWayFiles;//oneWayVTK;//
+dataExchangeModel twoWayMPI;//twoWayM2M;//twoWayFiles;//oneWayVTK;//
 
 averagingModel dense;//dilute;//
 
@@ -160,6 +160,14 @@ centreProps
 engineProps
 {
     treeSearch true;
+}
+
+turboEngineM2MProps
+{
+    turboEngineProps
+    {
+        treeSearch true;
+    }
 }
 
 dividedProps
