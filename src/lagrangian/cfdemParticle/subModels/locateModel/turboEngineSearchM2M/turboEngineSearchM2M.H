@@ -89,6 +89,12 @@ public:
             int size
         ) const;
 
+        label intersection
+        (
+                const point& pStart,
+                const point& pEnd
+        ) const;
+
 };
 
 

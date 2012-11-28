@@ -148,7 +148,9 @@ twoWayM2M::~twoWayM2M()
     delete[] lost_pos_;
     delete[] cellID_foam_;
     delete[] pos_foam_;
-    //delete[] lmp2foam_;
+    delete lmp2foam_;
+    delete lmp2foam_vec_;
+    delete foam2lmp_vec_;
     //delete lmp;
 }
 
@@ -247,7 +249,7 @@ void Foam::twoWayM2M::allocateArray
 ) const
 {
     //if(length==-1) then LIGGGHTS uses own length data
-    allocate_external_double(array, width,length,initVal,lmp);
+    allocate_external_double(array, width,max(length,1),initVal,lmp);
 }
 
 void Foam::twoWayM2M::allocateArray
@@ -272,7 +274,7 @@ void Foam::twoWayM2M::allocateArray
 ) const
 {
     //if(length==-1) then LIGGGHTS uses own length data
-    allocate_external_int(array, width,length,initVal,lmp);
+    allocate_external_int(array, width,max(length,1),initVal,lmp);
 }
 
 void Foam::twoWayM2M::allocateArray
@@ -352,19 +354,22 @@ int Foam::twoWayM2M::getNumberOfClumps() const
 
 void Foam::twoWayM2M::syncIDs() const
 {
+    // if I do not creat new communicators it fails at liggghts porcessor transfer!
+    // this should probably not be done that often!!!  
+    delete lmp2foam_;
+    delete lmp2foam_vec_;
+    delete foam2lmp_vec_;
+    lmp2foam_ = new Many2Many(MPI_COMM_WORLD);
+    lmp2foam_vec_ = new Many2Many(MPI_COMM_WORLD);
+    foam2lmp_vec_ = new Many2Many(MPI_COMM_WORLD);
+    //?=======
+
     //MPI_Barrier(MPI_COMM_WORLD);
-    //Pout << "== syncIDs  " << endl;
+    //Pout << couplingStep_ << "st == syncIDs  " << endl;
 
     particleCloud_.clockM().start(5,"recv_DEM_ids");
     // get data from lammps
-    int nlocal_lammps_old=nlocal_lammps_;
     nlocal_lammps_ = *((int *) lammps_extract_global(lmp,"nlocal"));
-
-    // weak form to detect lmp proc change - this will cause problems!!!
-    //bool comRun=false;
-    //if(nlocal_lammps_old != nlocal_lammps_) comRun=true;
-    //MPI_Allreduce(&comRun, &firstRun_, 1, MPI_INT, MPI_MAX, MPI_COMM_WORLD);
-
     int*  id_lammps_sync;
     double** pos_lammps_sync;
     if(firstRun_)  // do not forget iterator !
@@ -379,18 +384,12 @@ void Foam::twoWayM2M::syncIDs() const
                 id_lammps_vec_[i*3+j] = id_lammps_[i]*3+j;
         
         Foam::dataExchangeModel::allocateArray(pos_lammps_,-1.,3,nlocal_lammps_);  // do I need this???
-        pos_lammps_ = (double **) lammps_extract_atom(lmp,"x");
-
-        //for (int i = 0; i < nlocal_lammps_; i++){
-        //    vector pp;
-        //    for (int j = 0; j < 3; j++) pp[j]=pos_lammps_[i][j];
-        //    Pout << "pp=" << pp << endl;
-        //}
-                
-    }else
+        pos_lammps_ = (double **) lammps_extract_atom(lmp,"x");                
+    }
+    else
     {
        // re-arrange data using map
-        Foam::dataExchangeModel::allocateArray(id_lammps_sync,-1.,nlocal_lammps_);
+        Foam::dataExchangeModel::allocateArray(id_lammps_sync,-1.,nlocal_lammps_); // probably not necessary
         id_lammps_sync = (int *) lammps_extract_atom(lmp,"id");
 
         delete [] id_lammps_vec_;
@@ -404,9 +403,9 @@ void Foam::twoWayM2M::syncIDs() const
         lmp2foam_vec_->setup(nlocal_lammps_*3,id_lammps_vec_,nlocal_foam_*3,id_foam_vec_);
         foam2lmp_vec_->setup(nlocal_foam_*3,id_foam_vec_,nlocal_lammps_*3,id_lammps_vec_);
 
+        // map data according to last TS
         Foam::dataExchangeModel::allocateArray(id_lammps_,-1,nlocal_foam_);  // probably not necessary
         lmp2foam_->exchange(id_lammps_sync, id_lammps_);
-
 
         Foam::dataExchangeModel::allocateArray(pos_lammps_sync,-1.,3,nlocal_lammps_);  // probably not necessary
         pos_lammps_sync = (double **) lammps_extract_atom(lmp,"x");
@@ -417,65 +416,13 @@ void Foam::twoWayM2M::syncIDs() const
         Foam::dataExchangeModel::allocateArray(pos_lammps_,-1.,3,nlocal_foam_);
         lmp2foam_vec_->exchange(&(pos_lammps_sync[0][0]), &(gugu[0][0]));
 
-        // try the same with getData
-        //double** gugu;
-        //Foam::dataExchangeModel::allocateArray(gugu,-1.,3,nlocal_foam_);
-        //Foam::dataExchangeModel::allocateArray(pos_lammps_,-1.,3,nlocal_foam_);
-        //getData("x","vector-atom",gugu,1);
-
         // conversion of array (should not be necessary if above problem is solved)
         for (int i = 0; i < nlocal_foam_; i++)
             for (int j = 0; j < 3; j++)
                 pos_lammps_[i][j]=gugu[0][i*3+j];
 
-        /*// test communication - works!!!
-        int* llv;
-        int* ovv;
-        Many2Many* l2f = new Many2Many(MPI_COMM_WORLD);
-        double** gaga;
-        if(Pstream::myProcNo()==0)
-        {
-            Foam::dataExchangeModel::allocateArray(llv,0,6);
-            Foam::dataExchangeModel::allocateArray(ovv,0,1);
-            for(int i=0;i<6;i++)
-                llv[i]=i+1;
-            ovv[0]=-1;
-            l2f->setup(6,llv,0,ovv);
-            l2f->exchange(&(pos_lammps_sync[0][0]), &(gaga[0][0]));
-        }else{
-            Foam::dataExchangeModel::allocateArray(llv,0,1);
-            Foam::dataExchangeModel::allocateArray(ovv,0,6);
-            for(int i=0;i<6;i++)
-                ovv[i]=i+1;
-            llv[0]=-1;
-            l2f->setup(0,llv,6,ovv);
-
-            double** gugu;
-            Foam::dataExchangeModel::allocateArray(gaga,-1.,3,2);
-            Foam::dataExchangeModel::allocateArray(gugu,-1.,3,2);
-            l2f->exchange(&(pos_lammps_sync[0][0]), &(gugu[0][0]));
-
-            // this does not work! -conversion needed!
-            //for (int i = 0; i < 2; i++)
-            //    Pout << "getDataXX: " << "v" <<"=" << gugu[i][0]<<","<< gugu[i][1]<<","<< gugu[i][2]<<endl;
-
-            // conversion of array
-            for (int i = 0; i < 2; i++)
-                for (int j = 0; j < 3; j++)
-                    gaga[i][j]=gugu[0][i*3+j];
-
-            // output
-            for (int i = 0; i < 2; i++)
-                Pout << "getData3: " << "v" <<"=" << gaga[i][0]<<","<< gaga[i][1]<<","<< gaga[i][2]<<endl;
-        }*/
-
     }
     particleCloud_.clockM().stop("recv_DEM_ids");
-
-    // make a copy of liggghts ID array
-    /*delete [] id_lammpsComm_;
-    Foam::dataExchangeModel::allocateArray(id_lammpsComm_,0,nlocal_lammps_);
-    for(int i=0;i<nlocal_lammps_;i++) id_lammpsComm_[i]=id_lammps_[i];*/
 
     particleCloud_.clockM().start(6,"locateParticle()");
     locateParticle();
@@ -490,28 +437,28 @@ void Foam::twoWayM2M::syncIDs() const
         {
             if(firstRun_)
             {
-                Pout << "id_lammps_[" << i << "]=" << id_lammps_[i] << "  -  "<<endl;
+                Pout << couplingStep_ << "st id_lammps_[" << i << "]=" << id_lammps_[i] << "  -  "<<endl;
             }else{
-                Pout << "id_lammps_sync[" << i << "]=" << id_lammps_sync[i] << "  -  "<<endl;
+                Pout << couplingStep_ << "st id_lammps_sync[" << i << "]=" << id_lammps_sync[i] << "  -  "<<endl;
             }
         }*/
         /*for (int i = 0; i < nlocal_lammps_*3; i++)
         {
-            Pout << "id_lammps_vec_[" << i << "]=" << id_lammps_vec_[i] << "  -  "<<endl;
+            Pout << couplingStep_ << "st id_lammps_vec_[" << i << "]=" << id_lammps_vec_[i] << "  -  "<<endl;
         }*/
         /*Info << "FOAM "<< endl;
         for (int i = 0; i < nlocal_foam_; i++)
         {
-            Pout << "id_foam_[" << i << "]=" << id_foam_[i] << "  -  "<<endl;
+            Pout << couplingStep_ << "st id_foam_[" << i << "]=" << id_foam_[i] << "  -  "<<endl;
         }*/
         /*for (int i = 0; i < nlocal_foam_*3; i++)
         {
-            Pout << "id_foam_vec_[" << i << "]=" << id_foam_vec_[i] << "  -  "<<endl;
+            Pout << couplingStep_ << "st id_foam_vec_[" << i << "]=" << id_foam_vec_[i] << "  -  "<<endl;
         }*/
         Pout << couplingStep_ << "st nlocal_lammps_=" << nlocal_lammps_ << endl;
         Pout << couplingStep_ << "st nlocal_foam_=" << nlocal_foam_ << endl;
 
-    // communicate lmp->foam
+    // correct mapping
     particleCloud_.clockM().start(11,"setup_Comm");
     if(firstRun_)
     {
@@ -531,14 +478,6 @@ void Foam::twoWayM2M::syncIDs() const
 
 void Foam::twoWayM2M::locateParticle() const
 {
-    //?=======
-    // if I do not creat new communicators it fails at liggghts porcessor transfer!
-    // this should probably not be done that often!!!  
-    lmp2foam_ = new Many2Many(MPI_COMM_WORLD);
-    lmp2foam_vec_ = new Many2Many(MPI_COMM_WORLD);
-    foam2lmp_vec_ = new Many2Many(MPI_COMM_WORLD);
-    //?=======
-
     int nop = particleCloud_.numberOfParticles();
 
     // realloc array of lost particles
@@ -590,9 +529,10 @@ void Foam::twoWayM2M::locateParticle() const
         pos = vector(pos_lammps_[i][0],pos_lammps_[i][1],pos_lammps_[i][2]);
         searchCellID = -1;
         //Pout << "stage1 looking for particle pos="<< pos << endl;
-
         cellID = particleCloud_.locateM().findSingleCell(pos,searchCellID);
     
+        point oldPos(pos_foam_[nlocal_foam_*3+0],pos_foam_[nlocal_foam_*3+1],pos_foam_[nlocal_foam_*3+2]);
+
         // found particle on cfd proc
         if (cellID >= 0)
         {
@@ -608,7 +548,7 @@ void Foam::twoWayM2M::locateParticle() const
             cellID_foam_[nlocal_foam_] = cellID;
 
             nlocal_foam_ += 1;
-            //Pout << "stage1 found particle at pos=" << pos << endl;
+            //Pout << couplingStep_ << "st stage1 found particle at pos=" << pos << " ,id_lammps_[i]=" << id_lammps_[i] << endl;
         }
         else
         {
@@ -618,7 +558,77 @@ void Foam::twoWayM2M::locateParticle() const
                 lost_pos_[nlocal_foam_lost_*3+j] = pos[j];
 
             nlocal_foam_lost_ += 1;
-            //Pout << "cellID="<< cellID << " lost particle id="<< id_lammps_[i] <<" at pos=" << pos << endl;
+            //Pout << couplingStep_ << "st cellID="<< cellID << " lost particle id="<< id_lammps_[i] <<" at pos=" << pos << endl;
+
+            // find out where particle has migrated (must have passed a CFD proc border)
+            /*point newPos=pos;
+            label nearestFace = particleCloud_.locateM().intersection(oldPos,newPos);
+            Pout << "nearest face=" << nearestFace << endl;
+
+            // If we hit a boundary face
+            if (nearestFace >= particleCloud_.mesh().nInternalFaces())
+            {
+                Pout << " face=" << nearestFace << " , is a boundary face!" << endl;
+            }*/
+
+/*  // probably useful proc stuff from Cloud.C
+
+    const polyBoundaryMesh& pbm = pMesh().boundaryMesh();
+    const globalMeshData& pData = polyMesh_.globalData();
+
+    // Which patches are processor patches
+    const labelList& procPatches = pData.processorPatches();
+
+    // Indexing of patches into the procPatches list
+    const labelList& procPatchIndices = pData.processorPatchIndices();
+
+    // Indexing of equivalent patch on neighbour processor into the
+    // procPatches list on the neighbour
+    const labelList& procPatchNeighbours = pData.processorPatchNeighbours();
+
+    // Which processors this processor is connected to
+    const labelList& neighbourProcs = pData[Pstream::myProcNo()];
+
+    // Indexing from the processor number into the neighbourProcs list
+    labelList neighbourProcIndices(Pstream::nProcs(), -1);
+
+    forAll(neighbourProcs, i)
+    {
+        neighbourProcIndices[neighbourProcs[i]] = i;
+    }
+
+
+
+                // If we are running in parallel and the particle is on a
+                // boundary face
+                if (Pstream::parRun() && p.face() >= pMesh().nInternalFaces())
+                {
+                    label patchI = pbm.whichPatch(p.face());
+
+                    // ... and the face is on a processor patch
+                    // prepare it for transfer
+                    if (procPatchIndices[patchI] != -1)
+                    {
+                        label n = neighbourProcIndices
+                        [
+                            refCast<const processorPolyPatch>
+                            (
+                                pbm[patchI]
+                            ).neighbProcNo()
+                        ];
+
+                        p.prepareForParallelTransfer(patchI, td);
+
+                        particleTransferLists[n].append(this->remove(&p));
+
+                        patchIndexTransferLists[n].append
+                        (
+                            procPatchNeighbours[patchI]
+                        );
+                    }
+                }
+*/
+
         }
     }
     particleCloud_.clockM().stop("locate_Stage1");

@@ -63,12 +63,12 @@ turboEngineSearch::turboEngineSearch
     locateModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
     treeSearch_(propsDict_.lookup("treeSearch")),
+    bb_(particleCloud_.mesh().points(),false),
     #ifdef version16ext
-        searchEngine_(particleCloud_.mesh(),false), //(particleCloud_.mesh(),faceDecomp_)
+        searchEngine_(particleCloud_.mesh(),false) //(particleCloud_.mesh(),faceDecomp_)
     #elif defined(version21)
-        searchEngine_(particleCloud_.mesh(),polyMesh::FACEPLANES), // FACEPLANES or FACECENTRETETS; FACEDIAGTETS not stable
+        searchEngine_(particleCloud_.mesh(),polyMesh::FACEPLANES) // FACEPLANES or FACECENTRETETS; FACEDIAGTETS not stable
     #endif
-    bb_(particleCloud_.mesh().points(),false)
 {}
 
 

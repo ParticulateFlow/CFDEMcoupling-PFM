@@ -28,7 +28,7 @@ turboEngineProps
 <PRE>locateModel turboEngine;
 turboEngineProps
 {
-    treeSearch false;
+    treeSearch true;
 } 
 </PRE>
 <P><B>Description:</B>
@@ -37,10 +37,9 @@ turboEngineProps
 </P>
 <P>The turboEngineSearch locate Model can be used with different settings to use different algorithms:
 </P>
-<UL><LI>faceDecomp false; treeSearch false;     will execute some geometric (linear) search using the last known cellID (recommended) 
+<UL><LI>faceDecomp false; treeSearch false;     will execute some geometric (linear) search using the last known cellID 
 
-<LI>faceDecomp false; treeSearch true;      will use a recursive tree structure to find the cell. 
-
+faceDecomp false; treeSearch true;      will use a recursive tree structure to find the cell. (recommended):l
 
 </UL>
 <P><B>Restrictions:</B> none.

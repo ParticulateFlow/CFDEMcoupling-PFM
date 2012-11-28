@@ -65,9 +65,11 @@ private:
 
     Switch treeSearch_;
 
-    meshSearch searchEngine_;
-
     boundBox bb_;
+
+protected:
+
+    meshSearch searchEngine_;
 
 public:
 

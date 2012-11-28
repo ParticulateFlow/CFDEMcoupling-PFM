@@ -85,6 +85,20 @@ label turboEngineSearchM2M::findCell
     return 1;
 }
 
+label turboEngineSearchM2M::intersection
+(
+    const point& pStart,
+    const point& pEnd
+) const
+{
+    // find intersection with boundary
+    //pointIndexHit hit=searchEngine_.intersection(pStart,pEnd);
+    //Info << "hit.index()=" << hit.index()<< endl;
+    
+    //return searchEngine_.findNearestBoundaryFace(pStart);
+    return searchEngine_.intersection(pStart,pEnd).index();
+}
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
