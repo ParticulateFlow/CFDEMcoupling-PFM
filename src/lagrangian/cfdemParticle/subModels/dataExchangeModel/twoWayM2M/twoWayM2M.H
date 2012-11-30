@@ -90,9 +90,9 @@ private:
 
     // new vars
     mutable bool firstRun_;
-    mutable Many2Many *lmp2foam_;
-    mutable Many2Many *lmp2foam_vec_;
-    mutable Many2Many *foam2lmp_vec_;
+    mutable Many2Many * lmp2foam_;
+    mutable Many2Many * lmp2foam_vec_;
+    mutable Many2Many * foam2lmp_vec_;
     mutable int nlocal_lammps_;
     mutable int *id_lammps_;
     //mutable int *id_lammpsComm_;
@@ -191,7 +191,9 @@ public:
 
         void syncIDs() const;
         void locateParticle() const;
-        void exchange(double*,double*) const;
+        //void exchange(double*,double*) const;
+        //template <typename T>
+        //T*& extract_save(T *& a,char name);
 };
 
 
