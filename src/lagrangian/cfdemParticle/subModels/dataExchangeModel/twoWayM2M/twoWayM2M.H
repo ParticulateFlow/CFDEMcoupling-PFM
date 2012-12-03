@@ -111,6 +111,13 @@ private:
     mutable int *cellID_foam_;
     mutable double *pos_foam_;
 
+    const polyBoundaryMesh& pbm_; 
+    const globalMeshData& pData_;
+    const labelList& procPatches_;
+    const labelList& procPatchIndices_;
+    const labelList& neighbourProcs_;
+    labelList neighbourProcIndices_;
+
     // variables
     int me;
 
@@ -191,9 +198,6 @@ public:
 
         void syncIDs() const;
         void locateParticle() const;
-        //void exchange(double*,double*) const;
-        //template <typename T>
-        //T*& extract_save(T *& a,char name);
 };
 
 
