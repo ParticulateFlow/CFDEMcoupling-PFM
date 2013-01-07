@@ -165,6 +165,8 @@ protected:
     autoPtr<liggghtsCommandModel>* liggghtsCommand_;
 
 // Private member functions
+    inline void free2D(double**);
+
     virtual void getDEMdata();
 
     virtual void giveDEMdata();

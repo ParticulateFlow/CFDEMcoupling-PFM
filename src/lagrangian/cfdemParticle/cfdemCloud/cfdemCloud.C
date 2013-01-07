@@ -230,18 +230,24 @@ Foam::cfdemCloud::cfdemCloud
 Foam::cfdemCloud::~cfdemCloud()
 {
     clockM().evalPar();
-    free(positions_);
-    free(velocities_);
-    free(impForces_);
-    free(expForces_);
-    free(DEMForces_);
-    free(radii_);
-    free(voidfractions_);
-    free(cellIDs_);
-    free(particleWeights_);
-    free(particleVolumes_);
+    free2D(positions_);
+    free2D(velocities_);
+    free2D(impForces_);
+    free2D(expForces_);
+    free2D(DEMForces_);
+    free2D(radii_);
+    free2D(voidfractions_);
+    free2D(cellIDs_);
+    free2D(particleWeights_);
+    free2D(particleVolumes_);
 }
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
+inline void Foam::cfdemCloud::free2D(double** array)
+{
+    free(array[0]);
+    free(array);
+}
+
 void Foam::cfdemCloud::getDEMdata()
 {
     dataExchangeM().getData("radius","scalar-atom",radii_);

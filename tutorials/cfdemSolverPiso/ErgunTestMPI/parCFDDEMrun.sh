@@ -21,7 +21,7 @@ logfileName="log_$headerText"
 solverName="cfdemSolverPiso"
 nrProcs="4"
 machineFileName="none"   # yourMachinefileName | none
-debugMode="off"          # on | off | prof
+debugMode="off"          # on | off| strictdebugMode="off"          # on | off| strict
 testHarnessPath="$CFDEM_TEST_HARNESS_PATH"
 runOctave="true"
 postproc="false"
@@ -94,7 +94,7 @@ rm -r $casePath/DEM/post/*
 rm -r $casePath/DEM/log.*
 rm -r $casePath/DEM/liggghts.restartCFDEM*
 rm -r $casePath/CFD/probes
-rm -r $casePath/CFD/particles
+rm -r $casePath/CFD/lagrangian
 rm -r $casePath/CFD/clockData
 echo "done"
 

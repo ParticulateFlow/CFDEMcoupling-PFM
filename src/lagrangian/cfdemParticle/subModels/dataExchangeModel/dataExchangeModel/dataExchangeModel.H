@@ -237,6 +237,7 @@ public:
                 particleCloud_.cellIDs_[i][0]=ID[i];
         };
 
+        virtual word myType() const=0;
 };
 
 

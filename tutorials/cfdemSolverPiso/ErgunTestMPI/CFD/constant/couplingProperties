@@ -32,15 +32,15 @@ couplingInterval 100;
 
 voidFractionModel divided;
 
-locateModel turboEngineM2M;//engine;//
+locateModel engine;//turboEngineM2M;//
 
 meshMotionModel noMeshMotion;
 
 regionModel allRegion;
 
-IOModel "off";
+IOModel "basicIO";
 
-dataExchangeModel twoWayM2M;//twoWayMPI;//twoWayFiles;//oneWayVTK;//
+dataExchangeModel twoWayMPI;//twoWayM2M;//twoWayFiles;//oneWayVTK;//
 
 averagingModel dense;//dilute;//
 

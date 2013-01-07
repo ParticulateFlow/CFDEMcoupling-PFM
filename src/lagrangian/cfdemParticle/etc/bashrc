@@ -107,6 +107,9 @@ alias cfdemCompM2M='bash $CFDEM_SRC_DIR/etc/compileM2Mlib.sh'
 #- shortcut to test basic tutorials
 alias cfdemTestTUT='bash $CFDEM_SRC_DIR/etc/testTutorials.sh'
 
+#- recursive touch of current directory
+alias touchRec='find ./* -exec touch {} \;'
+
 #- shortcut to run liggghts in serial
 cfdemLiggghts() { $CFDEM_LIGGGHTS_SRC_DIR/lmp_$CFDEM_LIGGGHTS_MAKEFILE_NAME < $1; }
 export -f cfdemLiggghts

@@ -101,6 +101,7 @@ private:
     mutable int *id_foam_;
     mutable int *id_foam_vec_;
     mutable double *tmp_;
+    mutable int *tmpI_;
     mutable double **pos_lammps_;
     mutable int nlocal_foam_lost_;
     mutable int *id_foam_lost_;
@@ -191,6 +192,15 @@ public:
         void allocateArray(int**&, int, int,const char* ="nparticles") const;
         //==============
 
+        //==============
+        // double *
+        void allocateArray(double*&, double, int) const;
+
+        //==============
+        // int *
+        void allocateArray(int*&, int, int) const;
+        //==============
+
         bool couple() const;
 
         int getNumberOfParticles() const;
@@ -198,6 +208,7 @@ public:
 
         void syncIDs() const;
         void locateParticle() const;
+        word myType() const{return typeName; };
 };
 
 

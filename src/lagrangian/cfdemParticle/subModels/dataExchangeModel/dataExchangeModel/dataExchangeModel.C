@@ -135,7 +135,7 @@ void Foam::dataExchangeModel::allocateArray
     int length
 ) const
 {
-    // allocate and init double array
+    // allocate and init int array
     array = new int[length];
     for (int i=0; i<length; i++)
         array[i] = initVal;

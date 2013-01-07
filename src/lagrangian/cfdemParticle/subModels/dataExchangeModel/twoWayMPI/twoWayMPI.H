@@ -156,6 +156,8 @@ public:
 
         int getNumberOfParticles() const;
         int getNumberOfClumps() const;
+
+        word myType() const{return typeName; };
 };
 
 
