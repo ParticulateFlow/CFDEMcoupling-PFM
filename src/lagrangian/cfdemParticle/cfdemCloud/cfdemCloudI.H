@@ -169,11 +169,6 @@ inline const clockModel& cfdemCloud::clockM() const
     return clockModel_;
 }
 
-inline const regionModel& cfdemCloud::regionM() const
-{
-    return regionModel_;
-}
-
 inline const meshMotionModel& cfdemCloud::meshMotionM() const
 {
     return meshMotionModel_;

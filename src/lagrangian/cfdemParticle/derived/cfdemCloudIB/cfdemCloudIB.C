@@ -33,7 +33,6 @@ Description
 #include "cfdemCloudIB.H"
 #include "voidFractionModel.H"
 #include "forceModel.H"
-#include "regionModel.H"
 #include "locateModel.H"
 #include "dataExchangeModel.H"
 #include "IOModel.H"
@@ -94,22 +93,18 @@ bool Foam::cfdemCloudIB::evolve()
         Info << "\n timeStepFraction() = " << dataExchangeM().timeStepFraction() << endl;
         doCouple=true;
 
-        if(verbose_) Info << "- defineRegion()" << endl;
-        regionM().defineRegion();
-        if(verbose_) Info << "defineRegion done." << endl;
-
         if(verbose_) Info << "- getDEMdata()" << endl;
         getDEMdata();
         Info << "nr particles = " << numberOfParticles() << endl;
 
         // search cellID of particles
         if(verbose_) Info << "- findCell()" << endl;
-        locateM().findCell(regionM().inRegion(),positions_,cellIDs_,numberOfParticles());
+        locateM().findCell(NULL,positions_,cellIDs_,numberOfParticles());
         if(verbose_) Info << "findCell done." << endl;
 
         // set void fraction field
         if(verbose_) Info << "- setvoidFraction()" << endl;
-        voidFractionM().setvoidFraction(regionM().inRegion(),voidfractions_,particleWeights_,particleVolumes_);
+        voidFractionM().setvoidFraction(NULL,voidfractions_,particleWeights_,particleVolumes_);
         if(verbose_) Info << "setvoidFraction done." << endl;
 
         // set particles forces
@@ -120,7 +115,7 @@ bool Foam::cfdemCloudIB::evolve()
                 expForces_[index][i] = 0;
             }
         }
-        for (int i=0;i<nrForceModels();i++) forceM(i).setForce(regionM().inRegion(),impForces_,expForces_,expForces_);
+        for (int i=0;i<nrForceModels();i++) forceM(i).setForce(NULL,impForces_,expForces_,expForces_);
         if(verbose_) Info << "setForce done." << endl;
 
         // write DEM data
@@ -152,8 +147,8 @@ void Foam::cfdemCloudIB::calcVelocityCorrection
     vector angVel(0,0,0);
     for(int index=0; index< numberOfParticles(); index++)
     {
-        if(regionM().inRegion()[index][0])
-        {
+        //if(regionM().inRegion()[index][0])
+        //{
             for(int subCell=0;subCell<voidFractionM().cellsPerParticle()[index][0];subCell++)
             {
                 //Info << "subCell=" << subCell << endl;
@@ -171,7 +166,7 @@ void Foam::cfdemCloudIB::calcVelocityCorrection
                     U[cellI]=(1-voidfractions_[index][subCell])*uParticle+voidfractions_[index][subCell]*U[cellI];
                 }
             }
-        }
+        //}
     }
 
     // make field divergence free

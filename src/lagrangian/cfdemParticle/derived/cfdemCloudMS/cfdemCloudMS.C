@@ -32,7 +32,6 @@ Description
 #include "cfdemCloudMS.H"
 #include "voidFractionModel.H"
 #include "forceModelMS.H"
-#include "regionModel.H"
 #include "locateModel.H"
 #include "dataExchangeModel.H"
 
@@ -212,7 +211,7 @@ void Foam::cfdemCloudMS::setNumberOfParticles(int nP)
 void Foam::cfdemCloudMS::findCells()
 {
     cfdemCloud::findCells();
-    locateM().findCell(regionM().inRegion(),positionsCM_,cellIDsCM_,numberOfClumps());
+    locateM().findCell(NULL,positionsCM_,cellIDsCM_,numberOfClumps());
 }
 
 void Foam::cfdemCloudMS::setForces()
@@ -222,7 +221,7 @@ void Foam::cfdemCloudMS::setForces()
     resetArray(impForces_,numberOfParticles(),3);
     resetArray(expForces_,numberOfParticles(),3);
     resetArray(DEMForces_,numberOfParticles(),3);
-    for (int i=0;i<cfdemCloudMS::nrForceModels();i++) cfdemCloudMS::forceM(i).setForce(regionM().inRegion(),impForces_,expForces_,DEMForces_);
+    for (int i=0;i<cfdemCloudMS::nrForceModels();i++) cfdemCloudMS::forceM(i).setForce(NULL,impForces_,expForces_,DEMForces_);
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

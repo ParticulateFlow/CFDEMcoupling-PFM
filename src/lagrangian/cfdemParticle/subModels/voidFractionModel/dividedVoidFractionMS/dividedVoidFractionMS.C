@@ -34,7 +34,6 @@ Description
 #include "dividedVoidFractionMS.H"
 #include "addToRunTimeSelectionTable.H"
 #include "locateModel.H"
-#include "regionModel.H"
 #include "dataExchangeModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -93,8 +92,8 @@ void dividedVoidFractionMS::setvoidFraction(double** const& mask,double**& voidf
 
     for(int index=0; index< particleCloud_.numberOfParticles(); index++)
     {
-        if(mask[index][0])
-        {
+        //if(mask[index][0])
+        //{
             // reset
             for(int subcell=0;subcell<cellsPerParticle_[index][0];subcell++){
                 particleWeights[index][subcell]=0;
@@ -191,7 +190,7 @@ void dividedVoidFractionMS::setvoidFraction(double** const& mask,double**& voidf
                 }*/
 
             }// end if in cell
-        }// end if in mask
+        //}// end if in mask
         //NP reset counter of lost volume
         if(index == particleCloud_.numberOfParticles()-1) Info << "Total particle volume neglected: " << tooMuch_<< endl;
     }// end loop all particles

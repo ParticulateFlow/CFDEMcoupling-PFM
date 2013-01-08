@@ -43,6 +43,7 @@ SourceFiles
 
 #include "fvCFD.H"
 #include "cfdemCloud.H"
+#include "dataExchangeModel.H"
 
 #include <vector>
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -127,6 +128,9 @@ public:
 	    virtual void evalPar() const;
 	    void initElems();
 	    std::vector<int> calcShift() const;			//detects empty indices in vector, when times are evaluated
+	    void Hist() const;					//calc Histogram
+	    void normHist() const;				//calc normalized Histogram
+        void plotHist(double,std::string,int,int) const;    //plot histogramm to terminal
 };
 
 

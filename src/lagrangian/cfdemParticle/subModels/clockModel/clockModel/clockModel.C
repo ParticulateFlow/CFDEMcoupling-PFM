@@ -308,6 +308,125 @@ std::vector<int> Foam::clockModel::calcShift() const
 	}
 	return shifts;
 }
+
+/*void Foam::clockModel::normHist() const
+{
+	int myrank=-10;
+	int numprocs=-10;
+	MPI_Comm_rank(MPI_COMM_WORLD,&myrank);
+	MPI_Comm_size(MPI_COMM_WORLD, &numprocs);
+
+
+	double buffOut=0.;
+    double buffIn=0.;
+	
+	// code to examine
+    List< int > codeParts(4);
+    codeParts[0]=1; // Global
+    codeParts[1]=2; // Coupling
+    codeParts[2]=3; // LIGGGHTS
+    codeParts[3]=26;// Flow
+
+	forAll(codeParts,i)
+    {
+        Info << "i=" << i << " ,codeParts[i]=" << codeParts[i] << endl;
+	    buffIn = double(deltaT_[codeParts[i]]);
+	    MPI_Allreduce(&buffIn, &buffOut, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+	    buffIn = buffIn/buffOut;
+	    Pout << "[" << myrank << "]: " << identifier_[codeParts[i]] << " " << buffIn << '\n';
+
+        Info << "CPU time % of " <<identifier_[codeParts[i]] << ":";    
+        List< double > globalTime(numprocs);
+        forAll(globalTime,procI)
+            globalTime[procI]=buffIn;
+
+        forAll(globalTime,procI)
+         Info<< globalTime[procI] << ", ";
+        Info << endl;
+    }	
+	return;
+}*/
+
+
+void Foam::clockModel::normHist() const
+{
+	int myrank=-10;
+	MPI_Comm_rank(MPI_COMM_WORLD,&myrank);
+	int numprocs=-10;
+	MPI_Comm_size(MPI_COMM_WORLD, &numprocs);
+	double buffOut=0.;
+    double buffIn=0.;
+	
+	Info << "==========================" << endl;
+    Info << " PROCESSOR LOAD HISTOGRAM" << endl;
+
+	//Global = 1
+	buffIn = double(deltaT_[1]);
+	MPI_Allreduce(&buffIn, &buffOut, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+    if(buffOut>SMALL) buffIn /= buffOut;
+    plotHist(buffIn,identifier_[1],numprocs,myrank);
+
+	//LIGGGHTS = 3
+	buffIn = double(deltaT_[3]);
+	MPI_Allreduce(&buffIn, &buffOut, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+    if(buffOut>SMALL) buffIn /= buffOut;
+    plotHist(buffIn,identifier_[3],numprocs,myrank);
+
+	//Coupling - LIGGGHTS = 2 - 3
+	buffIn = double(deltaT_[2]) - buffIn;
+	MPI_Allreduce(&buffIn, &buffOut, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+    if(buffOut>SMALL) buffIn /= buffOut;
+    plotHist(buffIn,"Coupling (routines)",numprocs,myrank);
+
+	//Flow = 26
+	buffIn = double(deltaT_[26]);
+	MPI_Allreduce(&buffIn, &buffOut, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+    if(buffOut>SMALL) buffIn /= buffOut;
+    plotHist(buffIn,identifier_[26],numprocs,myrank);
+    Info << "===========================" << endl;
+
+	return;
+}
+
+void Foam::clockModel::plotHist(double buffIn,std::string identifier,int numprocs,int myrank) const
+{
+    double* globalTime=NULL;
+    double* globalTime_all=NULL;
+    particleCloud_.dataExchangeM().allocateArray(globalTime,0.,numprocs);
+    particleCloud_.dataExchangeM().allocateArray(globalTime_all,0.,numprocs);  
+   
+    globalTime[myrank]=buffIn;
+    MPI_Allreduce(globalTime, globalTime_all, numprocs, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+
+    for(int j=0;j<numprocs;j++)
+        printf("%4f  ",globalTime_all[j]);
+    Info << "\t" <<identifier << endl;
+
+    free(globalTime);
+    free(globalTime_all);
+}
+
+void Foam::clockModel::Hist() const
+{
+    int myrank=-10;
+    MPI_Comm_rank(MPI_COMM_WORLD,&myrank);
+
+    //Global = 1 / Coupling = 2 / LIGGGHTS = 3 /Flow = 26
+
+    //Global = 1
+	Pout << "[" << myrank << "]: " << identifier_[1] << " " << (deltaT_[1]/CLOCKS_PER_SEC) << '\n';
+	//LIGGGHTS = 3
+	Pout << "[" << myrank << "]: " << identifier_[3] << " " << (deltaT_[3]/CLOCKS_PER_SEC) << '\n';
+	//Coupling - LIGGGHTS = 2 - 3
+	Pout << "[" << myrank << "]: " << "Coupling - LIGGGHTS" << " " << ((deltaT_[2]-deltaT_[3])/CLOCKS_PER_SEC) << '\n';
+	//Flow = 26
+	Pout << "[" << myrank << "]: " << identifier_[26] << " " << (deltaT_[26]/CLOCKS_PER_SEC) << '\n';
+		
+	return;
+}
+
+
+
 // * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * //
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //

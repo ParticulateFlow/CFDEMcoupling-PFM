@@ -73,7 +73,6 @@ class IOModel;
 class averagingModel;
 class clockModel;
 class momCoupleModel;
-class regionModel;
 class meshMotionModel;
 class liggghtsCommandModel;
 
@@ -157,8 +156,6 @@ protected:
     autoPtr<averagingModel> averagingModel_;
 
     autoPtr<clockModel> clockModel_;
-
-    autoPtr<regionModel> regionModel_;
 
     autoPtr<meshMotionModel> meshMotionModel_;
 
@@ -272,8 +269,6 @@ public:
        inline const averagingModel& averagingM() const;
 
        inline const clockModel& clockM() const;
-
-       inline const regionModel& regionM() const;
 
        inline const meshMotionModel& meshMotionM() const;
 
