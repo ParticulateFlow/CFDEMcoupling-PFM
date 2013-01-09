@@ -106,7 +106,6 @@ private:
     mutable int nlocal_foam_lost_;
     mutable int *id_foam_lost_;
     mutable int *id_foam_lost_all;
-    mutable int *id_foam_nowhere_all;
     mutable double *lost_pos_;
     mutable double *lost_pos_all;
     mutable int *cellID_foam_;

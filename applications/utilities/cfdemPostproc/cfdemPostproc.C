@@ -38,9 +38,10 @@ Description
 #include "cfdemCloud.H"
 #include "dataExchangeModel.H"
 #include "voidFractionModel.H"
-#include "regionModel.H"
 #include "locateModel.H"
 #include "averagingModel.H"
+#include "momCoupleModel.H"
+#include "forceModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -83,9 +84,12 @@ int main(int argc, char *argv[])
         Info<< "Time = " << runTime.timeName() << nl << endl;
         count+=DEM_dump_Interval;// proceed loading new data
 
-
-
-        particleCloud.regionM().resetVolFields(Us);
+        particleCloud.averagingM().resetVectorAverage(particleCloud.averagingM().UsPrev(),particleCloud.averagingM().UsNext());
+        particleCloud.voidFractionM().resetVoidFractions();
+        particleCloud.averagingM().resetVectorAverage(particleCloud.forceM(0).impParticleForces(),particleCloud.forceM(0).impParticleForces(),true);
+        particleCloud.averagingM().resetVectorAverage(particleCloud.forceM(0).expParticleForces(),particleCloud.forceM(0).expParticleForces(),true);
+        particleCloud.averagingM().resetWeightFields();
+        particleCloud.momCoupleM(0).resetMomSourceField();
 
         particleCloud.dataExchangeM().couple();
 
@@ -95,13 +99,13 @@ int main(int argc, char *argv[])
 
         particleCloud.set_radii(radii_);
 
-        particleCloud.locateM().findCell(particleCloud.regionM().inRegion(),positions_,cellIDs_,particleCloud.numberOfParticles());
+        particleCloud.locateM().findCell(NULL,positions_,cellIDs_,particleCloud.numberOfParticles());
 
         particleCloud.set_cellIDs(cellIDs_);
 
         particleCloud.voidFractionM().setvoidFraction
         (
-            particleCloud.regionM().inRegion(),voidfractions_,particleWeights_,particleVolumes_
+            NULL,voidfractions_,particleWeights_,particleVolumes_
         );
 
         voidfraction.internalField() = particleCloud.voidFractionM().voidFractionInterp();
@@ -113,7 +117,7 @@ int main(int argc, char *argv[])
             velocities_,
             particleWeights_,
             particleCloud.averagingM().UsWeightField(),
-            particleCloud.regionM().inRegion()
+            NULL
         );
 
         runTime.write();

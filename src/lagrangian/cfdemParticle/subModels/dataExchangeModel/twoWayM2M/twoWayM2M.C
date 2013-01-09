@@ -141,7 +141,6 @@ twoWayM2M::twoWayM2M
     nlocal_foam_lost_ = -1;
     id_foam_lost_ = NULL;
     id_foam_lost_all = NULL;
-    id_foam_nowhere_all = NULL;
     lost_pos_ = NULL;
     lost_pos_all = NULL;
     cellID_foam_ = NULL;
@@ -153,15 +152,13 @@ twoWayM2M::twoWayM2M
 
 twoWayM2M::~twoWayM2M()
 {
-    //delete[] id_lammps_; // does not work?
-    //delete[] id_lammpsComm_;
+    free(id_lammps_);
     free(id_lammps_vec_);
     free(id_foam_vec_);
     free(id_foam_);
     free(id_foam_lost_);
-    free(lost_pos_);
-    free(cellID_foam_);
     free(pos_foam_);
+    free(cellID_foam_);
     //delete& lmp2foam_;  // suitable for m2m&
     //delete& lmp2foam_vec_;
     //delete& foam2lmp_vec_;
@@ -384,6 +381,8 @@ bool Foam::twoWayM2M::couple() const
         // give existing position and cellID data to cloud
         setPositions(nlocal_foam_,pos_foam_);
         setCellIDs(nlocal_foam_,cellID_foam_);
+        //free(cellID_foam_); // cannot free here?
+        //free(pos_foam_); // cannot free here?
     }
     return coupleNow;
 }
@@ -418,8 +417,9 @@ void Foam::twoWayM2M::syncIDs() const
     double** pos_lammps_sync=NULL;
     if(firstRun_)
     {
-        // IDs for vectors
-        id_lammps_ = (int *) lammps_extract_atom(lmp,"id");
+        // make a copy of id array
+        allocateArray(id_lammps_,0,nlocal_lammps_);
+        memcpy(id_lammps_, (int *) lammps_extract_atom(lmp,"id"), nlocal_lammps_*sizeof(int));
 
         allocateArray(id_lammps_vec_,0,nlocal_lammps_*3);
         for (int i = 0; i < nlocal_lammps_; i++)
@@ -432,7 +432,7 @@ void Foam::twoWayM2M::syncIDs() const
     {
         // re-arrange data using map
        
-        // make a copy of id array
+        // get access to id array
         id_lammps_sync = (int *) lammps_extract_atom(lmp,"id");
 
         // genereate vector IDs
@@ -447,6 +447,7 @@ void Foam::twoWayM2M::syncIDs() const
         foam2lmp_vec_->setup(nlocal_foam_*3,id_foam_vec_,nlocal_lammps_*3,id_lammps_vec_);
 
         // map data according to last TS
+        allocateArray(id_lammps_,-1.,nlocal_foam_);
         allocateArray(tmpI_,-1.,nlocal_foam_);
         lmp2foam_->exchange(id_lammps_sync, tmpI_);
         for(int i=0;i<nlocal_foam_;i++)
@@ -515,13 +516,11 @@ void Foam::twoWayM2M::syncIDs() const
  
     if(firstRun_)
     {
-        //lmp2foam_->setup(nlocal_lammps_,id_lammpsComm_,nlocal_foam_,id_foam_);
         lmp2foam_->setup(nlocal_lammps_,id_lammps_,nlocal_foam_,id_foam_);
         lmp2foam_vec_->setup(nlocal_lammps_*3,id_lammps_vec_,nlocal_foam_*3,id_foam_vec_);
         foam2lmp_vec_->setup(nlocal_foam_*3,id_foam_vec_,nlocal_lammps_*3,id_lammps_vec_);
     }else
     {
-        //lmp2foam_->setup(nlocal_lammps_,id_lammpsComm_,nlocal_foam_,id_foam_);
         lmp2foam_->setup(nlocal_lammps_,id_lammps_sync,nlocal_foam_,id_foam_);
         lmp2foam_vec_->setup(nlocal_lammps_*3,id_lammps_vec_,nlocal_foam_*3,id_foam_vec_);
         foam2lmp_vec_->setup(nlocal_foam_*3,id_foam_vec_,nlocal_lammps_*3,id_lammps_vec_);
@@ -723,11 +722,11 @@ void Foam::twoWayM2M::locateParticle() const
     if (nlocal_foam_lost_all > 0)
     {
         Info << "all-to-all necessary: nlocal_foam_lost_all=" << nlocal_foam_lost_all << endl;
-        /*if(lost_pos_all) 
+        if(lost_pos_all) 
         { 
            delete[] lost_pos_all;
            lost_pos_all = NULL;
-        }*/
+        }
         int nlocal_foam_lost_all = LAMMPS_NS::MPI_Allgather_Vector(lost_pos_, nlocal_foam_lost_*3, lost_pos_all, MPI_COMM_WORLD)/3; // new[] für lost_pos_all!!!
         LAMMPS_NS::MPI_Allgather_Vector(id_foam_lost_, nlocal_foam_lost_, id_foam_lost_all, MPI_COMM_WORLD);
         //Info << couplingStep_ << "st nlocal_foam_lost_all=" << nlocal_foam_lost_all << endl;
@@ -754,7 +753,7 @@ void Foam::twoWayM2M::locateParticle() const
                 cellID_foam_[nlocal_foam_] = cellID;
 
                 // mark that ID was finally found
-                id_foam_lost_all[i]=-1;
+                //id_foam_lost_all[i]=-1;
 
                 nlocal_foam_ += 1;
                 //Pout << "stage3 found particle at pos=" << pos << " ,id="<< id_foam_lost_all[i] << endl;
@@ -804,9 +803,9 @@ int gugu;
 MPI_Allreduce(&nlocal_lammps_, &gugu, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
 Info << "nlocal_lammps_ALL=" << gugu << endl;*/
 
-    //delete[] id_foam_nowhere_all;
+    //delete[] lost_pos_all;
+    //lmp->memory->destroy(lost_pos_);
     //delete[] id_foam_lost_all;
-    //delete[] lost_pos_all; // gives invalid free() ...
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

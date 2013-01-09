@@ -25,7 +25,7 @@ fi
 if [ $liggghtsSim == "true" ]
   then
     cd $casePath/DEM
-    liggghts < in.liggghts_init
+    $CFDEM_LIGGGHTS_SRC_DIR/lmp_$CFDEM_LIGGGHTS_MAKEFILE_NAME < in.liggghts_init
 
     #- get VTK data from liggghts dump file
     #cd $casePath/DEM

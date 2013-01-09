@@ -309,45 +309,6 @@ std::vector<int> Foam::clockModel::calcShift() const
 	return shifts;
 }
 
-/*void Foam::clockModel::normHist() const
-{
-	int myrank=-10;
-	int numprocs=-10;
-	MPI_Comm_rank(MPI_COMM_WORLD,&myrank);
-	MPI_Comm_size(MPI_COMM_WORLD, &numprocs);
-
-
-	double buffOut=0.;
-    double buffIn=0.;
-	
-	// code to examine
-    List< int > codeParts(4);
-    codeParts[0]=1; // Global
-    codeParts[1]=2; // Coupling
-    codeParts[2]=3; // LIGGGHTS
-    codeParts[3]=26;// Flow
-
-	forAll(codeParts,i)
-    {
-        Info << "i=" << i << " ,codeParts[i]=" << codeParts[i] << endl;
-	    buffIn = double(deltaT_[codeParts[i]]);
-	    MPI_Allreduce(&buffIn, &buffOut, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-	    buffIn = buffIn/buffOut;
-	    Pout << "[" << myrank << "]: " << identifier_[codeParts[i]] << " " << buffIn << '\n';
-
-        Info << "CPU time % of " <<identifier_[codeParts[i]] << ":";    
-        List< double > globalTime(numprocs);
-        forAll(globalTime,procI)
-            globalTime[procI]=buffIn;
-
-        forAll(globalTime,procI)
-         Info<< globalTime[procI] << ", ";
-        Info << endl;
-    }	
-	return;
-}*/
-
-
 void Foam::clockModel::normHist() const
 {
 	int myrank=-10;
@@ -398,8 +359,9 @@ void Foam::clockModel::plotHist(double buffIn,std::string identifier,int numproc
     globalTime[myrank]=buffIn;
     MPI_Allreduce(globalTime, globalTime_all, numprocs, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
 
-    for(int j=0;j<numprocs;j++)
-        printf("%4f  ",globalTime_all[j]);
+    if(myrank==0)
+        for(int j=0;j<numprocs;j++)
+            printf("%4f  ",globalTime_all[j]);
     Info << "\t" <<identifier << endl;
 
     free(globalTime);
