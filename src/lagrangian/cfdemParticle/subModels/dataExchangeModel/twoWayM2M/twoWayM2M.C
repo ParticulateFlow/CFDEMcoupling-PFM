@@ -159,6 +159,9 @@ twoWayM2M::~twoWayM2M()
     free(id_foam_lost_);
     free(pos_foam_);
     free(cellID_foam_);
+    delete[] lost_pos_all;
+    free(lost_pos_);
+    delete[] id_foam_lost_all;
     //delete& lmp2foam_;  // suitable for m2m&
     //delete& lmp2foam_vec_;
     //delete& foam2lmp_vec_;
@@ -802,10 +805,6 @@ Info << "nlocal_foam_ALL=" << gaga << endl;
 int gugu;
 MPI_Allreduce(&nlocal_lammps_, &gugu, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
 Info << "nlocal_lammps_ALL=" << gugu << endl;*/
-
-    //delete[] lost_pos_all;
-    //lmp->memory->destroy(lost_pos_);
-    //delete[] id_foam_lost_all;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
