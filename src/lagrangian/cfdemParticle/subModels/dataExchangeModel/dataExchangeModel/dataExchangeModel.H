@@ -157,24 +157,26 @@ public:
         //====
         // double **
         virtual void allocateArray(double**&, double, int, int) const;
-
         virtual void allocateArray(double**&, double, int, const char* ="nparticles") const;
+        virtual void destroy(double**) const;
 
         //====
         // int **
         virtual void allocateArray(int**&, int, int, int) const;
-
         virtual void allocateArray(int**&, int, int, const char* ="nparticles") const;
+        virtual void destroy(int**) const;
         //====
 
         //====
         // int *
         virtual void allocateArray(int*&, int, int) const;
+        virtual void destroy(int*) const;
         //====
 
         //====
         // double *
         virtual void allocateArray(double*&, double, int) const;
+        virtual void destroy(double*) const;
         //====
 
         virtual bool couple() const;

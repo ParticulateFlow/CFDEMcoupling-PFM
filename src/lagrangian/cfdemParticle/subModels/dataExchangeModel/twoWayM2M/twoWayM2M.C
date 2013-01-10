@@ -158,8 +158,9 @@ twoWayM2M::~twoWayM2M()
     delete[] lost_pos_all;
     free(lost_pos_);
     delete[] id_foam_lost_all;
-    lmp->memory->destroy(tmpI_);
-    lmp->memory->destroy(tmp_);
+    destroy(tmpI_);
+    destroy(tmp_);
+    destroy(pos_lammps_);
     delete lmp2foam_;
     delete lmp2foam_vec_;
     delete foam2lmp_vec_;
@@ -270,7 +271,7 @@ void Foam::twoWayM2M::allocateArray
 ) const
 {
     int len = max(length,1);
-    lmp->memory->grow(array, len, width, "m2m:data");
+    lmp->memory->grow(array, len, width, "m2m:dbl**");
     for (int i = 0; i < len; i++)
         for (int j = 0; j < width; j++)
             array[i][j] = initVal;
@@ -285,12 +286,15 @@ void Foam::twoWayM2M::allocateArray
 ) const
 {
     int len = max(particleCloud_.numberOfParticles(),1);
-    lmp->memory->grow(array, len, width, "m2m:data");
+    lmp->memory->grow(array, len, width, "m2m:dbl**:autolen");
     for (int i = 0; i < len; i++)
         for (int j = 0; j < width; j++)
             array[i][j] = initVal;
 }
-
+void Foam::twoWayM2M::destroy(double** array) const
+{
+    lmp->memory->destroy(array);
+}
 //============
 // int **
 void Foam::twoWayM2M::allocateArray
@@ -302,7 +306,7 @@ void Foam::twoWayM2M::allocateArray
 ) const
 {
     int len = max(length,1);
-    lmp->memory->grow(array, len, width, "m2m:data");
+    lmp->memory->grow(array, len, width, "m2m:int**");
     for (int i = 0; i < len; i++)
         for (int j = 0; j < width; j++)
             array[i][j] = initVal;
@@ -317,28 +321,40 @@ void Foam::twoWayM2M::allocateArray
 ) const
 {
     int len = max(particleCloud_.numberOfParticles(),1);
-    lmp->memory->grow(array, len, width, "m2m:data");
+    lmp->memory->grow(array, len, width, "m2m:int**:autolen");
     for (int i = 0; i < len; i++)
         for (int j = 0; j < width; j++)
             array[i][j] = initVal;
+}
+void Foam::twoWayM2M::destroy(int** array) const
+{
+    lmp->memory->destroy(array);
 }
 //============
 // double *
 void Foam::twoWayM2M::allocateArray(double*& array, double initVal, int length) const
 {
     int len = max(length,1);
-    lmp->memory->grow(array, len, "m2m:data");
+    lmp->memory->grow(array, len, "m2m:dbl*");
     for (int i = 0; i < len; i++)
         array[i] = initVal;
+}
+void Foam::twoWayM2M::destroy(double* array) const
+{
+    lmp->memory->destroy(array);
 }
 //==============
 // int *
 void Foam::twoWayM2M::allocateArray(int*& array, int initVal, int length) const
 {
     int len = max(length,1);
-    lmp->memory->grow(array, len, "m2m:data");
+    lmp->memory->grow(array, len, "m2m:int*");
     for (int i = 0; i < len; i++)
         array[i] = initVal;
+}
+void Foam::twoWayM2M::destroy(int* array) const
+{
+    lmp->memory->destroy(array);
 }
 //==============
 
@@ -457,7 +473,6 @@ void Foam::twoWayM2M::syncIDs() const
         foam2lmp_vec_->setup(nlocal_foam_*3,id_foam_vec_,nlocal_lammps_*3,id_lammpsVec_);
 
         // map data according to last TS
-        id_lammps_=NULL;
         allocateArray(id_lammps_,-1.,nlocal_foam_);
         allocateArray(tmpI_,-1.,nlocal_foam_);
         lmp2foam_->exchange(id_lammpsSync, tmpI_);
@@ -469,7 +484,6 @@ void Foam::twoWayM2M::syncIDs() const
         allocateArray(tmp_,-1.,nlocal_foam_*3);
         lmp2foam_vec_->exchange(pos_lammpsSync ? pos_lammpsSync[0] : NULL, tmp_);
 
-        pos_lammps_ = NULL; // points to lig data before
         allocateArray(pos_lammps_,0,3,nlocal_foam_);
         for(int i=0;i<nlocal_foam_;i++)
             for(int j=0;j<3;j++)
@@ -533,6 +547,8 @@ void Foam::twoWayM2M::syncIDs() const
         lmp2foam_->setup(nlocal_lammps_,id_lammps_,nlocal_foam_,id_foam_);
         lmp2foam_vec_->setup(nlocal_lammps_*3,id_lammpsVec_,nlocal_foam_*3,id_foam_vec_);
         foam2lmp_vec_->setup(nlocal_foam_*3,id_foam_vec_,nlocal_lammps_*3,id_lammpsVec_);
+        id_lammps_=NULL;    // free pointer from LIG
+        pos_lammps_ = NULL; // free pointer from LIG
     }else
     {
         lmp2foam_->setup(nlocal_lammps_,id_lammpsSync,nlocal_foam_,id_foam_);

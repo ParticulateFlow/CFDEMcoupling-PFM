@@ -364,8 +364,8 @@ void Foam::clockModel::plotHist(double buffIn,std::string identifier,int numproc
             printf("%4f  ",globalTime_all[j]);
     Info << "\t" <<identifier << endl;
 
-    free(globalTime);
-    free(globalTime_all);
+    particleCloud_.dataExchangeM().destroy(globalTime);
+    particleCloud_.dataExchangeM().destroy(globalTime_all);
 }
 
 void Foam::clockModel::Hist() const
@@ -394,7 +394,7 @@ void Foam::clockModel::Hist() const
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 // Construct from components
-clockModel::clockModel
+Foam::clockModel::clockModel
 (
     const dictionary& dict,
     cfdemCloud& sm
@@ -416,7 +416,7 @@ clockModel::clockModel
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-clockModel::~clockModel()
+Foam::clockModel::~clockModel()
 {}
 
 

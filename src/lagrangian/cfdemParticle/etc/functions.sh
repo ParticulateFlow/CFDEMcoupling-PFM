@@ -314,7 +314,8 @@ parCFDDEMrun()
     if [ $debugMode == "on" ]; then
         debugMode="valgrind"
     elif [ $debugMode == "strict" ]; then
-        debugMode="valgrind --leak-check=full -v --trace-children=yes --track-origins=yes"   
+        #debugMode="valgrind --leak-check=full -v --trace-children=yes --track-origins=yes" 
+        debugMode="valgrind --tool=memcheck --leak-check=yes --show-reachable=yes --num-callers=20 --track-fds=yes"  
     else
         debugMode=""
     fi

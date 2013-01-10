@@ -95,7 +95,6 @@ private:
     mutable Many2Many * foam2lmp_vec_;
     mutable int nlocal_lammps_;
     mutable int *id_lammps_;
-    //mutable int *id_lammpsComm_;
     mutable int *id_lammpsVec_;
     mutable int nlocal_foam_;
     mutable int *id_foam_;
@@ -181,23 +180,23 @@ public:
         //============
         // double **
         void allocateArray(double**&, double, int, int) const;
-
         void allocateArray(double**&, double, int,const char* ="nparticles") const;
-
+        void destroy(double**) const;
         //============
         // int **
         void allocateArray(int**&, int, int, int) const;
-
         void allocateArray(int**&, int, int,const char* ="nparticles") const;
+        void destroy(int**) const;
         //==============
 
         //==============
         // double *
         void allocateArray(double*&, double, int) const;
-
+        void destroy(double*) const;
         //==============
         // int *
         void allocateArray(int*&, int, int) const;
+        void destroy(int*) const;
         //==============
 
         bool couple() const;

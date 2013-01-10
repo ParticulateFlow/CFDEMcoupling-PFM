@@ -172,7 +172,8 @@ void twoWayMPI::giveData
     char* charDatatype= const_cast<char*> (datatype);
     data_of_to_liggghts(charName,charType, lmp, (void*) field,charDatatype);
 }
-
+//============
+// double **
 void Foam::twoWayMPI::allocateArray
 (
     double**& array,
@@ -197,7 +198,12 @@ void Foam::twoWayMPI::allocateArray
     char* charLength= const_cast<char*> (length);
     allocate_external_double(array, width,charLength,initVal,lmp);
 }
-
+void Foam::twoWayMPI::destroy(double** array) const
+{
+    if (array == NULL) return;
+    free(array[0]);
+    free(array);
+}
 //============
 // int **
 void Foam::twoWayMPI::allocateArray
@@ -223,6 +229,12 @@ void Foam::twoWayMPI::allocateArray
     //if(length==-1) then LIGGGHTS uses own length data
     char* charLength= const_cast<char*> (length);
     allocate_external_int(array, width,charLength,initVal,lmp);
+}
+void Foam::twoWayMPI::destroy(int** array) const
+{
+    if (array == NULL) return;
+    free(array[0]);
+    free(array);
 }
 //============
 

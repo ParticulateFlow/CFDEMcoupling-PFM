@@ -236,7 +236,7 @@ Foam::cfdemCloud::~cfdemCloud()
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
 inline void Foam::cfdemCloud::free2D(double** array)
 {
-    free(array[0]);
+    if(array) free(array[0]);
     free(array);
 }
 

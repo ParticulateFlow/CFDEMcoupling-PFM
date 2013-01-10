@@ -88,6 +88,12 @@ void Foam::dataExchangeModel::allocateArray
     else FatalError<<"call allocateArray with length, nparticles or nbodies!\n" << abort(FatalError);
     allocateArray(array,initVal,width,len);
 }
+void Foam::dataExchangeModel::destroy(double** array) const
+{
+    if (array == NULL) return;
+    delete [] array[0];
+    delete [] array;
+}
 
 //====
 // int **
@@ -124,6 +130,12 @@ void Foam::dataExchangeModel::allocateArray
     else FatalError<<"call allocateArray with length, nparticles or nbodies!\n" << abort(FatalError);
     allocateArray(array,initVal,width,len);
 }
+void Foam::dataExchangeModel::destroy(int** array) const
+{
+    if (array == NULL) return;
+    delete [] array[0];
+    delete [] array;
+}
 //====
 
 //====
@@ -140,6 +152,10 @@ void Foam::dataExchangeModel::allocateArray
     for (int i=0; i<length; i++)
         array[i] = initVal;
 }
+void Foam::dataExchangeModel::destroy(int* array) const
+{
+    delete [] array;
+}
 //====
 
 //====
@@ -155,6 +171,10 @@ void Foam::dataExchangeModel::allocateArray
     array = new double[length];
     for (int i=0; i<length; i++)
         array[i] = initVal;
+}
+void Foam::dataExchangeModel::destroy(double* array) const
+{
+    delete [] array;
 }
 //====
 
