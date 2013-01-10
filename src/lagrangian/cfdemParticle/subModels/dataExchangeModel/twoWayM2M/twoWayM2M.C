@@ -69,9 +69,6 @@ twoWayM2M::twoWayM2M
     procPatchIndices_(pData_.processorPatchIndices()),
     neighbourProcs_(pData_[Pstream::myProcNo()]),
     neighbourProcIndices_(Pstream::nProcs(), -1)
-/*  lmp2foam_(*new Many2Many(MPI_COMM_WORLD)), // init of many2many &
-    lmp2foam_vec_(*new Many2Many(MPI_COMM_WORLD)),
-    foam2lmp_vec_(*new Many2Many(MPI_COMM_WORLD))*/
 {
     forAll(neighbourProcs_, i) neighbourProcIndices_[neighbourProcs_[i]] = i;
 
@@ -130,8 +127,7 @@ twoWayM2M::twoWayM2M
     foam2lmp_vec_ = NULL;
     nlocal_lammps_ = -1;
     id_lammps_ = NULL;
-    //id_lammpsComm_ = NULL;
-    id_lammps_vec_ = NULL;
+    id_lammpsVec_ = NULL;
     nlocal_foam_ = -1;
     id_foam_ = NULL;
     id_foam_vec_ = NULL;
@@ -153,7 +149,7 @@ twoWayM2M::twoWayM2M
 twoWayM2M::~twoWayM2M()
 {
     free(id_lammps_);
-    free(id_lammps_vec_);
+    free(id_lammpsVec_);
     free(id_foam_vec_);
     free(id_foam_);
     free(id_foam_lost_);
@@ -162,9 +158,6 @@ twoWayM2M::~twoWayM2M()
     delete[] lost_pos_all;
     free(lost_pos_);
     delete[] id_foam_lost_all;
-    //delete& lmp2foam_;  // suitable for m2m&
-    //delete& lmp2foam_vec_;
-    //delete& foam2lmp_vec_;
     lmp->memory->destroy(tmpI_);
     lmp->memory->destroy(tmp_);
     delete lmp2foam_;
@@ -194,17 +187,30 @@ void twoWayM2M::getData
     char* charName = wordToChar(name);
     if ( type == "vector-atom" && name != "x")
     {
-        double **tata_ = (double **) lammps_extract_atom(lmp,charName);
-        lmp2foam_vec_->exchange(&(tata_[0][0]), &(field[0][0]));
-    }else if (name != "x"){
-        //tmp_ = (double *) lammps_extract_atom(lmp,charName); // funct nicht?
+        double **tmp_ = (double **) lammps_extract_atom(lmp,charName);
+        //for (int i = 0; i < nlocal_lammps_; i++)
+        //    for(int j=0;j<3; j++)
+        //       Pout << couplingStep_ << "st tmp_[" << i << "][j]=" << tmp_[i][j] << "  - name="<< name <<endl;
+
+        lmp2foam_vec_->exchange(tmp_ ? tmp_[0] : NULL, field[0]);
+
+        //for (int i = 0; i < nlocal_foam_; i++)
+        //    for(int j=0;j<3; j++)
+        //       Pout << couplingStep_ << "st field[" << i << "][j]=" << field[i][j] << "  - name="<< name <<endl;
+
+    }else if (name != "x")
+    {
         double *tmp_ = (double *) lammps_extract_atom(lmp,charName);
 
-        //if(nlocal_lammps_>0)
-        //    for (int i = 0; i < nlocal_lammps_; i++)
-        //       Pout << couplingStep_ << "st tmp_[" << i << "]=" << tmp_[i] << "  -  "<<endl;
-        lmp2foam_->exchange(tmp_, &(field[0][0]));
+        //for (int i = 0; i < nlocal_lammps_; i++)
+        //    Pout << couplingStep_ << "st tmp_[" << i << "]=" << tmp_[i] << "  -  name=" << name <<endl;
+
+        lmp2foam_->exchange(tmp_, field[0]);
+
+        //for (int i = 0; i < nlocal_foam_; i++)
+        //    Pout << couplingStep_ << "st field[0][" << i << "]=" << field[0][i] << "  -  name=" << name <<endl;
     }
+    //Info << "getData done for :" << name << endl;
 }
 
 void twoWayM2M::getData
@@ -231,15 +237,15 @@ void twoWayM2M::giveData
     char* charName = wordToChar(name);
     if ( type == "vector-atom")
     {
-        double **tata_=NULL;
+        double **tmp_=NULL;
         LAMMPS_NS::Fix *fix = NULL;
         fix = lmp->modify->find_fix_property(charName,"property/atom","vector",0,0,"cfd coupling",false);
         if(fix)
-            tata_ = (double **) static_cast<LAMMPS_NS::FixPropertyAtom*>(fix)->array_atom;
+            tmp_ = (double **) static_cast<LAMMPS_NS::FixPropertyAtom*>(fix)->array_atom;
         else
             Warning << "coupling fix not found!"<<endl;
 
-        foam2lmp_vec_->exchange(&(field[0][0]),&(tata_[0][0]));
+        foam2lmp_vec_->exchange(field[0],tmp_ ? tmp_[0] : NULL);
 
         //==================
         //for(int index = 0;index <  nlocal_lammps_; ++index){
@@ -416,53 +422,61 @@ void Foam::twoWayM2M::syncIDs() const
 
     // get data from lammps
     nlocal_lammps_ = *((int *) lammps_extract_global(lmp,"nlocal"));
-    int*  id_lammps_sync=NULL;
-    double** pos_lammps_sync=NULL;
+    int*  id_lammpsSync=NULL;
+    double** pos_lammpsSync=NULL;
     if(firstRun_)
     {
-        // make a copy of id array
-        allocateArray(id_lammps_,0,nlocal_lammps_);
-        memcpy(id_lammps_, (int *) lammps_extract_atom(lmp,"id"), nlocal_lammps_*sizeof(int));
+        // get access to id array
+        id_lammps_ = (int *) lammps_extract_atom(lmp,"id");
 
-        allocateArray(id_lammps_vec_,0,nlocal_lammps_*3);
+        // genereate vector IDs
+        allocateArray(id_lammpsVec_,0,nlocal_lammps_*3);
         for (int i = 0; i < nlocal_lammps_; i++)
             for (int j=0;j<3;j++)
-                id_lammps_vec_[i*3+j] = id_lammps_[i]*3+j;
+                id_lammpsVec_[i*3+j] = id_lammps_[i]*3+j;
         
-        pos_lammps_ = (double **) lammps_extract_atom(lmp,"x");         
+        // get access to "x"
+        pos_lammps_ = (double **) lammps_extract_atom(lmp,"x");
     }
     else
     {
         // re-arrange data using map
        
         // get access to id array
-        id_lammps_sync = (int *) lammps_extract_atom(lmp,"id");
+        id_lammpsSync = (int *) lammps_extract_atom(lmp,"id");
 
         // genereate vector IDs
-        allocateArray(id_lammps_vec_,0,nlocal_lammps_*3);
+        allocateArray(id_lammpsVec_,0,nlocal_lammps_*3);
         for (int i = 0; i < nlocal_lammps_; i++)
             for (int j=0;j<3;j++)
-                id_lammps_vec_[i*3+j] = id_lammps_sync[i]*3+j;
+                id_lammpsVec_[i*3+j] = id_lammpsSync[i]*3+j;
 
         // make setup of m2m
-        lmp2foam_->setup(nlocal_lammps_,id_lammps_sync,nlocal_foam_,id_foam_);
-        lmp2foam_vec_->setup(nlocal_lammps_*3,id_lammps_vec_,nlocal_foam_*3,id_foam_vec_);
-        foam2lmp_vec_->setup(nlocal_foam_*3,id_foam_vec_,nlocal_lammps_*3,id_lammps_vec_);
+        lmp2foam_->setup(nlocal_lammps_,id_lammpsSync,nlocal_foam_,id_foam_);
+        lmp2foam_vec_->setup(nlocal_lammps_*3,id_lammpsVec_,nlocal_foam_*3,id_foam_vec_);
+        foam2lmp_vec_->setup(nlocal_foam_*3,id_foam_vec_,nlocal_lammps_*3,id_lammpsVec_);
 
         // map data according to last TS
+        id_lammps_=NULL;
         allocateArray(id_lammps_,-1.,nlocal_foam_);
         allocateArray(tmpI_,-1.,nlocal_foam_);
-        lmp2foam_->exchange(id_lammps_sync, tmpI_);
+        lmp2foam_->exchange(id_lammpsSync, tmpI_);
         for(int i=0;i<nlocal_foam_;i++)
             id_lammps_[i]=tmpI_[i];
 
         // get access to "x"
-        pos_lammps_sync = (double **) lammps_extract_atom(lmp,"x");
+        pos_lammpsSync = (double **) lammps_extract_atom(lmp,"x");
         allocateArray(tmp_,-1.,nlocal_foam_*3);
-        lmp2foam_vec_->exchange(pos_lammps_sync[0], tmp_);
+        lmp2foam_vec_->exchange(pos_lammpsSync ? pos_lammpsSync[0] : NULL, tmp_);
+
+        pos_lammps_ = NULL; // points to lig data before
+        allocateArray(pos_lammps_,0,3,nlocal_foam_);
         for(int i=0;i<nlocal_foam_;i++)
             for(int j=0;j<3;j++)
                 pos_lammps_[i][j]=tmp_[i*3+j];
+
+        //for (int i = 0; i < nlocal_foam_; i++)
+        //    Pout << couplingStep_ << "st pos exchanged:" <<"=" << pos_lammps_[i][0]<<","<<pos_lammps_[i][1]<<","<<pos_lammps_[i][2] <<endl;
     }
     particleCloud_.clockM().stop("recv_DEM_ids");
 
@@ -476,24 +490,21 @@ void Foam::twoWayM2M::syncIDs() const
 //FatalError<<"stop!!!"<< abort(FatalError);
 //}
 
-        /*// output
-        Info << "LAMMPS " << endl;
+        // output
+        /*Info << "LAMMPS " << endl;
         for (int i = 0; i < nlocal_lammps_; i++)
         {
             if(firstRun_)
             {
                 Pout << couplingStep_ << "st id_lammps_[" << i << "]=" << id_lammps_[i] << "  -  "<<endl;
             }else{
-                Pout << couplingStep_ << "st id_lammps_sync[" << i << "]=" << id_lammps_sync[i] << "  -  "<<endl;
+                Pout << couplingStep_ << "st id_lammpsSync[" << i << "]=" << id_lammpsSync[i] << "  -  "<<endl;
             }
         }
         for (int i = 0; i < nlocal_lammps_*3; i++)
         {
-            Pout << couplingStep_ << "st id_lammps_vec_[" << i << "]=" << id_lammps_vec_[i] << "  -  "<<endl;
+            Pout << couplingStep_ << "st id_lammpsVec_[" << i << "]=" << id_lammpsVec_[i] << "  -  "<<endl;
         }
-        if (nlocal_foam_>0)
-            for (int i = 0; i < nlocal_foam_; i++)
-                Pout << couplingStep_ << "st pos:" <<"=" << pos_lammps_[i][0]<<","<<pos_lammps_[i][1]<<","<<pos_lammps_[i][2] <<endl;
         Info << "FOAM "<< endl;
         for (int i = 0; i < nlocal_foam_; i++)
         {
@@ -520,13 +531,13 @@ void Foam::twoWayM2M::syncIDs() const
     if(firstRun_)
     {
         lmp2foam_->setup(nlocal_lammps_,id_lammps_,nlocal_foam_,id_foam_);
-        lmp2foam_vec_->setup(nlocal_lammps_*3,id_lammps_vec_,nlocal_foam_*3,id_foam_vec_);
-        foam2lmp_vec_->setup(nlocal_foam_*3,id_foam_vec_,nlocal_lammps_*3,id_lammps_vec_);
+        lmp2foam_vec_->setup(nlocal_lammps_*3,id_lammpsVec_,nlocal_foam_*3,id_foam_vec_);
+        foam2lmp_vec_->setup(nlocal_foam_*3,id_foam_vec_,nlocal_lammps_*3,id_lammpsVec_);
     }else
     {
-        lmp2foam_->setup(nlocal_lammps_,id_lammps_sync,nlocal_foam_,id_foam_);
-        lmp2foam_vec_->setup(nlocal_lammps_*3,id_lammps_vec_,nlocal_foam_*3,id_foam_vec_);
-        foam2lmp_vec_->setup(nlocal_foam_*3,id_foam_vec_,nlocal_lammps_*3,id_lammps_vec_);
+        lmp2foam_->setup(nlocal_lammps_,id_lammpsSync,nlocal_foam_,id_foam_);
+        lmp2foam_vec_->setup(nlocal_lammps_*3,id_lammpsVec_,nlocal_foam_*3,id_foam_vec_);
+        foam2lmp_vec_->setup(nlocal_foam_*3,id_foam_vec_,nlocal_lammps_*3,id_lammpsVec_);
     }
     particleCloud_.clockM().stop("setup_Comm");
 }
@@ -719,23 +730,28 @@ void Foam::twoWayM2M::locateParticle() const
     particleCloud_.clockM().start(9,"locate_Stage3");
 
     // check if all-to-all is necessary
-    int nlocal_foam_lost_all;
-    MPI_Allreduce(&nlocal_foam_lost_, &nlocal_foam_lost_all, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+    int nlocal_foam_lostAll;
+    MPI_Allreduce(&nlocal_foam_lost_, &nlocal_foam_lostAll, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
 
-    if (nlocal_foam_lost_all > 0)
+    if (nlocal_foam_lostAll > 0)
     {
-        Info << "all-to-all necessary: nlocal_foam_lost_all=" << nlocal_foam_lost_all << endl;
+        Info << "all-to-all necessary: nlocal_foam_lostAll=" << nlocal_foam_lostAll << endl;
         if(lost_pos_all) 
         { 
            delete[] lost_pos_all;
            lost_pos_all = NULL;
         }
-        int nlocal_foam_lost_all = LAMMPS_NS::MPI_Allgather_Vector(lost_pos_, nlocal_foam_lost_*3, lost_pos_all, MPI_COMM_WORLD)/3; // new[] für lost_pos_all!!!
+        if(id_foam_lost_all) 
+        { 
+           delete[] id_foam_lost_all;
+           id_foam_lost_all = NULL;
+        }
+        int nlocal_foam_lostAll = LAMMPS_NS::MPI_Allgather_Vector(lost_pos_, nlocal_foam_lost_*3, lost_pos_all, MPI_COMM_WORLD)/3; // new[] für lost_pos_all!!!
         LAMMPS_NS::MPI_Allgather_Vector(id_foam_lost_, nlocal_foam_lost_, id_foam_lost_all, MPI_COMM_WORLD);
-        //Info << couplingStep_ << "st nlocal_foam_lost_all=" << nlocal_foam_lost_all << endl;
+        //Info << couplingStep_ << "st nlocal_foam_lostAll=" << nlocal_foam_lostAll << endl;
 
         // locate lost particles
-        for (int i = 0; i < nlocal_foam_lost_all; i++)
+        for (int i = 0; i < nlocal_foam_lostAll; i++)
         {
             pos = vector(lost_pos_all[i*3+0],lost_pos_all[i*3+1],lost_pos_all[i*3+2]);
             //Pout << "stage3 look for particle at pos=" << pos << endl;
@@ -767,11 +783,11 @@ void Foam::twoWayM2M::locateParticle() const
 
   /*  // check if really all particles were found
     particleCloud_.clockM().start(10,"locate_Stage3");
-    Foam::dataExchangeModel::allocateArray(id_foam_nowhere_all,1,nlocal_foam_lost_all);
-    MPI_Allreduce(id_foam_lost_all, id_foam_nowhere_all, nlocal_foam_lost_all, MPI_INT, MPI_MIN, MPI_COMM_WORLD);
+    Foam::dataExchangeModel::allocateArray(id_foam_nowhere_all,1,nlocal_foam_lostAll);
+    MPI_Allreduce(id_foam_lost_all, id_foam_nowhere_all, nlocal_foam_lostAll, MPI_INT, MPI_MIN, MPI_COMM_WORLD);
 
     int i=0;
-    while (i < nlocal_foam_lost_all)
+    while (i < nlocal_foam_lostAll)
     {
         // these particles where found nowhere
         if (id_foam_nowhere_all[i] > 0)
@@ -786,7 +802,7 @@ void Foam::twoWayM2M::locateParticle() const
                     // re-arrange IDs for vectors
                     for (int k=0;k<3;k++)
                     {
-                        id_lammps_vec_[j*3+k] = id_lammps_vec_[nlocal_lammps_*3+k];
+                        id_lammpsVec_[j*3+k] = id_lammpsVec_[nlocal_lammps_*3+k];
                     }
                 
                     nlocal_lammps_ -= 1;

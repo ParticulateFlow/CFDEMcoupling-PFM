@@ -29,7 +29,7 @@ liggghtsCommandModels
 );
 // ************************************************************************* //
 
-runLiggghtsProps
+/*runLiggghtsProps
 {
     preNo false;
-}
+}*/
