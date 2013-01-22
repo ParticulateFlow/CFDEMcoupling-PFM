@@ -90,6 +90,7 @@ private:
 
     // new vars
     mutable bool firstRun_;
+    bool safeRun_;
     mutable Many2Many * lmp2foam_;
     mutable Many2Many * lmp2foam_vec_;
     mutable Many2Many * foam2lmp_vec_;

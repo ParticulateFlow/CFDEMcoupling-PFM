@@ -121,8 +121,8 @@ void KochHillDrag::setForce
 	scalar Vs(0);
 	scalar volumefraction(0);
 
-    interpolationCellPoint<scalar> voidfractionInterpolator_(voidfraction_);
-    interpolationCellPoint<vector> UInterpolator_(U_);
+    //interpolationCellPoint<scalar> voidfractionInterpolator_(voidfraction_);
+    //interpolationCellPoint<vector> UInterpolator_(U_);
 
     for(int index = 0;index <  particleCloud_.numberOfParticles(); index++)
     {
@@ -133,7 +133,7 @@ void KochHillDrag::setForce
 
             if (cellI > -1) // particle Found
             {
-                if(interpolation_)
+                /*if(interpolation_)
                 {
 	                position = particleCloud_.position(index);
                     voidfraction = voidfractionInterpolator_.interpolate(position,cellI);
@@ -142,7 +142,7 @@ void KochHillDrag::setForce
                     // Info << " --> voidfraction: " << voidfraction << endl;
                     if(voidfraction>1.00) voidfraction = 1.00;
                     if(voidfraction<0.40) voidfraction = 0.40;
-                }else
+                }else*/
                 {
 					voidfraction = particleCloud_.voidfraction(index);
                     Ufluid = U_[cellI];

@@ -122,6 +122,7 @@ twoWayM2M::twoWayM2M
 
     // m2m stuff
     firstRun_=true;
+	safeRun_=false;
     lmp2foam_ = NULL;
     lmp2foam_vec_ = NULL;
     foam2lmp_vec_ = NULL;
@@ -141,6 +142,7 @@ twoWayM2M::twoWayM2M
     lost_posAll = NULL;
     cellID_foam_ = NULL;
     pos_foam_ = NULL;
+	if (propsDict_.found("safeRun")) safeRun_=true;
 }
 
 
@@ -747,9 +749,13 @@ void Foam::twoWayM2M::locateParticle() const
     // stage 3 - all-to-all
     particleCloud_.clockM().start(9,"locate_Stage3");
 
+    particleCloud_.clockM().start(10,"locate_Stage3.1");
     // check if all-to-all is necessary
-    int nlocal_foam_lostAll;
-    MPI_Allreduce(&nlocal_foam_lost_, &nlocal_foam_lostAll, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+    int nlocal_foam_lostAll(-1);
+	if (firstRun_ || safeRun_)
+	    MPI_Allreduce(&nlocal_foam_lost_, &nlocal_foam_lostAll, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+ 
+   particleCloud_.clockM().stop("locate_Stage3.1");
 
     if (nlocal_foam_lostAll > 0)
     {
