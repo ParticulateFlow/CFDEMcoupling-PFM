@@ -651,7 +651,7 @@ void Foam::twoWayM2M::locateParticle() const
     particleCloud_.clockM().stop("locate_Stage1");
 
     // stage 2 - recv particle, locate or all-to-all
-    particleCloud_.clockM().start(9,"locate_Stage2");
+    particleCloud_.clockM().start(8,"locate_Stage2");
  
     // Allocate transfer buffers
     PstreamBuffers pBufs(Pstream::nonBlocking);
