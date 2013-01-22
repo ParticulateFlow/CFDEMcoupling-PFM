@@ -112,13 +112,14 @@ int main(int argc, char *argv[])
             for (int corr=0; corr<nCorrSoph; corr++)
             {
                 volScalarField rUA = 1.0/UEqn.A();
+
                 surfaceScalarField rUAf("(1|A(U))", fvc::interpolate(rUA));
                 volScalarField rUAvoidfraction("(voidfraction2|A(U))",rUA*voidfraction);
 
                 U = rUA*UEqn.H();
 
-                phi = ( fvc::interpolate(U*voidfraction) & mesh.Sf() )
-                      + fvc::ddtPhiCorr(rUAvoidfraction, U, phi);
+                phi = (fvc::interpolate(U*voidfraction) & mesh.Sf() )
+                     + fvc::ddtPhiCorr(rUAvoidfraction, U, phi);
                 surfaceScalarField phiS(fvc::interpolate(Us*voidfraction) & mesh.Sf());
                 surfaceScalarField phiGes = phi + rUAf*(fvc::interpolate(Ksl/rho) * phiS);
 

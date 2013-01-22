@@ -43,6 +43,13 @@ namespace Foam
 
 defineTypeNameAndDebug(noClock, 0);
 
+addToRunTimeSelectionTable
+(
+    clockModel,
+    noClock,
+    dictionary
+);
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 // Construct from components

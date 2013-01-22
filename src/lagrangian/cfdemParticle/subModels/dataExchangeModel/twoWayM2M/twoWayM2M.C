@@ -130,15 +130,15 @@ twoWayM2M::twoWayM2M
     id_lammpsVec_ = NULL;
     nlocal_foam_ = -1;
     id_foam_ = NULL;
-    id_foam_vec_ = NULL;
+    id_foamVec_ = NULL;
     tmp_ = NULL;
     tmpI_ = NULL;
     pos_lammps_=NULL;
     nlocal_foam_lost_ = -1;
-    id_foam_lost_ = NULL;
-    id_foam_lost_all = NULL;
+    id_foamLost_ = NULL;
+    id_foamLostAll = NULL;
     lost_pos_ = NULL;
-    lost_pos_all = NULL;
+    lost_posAll = NULL;
     cellID_foam_ = NULL;
     pos_foam_ = NULL;
 }
@@ -150,14 +150,14 @@ twoWayM2M::~twoWayM2M()
 {
     free(id_lammps_);
     free(id_lammpsVec_);
-    free(id_foam_vec_);
+    free(id_foamVec_);
     free(id_foam_);
-    free(id_foam_lost_);
+    free(id_foamLost_);
     free(pos_foam_);
     free(cellID_foam_);
-    delete[] lost_pos_all;
+    delete[] lost_posAll;
     free(lost_pos_);
-    delete[] id_foam_lost_all;
+    delete[] id_foamLostAll;
     destroy(tmpI_);
     destroy(tmp_);
     destroy(pos_lammps_);
@@ -469,8 +469,8 @@ void Foam::twoWayM2M::syncIDs() const
 
         // make setup of m2m
         lmp2foam_->setup(nlocal_lammps_,id_lammpsSync,nlocal_foam_,id_foam_);
-        lmp2foam_vec_->setup(nlocal_lammps_*3,id_lammpsVec_,nlocal_foam_*3,id_foam_vec_);
-        foam2lmp_vec_->setup(nlocal_foam_*3,id_foam_vec_,nlocal_lammps_*3,id_lammpsVec_);
+        lmp2foam_vec_->setup(nlocal_lammps_*3,id_lammpsVec_,nlocal_foam_*3,id_foamVec_);
+        foam2lmp_vec_->setup(nlocal_foam_*3,id_foamVec_,nlocal_lammps_*3,id_lammpsVec_);
 
         // map data according to last TS
         allocateArray(id_lammps_,-1.,nlocal_foam_);
@@ -526,7 +526,7 @@ void Foam::twoWayM2M::syncIDs() const
         }
         for (int i = 0; i < nlocal_foam_*3; i++)
         {
-            Pout << couplingStep_ << "st id_foam_vec_[" << i << "]=" << id_foam_vec_[i] << "  -  "<<endl;
+            Pout << couplingStep_ << "st id_foamVec_[" << i << "]=" << id_foamVec_[i] << "  -  "<<endl;
         }
         Pout << couplingStep_ << "st nlocal_lammps_=" << nlocal_lammps_ << endl;
         Pout << couplingStep_ << "st nlocal_foam_=" << nlocal_foam_ << endl;*/
@@ -545,15 +545,15 @@ void Foam::twoWayM2M::syncIDs() const
     if(firstRun_)
     {
         lmp2foam_->setup(nlocal_lammps_,id_lammps_,nlocal_foam_,id_foam_);
-        lmp2foam_vec_->setup(nlocal_lammps_*3,id_lammpsVec_,nlocal_foam_*3,id_foam_vec_);
-        foam2lmp_vec_->setup(nlocal_foam_*3,id_foam_vec_,nlocal_lammps_*3,id_lammpsVec_);
+        lmp2foam_vec_->setup(nlocal_lammps_*3,id_lammpsVec_,nlocal_foam_*3,id_foamVec_);
+        foam2lmp_vec_->setup(nlocal_foam_*3,id_foamVec_,nlocal_lammps_*3,id_lammpsVec_);
         id_lammps_=NULL;    // free pointer from LIG
         pos_lammps_ = NULL; // free pointer from LIG
     }else
     {
         lmp2foam_->setup(nlocal_lammps_,id_lammpsSync,nlocal_foam_,id_foam_);
-        lmp2foam_vec_->setup(nlocal_lammps_*3,id_lammpsVec_,nlocal_foam_*3,id_foam_vec_);
-        foam2lmp_vec_->setup(nlocal_foam_*3,id_foam_vec_,nlocal_lammps_*3,id_lammpsVec_);
+        lmp2foam_vec_->setup(nlocal_lammps_*3,id_lammpsVec_,nlocal_foam_*3,id_foamVec_);
+        foam2lmp_vec_->setup(nlocal_foam_*3,id_foamVec_,nlocal_lammps_*3,id_lammpsVec_);
     }
     particleCloud_.clockM().stop("setup_Comm");
 }
@@ -563,12 +563,13 @@ void Foam::twoWayM2M::locateParticle() const
     int nop = particleCloud_.numberOfParticles();
 
     // realloc array of lost particles     // these arrays will be too long, but we do not know their length a priori???
-    allocateArray(id_foam_lost_,0,nop);
+    allocateArray(id_foamLost_,0,nop);
     allocateArray(lost_pos_,0.,nop*3);
     allocateArray(id_foam_,0,nop);
-    allocateArray(id_foam_vec_,0,nop*3);
+    allocateArray(id_foamVec_,0,nop*3);
     allocateArray(cellID_foam_,0,nop);
-    allocateArray(pos_foam_,0,nop*3);
+    if(firstRun_)
+		allocateArray(pos_foam_,0,nop*3);
 
     // stage 1 - look on proc or send or prepare for all-to-all
     particleCloud_.clockM().start(7,"locate_Stage1");
@@ -599,7 +600,7 @@ void Foam::twoWayM2M::locateParticle() const
             // IDs for vectors
             for (int j=0;j<3;j++)
             {
-                id_foam_vec_[nlocal_foam_*3+j] = id_lammps_[i]*3+j;                
+                id_foamVec_[nlocal_foam_*3+j] = id_lammps_[i]*3+j;                
                 pos_foam_[nlocal_foam_*3+j] = pos[j];
             }
             cellID_foam_[nlocal_foam_] = cellID;
@@ -631,12 +632,13 @@ void Foam::twoWayM2M::locateParticle() const
                     particleTransferID[n].append(id_lammps_[i]);
                     particleTransferPos[n].append(pos);
                     commPart=true;
+					//Pout << couplingStep_ << "st communicating particle " << id_lammps_[i] << ", to proc# " << n << endl;
                 }
             }
             if (!commPart)
             {
                 // prepare for all to all comm
-                id_foam_lost_[nlocal_foam_lost_] = id_lammps_[i];
+                id_foamLost_[nlocal_foam_lost_] = id_lammps_[i];
           
                 for (int j=0; j<3; j++)
                     lost_pos_[nlocal_foam_lost_*3+j] = pos[j];
@@ -715,13 +717,13 @@ void Foam::twoWayM2M::locateParticle() const
                     // IDs for vectors
                     for (int j=0;j<3;j++)
                     {
-                        id_foam_vec_[nlocal_foam_*3+j] = recvParticleTransferID[i]*3+j;
+                        id_foamVec_[nlocal_foam_*3+j] = recvParticleTransferID[i]*3+j;
                         pos_foam_[nlocal_foam_*3+j] = pos[j];
                     }
                     cellID_foam_[nlocal_foam_] = cellID;
 
                     // mark that ID was finally found
-                    //id_foam_lost_all[i]=-1;
+                    //id_foamLostAll[i]=-1;
 
                     nlocal_foam_ += 1;
                     //Pout << couplingStep_ << "st stage2 found particle at pos=" << pos << " ,id_foam_[i]=" << id_foam_[i] << endl;
@@ -729,7 +731,7 @@ void Foam::twoWayM2M::locateParticle() const
                 else // might have been comm to wrong proc
                 {
                     // prepare for all to all comm
-                    id_foam_lost_[nlocal_foam_lost_] = recvParticleTransferID[i];
+                    id_foamLost_[nlocal_foam_lost_] = recvParticleTransferID[i];
           
                     for (int j=0; j<3; j++)
                         lost_pos_[nlocal_foam_lost_*3+j] = pos[j];
@@ -752,24 +754,24 @@ void Foam::twoWayM2M::locateParticle() const
     if (nlocal_foam_lostAll > 0)
     {
         Info << "all-to-all necessary: nlocal_foam_lostAll=" << nlocal_foam_lostAll << endl;
-        if(lost_pos_all) 
+        if(lost_posAll) 
         { 
-           delete[] lost_pos_all;
-           lost_pos_all = NULL;
+           delete[] lost_posAll;
+           lost_posAll = NULL;
         }
-        if(id_foam_lost_all) 
+        if(id_foamLostAll) 
         { 
-           delete[] id_foam_lost_all;
-           id_foam_lost_all = NULL;
+           delete[] id_foamLostAll;
+           id_foamLostAll = NULL;
         }
-        int nlocal_foam_lostAll = LAMMPS_NS::MPI_Allgather_Vector(lost_pos_, nlocal_foam_lost_*3, lost_pos_all, MPI_COMM_WORLD)/3; // new[] für lost_pos_all!!!
-        LAMMPS_NS::MPI_Allgather_Vector(id_foam_lost_, nlocal_foam_lost_, id_foam_lost_all, MPI_COMM_WORLD);
+        int nlocal_foam_lostAll = LAMMPS_NS::MPI_Allgather_Vector(lost_pos_, nlocal_foam_lost_*3, lost_posAll, MPI_COMM_WORLD)/3; // new[] für lost_posAll!!!
+        LAMMPS_NS::MPI_Allgather_Vector(id_foamLost_, nlocal_foam_lost_, id_foamLostAll, MPI_COMM_WORLD);
         //Info << couplingStep_ << "st nlocal_foam_lostAll=" << nlocal_foam_lostAll << endl;
 
         // locate lost particles
         for (int i = 0; i < nlocal_foam_lostAll; i++)
         {
-            pos = vector(lost_pos_all[i*3+0],lost_pos_all[i*3+1],lost_pos_all[i*3+2]);
+            pos = vector(lost_posAll[i*3+0],lost_posAll[i*3+1],lost_posAll[i*3+2]);
             //Pout << "stage3 look for particle at pos=" << pos << endl;
             cellID = particleCloud_.locateM().findSingleCell(pos,searchCellID);
         
@@ -777,21 +779,21 @@ void Foam::twoWayM2M::locateParticle() const
             if (cellID >= 0)
             {
                 // IDs for scalars
-                id_foam_[nlocal_foam_] = id_foam_lost_all[i];
+                id_foam_[nlocal_foam_] = id_foamLostAll[i];
 
                 // IDs for vectors
                 for (int j=0;j<3;j++)
                 {
-                    id_foam_vec_[nlocal_foam_*3+j] = id_foam_lost_all[i]*3+j;
+                    id_foamVec_[nlocal_foam_*3+j] = id_foamLostAll[i]*3+j;
                     pos_foam_[nlocal_foam_*3+j] = pos[j];
                 }
                 cellID_foam_[nlocal_foam_] = cellID;
 
                 // mark that ID was finally found
-                //id_foam_lost_all[i]=-1;
+                //id_foamLostAll[i]=-1;
 
                 nlocal_foam_ += 1;
-                //Pout << "stage3 found particle at pos=" << pos << " ,id="<< id_foam_lost_all[i] << endl;
+                //Pout << "stage3 found particle at pos=" << pos << " ,id="<< id_foamLostAll[i] << endl;
             }
         }
     }
@@ -800,7 +802,7 @@ void Foam::twoWayM2M::locateParticle() const
   /*  // check if really all particles were found
     particleCloud_.clockM().start(10,"locate_Stage3");
     Foam::dataExchangeModel::allocateArray(id_foam_nowhere_all,1,nlocal_foam_lostAll);
-    MPI_Allreduce(id_foam_lost_all, id_foam_nowhere_all, nlocal_foam_lostAll, MPI_INT, MPI_MIN, MPI_COMM_WORLD);
+    MPI_Allreduce(id_foamLostAll, id_foam_nowhere_all, nlocal_foam_lostAll, MPI_INT, MPI_MIN, MPI_COMM_WORLD);
 
     int i=0;
     while (i < nlocal_foam_lostAll)

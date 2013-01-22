@@ -98,15 +98,15 @@ private:
     mutable int *id_lammpsVec_;
     mutable int nlocal_foam_;
     mutable int *id_foam_;
-    mutable int *id_foam_vec_;
+    mutable int *id_foamVec_;
     mutable double *tmp_;
     mutable int *tmpI_;
     mutable double **pos_lammps_;
     mutable int nlocal_foam_lost_;
-    mutable int *id_foam_lost_;
-    mutable int *id_foam_lost_all;
+    mutable int *id_foamLost_;
+    mutable int *id_foamLostAll;
     mutable double *lost_pos_;
-    mutable double *lost_pos_all;
+    mutable double *lost_posAll;
     mutable int *cellID_foam_;
     mutable double *pos_foam_;
 
