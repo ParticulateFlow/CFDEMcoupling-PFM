@@ -59,11 +59,11 @@ int main(int argc, char *argv[])
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-    Info<< "\nStarting time loop\n" << endl;
-    particleCloud.clockM().start(1,"Global");
-
     while (runTime.loop())
     {
+        Info<< "\nStarting time loop\n" << endl;
+            particleCloud.clockM().start(1,"Global");
+
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
         #include "readPISOControls.H"
@@ -177,11 +177,11 @@ int main(int argc, char *argv[])
             << nl << endl;
 
         particleCloud.clockM().stop("Flow");
+        particleCloud.clockM().stop("Global");
     }
 
     Info<< "End\n" << endl;
-
-    particleCloud.clockM().stop("Global");
+    
     return 0;
 }
 

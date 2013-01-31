@@ -98,8 +98,17 @@ alias cfdemSysTest='bash $CFDEM_SRC_DIR/etc/cfdemSystemTest.sh'
 #- shortcut to compile LIGGGHTS
 alias cfdemCompLIG='bash $CFDEM_SRC_DIR/etc/compileLIGGGHTS.sh'
 
-#- shortcut to compile CFDEMcoupling
+#- shortcut to compile CFDEMcoupling (src+solvers)
 alias cfdemCompCFDEM='bash $CFDEM_SRC_DIR/etc/compileCFDEMcoupling.sh'
+
+#- shortcut to compile CFDEMcoupling src
+alias cfdemCompCFDEMsrc='bash $CFDEM_SRC_DIR/etc/compileCFDEMcoupling_src.sh'
+
+#- shortcut to compile CFDEMcoupling solvers
+alias cfdemCompCFDEMsol='bash $CFDEM_SRC_DIR/etc/compileCFDEMcoupling_sol.sh'
+
+#- shortcut to compile CFDEMcoupling utilities
+alias cfdemCompCFDEMuti='bash $CFDEM_SRC_DIR/etc/compileCFDEMcoupling_uti.sh'
 
 #- shortcut to compile couple library
 alias cfdemCompM2M='bash $CFDEM_SRC_DIR/etc/compileM2Mlib.sh'

@@ -749,13 +749,14 @@ void Foam::twoWayM2M::locateParticle() const
     // stage 3 - all-to-all
     particleCloud_.clockM().start(9,"locate_Stage3");
 
-    particleCloud_.clockM().start(10,"locate_Stage3.1");
     // check if all-to-all is necessary
     int nlocal_foam_lostAll(-1);
 	if (firstRun_ || safeRun_)
+    {
+        particleCloud_.clockM().start(10,"locate_Stage3_1");
 	    MPI_Allreduce(&nlocal_foam_lost_, &nlocal_foam_lostAll, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
- 
-   particleCloud_.clockM().stop("locate_Stage3.1");
+        particleCloud_.clockM().stop("locate_Stage3_1");
+    }
 
     if (nlocal_foam_lostAll > 0)
     {

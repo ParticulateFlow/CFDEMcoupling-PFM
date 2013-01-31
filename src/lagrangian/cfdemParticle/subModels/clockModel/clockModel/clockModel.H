@@ -63,6 +63,7 @@ protected:
     const dictionary& dict_;
     cfdemCloud& particleCloud_;
     fileName path_;
+    scalar startTime_;
 
     mutable int n_;
     mutable std::vector<clock_t> deltaT_;

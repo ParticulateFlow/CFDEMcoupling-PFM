@@ -54,6 +54,8 @@ void Foam::clockModel::start(int pos) const
 
 void Foam::clockModel::start(int pos,std::string ident) const
 {
+    if(particleCloud_.mesh().time().value() > startTime_)
+    {
 	if (pos >= n_) // alternatively one fixed size?
 	{
 		n_ = 2*n_;
@@ -70,11 +72,14 @@ void Foam::clockModel::start(int pos,std::string ident) const
 	curParent_ = pos;
 	nOfRuns_[pos] += 1;
 	deltaT_[pos]-=std::clock();
+    }
 	return;
 }
 
 void Foam::clockModel::stop() const
 {
+    if(particleCloud_.mesh().time().value() > startTime_)
+    {
 	deltaT_[curParent_]+=std::clock();
 	curLev_ -= 1;
 	if (curParent_ >= 0)
@@ -85,11 +90,14 @@ void Foam::clockModel::stop() const
 	{
 		curParent_ = -1;
 	}
+    }
 	return;
 }
 
 void Foam::clockModel::stop(std::string ident) const
 {
+    if(particleCloud_.mesh().time().value() > startTime_)
+    {
 	deltaT_[curParent_] += std::clock();
 	if (curParent_ > 0 && identifier_[curParent_].compare(ident)!=0)
 	{
@@ -104,6 +112,7 @@ void Foam::clockModel::stop(std::string ident) const
 	{
 		curParent_ = -1;
 	}
+    }
 	return;
 }
 
@@ -198,7 +207,7 @@ void Foam::clockModel::evalPar() const
 	// MPI_REDUCE SUM NODES
 	MPI_Barrier(MPI_COMM_WORLD);
 	strs.str("");
-	std::string msg = "Parallel Measurements in CPU-seconds of all Processors:";
+	std::string msg = "Parallel Measurements in CPU-seconds of all Processors (starting after first t.s.):";
 	msg.append("\n");
 	msg.append("Name \t avgdeltaT \t maxdeltaT \t nOfRuns \t level \t parentNr \t parentName \n");
 	double buffOut=0.;
@@ -403,6 +412,8 @@ Foam::clockModel::clockModel
     dict_(dict),
     particleCloud_(sm),
     path_("clockData"),
+    startTime_(sm.mesh().time().startTime().value()+sm.mesh().time().deltaT().value()+SMALL),  // delay start of measurement by deltaT
+    //startTime_(0),                                //no delay
     n_(30),
     deltaT_(std::vector<clock_t> (n_)),
     identifier_(std::vector<std::string> (n_)),
@@ -411,7 +422,10 @@ Foam::clockModel::clockModel
     curLev_(0),
     parent_(std::vector<int> (n_)),
     curParent_(0)
-{}
+{
+
+    Info << "start clock measurement at t >"  << startTime_ << endl;
+}
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //

@@ -295,6 +295,55 @@ CFDrun()
 #==================================#
 
 #==================================#
+#- function to run a CFD case in parallel   !!!NOT DEBUGGED!!!
+parCFDrun()
+{
+    #--------------------------------------------------------------------------------#
+    #- define variables
+    logpath="$1"
+    logfileName="$2"
+    casePath="$3"
+    headerText="$4"
+    solverName="$5"
+    nrProcs="$6"
+    machineFileName="$7"
+    debugMode="$8"
+    #--------------------------------------------------------------------------------#
+
+    if [ $debugMode == "on" ]; then
+        debugMode="valgrind"
+    else
+        debugMode=""
+    fi
+
+    #- clean up old log file
+    rm $logpath/$logfileName
+
+    #- change path
+    cd $casePath/CFD
+
+    #- header
+    echo 2>&1 | tee -a /$logpath/$logfileName
+    echo "//   $headerText   //" 2>&1 | tee -a $logpath/$logfileName
+    echo 2>&1 | tee -a $logpath/$logfileName
+
+    #- write path
+    pwd 2>&1 | tee -a $logpath/$logfileName
+    echo 2>&1 | tee -a $logpath/$logfileName
+
+    #- run applictaion
+    if [ $machineFileName == "none" ]; then
+        mpirun -np $nrProcs $solverName 2>&1 | tee -a $logpath/$logfileName
+    else
+        mpirun -machinefile $machineFileName -np $nrProcs $debugMode $solverName -parallel 2>&1 | tee -a $logpath/$logfileName
+    fi
+
+    #- keep terminal open (if started in new terminal)
+    #read
+}
+#==================================#
+
+#==================================#
 #- function to run a parallel CFD-DEM case
 
 parCFDDEMrun()
