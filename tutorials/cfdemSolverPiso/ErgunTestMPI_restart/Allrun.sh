@@ -107,6 +107,7 @@ rm -rf $casePath/CFD/patchAverage_pressureDrop
 rm -rf $casePath/CFD/probes
 rm -rf $casePath/CFD/particles
 rm -r $casePath/CFD/log.*
+rm -r $casePath/CFD/lagrangian
 rm $casePath/log.liggghts
 rm $casePath/DEM/liggghts.restartCFDEM*
 rm $casePath/DEM/post/dump.*

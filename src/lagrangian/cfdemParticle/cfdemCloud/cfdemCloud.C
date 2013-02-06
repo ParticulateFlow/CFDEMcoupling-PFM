@@ -42,7 +42,6 @@ Description
 #include "clockModel.H"
 #include "liggghtsCommandModel.H"
 
-#include "mpi.h"
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 Foam::cfdemCloud::cfdemCloud
 (
@@ -222,24 +221,18 @@ Foam::cfdemCloud::~cfdemCloud()
 {
     clockM().evalPar();
     clockM().normHist();
-    free2D(positions_);
-    free2D(velocities_);
-    free2D(impForces_);
-    free2D(expForces_);
-    free2D(DEMForces_);
-    free2D(radii_);
-    free2D(voidfractions_);
-    free2D(cellIDs_);
-    free2D(particleWeights_);
-    free2D(particleVolumes_);
+    dataExchangeM().destroy(positions_,3);
+    dataExchangeM().destroy(velocities_,3);
+    dataExchangeM().destroy(impForces_,3);
+    dataExchangeM().destroy(expForces_,3);
+    dataExchangeM().destroy(DEMForces_,3);
+    dataExchangeM().destroy(radii_,1);
+    dataExchangeM().destroy(voidfractions_,1);
+    dataExchangeM().destroy(cellIDs_,1);
+    dataExchangeM().destroy(particleWeights_,1);
+    dataExchangeM().destroy(particleVolumes_,1);
 }
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
-inline void Foam::cfdemCloud::free2D(double** array)
-{
-    if(array) free(array[0]);
-    free(array);
-}
-
 void Foam::cfdemCloud::getDEMdata()
 {
     dataExchangeM().getData("radius","scalar-atom",radii_);

@@ -46,7 +46,7 @@ if [ $liggghtsSim == "true" ]
 
     #- generate VTK data
     cd $casePath/DEM/post
-    python -i $CFDEM_LPP_DIR/lpp.py  dump.liggghts_init
+    python $CFDEM_LPP_DIR/lpp.py  dump.liggghts_init
 
 fi
 
@@ -58,7 +58,7 @@ if [ $cfdemPostProc == "true" ]
     headerText="run_cfdemPostproc_fillCylinder_CFD"
     logfileName="log_$headerText"
     solverName="cfdemPostproc"
-    debugMode="off"          # on | off
+    debugMode="off"          # on | off | strict
     #--------------------------------------------------------------------------------#
 
     #- clean up case
@@ -90,7 +90,6 @@ rm -r $casePath/CFD/particles
 rm -r $casePath/CFD/VTK
 rm -r $casePath/DEM/post/*
 rm -r $casePath/DEM/log.*
-rm -r $casePath/log*
 echo "done"
 
 #- preserve post directory

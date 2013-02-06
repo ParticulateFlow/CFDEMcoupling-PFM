@@ -162,7 +162,7 @@ twoWayM2M::~twoWayM2M()
     delete[] id_foamLostAll;
     destroy(tmpI_);
     destroy(tmp_);
-    destroy(pos_lammps_);
+    destroy(pos_lammps_,3);
     delete lmp2foam_;
     delete lmp2foam_vec_;
     delete foam2lmp_vec_;
@@ -293,8 +293,9 @@ void Foam::twoWayM2M::allocateArray
         for (int j = 0; j < width; j++)
             array[i][j] = initVal;
 }
-void Foam::twoWayM2M::destroy(double** array) const
+void Foam::twoWayM2M::destroy(double** array,int len) const
 {
+    // destroy array[i] first?
     lmp->memory->destroy(array);
 }
 //============
@@ -328,8 +329,9 @@ void Foam::twoWayM2M::allocateArray
         for (int j = 0; j < width; j++)
             array[i][j] = initVal;
 }
-void Foam::twoWayM2M::destroy(int** array) const
+void Foam::twoWayM2M::destroy(int** array,int len) const
 {
+    // destroy array[i] first?
     lmp->memory->destroy(array);
 }
 //============

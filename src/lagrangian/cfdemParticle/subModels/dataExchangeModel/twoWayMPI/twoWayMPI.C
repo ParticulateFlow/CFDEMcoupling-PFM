@@ -198,10 +198,14 @@ void Foam::twoWayMPI::allocateArray
     char* charLength= const_cast<char*> (length);
     allocate_external_double(array, width,charLength,initVal,lmp);
 }
-void Foam::twoWayMPI::destroy(double** array) const
+void Foam::twoWayMPI::destroy(double** array,int len) const
 {
     if (array == NULL) return;
-    free(array[0]);
+
+    //for ( int i = 0; i < len; i++ ) // does not work
+    for ( int i = 0; i < 1; i++ )
+        free(array[i]); 
+
     free(array);
 }
 //============
@@ -230,10 +234,28 @@ void Foam::twoWayMPI::allocateArray
     char* charLength= const_cast<char*> (length);
     allocate_external_int(array, width,charLength,initVal,lmp);
 }
-void Foam::twoWayMPI::destroy(int** array) const
+void Foam::twoWayMPI::destroy(int** array,int len) const
 {
     if (array == NULL) return;
-    free(array[0]);
+
+    //for ( int i = 0; i < len; i++ ) // does not work
+    for ( int i = 0; i < 1; i++ )
+        free(array[i]); 
+
+    free(array);
+}
+//============
+// int *
+void Foam::twoWayMPI::destroy(int* array) const
+{
+    if (array == NULL) return;
+    free(array);
+}
+//============
+// double *
+void Foam::twoWayMPI::destroy(double* array) const
+{
+    if (array == NULL) return;
     free(array);
 }
 //============

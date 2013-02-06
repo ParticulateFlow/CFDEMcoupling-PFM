@@ -162,8 +162,6 @@ protected:
     autoPtr<liggghtsCommandModel>* liggghtsCommand_;
 
 // Private member functions
-    inline void free2D(double**);
-
     virtual void getDEMdata();
 
     virtual void giveDEMdata();
@@ -238,11 +236,11 @@ public:
 
        inline double ** voidfractions() const;
 
-       inline void set_radii(double**&) const;
+       inline void get_radii(double**&) const;
 
        inline double ** cellIDs() const;
 
-       inline void set_cellIDs(double**&) const;
+       inline void get_cellIDs(double**&) const;
 
        inline double ** particleWeights() const;
 

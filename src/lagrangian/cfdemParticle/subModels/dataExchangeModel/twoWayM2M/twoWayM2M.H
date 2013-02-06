@@ -182,12 +182,12 @@ public:
         // double **
         void allocateArray(double**&, double, int, int) const;
         void allocateArray(double**&, double, int,const char* ="nparticles") const;
-        void destroy(double**) const;
+        void destroy(double**,int) const;
         //============
         // int **
         void allocateArray(int**&, int, int, int) const;
         void allocateArray(int**&, int, int,const char* ="nparticles") const;
-        void destroy(int**) const;
+        void destroy(int**,int) const;
         //==============
 
         //==============

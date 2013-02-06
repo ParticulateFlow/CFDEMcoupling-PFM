@@ -94,7 +94,7 @@ voidFractionModel::voidFractionModel
 
 voidFractionModel::~voidFractionModel()
 {
-    particleCloud_.dataExchangeM().destroy(cellsPerParticle_);
+    particleCloud_.dataExchangeM().destroy(cellsPerParticle_,1);
 }
 
 // * * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * * //
