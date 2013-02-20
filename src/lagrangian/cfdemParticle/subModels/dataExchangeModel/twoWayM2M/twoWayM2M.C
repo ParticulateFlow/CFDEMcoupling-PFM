@@ -34,7 +34,6 @@ Description
 #include "addToRunTimeSelectionTable.H"
 #include "clockModel.H"
 #include "memory.h"
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam

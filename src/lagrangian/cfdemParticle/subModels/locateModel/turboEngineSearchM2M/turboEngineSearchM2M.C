@@ -92,21 +92,23 @@ label turboEngineSearchM2M::intersection
 ) const
 {
     // find intersection with boundary
-    label face = searchEngine_.intersection(pStart,pEnd).index();
+    label face = searchEngine_.findNearestBoundaryFace(pEnd);
+    //Pout << "a1- found face=" << face << " with findNearestBoundaryFace" << endl;
 
     // try alternative
     if (face==-1)
     {
         // try alternative
-        face = searchEngine_.findNearestBoundaryFace(pEnd);
-        //Pout << "found face=" << face << " with findNearestBoundaryFace" << endl;
+        face = searchEngine_.intersection(pStart,pEnd).index();
+        //Pout << "a2- found face=" << face << " with intersection" << endl;
 
         // might have been first search
         if (face==-1 && mag(pStart-point(0,0,0))<SMALL)
         {
             point pStart2 = pEnd+0.0001*(pStart-pEnd)/mag(pStart-pEnd);
             face = searchEngine_.intersection(pStart2,pEnd).index();
-            //Pout << "found face=" << face << " with pStart2="<< pStart2 << endl;
+            //Pout << "a2- found face=" << face << " with intersection"
+            //     << " with pStart2="<< pStart2  << endl;
         }
 
     }

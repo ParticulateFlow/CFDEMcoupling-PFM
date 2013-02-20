@@ -45,6 +45,9 @@ SourceFiles
 #include "liggghtsCommandModel.H"
 #include "OFstream.H"
 #include "sys/stat.h"
+#include "pair.h"
+#include "force.h"
+#include "forceModel.H"
 
 //=================================//
 //LAMMPS/LIGGGHTS
@@ -208,6 +211,7 @@ public:
         void syncIDs() const;
         void locateParticle() const;
         word myType() const{return typeName; };
+        void setCG() const { particleCloud_.forceM(0).setCG(lmp->force->cg()); };
 };
 
 
