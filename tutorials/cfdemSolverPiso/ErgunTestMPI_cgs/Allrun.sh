@@ -2,8 +2,8 @@
 
 #===================================================================#
 # allrun script for testcase as part of test routine 
-# run settlingTest
-# Christoph Goniva - Sept. 2010
+# run ErgunTestMPI_cgs (working in CGS unit system)
+# Christoph Goniva - March 2013
 #===================================================================#
 
 #- define variables

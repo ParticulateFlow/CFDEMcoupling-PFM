@@ -2,8 +2,8 @@
 
 #===================================================================#
 # allrun script for testcase as part of test routine 
-# run settlingTest CFD part
-# Christoph Goniva - Feb. 2011
+# run ErgunTestMPI_cgs 
+# Christoph Goniva - March 2013
 #===================================================================#
 
 #- source CFDEM env vars
@@ -16,12 +16,12 @@ source $CFDEM_SRC_DIR/etc/functions.sh
 #- define variables
 casePath="$(dirname "$(readlink -f ${BASH_SOURCE[0]})")"
 logpath=$casePath
-headerText="run_parallel_cfdemSolverPiso_ErgunTestMPI_CFDDEM"
+headerText="run_parallel_cfdemSolverPiso_ErgunTestMPI_cgs_CFDDEM"
 logfileName="log_$headerText"
 solverName="cfdemSolverPiso"
 nrProcs="4"
 machineFileName="none"   # yourMachinefileName | none
-debugMode="off"          # on | off| strictdebugMode="off"          # on | off| strict
+debugMode="off"          # on | off| strict
 testHarnessPath="$CFDEM_TEST_HARNESS_PATH"
 runOctave="true"
 postproc="false"
