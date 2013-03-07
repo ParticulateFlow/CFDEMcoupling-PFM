@@ -1,0 +1,30 @@
+"CFDEMproject WWW Site"_lws - "CFDEM Commands"_lc :c
+
+:link(lws,http://www.cfdem.com)
+:link(lc,CFDEMcoupling_Manual.html#comm)
+
+:line
+
+IOModel_sophIO command :h3
+
+[Syntax:]
+
+Defined in couplingProperties dictionary.
+
+IOModel "sophIO"; :pre
+
+[Examples:]
+
+IOModel "sophIO"; :pre
+
+[Description:]
+
+The soph IO-model writes particle positions, velocities, voidfraction, implicit forces, explicit forces , DEM forces and radii to files. the same as for basicIO model. Data is written every write time of the CFD simulation.
+Currently paraview can only interpret position, velocity and radius (a port to VTK might help).
+
+[Restrictions:] None.
+
+[Related commands:]
+
+"IOModel"_IOModel.html
+
