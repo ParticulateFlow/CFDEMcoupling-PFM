@@ -93,13 +93,7 @@ DiFeliceDragMS::~DiFeliceDragMS()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void DiFeliceDragMS::setForce
-(
-    double** const& mask,
-    double**& impForces,
-    double**& expForces,
-    double**& DEMForces
-) const
+void DiFeliceDragMS::setForce() const
 {
     // get viscosity field
     #ifdef comp
@@ -218,8 +212,8 @@ void DiFeliceDragMS::setForce
                 Warning <<"A BUG occurred in DiFeliceDragMS::setForce!!! nrigidC = " << nrigidC <<", ind = " << ind <<", index=" << index <<"\n" << endl;
                 nrigidC = 1000;
             }
-            if(treatExplicit_) for(int j=0;j<3;j++) expForces[index][j] += cloudRefMS().expForcesCM()[ind][j] / nrigidC;
-            else  for(int j=0;j<3;j++) impForces[index][j] += cloudRefMS().impForcesCM()[ind][j] / nrigidC;
+            if(treatExplicit_) for(int j=0;j<3;j++) expForces()[index][j] += cloudRefMS().expForcesCM()[ind][j] / nrigidC;
+            else  for(int j=0;j<3;j++) impForces()[index][j] += cloudRefMS().impForcesCM()[ind][j] / nrigidC;
         }
     }
 }

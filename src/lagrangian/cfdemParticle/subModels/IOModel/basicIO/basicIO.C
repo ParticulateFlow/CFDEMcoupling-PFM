@@ -146,7 +146,14 @@ void basicIO::streamDataToPath(fileName path, double** array,word name,word type
     *fileStream << "FoamFile\n";
     *fileStream << "{version 2.0; format ascii;class "<< className << "; location 0;object  "<< name <<";}\n";
     *fileStream << nPProc_ <<"\n";
-    *fileStream << "(\n";
+    //*fileStream << "(\n";
+
+    if(type!="origProcId")*fileStream << "(\n";
+    else if(type=="origProcId")
+    {
+        if(nPProc_>0) *fileStream <<"{0}"<< "\n";
+        else *fileStream <<"{}"<< "\n";
+    }
 
     for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)
     {
@@ -154,13 +161,16 @@ void basicIO::streamDataToPath(fileName path, double** array,word name,word type
         {
             if (type=="scalar"){
                 *fileStream << array[index][0] << " \n";
-            }else {
+            }else if (type=="position" || type=="vector"){
                 for(int i=0;i<3;i++) vec[i] = array[index][i];
                 *fileStream <<"( "<< vec[0] <<" "<<vec[1]<<" "<<vec[2]<<" ) "<< finaliser << " \n";
+            }else if (type=="label"){
+                *fileStream << index << finaliser << " \n";
             }
         }
     }
-    *fileStream << ")\n";
+    //*fileStream << ")\n";
+    if(type!="origProcId")*fileStream << ")\n";
     delete fileStream;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

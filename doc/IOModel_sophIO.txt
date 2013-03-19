@@ -19,8 +19,7 @@ IOModel "sophIO"; :pre
 
 [Description:]
 
-The soph IO-model writes particle positions, velocities, voidfraction, implicit forces, explicit forces , DEM forces and radii to files. the same as for basicIO model. Data is written every write time of the CFD simulation.
-Currently paraview can only interpret position, velocity and radius (a port to VTK might help).
+The sophIO-model is based on basicIO model and additionally writes voidfraction, implicit forces, explicit forces. Data is written every write time of the CFD simulation.
 
 [Restrictions:] None.
 
