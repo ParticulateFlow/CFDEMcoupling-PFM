@@ -95,7 +95,7 @@ Foam::cfdemCloud::cfdemCloud
     turbulenceModelType_(couplingProperties_.lookup("turbulenceModelType")),
     cgOK_(true),
     impDEMdrag_(false),
-    useDDTvoidfraction_(true),
+    useDDTvoidfraction_(false),
     ddtVoidfraction_
     (   
         IOobject
@@ -198,8 +198,8 @@ Foam::cfdemCloud::cfdemCloud
     if (turbulenceModelType_=="LESProperties")
         Info << "WARNING - LES functionality not yet tested!" << endl;
 
-    if (couplingProperties_.found("ignoreDDTvoidfraction"))
-        useDDTvoidfraction_=false;
+    if (couplingProperties_.found("useDDTvoidfraction"))
+        useDDTvoidfraction_=true;
     else        
         Info << "ignoring ddt(voidfraction)" << endl;
 
