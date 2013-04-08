@@ -419,7 +419,10 @@ bool Foam::cfdemCloud::evolve
 
             // reset vol Fields
             clockM().start(16,"resetVolFields");
-            if(verbose_) Info << "- resetVolFields()" << endl;
+            if(verbose_){
+                Info << "couplingStep:" << dataExchangeM().couplingStep() 
+                     << "\n- resetVolFields()" << endl;
+            }
             averagingM().resetVectorAverage(averagingM().UsPrev(),averagingM().UsNext());
             voidFractionM().resetVoidFractions();
             averagingM().resetVectorAverage(forceM(0).impParticleForces(),forceM(0).impParticleForces(),true);
@@ -495,7 +498,6 @@ bool Foam::cfdemCloud::evolve
             clockM().start(23,"giveDEMdata");
             giveDEMdata();
             clockM().stop("giveDEMdata");
-
         }//end dataExchangeM().couple()
         Info << "\n timeStepFraction() = " << dataExchangeM().timeStepFraction() << endl;
 
@@ -506,7 +508,7 @@ bool Foam::cfdemCloud::evolve
 
         // calc ddt(voidfraction)
         if (doCouple) calcDdtVoidfraction(voidFractionM().voidFractionNext());
-        //calcDdtVoidfraction(alpha); // alternative with scale=1!
+        //calcDdtVoidfraction(alpha); // alternative with scale=1! (does not see change in alpha?)
 
         // update particle velocity Field
         Us.internalField() = averagingM().UsInterp();
@@ -572,7 +574,6 @@ void cfdemCloud::calcDdtVoidfraction(volScalarField& voidfraction) const
 {
     Info << "calculating ddt(voidfraction) based on couplingTime" << endl;
     scalar scale=mesh().time().deltaT().value()/dataExchangeM().couplingTime();
-    Info << "scale="<< scale << endl;
     ddtVoidfraction_ = fvc::ddt(voidfraction) * scale;
 }
 

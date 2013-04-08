@@ -28,7 +28,7 @@ FoamFile
 
 modelType B; // A or B
 
-couplingInterval 100;
+couplingInterval 500;
 
 voidFractionModel divided;
 

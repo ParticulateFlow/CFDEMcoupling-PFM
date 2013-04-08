@@ -39,7 +39,7 @@ divSchemes
     div((nuEff*dev(grad(U).T()))) Gauss linear;
     div((viscousTerm*dev(grad(U).T()))) Gauss linear;
     div((nu*dev(grad(U).T()))) Gauss linear;
-    div(phi,T)      Gauss upwind; //limitedLinear 1;
+    div(phi,T)      Gauss limitedLinear 1; //Gauss upwind; //
 }
 
 laplacianSchemes
