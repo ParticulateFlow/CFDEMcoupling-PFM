@@ -114,13 +114,13 @@ cfdemCloudMS::~cfdemCloudMS()
 void cfdemCloudMS::getDEMdata()
 {
     cfdemCloud::getDEMdata();
-
     // update NClumpTypes in data exch. model
     //dataExchangeM().checkNClumpTypes();
 
     dataExchangeM().getData("xcm","vector-multisphere",positionsCM_);   // position of the centre of mass
     dataExchangeM().getData("vcm","vector-multisphere",velocitiesCM_);  // velocity of the centre of mass
     dataExchangeM().getData("body","scalar-atom",bodies_);              // clump-particle connex
+
     dataExchangeM().getData("nrigid","scalar-multisphere",nrigids_);    // # particles in clump
     dataExchangeM().getData("ex_space","vector-multisphere",exCM_);     // axis of inertia
     dataExchangeM().getData("ey_space","vector-multisphere",eyCM_);     // axis of inertia
@@ -148,9 +148,10 @@ void Foam::cfdemCloudMS::giveDEMdata()
     {
         for(int i=0;i<3;i++){
             impForcesCM()[index][i] += expForcesCM()[index][i] + DEMForcesCM()[index][i];
+            Info << "index=" << index << " ,impForcesCM()[index][i]=" << impForcesCM()[index][i] << endl;
         }
     }
-    if(forceM(0).coupleForce()) dataExchangeM().giveData("dragforce_cm","vector-multisphere",impForcesCM());
+    if(forceM(0).coupleForce()) dataExchangeM().giveData("dragforce","vector-multisphere",impForcesCM());
     if(verbose_) Info << "giveDEMdata done." << endl;
 }
 

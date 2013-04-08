@@ -26,6 +26,8 @@ FoamFile
 //===========================================================================//
 // sub-models & settings
 
+//ignoreDDTvoidfraction;
+
 modelType "A"; // A or B
 
 couplingInterval 100;
