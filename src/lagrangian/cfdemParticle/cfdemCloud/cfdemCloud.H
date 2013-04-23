@@ -45,9 +45,6 @@ SourceFiles
 // choose version
 #include "OFversion.H"
 
-// choose comp/incomp
-//#define comp
-
 #include "fvCFD.H"
 #include "IFstream.H"
 
