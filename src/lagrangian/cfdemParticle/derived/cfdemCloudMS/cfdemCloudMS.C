@@ -222,9 +222,6 @@ void Foam::cfdemCloudMS::setForces()
     resetArray(impForces_,numberOfParticles(),3);
     resetArray(expForces_,numberOfParticles(),3);
     resetArray(DEMForces_,numberOfParticles(),3);
-Info << "hallo1" << endl;
-cfdemCloudMS::nrForceModels();
-Info << "hallo2" << endl;
     for (int i=0;i<cfdemCloudMS::nrForceModels();i++) cfdemCloudMS::forceM(i).setForce();
 }
 
@@ -252,7 +249,7 @@ label Foam::cfdemCloudMS::cellIDCM(int index)
 
 label Foam::cfdemCloudMS::body(int index)
 {
-    return bodies_[0][index];
+    return bodies_[0][index]-1;
 }
 
 label Foam::cfdemCloudMS::nrigid(int index)

@@ -265,6 +265,8 @@ public:
 
        inline bool numberOfParticlesChanged() const;
 
+       inline int numberOfClumps() const;
+
        inline bool arraysReallocated() const;
 
        inline const wordList& forceModels();

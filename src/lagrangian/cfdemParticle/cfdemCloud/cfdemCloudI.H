@@ -141,6 +141,12 @@ inline bool cfdemCloud::numberOfParticlesChanged() const
     return numberOfParticlesChanged_;
 }
 
+inline int cfdemCloud::numberOfClumps() const
+{
+    Warning << "cfdemCloud::numberOfClumps() is not called correctly!" << endl;
+    return -1;
+}
+
 inline bool cfdemCloud::arraysReallocated() const
 {
     return arraysReallocated_;

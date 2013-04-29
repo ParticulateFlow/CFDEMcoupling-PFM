@@ -207,13 +207,21 @@ void DiFeliceDragMS::setForce() const
             ind=cloudRefMS().body(index);
             nrigidC=cloudRefMS().nrigid(ind);
 
+cloudRefMS().impForcesCM();
+Warning <<"A BUG occurred in DiFeliceDragMS::setForce!!! nrigidC = " << nrigidC <<", ind = " << ind <<", index=" << index <<"\n" << endl;
+
             if (nrigidC <= 0)
             {
                 Warning <<"A BUG occurred in DiFeliceDragMS::setForce!!! nrigidC = " << nrigidC <<", ind = " << ind <<", index=" << index <<"\n" << endl;
                 nrigidC = 1000;
             }
             if(treatExplicit_) for(int j=0;j<3;j++) expForces()[index][j] += cloudRefMS().expForcesCM()[ind][j] / nrigidC;
-            else  for(int j=0;j<3;j++) impForces()[index][j] += cloudRefMS().impForcesCM()[ind][j] / nrigidC;
+            else{
+                for(int j=0;j<3;j++){
+                    Info << "j=" << j << "ind=" << ind << endl;
+                    impForces()[index][j] += cloudRefMS().impForcesCM()[ind][j] / nrigidC;
+                }
+            }
         }
     }
 }
