@@ -148,7 +148,6 @@ void Foam::cfdemCloudMS::giveDEMdata()
     {
         for(int i=0;i<3;i++){
             impForcesCM()[index][i] += expForcesCM()[index][i] + DEMForcesCM()[index][i];
-            Info << "index=" << index << " ,impForcesCM()[index][i]=" << impForcesCM()[index][i] << endl;
         }
     }
     if(forceM(0).coupleForce()) dataExchangeM().giveData("dragforce","vector-multisphere",impForcesCM());
@@ -254,9 +253,8 @@ label Foam::cfdemCloudMS::body(int index)
 
 label Foam::cfdemCloudMS::nrigid(int index)
 {
-//    return nrigids_[0][index];
-    Warning << "Foam::cfdemCloudMS::nrigid: assuming all clumps are equal - LIGGGHTS' nrigid is not transferred correctly! " << endl;
-    return nrigids_[0][0];
+    return nrigids_[0][index];
+//    return nrigids_[0][0];
 }
 
 const forceModel& Foam::cfdemCloudMS::forceM(int i)

@@ -47,7 +47,7 @@ fix		pdd1 all particledistribution/discrete 1.  1 pts1 1.0
 group		rigid_group region reg
 region		bc cylinder z 0.0 0.0 0.012 0.001 0.055 units box
 
-fix		ins rigid_group insert/pack seed 100001 distributiontemplate pdd1 vel constant 0. 0. 0. insert_every once overlapcheck yes region bc ntry_mc 10000 particles_in_region 1 #2500  # volumefraction_region 0.01 #
+fix		ins rigid_group insert/pack seed 100001 distributiontemplate pdd1 vel constant 0. 0. 0. insert_every once overlapcheck yes region bc ntry_mc 10000 particles_in_region 2500  # volumefraction_region 0.01 #
 
 #integrator for multisphere rigid bodies
 fix		integr rigid_group multisphere

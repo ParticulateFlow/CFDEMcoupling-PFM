@@ -21,7 +21,7 @@ logfileName="log_$headerText"
 solverName="cfdemSolverPisoMS"
 nrProcs="2"
 machineFileName="none"   # yourMachinefileName | none
-debugMode="on"          # on | off
+debugMode="off"          # on | off
 testHarnessPath="$CFDEM_TEST_HARNESS_PATH"
 
 cleanUp="true"

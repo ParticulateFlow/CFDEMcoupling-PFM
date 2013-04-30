@@ -25,7 +25,7 @@ FoamFile
 
 //===========================================================================//
 // sub-models & settings
-verbose;
+//verbose;
 
 modelType B; // A or B
 
