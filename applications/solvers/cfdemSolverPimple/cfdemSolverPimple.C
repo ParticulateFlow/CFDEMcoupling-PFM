@@ -43,6 +43,7 @@ Description
 
 #include "cfdemCloud.H"
 #include "implicitCouple.H"
+#include "smoothingModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -80,7 +81,8 @@ int main(int argc, char *argv[])
         particleCloud.evolve(voidfraction,Us,U);
 
         Info << "update Ksl.internalField()" << endl;
-        Ksl.internalField() = particleCloud.momCoupleM(0).impMomSource();
+        Ksl.oldTime().internalField() = particleCloud.momCoupleM(0).impMomSource();
+        particleCloud.smoothingM().smoothen(Ksl);
         Ksl.correctBoundaryConditions();
 
         // --- Pressure-velocity PIMPLE corrector loop

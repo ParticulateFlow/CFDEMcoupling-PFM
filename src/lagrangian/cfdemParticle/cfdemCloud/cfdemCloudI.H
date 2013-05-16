@@ -192,6 +192,11 @@ inline const clockModel& cfdemCloud::clockM() const
     return clockModel_;
 }
 
+inline const smoothingModel& cfdemCloud::smoothingM() const
+{
+    return smoothingModel_;
+}
+
 inline const meshMotionModel& cfdemCloud::meshMotionM() const
 {
     return meshMotionModel_;

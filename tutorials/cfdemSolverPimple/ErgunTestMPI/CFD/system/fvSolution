@@ -54,6 +54,13 @@ solvers
         tolerance       1e-05;
         relTol          0;
     }
+    "(voidfraction|Ksl|f)"
+    {
+        solver          PCG;
+        preconditioner  DIC;
+        tolerance       1e-06;
+        relTol          0;
+    }
 }
 
 PIMPLE
