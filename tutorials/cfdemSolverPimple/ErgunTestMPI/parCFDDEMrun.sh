@@ -18,7 +18,7 @@ casePath="$(dirname "$(readlink -f ${BASH_SOURCE[0]})")"
 logpath=$casePath
 headerText="run_parallel_cfdemSolverPimple_ErgunTestMPI_CFDDEM"
 logfileName="log_$headerText"
-solverName="cfdemSolverPimpleSmooth"
+solverName="cfdemSolverPimple" #"cfdemSolverPimpleDyM_22x"#
 nrProcs="2"
 machineFileName="none"   # yourMachinefileName | none
 debugMode="off"          # on | off
@@ -54,6 +54,7 @@ rm -rf 0.*
 rm -rf processor*
 rm -rf patchAverage_pressureDrop
 rm -rf probes
+rm -rf postProcessing
 rm log.liggghts
 rm ../DEM/post/dump*
 rm -rf particles

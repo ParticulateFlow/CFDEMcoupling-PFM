@@ -71,6 +71,8 @@ protected:
 
         int maxCellsPerParticle_;
 
+        mutable scalar weight_;
+
     // Protected member functions
 
 public:
@@ -125,6 +127,10 @@ public:
         inline volScalarField& voidFractionPrev()const { return voidfractionPrev_; }
 
         inline volScalarField& voidFractionNext()const { return voidfractionNext_; }
+
+        inline void setWeight(scalar weight)const { weight_ = weight; }
+
+        inline scalar weight()const { return weight_; }
 
         void resetVoidFractions() const;
 

@@ -161,6 +161,7 @@ void volWeightedAverage::setForce() const
             scalar cellVol=-1;
             scalar totVol=0;
             scalar totVol_all=0;
+            scalar integralValue=0;
 
             forAll(field,cellI)
             {
@@ -178,13 +179,18 @@ void volWeightedAverage::setForce() const
             }
 
             MPI_Allreduce(&totVol, &totVol_all, 3, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-            volWeightedAverage = gSum(scalarFields_[i]) / (totVol_all+SMALL);
+            integralValue = gSum(scalarFields_[i]);
+            volWeightedAverage = integralValue / (totVol_all+SMALL);
             scalarFields_[i].internalField() = volWeightedAverage;
 
             if(verbose_)
             {
                 Info << "calculated vol. weighted average of field: " << scalarFieldNames_[i]
                      << " = " << volWeightedAverage
+                     << ",\n integral value "
+                     << " = " << integralValue
+                     << ",\n volume accounted for "
+                     << " = " << totVol_all
                      << ",\n considering cells where the field < " << upperThreshold_
                      << ", and > " << lowerThreshold_ << endl;
             }

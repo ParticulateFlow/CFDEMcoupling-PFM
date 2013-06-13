@@ -75,6 +75,8 @@ dividedVoidFractionMS::dividedVoidFractionMS
 
     if(scaleUpVol_ > 1.3 || scaleUpVol_ < 1){ FatalError<< "scaleUpVol shloud be > 1 and < 1.3 !!!" << abort(FatalError); }
     if(alphaMin_ > 1 || alphaMin_ < 0.01){ FatalError<< "alphaMin shloud be > 1 and < 0.01 !!!" << abort(FatalError); }
+    if (propsDict_.found("weight"))
+        setWeight(readScalar(propsDict_.lookup("weight")));
 }
 
 
@@ -106,7 +108,7 @@ void dividedVoidFractionMS::setvoidFraction(double** const& mask,double**& voidf
             vector position = particleCloud_.position(index);
             label cellID = particleCloud_.cellIDs()[index][0];
             scalar radius = particleCloud_.radii()[index][0];
-            scalar volume =  clumpVol_/nrigid_;
+            scalar volume =  clumpVol_/nrigid_*weight();
             radius = radius*pow(scaleUpVol_,1/3);
             scalar cellVol(1);
 

@@ -285,7 +285,6 @@ bool Foam::twoWayMPI::couple() const
             particleCloud_.clockM().start(3,"LIGGGHTS");
             forAll(particleCloud_.liggghtsCommandModelList(),i)
             {
-
                 if(particleCloud_.liggghtsCommand()[i]().runCommand(couplingStep()))
                 {
                     const char* command = particleCloud_.liggghtsCommand()[i]().command();
@@ -318,10 +317,9 @@ int Foam::twoWayMPI::getNumberOfParticles() const
 
 int Foam::twoWayMPI::getNumberOfClumps() const
 {
-    Warning << "liggghts_get_maxtag_ms(lmp) is commented here!" << endl;
-
-    return -1;
-    //return liggghts_get_maxtag_ms(lmp);
+//    Warning << "liggghts_get_maxtag_ms(lmp) is commented here!" << endl;
+//    return -1;
+    return liggghts_get_maxtag_ms(lmp);
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

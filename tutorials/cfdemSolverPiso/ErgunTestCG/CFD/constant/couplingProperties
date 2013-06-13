@@ -46,11 +46,14 @@ averagingModel dense;//dilute;//
 
 clockModel off;//standardClock;//
 
+smoothingModel off;
+
 forceModels
 (
     //GidaspowDrag
     //DiFeliceDrag
     KochHillDrag
+    //BeetstraDrag
     gradPForce
     viscForce
     //Archimedes
@@ -134,6 +137,21 @@ KochHillDragProps
     densityFieldName "rho";
     voidfractionFieldName "voidfraction";
     //verbose;
+}
+
+BeetstraDragProps
+{
+    velFieldName "U";
+    densityFieldName "rho";
+    gravityFieldName "g";
+    rhoParticle     2000.;
+    voidfractionFieldName "voidfraction";
+    interpolation ;
+    useFilteredDragModel ;
+    useParcelSizeDependentFilteredDrag ;
+    k       0.05;
+    aLimit  0.0;
+//    verbose ;
 }
 
 virtualMassForceProps

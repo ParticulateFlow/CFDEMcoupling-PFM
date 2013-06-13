@@ -17,9 +17,9 @@ lammps_data_write.o: lammps_data_write.cpp /usr/include/stdlib.h \
  /usr/lib/openmpi/include/openmpi/ompi/mpi/cxx/mpicxx.h \
  /usr/include/c++/4.6/map /usr/include/c++/4.6/bits/stl_tree.h \
  /usr/include/c++/4.6/bits/stl_algobase.h \
- /usr/include/c++/4.6/x86_64-linux-gnu/./bits/c++config.h \
- /usr/include/c++/4.6/x86_64-linux-gnu/./bits/os_defines.h \
- /usr/include/c++/4.6/x86_64-linux-gnu/./bits/cpu_defines.h \
+ /usr/include/c++/4.6/x86_64-linux-gnu/bits/c++config.h \
+ /usr/include/c++/4.6/x86_64-linux-gnu/bits/os_defines.h \
+ /usr/include/c++/4.6/x86_64-linux-gnu/bits/cpu_defines.h \
  /usr/include/c++/4.6/bits/functexcept.h \
  /usr/include/c++/4.6/bits/exception_defines.h \
  /usr/include/c++/4.6/bits/cpp_type_traits.h \
@@ -31,7 +31,7 @@ lammps_data_write.o: lammps_data_write.cpp /usr/include/stdlib.h \
  /usr/include/c++/4.6/bits/stl_iterator_base_funcs.h \
  /usr/include/c++/4.6/bits/stl_iterator.h \
  /usr/include/c++/4.6/debug/debug.h /usr/include/c++/4.6/bits/allocator.h \
- /usr/include/c++/4.6/x86_64-linux-gnu/./bits/c++allocator.h \
+ /usr/include/c++/4.6/x86_64-linux-gnu/bits/c++allocator.h \
  /usr/include/c++/4.6/ext/new_allocator.h /usr/include/c++/4.6/new \
  /usr/include/c++/4.6/exception /usr/include/c++/4.6/bits/stl_function.h \
  /usr/include/c++/4.6/backward/binders.h \
@@ -51,19 +51,19 @@ lammps_data_write.o: lammps_data_write.cpp /usr/include/stdlib.h \
  /usr/include/bits/wchar.h /usr/include/bits/wchar2.h \
  /usr/include/c++/4.6/bits/char_traits.h \
  /usr/include/c++/4.6/bits/localefwd.h \
- /usr/include/c++/4.6/x86_64-linux-gnu/./bits/c++locale.h \
+ /usr/include/c++/4.6/x86_64-linux-gnu/bits/c++locale.h \
  /usr/include/c++/4.6/clocale /usr/include/locale.h \
  /usr/include/bits/locale.h /usr/include/c++/4.6/cctype \
  /usr/include/ctype.h /usr/include/c++/4.6/bits/ios_base.h \
  /usr/include/c++/4.6/ext/atomicity.h \
- /usr/include/c++/4.6/x86_64-linux-gnu/./bits/gthr.h \
- /usr/include/c++/4.6/x86_64-linux-gnu/./bits/gthr-default.h \
+ /usr/include/c++/4.6/x86_64-linux-gnu/bits/gthr.h \
+ /usr/include/c++/4.6/x86_64-linux-gnu/bits/gthr-default.h \
  /usr/include/pthread.h /usr/include/sched.h /usr/include/bits/sched.h \
  /usr/include/signal.h /usr/include/bits/setjmp.h /usr/include/unistd.h \
  /usr/include/bits/posix_opt.h /usr/include/bits/environments.h \
  /usr/include/bits/confname.h /usr/include/getopt.h \
  /usr/include/bits/unistd.h \
- /usr/include/c++/4.6/x86_64-linux-gnu/./bits/atomic_word.h \
+ /usr/include/c++/4.6/x86_64-linux-gnu/bits/atomic_word.h \
  /usr/include/c++/4.6/bits/locale_classes.h /usr/include/c++/4.6/string \
  /usr/include/c++/4.6/bits/ostream_insert.h \
  /usr/include/c++/4.6/bits/cxxabi_forced.h \
@@ -74,9 +74,9 @@ lammps_data_write.o: lammps_data_write.cpp /usr/include/stdlib.h \
  /usr/include/c++/4.6/bits/basic_ios.h \
  /usr/include/c++/4.6/bits/locale_facets.h /usr/include/c++/4.6/cwctype \
  /usr/include/wctype.h \
- /usr/include/c++/4.6/x86_64-linux-gnu/./bits/ctype_base.h \
+ /usr/include/c++/4.6/x86_64-linux-gnu/bits/ctype_base.h \
  /usr/include/c++/4.6/bits/streambuf_iterator.h \
- /usr/include/c++/4.6/x86_64-linux-gnu/./bits/ctype_inline.h \
+ /usr/include/c++/4.6/x86_64-linux-gnu/bits/ctype_inline.h \
  /usr/include/c++/4.6/bits/locale_facets.tcc \
  /usr/include/c++/4.6/bits/basic_ios.tcc \
  /usr/include/c++/4.6/bits/ostream.tcc /usr/include/c++/4.6/istream \
