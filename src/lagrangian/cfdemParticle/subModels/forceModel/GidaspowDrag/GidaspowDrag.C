@@ -69,6 +69,14 @@ GidaspowDrag::GidaspowDrag
     densityFieldName_(propsDict_.lookup("densityFieldName")),
     rho_(sm.mesh().lookupObject<volScalarField> (densityFieldName_))
 {
+    //Append the field names to be probed
+    particleCloud_.probeM().initialize(typeName, "gidaspowDrag.logDat");
+    particleCloud_.probeM().vectorFields_.append("dragForce"); //first entry must the be the force
+    particleCloud_.probeM().vectorFields_.append("Urel");        //other are debug
+    particleCloud_.probeM().scalarFields_.append("KslLag");                 //other are debug
+    particleCloud_.probeM().scalarFields_.append("voidfraction");       //other are debug
+    particleCloud_.probeM().writeHeader();
+
     if (propsDict_.found("verbose")) verbose_=true;
     if (propsDict_.found("treatExplicit")) treatExplicit_=true;
     particleCloud_.checkCG(false);
@@ -91,6 +99,10 @@ void GidaspowDrag::setForce() const
     #else
         const volScalarField& nufField = particleCloud_.turbulence().nu();
     #endif
+
+    //set probeModel parameters for this force model
+    particleCloud_.probeM().setOutputFile();
+    particleCloud_.probeM().setCounter();
 
     for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
     {
@@ -134,6 +146,21 @@ void GidaspowDrag::setForce() const
 
                 if (modelType_=="B")
                     drag /= voidfraction;
+
+
+                //Set value fields and write the probe
+                Field<vector> vValues;
+                vValues.clear();
+                vValues.append(drag);           //first entry must the be the force
+                vValues.append(Ur);            //other are debug
+
+                Field<scalar> sValues;
+                sValues.clear();
+                sValues.append(KslLag);     //other are debug
+                sValues.append(voidfraction);     //other are debug
+
+                particleCloud_.probeM().writeProbe(index, sValues, vValues);
+
             }
 
             // set force on particle

@@ -105,6 +105,7 @@ rm -rf $casePath/CFD/processor*
 rm -r $casePath/CFD/VTK
 rm -rf $casePath/CFD/patchAverage_pressureDrop
 rm -rf $casePath/CFD/probes
+rm -rf $casePath/CFD/postProcessing
 rm -rf $casePath/CFD/particles
 rm -r $casePath/CFD/log.*
 rm -r $casePath/CFD/lagrangian

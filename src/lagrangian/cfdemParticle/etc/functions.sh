@@ -6,6 +6,38 @@
 # Christoph Goniva - June. 2011, DCS Computing GmbH
 #===================================================================#
 
+#==================================#
+#- function to pull from a repo
+
+pullRepo()
+{
+    #--------------------------------------------------------------------------------#
+    #- define variables
+    logpath="$1"
+    logfileName="$2"
+    casePath="$3"
+    headerText="$4"
+    #--------------------------------------------------------------------------------#
+
+    #- clean up old log file
+    rm $logpath/$logfileName
+
+    #- change path
+    cd $casePath
+
+    #- header
+    echo 2>&1 | tee -a $logpath/$logfileName
+    echo "//   $headerText   //" 2>&1 | tee -a $logpath/$logfileName
+    echo 2>&1 | tee -a $logpath/$logfileName
+
+    #- write path
+    pwd 2>&1 | tee -a $logpath/$logfileName
+    echo 2>&1 | tee -a $logpath/$logfileName
+
+    #- pull
+    git pull 2>&1 | tee -a $logpath/$logfileName
+}
+#==================================#
 
 #==================================#
 #- function to compile a cfdem library
@@ -162,6 +194,47 @@ compileLMPlib()
     echo "make" 2>&1 | tee -a $logpath/$logfileName
     echo 2>&1 | tee -a $logpath/$logfileName
     make -f $makeFileName 2>&1 | tee -a $logpath/$logfileName
+}
+#==================================#
+
+#==================================#
+#- function to clean CFDEMcoupling solvers and src
+
+cleanCFDEM()
+{
+    echo "do you really want to clean CFDEM src?"
+    echo "if not, abort with ctrl-C"
+    read
+
+    echo ""
+    echo "removing object files in"
+    echo "   $CFDEM_SRC_DIR"
+    echo "   and"
+    echo "   $CFDEM_UT_DIR"
+    rm -r $CFDEM_UT_DIR/*/Make/linux*
+    rm -r $CFDEM_UT_DIR/*/Make/linux*
+    rm -r $CFDEM_UT_DIR/*/*.dep
+
+    rm -r $CFDEM_SRC_DIR/Make/linux*
+    rm -r $CFDEM_SRC_DIR/lnInclude
+
+    rm -r $CFDEM_SRC_DIR/../../finiteVolume/Make/linux*
+    rm -r $CFDEM_SRC_DIR/../../finiteVolume/lnInclude
+
+    echo ""
+    echo "cleaning $CFDEM_SRC_DIR"
+    cd $CFDEM_SRC_DIR
+    rmdepall
+    wclean
+
+    for solver in  "cfdemSolverIB" "cfdemSolverPiso" "cfdemSolverPisoScalar"
+    do
+        echo ""
+        echo "cleaning $CFDEM_SOLVER_DIRapplications/$solver"
+        cd $CFDEM_SOLVER_DIR/$solver
+        rmdepall
+        wclean
+    done
 }
 #==================================#
 

@@ -73,7 +73,8 @@ int main(int argc, char *argv[])
         // do particle stuff
         particleCloud.clockM().start(2,"Coupling");
         particleCloud.evolve(voidfraction,Us,U);
-
+        voidfraction.oldTime().internalField() = voidfraction;
+        
         Info << "update Ksl.internalField()" << endl;
         Ksl.oldTime().internalField() = particleCloud.momCoupleM(0).impMomSource();
         particleCloud.smoothingM().smoothen(Ksl);

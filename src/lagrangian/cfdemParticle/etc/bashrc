@@ -103,8 +103,17 @@ alias cfdemLIG='cd $CFDEM_LIGGGHTS_SRC_DIR'
 #- shortcut to system test
 alias cfdemSysTest='bash $CFDEM_SRC_DIR/etc/cfdemSystemTest.sh'
 
+#- shortcut to pull LIGGGHTS
+alias cfdemPullLIG='bash $CFDEM_SRC_DIR/etc/pullLIGGGHTS.sh'
+
+#- shortcut to clean CFDEM
+alias cfdemCleanCFDEM='bash $CFDEM_SRC_DIR/etc/cleanCFDEMcoupling.sh'
+
 #- shortcut to compile LIGGGHTS
 alias cfdemCompLIG='bash $CFDEM_SRC_DIR/etc/compileLIGGGHTS.sh'
+
+#- shortcut to compile CFDEMcoupling +LIGGGHTS
+alias cfdemCompCFDEMall='bash $CFDEM_SRC_DIR/etc/compileCFDEMcoupling_all.sh'
 
 #- shortcut to compile CFDEMcoupling (src+solvers)
 alias cfdemCompCFDEM='bash $CFDEM_SRC_DIR/etc/compileCFDEMcoupling.sh'

@@ -73,6 +73,11 @@ ShirgaonkarIB::ShirgaonkarIB
     pressureFieldName_(propsDict_.lookup("pressureFieldName")),
     p_(sm.mesh().lookupObject<volScalarField> (pressureFieldName_))
 {
+    //Append the field names to be probed
+    particleCloud_.probeM().initialize(typeName, "shirgaonkarIB.logDat");
+    particleCloud_.probeM().vectorFields_.append("dragForce"); //first entry must the be the force
+    particleCloud_.probeM().writeHeader();
+
     if (propsDict_.found("verbose")) verbose_=true;
     if (propsDict_.found("twoDimensional"))
     {
@@ -110,6 +115,10 @@ void ShirgaonkarIB::setForce() const
         volVectorField h = rho_*(nufField*fvc::laplacian(U_)-fvc::grad(p_));
     #endif
 
+    //set probeModel parameters for this force model
+    particleCloud_.probeM().setOutputFile();
+    particleCloud_.probeM().setCounter();
+
     for(int index=0; index< particleCloud_.numberOfParticles(); index++)
     {
         //if(mask[index][0])
@@ -130,6 +139,16 @@ void ShirgaonkarIB::setForce() const
 
             // set force on particle
             if(twoDimensional_) drag /= depth_;
+
+           //Set value fields and write the probe
+           Field<vector> vValues;
+           vValues.clear();
+           vValues.append(drag);           //first entry must the be the force
+
+            Field<scalar> sValues;
+            sValues.clear();
+            particleCloud_.probeM().writeProbe(index, sValues, vValues);
+
             if(treatExplicit_) for(int j=0;j<3;j++) expForces()[index][j] += drag[j];
             else  for(int j=0;j<3;j++) impForces()[index][j] += drag[j];
             for(int j=0;j<3;j++) DEMForces()[index][j] += drag[j];

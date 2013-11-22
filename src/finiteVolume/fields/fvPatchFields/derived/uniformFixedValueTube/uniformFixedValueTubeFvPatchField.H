@@ -60,6 +60,10 @@ class uniformFixedValueTubeFvPatchField
 
         autoPtr<DataEntry<Type> > uniformValue_;
 
+		word pName_; //JOKER pressure
+		
+		word phiName_; //JOKER flux
+
         word velocityFieldName_;
 
         word densityFieldName_;
@@ -68,7 +72,7 @@ class uniformFixedValueTubeFvPatchField
 
         scalar tubeDiameter_;
 
-        scalar wallRoughness_;
+        scalar zeta_;
 
 public:
 

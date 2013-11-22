@@ -73,6 +73,15 @@ DiFeliceDrag::DiFeliceDrag
     voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
     interpolation_(false)
 {
+    //Append the field names to be probed
+    particleCloud_.probeM().initialize(typeName, "diFeliceDrag.logDat");
+    particleCloud_.probeM().vectorFields_.append("dragForce"); //first entry must the be the force
+    particleCloud_.probeM().vectorFields_.append("Urel");        //other are debug
+    particleCloud_.probeM().scalarFields_.append("Rep");          //other are debug
+    particleCloud_.probeM().scalarFields_.append("Cd");                 //other are debug
+    particleCloud_.probeM().scalarFields_.append("voidfraction");       //other are debug
+    particleCloud_.probeM().writeHeader();
+
     if (propsDict_.found("verbose")) verbose_=true;
     if (propsDict_.found("treatExplicit")) treatExplicit_=true;
     if (propsDict_.found("interpolation"))
@@ -118,6 +127,10 @@ void DiFeliceDrag::setForce() const
 
     interpolationCellPoint<scalar> voidfractionInterpolator_(voidfraction_);
     interpolationCellPoint<vector> UInterpolator_(U_);
+
+    //set probeModel parameters for this force model
+    particleCloud_.probeM().setOutputFile();
+    particleCloud_.probeM().setCounter();
 
     for(int index = 0;index <  particleCloud_.numberOfParticles(); index++)
     {
@@ -180,6 +193,21 @@ void DiFeliceDrag::setForce() const
                     Info << "Cd = " << Cd << endl;
                     Info << "drag = " << drag << endl;
                 }
+
+                //Set value fields and write the probe
+                Field<vector> vValues;
+                vValues.clear();
+                vValues.append(drag);           //first entry must the be the force
+                vValues.append(Ur);            //other are debug
+
+                Field<scalar> sValues;
+                sValues.clear();
+                sValues.append(Rep);        //other are debug
+                sValues.append(Cd);     //other are debug
+                sValues.append(voidfraction);     //other are debug
+
+                particleCloud_.probeM().writeProbe(index, sValues, vValues);
+
             }
             // set force on particle
             if(treatExplicit_) for(int j=0;j<3;j++) expForces()[index][j] += drag[j];

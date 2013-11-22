@@ -97,6 +97,7 @@ rm -r $casePath/DEM/log.*
 rm -r $casePath/CFD/log.*
 rm -r $casePath/DEM/log.*
 rm -r $casePath/CFD/probes
+rm -r $casePath/CFD/postProcessing
 rm -r $casePath/log_*
 echo "done"
 

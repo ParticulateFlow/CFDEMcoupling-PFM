@@ -40,6 +40,8 @@ regionModel allRegion;
 
 IOModel off;
 
+probeModel off;
+
 dataExchangeModel twoWayMPI;//twoWayFiles;//oneWayVTK;//
 
 averagingModel dense;//dilute;//
@@ -74,7 +76,7 @@ constDiffSmoothingProps
 {
     lowerLimit 0.1;
     upperLimit 1e10;
-    DT 1e-3;
+    smoothingLength 0.1;    
 }
 
 implicitCoupleProps

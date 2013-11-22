@@ -1,0 +1,43 @@
+"CFDEMproject WWW Site"_lws - "CFDEM Commands"_lc :c
+
+:link(lws,http://www.cfdem.com)
+:link(lc,CFDEMcoupling_Manual.html#comm)
+
+:line
+
+probeModel noProbe command :h3
+
+[Syntax:]
+
+To be activated via couplingProperties dictionary.
+
+particleIDsToSample (ID1 ID2 ID3 ...);
+forceModels
+\{
+    myForceModel1
+    myForceModel2
+    myForceModel3
+\}; :pre
+
+[Examples:]
+
+probeModel noProbe; :pre
+Alternatively use:
+
+probeModel off; :pre
+
+Note: This examples list might not be complete - please check below for the list of force models that can perform particle probing.
+
+[Description:]
+
+Does not perform any probing.
+
+[Restrictions:]
+
+None.
+
+[Related commands which are currently enabled for particle probing:]
+
+"particleProbe"_probeModel_particleProbe.html
+
+[Default:] none.

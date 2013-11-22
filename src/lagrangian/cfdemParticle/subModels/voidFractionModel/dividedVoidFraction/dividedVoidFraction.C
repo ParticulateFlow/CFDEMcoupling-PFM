@@ -105,9 +105,12 @@ void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfra
 
     for(int index=0; index< particleCloud_.numberOfParticles(); index++)
     {
+           if(!checkParticleType(index)) continue; //skip this particle if not correct type
+
         //if(mask[index][0])
         //{
             // reset
+
             for(int subcell=0;subcell<cellsPerParticle_[index][0];subcell++)
             {
                 particleWeights[index][subcell]=0;
@@ -118,7 +121,8 @@ void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfra
             position = particleCloud_.position(index);
             cellID = particleCloud_.cellIDs()[index][0];
             radius = particleCloud_.radii()[index][0];
-            scalar volume =  4./3.*radius*radius*radius*3.1415*weight();
+
+            scalar volume =  4.188790205*radius*radius*radius*weight(); //4/3*pi=4.188790205
             radius = radius*pow(scaleUpVol_,1/3);
             cellVol=0;
 

@@ -39,12 +39,15 @@ Description
 #include "singlePhaseTransportModel.H"
 #include "turbulenceModel.H"
 #include "pimpleControl.H"
-#include "IObasicSourceList.H"
+//#include "IObasicSourceList.H"
 
 #include "cfdemCloud.H"
 #include "implicitCouple.H"
 #include "smoothingModel.H"
 
+#if defined(version22)
+#include "fvIOoptionList.H"
+#endif
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 int main(int argc, char *argv[])
@@ -54,6 +57,10 @@ int main(int argc, char *argv[])
     #include "createMesh.H"
     #include "createFields.H"
     #include "initContinuityErrs.H"
+
+    #if defined(version22)
+    #include "createFvOptions.H"
+    #endif
 
     pimpleControl pimple(mesh);
 
@@ -79,6 +86,7 @@ int main(int argc, char *argv[])
         // do particle stuff
         Info << "- evolve()" << endl;
         particleCloud.evolve(voidfraction,Us,U);
+        voidfraction.oldTime().internalField() = voidfraction;
 
         Info << "update Ksl.internalField()" << endl;
         Ksl.oldTime().internalField() = particleCloud.momCoupleM(0).impMomSource();

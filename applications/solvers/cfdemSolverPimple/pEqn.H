@@ -1,8 +1,8 @@
 volScalarField rAU(1.0/UEqn().A());
 surfaceScalarField rUAf("(1|A(U))", fvc::interpolate(rAU));
 
-U = rAU*(UEqn() == sources(U))().H(); // new formulation
-//U = rAU*UEqn().H();   // old
+//U = rAU*(UEqn() == sources(U))().H(); // new formulation
+U = rAU*UEqn().H();   // old
 
 if (pimple.nCorrPISO() <= 1)
 {
@@ -51,4 +51,7 @@ else
     U -= voidfraction*rAU*fvc::grad(p) - Ksl/rho*Us*rAU;
 
 U.correctBoundaryConditions();
-sources.correct(U);
+#if defined(version22)
+fvOptions.correct(U);  // test phase
+#endif
+//sources.correct(U);

@@ -42,7 +42,7 @@ particleCellVolumeProps
 [Description:]
 
 This "forceModel" does not influence the particles or the simulation - it is a postprocessing tool! The total volume of the particles as they are represented on the CFD mesh is calculated.
-At "writeTime" a field named particleCellVolume , where scalarField is the name of the original field, is written. This can be can the be probed using standard function object probes. Using the verbous option a screen output is given.
+At "writeTime" a field named particleCellVolume , where scalarField is the name of the original field, is written. This can be can the be probed using standard function object probes. Using the verbose option a screen output is given.
 
 [Restrictions:]
 

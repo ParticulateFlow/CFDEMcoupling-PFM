@@ -72,6 +72,14 @@ Archimedes::Archimedes
         g_(dimensionedVector(sm.mesh().lookupObject<IOdictionary>("environmentalProperties").lookup(gravityFieldName_)).value())
     #endif
 {
+
+    //Append the field names to be probed
+    particleCloud_.probeM().initialize(typeName, "archimedesF.logDat");
+    particleCloud_.probeM().vectorFields_.append("archimedesForce");  //first entry must the be the force
+    particleCloud_.probeM().scalarFields_.append("Vp");
+    particleCloud_.probeM().writeHeader();  
+
+
     if (propsDict_.found("twoDimensional"))
     {
         twoDimensional_=true;
@@ -104,6 +112,10 @@ void Archimedes::setForce() const
 {
     vector force(0,0,0);
 
+    //set probeModel parameters for this force model
+    particleCloud_.probeM().setOutputFile();
+    particleCloud_.probeM().setCounter();
+
     for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
     {
         //if(mask[index][0])
@@ -121,6 +133,17 @@ void Archimedes::setForce() const
                 }else{
                     force = -g_.value()*rho_[cellI]*pow(dp,3)/6*M_PI;
                 }
+
+                //Set value fields and write the probe
+                Field<vector> vValues;
+                vValues.clear();
+                vValues.append(force);           //first entry must the be the force
+
+                Field<scalar> sValues;
+                sValues.clear();
+                sValues.append(pow(dp,3)/6*M_PI);        //other are debug
+
+                particleCloud_.probeM().writeProbe(index, sValues, vValues);
             }
 
             if(!treatDEM_)

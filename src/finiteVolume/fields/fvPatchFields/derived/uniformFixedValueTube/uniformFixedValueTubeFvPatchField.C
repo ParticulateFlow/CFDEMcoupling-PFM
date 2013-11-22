@@ -24,6 +24,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "uniformFixedValueTubeFvPatchField.H"
+#include "surfaceFields.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -41,13 +42,15 @@ uniformFixedValueTubeFvPatchField<Type>::uniformFixedValueTubeFvPatchField
 :
     fixedValueFvPatchField<Type>(p, iF),
     uniformValue_(),
+	pName_("p"), //JOKER
+	phiName_("phi"), //JOKER
     velocityFieldName_("U"),
     densityFieldName_("rho"),
     tubeLength_(-1.),
     tubeDiameter_(-1.),
-    wallRoughness_(-1)
+    zeta_(-1)
 {
-    Info << "error, wrong constructor!" << endl;
+    Info << "error, wrong constructor1!" << endl;
 }
 
 
@@ -62,15 +65,17 @@ uniformFixedValueTubeFvPatchField<Type>::uniformFixedValueTubeFvPatchField
 :
     fixedValueFvPatchField<Type>(p, iF),
     uniformValue_(ptf.uniformValue_().clone().ptr()),
+	pName_("p"), //JOKER
+	phiName_("phi"), //JOKER
     velocityFieldName_("U"),
     densityFieldName_("rho"),
     tubeLength_(ptf.tubeLength_),
     tubeDiameter_(ptf.tubeDiameter_),
-    wallRoughness_(ptf.wallRoughness_)
+    zeta_(ptf.zeta_)
 {
     const scalar t = this->db().time().timeOutputValue();
     fvPatchField<Type>::operator==(uniformValue_->value(t));
-    Info << "error, wrong constructor!" << endl;
+    Info << "error, wrong constructor2!" << endl;
 }
 
 
@@ -84,11 +89,13 @@ uniformFixedValueTubeFvPatchField<Type>::uniformFixedValueTubeFvPatchField
 :
     fixedValueFvPatchField<Type>(p, iF),
     uniformValue_(DataEntry<Type>::New("uniformValue", dict)),
+	pName_("p"), //JOKER
+	phiName_("phi"), //JOKER
     velocityFieldName_("U"),
     densityFieldName_("rho"),
     tubeLength_(readScalar(dict.lookup("tubeLength"))),
     tubeDiameter_(readScalar(dict.lookup("tubeDiameter"))),
-    wallRoughness_(readScalar(dict.lookup("wallRoughness")))
+    zeta_(readScalar(dict.lookup("zeta")))
 {
     const scalar t = this->db().time().timeOutputValue();
     fvPatchField<Type>::operator==(uniformValue_->value(t));
@@ -103,11 +110,13 @@ uniformFixedValueTubeFvPatchField<Type>::uniformFixedValueTubeFvPatchField
 :
     fixedValueFvPatchField<Type>(ptf),
     uniformValue_(ptf.uniformValue_().clone().ptr()),
+	pName_("p"), //JOKER
+	phiName_("phi"), //JOKER
     velocityFieldName_("U"),
     densityFieldName_("rho"),
     tubeLength_(ptf.tubeLength_),
     tubeDiameter_(ptf.tubeDiameter_),
-    wallRoughness_(ptf.wallRoughness_)
+    zeta_(ptf.zeta_)
 {
     const scalar t = this->db().time().timeOutputValue();
     fvPatchField<Type>::operator==(uniformValue_->value(t));
@@ -123,11 +132,13 @@ uniformFixedValueTubeFvPatchField<Type>::uniformFixedValueTubeFvPatchField
 :
     fixedValueFvPatchField<Type>(ptf, iF),
     uniformValue_(ptf.uniformValue_().clone().ptr()),
+	pName_("p"), //JOKER
+	phiName_("phi"), //JOKER
     velocityFieldName_("U"),
     densityFieldName_("rho"),
     tubeLength_(ptf.tubeLength_),
     tubeDiameter_(ptf.tubeDiameter_),
-    wallRoughness_(ptf.wallRoughness_)
+    zeta_(ptf.zeta_)
 {
     const scalar t = this->db().time().timeOutputValue();
     fvPatchField<Type>::operator==(uniformValue_->value(t));
@@ -156,18 +167,26 @@ void uniformFixedValueTubeFvPatchField<Type>::updateCoeffs()
         return;
     }
 
-    const fvPatchField<vector>& velocity = this->patch().template lookupPatchField<volVectorField, vector>(velocityFieldName_);
+//    const fvPatchField<vector>& velocity = this->patch().template lookupPatchField<volVectorField, vector>(velocityFieldName_);
     const fvPatchField<scalar>& density = this->patch().template lookupPatchField<volScalarField, scalar>(densityFieldName_);
+	const fvPatchField<scalar>& pressure = this->patch().template lookupPatchField<volScalarField, scalar>(pName_);
     const scalar t = this->db().time().timeOutputValue();
 
-    // calc zeta value
-    scalar zeta=1;
+	const fvsPatchField<scalar>& phip = this->patch().template lookupPatchField<surfaceScalarField, scalar>(phiName_);
 
+	const scalar uRelFact = 1.e-3;
+
+	//scalar zeta = 0.1; //must be read from dict
+
+	//calc cell velocity from flux phip
+	//scalar vel = phip/this->patch().magSf();
     // some relaxation might be useful?
     
     // calc pressure drop
-    fvPatchField<Type>::operator==(0.5*zeta*density*mag(velocity)*mag(velocity)*uniformValue_->value(t));
-
+//    fvPatchField<Type>::operator==(0.5*zeta*density*mag(velocity)*mag(velocity)*uniformValue_->value(t));
+	//dP = zeta * l/d * rho u^2 / 2
+	fvPatchField<Type>::operator==((pressure+(0.5*zeta_*tubeLength_/tubeDiameter_*density*phip/this->patch().magSf()*phip/this->patch().magSf()-pressure)*uRelFact)*uniformValue_->value(t));
+	//fvPatchField<Type>::operator==((100.*uniformValue_->value(t)));
     fixedValueFvPatchField<Type>::updateCoeffs();
 }
 
@@ -179,7 +198,7 @@ void uniformFixedValueTubeFvPatchField<Type>::write(Ostream& os) const
     uniformValue_->writeData(os);
     os.writeKeyword("tubeLength") << tubeLength_ << token::END_STATEMENT << nl;
     os.writeKeyword("tubeDiameter") << tubeDiameter_ << token::END_STATEMENT << nl;
-    os.writeKeyword("wallRoughness") << wallRoughness_ << token::END_STATEMENT << nl;
+    os.writeKeyword("zeta") << zeta_ << token::END_STATEMENT << nl;
 }
 
 

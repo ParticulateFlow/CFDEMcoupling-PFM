@@ -40,11 +40,15 @@ regionModel allRegion;
 
 IOModel basicIO;
 
+probeModel off;
+
 dataExchangeModel oneWayVTK;
 
 averagingModel dense;
 
 clockModel off;
+
+smoothingModel off;
 
 forceModels
 (

@@ -38,6 +38,7 @@ Description
 #include "voidFractionModel.H"
 #include "dataExchangeModel.H"
 #include "IOModel.H"
+#include "probeModel.H"
 #include "averagingModel.H"
 #include "clockModel.H"
 #include "smoothingModel.H"
@@ -155,6 +156,16 @@ Foam::cfdemCloud::cfdemCloud
         (
             couplingProperties_,
             *this
+        )
+    ),
+    probeModel_
+    (
+        probeModel::New
+        (
+            couplingProperties_,
+            *this,
+            "none",
+            "none"
         )
     ),
     voidFractionModel_
@@ -320,6 +331,19 @@ void Foam::cfdemCloud::setForces()
     for (int i=0;i<cfdemCloud::nrForceModels();i++) cfdemCloud::forceM(i).setForce();
 }
 
+void Foam::cfdemCloud::setVectorAverages()
+{
+    if(verbose_) Info << "- setVectorAverage(Us,velocities_,weights_)" << endl;
+    averagingM().setVectorAverage
+    (
+        averagingM().UsNext(),
+        velocities_,
+        particleWeights_,
+        averagingM().UsWeightField(),
+        NULL //mask
+    );
+    if(verbose_) Info << "setVectorAverage done." << endl;
+}
 // * * * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * * //
 void Foam::cfdemCloud::checkCG(bool ok)
 {
@@ -464,16 +488,7 @@ bool Foam::cfdemCloud::evolve
 
             // set particles velocity field
             clockM().start(20,"setVectorAverage");
-            if(verbose_) Info << "- setVectorAverage(Us,velocities_,weights_)" << endl;
-            averagingM().setVectorAverage
-            (
-                averagingM().UsNext(),
-                velocities_,
-                particleWeights_,
-                averagingM().UsWeightField(),
-                NULL //mask
-            );
-            if(verbose_) Info << "setVectorAverage done." << endl;
+            setVectorAverages();
             clockM().stop("setVectorAverage");
 
             // set particles forces
@@ -512,10 +527,11 @@ bool Foam::cfdemCloud::evolve
         Info << "\n timeStepFraction() = " << dataExchangeM().timeStepFraction() << endl;
 
         clockM().start(24,"interpolateEulerFields");
+        // update smoothing model
+        smoothingM().dSmoothing();
+
         // update voidFractionField
         alpha.oldTime().internalField() = voidFractionM().voidFractionInterp();
-        
-        // smoothing exchange field
         smoothingM().smoothen(alpha);
         alpha.correctBoundaryConditions();
 
@@ -524,7 +540,8 @@ bool Foam::cfdemCloud::evolve
         //calcDdtVoidfraction(alpha); // alternative with scale=1! (does not see change in alpha?)
 
         // update particle velocity Field
-        Us.internalField() = averagingM().UsInterp();
+        Us.oldTime().internalField() = averagingM().UsInterp();
+        smoothingM().smoothenReferenceField(Us);
         Us.correctBoundaryConditions();
         clockM().stop("interpolateEulerFields");
 
@@ -580,7 +597,7 @@ tmp<volScalarField> cfdemCloud::ddtVoidfraction() const
         Info << "suppressing ddt(voidfraction)" << endl;
         return tmp<volScalarField> (ddtVoidfraction_ * 0.);
     }
-    return tmp<volScalarField> (ddtVoidfraction_) ;
+    return tmp<volScalarField> (ddtVoidfraction_ * 1.) ;
 }
 
 void cfdemCloud::calcDdtVoidfraction(volScalarField& voidfraction) const
