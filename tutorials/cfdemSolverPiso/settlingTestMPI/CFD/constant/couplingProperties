@@ -142,6 +142,7 @@ dividedProps
 {
     alphaMin 0.3;
     scaleUpVol 1.0;
+    verbose;
 }
 
 bigParticleProps
