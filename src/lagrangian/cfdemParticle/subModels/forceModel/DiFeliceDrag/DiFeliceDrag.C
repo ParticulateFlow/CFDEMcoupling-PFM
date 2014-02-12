@@ -115,7 +115,6 @@ void DiFeliceDrag::setForce() const
     vector Ufluid(0,0,0);
     vector drag(0,0,0);
     label cellI=0;
-
     vector Us(0,0,0);
     vector Ur(0,0,0);
     scalar ds(0);
@@ -128,9 +127,7 @@ void DiFeliceDrag::setForce() const
     interpolationCellPoint<scalar> voidfractionInterpolator_(voidfraction_);
     interpolationCellPoint<vector> UInterpolator_(U_);
 
-    //set probeModel parameters for this force model
-    particleCloud_.probeM().setOutputFile();
-    particleCloud_.probeM().setCounter();
+    #include "setupProbeModel.H"
 
     for(int index = 0;index <  particleCloud_.numberOfParticles(); index++)
     {
@@ -149,7 +146,7 @@ void DiFeliceDrag::setForce() const
                     Ufluid = UInterpolator_.interpolate(position,cellI);
                 }else
                 {
-                    voidfraction = particleCloud_.voidfraction(index);
+                    voidfraction = voidfraction_[cellI];
                     Ufluid = U_[cellI];
                 }
 
@@ -182,32 +179,29 @@ void DiFeliceDrag::setForce() const
 
                 if(verbose_ && index >100 && index <102)
                 {
-                    Info << "index = " << index << endl;
-                    Info << "Us = " << Us << endl;
-                    Info << "Ur = " << Ur << endl;
-                    Info << "ds = " << ds << endl;
-                    Info << "rho = " << rho << endl;
-                    Info << "nuf = " << nuf << endl;
-                    Info << "voidfraction = " << voidfraction << endl;
-                    Info << "Rep = " << Rep << endl;
-                    Info << "Cd = " << Cd << endl;
-                    Info << "drag = " << drag << endl;
+                    Pout << "index = " << index << endl;
+                    Pout << "Us = " << Us << endl;
+                    Pout << "Ur = " << Ur << endl;
+                    Pout << "ds = " << ds << endl;
+                    Pout << "rho = " << rho << endl;
+                    Pout << "nuf = " << nuf << endl;
+                    Pout << "voidfraction = " << voidfraction << endl;
+                    Pout << "Rep = " << Rep << endl;
+                    Pout << "Cd = " << Cd << endl;
+                    Pout << "drag = " << drag << endl;
                 }
 
                 //Set value fields and write the probe
-                Field<vector> vValues;
-                vValues.clear();
-                vValues.append(drag);           //first entry must the be the force
-                vValues.append(Ur);            //other are debug
-
-                Field<scalar> sValues;
-                sValues.clear();
-                sValues.append(Rep);        //other are debug
-                sValues.append(Cd);     //other are debug
-                sValues.append(voidfraction);     //other are debug
-
-                particleCloud_.probeM().writeProbe(index, sValues, vValues);
-
+                if(probeIt_)
+                {
+                    #include "setupProbeModelfields.H"
+                    vValues.append(drag);   //first entry must the be the force
+                    vValues.append(Ur);
+                    sValues.append(Rep);
+                    sValues.append(Cd);
+                    sValues.append(voidfraction);
+                    particleCloud_.probeM().writeProbe(index, sValues, vValues);
+                }
             }
             // set force on particle
             if(treatExplicit_) for(int j=0;j<3;j++) expForces()[index][j] += drag[j];

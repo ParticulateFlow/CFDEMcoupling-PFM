@@ -67,7 +67,8 @@ GidaspowDrag::GidaspowDrag
     velFieldName_(propsDict_.lookup("velFieldName")),
     U_(sm.mesh().lookupObject<volVectorField> (velFieldName_)),
     densityFieldName_(propsDict_.lookup("densityFieldName")),
-    rho_(sm.mesh().lookupObject<volScalarField> (densityFieldName_))
+    rho_(sm.mesh().lookupObject<volScalarField> (densityFieldName_)),
+    phi_(readScalar(propsDict_.lookup("phi")))
 {
     //Append the field names to be probed
     particleCloud_.probeM().initialize(typeName, "gidaspowDrag.logDat");
@@ -100,9 +101,7 @@ void GidaspowDrag::setForce() const
         const volScalarField& nufField = particleCloud_.turbulence().nu();
     #endif
 
-    //set probeModel parameters for this force model
-    particleCloud_.probeM().setOutputFile();
-    particleCloud_.probeM().setCounter();
+    #include "setupProbeModel.H"
 
     for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
     {
@@ -116,7 +115,7 @@ void GidaspowDrag::setForce() const
                 vector Us = particleCloud_.velocity(index);
                 vector Ur = U_[cellI]-Us;
                 scalar magUr = mag(Ur);
-                scalar ds = 2*particleCloud_.radius(index);
+                scalar ds = 2*particleCloud_.radius(index)*phi_;
                 scalar voidfraction = particleCloud_.voidfraction(index);
                 scalar rho = rho_[cellI];
                 scalar nuf = nufField[cellI];
@@ -149,18 +148,15 @@ void GidaspowDrag::setForce() const
 
 
                 //Set value fields and write the probe
-                Field<vector> vValues;
-                vValues.clear();
-                vValues.append(drag);           //first entry must the be the force
-                vValues.append(Ur);            //other are debug
-
-                Field<scalar> sValues;
-                sValues.clear();
-                sValues.append(KslLag);     //other are debug
-                sValues.append(voidfraction);     //other are debug
-
-                particleCloud_.probeM().writeProbe(index, sValues, vValues);
-
+                if(probeIt_)
+                {
+                    #include "setupProbeModelfields.H"
+                    vValues.append(drag);   //first entry must the be the force
+                    vValues.append(Ur);
+                    sValues.append(KslLag);
+                    sValues.append(voidfraction);
+                    particleCloud_.probeM().writeProbe(index, sValues, vValues);
+                }
             }
 
             // set force on particle

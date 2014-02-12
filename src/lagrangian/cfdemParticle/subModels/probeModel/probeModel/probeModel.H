@@ -138,7 +138,7 @@ public:
     virtual void writeProbe(int index, Field<scalar> sValues, Field<vector> vValues) const {};
     virtual bool checkIDForPrint(int) const {return false;};
     virtual void setCounter() const {};
-
+    virtual bool active() const {return true;}; 
     const char* wordToChar(word&) const;
 
     // Access

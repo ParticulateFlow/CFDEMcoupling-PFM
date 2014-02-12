@@ -27,7 +27,8 @@ pullRepo()
 
     #- header
     echo 2>&1 | tee -a $logpath/$logfileName
-    echo "//   $headerText   //" 2>&1 | tee -a $logpath/$logfileName
+    echo 2>&1 | tee -a $logpath/$logfileName
+    echo "//=== $headerText ===//" 2>&1 | tee -a $logpath/$logfileName
     echo 2>&1 | tee -a $logpath/$logfileName
 
     #- write path
@@ -149,6 +150,8 @@ compileLIGGGHTS()
     echo 2>&1 | tee -a $logpath/$logfileName
 
     #- wclean and wmake
+    rm $CFDEM_LIGGGHTS_SRC_DIR/"lmp_"$CFDEM_LIGGGHTS_MAKEFILE_NAME
+    rm $CFDEM_LIGGGHTS_SRC_DIR/"lib"$CFDEM_LIGGGHTS_LIB_NAME".a"
     make clean-all 2>&1 | tee -a $logpath/$logfileName
     make $CFDEM_LIGGGHTS_MAKEFILE_NAME -j $WM_NCOMPPROCS  2>&1 | tee -a $logpath/$logfileName
     make makelib 2>&1 | tee -a $logpath/$logfileName
@@ -206,34 +209,99 @@ cleanCFDEM()
     echo "if not, abort with ctrl-C"
     read
 
+    #**********************************************
+    #cleaning libraries
+    whitelist="$CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/library-list.txt"
     echo ""
+    echo "Please provide the libraries to be cleaned in the $CWD/$whitelist file."
+
+    if [ ! -f "$CWD/$whitelist" ];then
+        echo "$whitelist does not exist in $CWD. Nothing will be done."
+        NLINES=0
+        COUNT=0
+    else
+        NLINES=`wc -l < $CWD/$whitelist`
+        COUNT=0
+    fi
+
+    while [ $COUNT -lt $NLINES ]
+    do
+            let COUNT++  
+            LINE=`head -n $COUNT $CWD/$whitelist | tail -1`
+  
+            # white lines
+            if [[ "$LINE" == "" ]]; then
+                continue
+            # comments
+            elif [[ "$LINE" == \#* ]]; then
+                continue
+             # paths
+            elif [[ "$LINE" == */dir ]]; then
+                echo "will change path..."
+                LINE=$(echo "${LINE%????}")
+                path="$CFDEM_PROJECT_DIR/src/$LINE"
+                cd $path
+                #continue
+            fi
+
+            cd  $path
+            echo "cleaning library $PWD"
+            rmdepall
+            wclean    
+            rm -r ./Make/linux*
+            rm -r ./lnInclude
+    done
+
+
+    #**********************************************
+    #cleaning utilities
     echo "removing object files in"
-    echo "   $CFDEM_SRC_DIR"
-    echo "   and"
     echo "   $CFDEM_UT_DIR"
     rm -r $CFDEM_UT_DIR/*/Make/linux*
     rm -r $CFDEM_UT_DIR/*/Make/linux*
     rm -r $CFDEM_UT_DIR/*/*.dep
 
-    rm -r $CFDEM_SRC_DIR/Make/linux*
-    rm -r $CFDEM_SRC_DIR/lnInclude
 
-    rm -r $CFDEM_SRC_DIR/../../finiteVolume/Make/linux*
-    rm -r $CFDEM_SRC_DIR/../../finiteVolume/lnInclude
 
+    #**********************************************
+    #cleaning solvers
+    whitelist="$CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/solver-list.txt"
     echo ""
-    echo "cleaning $CFDEM_SRC_DIR"
-    cd $CFDEM_SRC_DIR
-    rmdepall
-    wclean
+    echo "Please provide the solvers to be cleaned in the $CWD/$whitelist file."
 
-    for solver in  "cfdemSolverIB" "cfdemSolverPiso" "cfdemSolverPisoScalar"
+    if [ ! -f "$CWD/$whitelist" ];then
+        echo "$whitelist does not exist in $CWD. Nothing will be done."
+        NLINES=0
+        COUNT=0
+    else
+        NLINES=`wc -l < $CWD/$whitelist`
+        COUNT=0
+    fi
+
+    while [ $COUNT -lt $NLINES ]
     do
-        echo ""
-        echo "cleaning $CFDEM_SOLVER_DIRapplications/$solver"
-        cd $CFDEM_SOLVER_DIR/$solver
-        rmdepall
-        wclean
+            let COUNT++  
+            LINE=`head -n $COUNT $CWD/$whitelist | tail -1`
+  
+            # white lines
+            if [[ "$LINE" == "" ]]; then
+                continue
+            # comments
+            elif [[ "$LINE" == \#* ]]; then
+                continue
+             # paths
+            elif [[ "$LINE" == */dir ]]; then
+                echo "will change path..."
+                LINE=$(echo "${LINE%????}")
+                path="$CFDEM_SOLVER_DIR/$LINE"
+                cd $path
+                #continue
+            fi
+
+            cd  $path            
+            echo "cleaning solver $PWD"
+            rmdepall
+            wclean    
     done
 }
 #==================================#

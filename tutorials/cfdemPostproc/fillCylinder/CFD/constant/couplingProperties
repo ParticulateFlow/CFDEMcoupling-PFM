@@ -52,7 +52,7 @@ smoothingModel off;
 
 forceModels
 (
-    off
+    noDrag
 );
 
 momCoupleModels

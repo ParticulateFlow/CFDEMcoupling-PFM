@@ -60,8 +60,18 @@ noDrag::noDrag
     cfdemCloud& sm
 )
 :
-    forceModel(dict,sm)
+    forceModel(dict,sm),
+    propsDict_(dict),
+    verbose_(false),
+    noDEMForce_(false)
 {
+    if(dict.found(word(typeName + "Props")))
+        propsDict_=dictionary(dict.subDict(typeName + "Props"));
+
+    if (propsDict_.found("noDEMForce")) noDEMForce_=true;
+
+    if (propsDict_.found("keepCFDForce")) keepCFDForce_=true;
+
     coupleForce_=false;
 }
 
@@ -80,12 +90,14 @@ void noDrag::setForce() const
     Info << "noDrag::setForce" << endl;
     for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
     {
-        //if(mask[index][0])
-        //{
-            // set force on particle
+        // set force on particle
+        if(!keepCFDForce_)
+        {
             if(treatExplicit_) for(int j=0;j<3;j++) expForces()[index][j] = 0.;
             else  for(int j=0;j<3;j++) impForces()[index][j] = 0.;
-        //}
+        }
+        if(noDEMForce_)for(int j=0;j<3;j++) DEMForces()[index][j] = 0.;
+        
     }
 }
 

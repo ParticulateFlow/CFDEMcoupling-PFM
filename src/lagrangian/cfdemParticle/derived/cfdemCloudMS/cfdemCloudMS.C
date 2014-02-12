@@ -144,13 +144,14 @@ void cfdemCloudMS::getDEMdata()
 
 void Foam::cfdemCloudMS::giveDEMdata()
 {
-    for(int index = 0;index < numberOfClumps(); ++index)
+    /*for(int index = 0;index < numberOfClumps(); ++index)
     {
         for(int i=0;i<3;i++){
             impForcesCM()[index][i] += expForcesCM()[index][i] + DEMForcesCM()[index][i];
         }
     }
-    if(forceM(0).coupleForce()) dataExchangeM().giveData("dragforce","vector-multisphere",impForcesCM());
+    if(forceM(0).coupleForce()) dataExchangeM().giveData("dragforce","vector-multisphere",impForcesCM());*/
+    if(forceM(0).coupleForce()) dataExchangeM().giveData("dragforce_cm","vector-multisphere",DEMForcesCM());
     if(verbose_) Info << "giveDEMdata done." << endl;
 }
 

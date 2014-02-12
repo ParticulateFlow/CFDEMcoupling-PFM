@@ -54,7 +54,6 @@ libs ( "libfiniteVolumeCFDEM.so" );
 
 functions
 (
-
     probes
     {
         type        probes;
@@ -95,6 +94,7 @@ functions
         outputInterval  1;
     }
 
+/*
     probes_inletFlux
     {
         type            faceSource;
@@ -144,7 +144,7 @@ functions
         (
             phi
         );
-    }
+    }*/
    /*pressureDrop
    {
      type patchAverage;

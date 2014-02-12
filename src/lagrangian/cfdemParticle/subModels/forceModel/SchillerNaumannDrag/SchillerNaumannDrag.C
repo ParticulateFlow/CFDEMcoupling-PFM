@@ -101,9 +101,7 @@ void SchillerNaumannDrag::setForce() const
         const volScalarField& nufField = particleCloud_.turbulence().nu();
     #endif
 
-    //set probeModel parameters for this force model
-    particleCloud_.probeM().setOutputFile();
-    particleCloud_.probeM().setCounter();
+    #include "setupProbeModel.H"
 
     for(int index = 0;index <  particleCloud_.numberOfParticles(); index++)
     {
@@ -155,18 +153,15 @@ void SchillerNaumannDrag::setForce() const
                 }
 
                 //Set value fields and write the probe
-                Field<vector> vValues;
-                vValues.clear();
-                vValues.append(drag);           //first entry must the be the force
-                vValues.append(Ur);            //other are debug
-
-                Field<scalar> sValues;
-                sValues.clear();
-                sValues.append(Rep);        //other are debug
-                sValues.append(Cd);     //other are debug
-
-                particleCloud_.probeM().writeProbe(index, sValues, vValues);
-
+                if(probeIt_)
+                {
+                    #include "setupProbeModelfields.H"
+                    vValues.append(drag);           //first entry must the be the force
+                    vValues.append(Ur);
+                    sValues.append(Rep);
+                    sValues.append(Cd);
+                    particleCloud_.probeM().writeProbe(index, sValues, vValues);
+                }
             }
             // set force on particle
             if(treatExplicit_) for(int j=0;j<3;j++) expForces()[index][j] += drag[j];

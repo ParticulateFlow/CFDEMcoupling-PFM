@@ -49,16 +49,20 @@ averagingModel dense;//dilute;//
 
 clockModel off;
 
+smoothingModel off;// localPSizeDiffSmoothing;// constDiffSmoothing; //
+
 forceModels
 (
-    off
+    noDrag
     Archimedes
     volWeightedAverage
 );
 
 forceModelsMS
 (
-    DiFeliceDragMS
+    //DiFeliceDragMS
+    GidaspowDragMS
+    //noDragMS
 );
 
 momCoupleModels
@@ -108,7 +112,7 @@ volWeightedAverageProps
     );
     upperThreshold 0.999;
     lowerThreshold 0;
-    verbose;
+    //verbose;
 }
 totalMomentumExchangeProps
 {
@@ -125,7 +129,15 @@ DiFeliceDragMSProps
     densityFieldName "rho";
     voidfractionFieldName "voidfraction";
     hydraulicDiameter 0.002;
-    verbose;
+    //verbose;
+}
+
+GidaspowDragMSProps
+{
+    velFieldName "U";
+    densityFieldName "rho";
+    voidfractionFieldName "voidfraction";
+    hydraulicDiameter 0.002;
 }
 
 oneWayVTKProps

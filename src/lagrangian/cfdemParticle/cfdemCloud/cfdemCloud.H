@@ -342,6 +342,8 @@ public:
 
         void calcDdtVoidfraction(volScalarField& voidfraction) const;
 
+        //tmp<fvVectorMatrix> ddtVoidfractionU(volVectorField& ,volScalarField&) const;
+
         tmp<volScalarField> voidfractionNuEff(volScalarField&) const;
 
         void resetArray(double**&,int,int,double resetVal=0.);

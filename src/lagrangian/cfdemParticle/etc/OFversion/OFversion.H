@@ -6,6 +6,8 @@
 // choose comp/incomp
 //#define comp   // if comp is on - you must use Make/options_comp!
 
+//define multi sphere
+#define multisphere
 
 // features of 2.1 work also in 2.2
 #if defined(version22)

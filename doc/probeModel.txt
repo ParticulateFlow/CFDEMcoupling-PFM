@@ -13,9 +13,8 @@ To be activated via couplingProperties dictionary.
 
 probeModel myProbeModel; :pre
 
-Use "off" for "myProbeModel" to disable this feature.
+Use probe model "off" to disable this feature.
 
-particleIDsToSample (ID1 ID2 ID3 ...); :pre
 myProbeModelProps :pre
 \{ :pre
 

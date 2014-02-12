@@ -136,6 +136,12 @@ void KochHillRWDrag::allocateMyArrays() const
 
 void KochHillRWDrag::setForce() const
 {
+
+    // realloc the arrays
+    reAllocArrays();
+
+Info << "huhu" << endl;
+
     if (scale_ > 1)
         Info << "KochHillRW using scale = " << scale_ << endl;
     else if (cg() > 1){
@@ -212,7 +218,7 @@ void KochHillRWDrag::setForce() const
             Ufluid =vector(0,0,0);
 
             // Pout << "RW-TEST: cellI = " << cellI << endl; // TEST-Output
-
+Info << "haha1" << endl;
             if (cellI > -1) // particle Found
             {
                 if(interpolation_)
@@ -246,7 +252,7 @@ void KochHillRWDrag::setForce() const
                 if(partTime_[index][0] > t+10*timeE)
                   partTime_[index][0] = t;
                 // -------------------------
-
+Info << "haha2" << endl;
                 //Pout << "RW-TEST: t = " << t << " partTime_ = " << partTime_[index][0] << endl; // TEST-Output
                 if(t>=partTime_[index][0])
                 {
@@ -281,6 +287,7 @@ void KochHillRWDrag::setForce() const
                     } else {
                       minDeltaT = timeE;
                     }
+Info << "haha3" << endl;
                     //Pout << "RW-TEST: timeE = " << timeE << " timeCR = " << timeCr << endl; // TEST-Output
 
                     // calculate time step of next update
@@ -295,9 +302,11 @@ void KochHillRWDrag::setForce() const
                         //Pout << "RW-TEST: Ufluid[" << dim << "] = " << Ufluid[dim] << " Ufluct = " << partUfluct_[index][dim] << " k = " << k << endl; // TEST-Output
                         Ufluid[dim] = Ufluid[dim] + partUfluct_[index][dim];
                     }
+Info << "haha4" << endl;
                 }
                 else
                 {
+Info << "haha5" << endl;
                     // no update of the turbulent velocity part
                     // modify current fluid velocity
                     for(int dim=0;dim<3;dim++)
@@ -315,7 +324,7 @@ void KochHillRWDrag::setForce() const
 				Rep = 0;
                 Vs = ds*ds*ds*M_PI/6;
                 volumefraction = 1-voidfraction+SMALL;
-
+Info << "haha6" << endl;
                 if (magUr > 0)
                 {
                     // calc particle Re Nr
@@ -349,6 +358,7 @@ void KochHillRWDrag::setForce() const
 
                     if (modelType_=="B")
                         drag /= voidfraction;
+Info << "haha7" << endl;
                 }
 
                 if(verbose_ && index >=0 && index <2)
@@ -364,7 +374,9 @@ void KochHillRWDrag::setForce() const
                     Pout << "Rep = " << Rep << endl;
                     Pout << "drag = " << drag << endl;
                 }
+Info << "haha8" << endl;
             }
+Info << "haha9" << endl;
             // set force on particle
             if(treatExplicit_) for(int j=0;j<3;j++) expForces()[index][j] += drag[j];
             else  for(int j=0;j<3;j++) impForces()[index][j] += drag[j];
@@ -382,9 +394,10 @@ void KochHillRWDrag::setForce() const
             }else{
                 for(int j=0;j<3;j++) DEMForces()[index][j] += drag[j];
             }
-
+Info << "haha10" << endl;
         //}
     }
+Info << "haha11" << endl;
 }
 
 

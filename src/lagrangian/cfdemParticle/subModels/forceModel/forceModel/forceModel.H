@@ -77,6 +77,8 @@ protected:
 
         mutable scalar cg_;
 
+        bool probeIt_;
+
 public:
 
     //- Runtime type information

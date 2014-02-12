@@ -10,7 +10,7 @@
 . ~/.bashrc
 
 #- include functions
-source $CFDEM_SRC_DIR/etc/functions.sh
+source $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/functions.sh
 
 #--------------------------------------------------------------------------------#
 #- define variables
@@ -59,6 +59,7 @@ if [ $cleanUp == "true" ]
     rm -rf particles
     rm -rf patchAverage_pressureDrop
     rm -rf probes
+    rm -rf postProcessing
     rm log.liggghts
     rm ../DEM/post/dump.*
 fi

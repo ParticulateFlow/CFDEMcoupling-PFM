@@ -74,8 +74,8 @@ dividedVoidFraction::dividedVoidFraction
 {
     maxCellsPerParticle_ = 29;
 
-    if(scaleUpVol_ > 1.3 || scaleUpVol_ < 1){ FatalError<< "scaleUpVol shloud be > 1 and < 1.3 !!!" << abort(FatalError); }
-    if(alphaMin_ > 1 || alphaMin_ < 0.01){ FatalError<< "alphaMin shloud be > 1 and < 0.01 !!!" << abort(FatalError); }
+    if(scaleUpVol_ > 2 || scaleUpVol_ < 1){ FatalError<< "scaleUpVol should be > 1 and < 2 !!!" << abort(FatalError); }
+    if(alphaMin_ > 1 || alphaMin_ < 0.01){ FatalError<< "alphaMin should be < 1 and > 0.01 !!!" << abort(FatalError); }
     if (propsDict_.found("interpolation")){
         interpolation_=true;
         Warning << "interpolation for dividedVoidFraction does not yet work correctly!" << endl;
@@ -125,8 +125,8 @@ void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfra
             cellID = particleCloud_.cellIDs()[index][0];
             radius = particleCloud_.radii()[index][0];
 
-            scalar volume =  4.188790205*radius*radius*radius*weight(); //4/3*pi=4.188790205
-            radius = radius*pow(scaleUpVol_,1/3);
+            //radius = radius*pow(scaleUpVol_,1/3);
+            scalar volume =  4.188790205*radius*radius*radius*weight()*scaleUpVol_; //4/3*pi=4.188790205
             cellVol=0;
 
             //--variables for sub-search

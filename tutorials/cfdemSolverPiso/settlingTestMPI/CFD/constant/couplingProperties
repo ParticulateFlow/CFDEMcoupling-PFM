@@ -48,7 +48,9 @@ averagingModel dense;//dilute;//
 
 clockModel standardClock;//off; //
 
-smoothingModel off;
+smoothingModel  off; //constDiffSmoothing; //
+
+//useDDTvoidfraction;
 
 forceModels
 (
@@ -57,6 +59,8 @@ forceModels
     //KochHillDrag
     //MeiLift
     //virtualMassForce
+    //gradPForce
+    //viscForce
     Archimedes
 );
 
@@ -69,6 +73,13 @@ turbulenceModelType RASProperties;//LESProperties;//
 
 //===========================================================================//
 // sub-model properties
+
+constDiffSmoothingProps
+{
+    lowerLimit 0.0;
+    upperLimit 1e99;
+    smoothingLength 3e-4;
+} 
 
 implicitCoupleProps
 {

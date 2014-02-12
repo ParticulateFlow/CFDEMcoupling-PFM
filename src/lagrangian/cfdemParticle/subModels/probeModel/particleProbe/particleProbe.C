@@ -78,7 +78,7 @@ particleProbe::particleProbe
     sampleAll_(false),
     probeDebug_(false),
     includePosition_(false),
-    particleIDsToSample_(dict.lookup("particleIDsToSample")),
+    particleIDsToSample_(propsDict_.lookup("particleIDsToSample")),
     itemsToSample_(NULL),
     sPtrList_(NULL),
     itemCounter_(0),

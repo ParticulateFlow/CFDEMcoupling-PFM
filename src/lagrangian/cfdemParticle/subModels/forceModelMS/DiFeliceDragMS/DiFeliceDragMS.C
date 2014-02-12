@@ -75,6 +75,15 @@ DiFeliceDragMS::DiFeliceDragMS
     //sphereToClump_(readScalar(propsDict_.lookup("sphereToClump")))
     dH_(readScalar(propsDict_.lookup("hydraulicDiameter")))
 {
+    //Append the field names to be probed
+    particleCloud_.probeM().initialize(typeName, "diFeliceDrag.logDat");
+    particleCloud_.probeM().vectorFields_.append("dragForce"); //first entry must the be the force
+    particleCloud_.probeM().vectorFields_.append("Urel");        //other are debug
+    particleCloud_.probeM().scalarFields_.append("Rep");          //other are debug
+    particleCloud_.probeM().scalarFields_.append("Cd");                 //other are debug
+    particleCloud_.probeM().scalarFields_.append("voidfraction");       //other are debug
+    particleCloud_.probeM().writeHeader();
+
     if (propsDict_.found("verbose")) verbose_=true;
     if (propsDict_.found("treatExplicit")) treatExplicit_=true;
     if (propsDict_.found("interpolation"))
@@ -82,6 +91,7 @@ DiFeliceDragMS::DiFeliceDragMS
         Info << "using interpolated value of U." << endl;
         interpolation_=true;
     }
+    particleCloud_.checkCG(false);
 }
 
 
@@ -102,11 +112,11 @@ void DiFeliceDragMS::setForce() const
         const volScalarField& nufField = cloudRefMS().turbulence().nu();
     #endif
 
-    interpolationCellPoint<vector> UInterpolator(U_);
-    interpolationCellPoint<scalar> voidfractionInterpolator(voidfraction_);
-    vector U(0,0,0);
     vector position(0,0,0);
     scalar voidfraction(1);
+    vector Ufluid(0,0,0);
+    vector drag(0,0,0);
+    label cellI=0;
     vector Us(0,0,0);
     vector Ur(0,0,0);
     scalar ds(0);
@@ -116,32 +126,38 @@ void DiFeliceDragMS::setForce() const
     scalar Rep(0);
     scalar Cd(0);
 
+    interpolationCellPoint<scalar> voidfractionInterpolator(voidfraction_);
+    interpolationCellPoint<vector> UInterpolator(U_);
+
     cloudRefMS().resetArray(cloudRefMS().expForcesCM(),cloudRefMS().numberOfClumps(),3);
     cloudRefMS().resetArray(cloudRefMS().impForcesCM(),cloudRefMS().numberOfClumps(),3);
+    cloudRefMS().resetArray(cloudRefMS().DEMForcesCM(),cloudRefMS().numberOfClumps(),3);
+
+    #include "setupProbeModel.H"
 
     for(int index = 0;index <  cloudRefMS().numberOfClumps(); index++)
     {
 
         //if(mask[index][0])  // would have to be transformed from body ID to particle ID
         //{
-            vector drag(0,0,0);
-            label cellI = cloudRefMS().cellIDCM(index);
+            cellI = cloudRefMS().cellIDCM(index);
+			drag = vector(0,0,0);
 
             if (cellI > -1) // particle Found
             {
                 if(interpolation_)
                 {
                     position = cloudRefMS().positionCM(index);
-                    U = UInterpolator.interpolate(position,cellI);
+                    Ufluid = UInterpolator.interpolate(position,cellI);
                     voidfraction = voidfractionInterpolator.interpolate(position,cellI);
                 }else
                 {
-                    U = U_[cellI];
-                    voidfraction = voidfraction_[cellI];
+                    Ufluid = U_[cellI];
+                    voidfraction = voidfraction_[cellI]; //particleCloud_.voidfraction(index); ???//
                 }
 
                 Us = cloudRefMS().velocityCM(index);
-                Ur = U-Us;
+                Ur = Ufluid-Us;
                 //ds = 2*cloudRefMS().radius(index)/sphereToClump_; // scale from particle diameter
                 ds = dH_;                                           // use dict defined diameter
 
@@ -156,7 +172,7 @@ void DiFeliceDragMS::setForce() const
                 if (magUr > 0)
                 {
                     // calc particle Re Nr
-                    Rep = ds*voidfraction*magUr/nuf;
+                    Rep = ds*voidfraction*magUr/(nuf+SMALL);
 
                     // calc fluid drag Coeff
 //                    phi=1; //AsurfAequi/Asurf;
@@ -194,6 +210,7 @@ void DiFeliceDragMS::setForce() const
             // set force on bodies
             if(treatExplicit_) for(int j=0;j<3;j++) cloudRefMS().expForcesCM()[index][j] += drag[j];
             else  for(int j=0;j<3;j++) cloudRefMS().impForcesCM()[index][j] += drag[j];
+            for(int j=0;j<3;j++) cloudRefMS().DEMForcesCM()[index][j] += drag[j];
         //}
     }
 

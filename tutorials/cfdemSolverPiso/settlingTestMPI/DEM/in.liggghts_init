@@ -27,7 +27,7 @@ fix 		m4 all property/global coefficientFriction peratomtypepair 1 0.5
 fix 		m5 all property/global characteristicVelocity scalar 2.0
 
 #pair style
-pair_style 	gran/hooke/history  #Hookean without cohesion
+pair_style gran model hooke tangential history #Hookean without cohesion
 pair_coeff	* *
 
 #timestep, gravity
@@ -35,12 +35,12 @@ timestep	0.00001
 fix		gravi all gravity 9.81 vector 0.0 -1.0 0.0
 
 #walls (liggghts 2.0)
-fix			xwalls1 all wall/gran/hooke/history   primitive type 1  xplane 0.0
-fix			xwalls2 all wall/gran/hooke/history   primitive type 1  xplane 0.1
-fix			ywalls1 all wall/gran/hooke/history   primitive type 1  yplane 0.0
-fix			ywalls2 all wall/gran/hooke/history   primitive type 1  yplane 0.1
-fix			zwalls1 all wall/gran/hooke/history   primitive type 1  zplane 0.0
-fix			zwalls2 all wall/gran/hooke/history   primitive type 1  zplane 0.01
+fix xwalls1 all wall/gran model hooke tangential history primitive type 1  xplane 0.0
+fix xwalls2 all wall/gran model hooke tangential history primitive type 1  xplane 0.1
+fix ywalls1 all wall/gran model hooke tangential history primitive type 1  yplane 0.0
+fix ywalls2 all wall/gran model hooke tangential history primitive type 1  yplane 0.1
+fix zwalls1 all wall/gran model hooke tangential history primitive type 1  zplane 0.0
+fix zwalls2 all wall/gran model hooke tangential history primitive type 1  zplane 0.01
 
 #-import mesh from cad:
 #fix		cad1 all mesh/gran hopperGenauerSALOME.stl 1 1.0 0. 0. 0. 0. 180. 0. 
@@ -49,7 +49,7 @@ fix			zwalls2 all wall/gran/hooke/history   primitive type 1  zplane 0.01
 #fix		bucket_wall all wall/gran/hertz/history 1 0 mesh/gran 1 cad1
 
 #- create single partciles
-create_atoms    1 single 0.05 0.04  0.046 units box  
+create_atoms    1 single 0.05 0.025  0.05 units box  
 set group all diameter 0.0001 density 3000
 
 #cfd coupling

@@ -8,9 +8,9 @@
 whitelist="solver-list.txt"
 
 #- include functions
-source $CFDEM_SRC_DIR/etc/functions.sh
+source $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/functions.sh
 logDir="log"
-cd $CFDEM_SRC_DIR/etc
+cd $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc
 mkdir -p $logDir
 
 CWD="$(dirname "$(readlink -f ${BASH_SOURCE[0]})")"
@@ -19,13 +19,13 @@ NOW="$(date +"%Y-%m-%d-%H:%M")"
 echo ""
 echo "This routine will compile the solvers specified in solver-list.txt"
 echo ""
-echo "Are the variables CFDEM_SOLVER_DIR=$CFDEM_SOLVER_DIR"
-echo "and CFDEM_SRC_DIR=$CFDEM_SRC_DIR correct? (y/n)"
-read YN
-if [ "$YN" != "y" ];then
-  	echo "Aborted by user."
-  	exit 1
-fi
+#echo "Are the variables CFDEM_SOLVER_DIR=$CFDEM_SOLVER_DIR"
+#echo "and CFDEM_SRC_DIR=$CFDEM_SRC_DIR/lagrangian/cfdemParticle correct? (y/n)"
+#read YN
+#if [ "$YN" != "y" ];then
+#  	echo "Aborted by user."
+#  	exit 1
+#fi
 
 echo ""
 echo "Please provide the solvers to be compiled in the $CWD/$whitelist file."

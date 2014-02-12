@@ -131,9 +131,7 @@ void viscForce::setForce() const
 
     interpolationCellPoint<vector> divTauInterpolator_(divTauField);
 
-    //set probeModel parameters for this force model
-    particleCloud_.probeM().setOutputFile();
-    particleCloud_.probeM().setCounter();
+    #include "setupProbeModel.H"
 
     for(int index = 0;index <  particleCloud_.numberOfParticles(); index++)
     {
@@ -170,14 +168,13 @@ void viscForce::setForce() const
                 }
 
                 //Set value fields and write the probe
-                Field<vector> vValues;
-                vValues.clear();
-                vValues.append(force);           //first entry must the be the force
-                Field<scalar> sValues;
-                sValues.clear();
-                sValues.append(Vs);
-                particleCloud_.probeM().writeProbe(index, sValues, vValues);
-
+                if(probeIt_)
+                {
+                    #include "setupProbeModelfields.H"
+                    vValues.append(force);  //first entry must the be the force
+                    sValues.append(Vs);
+                    particleCloud_.probeM().writeProbe(index, sValues, vValues);
+                }
             }
 
             // set force on particle
@@ -190,7 +187,6 @@ void viscForce::setForce() const
         //}
     }
 }
-
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

@@ -1,11 +1,11 @@
 EXE_INC = \
-    -I$(CFDEM_SRC_DIR)/lnInclude \
+    -I$(CFDEM_SRC_DIR)/lagrangian/cfdemParticle/lnInclude \
     -I ../cfdemSolverPiso \
     -I$(LIB_SRC)/turbulenceModels/incompressible/turbulenceModel \
     -I$(LIB_SRC)/transportModels \
     -I$(LIB_SRC)/transportModels/incompressible/singlePhaseTransportModel \
     -I$(LIB_SRC)/finiteVolume/lnInclude \
-    -I$(CFDEM_SRC_DIR)/cfdTools \
+    -I$(CFDEM_SRC_DIR)/lagrangian/cfdemParticle/cfdTools \
 
 EXE_LIBS = \
     -L$(FOAM_USER_LIBBIN)\

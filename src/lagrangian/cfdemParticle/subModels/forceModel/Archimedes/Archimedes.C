@@ -112,9 +112,7 @@ void Archimedes::setForce() const
 {
     vector force(0,0,0);
 
-    //set probeModel parameters for this force model
-    particleCloud_.probeM().setOutputFile();
-    particleCloud_.probeM().setCounter();
+    #include "setupProbeModel.H"
 
     for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
     {
@@ -135,15 +133,13 @@ void Archimedes::setForce() const
                 }
 
                 //Set value fields and write the probe
-                Field<vector> vValues;
-                vValues.clear();
-                vValues.append(force);           //first entry must the be the force
-
-                Field<scalar> sValues;
-                sValues.clear();
-                sValues.append(pow(dp,3)/6*M_PI);        //other are debug
-
-                particleCloud_.probeM().writeProbe(index, sValues, vValues);
+                if(probeIt_)
+                {
+                    #include "setupProbeModelfields.H"
+                    vValues.append(force);           //first entry must the be the force
+                    sValues.append(pow(dp,3)/6*M_PI);
+                    particleCloud_.probeM().writeProbe(index, sValues, vValues);
+                }
             }
 
             if(!treatDEM_)

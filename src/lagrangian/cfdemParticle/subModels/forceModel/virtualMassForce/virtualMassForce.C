@@ -107,9 +107,7 @@ void virtualMassForce::setForce() const
 
     scalar dt = U_.mesh().time().deltaT().value();
 
-    //set probeModel parameters for this force model
-    particleCloud_.probeM().setOutputFile();
-    particleCloud_.probeM().setCounter();
+    #include "setupProbeModel.H"
 
     for(int index = 0;index <  particleCloud_.numberOfParticles(); index++)
     {
@@ -137,17 +135,16 @@ void virtualMassForce::setForce() const
                 virtualMassForce = 0.5 * rho * Vs * ddtUrel;
 
                 //Set value fields and write the probe
-                Field<vector> vValues;
-                vValues.clear();
-                vValues.append(virtualMassForce);           //first entry must the be the force
-                vValues.append(Ur);
-                vValues.append(UrelOld);
-                Field<scalar> sValues;
-                sValues.clear();
-                sValues.append(Vs);
-                sValues.append(rho);
-                particleCloud_.probeM().writeProbe(index, sValues, vValues);
-
+                if(probeIt_)
+                {
+                    #include "setupProbeModelfields.H"
+                    vValues.append(virtualMassForce);           //first entry must the be the force
+                    vValues.append(Ur);
+                    vValues.append(UrelOld);
+                    sValues.append(Vs);
+                    sValues.append(rho);
+                    particleCloud_.probeM().writeProbe(index, sValues, vValues);
+                }
             }
             // set force on particle
             if(treatExplicit_) for(int j=0;j<3;j++) expForces()[index][j] += virtualMassForce[j];

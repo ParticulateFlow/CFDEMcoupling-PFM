@@ -144,9 +144,7 @@ void KochHillDrag::setForce() const
     interpolationCellPoint<scalar> voidfractionInterpolator_(voidfraction_);
     interpolationCellPoint<vector> UInterpolator_(U_);
 
-    //set probeModel parameters for this force model
-    particleCloud_.probeM().setOutputFile();
-    particleCloud_.probeM().setCounter();
+    #include "setupProbeModel.H"
 
     for(int index = 0;index <  particleCloud_.numberOfParticles(); index++)
     {
@@ -171,7 +169,7 @@ void KochHillDrag::setForce() const
                     if(voidfraction<0.40) voidfraction = 0.40;
                 }else
                 {
-					voidfraction = particleCloud_.voidfraction(index);
+					voidfraction = voidfraction_[cellI];
                     Ufluid = U_[cellI];
                 }
 
@@ -222,6 +220,7 @@ void KochHillDrag::setForce() const
 
                 if(verbose_ && index >=0 && index <2)
                 {
+                    Pout << "cellI = " << cellI << endl;
                     Pout << "index = " << index << endl;
                     Pout << "Us = " << Us << endl;
                     Pout << "Ur = " << Ur << endl;
@@ -234,20 +233,17 @@ void KochHillDrag::setForce() const
                     Pout << "drag = " << drag << endl;
                 }
 
-                            //Set value fields and write the probe
-                Field<vector> vValues;
-                vValues.clear();
-                vValues.append(drag);           //first entry must the be the force
-                vValues.append(Ur);            //other are debug
-
-                Field<scalar> sValues;
-                sValues.clear();
-                sValues.append(Rep);        //other are debug
-                sValues.append(betaP);     //other are debug
-                sValues.append(voidfraction);     //other are debug
-
-                particleCloud_.probeM().writeProbe(index, sValues, vValues);
-    
+                //Set value fields and write the probe
+                if(probeIt_)
+                {
+                    #include "setupProbeModelfields.H"
+                    vValues.append(drag);           //first entry must the be the force
+                    vValues.append(Ur);
+                    sValues.append(Rep);
+                    sValues.append(betaP);
+                    sValues.append(voidfraction);
+                    particleCloud_.probeM().writeProbe(index, sValues, vValues);
+                }    
             }
             // set force on particle
             if(treatExplicit_) for(int j=0;j<3;j++) expForces()[index][j] += drag[j];

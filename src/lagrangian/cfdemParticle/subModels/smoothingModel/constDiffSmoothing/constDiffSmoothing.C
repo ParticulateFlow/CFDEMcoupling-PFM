@@ -110,8 +110,14 @@ bool constDiffSmoothing::doSmoothing() const
     dSmooth.internalField() = dSmooth0;             
 }*/
 
-void Foam::constDiffSmoothing::smoothen(volScalarField& field) const
+void Foam::constDiffSmoothing::smoothen(volScalarField& fieldSrc) const
 {
+    // transfer data to working field to not mess up ddt
+    volScalarField field=fieldSrc;
+    field.correctBoundaryConditions();
+    field.oldTime()=fieldSrc;
+    field.oldTime().correctBoundaryConditions();
+
     double deltaT = field.mesh().time().deltaTValue();
     DT_.value() = smoothingLength_.value() * smoothingLength_.value() / deltaT;
 
@@ -127,7 +133,10 @@ void Foam::constDiffSmoothing::smoothen(volScalarField& field) const
     {
         field[cellI]=max(lowerLimit_,min(upperLimit_,field[cellI]));
     }  
- 
+
+    // get data from working field
+    fieldSrc=field;
+    fieldSrc.correctBoundaryConditions(); 
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 void Foam::constDiffSmoothing::smoothen(volVectorField& field) const
@@ -184,7 +193,7 @@ void Foam::constDiffSmoothing::smoothenReferenceField(volVectorField& field) con
     (
         fvm::ddt(field) == fvm::laplacian( DT_, field) 
                                        +  NLarge() / deltaT * field.oldTime() //add source to keep cell values constant
-                                       - fvm::Sp( NLarge() / deltaT, field)     //add sink to keep cell values constant
+                                       - fvm::Sp( NLarge() / deltaT, field)   //add sink to keep cell values constant
     );  
 
 }

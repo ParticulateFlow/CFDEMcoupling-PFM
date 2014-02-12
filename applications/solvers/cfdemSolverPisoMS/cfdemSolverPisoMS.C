@@ -40,6 +40,8 @@ Description
 
 #include "cfdemCloudMS.H"
 #include "implicitCouple.H"
+#include "clockModel.H"
+#include "smoothingModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -49,85 +51,80 @@ int main(int argc, char *argv[])
     #include "createTime.H"
     #include "createMesh.H"
     #include "createFields.H"
-
     #include "initContinuityErrs.H"
 
     // create cfdemCloud
     #include "readGravitationalAcceleration.H"
     cfdemCloudMS particleCloud(mesh);
-
     #include "checkModelType.H"
-    // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-    Info<< "\nStarting time loop\n" << endl;
+    // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
     while (runTime.loop())
     {
+        Info<< "\nStarting time loop\n" << endl;
+            particleCloud.clockM().start(1,"Global");
+
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
         #include "readPISOControls.H"
         #include "CourantNo.H"
 
         // do particle stuff
-        Info << "- evolve()" << endl;
+        particleCloud.clockM().start(2,"Coupling");
         particleCloud.evolve(voidfraction,Us,U);
-
+      
         Info << "update Ksl.internalField()" << endl;
-        Ksl.internalField() = particleCloud.momCoupleM(0).impMomSource();
+        Ksl = particleCloud.momCoupleM(0).impMomSource();
+        particleCloud.smoothingM().smoothen(Ksl);
         Ksl.correctBoundaryConditions();
 
-        // debug info
-        //Info << "totaldragforceEuler calculus" << endl;
-        //vector totaldragforceEuler(0,0,0);
-        //forAll(Ksl,cellI)
-        //{
-        //    totaldragforceEuler += Ksl[cellI]*(Us[cellI]-U[cellI])/rho[cellI] * Ksl.mesh().V()[cellI];
-        //}
-        //Pout <<"totaldragforceEuler = "<< mag(totaldragforceEuler) << endl;
-        //Pout << "dv/dt =" << sum(fvc::ddt(voidfraction)) << endl;
-        //-----------
+        #include "solverDebugInfo.H"
+        particleCloud.clockM().stop("Coupling");
 
+        particleCloud.clockM().start(26,"Flow");
         // Pressure-velocity PISO corrector
         {
             // Momentum predictor
             fvVectorMatrix UEqn
             (
-                fvm::ddt(voidfraction,U)
+                fvm::ddt(voidfraction,U) //particleCloud.ddtVoidfractionU(U,voidfraction) //
               + fvm::div(phi, U)
 //              + turbulence->divDevReff(U)
               + particleCloud.divVoidfractionTau(U, voidfraction)
-             == 
-              - fvm::Sp(Ksl/rho,U) 
+             ==
+              - fvm::Sp(Ksl/rho,U)
             );
+
+            if (modelType=="B")
+                UEqn == - fvc::grad(p) + Ksl/rho*Us;
+            else
+                UEqn == - voidfraction*fvc::grad(p) + Ksl/rho*Us;
 
             UEqn.relax();
 
             if (momentumPredictor)
-            {
-                //solve UEqn
-                if (modelType=="B")
-                    solve(UEqn == - fvc::grad(p) + Ksl/rho*Us);
-                else
-                    solve(UEqn == - voidfraction*fvc::grad(p) + Ksl/rho*Us);
-            }
+                solve(UEqn);
 
             // --- PISO loop
 
             //for (int corr=0; corr<nCorr; corr++)
             int nCorrSoph = nCorr + 5 * pow((1-particleCloud.dataExchangeM().timeStepFraction()),1);
+
             for (int corr=0; corr<nCorrSoph; corr++)
             {
                 volScalarField rUA = 1.0/UEqn.A();
+
                 surfaceScalarField rUAf("(1|A(U))", fvc::interpolate(rUA));
+                volScalarField rUAvoidfraction("(voidfraction2|A(U))",rUA*voidfraction);
 
                 U = rUA*UEqn.H();
 
-                phi = fvc::interpolate(U*voidfraction) & mesh.Sf();
-                                      //+ fvc::ddtPhiCorr(rUA, U, phi)
+                phi = (fvc::interpolate(U*voidfraction) & mesh.Sf() );
+                     //+ fvc::ddtPhiCorr(rUAvoidfraction, U, phi);
                 surfaceScalarField phiS(fvc::interpolate(Us*voidfraction) & mesh.Sf());
                 surfaceScalarField phiGes = phi + rUAf*(fvc::interpolate(Ksl/rho) * phiS);
 
-                volScalarField rUAvoidfraction("(voidfraction2|A(U))",rUA*voidfraction);
                 if (modelType=="A")
                     rUAvoidfraction = volScalarField("(voidfraction2|A(U))",rUA*voidfraction*voidfraction);
 
@@ -167,7 +164,7 @@ int main(int argc, char *argv[])
                     U -= rUA*fvc::grad(p) - Ksl/rho*Us*rUA;
                 else
                     U -= voidfraction*rUA*fvc::grad(p) - Ksl/rho*Us*rUA;
-                
+
                 U.correctBoundaryConditions();
 
             } // end piso loop
@@ -180,10 +177,13 @@ int main(int argc, char *argv[])
         Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
             << "  ClockTime = " << runTime.elapsedClockTime() << " s"
             << nl << endl;
+
+        particleCloud.clockM().stop("Flow");
+        particleCloud.clockM().stop("Global");
     }
 
     Info<< "End\n" << endl;
-
+    
     return 0;
 }
 

@@ -138,9 +138,7 @@ void MeiLift::setForce() const
     interpolationCellPoint<vector> UInterpolator_(U_);
     interpolationCellPoint<vector> VorticityInterpolator_(vorticityField);
 
-    //set probeModel parameters for this force model
-    particleCloud_.probeM().setOutputFile();
-    particleCloud_.probeM().setCounter();
+    #include "setupProbeModel.H"
 
     for(int index = 0;index <  particleCloud_.numberOfParticles(); index++)
     {
@@ -248,19 +246,17 @@ void MeiLift::setForce() const
                 }
 
                 //Set value fields and write the probe
-                Field<vector> vValues;
-                vValues.clear();
-                vValues.append(lift);           //first entry must the be the force
-                vValues.append(Ur);            //other are debug
-                vValues.append(vorticity);   //other are debug
-
-                Field<scalar> sValues;
-                sValues.clear();
-                sValues.append(Rep);        //other are debug
-                sValues.append(Rew);        //other are debug
-                sValues.append(J_star);     //other are debug
-
-                particleCloud_.probeM().writeProbe(index, sValues, vValues);
+                if(probeIt_)
+                {
+                    #include "setupProbeModelfields.H"
+                    vValues.append(lift);   //first entry must the be the force
+                    vValues.append(Ur);
+                    vValues.append(vorticity);
+                    sValues.append(Rep);
+                    sValues.append(Rew);
+                    sValues.append(J_star);
+                    particleCloud_.probeM().writeProbe(index, sValues, vValues);
+                }
                 // END OF SAMPLING AND VERBOSE OUTOUT
                 //**********************************        
 

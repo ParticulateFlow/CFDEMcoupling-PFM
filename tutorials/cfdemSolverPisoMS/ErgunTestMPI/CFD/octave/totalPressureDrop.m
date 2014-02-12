@@ -7,7 +7,7 @@ clc;
 %====================================%
 rhoG = 5			% density in kg/m3
 %path = '../probes/0/p';
-path = '../probes/0/p';
+path = '../postProcessing/probes/0/p';
 columns=22;
 headerlines=4;
 data = loaddata(path,columns,headerlines);

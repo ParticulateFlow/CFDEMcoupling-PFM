@@ -38,7 +38,7 @@ fix 		m4 all property/global coefficientFriction peratomtypepair 1 0.5
 fix 		m5 all property/global characteristicVelocity scalar 1.
 
 #pair style
-pair_style 	gran/hooke/history
+pair_style gran model hooke tangential history
 pair_coeff	* *
 
 #timestep, gravity
@@ -46,9 +46,9 @@ timestep	0.000005
 fix		gravi all gravity 9.81 vector 0.0 0.0 -1.0
 
 #walls
-fix			zwalls1 all wall/gran/hooke/history     primitive type 1  zplane 0.0
-fix			zwalls2 all wall/gran/hooke/history     primitive type 1  zplane 0.0553
-fix         cylwalls all wall/gran/hooke/history    primitive type 1 zcylinder 0.01385 0. 0. tangential_damping off
+fix zwalls1 all wall/gran model hooke tangential history primitive type 1  zplane 0.0
+fix zwalls2 all wall/gran model hooke tangential history primitive type 1  zplane 0.0553
+fix cylwalls all wall/gran model hooke tangential history primitive type 1 zcylinder 0.01385 0. 0.
 
 #particle distributions and insertion
 region		bc cylinder z 0.0 0.0 0.012 0. 0.055 units box
