@@ -18,7 +18,7 @@
 ##- source cfdem env vars
 #export CFDEM_VERSION=PUBLIC
 #export CFDEM_PROJECT_DIR=$HOME/CFDEM/CFDEMcoupling-$CFDEM_VERSION-$WM_PROJECT_VERSION
-#export CFDEM_SRC_DIR=$CFDEM_PROJECT_DIR/src/lagrangian/cfdemParticle
+#export CFDEM_SRC_DIR=$CFDEM_PROJECT_DIR/src
 #export CFDEM_SOLVER_DIR=$CFDEM_PROJECT_DIR/applications/solvers
 #export CFDEM_DOC_DIR=$CFDEM_PROJECT_DIR/doc
 #export CFDEM_UT_DIR=$CFDEM_PROJECT_DIR/applications/utilities
