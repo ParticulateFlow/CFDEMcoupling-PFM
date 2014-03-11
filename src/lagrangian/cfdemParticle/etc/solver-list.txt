@@ -1,5 +1,11 @@
-cfdemSolverPimple/dir
-cfdemSolverPisoMS/dir
 cfdemSolverPiso/dir
 cfdemSolverIB/dir
 cfdemSolverPisoScalar/dir
+cfdemSolverPimpleImEx/dir
+cfdemSolverIBInterLubrication/dir
+cfdemSolverIBScalar/dir
+cfdemSolverInterDyM/dir
+cfdemSolverBubble/dir
+cfdemSolverPimple/dir
+cfdemSolverPisoMS/dir
+cfdemSolverPimpleDyM_22x/dir

@@ -93,6 +93,7 @@ compileSolver()
     casePath="$3"
     headerText="$4"
     #doClean="$5"
+    parallel="$5"
     #--------------------------------------------------------------------------------#
 
     #- clean up old log file
@@ -115,7 +116,13 @@ compileSolver()
         rmdepall 2>&1 | tee -a $logpath/$logfileName
         wclean 2>&1 | tee -a $logpath/$logfileName
     #fi
-    wmake 2>&1 | tee -a $logpath/$logfileName
+    
+    # compile parallel?
+    if [[ $parallel == "true" ]]; then
+        wmake 2>&1 | tee -a $logpath/$logfileName &
+    else
+        wmake 2>&1 | tee -a $logpath/$logfileName
+    fi
 
     #- keep terminal open
     #read
@@ -307,6 +314,26 @@ cleanCFDEM()
 #==================================#
 
 #==================================#
+#- function to clean CFDEMcoupling case
+
+cleanCFDEMcase()
+{
+    #--------------------------------------------------------------------------------#
+    #- define variables
+    casepath="$1"
+    #--------------------------------------------------------------------------------#
+
+    echo "deleting data at: $casePath :\n"
+    source $WM_PROJECT_DIR/bin/tools/CleanFunctions
+    cd $casePath/CFD
+    cleanCase
+    rm -r $casePath/DEM/post/*
+    echo "dummyfile" >> $casePath/DEM/post/dummy
+    cd $casePath
+    echo "done"
+}
+
+#==================================#
 #- function to run a DEM case
 
 DEMrun()
@@ -443,7 +470,7 @@ CFDrun()
     echo 2>&1 | tee -a $logpath/$logfileName
 
     #- clean up case
-    rm couplingFiles/*
+    #rm couplingFiles/*
 
     #- run applictaion
     $debugMode $solverName 2>&1 | tee -a $logpath/$logfileName

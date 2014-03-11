@@ -19,11 +19,13 @@ GidaspowDragProps
 \{
     velFieldName "U";
     densityFieldName "density";
+    voidfractionFieldName "voidfraction"; 
     phi "scalar";
 \}; :pre
 
 {U} = name of the finite volume fluid velocity field :ulb,l
 {density} = name of the finite volume gravity field :l
+{voidfraction} = name of the finite volume voidfraction field :l
 {phi} = drag correction factor (in doubt 1) :l
 :ule
 
@@ -37,6 +39,7 @@ GidaspowDragProps
 \{
     velFieldName "U";
     densityFieldName "rho";
+    voidfractionFieldName "voidfraction"; 
 \} :pre
 
 [Description:]

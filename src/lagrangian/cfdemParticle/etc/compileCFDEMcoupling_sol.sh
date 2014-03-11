@@ -39,6 +39,10 @@ echo ""
 if [ ! -f "$CWD/$whitelist" ];then
     echo "$whitelist does not exist in $CWD"
 else
+
+    #--------------------------------------------------------------------------------#
+    logpath="$(dirname "$(readlink -f ${BASH_SOURCE[0]})")/$logDir"
+
     NLINES=`wc -l < $CWD/$whitelist`
     COUNT=0
 
@@ -71,12 +75,13 @@ else
 
             #--------------------------------------------------------------------------------#
             #- define variables
-            logpath="$(dirname "$(readlink -f ${BASH_SOURCE[0]})")/$logDir"
+            #logpath="$(dirname "$(readlink -f ${BASH_SOURCE[0]})")/$logDir"
             logfileName="log_compileCFDEMcoupling""_$LINE" 
             casePath="$CFDEM_SOLVER_DIR/$LINE"
             headerText="$logfileName""_$LINE""-$NOW"
+            parallel="false"
             #--------------------------------------------------------------------------------#
-            compileSolver $logpath $logfileName $casePath $headerText
+            compileSolver $logpath $logfileName $casePath $headerText $parallel
 
             #echo "did the solvers compile correcty? - press enter to proceed."
             #read

@@ -68,14 +68,16 @@ GidaspowDrag::GidaspowDrag
     U_(sm.mesh().lookupObject<volVectorField> (velFieldName_)),
     densityFieldName_(propsDict_.lookup("densityFieldName")),
     rho_(sm.mesh().lookupObject<volScalarField> (densityFieldName_)),
+    voidfractionFieldName_(propsDict_.lookup("voidfractionFieldName")),
+    voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
     phi_(readScalar(propsDict_.lookup("phi")))
 {
     //Append the field names to be probed
     particleCloud_.probeM().initialize(typeName, "gidaspowDrag.logDat");
     particleCloud_.probeM().vectorFields_.append("dragForce"); //first entry must the be the force
-    particleCloud_.probeM().vectorFields_.append("Urel");        //other are debug
-    particleCloud_.probeM().scalarFields_.append("KslLag");                 //other are debug
-    particleCloud_.probeM().scalarFields_.append("voidfraction");       //other are debug
+    particleCloud_.probeM().vectorFields_.append("Urel");
+    particleCloud_.probeM().scalarFields_.append("KslLag");
+    particleCloud_.probeM().scalarFields_.append("voidfraction");
     particleCloud_.probeM().writeHeader();
 
     if (propsDict_.found("verbose")) verbose_=true;
@@ -116,7 +118,7 @@ void GidaspowDrag::setForce() const
                 vector Ur = U_[cellI]-Us;
                 scalar magUr = mag(Ur);
                 scalar ds = 2*particleCloud_.radius(index)*phi_;
-                scalar voidfraction = particleCloud_.voidfraction(index);
+                scalar voidfraction = voidfraction_[cellI];                
                 scalar rho = rho_[cellI];
                 scalar nuf = nufField[cellI];
                 scalar CdMagUrLag=0;//Cd of the very particle
@@ -146,6 +148,18 @@ void GidaspowDrag::setForce() const
                 if (modelType_=="B")
                     drag /= voidfraction;
 
+                if(verbose_ && index >=0 && index <2)
+                {
+                    Pout << "cellI = " << cellI << endl;
+                    Pout << "index = " << index << endl;
+                    Pout << "Us = " << Us << endl;
+                    Pout << "Ur = " << Ur << endl;
+                    Pout << "ds = " << ds << endl;
+                    Pout << "rho = " << rho << endl;
+                    Pout << "nuf = " << nuf << endl;
+                    Pout << "voidfraction = " << voidfraction << endl;
+                    Pout << "drag = " << drag << endl;
+                }
 
                 //Set value fields and write the probe
                 if(probeIt_)

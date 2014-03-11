@@ -139,8 +139,11 @@ totalMomentumExchangeProps
 }
 GidaspowDragProps
 {
+    verbose;
     velFieldName "U";
     densityFieldName "rho";
+    voidfractionFieldName "voidfraction";
+    phi 1;
 }
 DiFeliceDragProps
 {

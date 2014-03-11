@@ -21,8 +21,6 @@ else
     blockMesh
 fi
 
-
-
 #- run parallel CFD-DEM in new terminal
 gnome-terminal --title='cfdemSolverPimple ErgunTestMPI CFD'  -e "bash $casePath/parCFDDEMrun.sh" 
 

@@ -6,7 +6,7 @@ clc;
 % simulation data 1
 %====================================%
 %path = '../probes/0/p';
-path = '../probes/0/p';
+path = '../postProcessing/0/p';
 columns=22;
 headerlines=4;
 data = loaddata(path,columns,headerlines);

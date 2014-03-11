@@ -69,6 +69,10 @@ private:
 
     const volScalarField& rho_;
 
+    word voidfractionFieldName_;
+
+    const volScalarField& voidfraction_;
+
     const scalar phi_;
 
 public:
