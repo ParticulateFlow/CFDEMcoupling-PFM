@@ -71,8 +71,6 @@ private:
 
     labelList labelList_;
 
-    bool runTimeModifiable_;
-
     bool timeStamp_;
 
 public:

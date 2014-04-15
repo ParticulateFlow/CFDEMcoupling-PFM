@@ -68,17 +68,13 @@ dividedVoidFractionMS::dividedVoidFractionMS
     alphaMin_(readScalar(propsDict_.lookup("alphaMin"))),
     alphaLimited_(0),
     tooMuch_(0.0),
-    scaleUpVol_(readScalar(propsDict_.lookup("scaleUpVol"))),
     clumpVol_(readScalar(propsDict_.lookup("clumpVol"))),
     nrigid_(readScalar(propsDict_.lookup("nrigid")))
 {
     maxCellsPerParticle_ = 29;
-
-    if(scaleUpVol_ > 1.3 || scaleUpVol_ < 1){ FatalError<< "scaleUpVol shloud be > 1 and < 1.3 !!!" << abort(FatalError); }
     if(alphaMin_ > 1 || alphaMin_ < 0.01){ FatalError<< "alphaMin shloud be > 1 and < 0.01 !!!" << abort(FatalError); }
-    if (propsDict_.found("weight"))
-        setWeight(readScalar(propsDict_.lookup("weight")));
-
+    checkWeightNporosity(propsDict_);
+    if(porosity()!=1) FatalError << "porosity not used in dividedVoidFractionMS" << abort(FatalError);
     if (propsDict_.found("verbose")) verbose_=true;
 }
 
@@ -99,7 +95,9 @@ void dividedVoidFractionMS::setvoidFraction(double** const& mask,double**& voidf
     vector position(0,0,0);
     label cellID=-1;
     scalar radius(-1);
+    scalar volume(0);
     scalar cellVol(0);
+    scalar scaleVol= weight();
 
     for(int index=0; index< particleCloud_.numberOfParticles(); index++)
     {
@@ -115,9 +113,7 @@ void dividedVoidFractionMS::setvoidFraction(double** const& mask,double**& voidf
             position = particleCloud_.position(index);
             cellID = particleCloud_.cellIDs()[index][0];
             radius = particleCloud_.radii()[index][0];
-
-            //radius = radius*pow(scaleUpVol_,1/3);
-            scalar volume =  clumpVol_/nrigid_*weight();
+            volume =  clumpVol_/nrigid_*scaleVol;
             cellVol=0;
 
             //--variables for sub-search

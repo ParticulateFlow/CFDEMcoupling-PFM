@@ -92,8 +92,6 @@ label turboEngineSearch::findCell
     vector position;
     for(int index = 0;index < size; ++index)
     {
-        cellIDs[index][0]=-1;
-
         //if(mask[index][0] && particleCloud_.radius(index) > SMALL)
         if(particleCloud_.radius(index) > SMALL)
         {
@@ -114,6 +112,7 @@ label turboEngineSearch::findCell
                     cellIDs[index][0] =-1;
             }
         }
+        else cellIDs[index][0]=-1;
     }
 
     return 1;

@@ -70,7 +70,8 @@ liggghtsCommandModel::liggghtsCommandModel
     firstCouplingStep_(-1),
     lastCouplingStep_(-1),
     couplingStepInterval_(0),
-    exactTiming_(false)
+    exactTiming_(false),
+    verbose_(false)
 {}
 
 
@@ -150,15 +151,18 @@ void liggghtsCommandModel::checkTimeSettings(const dictionary& propsDict)
             lastCouplingStep_ =1;
             couplingStepInterval_ =1;
     }
-    nextRun_ = firstCouplingStep_;
 
-    Info << "firstCouplingStep = " << firstCouplingStep_ << endl;
-    Info << "lastCouplingStep = " << lastCouplingStep_ << endl;
-    Info << "couplingStepInterval = " << couplingStepInterval_ << endl;
+    if(verbose_){
+        Info << "firstCouplingStep = " << firstCouplingStep_ << endl;
+        Info << "lastCouplingStep = " << lastCouplingStep_ << endl;
+        Info << "couplingStepInterval = " << couplingStepInterval_ << endl;
+        Info << "nextRun = " << nextRun_ << endl;
+    }
 }
 
 bool liggghtsCommandModel::runThisCommand(int couplingStep)
 {
+    if(verbose_) Info << "couplingStep = " << couplingStep << endl;
     bool runIt=false;
     if(
        (!runEveryWriteStep_ && firstCouplingStep_  <= couplingStep && lastCouplingStep_  >= couplingStep)  ||
@@ -194,7 +198,7 @@ DynamicList<scalar> liggghtsCommandModel::executionsWithinPeriod(scalar TSstart,
     DynamicList<scalar> executions(0);
 
     // current TS within active period
-    if(startTime_<TSend && endTime_>=TSstart )
+    if(startTime_+SMALL<TSend && endTime_>TSstart-SMALL )
     {
         Info << "working time within this TS" << endl;
 
@@ -212,10 +216,10 @@ DynamicList<scalar> liggghtsCommandModel::executionsWithinPeriod(scalar TSstart,
             t -= timeInterval_;
         }
         // check if first exec found within TS
-        if(TSstart <= t && t < TSend)
+        if(TSstart < t + SMALL && t +SMALL < TSend)
         {
             // check for more executions
-            while (t <= endTime_ && TSend - t > SMALL)
+            while (t < endTime_ + SMALL && TSend - t > SMALL)
             {
                 executions.append(t);
                 t += timeInterval_;

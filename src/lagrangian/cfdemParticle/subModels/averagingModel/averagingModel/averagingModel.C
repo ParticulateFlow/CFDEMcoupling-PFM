@@ -165,6 +165,35 @@ void averagingModel::setVectorSum
     field.correctBoundaryConditions();
 }
 
+void averagingModel::setVectorSumSimple
+(
+    volVectorField& field,
+    double**& value,
+    double**& weight,
+    int nP
+) const
+{
+    label cellI;
+    label subCell=0;
+    vector valueVec;
+    scalar weightP;
+
+    for(int index=0; index< nP; index++)
+    {
+        cellI = particleCloud_.cellIDs()[index][subCell];
+
+        if (cellI >= 0)
+        {
+            for(int i=0;i<3;i++) valueVec[i] = value[index][i];
+            weightP = weight[index][subCell];
+            field[cellI] += valueVec*weightP;
+        }
+    }
+
+    // correct cell values to patches
+    field.correctBoundaryConditions();
+}
+
 void averagingModel::setScalarSum
 (
     volScalarField& field,
@@ -301,7 +330,7 @@ void Foam::averagingModel::undoWeightFields(double**const& mask) const
 
 tmp<volVectorField> Foam::averagingModel::UsInterp() const
 {
-   tmp<volVectorField> tsource
+    tmp<volVectorField> tsource
     (
         new volVectorField
         (

@@ -72,6 +72,9 @@ runLiggghts::runLiggghts
     {
         propsDict_=dictionary(dict.subDict(myName));
         preNo_=Switch(propsDict_.lookup("preNo"));
+
+        // check if verbose
+        if (propsDict_.found("verbose")) verbose_=true;
     }
 
     runEveryCouplingStep_=true;

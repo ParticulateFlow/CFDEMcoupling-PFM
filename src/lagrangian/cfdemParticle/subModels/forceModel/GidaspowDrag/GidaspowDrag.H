@@ -29,6 +29,8 @@ Description
     and OpenFOAM(R). Note: this code is not part of OpenFOAM(R) (see DISCLAIMER).
 
     Gidaspow drag law
+    - only valid for low-Reynolds number systems (Re_p<1000)
+    - including interpolation of the velocity to the exact position
 
 Class
     GidaspowDrag
@@ -42,6 +44,7 @@ SourceFiles
 #define GidaspowDrag_H
 
 #include "forceModel.H"
+#include "interpolationCellPoint.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -74,6 +77,8 @@ private:
     const volScalarField& voidfraction_;
 
     const scalar phi_;
+
+    bool interpolation_; // use interpolated field values
 
 public:
 

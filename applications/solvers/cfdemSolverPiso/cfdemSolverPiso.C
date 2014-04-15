@@ -73,7 +73,7 @@ int main(int argc, char *argv[])
         // do particle stuff
         particleCloud.clockM().start(2,"Coupling");
         particleCloud.evolve(voidfraction,Us,U);
-      
+    
         Info << "update Ksl.internalField()" << endl;
         Ksl = particleCloud.momCoupleM(0).impMomSource();
         particleCloud.smoothingM().smoothen(Ksl);
@@ -88,8 +88,8 @@ int main(int argc, char *argv[])
             // Momentum predictor
             fvVectorMatrix UEqn
             (
-                fvm::ddt(voidfraction,U) //particleCloud.ddtVoidfractionU(U,voidfraction) //
-              + fvm::div(phi, U)
+                fvm::ddt(voidfraction,U) + fvm::Sp(fvc::ddt(voidfraction),U)
+              + fvm::div(phi,U) + fvm::Sp(fvc::div(phi),U)
 //              + turbulence->divDevReff(U)
               + particleCloud.divVoidfractionTau(U, voidfraction)
              ==

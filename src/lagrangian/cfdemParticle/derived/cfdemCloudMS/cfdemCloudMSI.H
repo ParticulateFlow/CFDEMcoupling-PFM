@@ -69,5 +69,10 @@ inline bool cfdemCloudMS::numberOfClumpsChanged() const
     return numberOfClumpsChanged_;
 }
 
+inline bool cfdemCloudMS::useforcePerClump() const
+{
+    return useforcePerClump_;
+}
+
 }
 // ************************************************************************* //

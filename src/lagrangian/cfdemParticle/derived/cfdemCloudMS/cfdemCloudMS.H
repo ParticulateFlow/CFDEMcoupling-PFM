@@ -83,8 +83,12 @@ private:
     mutable double **expForcesCM_;
     mutable double **DEMForcesCM_;
 
+    mutable double **particleWeightsCM_;
+
     int numberOfClumps_;
     bool numberOfClumpsChanged_;
+
+    bool useforcePerClump_;
 
     const wordList forceModels_;
     autoPtr<class forceModelMS>* forceModel_;
@@ -96,6 +100,7 @@ private:
     void setNumberOfParticles(int);
     void findCells();
     void setForces();
+    void setParticleForceField();
 
 public:
 
@@ -138,6 +143,8 @@ public:
        inline int numberOfClumps() const;
 
        inline bool numberOfClumpsChanged() const;
+
+       inline bool useforcePerClump() const;
 
        const forceModel& forceM(int);
 

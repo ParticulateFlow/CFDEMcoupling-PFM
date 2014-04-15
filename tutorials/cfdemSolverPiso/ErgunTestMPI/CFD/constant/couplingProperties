@@ -61,7 +61,7 @@ forceModels
     //Archimedes
     //volWeightedAverage
     //totalMomentumExchange
-    particleCellVolume
+    //particleCellVolume
 );
 
 momCoupleModels
@@ -225,7 +225,6 @@ dividedProps
 
 twoWayMPIProps
 {
-    //maxNumberOfParticles 10100;
     liggghtsPath "../DEM/in.liggghts_resume";
 }
 twoWayM2MProps

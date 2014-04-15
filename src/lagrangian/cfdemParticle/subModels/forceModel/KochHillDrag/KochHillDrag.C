@@ -72,7 +72,8 @@ KochHillDrag::KochHillDrag
     voidfractionFieldName_(propsDict_.lookup("voidfractionFieldName")),
     voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
     interpolation_(false),
-    scale_(1.)
+    scaleDia_(1.),
+    scaleDrag_(1.)
 {
     //Append the field names to be probed
     particleCloud_.probeM().initialize(typeName, "kochHillDrag.logDat");
@@ -96,7 +97,9 @@ KochHillDrag::KochHillDrag
     particleCloud_.checkCG(true);
 
     if (propsDict_.found("scale"))
-        scale_=scalar(readScalar(propsDict_.lookup("scale")));
+        scaleDia_=scalar(readScalar(propsDict_.lookup("scale")));
+    if (propsDict_.found("scaleDrag"))
+        scaleDrag_=scalar(readScalar(propsDict_.lookup("scaleDrag")));
 }
 
 
@@ -110,11 +113,11 @@ KochHillDrag::~KochHillDrag()
 
 void KochHillDrag::setForce() const
 {
-    if (scale_ > 1)
-        Info << "KochHill using scale = " << scale_ << endl;
+    if (scaleDia_ > 1)
+        Info << "KochHill using scale = " << scaleDia_ << endl;
     else if (cg() > 1){
-        scale_=cg();
-        Info << "KochHill using scale from liggghts cg = " << scale_ << endl;
+        scaleDia_=cg();
+        Info << "KochHill using scale from liggghts cg = " << scaleDia_ << endl;
     }
 
     // get viscosity field
@@ -186,7 +189,7 @@ void KochHillDrag::setForce() const
                 if (magUr > 0)
                 {
                     // calc particle Re Nr
-                    Rep = ds/scale_*voidfraction*magUr/(nuf+SMALL);
+                    Rep = ds/scaleDia_*voidfraction*magUr/(nuf+SMALL);
 
                     // calc model coefficient F0
                     scalar F0=0.;
@@ -209,10 +212,10 @@ void KochHillDrag::setForce() const
                     scalar F = voidfraction * (F0 + 0.5*F3*Rep);
 
                     // calc drag model coefficient betaP
-                    betaP = 18.*nuf*rho/(ds/scale_*ds/scale_)*voidfraction*F;
+                    betaP = 18.*nuf*rho/(ds/scaleDia_*ds/scaleDia_)*voidfraction*F;
 
                     // calc particle's drag
-                    drag = Vs*betaP*Ur;
+                    drag = Vs*betaP*Ur*scaleDrag_;
 
                     if (modelType_=="B")
                         drag /= voidfraction;
@@ -225,7 +228,7 @@ void KochHillDrag::setForce() const
                     Pout << "Us = " << Us << endl;
                     Pout << "Ur = " << Ur << endl;
                     Pout << "ds = " << ds << endl;
-                    Pout << "ds/scale = " << ds/scale_ << endl;
+                    Pout << "ds/scale = " << ds/scaleDia_ << endl;
                     Pout << "rho = " << rho << endl;
                     Pout << "nuf = " << nuf << endl;
                     Pout << "voidfraction = " << voidfraction << endl;

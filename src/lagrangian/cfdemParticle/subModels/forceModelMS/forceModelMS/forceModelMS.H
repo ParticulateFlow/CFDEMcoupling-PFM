@@ -59,6 +59,7 @@ protected:
 
         cfdemCloudMS& particleCloudMS_;
 
+        void setForcesOnParticle() const;
 
 public:
 
@@ -106,7 +107,6 @@ public:
 
 
     // Member Functions
-
 
     // Access
         cfdemCloudMS& cloudRefMS() const;

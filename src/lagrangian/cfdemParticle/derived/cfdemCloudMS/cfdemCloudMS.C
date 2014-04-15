@@ -68,8 +68,10 @@ cfdemCloudMS::cfdemCloudMS
     impForcesCM_(NULL),
     expForcesCM_(NULL),
     DEMForcesCM_(NULL),
+    particleWeightsCM_(NULL),
     numberOfClumps_(-1),
     numberOfClumpsChanged_(false),
+    useforcePerClump_(false),
     forceModels_(couplingProperties_.lookup("forceModelsMS"))
 {
     forceModel_ = new autoPtr<forceModelMS>[nrForceModels()];
@@ -106,6 +108,7 @@ cfdemCloudMS::~cfdemCloudMS()
     delete impForcesCM_;
     delete expForcesCM_;
     delete DEMForcesCM_;
+    delete particleWeightsCM_;
 }
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
@@ -191,6 +194,7 @@ bool cfdemCloudMS::reAllocArrays() const
         dataExchangeM().allocateArray(impForcesCM_,0,3,"nbodies");
         dataExchangeM().allocateArray(expForcesCM_,0,3,"nbodies");
         dataExchangeM().allocateArray(DEMForcesCM_,0,3,"nbodies");
+        dataExchangeM().allocateArray(particleWeightsCM_,1,1,"nbodies");        // filed is never changed-correct only for centre
         return true;
     }
     return false;
@@ -217,12 +221,42 @@ void Foam::cfdemCloudMS::findCells()
 
 void Foam::cfdemCloudMS::setForces()
 {
-    cfdemCloud::setForces();
-
     resetArray(impForces_,numberOfParticles(),3);
     resetArray(expForces_,numberOfParticles(),3);
     resetArray(DEMForces_,numberOfParticles(),3);
+
+    cfdemCloud::setForces();
+
+    resetArray(impForcesCM_,numberOfClumps(),3);
+    resetArray(expForcesCM_,numberOfClumps(),3);
+    resetArray(DEMForcesCM_,numberOfClumps(),3);
     for (int i=0;i<cfdemCloudMS::nrForceModels();i++) cfdemCloudMS::forceM(i).setForce();
+}
+
+void Foam::cfdemCloudMS::setParticleForceField()
+{
+    // set forces per particle
+    cfdemCloud::setParticleForceField();
+
+    // set forces per clump
+    // seems to be very unstable - exchange field is very inhomogeneous
+    if(useforcePerClump_)
+    {
+        averagingM().setVectorSumSimple
+        (
+        forceM(0).impParticleForces(),
+        impForcesCM_,
+        particleWeightsCM_,
+        numberOfClumps()
+        );
+        averagingM().setVectorSumSimple
+        (
+        forceM(0).expParticleForces(),
+        expForcesCM_,
+        particleWeightsCM_,
+        numberOfClumps()
+        );
+    }
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

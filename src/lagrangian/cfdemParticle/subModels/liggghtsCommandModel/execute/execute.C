@@ -69,7 +69,6 @@ execute::execute
     command_(""),
     scalarList_(0),
     labelList_(0),
-    runTimeModifiable_(true),
     timeStamp_(false)
 {
     // define dictionary
@@ -86,6 +85,9 @@ execute::execute
 
     // read list of labels
     if(propsDict_.found("labels")) labelList_ = labelList(propsDict_.lookup("labels"));
+
+    // check if verbose
+    if (propsDict_.found("verbose")) verbose_=true;
 
     bool addBlank = true;  // std no blanks after each word
     fileName add;
@@ -178,7 +180,7 @@ const char* execute::command()
 bool execute::runCommand(int couplingStep)
 {
     if(timeStamp_) strCommand_=addTimeStamp(command_);
-    if(runTimeModifiable_) checkTimeSettings(propsDict_);
+    checkTimeSettings(propsDict_);
 
     return runThisCommand(couplingStep);
 }

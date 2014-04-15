@@ -129,10 +129,6 @@ void DiFeliceDragMS::setForce() const
     interpolationCellPoint<scalar> voidfractionInterpolator(voidfraction_);
     interpolationCellPoint<vector> UInterpolator(U_);
 
-    cloudRefMS().resetArray(cloudRefMS().expForcesCM(),cloudRefMS().numberOfClumps(),3);
-    cloudRefMS().resetArray(cloudRefMS().impForcesCM(),cloudRefMS().numberOfClumps(),3);
-    cloudRefMS().resetArray(cloudRefMS().DEMForcesCM(),cloudRefMS().numberOfClumps(),3);
-
     #include "setupProbeModel.H"
 
     for(int index = 0;index <  cloudRefMS().numberOfClumps(); index++)
@@ -215,29 +211,7 @@ void DiFeliceDragMS::setForce() const
     }
 
     // set force on particles
-    int nrigidC(-1);
-    label ind(-1);
-    for(int index = 0;index <  cloudRefMS().numberOfParticles(); index++)
-    {
-        if (particleCloud_.cellIDs()[index][0] > -1) // particle Found
-        {
-            ind=cloudRefMS().body(index);
-            nrigidC=cloudRefMS().nrigid(ind);
-
-            if (nrigidC <= 0)
-            {
-                Warning <<"A BUG occurred in DiFeliceDragMS::setForce!!! nrigidC = " 
-                        << nrigidC <<", ind = " << ind <<", index=" << index <<"\n" << endl;
-                nrigidC = 1000;
-            }
-            if(treatExplicit_) for(int j=0;j<3;j++) expForces()[index][j] += cloudRefMS().expForcesCM()[ind][j] / nrigidC;
-            else{
-                for(int j=0;j<3;j++){
-                    impForces()[index][j] += cloudRefMS().impForcesCM()[ind][j] / nrigidC;
-                }
-            }
-        }
-    }
+    setForcesOnParticle();
 }
 
 

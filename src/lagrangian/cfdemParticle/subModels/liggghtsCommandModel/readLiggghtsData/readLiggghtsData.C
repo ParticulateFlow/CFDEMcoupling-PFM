@@ -79,6 +79,8 @@ readLiggghtsData::readLiggghtsData
         exactTiming_=true;
     Info << "exactTiming==" << exactTiming_ << endl;
 
+    if (propsDict_.found("verbose")) verbose_=true;
+
     // read first index of data file to be injected
     insertionNr_=readScalar(propsDict_.lookup("startIndex"));
 
@@ -123,6 +125,7 @@ const char* readLiggghtsData::command()
 
 bool readLiggghtsData::runCommand(int couplingStep)
 {
+    checkTimeSettings(propsDict_);
     return runThisCommand(couplingStep);
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

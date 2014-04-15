@@ -185,6 +185,8 @@ protected:
 
     virtual void setForces();
 
+    virtual void setParticleForceField();
+
     virtual void setVectorAverages();
 
 public:

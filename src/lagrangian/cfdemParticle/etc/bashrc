@@ -43,8 +43,13 @@ export CFDEM_LIGGGHTS_LIB_NAME=lmp_$CFDEM_LIGGGHTS_MAKEFILE_NAME
 #- CFDEM lib name
 export CFDEM_LIB_NAME=lagrangianCFDEM-$CFDEM_VERSION-$WM_PROJECT_VERSION
 
-#- LMP M2M lib path
+#- LMP M2M lib path and makefile
 export CFDEM_M2MLIB_PATH=$CFDEM_SRC_DIR/lagrangian/cfdemParticle/subModels/dataExchangeModel/twoWayM2M/library
+export CFDEM_M2MLIB_MAKEFILENAME=$CFDEM_LIGGGHTS_MAKEFILE_NAME
+
+#- LMP POEMS lib path and makefile
+export CFDEM_POEMSLIB_PATH=$CFDEM_LIGGGHTS_SRC_DIR/../lib/poems
+export CFDEM_POEMSLIB_MAKEFILENAME=g++
 
 #- path to test harness
 export CFDEM_TEST_HARNESS_PATH=$CFDEM_PROJECT_USER_DIR/log/logFilesCFDEM-$CFDEM_VERSION-$WM_PROJECT_VERSION
@@ -112,7 +117,7 @@ alias cfdemPullCFDEMcoupling='bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/p
 #- shortcut to clean CFDEM
 alias cfdemCleanCFDEM='bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/cleanCFDEMcoupling.sh'
 
-#- shortcut to compile LIGGGHTS
+#- shortcut to compile LIGGGHTS + sublibraries
 alias cfdemCompLIG='bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/compileLIGGGHTS.sh'
 
 #- shortcut to compile CFDEMcoupling +LIGGGHTS
@@ -151,21 +156,16 @@ export -f cfdemLiggghtsPar
 if [ -d "$CFDEM_PROJECT_USER_DIR" ]; then
     :
 else
-    if [ -d "$CFDEM_PROJECT_DIR" ]; then
-        cd $CFDEM_PROJECT_DIR/..
-        echo "make new dirs $CFDEM_PROJECT_DIR/../$LOGNAME-$CFDEM_VERSION-$WM_PROJECT_VERSION ? (y/n)"
+        echo "make new dirs $CFDEM_PROJECT_USER_DIR ? (y/n)"
         read YN
         if [ $YN == "y" ]; then
+            cd $CFDEM_PROJECT_DIR
             mkdir $LOGNAME-$CFDEM_VERSION-$WM_PROJECT_VERSION
             cd $LOGNAME-$CFDEM_VERSION-$WM_PROJECT_VERSION
             mkdir run
             mkdir -p log/logFilesCFDEM-$CFDEM_VERSION-$WM_PROJECT_VERSION
         else
             echo "aborted by user."
-            exit
+            #exit
         fi
-    else
-        echo "error in CFDEMcoupling's bashrc."
-        exit
-    fi
 fi

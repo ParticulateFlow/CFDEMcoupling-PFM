@@ -67,8 +67,6 @@ dpUmf= L * (
 %====================================%
 % plot data
 %====================================%
-length(U)
-length(dp_sim)
 figure(2)
 plot(U,dp_sim)
 title("Ergun pressure drop vs. simulation")

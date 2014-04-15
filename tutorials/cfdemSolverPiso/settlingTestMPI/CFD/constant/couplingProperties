@@ -46,9 +46,9 @@ dataExchangeModel twoWayMPI;//twoWayFiles;//oneWayVTK;//
 
 averagingModel dense;//dilute;//
 
-clockModel standardClock;//off; //
+clockModel off; //standardClock;//
 
-smoothingModel  off; //constDiffSmoothing; //
+smoothingModel  constDiffSmoothing; //off;//
 
 //useDDTvoidfraction;
 

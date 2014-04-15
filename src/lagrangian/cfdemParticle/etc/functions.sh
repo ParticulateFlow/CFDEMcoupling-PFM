@@ -160,11 +160,16 @@ compileLIGGGHTS()
     rm $CFDEM_LIGGGHTS_SRC_DIR/"lmp_"$CFDEM_LIGGGHTS_MAKEFILE_NAME
     rm $CFDEM_LIGGGHTS_SRC_DIR/"lib"$CFDEM_LIGGGHTS_LIB_NAME".a"
     make clean-all 2>&1 | tee -a $logpath/$logfileName
-    make $CFDEM_LIGGGHTS_MAKEFILE_NAME -j $WM_NCOMPPROCS  2>&1 | tee -a $logpath/$logfileName
+    if [[ $WM_NCOMPPROCS == "" ]]; then
+        echo "compiling LIGGGHTS on one CPU"
+        make $CFDEM_LIGGGHTS_MAKEFILE_NAME 2>&1 | tee -a $logpath/$logfileName
+    else
+        echo "compiling LIGGGHTS on $WM_NCOMPPROCS CPUs"
+        make $CFDEM_LIGGGHTS_MAKEFILE_NAME -j $WM_NCOMPPROCS  2>&1 | tee -a $logpath/$logfileName
+    fi
     make makelib 2>&1 | tee -a $logpath/$logfileName
     make -f Makefile.lib $CFDEM_LIGGGHTS_MAKEFILE_NAME 2>&1 | tee -a $logpath/$logfileName
 }
-#==================================#
 
 #==================================#
 #- function to compile a lammps lib
@@ -352,7 +357,7 @@ DEMrun()
         debugMode="valgrind"
     elif [ $debugMode == "strict" ]; then
         #debugMode="valgrind --leak-check=full -v --trace-children=yes --track-origins=yes" 
-        debugMode="valgrind --tool=memcheck --leak-check=yes --show-reachable=yes --num-callers=20 --track-fds=yes"  
+        debugMode="valgrind --tool=memcheck --track-origins=yes --leak-check=yes --show-reachable=yes --num-callers=20 --track-fds=yes"  
     else
         debugMode=""
     fi
@@ -544,6 +549,7 @@ parCFDDEMrun()
     nrProcs="$6"
     machineFileName="$7"
     debugMode="$8"
+    reconstuctCase="$9"
     #--------------------------------------------------------------------------------#
 
     if [ $debugMode == "on" ]; then
@@ -567,6 +573,14 @@ parCFDDEMrun()
     #- decompose case
     decomposePar
 
+    #- make proc dirs visible
+    count=0
+    for i in `seq $nrProcs`
+    do
+        let count=$i-1
+        (cd $casePath/CFD/processor$count && touch file.foam)
+    done
+
     #- header
     echo 2>&1 | tee -a /$logpath/$logfileName
     echo "//   $headerText   //" 2>&1 | tee -a $logpath/$logfileName
@@ -580,17 +594,22 @@ parCFDDEMrun()
     rm couplingFiles/*
 
     #- run applictaion
-    if [ $machineFileName == "none" ]; then
+    if [[ $machineFileName == "none" ]]; then
         mpirun -np $nrProcs $debugMode $solverName -parallel 2>&1 | tee -a $logpath/$logfileName
 
         #- reconstruct case
-        #pseudoParallelRun "reconstructPar" $nrProcs
-        reconstructPar
+        if [[ $reconstuctCase == "true" ]]; then   
+            #pseudoParallelRun "reconstructPar" $nrProcs
+            reconstructPar
+        fi
     else
         mpirun -machinefile $machineFileName -np $nrProcs $debugMode $solverName -parallel 2>&1 | tee -a $logpath/$logfileName
 
         #- reconstruct case
-        reconstructPar
+        if [[ $reconstuctCase == "true" ]]; then   
+            #pseudoParallelRun "reconstructPar" $nrProcs
+            reconstructPar
+        fi
     fi
 
     #- keep terminal open (if started in new terminal)
@@ -617,6 +636,35 @@ collectLog()
     echo  2>&1 | tee -a $logpath/$logfileName
     echo "//   $headerText   //" 2>&1 | tee -a $logpath/$logfileName
     tail --lines=$nrOfLines $casePath |cut -d " " -f1- 2>&1 | tee -a $logpath/$logfileName
+}
+#==================================#
+
+#==================================#
+#- function to collect results from 
+#- logfiles to one log file
+
+collectLogCFDEMcoupling_sol()
+{
+    #--------------------------------------------------------------------------------#
+    #- define variables
+    logpath="$1"
+    logfileName="$2"
+    casePath="$3"
+    #--------------------------------------------------------------------------------#
+    # read name of solver
+    SOLVERNAME=$(basename $casePath)
+    
+    # read last line of log
+    LASTLINE=`tac $logpath/$logfileName | egrep -m 1 .`
+    LASTSTRING=`echo ${LASTLINE##* }`
+    LASTWORD=$(basename $LASTSTRING)
+
+    # log if compilation was success  
+    if [[ $LASTWORD == $SOLVERNAME ]]; then
+        echo "$SOLVERNAME" >> $logpath/log_compile_results_success
+    else
+        echo "$SOLVERNAME" >> $logpath/log_compile_results_fail
+    fi
 }
 #==================================#
 

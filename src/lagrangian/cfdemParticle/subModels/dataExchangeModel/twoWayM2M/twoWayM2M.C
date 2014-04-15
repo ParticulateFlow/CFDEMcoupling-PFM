@@ -127,6 +127,8 @@ twoWayM2M::twoWayM2M
     lmp2foam_ = NULL;
     lmp2foam_vec_ = NULL;
     foam2lmp_vec_ = NULL;
+    foam2lmp_ = NULL;
+    foam2lmp_ = NULL;
     nlocal_lammps_ = -1;
     id_lammps_ = NULL;
     id_lammpsVec_ = NULL;
@@ -167,6 +169,8 @@ twoWayM2M::~twoWayM2M()
     delete lmp2foam_;
     delete lmp2foam_vec_;
     delete foam2lmp_vec_;
+    delete foam2lmp_;
+    delete foam2lmp_;
     delete lmp;
 }
 
@@ -239,7 +243,7 @@ void twoWayM2M::giveData
 ) const
 {
     char* charName = wordToChar(name);
-    if ( type == "vector-atom")
+    if ( type == "vector-atom" )
     {
         double **tmp_=NULL;
         LAMMPS_NS::Fix *fix = NULL;
@@ -247,19 +251,41 @@ void twoWayM2M::giveData
         if(fix)
             tmp_ = (double **) static_cast<LAMMPS_NS::FixPropertyAtom*>(fix)->array_atom;
         else
-            Warning << "coupling fix not found!"<<endl;
+            FatalError << "coupling fix not found!"<< abort(FatalError);
 
         foam2lmp_vec_->exchange(field[0],tmp_ ? tmp_[0] : NULL);
 
         //==================
         //for(int index = 0;index <  nlocal_lammps_; ++index){
         //    vector forceField(field[index][0],field[index][1],field[index][2]); 
-        //    vector tataField(tata_[index][0],tata_[index][1],tata_[index][2]); 
-        //    Pout << "particle=" << index << " ,forceField=" << forceField<< " ,tataField=" << tataField <<  endl;
+        //    vector tmpField(tmp_[index][0],tmp_[index][1],tmp_[index][2]); 
+        //    Pout << "particle=" << index << " ,forceField=" << forceField<< " ,tmpField=" << tmpField <<  endl;
+        //}
+        //==================
+    }else if( type == "scalar-atom" )
+    {
+        double *tmp_=NULL;
+        LAMMPS_NS::Fix *fix = NULL;
+        fix = lmp->modify->find_fix_property(charName,"property/atom","scalar",0,0,"cfd coupling",false);
+        if(fix)
+            tmp_ = (double *) static_cast<LAMMPS_NS::FixPropertyAtom*>(fix)->array_atom;
+        else
+            FatalError << "coupling fix not found!"<< abort(FatalError);
+
+        if(!tmp_)
+            allocateArray(tmp_,0,nlocal_lammps_);
+
+        foam2lmp_->exchange(field[0],tmp_ ? tmp_ : NULL);
+
+        //==================
+        //for(int index = 0;index <  nlocal_lammps_; ++index){
+        //    scalar forceField(field[index][0]); 
+        //    scalar tmpField(tmp_[index]); 
+        //    Pout << "particle=" << index << " ,forceField=" << forceField<< " ,tmpField=" << tmpField <<  endl;
         //}
         //==================
     }else{
-        FatalError << "twoWayM2M::giveData requested type not implemented! \n"<< abort(FatalError);
+        FatalError << "twoWayM2M::giveData requested type "<< type <<" not implemented! \n"<< abort(FatalError);
     }
 }
 
@@ -448,9 +474,11 @@ void Foam::twoWayM2M::syncIDs() const
     delete lmp2foam_;
     delete lmp2foam_vec_;
     delete foam2lmp_vec_;
+    delete foam2lmp_;
     lmp2foam_ = new Many2Many(MPI_COMM_WORLD);
     lmp2foam_vec_ = new Many2Many(MPI_COMM_WORLD);
     foam2lmp_vec_ = new Many2Many(MPI_COMM_WORLD);
+    foam2lmp_ = new Many2Many(MPI_COMM_WORLD);
 
     // get data from lammps
     nlocal_lammps_ = *((int *) lammps_extract_global(lmp,"nlocal"));
@@ -499,6 +527,7 @@ void Foam::twoWayM2M::syncIDs() const
         lmp2foam_->setup(nlocal_lammps_,id_lammpsSync,nlocal_foam_,id_foam_);
         lmp2foam_vec_->setup(nlocal_lammps_*3,id_lammpsVec_,nlocal_foam_*3,id_foamVec_);
         foam2lmp_vec_->setup(nlocal_foam_*3,id_foamVec_,nlocal_lammps_*3,id_lammpsVec_);
+        foam2lmp_->setup(nlocal_foam_,id_foam_,nlocal_lammps_,id_lammpsSync);
 
         // map data according to last TS
         id_lammps_=NULL;
@@ -571,20 +600,24 @@ void Foam::twoWayM2M::syncIDs() const
     delete lmp2foam_;
     delete lmp2foam_vec_;
     delete foam2lmp_vec_;
+    delete foam2lmp_;
     lmp2foam_ = new Many2Many(MPI_COMM_WORLD);
     lmp2foam_vec_ = new Many2Many(MPI_COMM_WORLD);
     foam2lmp_vec_ = new Many2Many(MPI_COMM_WORLD);
+    foam2lmp_ = new Many2Many(MPI_COMM_WORLD);
 
     if(firstRun_ || particleLost_)
     {
         lmp2foam_->setup(nlocal_lammps_,id_lammps_,nlocal_foam_,id_foam_);
         lmp2foam_vec_->setup(nlocal_lammps_*3,id_lammpsVec_,nlocal_foam_*3,id_foamVec_);
         foam2lmp_vec_->setup(nlocal_foam_*3,id_foamVec_,nlocal_lammps_*3,id_lammpsVec_);
+        foam2lmp_->setup(nlocal_foam_,id_foam_,nlocal_lammps_,id_lammps_);
     }else
     {
         lmp2foam_->setup(nlocal_lammps_,id_lammpsSync,nlocal_foam_,id_foam_);
         lmp2foam_vec_->setup(nlocal_lammps_*3,id_lammpsVec_,nlocal_foam_*3,id_foamVec_);
         foam2lmp_vec_->setup(nlocal_foam_*3,id_foamVec_,nlocal_lammps_*3,id_lammpsVec_);
+        foam2lmp_->setup(nlocal_foam_,id_foam_,nlocal_lammps_,id_lammpsSync);
     }
     id_lammps_=NULL;    // free pointer from LIG
     id_lammpsSync=NULL; // free pointer from LIG

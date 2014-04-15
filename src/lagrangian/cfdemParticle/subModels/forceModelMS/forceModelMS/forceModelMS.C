@@ -65,6 +65,45 @@ forceModelMS::~forceModelMS()
 {}
 
 // * * * * * * * * * * * * * * * * Member Fct  * * * * * * * * * * * * * * * //
+void forceModelMS::setForcesOnParticle() const
+{
+    if(!cloudRefMS().useforcePerClump())
+    {
+        int nrigidC(-1);
+        label ind(-1);
+        for(int index = 0;index <  cloudRefMS().numberOfParticles(); index++)
+        {
+
+            if (particleCloud_.cellIDs()[index][0] > -1) // particle Found
+            {
+
+                ind=cloudRefMS().body(index);
+                if (ind <= 0)
+                {
+                    Warning <<"clump was deleted??? ind = "<< ind << endl;
+                }
+                else
+                {
+                    nrigidC=cloudRefMS().nrigid(ind);
+
+                    if (nrigidC <= 0)
+                    {
+                        Warning <<"A BUG occurred in GidaspowDragMS::setForce!!! nrigidC = " 
+                                << nrigidC <<", ind = " << ind <<", index=" << index <<"\n" << endl;
+                        nrigidC = 1000;
+                    }
+                    if(treatExplicit_) for(int j=0;j<3;j++) expForces()[index][j] += cloudRefMS().expForcesCM()[ind][j] / nrigidC;
+                    else{
+                        for(int j=0;j<3;j++){
+                        impForces()[index][j] += cloudRefMS().impForcesCM()[ind][j] / nrigidC;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 cfdemCloudMS& forceModelMS::cloudRefMS() const
 {
     return particleCloudMS_;

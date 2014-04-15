@@ -45,6 +45,11 @@ setenv CFDEM_LIB_NAME lagrangianCFDEM-$CFDEM_VERSION-$WM_PROJECT_VERSION
 
 #- LMP M2M lib path
 setenv CFDEM_M2MLIB_PATH $CFDEM_SRC_DIR/lagrangian/cfdemParticle/subModels/dataExchangeModel/twoWayM2M/library
+setenv CFDEM_M2MLIB_MAKEFILENAME $CFDEM_LIGGGHTS_MAKEFILE_NAME
+
+#- LMP POEMS lib path
+setenv CFDEM_POEMSLIB_PATH $CFDEM_LIGGGHTS_SRC_DIR/../lib/poems
+setenv CFDEM_POEMSLIB_MAKEFILENAME g++
 
 #- path to test harness
 setenv CFDEM_TEST_HARNESS_PATH $CFDEM_PROJECT_USER_DIR/log/logFilesCFDEM-$CFDEM_VERSION-$WM_PROJECT_VERSION
@@ -110,7 +115,7 @@ alias cfdemPullCFDEMcoupling 'bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/p
 #- shortcut to clean CFDEM
 alias cfdemCleanCFDEM 'bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/cleanCFDEMcoupling.sh'
 
-#- shortcut to compile LIGGGHTS
+#- shortcut to compile LIGGGHTS + sublibraries
 alias cfdemCompLIG 'bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/compileLIGGGHTS.sh'
 
 #- shortcut to compile CFDEMcoupling +LIGGGHTS
@@ -136,6 +141,9 @@ alias cfdemTestTUT 'bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/testTutoria
 
 #- shortcut to run liggghts in serial
 alias cfdemLiggghts '$CFDEM_LIGGGHTS_SRC_DIR/lmp_$CFDEM_LIGGGHTS_MAKEFILE_NAME'
+
+#- shortcut to run liggghts in parallel (no fcts in csh...)
+alias cfdemLiggghtsPar 'echo "mpirun -np xx -machinefile mynodes $CFDEM_LIGGGHTS_SRC_DIR/lmp_$CFDEM_LIGGGHTS_MAKEFILE_NAME < in.liggghts_init"'
 
 #- shortcut to run liggghts in parallel
 # unfortunately no functions available in csh

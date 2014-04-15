@@ -62,11 +62,9 @@ private:
 
         const scalar alphaMin_;          //NP min value of voidFraction
 
-	mutable bool alphaLimited_;
+        mutable bool alphaLimited_;
 
         mutable scalar tooMuch_;         //NP particle volume which is lost due to voidFraction limitation
-
-        const scalar scaleUpVol_;        //NP scaling radius, keeping volume of particle
 
         const scalar clumpVol_;
 

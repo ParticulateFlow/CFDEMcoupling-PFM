@@ -89,6 +89,8 @@ protected:
 
     bool exactTiming_;
 
+    bool verbose_;
+
 public:
 
     //- Runtime type information
