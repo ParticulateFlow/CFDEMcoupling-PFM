@@ -28,8 +28,4 @@ LIB_LIBS = \
     -L$(CFDEM_LIGGGHTS_SRC_DIR) \
     -l$(CFDEM_LIGGGHTS_LIB_NAME) \
     -L$(CFDEM_M2MLIB_PATH) \
-    -lcouple \
-
-/* add -I$(CFDEM_POEMSLIB_PATH) \ to EXE_INC */
-/*    -L$(CFDEM_POEMSLIB_PATH) \ */
-/*    -lpoems   */
+    -lcouple
