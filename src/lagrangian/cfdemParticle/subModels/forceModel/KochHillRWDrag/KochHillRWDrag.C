@@ -140,12 +140,10 @@ void KochHillRWDrag::setForce() const
     // realloc the arrays
     reAllocArrays();
 
-Info << "huhu" << endl;
-
     if (scale_ > 1)
         Info << "KochHillRW using scale = " << scale_ << endl;
-    else if (cg() > 1){
-        scale_=cg();
+    else if (particleCloud_.cg() > 1){
+        scale_=particleCloud_.cg();
         Info << "KochHillRW using scale from liggghts cg = " << scale_ << endl;
     }
 

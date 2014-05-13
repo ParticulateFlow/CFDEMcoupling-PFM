@@ -73,8 +73,7 @@ private:
     mutable PtrList<volVectorField> vectorFields_;
 
     mutable double nrAverages_;
-
-
+    
 public:
 
     //- Runtime type information

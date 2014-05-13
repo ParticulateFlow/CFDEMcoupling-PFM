@@ -23,13 +23,13 @@ startTime       0;
 
 stopAt          endTime;
 
-endTime         0.2;//0.01;
+endTime         0.1;
 
 deltaT          0.001;
 
 writeControl    adjustableRunTime;
 
-writeInterval   0.005;//0.01;
+writeInterval   0.01;
 
 purgeWrite      0;
 
@@ -54,6 +54,7 @@ libs ( "libfiniteVolumeCFDEM.so" );
 
 functions
 (
+
     probes
     {
         type        probes;
@@ -87,7 +88,7 @@ functions
         );
 
         // Fields to be probed
-        fields ( p U voidfraction volAverage_voidfraction);
+        fields ( p U voidfraction volAverage_voidfraction voidfractionNext voidfractionPrev);
 
         // Write at same frequency as fields
         outputControl   timeStep;//outputTime;

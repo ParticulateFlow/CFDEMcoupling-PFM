@@ -93,7 +93,7 @@ runLiggghts::~runLiggghts()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-const char* runLiggghts::command()
+const char* runLiggghts::command(int commandLine)
 {
     return strCommand_.c_str();
 }

@@ -112,7 +112,7 @@ readLiggghtsData::~readLiggghtsData()
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-const char* readLiggghtsData::command()
+const char* readLiggghtsData::command(int commandLine)
 {
     char h[50];
     sprintf(h,"_%d",insertionNr_);

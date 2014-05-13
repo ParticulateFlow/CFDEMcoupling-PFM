@@ -21,13 +21,14 @@ KochHillDragProps
     densityFieldName "density";
     voidfractionFieldName "voidfraction"; 
     interpolation;
+    implDEM;
 \}; :pre
 
 {U} = name of the finite volume fluid velocity field :ulb,l
 {density} = name of the finite volume gravity field :l
 {voidfraction} = name of the finite volume voidfraction field :l
 {interpolation} = (optional, normally off) flag to use interpolated voidfraction and fluid velocity values :l
-{implDEM} = flag to use implicit formulation of drag on DEM side (normally off) :l
+{implDEM} = (optional, normally off) flag to use implicit formulation of drag on DEM side:l
 :ule
 
 [Examples:]

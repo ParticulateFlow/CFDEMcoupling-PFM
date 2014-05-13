@@ -128,7 +128,6 @@ twoWayM2M::twoWayM2M
     lmp2foam_vec_ = NULL;
     foam2lmp_vec_ = NULL;
     foam2lmp_ = NULL;
-    foam2lmp_ = NULL;
     nlocal_lammps_ = -1;
     id_lammps_ = NULL;
     id_lammpsVec_ = NULL;
@@ -169,7 +168,6 @@ twoWayM2M::~twoWayM2M()
     delete lmp2foam_;
     delete lmp2foam_vec_;
     delete foam2lmp_vec_;
-    delete foam2lmp_;
     delete foam2lmp_;
     delete lmp;
 }
@@ -264,6 +262,7 @@ void twoWayM2M::giveData
         //==================
     }else if( type == "scalar-atom" )
     {
+        Warning << "LIGGGHTS not ready for use of impleDEM and Many2Many" << endl;
         double *tmp_=NULL;
         LAMMPS_NS::Fix *fix = NULL;
         fix = lmp->modify->find_fix_property(charName,"property/atom","scalar",0,0,"cfd coupling",false);
@@ -320,7 +319,7 @@ void Foam::twoWayM2M::allocateArray
         for (int j = 0; j < width; j++)
             array[i][j] = initVal;
 }
-void Foam::twoWayM2M::destroy(double** array,int len) const
+void inline Foam::twoWayM2M::destroy(double** array,int len) const
 {
     // destroy array[i] first?
     lmp->memory->destroy(array);
@@ -356,7 +355,7 @@ void Foam::twoWayM2M::allocateArray
         for (int j = 0; j < width; j++)
             array[i][j] = initVal;
 }
-void Foam::twoWayM2M::destroy(int** array,int len) const
+void inline Foam::twoWayM2M::destroy(int** array,int len) const
 {
     // destroy array[i] first?
     lmp->memory->destroy(array);
@@ -370,7 +369,7 @@ void Foam::twoWayM2M::allocateArray(double*& array, double initVal, int length) 
     for (int i = 0; i < len; i++)
         array[i] = initVal;
 }
-void Foam::twoWayM2M::destroy(double* array) const
+void inline Foam::twoWayM2M::destroy(double* array) const
 {
     lmp->memory->destroy(array);
 }
@@ -383,7 +382,7 @@ void Foam::twoWayM2M::allocateArray(int*& array, int initVal, int length) const
     for (int i = 0; i < len; i++)
         array[i] = initVal;
 }
-void Foam::twoWayM2M::destroy(int* array) const
+void inline Foam::twoWayM2M::destroy(int* array) const
 {
     lmp->memory->destroy(array);
 }
@@ -409,7 +408,7 @@ bool Foam::twoWayM2M::couple() const
 
                 if(particleCloud_.liggghtsCommand()[i]().runCommand(couplingStep()))
                 {
-                    const char* command = particleCloud_.liggghtsCommand()[i]().command();
+                    const char* command = particleCloud_.liggghtsCommand()[i]().command(0);
                     Info << "Executing command: '"<< command <<"'"<< endl;
                     lmp->input->one(command);
                 }
@@ -485,6 +484,8 @@ void Foam::twoWayM2M::syncIDs() const
 
     int*  id_lammpsSync=NULL;
     double** pos_lammpsSync=NULL;
+	bool pos_lammps_alloc_flag=false;
+	bool id_lammps_alloc_flag=false;
 
     if(firstRun_ || particleLost_)
     {
@@ -503,9 +504,11 @@ void Foam::twoWayM2M::syncIDs() const
             for (int j=0;j<3;j++)
                 id_lammpsVec_[i*3+j] = id_lammps_[i]*3+j;
         }
-
-        // get access to "x"
+		destroy(pos_lammps_,0);
+		pos_lammps_=NULL;
         pos_lammps_ = (double **) lammps_extract_atom(lmp,"x");
+		pos_lammps_alloc_flag=false;
+		id_lammps_alloc_flag=false;
     }
     else
     {
@@ -532,6 +535,8 @@ void Foam::twoWayM2M::syncIDs() const
         // map data according to last TS
         id_lammps_=NULL;
         allocateArray(id_lammps_,-1.,nlocal_foam_);
+		id_lammps_alloc_flag=true;
+
         allocateArray(tmpI_,-1.,nlocal_foam_);
         lmp2foam_->exchange(id_lammpsSync, tmpI_);
         for(int i=0;i<nlocal_foam_;i++)
@@ -544,6 +549,7 @@ void Foam::twoWayM2M::syncIDs() const
         lmp2foam_vec_->exchange(pos_lammpsSync ? pos_lammpsSync[0] : NULL, tmp_);
 
         allocateArray(pos_lammps_,0,3,nlocal_foam_);
+		pos_lammps_alloc_flag=true;
         for(int i=0;i<nlocal_foam_;i++)
             for(int j=0;j<3;j++)
                 pos_lammps_[i][j]=tmp_[i*3+j];
@@ -554,7 +560,8 @@ void Foam::twoWayM2M::syncIDs() const
     particleCloud_.clockM().stop("recv_DEM_ids");
 
     particleCloud_.clockM().start(6,"locateParticle()");
-    locateParticle(id_lammpsSync);
+    locateParticle(id_lammpsSync, id_lammps_alloc_flag);
+	id_lammps_alloc_flag=true;
     particleCloud_.clockM().stop("locateParticle()");
 
 //MPI_Barrier(MPI_COMM_WORLD);
@@ -619,8 +626,11 @@ void Foam::twoWayM2M::syncIDs() const
         foam2lmp_vec_->setup(nlocal_foam_*3,id_foamVec_,nlocal_lammps_*3,id_lammpsVec_);
         foam2lmp_->setup(nlocal_foam_,id_foam_,nlocal_lammps_,id_lammpsSync);
     }
+    if (id_lammps_alloc_flag) destroy(id_lammps_);
     id_lammps_=NULL;    // free pointer from LIG
+    destroy(id_lammpsSync);
     id_lammpsSync=NULL; // free pointer from LIG
+    if (pos_lammps_alloc_flag) destroy(pos_lammps_,0);
     pos_lammps_ = NULL; // free pointer from LIG
 
     particleCloud_.clockM().stop("setup_Comm");
@@ -629,7 +639,7 @@ void Foam::twoWayM2M::syncIDs() const
 //Info << "update communication - done." << endl;
 }
 
-void Foam::twoWayM2M::locateParticle(int* id_lammpsSync) const
+void Foam::twoWayM2M::locateParticle(int* id_lammpsSync, bool id_lammps_alloc_flag) const
 {
 #if defined(version21)
 
@@ -918,6 +928,9 @@ void Foam::twoWayM2M::locateParticle(int* id_lammpsSync) const
             }
             i++;
         }
+		Foam::dataExchangeModel::destroy(id_foam_nowhere_all);
+		id_foam_nowhere_all=NULL;
+		if (id_lammps_alloc_flag) destroy(id_lammps_);
 
         // make cpy
         id_lammps_=NULL;

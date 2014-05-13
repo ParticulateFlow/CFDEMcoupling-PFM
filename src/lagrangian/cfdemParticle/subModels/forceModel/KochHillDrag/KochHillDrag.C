@@ -115,8 +115,8 @@ void KochHillDrag::setForce() const
 {
     if (scaleDia_ > 1)
         Info << "KochHill using scale = " << scaleDia_ << endl;
-    else if (cg() > 1){
-        scaleDia_=cg();
+    else if (particleCloud_.cg() > 1){
+        scaleDia_=particleCloud_.cg();
         Info << "KochHill using scale from liggghts cg = " << scaleDia_ << endl;
     }
 
@@ -158,6 +158,7 @@ void KochHillDrag::setForce() const
             betaP = 0;
             Vs = 0;
             Ufluid =vector(0,0,0);
+            voidfraction=0;
 
             if (cellI > -1) // particle Found
             {
@@ -233,6 +234,7 @@ void KochHillDrag::setForce() const
                     Pout << "nuf = " << nuf << endl;
                     Pout << "voidfraction = " << voidfraction << endl;
                     Pout << "Rep = " << Rep << endl;
+                    Pout << "betaP = " << betaP << endl;
                     Pout << "drag = " << drag << endl;
                 }
 
@@ -257,10 +259,10 @@ void KochHillDrag::setForce() const
             {
                 for(int j=0;j<3;j++) fluidVel()[index][j]=Ufluid[j];
 
-                if (modelType_=="B")
-                    Cds()[index][0] = Vs*betaP/voidfraction;
+                if (modelType_=="B" && cellI > -1)
+                    Cds()[index][0] = Vs*betaP/voidfraction*scaleDrag_;
                 else
-                    Cds()[index][0] = Vs*betaP;
+                    Cds()[index][0] = Vs*betaP*scaleDrag_;
 
             }else{
                 for(int j=0;j<3;j++) DEMForces()[index][j] += drag[j];

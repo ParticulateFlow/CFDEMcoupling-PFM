@@ -245,7 +245,7 @@ void averagingModel::setDSauter
     scalar radiusPow3(-1);
     scalar volume(-1);
 
-    scalar scale_ = particleCloud_.forceM(0).cg(); //scaling of parcel vs. primary particle diameter
+    scalar scale_ = particleCloud_.cg(); //scaling of parcel vs. primary particle diameter
     dSauter = 0.0 * dSauter; //set to zero, because we will use it to calc sum(wi*ri^3)
     volScalarField riPower2
     (

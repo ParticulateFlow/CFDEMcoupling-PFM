@@ -93,6 +93,8 @@ DiFeliceDragProps
     velFieldName "U";
     densityFieldName "rho";
     voidfractionFieldName "voidfraction";
+    granVelFieldName "Us";
+    verbose;
 }
 
 SchillerNaumannDragProps

@@ -80,6 +80,10 @@ private:
 
     bool interpolation_; // use interpolated field values
 
+    mutable scalar scaleDia_;
+
+    mutable scalar scaleDrag_;
+
 public:
 
     //- Runtime type information

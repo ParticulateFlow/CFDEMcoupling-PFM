@@ -327,23 +327,25 @@ bool Foam::twoWayMPI::couple() const
             }
 
             // models with exact timing exists
+            label commandLines(0);
             if(exactTiming)
             {
                 // extension for more liggghtsCommands active the same time:
                 //    sort interrupt list within this run period
                 //    keep track of corresponding liggghtsCommand
                 int DEMstepsRun(0);
+                
                 forAll(interruptTimes,j)
                 {                  
                     // set run command till interrupt
                     DEMstepsRun += DEMstepsToInterrupt[j];          
                     particleCloud_.liggghtsCommand()[runComNr]().set(DEMstepsToInterrupt[j]);
-                    const char* command = particleCloud_.liggghtsCommand()[runComNr]().command();
+                    const char* command = particleCloud_.liggghtsCommand()[runComNr]().command(0);
                     Info << "Executing run command: '"<< command <<"'"<< endl;
                     lmp->input->one(command);
     
                     // run liggghts command with exact timing
-                    command = particleCloud_.liggghtsCommand()[lcModel[j]]().command();
+                    command = particleCloud_.liggghtsCommand()[lcModel[j]]().command(0);
                     Info << "Executing command: '"<< command <<"'"<< endl;
                     lmp->input->one(command);
                 }
@@ -352,7 +354,7 @@ bool Foam::twoWayMPI::couple() const
                 if(particleCloud_.liggghtsCommand()[runComNr]().runCommand(couplingStep()))
                 {
                     particleCloud_.liggghtsCommand()[runComNr]().set(couplingInterval() - DEMstepsRun);
-                    const char* command = particleCloud_.liggghtsCommand()[runComNr]().command();
+                    const char* command = particleCloud_.liggghtsCommand()[runComNr]().command(0);
                     Info << "Executing run command: '"<< command <<"'"<< endl;
                     lmp->input->one(command);
                 }
@@ -366,9 +368,13 @@ bool Foam::twoWayMPI::couple() const
                         particleCloud_.liggghtsCommand()[i]().runCommand(couplingStep())
                     )
                     {
-                        const char* command = particleCloud_.liggghtsCommand()[i]().command();
-                        Info << "Executing command: '"<< command <<"'"<< endl;
-                        lmp->input->one(command);
+                        commandLines=particleCloud_.liggghtsCommand()[i]().commandLines();
+                        for(int j=0;j<commandLines;j++)
+                        {
+                            const char* command = particleCloud_.liggghtsCommand()[i]().command(j);
+                            Info << "Executing command: '"<< command <<"'"<< endl;
+                            lmp->input->one(command);
+                        }
                     }
                 }
             }
@@ -379,9 +385,13 @@ bool Foam::twoWayMPI::couple() const
                 {
                     if(particleCloud_.liggghtsCommand()[i]().runCommand(couplingStep()))
                     {
-                        const char* command = particleCloud_.liggghtsCommand()[i]().command();
-                        Info << "Executing command: '"<< command <<"'"<< endl;
-                        lmp->input->one(command);
+                        commandLines=particleCloud_.liggghtsCommand()[i]().commandLines();
+                        for(int j=0;j<commandLines;j++)
+                        {
+                            const char* command = particleCloud_.liggghtsCommand()[i]().command(j);
+                            Info << "Executing command: '"<< command <<"'"<< endl;
+                            lmp->input->one(command);
+                        }
                     }
                 }
             }

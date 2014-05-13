@@ -115,7 +115,7 @@ writeLiggghts::~writeLiggghts()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-const char* writeLiggghts::command()
+const char* writeLiggghts::command(int commandLine)
 {
     return strCommand_.c_str();
 }

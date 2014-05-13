@@ -100,7 +100,15 @@ void noDrag::setForce() const
                 if(treatExplicit_) for(int j=0;j<3;j++) expForces()[index][j] = 0.;
                 else  for(int j=0;j<3;j++) impForces()[index][j] = 0.;
             }
-            if(noDEMForce_)for(int j=0;j<3;j++) DEMForces()[index][j] = 0.;
+            if(noDEMForce_)
+            {
+                for(int j=0;j<3;j++) DEMForces()[index][j] = 0.;
+                if(particleCloud_.impDEMdrag())
+                {
+                    Cds()[index][0] = 0.;
+                    for(int j=0;j<3;j++) fluidVel()[index][j] = 0.;
+                }
+            }
         }        
     }
 }

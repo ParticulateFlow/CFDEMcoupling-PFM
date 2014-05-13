@@ -74,9 +74,8 @@ fieldTimeAverage::fieldTimeAverage
     // create time average scalar fields
     scalarFields_.setSize(scalarFieldNames_.size());
 
-    if (propsDict_.found("startTime")){
+    if (propsDict_.found("startTime"))
         startTime_=readScalar(propsDict_.lookup("startTime"));
-    }
 
     for (int i=0;i < scalarFieldNames_.size(); i++)
     {

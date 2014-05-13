@@ -25,42 +25,44 @@ FoamFile
 
 //===========================================================================//
 // sub-models & settings
+solveFlow true;
 
 modelType "A"; // A or B
 
 couplingInterval 100;
 
-voidFractionModel divided;
+voidFractionModel divided;//centre;//
 
-locateModel engine;
+locateModel engine;//turboEngineM2M;//
 
 meshMotionModel noMeshMotion;
 
 regionModel allRegion;
 
-IOModel "basicIO";
+IOModel basicIO;
 
 probeModel off;
 
-dataExchangeModel twoWayMPI;//twoWayFiles;//oneWayVTK;//
+dataExchangeModel twoWayMPI;//twoWayM2M;//twoWayFiles;//oneWayVTK;//
 
 averagingModel dense;//dilute;//
 
 clockModel off;//standardClock;//
 
-smoothingModel off;
+smoothingModel off;// localPSizeDiffSmoothing;// constDiffSmoothing; //
 
 forceModels
 (
-    //GidaspowDrag
-    //DiFeliceDrag
-    KochHillDrag
+    //KochHillDrag
     //BeetstraDrag
+    //noDrag
     gradPForce
     viscForce
+    GidaspowDrag
     //Archimedes
     //volWeightedAverage
     //totalMomentumExchange
+    particleCellVolume
 );
 
 momCoupleModels
@@ -72,6 +74,21 @@ turbulenceModelType "RASProperties";//"LESProperties";//
 
 //===========================================================================//
 // sub-model properties
+
+localPSizeDiffSmoothingProps
+{
+    lowerLimit 0.1;
+    upperLimit 1e10;
+    dSmoothingLength 1.5e-3;
+    Csmoothing    1.0; 
+}
+
+constDiffSmoothingProps
+{
+    lowerLimit 0.1;
+    upperLimit 1e10;
+    smoothingLength 1.5e-3;
+}
 
 implicitCoupleProps
 {
@@ -91,7 +108,7 @@ gradPForceProps
     densityFieldName "rho";
     voidfractionFieldName "voidfraction";
     velocityFieldName "U";
-    //interpolation;
+    interpolation;
 }
 
 viscForceProps
@@ -99,6 +116,11 @@ viscForceProps
     velocityFieldName "U";
     densityFieldName "rho";
     interpolation;
+}
+noDragProps
+{
+    //noDEMForce;
+    //keepCFDForce;
 }
 volWeightedAverageProps
 {
@@ -123,22 +145,24 @@ totalMomentumExchangeProps
 }
 GidaspowDragProps
 {
-    velFieldName "U";
-    densityFieldName "rho";
-}
-DiFeliceDragProps
-{
+    verbose;
     velFieldName "U";
     densityFieldName "rho";
     voidfractionFieldName "voidfraction";
+    phi 1;
+    //interpolation; // this case does not like interpolation
+    implDEM_;
 }
 
 KochHillDragProps
 {
+    //verbose;
     velFieldName "U";
     densityFieldName "rho";
     voidfractionFieldName "voidfraction";
-    //verbose;
+    //interpolation;
+    implDEM_;
+    verbose;
 }
 
 BeetstraDragProps
@@ -162,6 +186,13 @@ virtualMassForceProps
     densityFieldName "rho";
 }
 
+particleCellVolumeProps
+{
+    upperThreshold 0.999;
+    lowerThreshold 0.;
+    verbose;
+}
+
 oneWayVTKProps
 {
     couplingFilename "vtk_out%4.4d.vtk";
@@ -175,7 +206,7 @@ twoWayFilesProps
 
 centreProps
 {
-    alphaMin 0.10;
+    alphaMin 0.1;
 }
 
 engineProps
@@ -185,7 +216,7 @@ engineProps
 
 dividedProps
 {
-    alphaMin 0.1;
+    alphaMin 0.05;
     scaleUpVol 1.0;
 }
 

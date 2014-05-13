@@ -71,6 +71,7 @@ liggghtsCommandModel::liggghtsCommandModel
     lastCouplingStep_(-1),
     couplingStepInterval_(0),
     exactTiming_(false),
+    commandLines_(1),
     verbose_(false)
 {}
 
@@ -235,6 +236,74 @@ DynamicList<scalar> liggghtsCommandModel::executionsWithinPeriod(scalar TSstart,
     // return dummy
 
     return executions;
+}
+
+void liggghtsCommandModel::parseCommandList(wordList& commandList,labelList& labelList,scalarList& scalarList,word& command, dictionary& propsDict, bool timeStamp)
+{
+    bool addBlank = true;  // std no blanks after each word
+    fileName add;
+    label numberCount=0;   // nr of scalars inserted to command
+    label labelCount=0;   // nr of labels inserted to command
+
+    forAll(commandList,i)
+    {
+        add = word(commandList[i]);
+
+        //- handle symbols
+        if (add == "$couplingInterval")
+        {
+            char h[50];
+            sprintf(h,"%d",particleCloud_.dataExchangeM().couplingInterval());
+            add = h;
+        }
+        else if (add=="dot")    add = ".";
+        else if (add=="dotdot") add = "..";
+        else if (add=="slash")  add = "/";
+        else if (add=="noBlanks")  // no blanks after the following words
+        {
+            add = "";
+            addBlank = false;
+        }else if (add=="blanks") // add a blank here and after the following words
+        {
+            add = "";
+            addBlank = true;
+        }else if (add=="timeStamp") // next command will be a number read from labelList
+        {
+            add = "";
+            timeStamp=true;
+        }else if (add=="number") // next command will be a number read from labelList
+        {
+            /*if (!propsDict.found("scalars"))
+            {
+                FatalError<<"you want to use a number in the command\n - specify a scalar list with all numbers"
+                << abort(FatalError);
+            }*/
+            char h[50];
+            sprintf(h,"%f",scalarList[numberCount]);
+            add = h;
+            numberCount ++;
+        }else if (add=="label") // next command will be a number read from labelList
+        {
+            /*if (!propsDict.found("labels"))
+            {
+                FatalError<<"you want to use a label in the command\n - specify a label list with all numbers"
+                << abort(FatalError);
+            }*/
+            char h[50];
+            sprintf(h,"%d",labelList[labelCount]);
+            add = h;
+            labelCount ++;
+        }
+
+        // compose command
+        if (addBlank)
+        {
+            command += add + " ";
+        }else
+        {
+            command += add;
+        }
+    }
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

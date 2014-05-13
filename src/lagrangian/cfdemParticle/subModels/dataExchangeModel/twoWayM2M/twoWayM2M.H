@@ -188,22 +188,22 @@ public:
         // double **
         void allocateArray(double**&, double, int, int) const;
         void allocateArray(double**&, double, int,const char* ="nparticles") const;
-        void destroy(double**,int) const;
+        void inline destroy(double**,int) const;
         //============
         // int **
         void allocateArray(int**&, int, int, int) const;
         void allocateArray(int**&, int, int,const char* ="nparticles") const;
-        void destroy(int**,int) const;
+        void inline destroy(int**,int) const;
         //==============
 
         //==============
         // double *
         void allocateArray(double*&, double, int) const;
-        void destroy(double*) const;
+        void inline destroy(double*) const;
         //==============
         // int *
         void allocateArray(int*&, int, int) const;
-        void destroy(int*) const;
+        void inline destroy(int*) const;
         //==============
 
         bool couple() const;
@@ -212,9 +212,9 @@ public:
         int getNumberOfClumps() const;
 
         void syncIDs() const;
-        void locateParticle(int*) const;
+        void locateParticle(int*, bool) const;
         word myType() const{return typeName; };
-        void setCG() const { particleCloud_.forceM(0).setCG(lmp->force->cg()); };
+        void setCG() const { particleCloud_.setCG(lmp->force->cg()); };
 };
 
 
