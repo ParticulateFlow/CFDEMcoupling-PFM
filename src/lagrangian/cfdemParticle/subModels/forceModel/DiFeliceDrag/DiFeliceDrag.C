@@ -101,7 +101,6 @@ DiFeliceDrag::DiFeliceDrag
         if(!interpolation_) 
             Info << "WARNING: will only consider fluctuating particle velocity in implicit / explicit force split!" << endl;
     }
-    
     particleCloud_.checkCG(true);
     if (propsDict_.found("scale"))
         scaleDia_=scalar(readScalar(propsDict_.lookup("scale")));
@@ -146,8 +145,8 @@ void DiFeliceDrag::setForce() const
     scalar rho(0);
     scalar magUr(0);
     scalar Rep(0);
-	scalar Cd(0);
-	
+    scalar Cd(0);
+
 	vector UfluidFluct(0,0,0);
     vector UsFluct(0,0,0);
     vector dragExplicit(0,0,0);
@@ -165,12 +164,12 @@ void DiFeliceDrag::setForce() const
 
             cellI = particleCloud_.cellIDs()[index][0];
             drag = vector(0,0,0);
-            
+
             if (cellI > -1) // particle Found
             {
                 if(interpolation_)
                 {
-	                position = particleCloud_.position(index);
+                    position = particleCloud_.position(index);
                     voidfraction = voidfractionInterpolator_.interpolate(position,cellI);
                     Ufluid = UInterpolator_.interpolate(position,cellI);
                 }else
@@ -191,7 +190,7 @@ void DiFeliceDrag::setForce() const
 
                 if (magUr > 0)
                 {
-                   
+
                     // calc particle Re Nr
                     Rep = ds/scaleDia_*voidfraction*magUr/(nuf+SMALL);
 
@@ -210,9 +209,9 @@ void DiFeliceDrag::setForce() const
                                      *scaleDrag_;
                     if (modelType_=="B")
                         dragCoefficient /= voidfraction;
-                        
+
                     drag = dragCoefficient*Ur; //total drag force!
-                        
+
                     //Split forces
                     if(splitImplicitExplicit_)
                     {
@@ -220,7 +219,6 @@ void DiFeliceDrag::setForce() const
                         UsFluct      = Us     - UsField_[cellI];
                         dragExplicit = dragCoefficient*(UfluidFluct - UsFluct); //explicit part of force
                     }
-
                 }
 
                 if(verbose_ && index >-1 && index <102)

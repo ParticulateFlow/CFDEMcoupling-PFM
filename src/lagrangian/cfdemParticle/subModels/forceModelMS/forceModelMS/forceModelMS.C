@@ -78,7 +78,7 @@ void forceModelMS::setForcesOnParticle() const
             {
 
                 ind=cloudRefMS().body(index);
-                if (ind <= 0)
+                if (ind < 0)
                 {
                     Warning <<"clump was deleted??? ind = "<< ind << endl;
                 }

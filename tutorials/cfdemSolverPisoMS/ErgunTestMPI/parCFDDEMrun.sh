@@ -18,7 +18,7 @@ casePath="$(dirname "$(readlink -f ${BASH_SOURCE[0]})")"
 logpath=$casePath
 headerText="run_parallel_cfdemSolverPisoMS_ErgunTestMPI_CFDDEM"
 logfileName="log_$headerText"
-solverName="cfdemSolverPisoMS"
+solverName="cfdemSolverPimpleDyMMS_22x" #"cfdemSolverPisoMS"
 nrProcs="2"
 machineFileName="none"   # yourMachinefileName | none
 debugMode="off"          # on | off
@@ -53,17 +53,13 @@ cp cfdemSolverPisoMS_ErgunTestMPI.eps $testHarnessPath
 if [ $cleanUp == "true" ]
   then
     #- clean up case
-    cd ..
-    rm -rf 0.*
-    rm -rf processor*
-    rm -rf particles
-    rm -rf patchAverage_pressureDrop
-    rm -rf probes
-    rm -rf postProcessing
-    rm log.liggghts
-    rm ../DEM/post/dump.*
+    echo "deleting data at: $casePath :\n"
+    source $WM_PROJECT_DIR/bin/tools/CleanFunctions
+    cd $casePath/CFD
+    cleanCase
+    rm -r $casePath/CFD/clockData
+    rm -r $casePath/DEM/post/*
+    (cd $casePath/DEM/post && touch dummy)
+    echo "done"
 fi
 
-
-#- preserve post directory
-echo "dummyfile" >> $casePath/DEM/post/dummy

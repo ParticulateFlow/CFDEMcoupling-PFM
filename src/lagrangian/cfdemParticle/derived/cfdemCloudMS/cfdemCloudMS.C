@@ -59,17 +59,21 @@ cfdemCloudMS::cfdemCloudMS
     exCM_(NULL),
     eyCM_(NULL),
     ezCM_(NULL),
-    VclumpCM_(NULL),
-    SclumpCM_(NULL),
-    scalingCM_(NULL),
     typeCM_(NULL),
-    Cclump_ex_(NULL),
-    Cclump_ey_(NULL),
+    typeVolCM_(NULL),
+    VclumpCM_(NULL),
+    particleWeightsCM_(NULL),
+    dHCM_(NULL),
+    //SclumpCM_(NULL),
+    //scalingCM_(NULL),
+    //Cclump_ex_(NULL),
+    //Cclump_ey_(NULL),
     impForcesCM_(NULL),
     expForcesCM_(NULL),
     DEMForcesCM_(NULL),
-    particleWeightsCM_(NULL),
     numberOfClumps_(-1),
+    overlapCorr_(readScalar(couplingProperties_.lookup("overlapCorr"))),
+    monoMS_(Switch(couplingProperties_.lookup("monoMS"))),
     numberOfClumpsChanged_(false),
     useforcePerClump_(false),
     forceModels_(couplingProperties_.lookup("forceModelsMS"))
@@ -84,6 +88,9 @@ cfdemCloudMS::cfdemCloudMS
             forceModels_[i]
         );
     }
+
+    if(overlapCorr_>1.0) FatalError << "overlapCorr_ must be <= 1."<< abort(FatalError);
+    Info << "overlapCorr_=" << overlapCorr_ << endl;
 }
 
 
@@ -99,16 +106,18 @@ cfdemCloudMS::~cfdemCloudMS()
     delete exCM_;
     delete eyCM_;
     delete ezCM_;
-    delete VclumpCM_;
-    delete SclumpCM_;
-    delete scalingCM_;
     delete typeCM_;
-    delete Cclump_ex_;
-    delete Cclump_ey_;
+    delete typeVolCM_;
+    delete VclumpCM_;
+    delete particleWeightsCM_;
+    delete dHCM_;
+    //delete SclumpCM_;
+    //delete scalingCM_;
+    //delete Cclump_ex_;
+    //delete Cclump_ey_;
     delete impForcesCM_;
     delete expForcesCM_;
     delete DEMForcesCM_;
-    delete particleWeightsCM_;
 }
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
@@ -129,12 +138,14 @@ void cfdemCloudMS::getDEMdata()
     dataExchangeM().getData("ey_space","vector-multisphere",eyCM_);     // axis of inertia
     dataExchangeM().getData("ez_space","vector-multisphere",ezCM_);     // axis of inertia
 
-//    dataExchangeM().getScalarData("Vclump",VclumpCM_);   // Volume of the clump
+//    dataExchangeM().getData("typeCM","scalar-multisphere",typeCM_);   // type of the clump
+//    dataExchangeM().getData("nTypes","scalar-global",nTypes_);        // nr of clump types
+//    dataExchangeM().getData("Vclump","vector-global",typeVolCM_);     // Volume of the clump type
+    setClumpVolume();   // can be replaced once volume is communicated!!!
+    setdHCM();            // calc and store dHCM
+
 //    dataExchangeM().getScalarData("Sclump",SclumpCM_);   // surface area of the clump
-
 //    dataExchangeM().getScalarData("scaling",scalingCM_); // scaling of the clump
-//    dataExchangeM().getScalarData("typeCM",typeCM_);    // type of the clump
-
 //    dataExchangeM().getScalarData("Cclump_ex",Cclump_ex_);   // cross section of the clump in ex normal direction
 //    dataExchangeM().getScalarData("Cclump_ey",Cclump_ey_);   // cross section of the clump in ey normal direction
 
@@ -179,22 +190,24 @@ bool cfdemCloudMS::reAllocArrays() const
         // get arrays of new length
         dataExchangeM().allocateArray(positionsCM_,0,3,"nbodies");
         dataExchangeM().allocateArray(velocitiesCM_,0,3,"nbodies");
-        dataExchangeM().allocateArray(cellIDsCM_,0,1,"nbodies");
-        dataExchangeM().allocateArray(bodies_,0,3);
+        dataExchangeM().allocateArray(cellIDsCM_,-1,1,"nbodies");
+        dataExchangeM().allocateArray(bodies_,0,1);
         dataExchangeM().allocateArray(nrigids_,0,1,"nbodies");
         dataExchangeM().allocateArray(exCM_,0,3,"nbodies");
         dataExchangeM().allocateArray(eyCM_,0,3,"nbodies");
         dataExchangeM().allocateArray(ezCM_,0,3,"nbodies");
-        dataExchangeM().allocateArray(VclumpCM_,0,3,nClumpTypes);
-        dataExchangeM().allocateArray(SclumpCM_,0,3,nClumpTypes);
-        dataExchangeM().allocateArray(scalingCM_,0,3,"nbodies");
-        dataExchangeM().allocateArray(typeCM_,0,3,"nbodies");
-        dataExchangeM().allocateArray(Cclump_ex_,0,3,nClumpTypes);
-        dataExchangeM().allocateArray(Cclump_ey_,0,3,nClumpTypes);
+        dataExchangeM().allocateArray(typeCM_,0,1,"nbodies");
+        dataExchangeM().allocateArray(typeVolCM_,0,1,nClumpTypes);
+        dataExchangeM().allocateArray(VclumpCM_,0,1,"nbodies");
+        dataExchangeM().allocateArray(particleWeightsCM_,1,1,"nbodies");
+        dataExchangeM().allocateArray(dHCM_,1.,1,"nbodies");
+        //dataExchangeM().allocateArray(SclumpCM_,0,3,nClumpTypes);
+        //dataExchangeM().allocateArray(scalingCM_,0,3,"nbodies");
+        //dataExchangeM().allocateArray(Cclump_ex_,0,3,nClumpTypes);
+        //dataExchangeM().allocateArray(Cclump_ey_,0,3,nClumpTypes);
         dataExchangeM().allocateArray(impForcesCM_,0,3,"nbodies");
         dataExchangeM().allocateArray(expForcesCM_,0,3,"nbodies");
         dataExchangeM().allocateArray(DEMForcesCM_,0,3,"nbodies");
-        dataExchangeM().allocateArray(particleWeightsCM_,1,1,"nbodies");        // filed is never changed-correct only for centre
         return true;
     }
     return false;
@@ -256,6 +269,95 @@ void Foam::cfdemCloudMS::setParticleForceField()
         particleWeightsCM_,
         numberOfClumps()
         );
+    }
+}
+
+void Foam::cfdemCloudMS::setClumpVolume()
+{
+    //============================================
+    // final version if vol is transferred
+    label type;
+    for(int ind = 0;ind < numberOfClumps(); ind++)
+    {
+        type = typeCM()[ind][0];
+        VclumpCM()[ind][0] = typeVolCM()[type][0];
+    }
+    //============================================
+
+
+    //============================================
+    // prelim version
+    scalar r(0);
+    int nrigidC(-1);
+    label ind(-1);
+    label prevInd(-2);
+
+    // loop all particles
+    // NOTE: this approach is inefficient and 
+    //       assumes same overlap for all clumps
+    for(int index = 0;index < numberOfParticles(); index++)
+    {
+        ind=body(index);
+        // clump not found
+        if (ind < 0) Warning <<"clump was deleted??? ind = "<< ind << endl;
+        else if(cellIDCM(ind) > -1) // clump found
+        //if (cellIDs()[index][0] > -1) // particle Found
+        {
+            //if(verbose_) Pout <<"clump :"<< ind << " found on this proc, cellIDCM(ind)=" << cellIDCM(ind) << endl;
+
+            // particles of clump have same size
+            // Note: does this work in parallel???
+            if(monoMS_)
+            {
+                if(prevInd!=ind)
+                {
+                    prevInd=ind;
+                    nrigidC=nrigid(ind);
+
+                    if (nrigidC <= 0)
+                    {
+                        Warning <<"A BUG occurred in Foam::cfdemCloudMS::setClumpVolume() nrigidC = " 
+                                << nrigidC <<", ind = " << ind <<", index=" << index <<"\n" << endl;
+                        nrigidC = 1;
+                    }
+                    r=radius(index);
+                    VclumpCM_[ind][0]=nrigidC*r*r*r*M_PI/6*overlapCorr_;
+
+                    //if(verbose_) Pout << "ind=" << ind << " ,VclumpCM_[ind][0]" << VclumpCM_[ind][0] << endl;
+                }
+            }
+            // particles of clump can have different size
+            else
+            {
+                r=radius(index);
+                VclumpCM_[ind][0]+=r*r*r*M_PI/6*overlapCorr_;
+                //if(verbose_) Pout << "summing up volume: " << "ind=" << ind << " ,VclumpCM_[ind][0]" << VclumpCM_[ind][0] << endl;
+            }
+        }
+        //else
+            //if(verbose_) Pout <<"clump :"<< ind << " not found on this proc." << endl;
+    }
+    if(verbose_)
+    {
+        for(int ind = 0;ind < numberOfClumps(); ind++)
+            Pout << "clumpVolume: " << "ind=" << ind << " ,VclumpCM_[ind][0]" << VclumpCM_[ind][0] << endl;
+    } 
+    //============================================
+}
+
+void Foam::cfdemCloudMS::setdHCM()
+{
+    // calc a hydraulic diameter as d of vol equal sphere
+    for(int ind = 0;ind < numberOfClumps(); ind++)
+    {
+        if (ind < 0)
+        {
+            Warning <<"clump was deleted??? ind = "<< ind << endl;
+        }
+        else
+        {
+            dHCM_[ind][0]=pow(VclumpCM_[ind][0]/(M_PI*4/3),1./3.);
+        }
     }
 }
 

@@ -14,6 +14,12 @@ logDir="log"
 cd $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc
 mkdir -p $logDir
 
+#================================================================================#
+# copy LIGGGHTS patch files if available
+#================================================================================#
+echo "copying patch files for LIGGGHTS if available"
+cp $CFDEM_SRC_DIR/LIGGGHTSpatch/* $CFDEM_LIGGGHTS_SRC_DIR
+
 #--------------------------------------------------------------------------------#
 #- define variables
 logpath="$(dirname "$(readlink -f ${BASH_SOURCE[0]})")/$logDir"

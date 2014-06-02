@@ -72,6 +72,9 @@ DiFeliceDragMS::DiFeliceDragMS
     voidfractionFieldName_(propsDict_.lookup("voidfractionFieldName")),
     voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
     interpolation_(false),
+    splitImplicitExplicit_(false),
+    UsFieldName_(propsDict_.lookup("granVelFieldName")),
+    UsField_(sm.mesh().lookupObject<volVectorField> (UsFieldName_)),
     //sphereToClump_(readScalar(propsDict_.lookup("sphereToClump")))
     dH_(readScalar(propsDict_.lookup("hydraulicDiameter")))
 {
@@ -90,6 +93,13 @@ DiFeliceDragMS::DiFeliceDragMS
     {
         Info << "using interpolated value of U." << endl;
         interpolation_=true;
+    }
+    if (propsDict_.found("splitImplicitExplicit"))
+    {
+        Info << "will split implicit / explicit force contributions." << endl;
+        splitImplicitExplicit_ = true;
+        if(!interpolation_) 
+            Info << "WARNING: will only consider fluctuating particle velocity in implicit / explicit force split!" << endl;
     }
     particleCloud_.checkCG(false);
 }
@@ -126,8 +136,13 @@ void DiFeliceDragMS::setForce() const
     scalar Rep(0);
     scalar Cd(0);
 
-    interpolationCellPoint<scalar> voidfractionInterpolator(voidfraction_);
-    interpolationCellPoint<vector> UInterpolator(U_);
+	vector UfluidFluct(0,0,0);
+    vector UsFluct(0,0,0);
+    vector dragExplicit(0,0,0);
+  	scalar dragCoefficient(0);
+
+    interpolationCellPoint<scalar> voidfractionInterpolator_(voidfraction_);
+    interpolationCellPoint<vector> UInterpolator_(U_);
 
     #include "setupProbeModel.H"
 
@@ -136,45 +151,39 @@ void DiFeliceDragMS::setForce() const
 
         //if(mask[index][0])  // would have to be transformed from body ID to particle ID
         //{
+
             cellI = cloudRefMS().cellIDCM(index);
-			drag = vector(0,0,0);
+            drag = vector(0,0,0);
 
             if (cellI > -1) // particle Found
             {
                 if(interpolation_)
                 {
                     position = cloudRefMS().positionCM(index);
-                    Ufluid = UInterpolator.interpolate(position,cellI);
-                    voidfraction = voidfractionInterpolator.interpolate(position,cellI);
+                    voidfraction = voidfractionInterpolator_.interpolate(position,cellI);
+                    Ufluid = UInterpolator_.interpolate(position,cellI);
                 }else
                 {
+                    voidfraction = voidfraction_[cellI];
                     Ufluid = U_[cellI];
-                    voidfraction = voidfraction_[cellI]; //particleCloud_.voidfraction(index); ???//
                 }
 
                 Us = cloudRefMS().velocityCM(index);
                 Ur = Ufluid-Us;
-                //ds = 2*cloudRefMS().radius(index)/sphereToClump_; // scale from particle diameter
-                ds = dH_;                                           // use dict defined diameter
-
+                //ds = cloudRefMS().dHCM()[index][0]; // use diameter stored in cloud - works as soon as vol is transferred
+                ds = dH_; // use dict defined diameter
                 nuf = nufField[cellI];
                 rho = rho_[cellI];
                 magUr = mag(Ur);
                 Rep = 0;
                 Cd = 0;
-                scalar phi(0);
-                scalar phiN(0);
+                dragCoefficient = 0;
 
                 if (magUr > 0)
                 {
+
                     // calc particle Re Nr
                     Rep = ds*voidfraction*magUr/(nuf+SMALL);
-
-                    // calc fluid drag Coeff
-//                    phi=1; //AsurfAequi/Asurf;
-//                    phiN=1; //AcrosssecAequi/Acrosssec;
-                    // paper uses different Re definition!?
-//                    Cd=8/(Rep*sqrt(phiN))+16/(Rep*sqrt(phi))+3/(sqrt(Rep)*pow(phi,0.75))+0.42*pow(10,(-0.4*pow(log(phi),0.2)))/phiN;
 
                     // calc fluid drag Coeff
                     Cd = sqr(0.63 + 4.8/sqrt(Rep));
@@ -183,29 +192,66 @@ void DiFeliceDragMS::setForce() const
                     scalar Xi = 3.7 - 0.65 * exp(-sqr(1.5-log10(Rep))/2);
 
                     // calc particle's drag
-                    drag = 0.125*Cd*rho*M_PI*ds*ds*pow(voidfraction,(2-Xi))*magUr*Ur;
-
+                    dragCoefficient = 0.125*Cd*rho
+                                     *M_PI
+                                     *ds*ds
+                                     *pow(voidfraction,(2-Xi))*magUr;
                     if (modelType_=="B")
-                        drag /= voidfraction;
+                        dragCoefficient /= voidfraction;
+
+                    drag = dragCoefficient*Ur; //total drag force!
+
+                    //Split forces
+                    if(splitImplicitExplicit_)
+                    {
+                        UfluidFluct  = Ufluid - U_[cellI];
+                        UsFluct      = Us     - UsField_[cellI];
+                        dragExplicit = dragCoefficient*(UfluidFluct - UsFluct); //explicit part of force
+                    }
                 }
 
                 if(verbose_ && index >=0 && index <10)
                 {
-                    Info << "index = " << index << endl;
-                    Info << "Us = " << Us << endl;
-                    Info << "Ur = " << Ur << endl;
-                    Info << "ds = " << ds << endl;
-                    Info << "rho = " << rho << endl;
-                    Info << "nuf = " << nuf << endl;
-                    Info << "voidfraction = " << voidfraction << endl;
-                    Info << "Rep = " << Rep << endl;
-                    Info << "Cd = " << Cd << endl;
-                    Info << "drag = " << drag << endl;
+                    Pout << "index = " << index << endl;
+                    Pout << "Us = " << Us << endl;
+                    Pout << "Ur = " << Ur << endl;
+                    Pout << "ds = " << ds << endl;
+                    Pout << "rho = " << rho << endl;
+                    Pout << "nuf = " << nuf << endl;
+                    Pout << "voidfraction = " << voidfraction << endl;
+                    Pout << "Rep = " << Rep << endl;
+                    Pout << "Cd = " << Cd << endl;
+                    Pout << "drag (total) = " << drag << endl;
+                    if(splitImplicitExplicit_)
+                    {
+                        Pout << "UfluidFluct = " << UfluidFluct << endl;
+                        Pout << "UsFluct = " << UsFluct << endl;
+                        Pout << "dragExplicit = " << dragExplicit << endl;
+                    }
+                }
+
+                //Set value fields and write the probe
+                if(probeIt_)
+                {
+                    #include "setupProbeModelfields.H"
+                    vValues.append(drag);   //first entry must the be the force
+                    vValues.append(Ur);
+                    sValues.append(Rep);
+                    sValues.append(Cd);
+                    sValues.append(voidfraction);
+                    particleCloud_.probeM().writeProbe(index, sValues, vValues);
                 }
             }
             // set force on bodies
             if(treatExplicit_) for(int j=0;j<3;j++) cloudRefMS().expForcesCM()[index][j] += drag[j];
-            else  for(int j=0;j<3;j++) cloudRefMS().impForcesCM()[index][j] += drag[j];
+            else   //implicit treatment, taking explicit force contribution into account
+            {
+                for(int j=0;j<3;j++)
+                {
+                    cloudRefMS().impForcesCM()[index][j] += drag[j];
+                    cloudRefMS().expForcesCM()[index][j] += dragExplicit[j];
+                }
+            }
             for(int j=0;j<3;j++) cloudRefMS().DEMForcesCM()[index][j] += drag[j];
         //}
     }

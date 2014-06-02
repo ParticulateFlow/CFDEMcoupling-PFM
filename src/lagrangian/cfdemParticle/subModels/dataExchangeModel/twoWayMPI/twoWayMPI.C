@@ -81,38 +81,27 @@ twoWayMPI::twoWayMPI
     MPI_Comm_split(MPI_COMM_WORLD,liggghts,0,&comm_liggghts);
 
     // open LIGGGHTS input script
-    FILE *fp=NULL;
+    char *liggghtsPathChar = new char[256];
+    int n = 0;
     if (me == 0)
     {
       // read path from dictionary
       const fileName liggghtsPath(propsDict_.lookup("liggghtsPath"));
-      char * liggghtsPathChar = (char*)liggghtsPath.c_str();
+      strcpy(liggghtsPathChar, liggghtsPath.c_str());
+      n = strlen(liggghtsPathChar) + 1;
 
       Info<<"Executing input script '"<< liggghtsPath.c_str() <<"'"<<endl;
-
-      fp = fopen(liggghtsPathChar,"r");
-
-      if (fp == NULL) {
-        printf("ERROR: Could not open LIGGGHTS input script\n");
-        MPI_Abort(MPI_COMM_WORLD,1);
-      }
     }
 
     if (liggghts == 1) lmp = new LAMMPS_NS::LAMMPS(0,NULL,comm_liggghts);
 
-    int n;
-    char line[1024];
-    while (1) {
-      if (me == 0) {
-        if (fgets(line,1024,fp) == NULL) n = 0;
-        else n = strlen(line) + 1;
-        if (n == 0) fclose(fp);
-      }
-      MPI_Bcast(&n,1,MPI_INT,0,MPI_COMM_WORLD);
-      if (n == 0) break;
-      MPI_Bcast(line,n,MPI_CHAR,0,MPI_COMM_WORLD);
-      if (liggghts == 1) lmp->input->one(line);
+    MPI_Bcast(&n,1,MPI_INT,0,MPI_COMM_WORLD);
+    if (n > 0) {
+        MPI_Bcast(liggghtsPathChar,n,MPI_CHAR,0,MPI_COMM_WORLD);
+        if (liggghts == 1) lmp->input->file(liggghtsPathChar);
     }
+
+    delete [] liggghtsPathChar;
 
     // get DEM time step size
     DEMts_ = lmp->update->dt;

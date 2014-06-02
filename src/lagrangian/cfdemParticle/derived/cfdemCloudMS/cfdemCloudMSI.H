@@ -44,6 +44,26 @@ inline double **& cfdemCloudMS::velocitiesCM() const
     return velocitiesCM_;
 }
 
+inline double **& cfdemCloudMS::typeCM() const
+{
+    return typeCM_;
+}
+
+inline double **& cfdemCloudMS::typeVolCM() const
+{
+    return typeVolCM_;
+}
+
+inline double **& cfdemCloudMS::VclumpCM() const
+{
+    return VclumpCM_;
+}
+
+inline double **& cfdemCloudMS::dHCM() const
+{
+    return dHCM_;
+}
+
 inline double **& cfdemCloudMS::impForcesCM() const
 {
     return impForcesCM_;

@@ -209,7 +209,7 @@ void KochHillDrag::setForce() const
                     // calc model coefficient F3
                     scalar F3 = 0.0673+0.212*volumefraction+0.0232/pow(voidfraction,5);
 
-                    //Calculate F in the formulation of van der Hoef et al. (JFM 528:233-254)
+                    //Calculate F
                     scalar F = voidfraction * (F0 + 0.5*F3*Rep);
 
                     // calc drag model coefficient betaP

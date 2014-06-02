@@ -28,6 +28,8 @@ Description
     This code is designed to realize coupled CFD-DEM simulations using LIGGGHTS
     and OpenFOAM(R). Note: this code is not part of OpenFOAM(R) (see DISCLAIMER).
 
+    Di Felice drag law (Zhou et al. (2010), JFM)
+
 Class
     DiFeliceDragMS
 
@@ -75,7 +77,12 @@ private:
 
     bool interpolation_; // use interpolated U field values
 
-    //scalar sphereToClump_; // ratio of sphere radius to clump radius
+    bool splitImplicitExplicit_; // use splitting of implicit and explict force contribution
+
+    word UsFieldName_;   
+
+    const volVectorField& UsField_;  // the average particle velocity field (for implicit/expliti force split)
+
 
     scalar dH_; // hydraulic diameter
 
