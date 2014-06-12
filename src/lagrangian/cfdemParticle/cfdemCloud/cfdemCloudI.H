@@ -162,9 +162,24 @@ inline double ** cfdemCloud::particleWeights() const
     return particleWeights_;
 }
 
-inline double ** cfdemCloud::particleVolumes() const
+inline label Foam::cfdemCloud::body(int index)
 {
-    return particleVolumes_;
+    return index;
+}
+
+inline double cfdemCloud::particleVolume(int index)
+{
+    return particleVolumes_[index][0];
+}
+
+inline scalar cfdemCloud::radius(int index)
+{
+    return radii_[index][0];
+}
+
+inline double cfdemCloud::d(int index)
+{
+    return 2*radii_[index][0];
 }
 
 inline int cfdemCloud::numberOfParticles() const

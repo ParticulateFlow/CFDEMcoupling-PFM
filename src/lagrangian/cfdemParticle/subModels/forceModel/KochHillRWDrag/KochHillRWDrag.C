@@ -250,11 +250,11 @@ Info << "haha1" << endl;
                 if(partTime_[index][0] > t+10*timeE)
                   partTime_[index][0] = t;
                 // -------------------------
-Info << "haha2" << endl;
+
                 //Pout << "RW-TEST: t = " << t << " partTime_ = " << partTime_[index][0] << endl; // TEST-Output
                 if(t>=partTime_[index][0])
                 {
-                    scalar ds = 2*particleCloud_.radii()[index][0];
+                    scalar ds = 2*particleCloud_.radius(index);
                     mu = muField[cellI];
                     k = kField[cellI];
                     epsilon = epsilonField[cellI];

@@ -83,8 +83,7 @@ private:
 
     const volVectorField& UsField_;  // the average particle velocity field (for implicit/expliti force split)
 
-
-    scalar dH_; // hydraulic diameter
+    //scalar dH_; // hydraulic diameter
 
 public:
 

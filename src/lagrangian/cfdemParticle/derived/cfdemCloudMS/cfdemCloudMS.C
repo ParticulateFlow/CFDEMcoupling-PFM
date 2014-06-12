@@ -276,12 +276,12 @@ void Foam::cfdemCloudMS::setClumpVolume()
 {
     //============================================
     // final version if vol is transferred
-    label type;
-    for(int ind = 0;ind < numberOfClumps(); ind++)
-    {
-        type = typeCM()[ind][0];
-        VclumpCM()[ind][0] = typeVolCM()[type][0];
-    }
+    //label type;
+    //for(int ind = 0;ind < numberOfClumps(); ind++)
+    //{
+    //    type = typeCM()[ind][0];
+    //    VclumpCM()[ind][0] = typeVolCM()[type][0];
+    //}
     //============================================
 
 
@@ -300,8 +300,7 @@ void Foam::cfdemCloudMS::setClumpVolume()
         ind=body(index);
         // clump not found
         if (ind < 0) Warning <<"clump was deleted??? ind = "<< ind << endl;
-        else if(cellIDCM(ind) > -1) // clump found
-        //if (cellIDs()[index][0] > -1) // particle Found
+        //else
         {
             //if(verbose_) Pout <<"clump :"<< ind << " found on this proc, cellIDCM(ind)=" << cellIDCM(ind) << endl;
 
@@ -321,8 +320,7 @@ void Foam::cfdemCloudMS::setClumpVolume()
                         nrigidC = 1;
                     }
                     r=radius(index);
-                    VclumpCM_[ind][0]=nrigidC*r*r*r*M_PI/6*overlapCorr_;
-
+                    VclumpCM_[ind][0]=nrigidC*r*r*r*0.52360*overlapCorr_; // pi/6=0.52360
                     //if(verbose_) Pout << "ind=" << ind << " ,VclumpCM_[ind][0]" << VclumpCM_[ind][0] << endl;
                 }
             }
@@ -330,7 +328,7 @@ void Foam::cfdemCloudMS::setClumpVolume()
             else
             {
                 r=radius(index);
-                VclumpCM_[ind][0]+=r*r*r*M_PI/6*overlapCorr_;
+                VclumpCM_[ind][0]+=r*r*r*0.52360*overlapCorr_; // pi/6=0.52360
                 //if(verbose_) Pout << "summing up volume: " << "ind=" << ind << " ,VclumpCM_[ind][0]" << VclumpCM_[ind][0] << endl;
             }
         }
@@ -349,60 +347,18 @@ void Foam::cfdemCloudMS::setdHCM()
 {
     // calc a hydraulic diameter as d of vol equal sphere
     for(int ind = 0;ind < numberOfClumps(); ind++)
-    {
-        if (ind < 0)
-        {
-            Warning <<"clump was deleted??? ind = "<< ind << endl;
-        }
-        else
-        {
-            dHCM_[ind][0]=pow(VclumpCM_[ind][0]/(M_PI*4/3),1./3.);
-        }
-    }
+        dHCM_[ind][0]=pow(VclumpCM_[ind][0]*1.9099,1./3.); // 6/pi=1.9099
+
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 //             PUBLIC MEMBER FUNCTIONS
-
-vector Foam::cfdemCloudMS::positionCM(int index)
-{
-    vector pos;
-    for(int i=0;i<3;i++) pos[i] = positionsCM()[index][i];
-    return pos;
-}
-
-vector Foam::cfdemCloudMS::velocityCM(int index)
-{
-    vector vel;
-    for(int i=0;i<3;i++) vel[i] = velocitiesCM()[index][i];
-    return vel;
-}
-
-label Foam::cfdemCloudMS::cellIDCM(int index)
-{
-    return cellIDsCM_[index][0];
-}
-
-label Foam::cfdemCloudMS::body(int index)
-{
-    return bodies_[0][index]-1;
-}
-
-label Foam::cfdemCloudMS::nrigid(int index)
-{
-    return nrigids_[0][index];
-//    return nrigids_[0][0];
-}
 
 const forceModel& Foam::cfdemCloudMS::forceM(int i)
 {
     return forceModel_[i];
 }
 
-int Foam::cfdemCloudMS::nrForceModels()
-{
-    return forceModels_.size();
-}
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam

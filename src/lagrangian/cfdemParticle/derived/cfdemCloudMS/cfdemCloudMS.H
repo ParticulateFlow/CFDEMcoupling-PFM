@@ -124,16 +124,21 @@ public:
 
     // Member Functions
       // Access
+       inline label body(int);
 
-       vector positionCM(int);
+       inline double particleVolume(int);
 
-       vector velocityCM(int);
+       //inline double d(int);
 
-       label cellIDCM(int);
+       inline vector positionCM(int);
 
-       label body(int);
+       inline vector velocityCM(int);
 
-       label nrigid(int);
+       inline label cellIDCM(int);
+
+       inline label nrigid(int);
+
+       inline int nrForceModels();
 
        inline double **& positionsCM() const;
 
@@ -160,8 +165,6 @@ public:
        inline bool useforcePerClump() const;
 
        const forceModel& forceM(int);
-
-       int nrForceModels();
 
        bool evolve(volScalarField&,volVectorField&,volVectorField&);
 };

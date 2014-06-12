@@ -223,8 +223,6 @@ public:
 
        label particleCell(int);
 
-       double d(int);
-
        vector position(int);
 
        vector velocity(int);
@@ -234,8 +232,6 @@ public:
        virtual const forceModel& forceM(int);
 
        virtual int nrForceModels();
-
-       scalar radius(int);
 
        scalar voidfraction(int);
 
@@ -285,7 +281,13 @@ public:
 
        inline double ** particleWeights() const;
 
-       inline double ** particleVolumes() const;
+       virtual inline label body(int);
+
+       virtual inline double particleVolume(int);
+
+       inline scalar radius(int);
+
+       virtual inline double d(int);
 
        virtual inline double dMin() {return -1;}
        virtual inline double dMax() {return -1;}
@@ -296,8 +298,6 @@ public:
        virtual inline double ** particleDensity() const {return NULL;};
        virtual inline int ** particleTypes() const {return NULL;};
        virtual label particleType(label index) const {return -1;};
-
-       //access to the particles' orientation information
        virtual inline double ** exArray() const {return NULL;};
        virtual vector ex(int) const {return Foam::vector(0,0,0);};
 

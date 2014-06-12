@@ -74,9 +74,9 @@ DiFeliceDragMS::DiFeliceDragMS
     interpolation_(false),
     splitImplicitExplicit_(false),
     UsFieldName_(propsDict_.lookup("granVelFieldName")),
-    UsField_(sm.mesh().lookupObject<volVectorField> (UsFieldName_)),
+    UsField_(sm.mesh().lookupObject<volVectorField> (UsFieldName_))
     //sphereToClump_(readScalar(propsDict_.lookup("sphereToClump")))
-    dH_(readScalar(propsDict_.lookup("hydraulicDiameter")))
+    //dH_(readScalar(propsDict_.lookup("hydraulicDiameter")))
 {
     //Append the field names to be probed
     particleCloud_.probeM().initialize(typeName, "diFeliceDrag.logDat");
@@ -170,8 +170,7 @@ void DiFeliceDragMS::setForce() const
 
                 Us = cloudRefMS().velocityCM(index);
                 Ur = Ufluid-Us;
-                //ds = cloudRefMS().dHCM()[index][0]; // use diameter stored in cloud - works as soon as vol is transferred
-                ds = dH_; // use dict defined diameter
+                ds = cloudRefMS().dHCM()[index][0];
                 nuf = nufField[cellI];
                 rho = rho_[cellI];
                 magUr = mag(Ur);
@@ -179,7 +178,7 @@ void DiFeliceDragMS::setForce() const
                 Cd = 0;
                 dragCoefficient = 0;
 
-                if (magUr > 0)
+                if (magUr > SMALL)
                 {
 
                     // calc particle Re Nr

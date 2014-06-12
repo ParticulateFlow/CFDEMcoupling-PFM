@@ -34,6 +34,55 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
+inline label Foam::cfdemCloudMS::body(int index)
+{
+    return bodies_[0][index]-1;
+}
+
+inline double cfdemCloudMS::particleVolume(int index)
+{
+    int ind = body(index); // particle to clump ID
+    double Vp(VclumpCM_[ind][0]);
+    int nR(nrigid(ind));
+    if(nR>0) Vp/=nR;
+    return Vp;
+}
+
+/*inline double cfdemCloudMS::d(int index)
+{
+    int ind = body(index); // particle to clump ID
+    return dHCM_[ind][0];
+}*/
+
+inline vector Foam::cfdemCloudMS::positionCM(int index)
+{
+    vector pos;
+    for(int i=0;i<3;i++) pos[i] = positionsCM()[index][i];
+    return pos;
+}
+
+inline vector Foam::cfdemCloudMS::velocityCM(int index)
+{
+    vector vel;
+    for(int i=0;i<3;i++) vel[i] = velocitiesCM()[index][i];
+    return vel;
+}
+
+inline label Foam::cfdemCloudMS::cellIDCM(int index)
+{
+    return cellIDsCM_[index][0];
+}
+
+inline label Foam::cfdemCloudMS::nrigid(int index)
+{
+    return nrigids_[0][index];
+}
+
+inline int Foam::cfdemCloudMS::nrForceModels()
+{
+    return forceModels_.size();
+}
+
 inline double **& cfdemCloudMS::positionsCM() const
 {
     return positionsCM_;
