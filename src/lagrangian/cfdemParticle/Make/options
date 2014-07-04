@@ -14,11 +14,12 @@ EXE_INC = \
     -I$(LIB_SRC)/OpenFOAM/containers/HashTables/labelHashSet \
     -I$(CFDEM_LIGGGHTS_SRC_DIR) \
     -I$(CFDEM_M2MLIB_PATH) \
+    -I$(CFDEM_Many2ManyLIB_PATH) \
     -I$(CFDEM_SRC_DIR)/cfdTools \
 
 LIB_LIBS = \
      $(PLIBS) \
-    -L$(CFDEM_LIB_DIR) \
+    -L$(FOAM_USER_LIBBIN) \
     -lfiniteVolume \
     -lincompressibleRASModels \
     -lincompressibleLESModels \
@@ -28,4 +29,10 @@ LIB_LIBS = \
     -L$(CFDEM_LIGGGHTS_SRC_DIR) \
     -Wl,--whole-archive -l$(CFDEM_LIGGGHTS_LIB_NAME) -Wl,--no-whole-archive \
     -L$(CFDEM_M2MLIB_PATH) \
-    /*-lcouple*/
+    -lcouple \
+    -L$(CFDEM_Many2ManyLIB_PATH) \
+    -lcoupleMany2Many \
+
+/* add -I$(CFDEM_POEMSLIB_PATH) \ to EXE_INC */
+/*    -L$(CFDEM_POEMSLIB_PATH) \ */
+/*    -lpoems   */
