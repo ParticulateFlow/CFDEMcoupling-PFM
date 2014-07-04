@@ -48,7 +48,7 @@ averagingModel dense;//dilute;//
 
 clockModel off; //standardClock;//
 
-smoothingModel  constDiffSmoothing; //off;//
+smoothingModel  off;//constDiffSmoothing; //
 
 //useDDTvoidfraction;
 

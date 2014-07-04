@@ -142,6 +142,8 @@ protected:
 
     mutable scalar imExSplitFactor_;
 
+    mutable bool treatVoidCellsAsExplicitForce_; //will treat the coupling force in cells with no Us data explicitly
+
     bool useDDTvoidfraction_;
 
     mutable volScalarField ddtVoidfraction_;
@@ -245,6 +247,8 @@ public:
 
        inline const scalar& imExSplitFactor() const;
 
+       inline const bool& treatVoidCellsAsExplicitForce() const;
+
        inline const bool& ignore() const;
 
        inline const fvMesh& mesh() const;
@@ -298,6 +302,13 @@ public:
        virtual inline double ** particleDensity() const {return NULL;};
        virtual inline int ** particleTypes() const {return NULL;};
        virtual label particleType(label index) const {return -1;};
+
+       //access to the particle's rotation and torque data
+       virtual inline double ** DEMTorques() const {return NULL;};
+       virtual inline double ** omegaArray() const {return NULL;};
+       virtual vector omega(int) const {return Foam::vector(0,0,0);};
+
+       //access to the particles' orientation information
        virtual inline double ** exArray() const {return NULL;};
        virtual vector ex(int) const {return Foam::vector(0,0,0);};
 

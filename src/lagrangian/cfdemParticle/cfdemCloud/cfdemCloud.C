@@ -100,6 +100,7 @@ Foam::cfdemCloud::cfdemCloud
     cgOK_(true),
     impDEMdrag_(false),
     imExSplitFactor_(1.0),
+    treatVoidCellsAsExplicitForce_(false),
     useDDTvoidfraction_(false),
     ddtVoidfraction_
     (   
@@ -219,6 +220,8 @@ Foam::cfdemCloud::cfdemCloud
         solveFlow_=Switch(couplingProperties_.lookup("solveFlow"));
     if (couplingProperties_.found("imExSplitFactor"))
         imExSplitFactor_ = readScalar(couplingProperties_.lookup("imExSplitFactor"));
+    if (couplingProperties_.found("treatVoidCellsAsExplicitForce"))
+        treatVoidCellsAsExplicitForce_ = readBool(couplingProperties_.lookup("treatVoidCellsAsExplicitForce"));
     if (couplingProperties_.found("verbose")) verbose_=true;
     if (couplingProperties_.found("ignore")) ignore_=true;
     if (turbulenceModelType_=="LESProperties")
@@ -508,7 +511,12 @@ bool Foam::cfdemCloud::evolve
             //Smoothen "next" fields            
             smoothingM().dSmoothing();
             smoothingM().smoothen(voidFractionM().voidFractionNext());
-            smoothingM().smoothenReferenceField(averagingM().UsNext());
+
+            //only smoothen if we use implicit force coupling in cells void of particles
+            //because we need unsmoothened Us field to detect cells for explicit 
+            //force coupling
+            if(!treatVoidCellsAsExplicitForce())
+                    smoothingM().smoothenReferenceField(averagingM().UsNext());
             
             clockM().stop("setVectorAverage");
         }

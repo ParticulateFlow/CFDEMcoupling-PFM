@@ -25,6 +25,8 @@ FoamFile
 
 //===========================================================================//
 // sub-models & settings
+
+//skipFlowSol;
 //verbose;
 
 modelType B; // A or B
@@ -45,7 +47,7 @@ probeModel off;
 
 dataExchangeModel twoWayMPI;//twoWayFiles;//oneWayVTK;//
 
-averagingModel dense;//dilute;//
+averagingModel dense;
 
 clockModel off;
 
@@ -53,16 +55,14 @@ smoothingModel off;// localPSizeDiffSmoothing;// constDiffSmoothing; //
 
 forceModels
 (
-    noDrag
     Archimedes
-    volWeightedAverage
+    //volWeightedAverage
 );
 
 forceModelsMS
 (
-    //DiFeliceDragMS
-    GidaspowDragMS
-    //noDragMS
+     DiFeliceDragMS
+    //GidaspowDragMS
 );
 
 momCoupleModels
@@ -82,25 +82,12 @@ implicitCoupleProps
     voidfractionFieldName "voidfraction";
 }
 
-ArchimedesProps
+dividedProps
 {
-    densityFieldName "rho";
-    gravityFieldName "g";
-}
-gradPForceProps
-{
-    pFieldName "p";
-    densityFieldName "rho";
-    velocityFieldName "U";
-    interpolation;
+    alphaMin 0.9;
+    scaleUpVol 1.0;
 }
 
-viscForceProps
-{
-    velocityFieldName "U";
-    densityFieldName "rho";
-    interpolation;
-}
 volWeightedAverageProps
 {
     scalarFieldNames
@@ -114,22 +101,14 @@ volWeightedAverageProps
     lowerThreshold 0;
     //verbose;
 }
-totalMomentumExchangeProps
-{
-    implicitMomExFieldName "Ksl";
-    explicitMomExFieldName "none";
-    fluidVelFieldName "U";
-    granVelFieldName "Us";
-    densityFieldName "rho";
-}
 
 DiFeliceDragMSProps
 {
     velFieldName "U";
     densityFieldName "rho";
     voidfractionFieldName "voidfraction";
-    hydraulicDiameter 0.002;
-    //verbose;
+    granVelFieldName "Us";
+    //verbose;    
 }
 
 GidaspowDragMSProps
@@ -140,42 +119,10 @@ GidaspowDragMSProps
     hydraulicDiameter 0.002;
 }
 
-oneWayVTKProps
+ArchimedesProps
 {
-    couplingFilename "vtk_out%4.4d.vtk";
-    maxNumberOfParticles 30000;
-}
-
-twoWayFilesProps
-{
-    maxNumberOfParticles 10100;
-}
-
-centreProps
-{
-    alphaMin 0.10;
-}
-
-dividedMSProps
-{
-    alphaMin 0.05;
-    scaleUpVol 1.0;
-    clumpVol 1.8433e-9; // this is particles volume, not clump!
-    nrigid 10;
-}
-
-bigParticleProps
-{
-    alphaMin 0.05;
-    scaleUpVol 50.0;
-    maxCellsPerParticle 1000;
-}
-
-GaussProps
-{
-    maxCellsPerParticle 5000;
-    alphaMin 0.05;
-    scaleUpVol 10.0;
+    densityFieldName "rho";
+    gravityFieldName "g";
 }
 
 engineProps

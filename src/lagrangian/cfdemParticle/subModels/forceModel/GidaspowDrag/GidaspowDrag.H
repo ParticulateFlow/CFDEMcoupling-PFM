@@ -31,6 +31,8 @@ Description
     Gidaspow drag law
     - only valid for low-Reynolds number systems (Re_p<1000)
     - including interpolation of the velocity to the exact position
+    - splits off explicit drag component due to fluctuation in fluid and particle
+      velocity
 
 Class
     GidaspowDrag
@@ -80,9 +82,17 @@ private:
 
     bool interpolation_; // use interpolated field values
 
+    bool splitImplicitExplicit_; // use splitting of implicit and explict force contribution
+
+    word UsFieldName_;   
+
+    const volVectorField& UsField_;  // the average particle velocity field (for implicit/expliti force split)
+
     mutable scalar scaleDia_;
 
     mutable scalar scaleDrag_;
+
+    mutable scalar switchingVoidfraction_; //voidfraction above which dilute formulation will be used
 
 public:
 

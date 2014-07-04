@@ -81,6 +81,11 @@ writeLiggghts::writeLiggghts
             writeLast_=Switch(propsDict_.lookup("writeLast"));
         }
 
+        if(propsDict_.found("writeName"))
+        {
+            propsDict_.lookup("writeName") >> writeName_;
+        }
+
         if (!writeLast_ && propsDict_.found("overwrite"))
         {
             overwrite_=Switch(propsDict_.lookup("overwrite"));

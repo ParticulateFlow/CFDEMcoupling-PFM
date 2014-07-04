@@ -132,7 +132,7 @@ oneWayVTKProps
 twoWayMPIProps
 {
     maxNumberOfParticles 10000;
-    liggghtsPath "../DEM/in.liggghts_init";
+    liggghtsPath "../DEM/in.liggghts_resume";
 }
 
 centreProps

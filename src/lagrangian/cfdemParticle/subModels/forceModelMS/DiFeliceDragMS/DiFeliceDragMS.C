@@ -170,7 +170,7 @@ void DiFeliceDragMS::setForce() const
 
                 Us = cloudRefMS().velocityCM(index);
                 Ur = Ufluid-Us;
-                ds = cloudRefMS().dHCM()[index][0];
+                ds = cloudRefMS().clumpDH()[index][0];
                 nuf = nufField[cellI];
                 rho = rho_[cellI];
                 magUr = mag(Ur);

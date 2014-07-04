@@ -60,6 +60,11 @@ inline const scalar& cfdemCloud::imExSplitFactor() const
 	    return imExSplitFactor_;
 };
 
+inline const bool& cfdemCloud::treatVoidCellsAsExplicitForce() const
+{
+    return treatVoidCellsAsExplicitForce_;
+}
+
 inline const scalar& cfdemCloud::cg() const
 { 
     return cg_;

@@ -31,7 +31,7 @@ Description
 
 #include "error.H"
 #include "forceModel.H"
-
+#include "mathExtra.H"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -142,6 +142,26 @@ void forceModel::repartitionImExForces() const
     // Update implicit particle
     expParticleForces_ += (1.0-particleCloud_.imExSplitFactor())*impParticleForces_;
     impParticleForces_ *= particleCloud_.imExSplitFactor();
+  }
+}
+
+void forceModel::treatVoidCells() const
+{
+  //force coupling force in cells where there are no particles to be explicit force
+  if(particleCloud_.treatVoidCellsAsExplicitForce())
+  {
+        int counter(0);
+        volVectorField& Us = particleCloud_.averagingM().UsNext();
+        forAll(Us,cellI)
+        {
+            if ( mag(Us[cellI]) == 0.0)  // cell is void of particles
+            {
+                expParticleForces_[cellI] += impParticleForces_[cellI];
+                impParticleForces_[cellI] *= 0.0;
+                counter +=1;
+            }
+        }
+        Info << "Re-partitioned "<<  counter << " cells void of particles" << endl;
   }
 }
 

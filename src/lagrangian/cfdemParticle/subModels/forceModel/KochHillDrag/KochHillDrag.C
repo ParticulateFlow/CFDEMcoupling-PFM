@@ -209,7 +209,8 @@ void KochHillDrag::setForce() const
                     // calc model coefficient F3
                     scalar F3 = 0.0673+0.212*volumefraction+0.0232/pow(voidfraction,5);
 
-                    //Calculate F
+                    //Calculate F (the factor 0.5 is introduced, since Koch and Hill, ARFM 33:619–47, use the radius
+                    //to define Rep, and we use the particle diameter, see vanBuijtenen et al., CES 66:2368–2376.
                     scalar F = voidfraction * (F0 + 0.5*F3*Rep);
 
                     // calc drag model coefficient betaP

@@ -42,17 +42,11 @@ inline label Foam::cfdemCloudMS::body(int index)
 inline double cfdemCloudMS::particleVolume(int index)
 {
     int ind = body(index); // particle to clump ID
-    double Vp(VclumpCM_[ind][0]);
+    double Vp(clumpVol_[ind][0]);
     int nR(nrigid(ind));
     if(nR>0) Vp/=nR;
     return Vp;
 }
-
-/*inline double cfdemCloudMS::d(int index)
-{
-    int ind = body(index); // particle to clump ID
-    return dHCM_[ind][0];
-}*/
 
 inline vector Foam::cfdemCloudMS::positionCM(int index)
 {
@@ -93,24 +87,24 @@ inline double **& cfdemCloudMS::velocitiesCM() const
     return velocitiesCM_;
 }
 
-inline double **& cfdemCloudMS::typeCM() const
+inline int cfdemCloudMS::nClumpTypes() const
 {
-    return typeCM_;
+    return nClumpTypes_;
 }
 
-inline double **& cfdemCloudMS::typeVolCM() const
+inline int **& cfdemCloudMS::clumpType() const
 {
-    return typeVolCM_;
+    return clumpType_;
 }
 
-inline double **& cfdemCloudMS::VclumpCM() const
+inline double **& cfdemCloudMS::clumpVol() const
 {
-    return VclumpCM_;
+    return clumpVol_;
 }
 
-inline double **& cfdemCloudMS::dHCM() const
+inline double **& cfdemCloudMS::clumpDH() const
 {
-    return dHCM_;
+    return clumpDH_;
 }
 
 inline double **& cfdemCloudMS::impForcesCM() const

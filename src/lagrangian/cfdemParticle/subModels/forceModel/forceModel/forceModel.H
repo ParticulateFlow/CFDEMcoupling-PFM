@@ -151,11 +151,12 @@ public:
         inline const bool& coupleForce() const { return coupleForce_;};
 
         void const setImpDEMdrag() const {particleCloud_.impDEMdrag_=true;};
-        
+
         virtual inline bool& requiresEx() { return requiresEx_;};
         
-    //Repartition Implixit/Explicit forces
-        void repartitionImExForces() const;
+        void repartitionImExForces() const; //Repartition Implixit/Explicit forces
+
+        void treatVoidCells() const;
 };
 
 

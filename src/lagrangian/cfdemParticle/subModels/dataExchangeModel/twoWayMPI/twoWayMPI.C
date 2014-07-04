@@ -114,7 +114,6 @@ twoWayMPI::twoWayMPI
 twoWayMPI::~twoWayMPI()
 {}
 
-
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
 char* twoWayMPI::wordToChar(word& inWord) const
 {
@@ -414,9 +413,29 @@ int Foam::twoWayMPI::getNumberOfClumps() const
         return liggghts_get_maxtag_ms(lmp);
     #endif
 
-    Warning << "liggghts_get_maxtag_ms(lmp) is commented here!" << endl;
+    Warning << "liggghts_get_maxtag_ms(lmp) is not available here!" << endl;
     return -1;       
 }
+
+int Foam::twoWayMPI::getNumberOfTypes() const
+{
+    #ifdef multisphere
+        return liggghts_get_ntypes_ms(lmp);
+    #endif
+    Warning << "liggghts_get_maxtag_ms(lmp) is not available here!" << endl;
+    return -1;
+}
+
+double* Foam::twoWayMPI::getTypeVol() const
+{
+    #ifdef multisphere
+        return liggghts_get_vclump_ms(lmp);
+    #endif
+
+    Warning << "liggghts_get_vclump_ms(lmp) is not available here!" << endl;
+    return NULL;       
+}
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam

@@ -66,17 +66,15 @@ private:
     mutable int **bodies_;
     mutable int **nrigids_;
 
-    mutable double **exCM_;
-    mutable double **eyCM_;
-    mutable double **ezCM_;
+    mutable int **clumpType_;
+    mutable int nClumpTypes_;
+    mutable double **clumpVol_;
+    mutable double **clumpDH_;
+    mutable double **clumpWeights_;
 
-    mutable double **typeCM_;
-    mutable double **typeVolCM_;
-    mutable double **VclumpCM_;
-    mutable double **particleWeightsCM_;
-
-    mutable double **dHCM_;
-
+    //mutable double **exCM_;
+    //mutable double **eyCM_;
+    //mutable double **ezCM_;
     //mutable double **SclumpCM_;
     //mutable double **scalingCM_;
     //mutable double **Cclump_ex_;
@@ -87,8 +85,6 @@ private:
     mutable double **DEMForcesCM_;
 
     int numberOfClumps_;
-    scalar overlapCorr_;        // ratio between clump vol and sum(particle vol)
-    Switch monoMS_;
     bool numberOfClumpsChanged_;
 
     bool useforcePerClump_;
@@ -104,8 +100,6 @@ private:
     void findCells();
     void setForces();
     void setParticleForceField();
-    void setClumpVolume(); // can be replaced once volume is communicated!!!
-    void setdHCM();
 
 public:
 
@@ -128,8 +122,6 @@ public:
 
        inline double particleVolume(int);
 
-       //inline double d(int);
-
        inline vector positionCM(int);
 
        inline vector velocityCM(int);
@@ -144,13 +136,13 @@ public:
 
        inline double **& velocitiesCM() const;
 
-       inline double **& typeCM() const;
+       inline int **& clumpType() const;
 
-       inline double **& typeVolCM() const;
+       inline int nClumpTypes() const;
 
-       inline double **& VclumpCM() const;
+       inline double **& clumpVol() const;
 
-       inline double **& dHCM() const;
+       inline double **& clumpDH() const;
 
        inline double **& impForcesCM() const;
 

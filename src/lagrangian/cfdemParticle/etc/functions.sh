@@ -139,6 +139,7 @@ compileLIGGGHTS()
     logpath="$1"
     logfileName="$2"
     headerText="$3"
+    clean="$4"
     #--------------------------------------------------------------------------------#
 
     #- clean up old log file
@@ -157,9 +158,14 @@ compileLIGGGHTS()
     echo 2>&1 | tee -a $logpath/$logfileName
 
     #- wclean and wmake
-    rm $CFDEM_LIGGGHTS_SRC_DIR/"lmp_"$CFDEM_LIGGGHTS_MAKEFILE_NAME
-    rm $CFDEM_LIGGGHTS_SRC_DIR/"lib"$CFDEM_LIGGGHTS_LIB_NAME".a"
-    make clean-all 2>&1 | tee -a $logpath/$logfileName
+    if [[ $clean == "false" ]]; then
+        echo "not cleaning LIGGGHTS"
+    else
+        rm $CFDEM_LIGGGHTS_SRC_DIR/"lmp_"$CFDEM_LIGGGHTS_MAKEFILE_NAME
+        rm $CFDEM_LIGGGHTS_SRC_DIR/"lib"$CFDEM_LIGGGHTS_LIB_NAME".a"
+        make clean-all 2>&1 | tee -a $logpath/$logfileName
+        echo "cleaning LIGGGHTS"
+    fi
     if [[ $WM_NCOMPPROCS == "" ]]; then
         echo "compiling LIGGGHTS on one CPU"
         make $CFDEM_LIGGGHTS_MAKEFILE_NAME 2>&1 | tee -a $logpath/$logfileName

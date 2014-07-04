@@ -72,8 +72,12 @@ GidaspowDrag::GidaspowDrag
     voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
     phi_(readScalar(propsDict_.lookup("phi"))),
     interpolation_(false),
+    splitImplicitExplicit_(false),
+    UsFieldName_(propsDict_.lookup("granVelFieldName")),
+    UsField_(sm.mesh().lookupObject<volVectorField> (UsFieldName_)),
     scaleDia_(1.),
-    scaleDrag_(1.)
+    scaleDrag_(1.),
+    switchingVoidfraction_(0.8)
 {
     //Append the field names to be probed
     particleCloud_.probeM().initialize(typeName, "gidaspowDrag.logDat");
@@ -87,6 +91,13 @@ GidaspowDrag::GidaspowDrag
     if (propsDict_.found("verbose")) verbose_=true;
     if (propsDict_.found("treatExplicit")) treatExplicit_=true;
     if (propsDict_.found("interpolation")) interpolation_=true;
+    if (propsDict_.found("splitImplicitExplicit"))
+    {
+        Info << "will split implicit / explicit force contributions." << endl;
+        splitImplicitExplicit_ = true;
+        if(!interpolation_) 
+            Info << "WARNING: will only consider fluctuating particle velocity in implicit / explicit force split!" << endl;
+    }
     if (propsDict_.found("implDEM"))
     {
         treatExplicit_=false;
@@ -99,6 +110,9 @@ GidaspowDrag::GidaspowDrag
         scaleDia_=scalar(readScalar(propsDict_.lookup("scale")));
     if (propsDict_.found("scaleDrag"))
         scaleDrag_=scalar(readScalar(propsDict_.lookup("scaleDrag")));
+
+    if (propsDict_.found("switchingVoidfraction"))
+        switchingVoidfraction_ = readScalar(propsDict_.lookup("switchingVoidfraction"));
 
     Info << "Gidaspow - interpolation switch: " << interpolation_ << endl;
 }
@@ -145,9 +159,12 @@ void GidaspowDrag::setForce() const
     scalar localPhiP(0);
 
     scalar CdMagUrLag(0);       //Cd of the very particle
-    scalar KslLag(0);           //momentum exchange of the very particle (per unit volume)
     scalar betaP(0);             //momentum exchange of the very particle
 
+    vector dragExplicit(0,0,0);
+	vector UfluidFluct(0,0,0);
+    vector UsFluct(0,0,0);
+    
     interpolationCellPoint<scalar> voidfractionInterpolator_(voidfraction_);
     interpolationCellPoint<vector> UInterpolator_(U_);
 
@@ -194,36 +211,44 @@ void GidaspowDrag::setForce() const
                 localPhiP = 1.0f-voidfraction+SMALL;
                 Vs = ds*ds*ds*M_PI/6;
 
-                //Compute specific drag coefficient (i.e., Force per unit slip velocity and per m³ SUSPENSION)
-                if(voidfraction > 0.8) //dilute
+                // calc particle's drag coefficient (i.e., Force per unit slip velocity and per m³ PARTICLE)
+                if(voidfraction > switchingVoidfraction_) //dilute
                 {
                     Rep=ds/scaleDia_*voidfraction*magUr/nuf;
-                    CdMagUrLag = (24.0*nuf/(ds/scaleDia_*voidfraction)) //1/magUr missing here, but compensated in expression for KslLag!
-                                 *(scalar(1)+0.15*Foam::pow(Rep, 0.687));
+                    CdMagUrLag = (24.0*nuf/(ds/scaleDia_*voidfraction)) //1/magUr missing here, but compensated in expression for betaP!
+                                 *(scalar(1.0)+0.15*Foam::pow(Rep, 0.687));
 
-                    KslLag = 0.75*(
-                                            rho*localPhiP*voidfraction*CdMagUrLag
+                    betaP = 0.75*(                                  //this is betaP = beta / localPhiP!
+                                            rho*voidfraction*CdMagUrLag
                                           /
                                             (ds/scaleDia_*Foam::pow(voidfraction,2.65))
                                           );
                 }
                 else  //dense
                 {
-                    KslLag = (150*Foam::pow(localPhiP,2)*nuf*rho)/
-                             (voidfraction*ds/scaleDia_*ds/scaleDia_+SMALL)
+                    betaP = (150 * localPhiP*nuf*rho)          //this is betaP = beta / localPhiP!
+                             /  (voidfraction*ds/scaleDia_*ds/scaleDia_)
                             +
-                             (1.75*(localPhiP) * magUr * rho)/
-                             ((ds/scaleDia_));
+                              (1.75 * magUr * rho)
+                             /((ds/scaleDia_));
                 }
-
-                // calc particle's drag coefficient (i.e., Force per unit slip velocity and per m³ PARTICLE)
-                betaP = KslLag / localPhiP;
 
                 // calc particle's drag
                 drag = Vs * betaP * Ur * scaleDrag_;
 
                 if (modelType_=="B")
                     drag /= voidfraction;
+
+                //Split forces
+                if(splitImplicitExplicit_)
+                {
+                    UfluidFluct  = Ufluid - U_[cellI];
+                    UsFluct      = Us     - UsField_[cellI];
+                    dragExplicit = Vs * betaP * (UfluidFluct - UsFluct); //explicit part of force
+ 
+                    if (modelType_=="B")
+                        dragExplicit /= voidfraction;
+                }
 
                 if(verbose_ && index >=0 && index <2)
                 {
@@ -240,6 +265,13 @@ void GidaspowDrag::setForce() const
                     Pout << "Rep = " << Rep << endl;
                     Pout << "betaP = " << betaP << endl;
                     Pout << "drag = " << drag << endl;
+                    
+                    if(splitImplicitExplicit_)
+                    {
+                        Pout << "UfluidFluct = " << UfluidFluct << endl;
+                        Pout << "UsFluct = " << UsFluct << endl;
+                        Pout << "dragExplicit = " << dragExplicit << endl;
+                    }
                 }
 
                 //Set value fields and write the probe
@@ -257,7 +289,14 @@ void GidaspowDrag::setForce() const
 
             // set force on particle
             if(treatExplicit_) for(int j=0;j<3;j++) expForces()[index][j] += drag[j];
-            else  for(int j=0;j<3;j++) impForces()[index][j] += drag[j];
+            else   //implicit treatment, taking explicit force contribution into account
+            {
+               for(int j=0;j<3;j++) 
+               { 
+                    impForces()[index][j] += drag[j] - dragExplicit[j]; //only consider implicit part!
+                    expForces()[index][j] += dragExplicit[j];
+               }
+            }
 
             // set Cd
             if(implDEM_)

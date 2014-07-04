@@ -36,9 +36,10 @@ divSchemes
     div(phi,R)      Gauss limitedLinear 1;
     div(R)          Gauss linear;
     div(phi,nuTilda) Gauss limitedLinear 1;
+    div((nuEff*dev(grad(U).T()))) Gauss linear;
+    div((nuEff*dev(T(grad(U))))) Gauss linear;
     div((viscousTerm*dev(grad(U).T()))) Gauss linear;
     div((nu*dev(grad(U).T()))) Gauss linear;
-    div((nuEff*dev(grad(U).T()))) Gauss linear;
 }
 
 laplacianSchemes
