@@ -14,7 +14,7 @@ casePath="$(dirname "$(readlink -f ${BASH_SOURCE[0]})")"
 echo $casePath
 
 # check if mesh was built
-if [ -f "$casePath/CFD/constant/polyMesh/boundary" ]; then
+if [ -f "$casePath/CFD/constant/polyMesh/points" ]; then
     echo "mesh was built before - using old mesh"
 else
     echo "mesh needs to be built"
