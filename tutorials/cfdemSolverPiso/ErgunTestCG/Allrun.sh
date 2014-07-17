@@ -18,5 +18,12 @@ else
     blockMesh
 fi
 
+if [ -f "$casePath/DEM/post/restart/liggghts.restart*" ];  then
+    echo "LIGGGHTS init was run before - using existing restart file"
+else
+    #- run DEM in new terminal
+    $casePath/parDEMrun.sh
+fi
+
 #- run parallel CFD-DEM in new terminal
 gnome-terminal --title='cfdemSolverPiso ErgunTestCG CFD'  -e "bash $casePath/parCFDDEMrun.sh" 

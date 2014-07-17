@@ -7,7 +7,7 @@ echo both
 #######################################################
 # variables                                           #
 #######################################################
-variable cg equal 3
+variable cg equal 2
 variable r0 equal 0.00025
 variable nPorg equal 71000
 variable nPscal equal ${nPorg}/(${cg}*${cg}*${cg})
@@ -25,7 +25,8 @@ units		si
 processors	2 2 1
 
 #read the restart file
-read_restart 	../DEM/liggghts.restart_coarseGraining_${cg}
+read_restart 	../DEM/post/restart/liggghts.restart_coarseGraining_${cg}
+#_coarseGraining_${cg}
 
 neighbor	0.001 bin
 neigh_modify	delay 0

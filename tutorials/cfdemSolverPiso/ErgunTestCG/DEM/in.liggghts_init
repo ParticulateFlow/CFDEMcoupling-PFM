@@ -7,7 +7,7 @@ echo both
 #######################################################
 # variables                                           #
 #######################################################
-variable cg equal 1
+variable cg equal 2
 variable r0 equal 0.00025
 variable nPorg equal 71000
 variable nPscal equal ${nPorg}/(${cg}*${cg}*${cg})
@@ -75,5 +75,5 @@ dump		dmp all custom 5000 post/dump.liggghts_init id type type x y z ix iy iz vx
 #node : f_couple_cfd[6]
 #cell id : f_couple_cfd[7]
 
-run		10000 upto
-write_restart 	liggghts.restart_coarseGraining_${cg}
+run		        10000 upto
+write_restart 	../DEM/post/restart/liggghts.restart_coarseGraining_${cg}

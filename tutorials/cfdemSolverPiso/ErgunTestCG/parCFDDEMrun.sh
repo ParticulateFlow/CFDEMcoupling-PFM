@@ -16,7 +16,7 @@ source $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/functions.sh
 #- define variables
 casePath="$(dirname "$(readlink -f ${BASH_SOURCE[0]})")"
 logpath=$casePath
-headerText="run_parallel_cfdemSolverPiso_ErgunTestMPI_CFDDEM"
+headerText="run_parallel_cfdemSolverPiso_ErgunTestCG_CFDDEM"
 logfileName="log_$headerText"
 solverName="cfdemSolverPiso"
 nrProcs="4"
@@ -40,17 +40,17 @@ if [ $runOctave == "true" ]
         cd octave
 
         #- rmove old graph
-        rm cfdemSolverPiso_ErgunTestMPI.eps
+        rm cfdemSolverPiso_ErgunTestCG.eps
 
         #- run octave
         octave totalPressureDrop.m
 
         #- show plot 
-        evince cfdemSolverPiso_ErgunTestMPI.eps
+        evince cfdemSolverPiso_ErgunTestCG.eps
 
         #- copy log file to test harness
         cp ../../$logfileName $testHarnessPath
-        cp cfdemSolverPiso_ErgunTestMPI.eps $testHarnessPath
+        cp cfdemSolverPiso_ErgunTestCG.eps $testHarnessPath
 fi
 
 if [ $postproc == "true" ]
@@ -62,7 +62,7 @@ if [ $postproc == "true" ]
 
     #- get VTK data from liggghts dump file
     cd $casePath/DEM/post
-    python -i $CFDEM_LPP_DIR/lpp.py dump*.liggghts_restart
+    python -i $CFDEM_LPP_DIR/lpp.py dump*.liggghts_run
 
     #- get VTK data from CFD sim
     cd $casePath/CFD
@@ -86,6 +86,8 @@ source $WM_PROJECT_DIR/bin/tools/CleanFunctions
 cd $casePath/CFD
 cleanCase
 rm -r $casePath/CFD/clockData
-rm -r $casePath/DEM/post/*
-(cd $casePath/DEM/post && touch dummy)
+rm -r $casePath/DEM/post/*.*
+rm -r $casePath/DEM/post/restart/*.*
+touch $casePath/DEM/post/.gitignore
+touch $casePath/DEM/post/restart/.gitignore
 echo "done"
