@@ -20,11 +20,18 @@ else
     blockMesh
 fi
 
+if [ -f "$casePath/DEM/post/restart/liggghts.restart" ];  then
+    echo "LIGGGHTS init was run before - using existing restart file"
+else
+    #- run DEM in new terminal
+    $casePath/DEMrun.sh
+fi
+
 #-------------------------------------------------------#
 # adapt settings for init run
-cp $casePath/CFD/constant/liggghtsCommands_init $casePath/CFD/constant/liggghtsCommands
-cp $casePath/CFD/constant/couplingProperties_init $casePath/CFD/constant/couplingProperties
-cp $casePath/CFD/system/controlDict_init $casePath/CFD/system/controlDict
+cp $casePath/CFD/constant/liggghtsCommands_run $casePath/CFD/constant/liggghtsCommands
+cp $casePath/CFD/constant/couplingProperties_run $casePath/CFD/constant/couplingProperties
+cp $casePath/CFD/system/controlDict_run $casePath/CFD/system/controlDict
 #-------------------------------------------------------#
 
 #- run parallel CFD-DEM in new terminal
@@ -102,7 +109,8 @@ source $WM_PROJECT_DIR/bin/tools/CleanFunctions
 cd $casePath/CFD
 cleanCase
 rm -r $casePath/CFD/clockData
-rm -r $casePath/DEM/post/*
-rm $casePath/DEM/liggghts.restartCFDEM*
-(cd $casePath/DEM/post && touch dummy)
+rm -r $casePath/DEM/post/*.*
+rm -r $casePath/DEM/post/restart/*.*
+touch $casePath/DEM/post/.gitignore
+touch $casePath/DEM/post/restart/.gitignore
 echo "done"

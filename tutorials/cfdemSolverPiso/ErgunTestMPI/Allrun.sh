@@ -2,18 +2,15 @@
 
 #===================================================================#
 # allrun script for testcase as part of test routine 
-# run ErgunTestMPI
-# Christoph Goniva - June 2014
+# run settlingTest
+# Christoph Goniva - Sept. 2010
 #===================================================================#
 
 #- define variables
 casePath="$(dirname "$(readlink -f ${BASH_SOURCE[0]})")"
 
-#- include functions
-source $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/functions.sh
-
 # check if mesh was built
-if [ -f "$casePath/CFD/constant/polyMesh/points" ]; then
+if [ -d "$casePath/CFD/constant/polyMesh/boundary" ]; then
     echo "mesh was built before - using old mesh"
 else
     echo "mesh needs to be built"
@@ -21,27 +18,11 @@ else
     blockMesh
 fi
 
-# check if DEM case was run
-if [ -f "$casePath/DEM/liggghts.restart" ]; then
-    echo "DEM restart file found"
+if [ -f "$casePath/DEM/post/restart/liggghts.restart" ];  then
+    echo "LIGGGHTS init was run before - using existing restart file"
 else
-    echo "starting DEM run..."
-    #--------------------------------------------------------------------------------#
-    #- define variables
-    logpath="$casePath"
-    headerText="run_liggghts_ErgunTestMPI_DEM"
-    logfileName="log_$headerText"
-    solverName="in.liggghts_init"
-    nrProcs=4
-    machineFileName="none"
-    debugMode="off"
-    #--------------------------------------------------------------------------------#
-
-    #- clean up case
-    rm -r $casePath/DEM/post/*
-
-    #- call function to run DEM case
-    parDEMrun $logpath $logfileName $casePath $headerText $solverName $nrProcs $machineFileName $debugMode
+    #- run DEM in new terminal
+    $casePath/DEMrun.sh
 fi
 
 #- run parallel CFD-DEM in new terminal

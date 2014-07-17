@@ -93,15 +93,15 @@ cfdemCloudMS::cfdemCloudMS
 
 cfdemCloudMS::~cfdemCloudMS()
 {
-    delete positionsCM_;
-    delete velocitiesCM_;
-    delete cellIDsCM_;
-    delete bodies_;
-    delete nrigids_;
-    delete clumpType_;
-    delete clumpVol_;
-    delete clumpDH_;
-    delete clumpWeights_;
+    dataExchangeM().destroy(positionsCM_,3);
+    dataExchangeM().destroy(velocitiesCM_,3);
+    dataExchangeM().destroy(cellIDsCM_,1);
+    dataExchangeM().destroy(bodies_,1);
+    dataExchangeM().destroy(nrigids_,1);
+    dataExchangeM().destroy(clumpType_,1);
+    dataExchangeM().destroy(clumpVol_,1);
+    dataExchangeM().destroy(clumpDH_,1);
+    dataExchangeM().destroy(clumpWeights_,1);
     //delete exCM_;
     //delete eyCM_;
     //delete ezCM_;
@@ -109,9 +109,9 @@ cfdemCloudMS::~cfdemCloudMS()
     //delete scalingCM_;
     //delete Cclump_ex_;
     //delete Cclump_ey_;
-    delete impForcesCM_;
-    delete expForcesCM_;
-    delete DEMForcesCM_;
+    dataExchangeM().destroy(impForcesCM_,3);
+    dataExchangeM().destroy(expForcesCM_,3);
+    dataExchangeM().destroy(DEMForcesCM_,3);
 }
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
@@ -137,7 +137,6 @@ void cfdemCloudMS::getDEMdata()
         typeDH[k][0]=pow(typeVol_[k]*1.9099,1./3.); // 6/pi=1.9099 // calc a hydraulic diameter as d of vol equal sphere
 
     int ct(0);
-    double dh(0);
     for(int ind = 0;ind < numberOfClumps(); ind++)
     {
         ct=clumpType()[0][ind];
@@ -147,7 +146,7 @@ void cfdemCloudMS::getDEMdata()
         //Info << "clumpVol()[ind][0]=" << clumpVol()[ind][0] << endl;
         //Info << "clumpDH()[ind][0]=" << clumpDH()[ind][0] << endl;
     }
-    delete typeDH;
+    dataExchangeM().destroy(typeDH,1);
     // --
 
     //dataExchangeM().getData("ex_space","vector-multisphere",exCM_);     // axis of inertia

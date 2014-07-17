@@ -598,7 +598,7 @@ bool Foam::cfdemCloud::reAllocArrays() const
         dataExchangeM().allocateArray(Cds_,0.,1);
         dataExchangeM().allocateArray(radii_,0.,1);
         dataExchangeM().allocateArray(voidfractions_,1.,voidFractionM().maxCellsPerParticle());
-        dataExchangeM().allocateArray(cellIDs_,0.,voidFractionM().maxCellsPerParticle());
+        dataExchangeM().allocateArray(cellIDs_,-1.,voidFractionM().maxCellsPerParticle());
         dataExchangeM().allocateArray(particleWeights_,0.,voidFractionM().maxCellsPerParticle());
         dataExchangeM().allocateArray(particleVolumes_,0.,voidFractionM().maxCellsPerParticle());
         arraysReallocated_ = true;

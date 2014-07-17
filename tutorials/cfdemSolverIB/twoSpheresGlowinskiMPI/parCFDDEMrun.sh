@@ -45,7 +45,7 @@ if [ $postproc == "true" ]
   then
     #- get VTK data from liggghts dump file
     cd $casePath/DEM/post
-    python -i $CFDEM_LPP_DIR/lpp.py  dump.liggghts_init
+    python -i $CFDEM_LPP_DIR/lpp.py  dump.liggghts_run
 
     #- get VTK data from CFD sim
     cd $casePath/CFD
@@ -79,6 +79,6 @@ rm -r $casePath/log_*
 echo "done"
 
 #- preserve post directory
-echo "dummyfile" >> $casePath/DEM/post/dummy
+touch $casePath/DEM/post/.gitignore
 
 

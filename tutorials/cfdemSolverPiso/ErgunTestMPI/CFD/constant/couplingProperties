@@ -228,11 +228,11 @@ dividedProps
 
 twoWayMPIProps
 {
-    liggghtsPath "../DEM/in.liggghts_resume";
+    liggghtsPath "../DEM/in.liggghts_run";
 }
 twoWayM2MProps
 {
     maxNumberOfParticles 10100;
-    liggghtsPath "../DEM/in.liggghts_resume";
+    liggghtsPath "../DEM/in.liggghts_run";
 }
 // ************************************************************************* //

@@ -42,7 +42,13 @@ inline label Foam::cfdemCloudMS::body(int index)
 inline double cfdemCloudMS::particleVolume(int index)
 {
     int ind = body(index); // particle to clump ID
-    double Vp(clumpVol_[ind][0]);
+
+    double Vp(SMALL);
+    if(ind >= 0 && ind <numberOfClumps())
+        Vp=clumpVol_[ind][0];
+    else
+        Warning << "ind=" << ind << endl;
+    
     int nR(nrigid(ind));
     if(nR>0) Vp/=nR;
     return Vp;

@@ -93,6 +93,7 @@ DiFeliceDragMS::DiFeliceDragMS
     {
         Info << "using interpolated value of U." << endl;
         interpolation_=true;
+        Warning << " interpolation is commented for this force model - it seems to be unstable with AMI!" << endl;
     }
     if (propsDict_.found("splitImplicitExplicit"))
     {
@@ -141,8 +142,8 @@ void DiFeliceDragMS::setForce() const
     vector dragExplicit(0,0,0);
   	scalar dragCoefficient(0);
 
-    interpolationCellPoint<scalar> voidfractionInterpolator_(voidfraction_);
-    interpolationCellPoint<vector> UInterpolator_(U_);
+    //interpolationCellPoint<scalar> voidfractionInterpolator_(voidfraction_);
+    //interpolationCellPoint<vector> UInterpolator_(U_);
 
     #include "setupProbeModel.H"
 
@@ -157,16 +158,19 @@ void DiFeliceDragMS::setForce() const
 
             if (cellI > -1) // particle Found
             {
-                if(interpolation_)
-                {
-                    position = cloudRefMS().positionCM(index);
-                    voidfraction = voidfractionInterpolator_.interpolate(position,cellI);
-                    Ufluid = UInterpolator_.interpolate(position,cellI);
-                }else
+                //if(interpolation_)
+                //{
+                //    position = cloudRefMS().positionCM(index);
+                //    voidfraction = voidfractionInterpolator_.interpolate(position,cellI);
+                //    Ufluid = UInterpolator_.interpolate(position,cellI);
+                //}else
                 {
                     voidfraction = voidfraction_[cellI];
                     Ufluid = U_[cellI];
                 }
+                //Ensure void fraction to be meaningful
+                if(voidfraction>1.00) voidfraction = 1.00;
+                if(voidfraction<0.40) voidfraction = 0.40;
 
                 Us = cloudRefMS().velocityCM(index);
                 Ur = Ufluid-Us;
@@ -178,7 +182,7 @@ void DiFeliceDragMS::setForce() const
                 Cd = 0;
                 dragCoefficient = 0;
 
-                if (magUr > SMALL)
+                if (magUr > SMALL && ds > SMALL)
                 {
 
                     // calc particle Re Nr

@@ -143,6 +143,9 @@ alias cfdemCompCFDEMuti 'bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/compil
 #- shortcut to test basic tutorials
 alias cfdemTestTUT 'bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/testTutorials.sh'
 
+#- shortcut to visualize the clock model data
+alias vizClock 'python $CFDEM_UT_DIR/vizClock/matPlot.py'
+
 #- shortcut to run liggghts in serial
 alias cfdemLiggghts '$CFDEM_LIGGGHTS_SRC_DIR/lmp_$CFDEM_LIGGGHTS_MAKEFILE_NAME'
 

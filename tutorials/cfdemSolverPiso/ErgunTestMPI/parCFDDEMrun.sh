@@ -62,7 +62,7 @@ if [ $postproc == "true" ]
 
     #- get VTK data from liggghts dump file
     cd $casePath/DEM/post
-    python -i $CFDEM_LPP_DIR/lpp.py dump*.liggghts_restart
+    python -i $CFDEM_LPP_DIR/lpp.py dump*.liggghts_run
 
     #- get VTK data from CFD sim
     cd $casePath/CFD
@@ -86,6 +86,8 @@ source $WM_PROJECT_DIR/bin/tools/CleanFunctions
 cd $casePath/CFD
 cleanCase
 rm -r $casePath/CFD/clockData
-rm -r $casePath/DEM/post/*
-(cd $casePath/DEM/post && touch dummy)
+rm -r $casePath/DEM/post/*.*
+rm -r $casePath/DEM/post/restart/*.*
+touch $casePath/DEM/post/.gitignore
+touch $casePath/DEM/post/restart/.gitignore
 echo "done"

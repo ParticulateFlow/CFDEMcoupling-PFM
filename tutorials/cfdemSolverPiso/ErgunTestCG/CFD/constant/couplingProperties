@@ -149,6 +149,7 @@ GidaspowDragProps
     velFieldName "U";
     densityFieldName "rho";
     voidfractionFieldName "voidfraction";
+    granVelFieldName "Us";
     phi 1;
     //interpolation; // this case does not like interpolation
     implDEM_;

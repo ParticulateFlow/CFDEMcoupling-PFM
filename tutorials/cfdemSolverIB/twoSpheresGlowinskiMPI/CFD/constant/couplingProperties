@@ -91,7 +91,7 @@ twoWayFilesProps
 twoWayMPIProps
 {
     maxNumberOfParticles 10100;
-    liggghtsPath "../DEM/in.liggghts_init";
+    liggghtsPath "../DEM/in.liggghts_run";
 }
 
 IBProps

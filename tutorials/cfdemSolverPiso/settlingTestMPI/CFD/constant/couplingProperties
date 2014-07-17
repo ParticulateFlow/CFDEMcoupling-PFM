@@ -48,7 +48,7 @@ averagingModel dense;//dilute;//
 
 clockModel off; //standardClock;//
 
-smoothingModel  off;//constDiffSmoothing; //
+smoothingModel  constDiffSmoothing; //off;//
 
 //useDDTvoidfraction;
 
@@ -137,7 +137,7 @@ oneWayVTKProps
 
 twoWayMPIProps
 {
-    liggghtsPath "../DEM/in.liggghts_init";
+    liggghtsPath "../DEM/in.liggghts_run";
 }
 
 twoWayFilesProps
@@ -166,7 +166,7 @@ bigParticleProps
 
 engineProps
 {
-        treeSearch true;
+    treeSearch true;
 }
 
 // ************************************************************************* //
