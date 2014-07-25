@@ -22,7 +22,7 @@ if [ -f "$casePath/DEM/post/restart/liggghts.restart" ];  then
     echo "LIGGGHTS init was run before - using existing restart file"
 else
     #- run DEM
-    $casePath/DEMrun.sh
+    $casePath/parDEMrun.sh
 fi
 
 #- run parallel CFD-DEM in new terminal

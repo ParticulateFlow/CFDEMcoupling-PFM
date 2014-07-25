@@ -88,7 +88,16 @@ DiFeliceDragMS::DiFeliceDragMS
     particleCloud_.probeM().writeHeader();
 
     if (propsDict_.found("verbose")) verbose_=true;
-    if (propsDict_.found("treatExplicit")) treatExplicit_=true;
+
+    // init force sub model
+    setForceSubModels(propsDict_);
+
+    // define switches which can be read from dict
+    forceSubM(0).setSwitchesList(0,true); // activate treatExplicit switch
+
+    // read those switches defined above, if provided in dict
+    forceSubM(0).readSwitches();
+
     if (propsDict_.found("interpolation"))
     {
         Info << "using interpolated value of U." << endl;
@@ -246,7 +255,7 @@ void DiFeliceDragMS::setForce() const
                 }
             }
             // set force on bodies
-            if(treatExplicit_) for(int j=0;j<3;j++) cloudRefMS().expForcesCM()[index][j] += drag[j];
+            if(forceSubM(0).switches()[0]) for(int j=0;j<3;j++) cloudRefMS().expForcesCM()[index][j] += drag[j];
             else   //implicit treatment, taking explicit force contribution into account
             {
                 for(int j=0;j<3;j++)

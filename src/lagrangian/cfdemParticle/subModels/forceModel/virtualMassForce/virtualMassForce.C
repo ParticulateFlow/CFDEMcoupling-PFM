@@ -77,7 +77,16 @@ virtualMassForce::virtualMassForce
         // get memory for 2d array
         particleCloud_.dataExchangeM().allocateArray(UrelOld_,0.,3);
     }
-    if (propsDict_.found("treatExplicit")) treatExplicit_=true;
+
+    // init force sub model
+    setForceSubModels(propsDict_);
+
+    // define switches which can be read from dict
+    forceSubM(0).setSwitchesList(0,true); // activate treatExplicit switch
+
+    // read those switches defined above, if provided in dict
+    forceSubM(0).readSwitches();
+
     particleCloud_.checkCG(true);
 
     //Append the field names to be probed
@@ -146,10 +155,9 @@ void virtualMassForce::setForce() const
                     particleCloud_.probeM().writeProbe(index, sValues, vValues);
                 }
             }
-            // set force on particle
-            if(treatExplicit_) for(int j=0;j<3;j++) expForces()[index][j] += virtualMassForce[j];
-            else  for(int j=0;j<3;j++) impForces()[index][j] += virtualMassForce[j];
-            for(int j=0;j<3;j++) DEMForces()[index][j] += virtualMassForce[j];
+
+            // write particle based data to global array
+            forceSubM(0).partToArray(index,virtualMassForce,vector::zero);
         //}
     }
 

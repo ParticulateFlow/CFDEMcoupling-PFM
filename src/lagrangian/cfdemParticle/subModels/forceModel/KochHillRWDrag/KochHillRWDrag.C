@@ -71,6 +71,8 @@ KochHillRWDrag::KochHillRWDrag
     rho_(sm.mesh().lookupObject<volScalarField> (densityFieldName_)),
     voidfractionFieldName_(propsDict_.lookup("voidfractionFieldName")),
     voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
+    UsFieldName_(propsDict_.lookupOrDefault("granVelFieldName",word("Us"))),
+    UsField_(sm.mesh().lookupObject<volVectorField> (UsFieldName_)),
     interpolation_(false),
     scale_(1.),
     randomTauE_(false),
@@ -80,16 +82,19 @@ KochHillRWDrag::KochHillRWDrag
 {
 
     if (propsDict_.found("verbose")) verbose_=true;
-    if (propsDict_.found("treatExplicit")) treatExplicit_=true;
     if (propsDict_.found("interpolation")) interpolation_=true;
     if (propsDict_.found("randomTauE")) randomTauE_=true;
-    if (propsDict_.found("implDEM"))
-    {
-        treatExplicit_=false;
-        implDEM_=true;
-        setImpDEMdrag();
-        Info << "Using implicit DEM drag formulation." << endl;
-    }
+
+    // init force sub model
+    setForceSubModels(propsDict_);
+
+    // define switches which can be read from dict
+    forceSubM(0).setSwitchesList(0,true); // activate treatExplicit switch
+    forceSubM(0).setSwitchesList(2,true); // activate implDEM switch
+
+    // read those switches defined above, if provided in dict
+    forceSubM(0).readSwitches();
+
     particleCloud_.checkCG(true);
 
     if (propsDict_.found("scale"))
@@ -162,6 +167,8 @@ void KochHillRWDrag::setForce() const
     scalar voidfraction(1);
     vector Ufluid(0,0,0);
     vector drag(0,0,0);
+    vector dragExplicit(0,0,0);
+    scalar dragCoefficient(0);
     label cellI=0;
 
     vector Us(0,0,0);
@@ -211,12 +218,13 @@ void KochHillRWDrag::setForce() const
         //{
             cellI = particleCloud_.cellIDs()[index][0];
             drag = vector(0,0,0);
+            dragExplicit = vector(0,0,0);
+            dragCoefficient=0;
             betaP = 0;
             Vs = 0;
             Ufluid =vector(0,0,0);
 
             // Pout << "RW-TEST: cellI = " << cellI << endl; // TEST-Output
-Info << "haha1" << endl;
             if (cellI > -1) // particle Found
             {
                 if(interpolation_)
@@ -285,7 +293,6 @@ Info << "haha1" << endl;
                     } else {
                       minDeltaT = timeE;
                     }
-Info << "haha3" << endl;
                     //Pout << "RW-TEST: timeE = " << timeE << " timeCR = " << timeCr << endl; // TEST-Output
 
                     // calculate time step of next update
@@ -300,11 +307,9 @@ Info << "haha3" << endl;
                         //Pout << "RW-TEST: Ufluid[" << dim << "] = " << Ufluid[dim] << " Ufluct = " << partUfluct_[index][dim] << " k = " << k << endl; // TEST-Output
                         Ufluid[dim] = Ufluid[dim] + partUfluct_[index][dim];
                     }
-Info << "haha4" << endl;
                 }
                 else
                 {
-Info << "haha5" << endl;
                     // no update of the turbulent velocity part
                     // modify current fluid velocity
                     for(int dim=0;dim<3;dim++)
@@ -322,7 +327,6 @@ Info << "haha5" << endl;
 				Rep = 0;
                 Vs = ds*ds*ds*M_PI/6;
                 volumefraction = 1-voidfraction+SMALL;
-Info << "haha6" << endl;
                 if (magUr > 0)
                 {
                     // calc particle Re Nr
@@ -352,11 +356,14 @@ Info << "haha6" << endl;
                     betaP = 18.*nuf*rho/(ds/scale_*ds/scale_)*voidfraction*F;
 
                     // calc particle's drag
-                    drag = Vs*betaP*Ur;
-
+                    dragCoefficient = Vs*betaP;//*scaleDrag_;
                     if (modelType_=="B")
-                        drag /= voidfraction;
-Info << "haha7" << endl;
+                        dragCoefficient /= voidfraction;
+
+                    drag = dragCoefficient * Ur;
+
+                    // explicitInterpCorr
+                    forceSubM(0).explicitInterpCorr(dragExplicit,dragCoefficient,Ufluid,U_[cellI],Us,UsField_[cellI],verbose_);
                 }
 
                 if(verbose_ && index >=0 && index <2)
@@ -372,30 +379,11 @@ Info << "haha7" << endl;
                     Pout << "Rep = " << Rep << endl;
                     Pout << "drag = " << drag << endl;
                 }
-Info << "haha8" << endl;
             }
-Info << "haha9" << endl;
-            // set force on particle
-            if(treatExplicit_) for(int j=0;j<3;j++) expForces()[index][j] += drag[j];
-            else  for(int j=0;j<3;j++) impForces()[index][j] += drag[j];
-
-            // set Cd
-            if(implDEM_)
-            {
-                for(int j=0;j<3;j++) fluidVel()[index][j]=Ufluid[j];
-
-                if (modelType_=="B")
-                    Cds()[index][0] = Vs*betaP/voidfraction;
-                else
-                    Cds()[index][0] = Vs*betaP;
-
-            }else{
-                for(int j=0;j<3;j++) DEMForces()[index][j] += drag[j];
-            }
-Info << "haha10" << endl;
+            // write particle based data to global array
+            forceSubM(0).partToArray(index,drag,dragExplicit,Ufluid,dragCoefficient);
         //}
     }
-Info << "haha11" << endl;
 }
 
 

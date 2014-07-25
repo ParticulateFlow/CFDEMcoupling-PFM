@@ -79,7 +79,16 @@ SchillerNaumannDrag::SchillerNaumannDrag
     particleCloud_.probeM().writeHeader();
 
     if (propsDict_.found("verbose")) verbose_=true;
-    if (propsDict_.found("treatExplicit")) treatExplicit_=true;
+
+    // init force sub model
+    setForceSubModels(propsDict_);
+
+    // define switches which can be read from dict
+    forceSubM(0).setSwitchesList(0,true); // activate treatExplicit switch
+
+    // read those switches defined above, if provided in dict
+    forceSubM(0).readSwitches();
+
     particleCloud_.checkCG(false);
 }
 
@@ -163,10 +172,9 @@ void SchillerNaumannDrag::setForce() const
                     particleCloud_.probeM().writeProbe(index, sValues, vValues);
                 }
             }
-            // set force on particle
-            if(treatExplicit_) for(int j=0;j<3;j++) expForces()[index][j] += drag[j];
-            else  for(int j=0;j<3;j++) impForces()[index][j] += drag[j];
-            for(int j=0;j<3;j++) DEMForces()[index][j] += drag[j];
+
+            // write particle based data to global array
+            forceSubM(0).partToArray(index,drag,vector::zero);
         //}
     }
 

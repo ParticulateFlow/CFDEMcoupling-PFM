@@ -71,6 +71,8 @@ KochHillDrag::KochHillDrag
     rho_(sm.mesh().lookupObject<volScalarField> (densityFieldName_)),
     voidfractionFieldName_(propsDict_.lookup("voidfractionFieldName")),
     voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
+    UsFieldName_(propsDict_.lookupOrDefault("granVelFieldName",word("Us"))),
+    UsField_(sm.mesh().lookupObject<volVectorField> (UsFieldName_)),
     interpolation_(false),
     scaleDia_(1.),
     scaleDrag_(1.)
@@ -85,15 +87,18 @@ KochHillDrag::KochHillDrag
     particleCloud_.probeM().writeHeader();
 
     if (propsDict_.found("verbose")) verbose_=true;
-    if (propsDict_.found("treatExplicit")) treatExplicit_=true;
     if (propsDict_.found("interpolation")) interpolation_=true;
-    if (propsDict_.found("implDEM"))
-    {
-        treatExplicit_=false;
-        implDEM_=true;
-        setImpDEMdrag();
-        Info << "Using implicit DEM drag formulation." << endl;
-    }
+
+    // init force sub model
+    setForceSubModels(propsDict_);
+
+    // define switches which can be read from dict
+    forceSubM(0).setSwitchesList(0,true); // activate treatExplicit switch
+    forceSubM(0).setSwitchesList(2,true); // activate implDEM switch
+
+    // read those switches defined above, if provided in dict
+    forceSubM(0).readSwitches();
+
     particleCloud_.checkCG(true);
 
     if (propsDict_.found("scale"))
@@ -131,6 +136,8 @@ void KochHillDrag::setForce() const
     scalar voidfraction(1);
     vector Ufluid(0,0,0);
     vector drag(0,0,0);
+    vector dragExplicit(0,0,0);
+    scalar dragCoefficient(0);
     label cellI=0;
 
     vector Us(0,0,0);
@@ -155,6 +162,8 @@ void KochHillDrag::setForce() const
         //{
             cellI = particleCloud_.cellIDs()[index][0];
             drag = vector(0,0,0);
+            dragExplicit = vector(0,0,0);
+            dragCoefficient=0;
             betaP = 0;
             Vs = 0;
             Ufluid =vector(0,0,0);
@@ -217,10 +226,14 @@ void KochHillDrag::setForce() const
                     betaP = 18.*nuf*rho/(ds/scaleDia_*ds/scaleDia_)*voidfraction*F;
 
                     // calc particle's drag
-                    drag = Vs*betaP*Ur*scaleDrag_;
-
+                    dragCoefficient = Vs*betaP*scaleDrag_;
                     if (modelType_=="B")
-                        drag /= voidfraction;
+                        dragCoefficient /= voidfraction;
+
+                    drag = dragCoefficient * Ur;
+
+                    // explicitInterpCorr
+                    forceSubM(0).explicitInterpCorr(dragExplicit,dragCoefficient,Ufluid,U_[cellI],Us,UsField_[cellI],verbose_);
                 }
 
                 if(verbose_ && index >=0 && index <2)
@@ -251,23 +264,9 @@ void KochHillDrag::setForce() const
                     particleCloud_.probeM().writeProbe(index, sValues, vValues);
                 }    
             }
-            // set force on particle
-            if(treatExplicit_) for(int j=0;j<3;j++) expForces()[index][j] += drag[j];
-            else  for(int j=0;j<3;j++) impForces()[index][j] += drag[j];
 
-            // set Cd
-            if(implDEM_)
-            {
-                for(int j=0;j<3;j++) fluidVel()[index][j]=Ufluid[j];
-
-                if (modelType_=="B" && cellI > -1)
-                    Cds()[index][0] = Vs*betaP/voidfraction*scaleDrag_;
-                else
-                    Cds()[index][0] = Vs*betaP*scaleDrag_;
-
-            }else{
-                for(int j=0;j<3;j++) DEMForces()[index][j] += drag[j];
-            }
+            // write particle based data to global array
+            forceSubM(0).partToArray(index,drag,dragExplicit,Ufluid,dragCoefficient);
 
         //}
     }

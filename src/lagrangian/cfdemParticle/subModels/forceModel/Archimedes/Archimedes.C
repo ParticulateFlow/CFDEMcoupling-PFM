@@ -86,13 +86,22 @@ Archimedes::Archimedes
         Info << "2-dimensional simulation - make sure DEM side is 2D" << endl;
     }
 
-    if (propsDict_.found("treatExplicit")) treatExplicit_=true;
+    // init force sub model
+    setForceSubModels(propsDict_);
+
+    // define switches which can be read from dict
+    forceSubM(0).setSwitchesList(0,true); // activate treatExplicit switch
+    forceSubM(0).setSwitchesList(1,true); // activate treatDEM switch
+
+    // read those switches defined above, if provided in dict
+    forceSubM(0).readSwitches();
+
     if (modelType_=="A"){
-        treatDEM_=true;
+        forceSubM(0).setSwitches(1,true); // treatDEM = true
         Info << "accounting for Archimedes only on DEM side!" << endl;
     }
     if (modelType_=="B"){
-        treatDEM_=false;
+        forceSubM(0).setSwitches(1,false); // treatDEM = false
         Info << "accounting for Archimedes on DEM and CFD side!" << endl;
     }
 
@@ -143,14 +152,8 @@ void Archimedes::setForce() const
                 }
             }
 
-            if(!treatDEM_)
-            {         
-                if(treatExplicit_)
-                    for(int j=0;j<3;j++) expForces()[index][j] += force[j];
-                else
-                    for(int j=0;j<3;j++) impForces()[index][j] += force[j];
-            }
-            for(int j=0;j<3;j++) DEMForces()[index][j] += force[j];
+            // write particle based data to global array
+            forceSubM(0).partToArray(index,force,vector::zero);
         //}
     }
 }

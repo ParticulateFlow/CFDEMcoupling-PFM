@@ -56,9 +56,9 @@ forceModel::forceModel
 :
     dict_(dict),
     particleCloud_(sm),
-    treatExplicit_(false),
-    treatDEM_(false),
-    implDEM_(false),
+    //treatExplicit_(false),
+    //treatDEM_(false),
+    //implDEM_(false),
     impParticleForces_
     (   IOobject
         (
@@ -86,7 +86,9 @@ forceModel::forceModel
     coupleForce_(true),
     modelType_(sm.modelType()),
     probeIt_(sm.probeM().active()),
-    requiresEx_(false)
+    requiresEx_(false),
+    forceSubModels_(wordList(0)),
+    forceSubModel_(new autoPtr<forceSubModel>[nrForceSubModels()])
 {}
 
 
@@ -165,6 +167,29 @@ void forceModel::treatVoidCells() const
   }
 }
 
+void forceModel::setForceSubModels(dictionary& dict)
+{
+    if (dict.found("forceSubModels"))
+        forceSubModels_ = wordList(dict.lookup("forceSubModels"));
+    else{
+        forceSubModels_ = wordList(1);
+        forceSubModels_[0] = "ImEx";
+    }
+
+    delete[] forceSubModel_;
+    forceSubModel_ = new autoPtr<forceSubModel>[nrForceSubModels()];
+    Info << "nrForceSubModels()=" << nrForceSubModels() << endl;
+    for (int i=0;i<nrForceSubModels();i++)
+    {
+        forceSubModel_[i] = forceSubModel::New
+        (
+            dict,
+            particleCloud_,
+            *this,
+            forceSubModels_[i]
+        );
+    }
+}
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam

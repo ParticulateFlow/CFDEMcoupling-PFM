@@ -24,7 +24,7 @@ if [ -f "$casePath/DEM/post/restart/liggghts.restart" ];  then
     echo "LIGGGHTS init was run before - using existing restart file"
 else
     #- run DEM in new terminal
-    $casePath/DEMrun.sh
+    $casePath/parDEMrun.sh
 fi
 
 #-------------------------------------------------------#
@@ -110,7 +110,7 @@ cd $casePath/CFD
 cleanCase
 rm -r $casePath/CFD/clockData
 rm -r $casePath/DEM/post/*.*
-rm -r $casePath/DEM/post/restart/*.*
+#rm -r $casePath/DEM/post/restart/*.*
 touch $casePath/DEM/post/.gitignore
 touch $casePath/DEM/post/restart/.gitignore
 echo "done"

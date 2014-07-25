@@ -78,6 +78,10 @@ private:
 
     const volScalarField& voidfraction_;
 
+    word UsFieldName_;   
+
+    const volVectorField& UsField_; 
+
     bool interpolation_; // use interpolated field values
 
     mutable scalar scaleDia_;

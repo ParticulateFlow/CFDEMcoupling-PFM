@@ -149,9 +149,12 @@ GidaspowDragProps
 }
 DiFeliceDragProps
 {
+    //verbose;
     velFieldName "U";
     densityFieldName "rho";
     voidfractionFieldName "voidfraction";
+    granVelFieldName "Us";
+    interpolation;
 }
 
 KochHillDragProps
@@ -161,6 +164,12 @@ KochHillDragProps
     densityFieldName "rho";
     voidfractionFieldName "voidfraction";
     interpolation;
+    //forceSubModels
+    //(
+    //    ImExCorr
+    //);
+    //implDEM true;
+    //explicitInterpCorr true;
 }
 
 BeetstraDragProps

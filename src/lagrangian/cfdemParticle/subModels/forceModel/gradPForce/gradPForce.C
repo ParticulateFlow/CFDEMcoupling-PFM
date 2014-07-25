@@ -74,16 +74,26 @@ gradPForce::gradPForce
     addedMassCoeff_(0.0),
     interpolation_(false)
 {
+    if (propsDict_.found("verbose")) verbose_=true;
+
+    // init force sub model
+    setForceSubModels(propsDict_);
+
+    // define switches which can be read from dict
+    forceSubM(0).setSwitchesList(0,true); // activate treatExplicit switch
+
+    // read those switches defined above, if provided in dict
+    forceSubM(0).readSwitches();
+
     if (modelType_ == "B")
     {
         FatalError <<"using  model gradPForce with model type B is not valid\n" << abort(FatalError);
     }else
     {
-        treatDEM_=true;
+        forceSubM(0).setSwitches(1,true); // treatDEM = true
         Info << "gradPForce is applied only to DEM side" << endl;
     }
-    if (propsDict_.found("verbose")) verbose_=true;
-    if (propsDict_.found("treatExplicit")) treatExplicit_=true;
+
     if (propsDict_.found("useU")) useU_=true;
     if (propsDict_.found("useAddedMass")) 
     {
@@ -131,7 +141,6 @@ void gradPForce::setForce() const
             gradPField = fvc::grad(0.5*rho_*U2);
     }*/
     vector gradP;
-    scalar ds;
     scalar Vs;
     scalar rho;
     vector position;
@@ -188,12 +197,8 @@ void gradPForce::setForce() const
                 }
             }
 
-            // set force on particle
-            if(!treatDEM_){
-                if(!treatExplicit_) for(int j=0;j<3;j++) impForces()[index][j] += force[j];
-                else  for(int j=0;j<3;j++) expForces()[index][j] += force[j];
-            }
-            for(int j=0;j<3;j++) DEMForces()[index][j] += force[j];
+            // write particle based data to global array
+            forceSubM(0).partToArray(index,force,vector::zero);
 
         //}
     }

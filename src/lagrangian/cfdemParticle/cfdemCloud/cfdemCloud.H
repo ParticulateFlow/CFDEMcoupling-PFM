@@ -202,6 +202,7 @@ public:
     friend class dataExchangeModel;
     friend class voidFractionModel;
     friend class forceModel;
+    friend class forceSubModel;
 
 // Constructors
 

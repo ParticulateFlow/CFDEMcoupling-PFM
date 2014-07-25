@@ -226,6 +226,10 @@ Reasonable example settings for the "liggghtsCommands" dictionary are given in t
 
 
 
+
+
+
+
 1.6 Models/Solvers :h4,link(cmd_5),link(comm)
 
 This section lists all CFDEMcoupling sub-models and solvers alphabetically, with a separate
@@ -267,6 +271,9 @@ listing below of styles within certain commands.
 "forceModel_particleCellVolume"_forceModel_particleCellVolume.html,
 "forceModel_virtualMassForce"_forceModel_virtualMassForce.html,
 "forceModel_viscForce"_forceModel_viscForce.html,
+"forceSubModel"_forceSubModel.html,
+"forceSubModel_ImEx"_forceSubModel_ImEx.html,
+"forceSubModel_ImExCorr"_forceSubModel_ImExCorr.html,
 "liggghtsCommandModel"_liggghtsCommandModel.html,
 "liggghtsCommandModel_execute"_liggghtsCommandModel_execute.html,
 "liggghtsCommandModel_readLiggghtsData"_liggghtsCommandModel_readLiggghtsData.html,

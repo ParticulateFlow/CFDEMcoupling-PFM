@@ -79,6 +79,10 @@ private:
 
     const volScalarField& voidfraction_;
 
+    word UsFieldName_;   
+
+    const volVectorField& UsField_;  // the average particle velocity field
+
     bool interpolation_; // use interpolated field values
 
     mutable scalar scale_;
