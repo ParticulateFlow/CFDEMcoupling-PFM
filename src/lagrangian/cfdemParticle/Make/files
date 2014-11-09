@@ -1,6 +1,7 @@
 cfdemCloud = cfdemCloud
 forceModels = subModels/forceModel
 forceModelsMS = subModels/forceModelMS
+forceSubModels = subModels/forceModel/forceSubModels
 IOModels = subModels/IOModel
 voidFractionModels = subModels/voidFractionModel
 locateModels = subModels/locateModel
@@ -39,6 +40,9 @@ $(forceModels)/MeiLift/MeiLift.C
 $(forceModels)/particleCellVolume/particleCellVolume.C
 $(forceModels)/fieldTimeAverage/fieldTimeAverage.C
 $(forceModels)/volWeightedAverage/volWeightedAverage.C
+
+$(forceSubModels)/forceSubModel/newForceSubModel.C
+$(forceSubModels)/forceSubModel/forceSubModel.C
 
 $(forceModelsMS)/forceModelMS/forceModelMS.C
 $(forceModelsMS)/forceModelMS/newForceModelMS.C
