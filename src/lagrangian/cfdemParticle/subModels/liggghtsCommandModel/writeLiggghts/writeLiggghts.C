@@ -67,7 +67,7 @@ writeLiggghts::writeLiggghts
     path_(word("..")/word("DEM")),
     writeName_("liggghts.restartCFDEM"),
     writeLast_(true),
-    overwrite_(true)
+    overwrite_(false)
 {
     if (dict.found(typeName + "Props"))    
     {

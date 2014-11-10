@@ -122,7 +122,7 @@ public:
 
 
     // public member functions
-        virtual void setvoidFraction(double** const&,double**&,double**&,double**&) const = 0;
+        virtual void setvoidFraction(double** const&,double**&,double**&,double**&,double**&) const = 0;
 
         tmp<volScalarField> voidFractionInterp() const;
 

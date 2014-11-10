@@ -62,13 +62,9 @@ viscForce::viscForce
 :
     forceModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
-    verbose_(false),
     velocityFieldName_(propsDict_.lookup("velocityFieldName")),
     U_(sm.mesh().lookupObject<volVectorField> (velocityFieldName_)),
-    densityFieldName_(propsDict_.lookup("densityFieldName")),
-    rho_(sm.mesh().lookupObject<volScalarField> (densityFieldName_)),
-    addedMassCoeff_(0.0),
-    interpolation_(false)
+    addedMassCoeff_(0.0)
 {
 
     // init force sub model
@@ -76,6 +72,9 @@ viscForce::viscForce
 
     // define switches which can be read from dict
     forceSubM(0).setSwitchesList(0,true); // activate treatExplicit switch
+    forceSubM(0).setSwitchesList(1,true); // activate treatForceDEM switch
+    forceSubM(0).setSwitchesList(4,true); // activate search for interpolate switch
+    forceSubM(0).setSwitchesList(8,true); // activate scalarViscosity switch
 
     // read those switches defined above, if provided in dict
     forceSubM(0).readSwitches();
@@ -83,12 +82,22 @@ viscForce::viscForce
     if (modelType_ == "B")
     {
         FatalError <<"using  model viscForce with model type B is not valid\n" << abort(FatalError);
-    }else
+    }else if (modelType_ == "Bfull")
     {
-        forceSubM(0).setSwitches(1,true); // treatDEM = true
-        Info << "viscForce is applied only to DEM side" << endl;
+        if(forceSubM(0).switches()[1])
+        {
+            Info << "Using treatForceDEM false!" << endl;
+            forceSubM(0).setSwitches(1,false); // treatForceDEM = false
+        }
+
+    }else // modelType_=="A"
+    {
+        if(!forceSubM(0).switches()[1])
+        {
+            Info << "Using treatForceDEM true!" << endl;
+            forceSubM(0).setSwitches(1,true); // treatForceDEM = true
+        }
     }
-    if (propsDict_.found("verbose")) verbose_=true;
 
     if (propsDict_.found("useAddedMass")) 
     {
@@ -97,11 +106,6 @@ viscForce::viscForce
         Info << "WARNING: use fix nve/sphere/addedMass in LIGGGHTS input script to correctly account for added mass effects!" << endl;
     }
 
-    if (propsDict_.found("interpolation"))
-    {
-        Info << "using interpolated value of pressure gradient." << endl;
-        interpolation_=true;
-    }
     particleCloud_.checkCG(true);
 
     //Append the field names to be probed
@@ -122,22 +126,20 @@ viscForce::~viscForce()
 
 void viscForce::setForce() const
 {
+    const volScalarField& nufField = forceSubM(0).nuField();
+    const volScalarField& rhoField = forceSubM(0).rhoField();
 
     // get viscosity field
     #ifdef comp
-        const volScalarField& mufField = particleCloud_.turbulence().mu();
-
         // calc div(Tau)
         volVectorField divTauField =
-        - fvc::laplacian(mufField, U_)
-        - fvc::div(mufField*dev(fvc::grad(U_)().T()));
+        - fvc::laplacian(forceSubM(0).muField(), U_)
+        - fvc::div(forceSubM(0).muField()*dev(fvc::grad(U_)().T()));
     #else
-        const volScalarField& nufField = particleCloud_.turbulence().nu();
-
         // calc div(Tau)
         volVectorField divTauField =
-        - fvc::laplacian(nufField*rho_, U_)
-        - fvc::div(nufField*rho_*dev(fvc::grad(U_)().T()));
+        - fvc::laplacian(nufField*rhoField, U_)
+        - fvc::div(nufField*rhoField*dev(fvc::grad(U_)().T()));
     #endif
 
     vector divTau;
@@ -162,7 +164,7 @@ void viscForce::setForce() const
 
                 position = particleCloud_.position(index);
 
-                if(interpolation_) // use intepolated values for alpha (normally off!!!)
+                if(forceSubM(0).interpolation()) // use intepolated values for alpha (normally off!!!)
                 {
                     divTau = divTauInterpolator_.interpolate(position,cellI);
                 }else
@@ -176,7 +178,7 @@ void viscForce::setForce() const
                 // to the generalized buoyancy force
                 force = -Vs*divTau*(1.0+addedMassCoeff_);
 
-                if(verbose_ && index >0 && index <2)
+                if(forceSubM(0).verbose() && index >0 && index <2)
                 {
                     Info << "index = " << index << endl;
                     Info << "gradP = " << divTau << endl;

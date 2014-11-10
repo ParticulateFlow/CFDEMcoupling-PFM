@@ -2,15 +2,18 @@
 
 #===================================================================#
 # allrun script for testcase as part of test routine 
-# run settlingTest
+# run ErgunTestCG
 # Christoph Goniva - Sept. 2010
 #===================================================================#
 
 #- define variables
 casePath="$(dirname "$(readlink -f ${BASH_SOURCE[0]})")"
 
+#- include functions
+source $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/functions.sh
+
 # check if mesh was built
-if [ -d "$casePath/CFD/constant/polyMesh/boundary" ]; then
+if [ -f "$casePath/CFD/constant/polyMesh/points" ]; then
     echo "mesh was built before - using old mesh"
 else
     echo "mesh needs to be built"
@@ -18,7 +21,7 @@ else
     blockMesh
 fi
 
-if [ -f "$casePath/DEM/post/restart/liggghts.restart*" ];  then
+if [ -f "$casePath/DEM/post/restart/liggghts.restart"* ];  then
     echo "LIGGGHTS init was run before - using existing restart file"
 else
     #- run DEM in new terminal

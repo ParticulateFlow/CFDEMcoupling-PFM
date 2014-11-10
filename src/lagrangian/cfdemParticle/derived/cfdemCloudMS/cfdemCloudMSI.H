@@ -138,6 +138,21 @@ inline bool cfdemCloudMS::numberOfClumpsChanged() const
     return numberOfClumpsChanged_;
 }
 
+inline void cfdemCloudMS::setManDHdev(Switch v)
+{
+    manDHdev_ = v;
+}
+
+inline void cfdemCloudMS::setDHbyV(scalarList v)
+{
+    dHbyV_ = v;
+}
+
+inline scalarList& cfdemCloudMS::dHbyV()
+{
+    return dHbyV_;
+}
+
 inline bool cfdemCloudMS::useforcePerClump() const
 {
     return useforcePerClump_;

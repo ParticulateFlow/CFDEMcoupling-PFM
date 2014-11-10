@@ -94,7 +94,7 @@ dividedVoidFraction::~dividedVoidFraction()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfractions,double**& particleWeights,double**& particleVolumes) const
+void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfractions,double**& particleWeights,double**& particleVolumes, double**& particleV) const
 {
     reAllocArrays();
 
@@ -119,6 +119,7 @@ void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfra
                 particleWeights[index][subcell]=0;
                 particleVolumes[index][subcell]=0;
             }
+            particleV[index][0]=0;
 
             cellsPerParticle_[index][0]=1;
             position = particleCloud_.position(index);
@@ -190,6 +191,7 @@ void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfra
 
                 // store particleVolume for each particle
                 particleVolumes[index][0] += volume*centreWeight;
+                particleV[index][0] += volume*centreWeight;
 
                 /*//OUTPUT
                 if (index==0 && verbose_)

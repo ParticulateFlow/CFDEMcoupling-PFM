@@ -25,9 +25,8 @@ LaEuScalarTempProps
     partHeatFluxName "convectiveHeatFlux";
     lambda value;
     Cp value1;
-    densityFieldName "density";
-    interpolation;
-    verbose;
+    interpolation "switch1";
+    verbose "switch2";
 \}; :pre
 
 {U} = name of the finite volume fluid velocity field :ulb,l
@@ -38,9 +37,8 @@ LaEuScalarTempProps
 {convectiveHeatFlux} = name of the DEM data representing the particle-fluid convective heat flux :l
 {value} = fluid thermal conductivity \[W/(m*K)\] :l
 {value1} = fluid specific heat capacity \[W*s/(kg*K)\] :l
-{density} = name of the finite volume fluid density field :l
-{interpolation} = (optional, normally off) flag to use interpolated voidfraction and fluid velocity values :l
-{verbose} = (normally off) for verbose run :l
+{switch1} = (optional, normally off) flag to use interpolated voidfraction and fluid velocity values :l
+{switch2} = (normally off) for verbose run :l
 :ule
 
 [Examples:]
@@ -59,7 +57,6 @@ LaEuScalarTempProps
     partHeatFluxName "convectiveHeatFlux";
     lambda 0.0256;
     Cp 1007;
-    densityFieldName "rho";
 \} :pre
 
 [Description:]

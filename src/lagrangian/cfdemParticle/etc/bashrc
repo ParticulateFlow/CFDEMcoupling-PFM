@@ -37,11 +37,21 @@
 #- export environment variables (adapt to your paths)
 #------------------------------------------------------------------------------
 
+#check if default lammps lib path should be used
+if [[ $CFDEM_LAMMPS_LIB_DIR == "" ]]; then
+    export CFDEM_LAMMPS_LIB_DIR=$CFDEM_LIGGGHTS_SRC_DIR/../lib/
+else
+    echo "using already defined CFDEM_LAMMPS_LIB_DIR=$CFDEM_LAMMPS_LIB_DIR ."
+fi
+
 #- LIGGGHTS lib name
 export CFDEM_LIGGGHTS_LIB_NAME=lmp_$CFDEM_LIGGGHTS_MAKEFILE_NAME
 
 #- CFDEM lib name
 export CFDEM_LIB_NAME=lagrangianCFDEM-$CFDEM_VERSION-$WM_PROJECT_VERSION
+
+#-----------------------------------------------------
+# additional libraries
 
 #- LMP Many2Many lib path and makefile
 export CFDEM_Many2ManyLIB_PATH=$CFDEM_SRC_DIR/lagrangian/cfdemParticle/subModels/dataExchangeModel/twoWayMany2Many/library
@@ -52,8 +62,13 @@ export CFDEM_M2MLIB_PATH=$CFDEM_SRC_DIR/lagrangian/cfdemParticle/subModels/dataE
 export CFDEM_M2MLIB_MAKEFILENAME=$CFDEM_LIGGGHTS_MAKEFILE_NAME
 
 #- LMP POEMS lib path and makefile
-export CFDEM_POEMSLIB_PATH=$CFDEM_LIGGGHTS_SRC_DIR/../lib/poems
+export CFDEM_POEMSLIB_PATH=$CFDEM_LAMMPS_LIB_DIR/poems
 export CFDEM_POEMSLIB_MAKEFILENAME=g++
+
+#- LMP ASPHERE lib path and makefile
+export CFDEM_ASPHERELIB_PATH=$CFDEM_LAMMPS_LIB_DIR/poems
+export CFDEM_ASPHERELIB_MAKEFILENAME=g++
+#-----------------------------------------------------
 
 #- path to test harness
 export CFDEM_TEST_HARNESS_PATH=$CFDEM_PROJECT_USER_DIR/log/logFilesCFDEM-$CFDEM_VERSION-$WM_PROJECT_VERSION

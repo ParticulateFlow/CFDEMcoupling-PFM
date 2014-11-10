@@ -59,7 +59,6 @@ class cfdemCloudMS
     public cfdemCloud
 {
 private:
-
     mutable double **positionsCM_;
     mutable double **velocitiesCM_;
     mutable double **cellIDsCM_;
@@ -86,9 +85,10 @@ private:
 
     int numberOfClumps_;
     bool numberOfClumpsChanged_;
+    Switch manDHdev_;
+    scalarList dHbyV_;
 
     bool useforcePerClump_;
-
     const wordList forceModels_;
     autoPtr<class forceModelMS>* forceModel_;
 
@@ -153,6 +153,12 @@ public:
        inline int numberOfClumps() const;
 
        inline bool numberOfClumpsChanged() const;
+
+       inline void setManDHdev(Switch);
+
+       inline void setDHbyV(scalarList);
+
+       inline scalarList& dHbyV();
 
        inline bool useforcePerClump() const;
 

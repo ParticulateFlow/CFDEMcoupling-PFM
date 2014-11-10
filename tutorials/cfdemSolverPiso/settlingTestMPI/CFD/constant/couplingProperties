@@ -91,10 +91,13 @@ implicitCoupleProps
 DiFeliceDragProps
 {
     velFieldName "U";
-    densityFieldName "rho";
     voidfractionFieldName "voidfraction";
     granVelFieldName "Us";
-    verbose;
+    verbose true;
+    
+    //- use of scalar viscosity for drag
+    //scalarViscosity true;
+    //nu nu [ 0 2 -1 0 0 0 0 ] 1e-04;
 }
 
 SchillerNaumannDragProps
@@ -120,7 +123,6 @@ ArchimedesProps
 {
     densityFieldName "rho";
     gravityFieldName "g";
-    treatDEM;
 }
 
 virtualMassForceProps

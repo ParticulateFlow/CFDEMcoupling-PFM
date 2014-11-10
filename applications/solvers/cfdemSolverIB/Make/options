@@ -11,7 +11,6 @@ EXE_INC = \
     -I$(LIB_SRC)/dynamicMesh/dynamicFvMesh/lnInclude \
     -I$(LIB_SRC)/dynamicMesh/dynamicMesh/lnInclude \
     -I$(LIB_SRC)/fvOptions/lnInclude
-
 EXE_LIBS = \
     -L$(CFDEM_LIB_DIR)\
     -lincompressibleRASModels \
@@ -22,3 +21,4 @@ EXE_LIBS = \
     -ldynamicMesh \
     -lfvOptions \
     -l$(CFDEM_LIB_NAME)
+

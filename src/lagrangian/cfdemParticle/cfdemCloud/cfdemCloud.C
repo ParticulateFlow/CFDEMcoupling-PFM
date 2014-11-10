@@ -80,6 +80,7 @@ Foam::cfdemCloud::cfdemCloud
     positions_(NULL),
     velocities_(NULL),
     fluidVel_(NULL),
+    fAcc_(NULL),
     impForces_(NULL),
     expForces_(NULL),
     DEMForces_(NULL),
@@ -89,6 +90,7 @@ Foam::cfdemCloud::cfdemCloud
     cellIDs_(NULL),
     particleWeights_(NULL),
     particleVolumes_(NULL),
+    particleV_(NULL),
     numberOfParticles_(0),
     numberOfParticlesChanged_(false),
     arraysReallocated_(false),
@@ -99,6 +101,7 @@ Foam::cfdemCloud::cfdemCloud
     cg_(1.),
     cgOK_(true),
     impDEMdrag_(false),
+    impDEMdragAcc_(false),
     imExSplitFactor_(1.0),
     treatVoidCellsAsExplicitForce_(false),
     useDDTvoidfraction_(false),
@@ -279,6 +282,7 @@ Foam::cfdemCloud::~cfdemCloud()
     dataExchangeM().destroy(positions_,3);
     dataExchangeM().destroy(velocities_,3);
     dataExchangeM().destroy(fluidVel_,3);
+    dataExchangeM().destroy(fAcc_,3);
     dataExchangeM().destroy(impForces_,3);
     dataExchangeM().destroy(expForces_,3);
     dataExchangeM().destroy(DEMForces_,3);
@@ -288,6 +292,7 @@ Foam::cfdemCloud::~cfdemCloud()
     dataExchangeM().destroy(cellIDs_,1);
     dataExchangeM().destroy(particleWeights_,1);
     dataExchangeM().destroy(particleVolumes_,1);
+    dataExchangeM().destroy(particleV_,1);
 }
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
 void Foam::cfdemCloud::getDEMdata()
@@ -295,6 +300,9 @@ void Foam::cfdemCloud::getDEMdata()
     dataExchangeM().getData("radius","scalar-atom",radii_);
     dataExchangeM().getData("x","vector-atom",positions_);
     dataExchangeM().getData("v","vector-atom",velocities_);
+
+    if(impDEMdragAcc_)
+        dataExchangeM().getData("dragAcc","vector-atom",fAcc_); // array is used twice - might be necessary to clean it first
 }
 
 void Foam::cfdemCloud::giveDEMdata()
@@ -305,6 +313,7 @@ void Foam::cfdemCloud::giveDEMdata()
 
         if(impDEMdrag_)
         {
+            if(verbose_) Info << "sending Ksl and uf" << endl;
             dataExchangeM().giveData("Ksl","scalar-atom",Cds_);
             dataExchangeM().giveData("uf","vector-atom",fluidVel_);
         }
@@ -499,14 +508,13 @@ bool Foam::cfdemCloud::evolve
             // set void fraction field
             clockM().start(19,"setvoidFraction");
             if(verbose_) Info << "- setvoidFraction()" << endl;
-            voidFractionM().setvoidFraction(NULL,voidfractions_,particleWeights_,particleVolumes_);
+            voidFractionM().setvoidFraction(NULL,voidfractions_,particleWeights_,particleVolumes_,particleV_);
             if(verbose_) Info << "setvoidFraction done." << endl;
             clockM().stop("setvoidFraction");
 
             // set average particles velocity field
             clockM().start(20,"setVectorAverage");
             setVectorAverages();
-
 
             //Smoothen "next" fields            
             smoothingM().dSmoothing();
@@ -516,7 +524,7 @@ bool Foam::cfdemCloud::evolve
             //because we need unsmoothened Us field to detect cells for explicit 
             //force coupling
             if(!treatVoidCellsAsExplicitForce())
-                    smoothingM().smoothenReferenceField(averagingM().UsNext());
+                smoothingM().smoothenReferenceField(averagingM().UsNext());
             
             clockM().stop("setVectorAverage");
         }
@@ -592,6 +600,7 @@ bool Foam::cfdemCloud::reAllocArrays() const
         dataExchangeM().allocateArray(positions_,0.,3);
         dataExchangeM().allocateArray(velocities_,0.,3);
         dataExchangeM().allocateArray(fluidVel_,0.,3);
+        dataExchangeM().allocateArray(fAcc_,0.,3);
         dataExchangeM().allocateArray(impForces_,0.,3);
         dataExchangeM().allocateArray(expForces_,0.,3);
         dataExchangeM().allocateArray(DEMForces_,0.,3);
@@ -601,6 +610,7 @@ bool Foam::cfdemCloud::reAllocArrays() const
         dataExchangeM().allocateArray(cellIDs_,-1.,voidFractionM().maxCellsPerParticle());
         dataExchangeM().allocateArray(particleWeights_,0.,voidFractionM().maxCellsPerParticle());
         dataExchangeM().allocateArray(particleVolumes_,0.,voidFractionM().maxCellsPerParticle());
+        dataExchangeM().allocateArray(particleV_,0.,1);
         arraysReallocated_ = true;
         return true;
     }
@@ -612,7 +622,7 @@ tmp<fvVectorMatrix> cfdemCloud::divVoidfractionTau(volVectorField& U,volScalarFi
     return
     (
       - fvm::laplacian(voidfractionNuEff(voidfraction), U)
-      - fvc::div(voidfractionNuEff(voidfraction)*dev(fvc::grad(U)().T()))
+      - fvc::div(voidfractionNuEff(voidfraction)*dev2(fvc::grad(U)().T()))
     );
 }
 
@@ -645,7 +655,7 @@ void cfdemCloud::calcDdtVoidfraction(volScalarField& voidfraction) const
 
 tmp<volScalarField> cfdemCloud::voidfractionNuEff(volScalarField& voidfraction) const
 {
-    if (modelType_=="B")
+    if (modelType_=="B" || modelType_=="Bfull")
     {
         return tmp<volScalarField>
         (

@@ -195,7 +195,13 @@ compileLMPlib()
     rm $logpath/$logfileName
 
     #- change path
-    cd $libraryPath
+    if [ -d "$libraryPath" ]; then
+        cd $libraryPath
+    else
+        echo ""
+        echo "lib path $libraryPath does not exist - check settings in .../etc/bashrc."
+        read
+    fi
 
     #- header
     echo 2>&1 | tee -a $logpath/$logfileName
@@ -556,6 +562,7 @@ parCFDDEMrun()
     machineFileName="$7"
     debugMode="$8"
     reconstuctCase="$9"
+    cleanCase="$10"
     #--------------------------------------------------------------------------------#
 
     if [ $debugMode == "on" ]; then

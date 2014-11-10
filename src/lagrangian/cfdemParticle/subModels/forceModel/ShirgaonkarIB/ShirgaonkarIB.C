@@ -68,8 +68,6 @@ ShirgaonkarIB::ShirgaonkarIB
     depth_(1),
     velFieldName_(propsDict_.lookup("velFieldName")),
     U_(sm.mesh().lookupObject<volVectorField> (velFieldName_)),
-    densityFieldName_(propsDict_.lookup("densityFieldName")),
-    rho_(sm.mesh().lookupObject<volScalarField> (densityFieldName_)),
     pressureFieldName_(propsDict_.lookup("pressureFieldName")),
     p_(sm.mesh().lookupObject<volScalarField> (pressureFieldName_))
 {
@@ -115,13 +113,12 @@ void ShirgaonkarIB::setForce() const
     vector drag;
 
     #ifdef comp
-        // get viscosity field
-        const volScalarField& mufField = particleCloud_.turbulence().mu();
+        const volScalarField& mufField = forceSubM(0).muField();
         volVectorField h = (mufField*fvc::laplacian(U_)-fvc::grad(p_));
     #else
-        // get viscosity field
-        const volScalarField& nufField = particleCloud_.turbulence().nu();
-        volVectorField h = rho_*(nufField*fvc::laplacian(U_)-fvc::grad(p_));
+        const volScalarField& nufField = forceSubM(0).nuField();
+        const volScalarField& rhoField = forceSubM(0).rhoField();
+        volVectorField h = rhoField*(nufField*fvc::laplacian(U_)-fvc::grad(p_));
     #endif
 
     #include "setupProbeModel.H"

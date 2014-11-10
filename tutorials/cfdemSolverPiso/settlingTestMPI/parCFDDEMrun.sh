@@ -24,7 +24,7 @@ machineFileName="none"   # yourMachinefileName | none
 debugMode="off"          # on | off| strict
 testHarnessPath="$CFDEM_TEST_HARNESS_PATH"
 runOctave="true"
-cleanCase="true"
+cleanUp="true"
 postproc="false"
 #--------------------------------------------------------------------------------#
 
@@ -77,7 +77,7 @@ if [ $postproc == "true" ]
 fi
 
 #- clean up case
-if [ $cleanCase == "true" ]
+if [ $cleanUp == "true" ]
   then
     echo "deleting data at: $casePath :\n"
     source $WM_PROJECT_DIR/bin/tools/CleanFunctions
@@ -86,6 +86,7 @@ if [ $cleanCase == "true" ]
     cd $casePath
     rm -r $casePath/CFD/clockData
     rm -r $casePath/DEM/post/*
+    rm -r $casePath/DEM/liggghts.restartCFDEM*
     echo "done"
 fi
 

@@ -102,6 +102,8 @@ protected:
 
     mutable double **fluidVel_;
 
+    mutable double **fAcc_;
+
     mutable double **impForces_;
 
     mutable double **expForces_;
@@ -119,6 +121,8 @@ protected:
     mutable double **particleWeights_;
 
     mutable double **particleVolumes_;
+
+    mutable double **particleV_;
 
     int numberOfParticles_;
 
@@ -139,6 +143,8 @@ protected:
     bool cgOK_;
 
     bool impDEMdrag_;
+
+    bool impDEMdragAcc_;
 
     mutable scalar imExSplitFactor_;
 
@@ -246,6 +252,8 @@ public:
 
        inline const bool& impDEMdrag() const;
 
+       inline const bool& impDEMdragAcc() const;
+
        inline const scalar& imExSplitFactor() const;
 
        inline const bool& treatVoidCellsAsExplicitForce() const;
@@ -265,6 +273,8 @@ public:
        inline double ** velocities() const;
 
        inline double ** fluidVels() const;
+
+       inline double ** fAccs() const;
 
        inline double ** impForces() const;
 

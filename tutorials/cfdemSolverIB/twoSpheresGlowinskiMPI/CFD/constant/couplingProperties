@@ -70,14 +70,12 @@ turbulenceModelType RASProperties;//LESProperties; //
 ShirgaonkarIBProps
 {
     velFieldName "U";
-    densityFieldName "rho";
     pressureFieldName "p";
     verbose;
 }
 
 ArchimedesIBProps
 {
-    densityFieldName "rho";
     gravityFieldName "g";
     voidfractionFieldName "voidfractionNext";
 }

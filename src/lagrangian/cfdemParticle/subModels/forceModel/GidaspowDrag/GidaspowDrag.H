@@ -32,7 +32,7 @@ Description
     - only valid for low-Reynolds number systems (Re_p<1000)
     - including interpolation of the velocity to the exact position
     - splits off explicit drag component due to fluctuation in fluid and particle
-      velocity
+      velocity (optional via forceSubModel "ImExCorr")
 
 Class
     GidaspowDrag
@@ -64,23 +64,15 @@ class GidaspowDrag
 private:
     dictionary propsDict_;
 
-    bool verbose_;
-
     word velFieldName_;
 
     const volVectorField& U_;
-
-    word densityFieldName_;
-
-    const volScalarField& rho_;
 
     word voidfractionFieldName_;
 
     const volScalarField& voidfraction_;
 
     const scalar phi_;
-
-    bool interpolation_; // use interpolated field values
 
     word UsFieldName_;   
 

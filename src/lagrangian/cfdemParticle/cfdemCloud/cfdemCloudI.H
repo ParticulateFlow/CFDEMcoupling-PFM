@@ -55,6 +55,11 @@ inline const bool& cfdemCloud::impDEMdrag() const
     return impDEMdrag_;
 };
 
+inline const bool& cfdemCloud::impDEMdragAcc() const
+{ 
+    return impDEMdragAcc_;
+};
+
 inline const scalar& cfdemCloud::imExSplitFactor() const
 {
 	    return imExSplitFactor_;
@@ -108,6 +113,11 @@ inline double ** cfdemCloud::velocities() const
 inline double ** cfdemCloud::fluidVels() const
 {
     return fluidVel_;
+}
+
+inline double ** cfdemCloud::fAccs() const
+{
+    return fAcc_;
 }
 
 inline double ** cfdemCloud::impForces() const
@@ -174,7 +184,7 @@ inline label Foam::cfdemCloud::body(int index)
 
 inline double cfdemCloud::particleVolume(int index)
 {
-    return particleVolumes_[index][0];
+    return particleV_[index][0];
 }
 
 inline scalar cfdemCloud::radius(int index)
