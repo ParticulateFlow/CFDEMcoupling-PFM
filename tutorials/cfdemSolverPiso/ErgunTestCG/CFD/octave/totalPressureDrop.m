@@ -104,8 +104,4 @@ axis([0,Uend,0,dpErgun(length(dpErgun))])
 
 %print('cfdemSolverPiso_settlingTest.eps','-deps2')
 print -color "cfdemSolverPiso_ErgunTestCG.eps"
-replot;
-
-
-
 

@@ -97,8 +97,4 @@ ylabel("pressure drop [Pa]")
 
 %print('cfdemSolverPiso_settlingTest.eps','-deps2')
 print -color "cfdemSolverPiso_ErgunTestMPI.eps"
-replot;
-
-
-
 

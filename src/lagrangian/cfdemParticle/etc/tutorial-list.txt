@@ -1,4 +1,3 @@
-
 #===================================================================#
 # This file specifies the example cases being executed by
 # .../etc/testTutorial.sh , which can be run with the alias
@@ -7,15 +6,63 @@
 #===================================================================#
 
 cfdemSolverPiso/settlingTestMPI/dir
-
 cfdemSolverPiso/ErgunTestMPI/dir
-
 cfdemSolverPiso/ErgunTestMPI_cgs/dir
-
 cfdemSolverPiso/ErgunTestMPI_restart/dir
-
 cfdemSolverIB/twoSpheresGlowinskiMPI/dir
-
 cfdemSolverPisoScalar/packedBedTemp/dir
 
-cfdemSolverPiso/ErgunTestCG/dir
+#===================================================================#
+# RADL
+#cfdemSolverPimpleImEx/settlingTestMPI/dir
+#cfdemSolverPimpleImEx/ErgunTestMPI/dir
+#cfdemSolverPimpleImEx/crossFlow/dir
+#cfdemSolverIB/periodicCase/dir
+#cfdemSolverIB/cfdemIBPeriodicCubicalBox_fullyPeriodic/dir
+#cfdemSolverIBInterLubrication/twoCoatedParticlesRelMotion_smallTest/dir
+#cfdemSolverIBScalar/cfdemIBPeriodicCubicalBoxScalar/dir
+
+#===================================================================#
+# BLAIS
+#SRFCfdemSolverPiso/SRFCouette/dir
+#cfdemSolverPiso/couette/dir
+#cfdemSolverPiso/plateViscometer/dir
+#cfdemIBMesh/couette/dir
+#cfdemSolverPisoIBm/couette/dir
+
+#===================================================================#
+# NesteJacobs
+cfdemSolverBubble/ErgunTestMPI_pureLiquid/dir
+cfdemSolverBubble/ErgunTestM2M_restart/dir
+Projects/Neste/cfdemSolverBubble/3pFBreactor/dir
+cfdemSolverInterDyM/sugarNcoffee/dir
+Projects/Neste/cfdemSolverInterDyM/3pFBreactor/dir
+
+#===================================================================#
+# not in release:
+
+#cfdemSolverPiso/settlingTestBigParticleMPI/dir
+#cfdemSolverPiso/ErgunTestCG/dir
+cfdemSolverPiso/ErgunTestM2M/dir
+cfdemSolverPiso/ErgunTestMPI_water/dir
+#cfdemSolverPiso/HopperEmptying/dir
+
+cfdemSolverPimpleDyM/ErgunTestMPI/dir
+
+#cfdemSolverPisoMS/settlingTestMPI/dir
+#cfdemSolverPisoMS/ErgunTestMPI/dir
+
+#cfdemSolverInterDyM/twoPhaseSettlingTest/dir
+#cfdemSolverInterDyM/ErgunTestMPI/dir
+#cfdemSolverInterDyM/granularPiston/dir
+#cfdemSolverInterDyM/sugarNcoffee/dir
+
+#cfdemSolverBubble/ErgunTestMPI_pureLiquid/dir
+
+#- these examples are already designed for 2.3.x
+#cfdemSolverInterDyMPC/sugarNcoffee/dir
+#cfdemSolverInterDyMPC/granularPiston/dir
+#cfdemSolverInterDyMPC/meltingPot/dir
+
+
+
