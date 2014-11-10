@@ -1,11 +1,2 @@
 lagrangian/cfdemParticle/dir
-
-#====================================================='
-#- RADL
-fvOptions/dir
-cylPorousMedia/dir
-
-#====================================================='
-#- other
 finiteVolume/dir
-transportModels/incompressible/dir
