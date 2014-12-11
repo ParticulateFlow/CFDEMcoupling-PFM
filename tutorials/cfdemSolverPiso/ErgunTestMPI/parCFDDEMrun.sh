@@ -87,7 +87,8 @@ cd $casePath/CFD
 cleanCase
 rm -r $casePath/CFD/clockData
 rm $casePath/DEM/post/*.*
-#rm -r $casePath/DEM/post/restart/*.*
 touch $casePath/DEM/post/.gitignore
+#rm $casePath/DEM/post/restart/*.*
+rm $casePath/DEM/post/restart/liggghts.restartCFDEM*
 touch $casePath/DEM/post/restart/.gitignore
 echo "done"

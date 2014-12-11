@@ -66,9 +66,7 @@ SchillerNaumannDrag::SchillerNaumannDrag
     propsDict_(dict.subDict(typeName + "Props")),
     verbose_(false),
     velFieldName_(propsDict_.lookup("velFieldName")),
-    U_(sm.mesh().lookupObject<volVectorField> (velFieldName_)),
-    densityFieldName_(propsDict_.lookup("densityFieldName")),
-    rho_(sm.mesh().lookupObject<volScalarField> (densityFieldName_))
+    U_(sm.mesh().lookupObject<volVectorField> (velFieldName_))
 {
     //Append the field names to be probed
     particleCloud_.probeM().initialize(typeName, "schillerNaumannDrag.logDat");
@@ -103,14 +101,10 @@ SchillerNaumannDrag::~SchillerNaumannDrag()
 
 void SchillerNaumannDrag::setForce() const
 {
-    // get viscosity field
-    #ifdef comp
-        const volScalarField nufField = particleCloud_.turbulence().mu() / rho_;
-    #else
-        const volScalarField& nufField = particleCloud_.turbulence().nu();
-    #endif
-
     #include "setupProbeModel.H"
+
+    const volScalarField& nufField = forceSubM(0).nuField();
+    const volScalarField& rhoField = forceSubM(0).rhoField();
 
     for(int index = 0;index <  particleCloud_.numberOfParticles(); index++)
     {
@@ -126,7 +120,7 @@ void SchillerNaumannDrag::setForce() const
                 vector Ur = U_[cellI]-Us;
                 scalar ds = 2*particleCloud_.radius(index);
                 scalar nuf = nufField[cellI];
-                scalar rho = rho_[cellI];
+                scalar rho = rhoField[cellI];
                 scalar voidfraction = particleCloud_.voidfraction(index);
                 scalar magUr = mag(Ur);
                 scalar Rep = 0;

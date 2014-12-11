@@ -69,6 +69,12 @@ twoWayMany2Many::twoWayMany2Many
     neighbourProcs_(pData_[Pstream::myProcNo()]),
     neighbourProcIndices_(Pstream::nProcs(), -1)
 {
+    allowDiagComm_=true;
+    if (propsDict_.found("allowDiagComm"))
+        allowDiagComm_=Switch(propsDict_.lookup("allowDiagComm"));
+    if(!allowDiagComm_)
+        Warning << "Make sure you decompose only in one direction as allowDiagComm flag is false!" << endl;
+
     forAll(neighbourProcs_, i) neighbourProcIndices_[neighbourProcs_[i]] = i;
 
     Info<<"Starting up LIGGGHTS for first time execution"<<endl;
@@ -82,38 +88,27 @@ twoWayMany2Many::twoWayMany2Many
     MPI_Comm_split(MPI_COMM_WORLD,liggghts,0,&comm_liggghts);
 
     // open LIGGGHTS input script
-    FILE *fp=NULL;
+    char *liggghtsPathChar = new char[256];
+    int n = 0;
     if (me == 0)
     {
       // read path from dictionary
       const fileName liggghtsPath(propsDict_.lookup("liggghtsPath"));
-      char * liggghtsPathChar = (char*)liggghtsPath.c_str();
+      strcpy(liggghtsPathChar, liggghtsPath.c_str());
+      n = strlen(liggghtsPathChar) + 1;
 
       Info<<"Executing input script '"<< liggghtsPath.c_str() <<"'"<<endl;
-
-      fp = fopen(liggghtsPathChar,"r");
-
-      if (fp == NULL) {
-        printf("ERROR: Could not open LIGGGHTS input script\n");
-        MPI_Abort(MPI_COMM_WORLD,1);
-      }
     }
 
     if (liggghts == 1) lmp = new LAMMPS_NS::LAMMPS(0,NULL,comm_liggghts);
 
-    int n;
-    char line[1024];
-    while (1) {
-      if (me == 0) {
-        if (fgets(line,1024,fp) == NULL) n = 0;
-        else n = strlen(line) + 1;
-        if (n == 0) fclose(fp);
-      }
-      MPI_Bcast(&n,1,MPI_INT,0,MPI_COMM_WORLD);
-      if (n == 0) break;
-      MPI_Bcast(line,n,MPI_CHAR,0,MPI_COMM_WORLD);
-      if (liggghts == 1) lmp->input->one(line);
+    MPI_Bcast(&n,1,MPI_INT,0,MPI_COMM_WORLD);
+    if (n > 0) {
+        MPI_Bcast(liggghtsPathChar,n,MPI_CHAR,0,MPI_COMM_WORLD);
+        if (liggghts == 1) lmp->input->file(liggghtsPathChar);
     }
+
+    delete [] liggghtsPathChar;
 
     // get DEM time step size
     DEMts_ = lmp->update->dt;
@@ -189,14 +184,46 @@ void twoWayMany2Many::getData
 ) const
 {
     char* charName = wordToChar(name);
-    if ( type == "vector-atom" && name != "x")
+    if(name != "x")
     {
-        double **tmp_ = (double **) lammps_extract_atom(lmp,charName);
-        lmp2foam_vec_->exchange(tmp_ ? tmp_[0] : NULL, field[0]);
-    }else if (name != "x")
-    {
-        double *tmp_ = (double *) lammps_extract_atom(lmp,charName);
-        lmp2foam_->exchange(tmp_, field[0]);
+        if ( type == "vector-atom")
+        {
+            double **tmp_ = (double **) lammps_extract_atom(lmp,charName);
+            if(!tmp_)
+            {
+                LAMMPS_NS::Fix *fix = NULL;
+                fix = lmp->modify->find_fix_property(charName,"property/atom","vector",0,0,"cfd coupling",false);
+                if(fix)
+                    tmp_ = (double **) static_cast<LAMMPS_NS::FixPropertyAtom*>(fix)->array_atom;
+                else
+                    Warning << "coupling fix not found!"<<endl;
+
+                if(!tmp_)
+                    FatalError << "find_fix_property " << charName << " array_atom not found." << abort(FatalError);
+            }
+
+            lmp2foam_vec_->exchange(tmp_ ? tmp_[0] : NULL, field[0]);
+        }else if ( type == "scalar-atom")
+        {
+            double *tmp_ = (double *) lammps_extract_atom(lmp,charName);
+            if(!tmp_)
+            {
+                LAMMPS_NS::Fix *fix = NULL;
+                fix = lmp->modify->find_fix_property(charName,"property/atom","scalar",0,0,"cfd coupling",true);
+                if(fix)
+                    tmp_ = (double *) static_cast<LAMMPS_NS::FixPropertyAtom*>(fix)->vector_atom;
+                else
+                    FatalError << "coupling fix not found!"<< abort(FatalError);
+
+                if(!tmp_)
+                    FatalError << "find_fix_property " << charName << " array_atom not found." << abort(FatalError);
+            }
+
+            lmp2foam_->exchange(tmp_, field[0]);
+        }else
+        {
+            FatalError << "requesting type " << type << " and name " << name << abort(FatalError);
+        }
     }
 }
 
@@ -232,24 +259,26 @@ void twoWayMany2Many::giveData
         else
             Warning << "coupling fix not found!"<<endl;
 
+        if(!tmp_)
+            FatalError << "find_fix_property " << charName << " array_atom not found." << abort(FatalError);
+
         foam2lmp_vec_->exchange(field[0],tmp_ ? tmp_[0] : NULL);
     }else if( type == "scalar-atom" )
     {
-        Warning << "LIGGGHTS not ready for use of impleDEM and Many2Many" << endl;
         double *tmp_=NULL;
         LAMMPS_NS::Fix *fix = NULL;
-        fix = lmp->modify->find_fix_property(charName,"property/atom","scalar",0,0,"cfd coupling",false);
+        fix = lmp->modify->find_fix_property(charName,"property/atom","scalar",0,0,"cfd coupling",true);
         if(fix)
-            tmp_ = (double *) static_cast<LAMMPS_NS::FixPropertyAtom*>(fix)->array_atom;
+            tmp_ = (double *) static_cast<LAMMPS_NS::FixPropertyAtom*>(fix)->vector_atom;
         else
             FatalError << "coupling fix not found!"<< abort(FatalError);
 
         if(!tmp_)
-            allocateArray(tmp_,0,nlocal_lammps_);
+            FatalError << "find_fix_property " << charName << " array_atom not found." << abort(FatalError);
 
-        foam2lmp_->exchange(field[0],tmp_ ? tmp_ : NULL);
+        foam2lmp_->exchange(field[0],tmp_ ? tmp_ : NULL); // for double *
     }else{
-        FatalError << "twoWayMany2Many::giveData requested type not implemented! \n"<< abort(FatalError);
+        FatalError << "twoWayMany2Many::giveData requested type "<< type <<" not implemented! \n"<< abort(FatalError);
     }
 }
 
@@ -355,6 +384,7 @@ void inline Foam::twoWayMany2Many::destroy(int* array) const
 bool Foam::twoWayMany2Many::couple() const
 {
     bool coupleNow = false;
+    label commandLines(0);
     if (doCoupleNow())
     {
         couplingStep_++;
@@ -371,9 +401,13 @@ bool Foam::twoWayMany2Many::couple() const
 
                 if(particleCloud_.liggghtsCommand()[i]().runCommand(couplingStep()))
                 {
-                    const char* command = particleCloud_.liggghtsCommand()[i]().command(0);
-                    Info << "Executing command: '"<< command <<"'"<< endl;
-                    lmp->input->one(command);
+                    commandLines=particleCloud_.liggghtsCommand()[i]().commandLines();
+                    for(int j=0;j<commandLines;j++)
+                    {
+                        const char* command = particleCloud_.liggghtsCommand()[i]().command(j);
+                        Info << "Executing command: '"<< command <<"'"<< endl;
+                        lmp->input->one(command);
+                    }
                 }
             }
             particleCloud_.clockM().stop("LIGGGHTS");
@@ -595,18 +629,29 @@ void Foam::twoWayMany2Many::locateParticle(int* id_lammpsSync, bool id_lammps_al
             {
                 label patchI = pbm_.whichPatch(nearestFace);
 
+                label n(-1);
                 if (procPatchIndices_[patchI] != -1)
                 {
-                    label n = neighbourProcIndices_
+                    n = neighbourProcIndices_
                     [
                         refCast<const processorPolyPatch>
                         (
                             pbm_[patchI]
                         ).neighbProcNo()
                     ];
-                    particleTransferID[n].append(id_lammps_[i]);
-                    particleTransferPos[n].append(pos);
-                    commPart=true;
+
+                    if(n==Pstream::myProcNo())
+                    {
+                        //Pout << couplingStep_ << "st communicating particle " << id_lammps_[i] 
+                        //     << "communication fails as particle travels diagonal or jumps over proc" << endl;
+                    }
+                    else
+                    {
+                        particleTransferID[n].append(id_lammps_[i]);
+                        particleTransferPos[n].append(pos);
+                        commPart=true;
+					    //Pout << couplingStep_ << "st communicating particle " << id_lammps_[i] << ", to proc# " << n << endl;
+                    }
                 }
             }
             if (!commPart)
@@ -703,7 +748,7 @@ void Foam::twoWayMany2Many::locateParticle(int* id_lammpsSync, bool id_lammps_al
     particleCloud_.clockM().start(9,"locate_Stage3");
 
     int nlocal_foam_lostAll(-1);
-	if (firstRun_)
+	if (firstRun_ || allowDiagComm_)
     {
         particleCloud_.clockM().start(10,"locate_Stage3_1");
 	    MPI_Allreduce(&nlocal_foam_lost_, &nlocal_foam_lostAll, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);

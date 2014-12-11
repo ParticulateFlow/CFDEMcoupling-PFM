@@ -67,8 +67,6 @@ DiFeliceDragMS::DiFeliceDragMS
     verbose_(false),
     velFieldName_(propsDict_.lookup("velFieldName")),
     U_(sm.mesh().lookupObject<volVectorField> (velFieldName_)),
-    densityFieldName_(propsDict_.lookup("densityFieldName")),
-    rho_(sm.mesh().lookupObject<volScalarField> (densityFieldName_)),
     voidfractionFieldName_(propsDict_.lookup("voidfractionFieldName")),
     voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
     interpolation_(false),
@@ -112,6 +110,8 @@ DiFeliceDragMS::DiFeliceDragMS
             Info << "WARNING: will only consider fluctuating particle velocity in implicit / explicit force split!" << endl;
     }
     particleCloud_.checkCG(false);
+
+    readDhbyV(propsDict_);
 }
 
 
@@ -125,12 +125,8 @@ DiFeliceDragMS::~DiFeliceDragMS()
 
 void DiFeliceDragMS::setForce() const
 {
-    // get viscosity field
-    #ifdef comp
-        const volScalarField& nufField = cloudRefMS().turbulence().mu() / rho_;
-    #else
-        const volScalarField& nufField = cloudRefMS().turbulence().nu();
-    #endif
+    const volScalarField& nufField = forceSubM(0).nuField();
+    const volScalarField& rhoField = forceSubM(0).rhoField();
 
     vector position(0,0,0);
     scalar voidfraction(1);
@@ -185,7 +181,7 @@ void DiFeliceDragMS::setForce() const
                 Ur = Ufluid-Us;
                 ds = cloudRefMS().clumpDH()[index][0];
                 nuf = nufField[cellI];
-                rho = rho_[cellI];
+                rho = rhoField[cellI];
                 magUr = mag(Ur);
                 Rep = 0;
                 Cd = 0;

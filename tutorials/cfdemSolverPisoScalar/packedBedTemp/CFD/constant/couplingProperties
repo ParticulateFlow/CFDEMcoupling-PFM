@@ -77,7 +77,6 @@ LaEuScalarTempProps
     partHeatFluxName "convectiveHeatFlux";
     lambda 0.0256;
     Cp 1007;
-    densityFieldName "rho";
 }
 
 implicitCoupleProps
@@ -91,36 +90,31 @@ implicitCoupleProps
 KochHillDragProps
 {
     velFieldName "U";
-    densityFieldName "rho";
     voidfractionFieldName "voidfraction";
 }
 
 DiFeliceDragProps
 {
     velFieldName "U";
-    densityFieldName "rho";
-    //verbose;
+    //verbose true;
 }
 
 ArchimedesProps
 {
-    densityFieldName "rho";
     gravityFieldName "g";
 }
 gradPForceProps
 {
     pFieldName "p";
-    densityFieldName "rho";
     voidfractionFieldName "voidfraction";
     velocityFieldName "U";
-    //interpolation;
+    //interpolation true;
 }
 
 viscForceProps
 {
     velocityFieldName "U";
-    densityFieldName "rho";
-    interpolation;
+    interpolation true;
 }
 
 oneWayVTKProps

@@ -90,6 +90,7 @@ private:
 
     // new vars
     mutable bool firstRun_;
+    Switch allowDiagComm_;
     mutable bool particleLost_;
     mutable double Npart_;
     mutable Many2Many * lmp2foam_;

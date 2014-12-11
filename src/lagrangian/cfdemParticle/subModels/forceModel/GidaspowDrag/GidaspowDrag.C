@@ -63,15 +63,11 @@ GidaspowDrag::GidaspowDrag
 :
     forceModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
-    verbose_(false),
     velFieldName_(propsDict_.lookup("velFieldName")),
     U_(sm.mesh().lookupObject<volVectorField> (velFieldName_)),
-    densityFieldName_(propsDict_.lookup("densityFieldName")),
-    rho_(sm.mesh().lookupObject<volScalarField> (densityFieldName_)),
     voidfractionFieldName_(propsDict_.lookup("voidfractionFieldName")),
     voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
     phi_(readScalar(propsDict_.lookup("phi"))),
-    interpolation_(false),
     UsFieldName_(propsDict_.lookup("granVelFieldName")),
     UsField_(sm.mesh().lookupObject<volVectorField> (UsFieldName_)),
     scaleDia_(1.),
@@ -87,17 +83,14 @@ GidaspowDrag::GidaspowDrag
     particleCloud_.probeM().scalarFields_.append("voidfraction");
     particleCloud_.probeM().writeHeader();
 
-    if (propsDict_.found("verbose")) verbose_=true;
-    if (propsDict_.found("interpolation")) interpolation_=true;
-
     // init force sub model
     setForceSubModels(propsDict_);
-
     // define switches which can be read from dict
     forceSubM(0).setSwitchesList(0,true); // activate treatExplicit switch
     forceSubM(0).setSwitchesList(2,true); // activate implDEM switch
-
-    // read those switches defined above, if provided in dict
+    forceSubM(0).setSwitchesList(3,true); // activate search for verbose switch
+    forceSubM(0).setSwitchesList(4,true); // activate search for interpolate switch
+    forceSubM(0).setSwitchesList(8,true); // activate scalarViscosity switch
     forceSubM(0).readSwitches();
 
     particleCloud_.checkCG(true);
@@ -108,8 +101,6 @@ GidaspowDrag::GidaspowDrag
 
     if (propsDict_.found("switchingVoidfraction"))
         switchingVoidfraction_ = readScalar(propsDict_.lookup("switchingVoidfraction"));
-
-    Info << "Gidaspow - interpolation switch: " << interpolation_ << endl;
 }
 
 
@@ -130,12 +121,8 @@ void GidaspowDrag::setForce() const
         Info << "Gidaspow using scale from liggghts cg = " << scaleDia_ << endl;
     }
 
-    // get viscosity field
-    #ifdef comp
-        const volScalarField nufField = particleCloud_.turbulence().mu() / rho_;
-    #else
-        const volScalarField& nufField = particleCloud_.turbulence().nu();
-    #endif
+    const volScalarField& nufField = forceSubM(0).nuField();
+    const volScalarField& rhoField = forceSubM(0).rhoField();
 
     vector position(0,0,0);
     scalar voidfraction(1);
@@ -180,7 +167,7 @@ void GidaspowDrag::setForce() const
             if (cellI > -1) // particle Found
             {
 
-                if(interpolation_)
+                if( forceSubM(0).interpolation() )
                 {
 	                position     = particleCloud_.position(index);
                     voidfraction = voidfractionInterpolator_.interpolate(position,cellI);
@@ -199,8 +186,8 @@ void GidaspowDrag::setForce() const
                 Us = particleCloud_.velocity(index);
                 Ur = Ufluid-Us;
                 magUr = mag(Ur);
-                ds = 2*particleCloud_.radius(index)*phi_;
-                rho = rho_[cellI];
+                ds = 2*particleCloud_.radius(index);
+                rho = rhoField[cellI];
                 nuf = nufField[cellI];
 
                 Rep=0.0;
@@ -223,10 +210,10 @@ void GidaspowDrag::setForce() const
                 else  //dense
                 {
                     betaP = (150 * localPhiP*nuf*rho)          //this is betaP = beta / localPhiP!
-                             /  (voidfraction*ds/scaleDia_*ds/scaleDia_)
+                             /  (voidfraction*ds/scaleDia_*phi_*ds/scaleDia_*phi_)
                             +
                               (1.75 * magUr * rho)
-                             /((ds/scaleDia_));
+                             /((ds/scaleDia_*phi_));
                 }
 
                 // calc particle's drag
@@ -237,9 +224,9 @@ void GidaspowDrag::setForce() const
                 drag = dragCoefficient * Ur;
 
                 // explicitInterpCorr
-                forceSubM(0).explicitInterpCorr(dragExplicit,dragCoefficient,Ufluid,U_[cellI],Us,UsField_[cellI],verbose_);
+                forceSubM(0).explicitInterpCorr(dragExplicit,dragCoefficient,Ufluid,U_[cellI],Us,UsField_[cellI],forceSubM(0).verbose());
 
-                if(verbose_ && index >=0 && index <2)
+                if(forceSubM(0).verbose() && index >=0 && index <2)
                 {
                     Pout << "cellI = " << cellI << endl;
                     Pout << "index = " << index << endl;

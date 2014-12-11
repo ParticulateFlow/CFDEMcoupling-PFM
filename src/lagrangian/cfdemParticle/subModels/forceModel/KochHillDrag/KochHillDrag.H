@@ -64,15 +64,9 @@ class KochHillDrag
 private:
     dictionary propsDict_;
 
-    bool verbose_;
-
     word velFieldName_;
 
     const volVectorField& U_;
-
-    word densityFieldName_;
-
-    const volScalarField& rho_;
 
     word voidfractionFieldName_;
 
@@ -81,8 +75,6 @@ private:
     word UsFieldName_;   
 
     const volVectorField& UsField_; 
-
-    bool interpolation_; // use interpolated field values
 
     mutable scalar scaleDia_;
 

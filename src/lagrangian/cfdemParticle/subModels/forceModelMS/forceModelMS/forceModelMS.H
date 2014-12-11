@@ -110,6 +110,8 @@ public:
 
     // Access
         cfdemCloudMS& cloudRefMS() const;
+
+        void readDhbyV(dictionary& dict);
 };
 
 

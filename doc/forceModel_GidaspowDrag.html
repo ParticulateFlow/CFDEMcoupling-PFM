@@ -20,17 +20,14 @@
 GidaspowDragProps
 {
     velFieldName "U";
-    densityFieldName "density";
     voidfractionFieldName "voidfraction";
     granVelFieldName "Us";
     phi "scalar";
-    interpolation;
-    implDEM;
+    interpolation switch1;
+    implForceDEM switch2;
 }; 
 </PRE>
 <UL><LI><I>U</I> = name of the finite volume fluid velocity field 
-
-<LI><I>density</I> = name of the finite volume gravity field 
 
 <LI><I>voidfraction</I> = name of the finite volume voidfraction field 
 
@@ -38,9 +35,9 @@ GidaspowDragProps
 
 <LI><I>phi</I> = drag correction factor (in doubt 1) 
 
-<LI><I>interpolation</I> = (optional, normally off) flag to use interpolated voidfraction and fluid velocity values 
+<LI><I>switch1</I> = (optional, normally off) flag to use interpolated voidfraction and fluid velocity values 
 
-<I>implDEM</I> = (optional, normally off) flag to use implicit formulation of drag on DEM side:l
+<I>switch2</I> = (optional, normally off) flag to use implicit formulation of drag on DEM side:l
 
 </UL>
 <P><B>Examples:</B>
@@ -52,7 +49,6 @@ GidaspowDragProps
 GidaspowDragProps
 {
     velFieldName "U";
-    densityFieldName "rho";
     voidfractionFieldName "voidfraction";
     granVelFieldName "Us";
 } 

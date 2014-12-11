@@ -56,8 +56,8 @@ cfdemCloudMS::cfdemCloudMS
     cellIDsCM_(NULL),
     bodies_(NULL),
     nrigids_(NULL),
-    nClumpTypes_(1),
     clumpType_(NULL),
+    nClumpTypes_(1),
     clumpVol_(NULL),
     clumpDH_(NULL),
     clumpWeights_(NULL),
@@ -73,6 +73,8 @@ cfdemCloudMS::cfdemCloudMS
     DEMForcesCM_(NULL),
     numberOfClumps_(-1),
     numberOfClumpsChanged_(false),
+    manDHdev_(false),
+    dHbyV_(scalarList(0)),
     useforcePerClump_(false),
     forceModels_(couplingProperties_.lookup("forceModelsMS"))
 {
@@ -86,6 +88,7 @@ cfdemCloudMS::cfdemCloudMS
             forceModels_[i]
         );
     }
+
 }
 
 
@@ -132,9 +135,17 @@ void cfdemCloudMS::getDEMdata()
 
     //- save clump volume and mass
     double **typeDH(NULL);
-    dataExchangeM().allocateArray(typeDH,-1,1,nClumpTypes()+1);    
-    for(int k = 1;k <= nClumpTypes(); k++)
-        typeDH[k][0]=pow(typeVol_[k]*1.9099,1./3.); // 6/pi=1.9099 // calc a hydraulic diameter as d of vol equal sphere
+    dataExchangeM().allocateArray(typeDH,-1,1,nClumpTypes()+1);
+    if(manDHdev_) // use manually defined dH
+    {
+        for(int k = 1;k <= nClumpTypes(); k++)
+            typeDH[k][0]=dHbyV_[k-1]*typeVol_[k];
+    }
+    else // calc dH from volAeqivalent shpere
+    {  
+        for(int k = 1;k <= nClumpTypes(); k++)
+            typeDH[k][0]=pow(typeVol_[k]*1.9099,1./3.); // 6/pi=1.9099 // calc a hydraulic diameter as d of vol equal sphere
+    }
 
     int ct(0);
     for(int ind = 0;ind < numberOfClumps(); ind++)
@@ -193,7 +204,7 @@ bool cfdemCloudMS::reAllocArrays() const
         dataExchangeM().allocateArray(cellIDsCM_,-1,1,"nbodies");
         dataExchangeM().allocateArray(bodies_,0,1);
         dataExchangeM().allocateArray(nrigids_,0,1,"nbodies");      
-        dataExchangeM().allocateArray(clumpType_,0,3,"nbodies");
+        dataExchangeM().allocateArray(clumpType_,0,1,"nbodies");
         dataExchangeM().allocateArray(clumpVol_,0,1,"nbodies");
         dataExchangeM().allocateArray(clumpDH_,1.,1,"nbodies");
         dataExchangeM().allocateArray(clumpWeights_,1,1,"nbodies");
@@ -215,7 +226,6 @@ bool cfdemCloudMS::reAllocArrays() const
 void Foam::cfdemCloudMS::setNumberOfParticles(int nP)
 {
     cfdemCloud::setNumberOfParticles(nP);
-
     int nC = dataExchangeM().getNumberOfClumps();
 
     if(nC != numberOfClumps())
@@ -223,6 +233,9 @@ void Foam::cfdemCloudMS::setNumberOfParticles(int nP)
         numberOfClumpsChanged_ = true;
         numberOfClumps_ = nC;
     }
+
+    // in case last particle has left an ma-_tag_ms is not up to date
+    numberOfClumps_ = min(numberOfParticles(),numberOfClumps_);
 }
 
 void Foam::cfdemCloudMS::findCells()

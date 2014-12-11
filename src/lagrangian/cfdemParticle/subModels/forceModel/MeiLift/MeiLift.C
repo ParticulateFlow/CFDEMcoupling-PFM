@@ -66,30 +66,20 @@ MeiLift::MeiLift
     propsDict_(dict.subDict(typeName + "Props")),
     velFieldName_(propsDict_.lookup("velFieldName")),
     U_(sm.mesh().lookupObject<volVectorField> (velFieldName_)),
-    densityFieldName_(propsDict_.lookup("densityFieldName")),
-    rho_(sm.mesh().lookupObject<volScalarField> (densityFieldName_)),
-    useSecondOrderTerms_(false),
-    interpolation_(false),
-    verbose_(false)
-/*,
-    vorticityFieldName_(propsDict_.lookup("vorticityFieldName")),
-    vorticity_(sm.mesh().lookupObject<volVectorField> (vorticityFieldName_))*/
+    useSecondOrderTerms_(false)
 {
     if (propsDict_.found("useSecondOrderTerms")) useSecondOrderTerms_=true;
 
     // init force sub model
     setForceSubModels(propsDict_);
-
     // define switches which can be read from dict
     forceSubM(0).setSwitchesList(0,true); // activate treatExplicit switch
-
-    // read those switches defined above, if provided in dict
+    forceSubM(0).setSwitchesList(3,true); // activate search for verbose switch
+    forceSubM(0).setSwitchesList(4,true); // activate search for interpolate switch
+    forceSubM(0).setSwitchesList(8,true); // activate scalarViscosity switch
     forceSubM(0).readSwitches();
 
-    if (propsDict_.found("interpolation")) interpolation_=true;
-    if (propsDict_.found("verbose")) verbose_=true;
-
-     particleCloud_.checkCG(false);
+    particleCloud_.checkCG(false);
 
     //Append the field names to be probed
     particleCloud_.probeM().initialize(typeName, "meiLift.logDat");
@@ -114,12 +104,8 @@ MeiLift::~MeiLift()
 
 void MeiLift::setForce() const
 {
-    // get viscosity field
-    #ifdef comp
-        const volScalarField nufField = particleCloud_.turbulence().mu() / rho_;
-    #else
-        const volScalarField& nufField = particleCloud_.turbulence().nu();
-    #endif
+    const volScalarField& nufField = forceSubM(0).nuField();
+    const volScalarField& rhoField = forceSubM(0).rhoField();
 
     vector position(0,0,0);
     vector lift(0,0,0);
@@ -159,7 +145,7 @@ void MeiLift::setForce() const
             {
                 Us = particleCloud_.velocity(index);
 
-                if(interpolation_)
+                if( forceSubM(0).interpolation() )
                 {
 	                position       = particleCloud_.position(index);
                     Ur               = UInterpolator_.interpolate(position,cellI) 
@@ -180,7 +166,7 @@ void MeiLift::setForce() const
                 {
                     ds  = 2*particleCloud_.radius(index);
                     nuf = nufField[cellI];
-                    rho = rho_[cellI];
+                    rho = rhoField[cellI];
 
                     // calc dimensionless properties
                     Rep = ds*magUr/nuf;
@@ -236,7 +222,7 @@ void MeiLift::setForce() const
 
                 //**********************************        
                 //SAMPLING AND VERBOSE OUTOUT
-                if(verbose_ )
+                if( forceSubM(0).verbose() )
                 {   
                     Pout << "index = " << index << endl;
                     Pout << "Us = " << Us << endl;

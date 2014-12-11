@@ -108,6 +108,17 @@ cfdemCloudMS& forceModelMS::cloudRefMS() const
 {
     return particleCloudMS_;
 }
+
+void forceModelMS::readDhbyV(dictionary& dict)
+{
+    if (dict.found("manDHdev"))
+    {
+        cloudRefMS().setManDHdev(Switch(dict.lookup("manDHdev")));
+        cloudRefMS().setDHbyV(scalarList(dict.lookup("dHbyV")));
+    }
+    Warning << "You defined:" << cloudRefMS().dHbyV().size() 
+            << " diameters manually - is this the number of clump types defined in *.in file?" << endl;
+}
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam

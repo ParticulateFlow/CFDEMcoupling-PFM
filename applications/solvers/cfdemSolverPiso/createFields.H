@@ -89,6 +89,22 @@
         mesh
     );
 
+/*
+    volVectorField fSmooth
+    (
+        IOobject
+        (
+            "fSmooth",
+            runTime.timeName(),
+            mesh,
+            IOobject::READ_IF_PRESENT, 
+            IOobject::NO_WRITE
+        ),
+        mesh,
+        dimensionedVector("0", dimensionSet(1, 1, -2, 0, 0), vector::zero)
+    );
+*/
+
 //===============================
 
 //#   include "createPhi.H"

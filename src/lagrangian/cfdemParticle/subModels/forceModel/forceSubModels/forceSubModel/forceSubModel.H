@@ -71,6 +71,13 @@ protected:
 
         mutable List<Switch> switches_;
 
+        mutable volScalarField nu_;
+
+        const volScalarField& nuField_;
+
+        word densityFieldName_;
+
+        const volScalarField& rho_;
 
 public:
 
@@ -127,6 +134,14 @@ public:
 
     // Access
 
+        inline bool verbose() const      { return switches_[3]; };
+
+        inline bool interpolation() const { return switches_[4]; };
+
+        inline bool useFilteredDragModel() const { return switches_[5]; };
+
+        inline bool useParcelSizeDependentFilteredDrag() const { return switches_[6]; };
+
         virtual word myType() const=0;
 
         inline forceModel& myForceM() const { return forceModel_;};
@@ -142,6 +157,12 @@ public:
         virtual void readSwitches() const;
 
         const label& nrDefaultSwitches() const {return nrDefaultSwitches_;};
+
+        const volScalarField& nuField() const;
+
+        const volScalarField& muField() const;
+
+        const volScalarField& rhoField() const;
 };
 
 

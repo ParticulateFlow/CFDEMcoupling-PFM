@@ -55,9 +55,11 @@ forceModels
     //GidaspowDrag
     //BeetstraDrag
     //DiFeliceDrag
-    KochHillDrag
     gradPForce
     viscForce
+    KochHillDrag
+    //DEMbasedDrag
+    //RongDrag
     //Archimedes
     //volWeightedAverage
     //totalMomentumExchange
@@ -99,23 +101,20 @@ implicitCoupleProps
 
 ArchimedesProps
 {
-    densityFieldName "rho";
     gravityFieldName "g";
 }
 gradPForceProps
 {
     pFieldName "p";
-    densityFieldName "rho";
     voidfractionFieldName "voidfraction";
     velocityFieldName "U";
-    interpolation;
+    interpolation true;
 }
 
 viscForceProps
 {
     velocityFieldName "U";
-    densityFieldName "rho";
-    interpolation;
+    interpolation true;
 }
 volWeightedAverageProps
 {
@@ -128,7 +127,7 @@ volWeightedAverageProps
     );
     upperThreshold 0.999;
     lowerThreshold 0;
-    verbose;
+    verbose true;
 }
 totalMomentumExchangeProps
 {
@@ -136,46 +135,48 @@ totalMomentumExchangeProps
     explicitMomExFieldName "none";
     fluidVelFieldName "U";
     granVelFieldName "Us";
-    densityFieldName "rho";
 }
 GidaspowDragProps
 {
-    verbose;
+    verbose true;
     velFieldName "U";
-    densityFieldName "rho";
     voidfractionFieldName "voidfraction";
-    interpolation;
+    interpolation true;
     phi 1;
 }
+DEMbasedDragProps
+{
+    velFieldName "U";
+    voidfractionFieldName "voidfraction";
+}
+
 DiFeliceDragProps
 {
-    //verbose;
+    //verbose true;
     velFieldName "U";
-    densityFieldName "rho";
     voidfractionFieldName "voidfraction";
     granVelFieldName "Us";
-    interpolation;
+    interpolation true;
 }
 
 KochHillDragProps
 {
-    //verbose;
+    //verbose true;
     velFieldName "U";
-    densityFieldName "rho";
     voidfractionFieldName "voidfraction";
-    interpolation;
+    interpolation true;
     //forceSubModels
     //(
     //    ImExCorr
     //);
-    //implDEM true;
+    implForceDEM true;
+    //implForceDEMaccumulated true;
     //explicitInterpCorr true;
 }
 
 BeetstraDragProps
 {
     velFieldName "U";
-    densityFieldName "rho";
     gravityFieldName "g";
     rhoParticle     2000.;
     voidfractionFieldName "voidfraction";
@@ -184,20 +185,30 @@ BeetstraDragProps
     useParcelSizeDependentFilteredDrag ;
     k       0.05;
     aLimit  0.0;
-//    verbose ;
+//    verbose true;
+}
+
+RongDragProps
+{
+    verbose true;
+    velFieldName "U";
+    voidfractionFieldName "voidfraction";
+    interpolation true;
+    implForceDEM true;
+    implForceDEMaccumulated true;
+    granVelFieldName "Us";
 }
 
 virtualMassForceProps
 {
     velFieldName "U";
-    densityFieldName "rho";
 }
 
 particleCellVolumeProps
 {
     upperThreshold 0.999;
     lowerThreshold 0.;
-    verbose;
+    verbose true;
 }
 
 oneWayVTKProps

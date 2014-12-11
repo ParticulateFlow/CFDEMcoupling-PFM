@@ -105,7 +105,6 @@ volWeightedAverageProps
 DiFeliceDragMSProps
 {
     velFieldName "U";
-    densityFieldName "rho";
     voidfractionFieldName "voidfraction";
     granVelFieldName "Us";
     //verbose;    
@@ -114,14 +113,12 @@ DiFeliceDragMSProps
 GidaspowDragMSProps
 {
     velFieldName "U";
-    densityFieldName "rho";
     voidfractionFieldName "voidfraction";
     hydraulicDiameter 0.002;
 }
 
 ArchimedesProps
 {
-    densityFieldName "rho";
     gravityFieldName "g";
 }
 

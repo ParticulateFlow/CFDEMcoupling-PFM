@@ -67,8 +67,6 @@ KochHillRWDrag::KochHillRWDrag
     verbose_(false),
     velFieldName_(propsDict_.lookup("velFieldName")),
     U_(sm.mesh().lookupObject<volVectorField> (velFieldName_)),
-    densityFieldName_(propsDict_.lookup("densityFieldName")),
-    rho_(sm.mesh().lookupObject<volScalarField> (densityFieldName_)),
     voidfractionFieldName_(propsDict_.lookup("voidfractionFieldName")),
     voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
     UsFieldName_(propsDict_.lookupOrDefault("granVelFieldName",word("Us"))),
@@ -152,16 +150,9 @@ void KochHillRWDrag::setForce() const
         Info << "KochHillRW using scale from liggghts cg = " << scale_ << endl;
     }
 
-    // get viscosity field
-    #ifdef comp
-        const volScalarField nufField = particleCloud_.turbulence().mu()/rho_;
-        const volScalarField& muField = particleCloud_.turbulence().mu();
-    #else
-        const volScalarField& nufField = particleCloud_.turbulence().nu();
-        const volScalarField muField = particleCloud_.turbulence().nu()*rho_;
-
-    #endif
-
+    const volScalarField& nufField = forceSubM(0).nuField();
+    const volScalarField& mufField = forceSubM(0).muField();
+    const volScalarField& rhoField = forceSubM(0).rhoField();
 
     vector position(0,0,0);
     scalar voidfraction(1);
@@ -263,7 +254,7 @@ void KochHillRWDrag::setForce() const
                 if(t>=partTime_[index][0])
                 {
                     scalar ds = 2*particleCloud_.radius(index);
-                    mu = muField[cellI];
+                    mu = mufField[cellI];
                     k = kField[cellI];
                     epsilon = epsilonField[cellI];
 
@@ -323,7 +314,7 @@ void KochHillRWDrag::setForce() const
 
                 ds = 2*particleCloud_.radius(index);
                 nuf = nufField[cellI];
-                rho = rho_[cellI];
+                rho = rhoField[cellI];
 				Rep = 0;
                 Vs = ds*ds*ds*M_PI/6;
                 volumefraction = 1-voidfraction+SMALL;

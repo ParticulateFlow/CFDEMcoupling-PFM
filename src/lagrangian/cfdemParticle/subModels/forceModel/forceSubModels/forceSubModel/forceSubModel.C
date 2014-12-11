@@ -59,15 +59,39 @@ forceSubModel::forceSubModel
     dict_(dict),
     particleCloud_(sm),
     forceModel_(fm),
-    nrDefaultSwitches_(3),
+    nrDefaultSwitches_(9),                                          // !!!
     switchesNameList_(wordList(nrDefaultSwitches_)),
     switchesList_(List<Switch>(nrDefaultSwitches_)),
-    switches_(List<Switch>(nrDefaultSwitches_))
+    switches_(List<Switch>(nrDefaultSwitches_)),
+    nu_
+    (
+        IOobject
+        (
+            "scalarViscosity",
+            sm.mesh().time().timeName(),
+            sm.mesh(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        sm.mesh(),
+        dimensionedScalar("nu0", dimensionSet(0, 2, -1, 0, 0), 1.)
+    ),
+    nuField_(sm.turbulence().nu()),
+    densityFieldName_(dict_.lookupOrDefault<word>("densityFieldName","rho")),
+    rho_(sm.mesh().lookupObject<volScalarField> (densityFieldName_))
 {
-    // init switches lists
-    switchesNameList_[0]="treatExplicit";
-    switchesNameList_[1]="treatDEM";
-    switchesNameList_[2]="implDEM";
+    // init standard switch list
+    int iCounter(0);
+    switchesNameList_[iCounter]="treatForceExplicit"; iCounter++;   //0
+    switchesNameList_[iCounter]="treatForceDEM";iCounter++;         //1
+    switchesNameList_[iCounter]="implForceDEM";iCounter++;          //2
+    switchesNameList_[iCounter]="verbose";iCounter++;               //3
+    switchesNameList_[iCounter]="interpolation";iCounter++;         //4
+    switchesNameList_[iCounter]="useFilteredDragModel";iCounter++;  //5
+    switchesNameList_[iCounter]="useParcelSizeDependentFilteredDrag";iCounter++;  //6
+	switchesNameList_[iCounter]="implForceDEMaccumulated";iCounter++;             //7
+	switchesNameList_[iCounter]="scalarViscosity";iCounter++;                     //8
+
     for(int i=0;i<switchesList_.size();i++)
     {
         switchesList_[i]=false;
@@ -114,7 +138,7 @@ void forceSubModel::partToArray
     }
 
     // forces for DEM
-    if(switches_[2]) // implDEM
+    if(switches_[2]) // implForceDEM
     {
         for(int j=0;j<3;j++)
             myForceM().fluidVel()[index][j]=Ufluid[j];
@@ -127,6 +151,8 @@ void forceSubModel::partToArray
             myForceM().DEMForces()[index][j] += dragTot[j];
     }
 }
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 void forceSubModel::explicitInterpCorr
 (
@@ -147,10 +173,10 @@ void forceSubModel::explicitInterpCorr
 
 void forceSubModel::readSwitches() const
 {
-    Info << "\nforceSubModel:" << myType() << endl;
+    Info << "\nreading switches for forceSubModel:" << myType() << endl;
     forAll(switchesNameList_,i)
     {
-        if(switchesList_[i] > 0+SMALL)
+        if(switchesList_[i] > 0+SMALL) //check if switch is required
         {
             Info << "  looking for " << switchesNameList_[i] << " ..." << endl;
             if (dict_.found(switchesNameList_[i]))
@@ -161,20 +187,91 @@ void forceSubModel::readSwitches() const
     }
     Info << endl;
 
-    if(switches_[2]) // implDEM=true
+    if(switches_[2]) // implForceDEM=true
     {
-        // communicate implDEM to particleCloud
+        // communicate implForceDEM to particleCloud
         particleCloud_.impDEMdrag_=true;
 
         // do sanity check
         if(switches_[0]) // treatExplicit=true
         {
-            Warning<< "please check your settings, treatExplicit together with implDEM does not work! (using treatExplicit=false)" << endl;
-            switches_[0]=false;
+            FatalError << "Please check your settings, treatExplicit together with implForceDEM does not work!." 
+                       << abort(FatalError);
         }
     }
+
+    if(switches_[7]) // implForceDEMaccumulated=true
+    {
+        // sanity check for implForceDEMaccumulated
+        if(!switches_[2]) //implForceDEM=false
+        {
+            Warning<< "please check your settings, implForceDEMaccumulated without implForceDEM does not work! (using implForceDEMaccumulated=false)" << endl;
+            switches_[3]=false;
+        }else
+        {
+            particleCloud_.impDEMdragAcc_=true;
+        }
+    }
+
+    if(switches_[8]) // scalarViscosity=true
+    {
+        Info << "Using a constant viscosity for this force model." << endl;
+        dimensionedScalar  nu0_("nu", dimensionSet(0, 2, -1, 0, 0), dict_.lookup("nu"));
+        nu_=volScalarField
+        (
+            IOobject
+            (
+                "scalarViscosity",
+                particleCloud_.mesh().time().timeName(),
+                particleCloud_.mesh(),
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+            ),
+            particleCloud_.mesh(),
+            nu0_
+        );
+    }
+
+    // look for old nomenclature
+    if (dict_.found("treatExplicit") || dict_.found("treatDEM") || dict_.found("implDEM"))
+        FatalError<< "You are using an old nomenclature for force model settings, please have a look at the forceSubModel doc." << abort(FatalError);
+        
+    // look for old nomenclature
+    if (dict_.found("verbose"))
+        Warning<< "Please make sure you use the new nomenclature for verbose force model settings, please have a look at the forceSubModel doc." << endl;
+
+    //if (dict_.found("interpolation"))
+    //    FatalError<< "Please make sure you use the new nomenclature for interpolation in force model settings, please have a look at the forceSubModel doc." << endl;
 }
 
+const volScalarField& forceSubModel::nuField() const
+{
+    #ifdef comp
+        return particleCloud_.turbulence().mu() / rho_;
+    #else
+        if(switches_[8]) // scalarViscosity=true
+            return nu_;
+        else
+            return particleCloud_.turbulence().nu();
+    #endif
+}
+
+const volScalarField& forceSubModel::muField() const
+{
+    #ifdef comp
+        return particleCloud_.turbulence().mu();
+    #else
+        if(switches_[8]) // scalarViscosity=true
+            return nu_*rho_;
+        else
+            return particleCloud_.turbulence().nu()*rho_;
+    #endif
+}
+
+const volScalarField& forceSubModel::rhoField() const
+{
+        return rho_;
+}
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam

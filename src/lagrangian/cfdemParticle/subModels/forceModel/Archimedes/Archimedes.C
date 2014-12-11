@@ -63,8 +63,6 @@ Archimedes::Archimedes
     forceModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
     twoDimensional_(false),
-    densityFieldName_(propsDict_.lookup("densityFieldName")),
-    rho_(sm.mesh().lookupObject<volScalarField> (densityFieldName_)),
     gravityFieldName_(propsDict_.lookup("gravityFieldName")),
     #if defined(version21) || defined(version16ext)
         g_(sm.mesh().lookupObject<uniformDimensionedVectorField> (gravityFieldName_))
@@ -91,18 +89,20 @@ Archimedes::Archimedes
 
     // define switches which can be read from dict
     forceSubM(0).setSwitchesList(0,true); // activate treatExplicit switch
-    forceSubM(0).setSwitchesList(1,true); // activate treatDEM switch
-
-    // read those switches defined above, if provided in dict
+    forceSubM(0).setSwitchesList(1,true); // activate treatForceDEM switch
     forceSubM(0).readSwitches();
 
-    if (modelType_=="A"){
-        forceSubM(0).setSwitches(1,true); // treatDEM = true
-        Info << "accounting for Archimedes only on DEM side!" << endl;
+    if (modelType_=="A" || modelType_=="Bfull"){
+        if(!forceSubM(0).switches()[1]) // treatDEM != true
+        {
+            Warning << "Usually model type A and Bfull need Archimedes only on DEM side only (treatForceDEM=true)! are you sure about your settings?" << endl;
+        }
     }
     if (modelType_=="B"){
-        forceSubM(0).setSwitches(1,false); // treatDEM = false
-        Info << "accounting for Archimedes on DEM and CFD side!" << endl;
+        if(forceSubM(0).switches()[1]) // treatDEM = true
+        {
+            Warning << "Usually model type B needs Archimedes only on CFD and DEM side (treatForceDEM=false)! are you sure about your settings?" << endl;
+        }
     }
 
     particleCloud_.checkCG(true);
@@ -136,11 +136,20 @@ void Archimedes::setForce() const
 
                 if(twoDimensional_)
                 {
-                    force = -g_.value()*rho_[cellI]*pow(dp,2)/4*M_PI;
+                    force = -g_.value()*forceSubM(0).rhoField()[cellI]*pow(dp,2)/4*M_PI;
                     Warning << "Archimedes::setForce() : this functionality is not tested!" << endl;
                 }else{
-                    force = -g_.value()*rho_[cellI]*particleCloud_.particleVolume(index);
+                    force = -g_.value()*forceSubM(0).rhoField()[cellI]*particleCloud_.particleVolume(index);
                 }
+
+                //if(index >=0 && index <100)
+                //{
+                //    Pout << "cellI = " << cellI << endl;
+                //    Pout << "index = " << index << endl;
+                //    Pout << "forceSubM(0).rhoField()[cellI] = " << forceSubM(0).rhoField()[cellI] << endl;
+                //    Pout << "particleCloud_.particleVolume(index) = " << particleCloud_.particleVolume(index) << endl;
+                //    Pout << "force = " << force << endl;
+                //}
 
                 //Set value fields and write the probe
                 if(probeIt_)

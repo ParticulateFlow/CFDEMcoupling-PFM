@@ -37,8 +37,9 @@ runLiggghtsProps
 //- optional
 writeLiggghtsProps
 {
-    writeLast on;
+    writeLast off;
     writeName "post/restart/liggghts.restartCFDEM";
+    overwrite on;
 }
 
 // ************************************************************************* //

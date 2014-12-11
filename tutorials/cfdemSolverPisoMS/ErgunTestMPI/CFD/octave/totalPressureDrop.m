@@ -109,7 +109,6 @@ axis([0,Uend,0,dpErgun(length(dpErgun))])
 
 %print('cfdemSolverPiso_settlingTest.eps','-deps2')
 print -color "cfdemSolverPisoMS_ErgunTestMPI.eps"
-replot;
 SimName="ErgunTestMPI_sphereOfSpheres"
 print(fig,strcat("figure_",SimName,".png"));
 

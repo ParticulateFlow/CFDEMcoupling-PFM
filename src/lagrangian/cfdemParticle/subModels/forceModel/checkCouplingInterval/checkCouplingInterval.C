@@ -64,8 +64,6 @@ checkCouplingInterval::checkCouplingInterval
 :
     forceModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
-    densityFieldName_(propsDict_.lookup("densityFieldName")),
-    rho_(sm.mesh().lookupObject<volScalarField> (densityFieldName_)),
     rhoP_(readScalar(propsDict_.lookup("rhoP")))
 {}
 
@@ -82,12 +80,9 @@ void checkCouplingInterval::setForce() const
 {
     if(particleCloud_.mesh().time().write())
     {
-        // get viscosity field
-        #ifdef comp
-            const volScalarField nufField = particleCloud_.turbulence().mu() / rho_;
-        #else
-            const volScalarField& nufField = particleCloud_.turbulence().nu();
-        #endif
+
+        const volScalarField& nufField = forceSubM(0).nuField();
+        const volScalarField& rhoField = forceSubM(0).rhoField();
 
         // find min particle relaxation time
         scalar minTauP = 1000;
@@ -101,7 +96,7 @@ void checkCouplingInterval::setForce() const
             {
                 scaledRad = particleCloud_.radius(index)/particleCloud_.cg();
                 tauP = rhoP_*4*scaledRad*scaledRad/
-                        (18 * nufField[cellI] * rho_[cellI]);
+                        (18 * nufField[cellI] * rhoField[cellI]);
                 minTauP = min(minTauP,tauP);
             }
         }

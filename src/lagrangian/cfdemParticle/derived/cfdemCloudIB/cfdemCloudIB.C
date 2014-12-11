@@ -121,7 +121,7 @@ bool Foam::cfdemCloudIB::evolve()
 
           // set void fraction field
           if(verbose_) Info << "- setvoidFraction()" << endl;
-          voidFractionM().setvoidFraction(NULL,voidfractions_,particleWeights_,particleVolumes_);
+          voidFractionM().setvoidFraction(NULL,voidfractions_,particleWeights_,particleVolumes_,particleV_);
           if(verbose_) Info << "setvoidFraction done." << endl;
         }
         
@@ -190,6 +190,7 @@ void Foam::cfdemCloudIB::calcVelocityCorrection
             }
         //}
     }
+    U.correctBoundaryConditions();
 
     // make field divergence free - set reference value in case it is needed
     fvScalarMatrix phiIBEqn

@@ -40,30 +40,26 @@ Description
 
 #include "cfdemCloud.H"
 #include "implicitCouple.H"
-#include "forceModel.H"
 #include "smoothingModel.H"
+#include "forceModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 int main(int argc, char *argv[])
 {
     #include "setRootCase.H"
-
     #include "createTime.H"
     #include "createMesh.H"
     #include "createFields.H"
-
     #include "initContinuityErrs.H"
 
     // create cfdemCloud
     #include "readGravitationalAcceleration.H"
     cfdemCloud particleCloud(mesh);
-
     #include "checkModelType.H"
+
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
     Info<< "\nStarting time loop\n" << endl;
-
     while (runTime.loop())
     {
         Info<< "Time = " << runTime.timeName() << nl << endl;
@@ -73,7 +69,7 @@ int main(int argc, char *argv[])
 
         // do particle stuff
         Info << "- evolve()" << endl;
-        particleCloud.evolve(voidfraction,Us,U);
+        bool hasEvolved = particleCloud.evolve(voidfraction,Us,U);
 
         Ksl.internalField() = particleCloud.momCoupleM(0).impMomSource();
         particleCloud.smoothingM().smoothen(Ksl);
@@ -115,7 +111,7 @@ int main(int argc, char *argv[])
             if (momentumPredictor)
             {
                 //solve UEqn
-                if (modelType=="B")
+                if (modelType=="B" || modelType=="Bfull")
                     solve(UEqn == - fvc::grad(p) + Ksl/rho*Us);
                 else
                     solve(UEqn == - voidfraction*fvc::grad(p) + Ksl/rho*Us);
@@ -176,7 +172,7 @@ int main(int argc, char *argv[])
 
                 #include "continuityErrorPhiPU.H"
 
-                if (modelType=="B")
+                if (modelType=="B" || modelType=="Bfull")
                     U -= rUA*fvc::grad(p) - Ksl/rho*Us*rUA;
                 else
                     U -= voidfraction*rUA*fvc::grad(p) - Ksl/rho*Us*rUA;

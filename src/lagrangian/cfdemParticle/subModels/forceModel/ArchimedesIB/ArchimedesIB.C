@@ -63,8 +63,6 @@ ArchimedesIB::ArchimedesIB
     forceModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
     twoDimensional_(false),
-    densityFieldName_(propsDict_.lookup("densityFieldName")),
-    rho_(sm.mesh().lookupObject<volScalarField> (densityFieldName_)),
     voidfractionFieldName_(propsDict_.lookup("voidfractionFieldName")), //mod by alice
     voidfractions_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),//mod by alice
     gravityFieldName_(propsDict_.lookup("gravityFieldName")),
@@ -125,8 +123,8 @@ void ArchimedesIB::setForce() const
                 label cellI = particleCloud_.cellIDs()[index][subCell];
                 if (cellI > -1) // particle Found
                 {
-                    //force += -g_.value()*rho_[cellI]*rho_.mesh().V()[cellI]*(1-particleCloud_.voidfractions()[index][subCell]);//mod by alice
-                	force += -g_.value()*rho_[cellI]*rho_.mesh().V()[cellI]*(1-voidfractions_[cellI]);//mod by alice
+                    //force += -g_.value()*forceSubM(0).rhoField()[cellI]*forceSubM(0).rhoField().mesh().V()[cellI]*(1-particleCloud_.voidfractions()[index][subCell]);//mod by alice
+                	force += -g_.value()*forceSubM(0).rhoField()[cellI]*particleCloud_.mesh().V()[cellI]*(1-voidfractions_[cellI]);//mod by alice
         	    }
             }
 
