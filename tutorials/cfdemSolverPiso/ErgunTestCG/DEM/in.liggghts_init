@@ -76,4 +76,4 @@ dump		dmp all custom 5000 post/dump.liggghts_init id type type x y z ix iy iz vx
 #cell id : f_couple_cfd[7]
 
 run		        10000 upto
-write_restart 	../DEM/post/restart/liggghts.restart_coarseGraining_${cg}
+write_restart 	./post/restart/liggghts.restart_coarseGraining_${cg}
