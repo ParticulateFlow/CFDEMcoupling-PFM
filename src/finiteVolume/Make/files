@@ -2,11 +2,8 @@ fvPatchFields = fields/fvPatchFields
 derivedFvPatchFields = $(fvPatchFields)/derived
 
 general = cfdTools/general
-/*porosity = $(general)/porosityModel*/
 
 $(derivedFvPatchFields)/uniformFixedValueVoidfraction/uniformFixedValueVoidfractionFvPatchFields.C
 $(derivedFvPatchFields)/uniformFixedValueTube/uniformFixedValueTubeFvPatchFields.C
-
-/*$(porosity)/DarcyForchheimerLimiter/DarcyForchheimerLimiter.C*/
 
 LIB = $(CFDEM_LIB_DIR)/libfiniteVolumeCFDEM
