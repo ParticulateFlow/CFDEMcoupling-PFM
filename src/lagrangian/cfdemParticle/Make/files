@@ -1,4 +1,5 @@
 cfdemCloud = cfdemCloud
+cfdTools = cfdTools
 forceModels = subModels/forceModel
 forceSubModels = subModels/forceModel/forceSubModels
 forceModelsMS = subModels/forceModelMS
@@ -19,11 +20,15 @@ $(cfdemCloud)/cfdemCloud.C
 derived/cfdemCloudIB/cfdemCloudIB.C
 derived/cfdemCloudMS/cfdemCloudMS.C
 
+$(cfdTools)/global.C
+$(cfdTools)/newGlobal.C
+
 $(forceModels)/forceModel/forceModel.C
 $(forceModels)/forceModel/newForceModel.C
 $(forceModels)/noDrag/noDrag.C
 $(forceModels)/checkCouplingInterval/checkCouplingInterval.C
 $(forceModels)/DiFeliceDrag/DiFeliceDrag.C
+$(forceModels)/fieldStore/fieldStore.C
 $(forceModels)/GidaspowDrag/GidaspowDrag.C
 $(forceModels)/SchillerNaumannDrag/SchillerNaumannDrag.C
 $(forceModels)/Archimedes/Archimedes.C
