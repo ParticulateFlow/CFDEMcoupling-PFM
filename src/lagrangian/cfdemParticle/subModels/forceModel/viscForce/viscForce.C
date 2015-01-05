@@ -126,21 +126,7 @@ viscForce::~viscForce()
 
 void viscForce::setForce() const
 {
-    const volScalarField& nufField = forceSubM(0).nuField();
-    const volScalarField& rhoField = forceSubM(0).rhoField();
-
-    // get viscosity field
-    #ifdef comp
-        // calc div(Tau)
-        volVectorField divTauField =
-        - fvc::laplacian(forceSubM(0).muField(), U_)
-        - fvc::div(forceSubM(0).muField()*dev(fvc::grad(U_)().T()));
-    #else
-        // calc div(Tau)
-        volVectorField divTauField =
-        - fvc::laplacian(nufField*rhoField, U_)
-        - fvc::div(nufField*rhoField*dev(fvc::grad(U_)().T()));
-    #endif
+    const volVectorField& divTauField = forceSubM(0).divTauField(U_);
 
     vector divTau;
     scalar Vs;

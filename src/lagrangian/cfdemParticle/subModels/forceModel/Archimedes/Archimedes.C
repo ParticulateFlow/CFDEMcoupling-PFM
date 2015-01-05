@@ -101,7 +101,7 @@ Archimedes::Archimedes
     if (modelType_=="B"){
         if(forceSubM(0).switches()[1]) // treatDEM = true
         {
-            Warning << "Usually model type B needs Archimedes only on CFD and DEM side (treatForceDEM=false)! are you sure about your settings?" << endl;
+            Warning << "Usually model type B needs Archimedes on CFD and DEM side (treatForceDEM=false)! are you sure about your settings?" << endl;
         }
     }
 

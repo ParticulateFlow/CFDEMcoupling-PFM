@@ -73,7 +73,9 @@ protected:
 
         mutable volScalarField nu_;
 
-        const volScalarField& nuField_;
+        mutable volVectorField divTau_;
+
+        mutable volVectorField IBDragPerV_;
 
         word densityFieldName_;
 
@@ -163,6 +165,10 @@ public:
         const volScalarField& muField() const;
 
         const volScalarField& rhoField() const;
+
+        const volVectorField& divTauField(const volVectorField&) const;
+
+        const volVectorField& IBDragPerV(const volVectorField&,const volScalarField&) const;
 };
 
 

@@ -65,7 +65,13 @@ checkCouplingInterval::checkCouplingInterval
     forceModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
     rhoP_(readScalar(propsDict_.lookup("rhoP")))
-{}
+{
+    // init force sub model
+    setForceSubModels(propsDict_);
+
+    // read those switches defined above, if provided in dict
+    forceSubM(0).readSwitches();
+}
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
@@ -108,7 +114,8 @@ void checkCouplingInterval::setForce() const
         double accNrAll=-1.;
 
         MPI_Allreduce(&accNr, &accNrAll, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
-
+        Info << "min. occurring particle relaxation time [s]: " << minTauP << endl;
+        Info << "coupling interval [s]: " << DEMtime << endl;
         Info << "max. occurring acceleration nr: " << accNrAll << endl;
         if(accNrAll > 0.1) Warning << "you should use a smaller coupling interval!" << endl;
     }

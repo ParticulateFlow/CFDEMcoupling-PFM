@@ -29,113 +29,91 @@ Description
     and OpenFOAM(R). Note: this code is not part of OpenFOAM(R) (see DISCLAIMER).
 
 Class
-    particleProbe
+    global
 
 SourceFiles
-    particleProbe.C
+    global.Cver
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef particleProbe_H
-#define particleProbe_H
+#ifndef global_H
+#define global_H
 
-#include "probeModel.H"
 #include "fvCFD.H"
-#include "polyMesh.H"
 #include "cfdemCloud.H"
-#include "OFstream.H"
-#include <vector>
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class particleProbe Declaration
+                           Class global Declaration
 \*---------------------------------------------------------------------------*/
 
-class particleProbe
-:
-    public probeModel
+class global
 {
 
-private:
+protected:
 
-    dictionary propsDict_;
-
-    mutable word name_;
+    // Protected data
+    const dictionary& dict_;
 
     cfdemCloud& particleCloud_;
 
-    bool verbose_;
+    const char* const CFDEMversion;
 
-    bool verboseToFile_;
 
-    int writePrecision_;
+    // Protected member functions
 
-    word dirName_;
-
-    mutable int rank_;
-
-    mutable OFstream* sPtr;
-
-    int printEvery_;
-
-    bool sampleAll_;
-
-    bool probeDebug_;
-
-    bool includePosition_;
-
-    const labelList particleIDsToSample_;
-
-    mutable wordList itemsToSample_;
-
-    mutable List<OFstream*> sPtrList_;
-
-    mutable int itemCounter_;
-
-    mutable int currItemId_;
-
-    mutable int printCounter_;
-
-    mutable bool printNow_;
-
-    mutable std::vector<double> sProbes_;
-    
-    mutable std::vector<double*> vProbes_;
-    
 public:
 
     //- Runtime type information
-    TypeName("particleProbe");
+    TypeName("global");
+
+    // Declare runtime constructor selection table
+
+        declareRunTimeSelectionTable
+        (
+            autoPtr,
+            global,
+            dictionary,
+            (
+                const dictionary& dict,
+                cfdemCloud& sm
+            ),
+            (dict,sm)
+        );
 
 
     // Constructors
 
         //- Construct from components
-        particleProbe
+        global
         (
             const dictionary& dict,
-            cfdemCloud& sm,
-            word   typeName,
-            char*  logFileName
+            cfdemCloud& sm
         );
+
 
     // Destructor
 
-        ~particleProbe();
+        virtual ~global();
 
-    // Member Functions
-    void initialize(word typeName, word logFileName) const;
-    void setOutputFile() const;
-    void writeHeader() const;
-    void writeProbe(int index, Field<scalar> sValues, Field<vector> vValues) const;
-    bool checkIDForPrint(int) const;
-    void setCounter() const;
-    void clearProbes() const;
-    std::vector<double*>* getVprobe() {return &vProbes_; };
-    std::vector<double>* getSprobe() {return &sProbes_; };
+
+    // Selector
+
+        static autoPtr<global> New
+        (
+            const dictionary& dict,
+            cfdemCloud& sm
+        );
+
+    // Member Function
+
+    void info();
+
+    // Access
+
 };
 
 

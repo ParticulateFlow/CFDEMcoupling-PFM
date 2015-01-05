@@ -112,14 +112,7 @@ void ShirgaonkarIB::setForce() const
     label cellI;
     vector drag;
 
-    #ifdef comp
-        const volScalarField& mufField = forceSubM(0).muField();
-        volVectorField h = (mufField*fvc::laplacian(U_)-fvc::grad(p_));
-    #else
-        const volScalarField& nufField = forceSubM(0).nuField();
-        const volScalarField& rhoField = forceSubM(0).rhoField();
-        volVectorField h = rhoField*(nufField*fvc::laplacian(U_)-fvc::grad(p_));
-    #endif
+    volVectorField h=forceSubM(0).IBDragPerV(U_,p_);
 
     #include "setupProbeModel.H"
 

@@ -204,7 +204,7 @@ void particleProbe::writeHeader() const
             *sPtr<<"||   scalarData:  "  << "   ";  
             forAll(scalarFields_, iter)
             {
-                 *sPtr << scalarFields_(iter)  << "   "; 
+                 *sPtr << scalarFields_(iter)  << "   ";
             }
          }
 
@@ -214,8 +214,20 @@ void particleProbe::writeHeader() const
 
 }
 
+void particleProbe::clearProbes() const
+{
+  for (unsigned int i=0; i<vProbes_.size(); i++)
+   delete vProbes_[i];
+   
+  sProbes_.clear();
+  vProbes_.clear();
+ 
+}
+
 void particleProbe::writeProbe(int index, Field<scalar> sValues, Field<vector> vValues) const
 {
+   
+    
     if(printNow_ && checkIDForPrint(index) &&  verboseToFile_) 
     {
 
@@ -224,15 +236,34 @@ void particleProbe::writeProbe(int index, Field<scalar> sValues, Field<vector> v
        *sPtr << index  << tab 
                 << particleCloud_.mesh().time().value()  << "   " ;
         *sPtr << "||   ";
-
+        
+        int vsize_=vProbes_.size();
         //vectorFields
         *sPtr <<    setprecision(writePrecision_) ;
          forAll(vValues, iter)
          {
-              if(!probeDebug_ && iter>0) break;
+             // if(!probeDebug_ && iter>0) break;
              *sPtr << vValues[iter][0] << "   ";
              *sPtr << vValues[iter][1] << "   "; 
              *sPtr << vValues[iter][2] << "   ";  
+             
+             
+             if(index<vsize_)
+             {
+              vProbes_[index][0]+=vValues[iter][0];
+              vProbes_[index][1]+=vValues[iter][1];
+              vProbes_[index][2]+=vValues[iter][2];
+             }
+             else
+             {
+              double * vprobe_= new double[3];
+              vprobe_[0]=vValues[iter][0];
+              vprobe_[1]=vValues[iter][1];
+              vprobe_[2]=vValues[iter][2];
+              
+              vProbes_.push_back(vprobe_);
+             }       
+          
           }
 
         //scalarFields
@@ -242,6 +273,7 @@ void particleProbe::writeProbe(int index, Field<scalar> sValues, Field<vector> v
            forAll(sValues, iter)
            {
                *sPtr << sValues[iter] << "   "; 
+               sProbes_.push_back(sValues[iter]);
             }
         }
 

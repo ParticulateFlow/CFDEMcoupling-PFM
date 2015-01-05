@@ -21,7 +21,6 @@ LaEuScalarTempProps
 {
     velFieldName "U";
     tempFieldName "T";
-    tempSourceFieldName "Tsource";
     voidfractionFieldName "voidfraction";
     partTempName "Temp";
     partHeatFluxName "convectiveHeatFlux";
@@ -34,8 +33,6 @@ LaEuScalarTempProps
 <UL><LI><I>U</I> = name of the finite volume fluid velocity field 
 
 <LI><I>T</I> = name of the finite volume scalar temperature field 
-
-<LI><I>Tsource</I> = name of the finite volume scalar temperature source field 
 
 <LI><I>voidfraction</I> = name of the finite volume voidfraction field 
 
@@ -63,7 +60,6 @@ LaEuScalarTempProps
 {
     velFieldName "U";
     tempFieldName "T";
-    tempSourceFieldName "Tsource";
     voidfractionFieldName "voidfraction";
     partTempName "Temp";
     partHeatFluxName "convectiveHeatFlux";
@@ -77,7 +73,7 @@ LaEuScalarTempProps
 </P>
 <P><B>Restrictions:</B>
 </P>
-<P>Goes only with cfdemSolverScalar.
+<P>Goes only with cfdemSolverScalar. The force model has to be the second (!!!) model in the forces list.
 </P>
 <P><B>Related commands:</B>
 </P>

@@ -27,86 +27,54 @@ License
 Description
     This code is designed to realize coupled CFD-DEM simulations using LIGGGHTS
     and OpenFOAM(R). Note: this code is not part of OpenFOAM(R) (see DISCLAIMER).
-
-Class
-    dividedVoidFraction
-
-SourceFiles
-    dividedVoidFraction.C
-
 \*---------------------------------------------------------------------------*/
 
-#ifndef dividedVoidFraction_H
-#define dividedVoidFraction_H
-
-#include "voidFractionModel.H"
-#include "interpolationCellPoint.H"
+#include "error.H"
+#include "global.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-/*---------------------------------------------------------------------------*\
-                           Class noDrag Declaration
-\*---------------------------------------------------------------------------*/
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-class dividedVoidFraction
-:
-    public voidFractionModel
+defineTypeNameAndDebug(global, 0);
+
+defineRunTimeSelectionTable(global, dictionary);
+
+// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+void global::info()
 {
+    Info << "\nYou are currently using:" << endl;
+    Info << "OF version: " << FOAMversion << endl;
+    Info << "OF build: " << FOAMbuild << endl;
+    Info << "CFDEM build: " << CFDEMversion << "\n" << endl;
+}
 
-private:
-        dictionary propsDict_;
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-        bool verbose_;
-
-        const scalar alphaMin_;          // min value of voidFraction
-
-	    mutable bool alphaLimited_;
-
-        mutable scalar tooMuch_;         // particle volume which is lost due to voidFraction limitation
-
-        bool interpolation_;
-
-        bool cfdemUseOnly_;
-
-        virtual inline scalar Vp(int index, scalar radius, scalar scaleVol) const
-        {
-            return 4.188790205*radius*radius*radius*scaleVol; //4/3*pi=4.188790205
-        };
-
-public:
-
-    //- Runtime type information
-    TypeName("divided");
+// Construct from components
+global::global
+(
+    const dictionary& dict,
+    cfdemCloud& sm
+)
+:
+    dict_(dict),
+    particleCloud_(sm),
+    CFDEMversion(GITVERSION)
+{}
 
 
-    // Constructors
+// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-        //- Construct from components
-        dividedVoidFraction
-        (
-            const dictionary& dict,
-            cfdemCloud& sm
-        );
-
-    // Destructor
-
-        ~dividedVoidFraction();
-
-
-    // Member Functions
-        void setvoidFraction(double** const& ,double**&, double**&, double**&, double**&) const;
-};
+global::~global()
+{}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#endif
 
 // ************************************************************************* //

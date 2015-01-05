@@ -50,6 +50,9 @@ export CFDEM_LIGGGHTS_LIB_NAME=lmp_$CFDEM_LIGGGHTS_MAKEFILE_NAME
 #- CFDEM lib name
 export CFDEM_LIB_NAME=lagrangianCFDEM-$CFDEM_VERSION-$WM_PROJECT_VERSION
 
+#- CFDEM compressible lib name
+export CFDEM_LIB_COMP_NAME=lagrangianCFDEMcomp-$CFDEM_VERSION-$WM_PROJECT_VERSION
+
 #-----------------------------------------------------
 # additional libraries
 
@@ -68,6 +71,9 @@ export CFDEM_POEMSLIB_MAKEFILENAME=g++
 #- LMP ASPHERE lib path and makefile
 export CFDEM_ASPHERELIB_PATH=$CFDEM_LAMMPS_LIB_DIR/poems
 export CFDEM_ASPHERELIB_MAKEFILENAME=g++
+
+#-C3PO library
+export C3PO_SRC_DIR=$CFDEM_SRC_DIR/c3po
 #-----------------------------------------------------
 
 #- path to test harness
@@ -177,6 +183,11 @@ export -f cfdemLiggghtsPar
 #- shortcut to open files including a pattern
 cfdemGrep() { grep -rl "$1" ./* | xargs gedit; }
 export -f cfdemGrep
+
+#- shortcut lo list files in a directory
+#cfdemListFiles() { find $1 | sed s:""$1"":: > listOfFiles.txt; }   #leave out the dir iteslf in list
+cfdemListFiles() { find $1 > listOfFiles.txt; }                     #keep the dir in list
+export -f cfdemListFiles
 
 # check if the run directory exists
 if [ -d "$CFDEM_PROJECT_USER_DIR" ]; then

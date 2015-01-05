@@ -28,114 +28,70 @@ Description
     This code is designed to realize coupled CFD-DEM simulations using LIGGGHTS
     and OpenFOAM(R). Note: this code is not part of OpenFOAM(R) (see DISCLAIMER).
 
+    calc time average of scalar or vector field
+
 Class
-    particleProbe
+    fieldStore
 
 SourceFiles
-    particleProbe.C
+    fieldStore.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef particleProbe_H
-#define particleProbe_H
+#ifndef fieldStore_H
+#define fieldStore_H
 
-#include "probeModel.H"
-#include "fvCFD.H"
-#include "polyMesh.H"
-#include "cfdemCloud.H"
-#include "OFstream.H"
-#include <vector>
+#include "forceModel.H"
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class particleProbe Declaration
+                           Class fieldStore Declaration
 \*---------------------------------------------------------------------------*/
 
-class particleProbe
+class fieldStore
 :
-    public probeModel
+    public forceModel
 {
-
 private:
 
     dictionary propsDict_;
 
-    mutable word name_;
+    const fvMesh& mesh_;
 
-    cfdemCloud& particleCloud_;
+    const wordList scalarFieldNames_;
 
-    bool verbose_;
+    const wordList vectorFieldNames_;
 
-    bool verboseToFile_;
+    mutable PtrList<volScalarField> scalarFields_;
 
-    int writePrecision_;
+    mutable PtrList<volVectorField> vectorFields_;
 
-    word dirName_;
-
-    mutable int rank_;
-
-    mutable OFstream* sPtr;
-
-    int printEvery_;
-
-    bool sampleAll_;
-
-    bool probeDebug_;
-
-    bool includePosition_;
-
-    const labelList particleIDsToSample_;
-
-    mutable wordList itemsToSample_;
-
-    mutable List<OFstream*> sPtrList_;
-
-    mutable int itemCounter_;
-
-    mutable int currItemId_;
-
-    mutable int printCounter_;
-
-    mutable bool printNow_;
-
-    mutable std::vector<double> sProbes_;
-    
-    mutable std::vector<double*> vProbes_;
-    
 public:
 
     //- Runtime type information
-    TypeName("particleProbe");
+    TypeName("fieldStore");
 
 
     // Constructors
 
         //- Construct from components
-        particleProbe
+        fieldStore
         (
             const dictionary& dict,
-            cfdemCloud& sm,
-            word   typeName,
-            char*  logFileName
+            cfdemCloud& sm
         );
 
     // Destructor
 
-        ~particleProbe();
+        ~fieldStore();
+
 
     // Member Functions
-    void initialize(word typeName, word logFileName) const;
-    void setOutputFile() const;
-    void writeHeader() const;
-    void writeProbe(int index, Field<scalar> sValues, Field<vector> vValues) const;
-    bool checkIDForPrint(int) const;
-    void setCounter() const;
-    void clearProbes() const;
-    std::vector<double*>* getVprobe() {return &vProbes_; };
-    std::vector<double>* getSprobe() {return &sProbes_; };
+        void setForce() const;
 };
 
 

@@ -138,8 +138,6 @@ void LaEuScalarTemp::manipulateScalarField(volScalarField& EuField) const
     const volScalarField& nufField = forceSubM(0).nuField();
     const volScalarField& rhoField = forceSubM(0).rhoField();
 
-Info << "nufField=" << nufField << endl;
-
     // calc La based heat flux
     vector position(0,0,0);
     scalar voidfraction(1);
@@ -160,6 +158,8 @@ Info << "nufField=" << nufField << endl;
     interpolationCellPoint<vector> UInterpolator_(U_);
     interpolationCellPoint<scalar> TInterpolator_(tempField_);
 
+    scalar h1(0);
+    scalar h2(0);
     for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)
     {
         //if(particleCloud_.regionM().inRegion()[index][0])
@@ -187,7 +187,7 @@ Info << "nufField=" << nufField << endl;
                 As = ds*ds*M_PI;
                 nuf = nufField[cellI];
                 Rep = ds*magUr/nuf;
-                Pr = Cp_*nuf*rhoField[cellI]/lambda_;
+                Pr = max(SMALL,Cp_*nuf*rhoField[cellI]/lambda_);
 
                 if (Rep < 200)
                 {
@@ -195,8 +195,9 @@ Info << "nufField=" << nufField << endl;
                 }
                 else if (Rep < 1500)
                 {
-                    Nup = 2+0.5*pow(voidfraction,n)*sqrt(Rep)*pow(Pr,0.33)
-                                 +0.02*pow(voidfraction,n)*pow(Rep,0.8)*pow(Pr,0.33);
+                    h1=pow(voidfraction,n);
+                    h2=pow(Pr,0.33);
+                    Nup = 2+0.5*h1*sqrt(Rep)*h2+0.02*h1*pow(Rep,0.8)*h2;
                 }
                 else
                 {

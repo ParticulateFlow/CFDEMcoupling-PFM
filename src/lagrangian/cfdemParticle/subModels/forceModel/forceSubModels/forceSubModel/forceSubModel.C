@@ -76,7 +76,32 @@ forceSubModel::forceSubModel
         sm.mesh(),
         dimensionedScalar("nu0", dimensionSet(0, 2, -1, 0, 0), 1.)
     ),
-    nuField_(sm.turbulence().nu()),
+    divTau_
+    (
+        IOobject
+        (
+            "divTau",
+            sm.mesh().time().timeName(),
+            sm.mesh(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        sm.mesh(),
+        dimensionedVector("divTau", dimensionSet(1, -2, -2, 0, 0), vector::zero)
+    ),
+    IBDragPerV_
+    (
+        IOobject
+        (
+            "IBDragPerV",
+            sm.mesh().time().timeName(),
+            sm.mesh(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        sm.mesh(),
+        dimensionedVector("IBDragPerV", dimensionSet(1, -2, -2, 0, 0), vector::zero)
+    ),
     densityFieldName_(dict_.lookupOrDefault<word>("densityFieldName","rho")),
     rho_(sm.mesh().lookupObject<volScalarField> (densityFieldName_))
 {
@@ -246,8 +271,9 @@ void forceSubModel::readSwitches() const
 
 const volScalarField& forceSubModel::nuField() const
 {
-    #ifdef comp
-        return particleCloud_.turbulence().mu() / rho_;
+    #ifdef compre
+        nu_=particleCloud_.turbulence().mu() / rho_;
+        return nu_;
     #else
         if(switches_[8]) // scalarViscosity=true
             return nu_;
@@ -258,9 +284,12 @@ const volScalarField& forceSubModel::nuField() const
 
 const volScalarField& forceSubModel::muField() const
 {
-    #ifdef comp
+    #ifdef compre
         return particleCloud_.turbulence().mu();
     #else
+        // passing the ref to nu*rho will not work->generate a mu_ field like nu_
+        FatalError<< "implementation not complete!" << abort(FatalError);
+
         if(switches_[8]) // scalarViscosity=true
             return nu_*rho_;
         else
@@ -270,7 +299,32 @@ const volScalarField& forceSubModel::muField() const
 
 const volScalarField& forceSubModel::rhoField() const
 {
-        return rho_;
+    return rho_;
+}
+
+const volVectorField& forceSubModel::divTauField(const volVectorField& U) const
+{
+    // calc div(Tau)
+    #ifdef compre
+        const volScalarField& mu_ = muField();
+        divTau_ = -fvc::laplacian(mu_, U) - fvc::div(mu_*dev(fvc::grad(U)().T()));
+        return divTau_;
+    #else
+        const volScalarField& nu_ = nuField();
+        const volScalarField& rho_ = rhoField();
+        divTau_ = -fvc::laplacian(nu_*rho_, U)- fvc::div(nu_*rho_*dev(fvc::grad(U)().T()));
+        return divTau_;
+    #endif
+}
+
+const volVectorField& forceSubModel::IBDragPerV(const volVectorField& U,const volScalarField& p) const
+{
+    #ifdef compre
+        IBDragPerV_ = muField()*fvc::laplacian(U)-fvc::grad(p)
+    #else
+        IBDragPerV_ = rhoField()*(nuField()*fvc::laplacian(U)-fvc::grad(p));
+    #endif
+    return IBDragPerV_;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

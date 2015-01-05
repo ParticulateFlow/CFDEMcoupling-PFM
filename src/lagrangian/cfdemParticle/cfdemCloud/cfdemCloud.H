@@ -44,6 +44,7 @@ SourceFiles
 
 // choose version
 #include "OFversion.H"
+#include <vector>
 
 #include "fvCFD.H"
 #include "IFstream.H"
@@ -155,7 +156,7 @@ protected:
     mutable volScalarField ddtVoidfraction_;
 
     #if defined(version21) || defined(version16ext)
-        #ifdef comp
+        #ifdef compre
             const compressible::turbulenceModel& turbulence_;
         #else
             const incompressible::turbulenceModel& turbulence_;
@@ -323,6 +324,9 @@ public:
        virtual inline double ** exArray() const {return NULL;};
        virtual vector ex(int) const {return Foam::vector(0,0,0);};
 
+       //Detector if SRF module is enable or not
+       virtual inline bool SRFOn(){return false;}
+
        inline int numberOfParticles() const;
 
        inline bool numberOfParticlesChanged() const;
@@ -358,7 +362,7 @@ public:
        inline autoPtr<liggghtsCommandModel>* liggghtsCommand() const;
 
        #if defined(version21) || defined(version16ext)
-            #ifdef comp
+            #ifdef compre
                 inline const compressible::turbulenceModel& turbulence() const;
             #else
                 inline const incompressible::turbulenceModel& turbulence() const;
@@ -373,6 +377,9 @@ public:
         virtual bool evolve(volScalarField&,volVectorField&,volVectorField&);
 
         virtual bool reAllocArrays() const;
+
+        virtual bool reAllocArrays(int nP, bool forceRealloc) const;  //force number of particles during reallocation
+
 
     // IO
         void writeScalarFieldToTerminal(double**&);
@@ -391,6 +398,10 @@ public:
         tmp<volScalarField> voidfractionNuEff(volScalarField&) const;
 
         void resetArray(double**&,int,int,double resetVal=0.);
+
+        std::vector<double*>* getVprobe();
+         
+        std::vector<double>* getSprobe();
 };
 
 

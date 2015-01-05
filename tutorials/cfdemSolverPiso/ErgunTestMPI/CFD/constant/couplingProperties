@@ -211,6 +211,18 @@ particleCellVolumeProps
     verbose true;
 }
 
+fieldStoreProps
+{
+    scalarFieldNames
+    (
+    );
+
+    vectorFieldNames
+    (
+        "U"
+    );
+}
+
 oneWayVTKProps
 {
     couplingFilename "vtk_out%4.4d.vtk";

@@ -61,8 +61,6 @@ class DiFeliceDragMS
 private:
     dictionary propsDict_;
 
-    bool verbose_;
-
     word velFieldName_;
 
     const volVectorField& U_;
@@ -70,8 +68,6 @@ private:
     word voidfractionFieldName_;
 
     const volScalarField& voidfraction_;
-
-    bool interpolation_; // use interpolated U field values
 
     bool splitImplicitExplicit_; // use splitting of implicit and explict force contribution
 

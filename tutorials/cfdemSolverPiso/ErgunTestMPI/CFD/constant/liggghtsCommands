@@ -26,7 +26,7 @@ FoamFile
 liggghtsCommandModels
 (
     runLiggghts
-    //writeLiggghts
+    writeLiggghts
 );
 // ************************************************************************* //
 
@@ -35,9 +35,9 @@ liggghtsCommandModels
     preNo false;
 }*/
 
-/*writeLiggghtsProps
+writeLiggghtsProps
 {
     writeLast off;
     writeName "post/restart/liggghts.restartCFDEM";
     overwrite on;
-}*/
+}

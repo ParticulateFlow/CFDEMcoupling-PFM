@@ -43,6 +43,9 @@ setenv CFDEM_LIGGGHTS_LIB_NAME lmp_$CFDEM_LIGGGHTS_MAKEFILE_NAME
 #- CFDEM lib name
 setenv CFDEM_LIB_NAME lagrangianCFDEM-$CFDEM_VERSION-$WM_PROJECT_VERSION
 
+#- CFDEM compressible lib name
+setenv CFDEM_LIB_COMP_NAME lagrangianCFDEMcomp-$CFDEM_VERSION-$WM_PROJECT_VERSION
+
 #- LMP Many2Many lib path and makefile
 setenv CFDEM_Many2ManyLIB_PATH $CFDEM_SRC_DIR/lagrangian/cfdemParticle/subModels/dataExchangeModel/twoWayMany2Many/library
 setenv CFDEM_Many2ManyLIB_MAKEFILENAME $CFDEM_LIGGGHTS_MAKEFILE_NAME

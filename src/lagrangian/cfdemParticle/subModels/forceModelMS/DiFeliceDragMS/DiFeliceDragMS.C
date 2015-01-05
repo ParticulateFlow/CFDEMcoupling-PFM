@@ -64,12 +64,10 @@ DiFeliceDragMS::DiFeliceDragMS
 :
     forceModelMS(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
-    verbose_(false),
     velFieldName_(propsDict_.lookup("velFieldName")),
     U_(sm.mesh().lookupObject<volVectorField> (velFieldName_)),
     voidfractionFieldName_(propsDict_.lookup("voidfractionFieldName")),
     voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
-    interpolation_(false),
     splitImplicitExplicit_(false),
     UsFieldName_(propsDict_.lookup("granVelFieldName")),
     UsField_(sm.mesh().lookupObject<volVectorField> (UsFieldName_))
@@ -85,28 +83,26 @@ DiFeliceDragMS::DiFeliceDragMS
     particleCloud_.probeM().scalarFields_.append("voidfraction");       //other are debug
     particleCloud_.probeM().writeHeader();
 
-    if (propsDict_.found("verbose")) verbose_=true;
-
     // init force sub model
     setForceSubModels(propsDict_);
 
     // define switches which can be read from dict
     forceSubM(0).setSwitchesList(0,true); // activate treatExplicit switch
+    forceSubM(0).setSwitchesList(3,true); // activate search for verbose switch
+    forceSubM(0).setSwitchesList(4,true); // activate search for interpolate switch
 
     // read those switches defined above, if provided in dict
     forceSubM(0).readSwitches();
 
-    if (propsDict_.found("interpolation"))
+    if (forceSubM(0).interpolation())
     {
-        Info << "using interpolated value of U." << endl;
-        interpolation_=true;
         Warning << " interpolation is commented for this force model - it seems to be unstable with AMI!" << endl;
     }
     if (propsDict_.found("splitImplicitExplicit"))
     {
         Info << "will split implicit / explicit force contributions." << endl;
         splitImplicitExplicit_ = true;
-        if(!interpolation_) 
+        if(!forceSubM(0).interpolation()) 
             Info << "WARNING: will only consider fluctuating particle velocity in implicit / explicit force split!" << endl;
     }
     particleCloud_.checkCG(false);
@@ -163,7 +159,7 @@ void DiFeliceDragMS::setForce() const
 
             if (cellI > -1) // particle Found
             {
-                //if(interpolation_)
+                //if(forceSubM(0).interpolation())
                 //{
                 //    position = cloudRefMS().positionCM(index);
                 //    voidfraction = voidfractionInterpolator_.interpolate(position,cellI);
@@ -218,7 +214,7 @@ void DiFeliceDragMS::setForce() const
                     }
                 }
 
-                if(verbose_ && index >=0 && index <10)
+                if(forceSubM(0).verbose() && index >=0 && index <10)
                 {
                     Pout << "index = " << index << endl;
                     Pout << "Us = " << Us << endl;

@@ -84,7 +84,7 @@ implicitCoupleProps
 
 dividedProps
 {
-    alphaMin 0.9;
+    alphaMin 0.1;
     scaleUpVol 1.0;
 }
 
@@ -107,7 +107,12 @@ DiFeliceDragMSProps
     velFieldName "U";
     voidfractionFieldName "voidfraction";
     granVelFieldName "Us";
-    //verbose;    
+    verbose true;
+    manDHdev true;
+    dHbyV
+    (
+        1084200. // d of sphere of equal area by clump volume
+    ); 
 }
 
 GidaspowDragMSProps

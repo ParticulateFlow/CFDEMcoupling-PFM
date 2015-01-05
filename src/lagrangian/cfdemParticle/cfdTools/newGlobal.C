@@ -27,86 +27,58 @@ License
 Description
     This code is designed to realize coupled CFD-DEM simulations using LIGGGHTS
     and OpenFOAM(R). Note: this code is not part of OpenFOAM(R) (see DISCLAIMER).
-
-Class
-    dividedVoidFraction
-
-SourceFiles
-    dividedVoidFraction.C
-
 \*---------------------------------------------------------------------------*/
 
-#ifndef dividedVoidFraction_H
-#define dividedVoidFraction_H
+#include "error.H"
 
-#include "voidFractionModel.H"
-#include "interpolationCellPoint.H"
+#include "global.H"
+#include "dilute.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-/*---------------------------------------------------------------------------*\
-                           Class noDrag Declaration
-\*---------------------------------------------------------------------------*/
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-class dividedVoidFraction
-:
-    public voidFractionModel
+autoPtr<global> global::New
+(
+    const dictionary& dict,
+    cfdemCloud& sm
+)
 {
+    word globalType
+    (
+        dict.lookup("global")
+    );
 
-private:
-        dictionary propsDict_;
-
-        bool verbose_;
-
-        const scalar alphaMin_;          // min value of voidFraction
-
-	    mutable bool alphaLimited_;
-
-        mutable scalar tooMuch_;         // particle volume which is lost due to voidFraction limitation
-
-        bool interpolation_;
-
-        bool cfdemUseOnly_;
-
-        virtual inline scalar Vp(int index, scalar radius, scalar scaleVol) const
-        {
-            return 4.188790205*radius*radius*radius*scaleVol; //4/3*pi=4.188790205
-        };
-
-public:
-
-    //- Runtime type information
-    TypeName("divided");
+    Info<< "Selecting global "
+         << globalType << endl;
 
 
-    // Constructors
+    dictionaryConstructorTable::iterator cstrIter =
+        dictionaryConstructorTablePtr_->find(globalType);
 
-        //- Construct from components
-        dividedVoidFraction
-        (
-            const dictionary& dict,
-            cfdemCloud& sm
-        );
+    if (cstrIter == dictionaryConstructorTablePtr_->end())
+    {
+        FatalError
+            << "global::New(const dictionary&, const spray&) : "
+            << endl
+            << "    unknown globalType type "
+            << globalType
+            << ", constructor not in hash table" << endl << endl
+            << "    Valid global types are :"
+            << endl;
+        Info<< dictionaryConstructorTablePtr_->toc()
+            << abort(FatalError);
+    }
 
-    // Destructor
-
-        ~dividedVoidFraction();
-
-
-    // Member Functions
-        void setvoidFraction(double** const& ,double**&, double**&, double**&, double**&) const;
-};
+    return autoPtr<global>(cstrIter()(dict,sm));
+}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#endif
 
 // ************************************************************************* //

@@ -187,7 +187,7 @@ void KochHillDrag::setForce() const
                 magUr = mag(Ur);
 				Rep = 0;
                 Vs = ds*ds*ds*M_PI/6;
-                volumefraction = 1-voidfraction+SMALL;
+                volumefraction = max(SMALL,min(1-SMALL,1-voidfraction));
 
                 if (magUr > 0)
                 {
