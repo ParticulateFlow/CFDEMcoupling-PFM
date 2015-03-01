@@ -36,7 +36,7 @@ Description
 #include "locateModel.H"
 #include "dataExchangeModel.H"
 
-#include "mpi.h"
+#include <mpi.h>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

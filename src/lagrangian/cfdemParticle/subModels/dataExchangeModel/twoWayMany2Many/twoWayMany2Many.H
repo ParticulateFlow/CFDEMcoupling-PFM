@@ -44,7 +44,7 @@ SourceFiles
 #include "dataExchangeModel.H"
 #include "liggghtsCommandModel.H"
 #include "OFstream.H"
-#include "sys/stat.h"
+#include <sys/stat.h>
 #include "pair.h"
 #include "force.h"
 #include "forceModel.H"
@@ -52,7 +52,7 @@ SourceFiles
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "mpi.h"
+#include <mpi.h>
 #include <lammps.h>
 #include <input.h>
 #include <atom.h>

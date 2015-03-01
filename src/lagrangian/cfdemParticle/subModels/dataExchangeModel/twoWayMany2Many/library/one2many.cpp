@@ -1,4 +1,4 @@
-#include "mpi.h"
+#include <mpi.h>
 #include "one2many.h"
 #include "memory.h"
 

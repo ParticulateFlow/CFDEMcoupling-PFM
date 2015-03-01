@@ -34,7 +34,7 @@ Description
 #include "checkCouplingInterval.H"
 #include "addToRunTimeSelectionTable.H"
 
-//#include "mpi.h"
+//#include <mpi.h>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
