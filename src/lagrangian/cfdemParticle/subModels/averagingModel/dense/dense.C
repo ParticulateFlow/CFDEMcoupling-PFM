@@ -35,7 +35,7 @@ Description
 #include "addToRunTimeSelectionTable.H"
 #include "voidFractionModel.H"
 
-//#include "mpi.h"
+//#include <mpi.h>
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam

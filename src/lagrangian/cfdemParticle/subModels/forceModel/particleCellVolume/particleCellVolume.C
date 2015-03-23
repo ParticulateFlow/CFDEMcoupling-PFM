@@ -34,7 +34,7 @@ Description
 #include "particleCellVolume.H"
 #include "addToRunTimeSelectionTable.H"
 #include "dataExchangeModel.H"
-#include "mpi.h"
+#include <mpi.h>
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam

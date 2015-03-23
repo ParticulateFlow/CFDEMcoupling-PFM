@@ -161,7 +161,8 @@ compileLIGGGHTS()
     rm $logpath/$logfileName
 
     #- change path
-    cd $CFDEM_LIGGGHTS_SRC_DIR
+    mkdir -p $CFDEM_LIGGGHTS_BIN_DIR
+    cd $CFDEM_LIGGGHTS_BIN_DIR
 
     #- header
     echo 2>&1 | tee -a $logpath/$logfileName
@@ -176,20 +177,18 @@ compileLIGGGHTS()
     if [[ $clean == "false" ]]; then
         echo "not cleaning LIGGGHTS"
     else
-        rm $CFDEM_LIGGGHTS_SRC_DIR/"lmp_"$CFDEM_LIGGGHTS_MAKEFILE_NAME
-        rm $CFDEM_LIGGGHTS_SRC_DIR/"lib"$CFDEM_LIGGGHTS_LIB_NAME".a"
-        make clean-all 2>&1 | tee -a $logpath/$logfileName
+        make clean 2>&1 | tee -a $logpath/$logfileName
+        rm CMakeCache.txt 2>&1 | tee -a $logpath/$logfileName
         echo "cleaning LIGGGHTS"
     fi
+    cmake $CFDEM_LIGGGHTS_SRC_DIR
     if [[ $WM_NCOMPPROCS == "" ]]; then
         echo "compiling LIGGGHTS on one CPU"
-        make $CFDEM_LIGGGHTS_MAKEFILE_NAME 2>&1 | tee -a $logpath/$logfileName
+        make 2>&1 | tee -a $logpath/$logfileName
     else
         echo "compiling LIGGGHTS on $WM_NCOMPPROCS CPUs"
-        make $CFDEM_LIGGGHTS_MAKEFILE_NAME -j $WM_NCOMPPROCS  2>&1 | tee -a $logpath/$logfileName
+        make -j $WM_NCOMPPROCS  2>&1 | tee -a $logpath/$logfileName
     fi
-    make makelib 2>&1 | tee -a $logpath/$logfileName
-    make -f Makefile.lib $CFDEM_LIGGGHTS_MAKEFILE_NAME 2>&1 | tee -a $logpath/$logfileName
 }
 
 #==================================#
@@ -405,7 +404,7 @@ DEMrun()
     echo 2>&1 | tee -a $logpath/$logfileName
 
     #- run applictaion
-    $debugMode $CFDEM_LIGGGHTS_SRC_DIR/$CFDEM_LIGGGHTS_LIB_NAME < $solverName 2>&1 | tee -a $logpath/$logfileName
+    $debugMode $CFDEM_LIGGGHTS_BIN_DIR/liggghts -in $solverName 2>&1 | tee -a $logpath/$logfileName
 
     #- keep terminal open (if started in new terminal)
     #read
@@ -455,9 +454,9 @@ parDEMrun()
 
     #- run applictaion
     if [ $machineFileName == "none" ]; then
-        mpirun -np $nrProcs $debugMode $CFDEM_LIGGGHTS_SRC_DIR/$CFDEM_LIGGGHTS_LIB_NAME < $solverName 2>&1 | tee -a $logpath/$logfileName
+        mpirun -np $nrProcs $debugMode $CFDEM_LIGGGHTS_BIN_DIR/liggghts -in $solverName 2>&1 | tee -a $logpath/$logfileName
     else
-        mpirun -machinefile $machineFileName -np $nrProcs $debugMode $CFDEM_LIGGGHTS_SRC_DIR/$CFDEM_LIGGGHTS_LIB_NAME < $solverName 2>&1 | tee -a $logpath/$logfileName
+        mpirun -machinefile $machineFileName -np $nrProcs $debugMode $CFDEM_LIGGGHTS_BIN_DIR/liggghts -in $solverName 2>&1 | tee -a $logpath/$logfileName
     fi
 
     #- keep terminal open (if started in new terminal)

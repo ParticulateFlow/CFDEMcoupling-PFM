@@ -43,7 +43,7 @@ SourceFiles
 
 #include "dataExchangeModel.H"
 #include "OFstream.H"
-#include "sys/stat.h"
+#include <sys/stat.h>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

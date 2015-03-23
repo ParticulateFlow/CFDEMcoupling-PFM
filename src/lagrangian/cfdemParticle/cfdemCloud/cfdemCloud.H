@@ -50,9 +50,9 @@ SourceFiles
 #include "IFstream.H"
 
 #if defined(version21) || defined(version16ext)
-    #include "turbulenceModel.H"
+    #include <turbulenceModel.H>
 #elif defined(version15)
-    #include "RASModel.H"
+    #include <RASModel.H>
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -36,7 +36,7 @@ Description
 #include "addToRunTimeSelectionTable.H"
 #include "mathematicalConstants.H"
 
-#include "mpi.h"
+#include <mpi.h>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
