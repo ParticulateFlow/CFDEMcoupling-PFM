@@ -98,7 +98,7 @@ public:
                 const dictionary& dict,
                 cfdemCloud& sm,
                 word   typeName,
-                char*  logFileName
+                const char*  logFileName
             ),
             (dict,sm,typeName,logFileName)
         );
@@ -112,7 +112,7 @@ public:
             const dictionary& dict,
             cfdemCloud& sm,
             word   typeName,
-            char*  logFileName
+            const char*  logFileName
         );
 
 
@@ -128,7 +128,7 @@ public:
             const dictionary& dict,
             cfdemCloud& sm,
             word   typeName,
-            char*  logFileName
+            const char *logFileName
         );
 
     // Member Functions
@@ -143,7 +143,6 @@ public:
     virtual std::vector<double*>* getVprobe() { return NULL; }
     virtual std::vector<double>* getSprobe() { return NULL; }
     virtual void clearProbes() const {}
-    const char* wordToChar(word&) const;
 
     // Access
 

@@ -80,25 +80,12 @@ twoWayFiles::~twoWayFiles()
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
 
-const char* twoWayFiles::wordToChar(word& inWord) const
-{
-    string HH = string(inWord);
-    return HH.c_str();
-}
-
-const char* twoWayFiles::fileNameToChar(fileName& inWord) const
-{
-    string HH = string(inWord);
-    return HH.c_str();
-}
-
 fileName twoWayFiles::getFilePath(word& name, bool in) const
 {
-    const char* charName = wordToChar(name);
     char timeStep[40];
 
     // file touched by DEM
-    strcpy(timeStep, charName);
+    strcpy(timeStep, name.c_str());
     strcat(timeStep,"1");
     fileName particleFilePathOld(particleCloud_.mesh().time().path()/"couplingFiles"/timeStep);
 
@@ -107,7 +94,7 @@ fileName twoWayFiles::getFilePath(word& name, bool in) const
     {
         Info << "wait for file " << particleFilePathOld << endl;
         struct stat st;
-        while (stat(fileNameToChar(particleFilePathOld),&st)) sleep(0.03);
+        while (stat(particleFilePathOld.c_str(),&st)) sleep(0.03);
     }
 
     return particleFilePathOld;
@@ -115,16 +102,15 @@ fileName twoWayFiles::getFilePath(word& name, bool in) const
 
 void twoWayFiles::renameFilePath(fileName& particleFilePathOld,word& name) const
 {
-    const char* charName = wordToChar(name);
     char timeStep[40];
 
     // file touched by CFD
-    strcpy(timeStep, charName);
+    strcpy(timeStep, name.c_str());
     strcat(timeStep,"0");
     fileName particleFilePath(particleCloud_.mesh().time().path()/"couplingFiles"/timeStep);
 
     // rename old file
-    rename(fileNameToChar(particleFilePathOld),fileNameToChar(particleFilePath));
+    rename(particleFilePathOld.c_str(),particleFilePath.c_str());
 }
 
 // * * * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * * //

@@ -95,8 +95,6 @@ private:
 
   // private member functions
 
-    char* wordToChar(word&) const;
-
 public:
 
     //- Runtime type information
@@ -145,12 +143,12 @@ public:
         //============
         // double **
         void allocateArray(double**&, double, int, int) const;
-        void allocateArray(double**&, double, int,const char* ="nparticles") const;
+        void allocateArray(double**&, double, int, const char* = "nparticles") const;
         void destroy(double**,int) const;
         //============
         // int **
         void allocateArray(int**&, int, int, int) const;
-        void allocateArray(int**&, int, int,const char* ="nparticles") const;
+        void allocateArray(int**&, int, int, const char* = "nparticles") const;
         void destroy(int**,int) const;
         //==============
         // double *

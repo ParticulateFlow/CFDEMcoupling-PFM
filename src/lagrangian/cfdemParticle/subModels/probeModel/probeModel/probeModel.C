@@ -43,14 +43,6 @@ defineTypeNameAndDebug(probeModel, 0);
 
 defineRunTimeSelectionTable(probeModel, dictionary);
 
-// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-
-const char* probeModel::wordToChar(word& inWord) const
-{
-    string HH = string(inWord);
-    return HH.c_str();
-}
-
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 // Construct from components
@@ -59,7 +51,7 @@ probeModel::probeModel
     const dictionary& dict,
     cfdemCloud& sm,
     word   typeName,
-    char*  logFileName
+    const char *logFileName
 )
 :
     dict_(dict),

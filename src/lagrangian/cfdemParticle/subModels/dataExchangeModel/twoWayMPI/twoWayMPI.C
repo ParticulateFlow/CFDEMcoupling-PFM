@@ -65,11 +65,6 @@ twoWayMPI::twoWayMPI
     dataExchangeModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props"))
 {
-    // set max nr of particles from dict
-    //Info << "twoWayMPI.C- this should no longer be needed" << endl;
-    //maxNumberOfParticles_ = readScalar(propsDict_.lookup("maxNumberOfParticles"));
-
-
     Info<<"Starting up LIGGGHTS for first time execution"<<endl;
 
     MPI_Comm_rank(MPI_COMM_WORLD,&me);
@@ -114,14 +109,6 @@ twoWayMPI::twoWayMPI
 twoWayMPI::~twoWayMPI()
 {}
 
-// * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
-char* twoWayMPI::wordToChar(word& inWord) const
-{
-    string HH = string(inWord);
-    return const_cast<char*>(HH.c_str());
-}
-
-
 // * * * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * * //
 void twoWayMPI::getData
 (
@@ -131,9 +118,7 @@ void twoWayMPI::getData
     label step
 ) const
 {
-    char* charName = wordToChar(name);
-    char* charType = wordToChar(type);
-    data_liggghts_to_of(charName,charType, lmp, (void*&) field,"double");
+    data_liggghts_to_of(name.c_str(), type.c_str(), lmp, (void*&) field, "double");
 }
 
 void twoWayMPI::getData
@@ -144,9 +129,7 @@ void twoWayMPI::getData
     label step
 ) const
 {
-    char* charName = wordToChar(name);
-    char* charType = wordToChar(type);
-    data_liggghts_to_of(charName,charType, lmp, (void*&) field,"int");
+    data_liggghts_to_of(name.c_str(), type.c_str(), lmp, (void*&) field, "int");
 }
 
 void twoWayMPI::giveData
@@ -157,11 +140,9 @@ void twoWayMPI::giveData
     const char* datatype
 ) const
 {
-    char* charName = wordToChar(name);
-    char* charType = wordToChar(type);
-    char* charDatatype= const_cast<char*> (datatype);
-    data_of_to_liggghts(charName,charType, lmp, (void*) field,charDatatype);
+    data_of_to_liggghts(name.c_str(), type.c_str(), lmp, (void*)field, datatype);
 }
+
 //============
 // double **
 void Foam::twoWayMPI::allocateArray
@@ -188,6 +169,7 @@ void Foam::twoWayMPI::allocateArray
     char* charLength= const_cast<char*> (length);
     allocate_external_double(array, width,charLength,initVal,lmp);
 }
+
 void Foam::twoWayMPI::destroy(double** array,int len) const
 {
     if (array == NULL) return;
@@ -198,6 +180,7 @@ void Foam::twoWayMPI::destroy(double** array,int len) const
 
     free(array);
 }
+
 //============
 // int **
 void Foam::twoWayMPI::allocateArray
@@ -271,7 +254,6 @@ bool Foam::twoWayMPI::couple() const
             DynamicList<scalar> interruptTimes(0);
             DynamicList<int> DEMstepsToInterrupt(0);
             DynamicList<int> lcModel(0);
-            scalar interruptTime = -1;
 
             forAll(particleCloud_.liggghtsCommandModelList(),i)
             {

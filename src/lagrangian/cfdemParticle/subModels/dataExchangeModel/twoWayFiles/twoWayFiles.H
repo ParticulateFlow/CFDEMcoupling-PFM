@@ -65,10 +65,6 @@ private:
 
   // private member functions
 
-    const char* wordToChar(word&) const;
-
-    const char* fileNameToChar(fileName&) const;
-
     fileName getFilePath(word&, bool) const;
 
     void renameFilePath(fileName&,word&) const;
