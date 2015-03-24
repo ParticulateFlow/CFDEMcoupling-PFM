@@ -180,6 +180,7 @@ void particleProbe::initialize(word typeName, word logFileName) const
   return;
 
 }
+
 void particleProbe::writeHeader() const
 {
 
@@ -194,97 +195,92 @@ void particleProbe::writeHeader() const
          forAll(vectorFields_, iter)
          {
              if(!probeDebug_ && iter>0) break;
-             *sPtr << vectorFields_(iter) << "   "; 
-          }
+             *sPtr << vectorFields_(iter) << "   ";
+         }
 
          if(probeDebug_)
          {
-            *sPtr<<"||   scalarData:  "  << "   ";  
+            *sPtr<<"||   scalarData:  "  << "   ";
             forAll(scalarFields_, iter)
             {
                  *sPtr << scalarFields_(iter)  << "   ";
             }
          }
 
-         if(includePosition_) *sPtr<<" ||  position" << endl; 
-         else *sPtr << endl; 
+         if(includePosition_) *sPtr<<" ||  position" << endl;
+         else *sPtr << endl;
      }
 
 }
 
 void particleProbe::clearProbes() const
 {
-  for (unsigned int i=0; i<vProbes_.size(); i++)
-   delete vProbes_[i];
-   
-  sProbes_.clear();
-  vProbes_.clear();
- 
+    for (unsigned int i=0; i<vProbes_.size(); i++)
+        delete vProbes_[i];
+
+    sProbes_.clear();
+    vProbes_.clear();
 }
 
 void particleProbe::writeProbe(int index, Field<scalar> sValues, Field<vector> vValues) const
 {
-   
-    
-    if(printNow_ && checkIDForPrint(index) &&  verboseToFile_) 
+    if(printNow_ && checkIDForPrint(index) &&  verboseToFile_)
     {
-
         //index and time
-       *sPtr <<    setprecision(IOstream::defaultPrecision()+7) ;
-       *sPtr << index  << tab 
-                << particleCloud_.mesh().time().value()  << "   " ;
+        *sPtr << setprecision(IOstream::defaultPrecision()+7);
+        *sPtr << index  << tab << particleCloud_.mesh().time().value()  << "   ";
         *sPtr << "||   ";
-        
-        int vsize_=vProbes_.size();
+
+        int vsize_ = vProbes_.size();
         //vectorFields
-        *sPtr <<    setprecision(writePrecision_) ;
-         forAll(vValues, iter)
-         {
-             // if(!probeDebug_ && iter>0) break;
-             *sPtr << vValues[iter][0] << "   ";
-             *sPtr << vValues[iter][1] << "   "; 
-             *sPtr << vValues[iter][2] << "   ";  
-             
-             
-             if(index<vsize_)
-             {
-              vProbes_[index][0]+=vValues[iter][0];
-              vProbes_[index][1]+=vValues[iter][1];
-              vProbes_[index][2]+=vValues[iter][2];
-             }
-             else
-             {
-              double * vprobe_= new double[3];
-              vprobe_[0]=vValues[iter][0];
-              vprobe_[1]=vValues[iter][1];
-              vprobe_[2]=vValues[iter][2];
-              
-              vProbes_.push_back(vprobe_);
-             }       
-          
-          }
+        *sPtr << setprecision(writePrecision_);
+        forAll(vValues, iter)
+        {
+            // if(!probeDebug_ && iter>0) break;
+            *sPtr << vValues[iter][0] << "   ";
+            *sPtr << vValues[iter][1] << "   ";
+            *sPtr << vValues[iter][2] << "   ";
+
+            if(index < vsize_)
+            {
+                vProbes_[index][0] += vValues[iter][0];
+                vProbes_[index][1] += vValues[iter][1];
+                vProbes_[index][2] += vValues[iter][2];
+            }
+            else
+            {
+                double * vprobe_ = new double[3];
+                vprobe_[0] = vValues[iter][0];
+                vprobe_[1] = vValues[iter][1];
+                vprobe_[2] = vValues[iter][2];
+
+                vProbes_.push_back(vprobe_);
+            }
+        }
 
         //scalarFields
         if(probeDebug_)
         {
-          *sPtr << "||   ";
-           forAll(sValues, iter)
-           {
-               *sPtr << sValues[iter] << "   "; 
-               sProbes_.push_back(sValues[iter]);
+            *sPtr << "||   ";
+            forAll(sValues, iter)
+            {
+                *sPtr << sValues[iter] << "   ";
+                sProbes_.push_back(sValues[iter]);
             }
         }
 
         if(includePosition_)
         {
             *sPtr << "||   ";
-             *sPtr <<     particleCloud_.position(index)[0] << "   " 
-                      <<     particleCloud_.position(index)[1] << "   "
-                      <<     particleCloud_.position(index)[2]
-                      << endl;
+            *sPtr << particleCloud_.position(index)[0] << "   "
+                  << particleCloud_.position(index)[1] << "   "
+                  << particleCloud_.position(index)[2]
+                  << endl;
         }
-        else *sPtr << endl;
-
+        else
+        {
+            *sPtr << endl;
+        }
     }
 
     return;
@@ -292,7 +288,6 @@ void particleProbe::writeProbe(int index, Field<scalar> sValues, Field<vector> v
 
 bool particleProbe::checkIDForPrint(int index) const
 {
-  
       bool sampleThisId_ = false;
       if(sampleAll_) sampleThisId_ = true;
       else
