@@ -152,7 +152,7 @@ void volWeightedAverage::setForce() const
         for (int i=0;i < scalarFieldNames_.size(); i++)
         {
             // get reference to actual field
-            volScalarField& field = (volScalarField&) mesh_.lookupObject<volScalarField>(scalarFieldNames_[i]);
+            const volScalarField& field = mesh_.lookupObject<volScalarField>(scalarFieldNames_[i]);
 
             scalar fieldValue=-1;
             scalar volWeightedAverage=-1;
@@ -197,7 +197,7 @@ void volWeightedAverage::setForce() const
         for (int i=0;i < vectorFieldNames_.size(); i++)
         {
             // get reference to actual field
-            volVectorField& field = (volVectorField&) mesh_.lookupObject<volVectorField>(vectorFieldNames_[i]);
+            const volVectorField& field = mesh_.lookupObject<volVectorField>(vectorFieldNames_[i]);
 
             vector fieldValue(-1,-1,-1);
             vector volWeightedAverage(-1,-1,-1);
