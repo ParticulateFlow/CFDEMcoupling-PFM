@@ -45,25 +45,25 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 inline void cfdemCloud::setCG(double cg) const
-{ 
+{
     cg_ = cg;
     Info << "cg is set to: " << cg_ << endl;
-};
+}
 
 inline const bool& cfdemCloud::impDEMdrag() const
-{ 
+{
     return impDEMdrag_;
-};
+}
 
 inline const bool& cfdemCloud::impDEMdragAcc() const
-{ 
+{
     return impDEMdragAcc_;
-};
+}
 
 inline const scalar& cfdemCloud::imExSplitFactor() const
 {
-	    return imExSplitFactor_;
-};
+    return imExSplitFactor_;
+}
 
 inline const bool& cfdemCloud::treatVoidCellsAsExplicitForce() const
 {
@@ -71,9 +71,9 @@ inline const bool& cfdemCloud::treatVoidCellsAsExplicitForce() const
 }
 
 inline const scalar& cfdemCloud::cg() const
-{ 
+{
     return cg_;
-};
+}
 
 inline const bool& cfdemCloud::ignore() const
 {

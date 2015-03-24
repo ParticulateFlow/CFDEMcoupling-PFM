@@ -108,7 +108,7 @@ public:
             word type,
             int ** const& field,
             label step
-        ) const {FatalError<<"function not implemented !!! twoWayFiles::getData!!!\n" << abort(FatalError);};
+        ) const { FatalError<<"function not implemented !!! twoWayFiles::getData!!!\n" << abort(FatalError); }
 
         void giveData
         (
@@ -118,7 +118,7 @@ public:
             const char* datatype = ""
         ) const;
 
-        word myType() const{return typeName; };
+        word myType() const{ return typeName; }
 };
 
 

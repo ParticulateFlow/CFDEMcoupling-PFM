@@ -133,16 +133,16 @@ public:
 
     // Member Functions
 
-    virtual void initialize(word typeName, word  logFileName) const {};
-    virtual void setOutputFile() const {};
-    virtual void writeHeader() const {};
-    virtual void writeProbe(int index, Field<scalar> sValues, Field<vector> vValues) const {};
-    virtual bool checkIDForPrint(int) const {return false;};
-    virtual void setCounter() const {};
-    virtual bool active() const {return true;}; 
-    virtual std::vector<double*>* getVprobe() {return NULL;};
-    virtual std::vector<double>* getSprobe() {return NULL;};
-    virtual void clearProbes() const {};
+    virtual void initialize(word typeName, word  logFileName) const {}
+    virtual void setOutputFile() const {}
+    virtual void writeHeader() const {}
+    virtual void writeProbe(int index, Field<scalar> sValues, Field<vector> vValues) const {}
+    virtual bool checkIDForPrint(int) const { return false; }
+    virtual void setCounter() const {}
+    virtual bool active() const { return true; }
+    virtual std::vector<double*>* getVprobe() { return NULL; }
+    virtual std::vector<double>* getSprobe() { return NULL; }
+    virtual void clearProbes() const {}
     const char* wordToChar(word&) const;
 
     // Access

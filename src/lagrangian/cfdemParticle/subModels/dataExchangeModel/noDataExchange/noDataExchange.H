@@ -82,7 +82,7 @@ public:
             word type,
             double ** const& field,
             label step
-        ) const {};
+        ) const {}
 
         void getData
         (
@@ -90,7 +90,7 @@ public:
             word type,
             int ** const& field,
             label step
-        ) const {};
+        ) const {}
 
         void giveData
         (
@@ -98,9 +98,9 @@ public:
             word type,
             double ** const& field,
             const char* datatype = ""
-        ) const {};
+        ) const {}
 
-        word myType() const{return typeName; };
+        word myType() const { return typeName; }
 };
 
 

@@ -134,8 +134,8 @@ public:
     bool checkIDForPrint(int) const;
     void setCounter() const;
     void clearProbes() const;
-    std::vector<double*>* getVprobe() {return &vProbes_; };
-    std::vector<double>* getSprobe() {return &sProbes_; };
+    std::vector<double*>* getVprobe() { return &vProbes_; }
+    std::vector<double>* getSprobe() { return &sProbes_; }
 };
 
 

@@ -167,9 +167,9 @@ public:
         int getNumberOfTypes() const;
         double* getTypeVol() const;
 
-        word myType() const{return typeName; };
+        word myType() const { return typeName; }
 
-        void setCG() const { particleCloud_.setCG(lmp->force->cg()); };
+        void setCG() const { particleCloud_.setCG(lmp->force->cg()); }
 };
 
 

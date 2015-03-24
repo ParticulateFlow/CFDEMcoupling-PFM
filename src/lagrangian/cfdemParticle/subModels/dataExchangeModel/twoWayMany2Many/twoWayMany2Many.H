@@ -210,8 +210,8 @@ public:
 
         void syncIDs() const;
         void locateParticle(int*, bool) const;
-        word myType() const{return typeName; };
-        void setCG() const { particleCloud_.setCG(lmp->force->cg()); };
+        word myType() const { return typeName; }
+        void setCG() const { particleCloud_.setCG(lmp->force->cg()); }
 };
 
 
