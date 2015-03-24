@@ -45,4 +45,5 @@ char **extract(char *file, char *header, int n, char **lines)
   }
 
   fclose(fp);
+  return lines;
 }
