@@ -67,8 +67,6 @@ fieldTimeAverage::fieldTimeAverage
     startTime_(0.),
     scalarFieldNames_(propsDict_.lookup("scalarFieldNames")),
     vectorFieldNames_(propsDict_.lookup("vectorFieldNames")),
-    scalarFields_(NULL),
-    vectorFields_(NULL),
     nrAverages_(0.0)
 {
     // create time average scalar fields

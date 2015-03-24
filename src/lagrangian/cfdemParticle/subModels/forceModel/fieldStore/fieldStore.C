@@ -65,9 +65,7 @@ fieldStore::fieldStore
     propsDict_(dict.subDict(typeName + "Props")),
     mesh_(particleCloud_.mesh()),
     scalarFieldNames_(propsDict_.lookup("scalarFieldNames")),
-    vectorFieldNames_(propsDict_.lookup("vectorFieldNames")),
-    scalarFields_(NULL),
-    vectorFields_(NULL)
+    vectorFieldNames_(propsDict_.lookup("vectorFieldNames"))
 {
     // create time average scalar fields
     scalarFields_.setSize(scalarFieldNames_.size());

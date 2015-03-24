@@ -79,8 +79,6 @@ particleProbe::particleProbe
     probeDebug_(false),
     includePosition_(false),
     particleIDsToSample_(propsDict_.lookup("particleIDsToSample")),
-    itemsToSample_(NULL),
-    sPtrList_(NULL),
     itemCounter_(0),
     currItemId_(0),
     printCounter_(0),
