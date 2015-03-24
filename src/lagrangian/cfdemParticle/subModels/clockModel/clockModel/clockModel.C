@@ -423,10 +423,10 @@ void Foam::clockModel::getRAMUsage() const
     	MPI_Comm_rank(MPI_COMM_WORLD,&myrank);
 	int numprocs=-10;
 	MPI_Comm_size(MPI_COMM_WORLD, &numprocs);
-	
+
 	pid_t myPID = getpid();	//get PID of running process
 	//Pout << myPID << "\n";
-	
+
 	std::string fileName = "/proc/"; //build path to /proc/PID/smaps and open file
 	std::stringstream strs;
 	strs << myPID;
@@ -461,11 +461,10 @@ void Foam::clockModel::getRAMUsage() const
 			SwapMem = SwapMem + temp;
 			//Pout << strs.str() << " ";
 			}
-		
 		}
 	}
-	double SwapMB = (double)SwapMem/1024.0; //kB -> MB
-	double RssMB = (double)RssMem/1024.0;
+	double SwapMB = static_cast<double>(SwapMem)/1024.0; //kB -> MB
+	double RssMB = static_cast<double>(RssMem)/1024.0;
 
 	inFile.close();
 
@@ -480,7 +479,6 @@ void Foam::clockModel::getRAMUsage() const
 
 	//Pout << "SWAP Memory used: " << SwapMem <<"MB\n";
 	//Pout << "Rss Memory used: " << RssMem <<"MB\n";
-	
 
 	return;
 }
