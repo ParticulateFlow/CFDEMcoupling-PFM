@@ -238,12 +238,10 @@ void averagingModel::setDSauter
 ) const
 {
     label cellI;
-    scalar valueScal;
     scalar weightP;
     scalar radius(-1);
     scalar radiusPow2(-1);
     scalar radiusPow3(-1);
-    scalar volume(-1);
 
     scalar scale_ = particleCloud_.cg(); //scaling of parcel vs. primary particle diameter
     dSauter = 0.0 * dSauter; //set to zero, because we will use it to calc sum(wi*ri^3)
