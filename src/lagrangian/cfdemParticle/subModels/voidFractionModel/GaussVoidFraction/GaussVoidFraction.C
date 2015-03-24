@@ -96,7 +96,7 @@ void GaussVoidFraction::setvoidFraction(double** const& mask,double**& voidfract
     scalar radius(-1);
     scalar volume(0);
     scalar scaleVol= weight();
-    scalar scaleRadius = pow(porosity(),1/3);
+    scalar scaleRadius = pow(porosity(),1./3.);
 
     for(int index=0; index< particleCloud_.numberOfParticles(); index++)
     {
@@ -232,7 +232,8 @@ void GaussVoidFraction::buildLabelHashSet
     hashSett.insert(cellID);
     //Info<<"cell inserted"<<cellID<<endl;
     const labelList& nc = particleCloud_.mesh().cellCells()[cellID];
-    forAll(nc,i){
+    forAll(nc,i)
+    {
         label neighbor=nc[i];
         if(!hashSett.found(neighbor) && mag(position-particleCloud_.mesh().C()[neighbor])<radius){
             buildLabelHashSet(radius,position,neighbor,hashSett);
