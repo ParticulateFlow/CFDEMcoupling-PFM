@@ -363,39 +363,17 @@ void Foam::clockModel::normHist() const
 
 void Foam::clockModel::plotHist(double buffIn,std::string identifier,int numprocs,int myrank) const
 {
-/*  // version using double*, problem: no alloc for double * and MPI
-    double* globalTime=NULL;
-    double* globalTime_all=NULL;
-    particleCloud_.dataExchangeM().allocateArray(globalTime,0.,numprocs);
-    particleCloud_.dataExchangeM().allocateArray(globalTime_all,0.,numprocs);  
-   
-    globalTime[myrank]=buffIn;
-    MPI_Allreduce(globalTime, globalTime_all, numprocs, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+    double* globalTime_all = NULL;
+    if(myrank == 0) globalTime_all = new double[numprocs];
+    MPI_Gather(&buffIn, 1, MPI_DOUBLE, globalTime_all, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
-    if(myrank==0)
-        for(int j=0;j<numprocs;j++)
+    if(myrank == 0)
+        for(int j=0; j<numprocs; j++)
             printf("%4f  ",globalTime_all[j]);
-    Info << "\t" <<identifier << endl;
 
-    particleCloud_.dataExchangeM().destroy(globalTime);
-    particleCloud_.dataExchangeM().destroy(globalTime_all);*/
+    Info << "\t" << identifier << endl;
 
-
-    double** globalTime=NULL;
-    double** globalTime_all=NULL;
-    particleCloud_.dataExchangeM().allocateArray(globalTime,0.,1,numprocs);
-    particleCloud_.dataExchangeM().allocateArray(globalTime_all,0.,1,numprocs);  
-   
-    globalTime[0][myrank]=buffIn;
-    MPI_Allreduce(globalTime[0], globalTime_all[0], numprocs, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-
-    if(myrank==0)
-        for(int j=0;j<numprocs;j++)
-            printf("%4f  ",globalTime_all[0][j]);
-    Info << "\t" <<identifier << endl;
-
-    particleCloud_.dataExchangeM().destroy(globalTime,1);
-    particleCloud_.dataExchangeM().destroy(globalTime_all,1);
+    delete [] globalTime_all;
 }
 
 void Foam::clockModel::Hist() const
