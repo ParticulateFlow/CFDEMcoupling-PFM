@@ -156,8 +156,7 @@ void Foam::twoWayMPI::allocateArray
     int length
 ) const
 {
-    //if(length==-1) then LIGGGHTS uses own length data
-    allocate_external_double(array, width,length,initVal,lmp);
+    allocate_external_double(array, width, length, initVal, lmp);
 }
 
 void Foam::twoWayMPI::allocateArray
@@ -168,18 +167,14 @@ void Foam::twoWayMPI::allocateArray
     const char* length
 ) const
 {
-    //if(length==-1) then LIGGGHTS uses own length data
-    char* charLength= const_cast<char*> (length);
-    allocate_external_double(array, width,charLength,initVal,lmp);
+    allocate_external_double(array, width, length, initVal, lmp);
 }
 
-void Foam::twoWayMPI::destroy(double** array,int len) const
+void Foam::twoWayMPI::destroy(double** array,int /*len*/) const
 {
     if (array == NULL) return;
 
-    //for ( int i = 0; i < len; i++ ) // does not work
-    for ( int i = 0; i < 1; i++ )
-        free(array[i]);
+    if (array[0]) free(array[0]);
 
     free(array);
     array = NULL;
@@ -195,8 +190,7 @@ void Foam::twoWayMPI::allocateArray
     int length
 ) const
 {
-    //if(length==-1) then LIGGGHTS uses own length data
-    allocate_external_int(array, width,length,initVal,lmp);
+    allocate_external_int(array, width, length, initVal, lmp);
 }
 
 void Foam::twoWayMPI::allocateArray
@@ -207,18 +201,14 @@ void Foam::twoWayMPI::allocateArray
     const char* length
 ) const
 {
-    //if(length==-1) then LIGGGHTS uses own length data
-    char* charLength= const_cast<char*> (length);
-    allocate_external_int(array, width,charLength,initVal,lmp);
+    allocate_external_int(array, width, length, initVal, lmp);
 }
 
-void Foam::twoWayMPI::destroy(int** array,int len) const
+void Foam::twoWayMPI::destroy(int** array,int /*len*/) const
 {
     if (array == NULL) return;
 
-    //for ( int i = 0; i < len; i++ ) // does not work
-    for ( int i = 0; i < 1; i++ )
-        free(array[i]);
+    if (array[0]) free(array[0]);
 
     free(array);
     array = NULL;
