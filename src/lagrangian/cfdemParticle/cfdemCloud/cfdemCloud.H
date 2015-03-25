@@ -229,7 +229,7 @@ public:
 
        void setPos(double **&);
 
-       word modelType(){ return modelType_; };
+       word modelType(){ return modelType_; }
 
        label particleCell(int);
 
@@ -311,18 +311,18 @@ public:
        virtual inline int maxType() {return -1;}
        virtual inline bool multipleTypesDMax() {return false;}
        virtual inline bool multipleTypesDMin() {return false;}
-       virtual inline double ** particleDensity() const {return NULL;};
-       virtual inline int ** particleTypes() const {return NULL;};
-       virtual label particleType(label index) const {return -1;};
+       virtual inline double ** particleDensity() const {return NULL;}
+       virtual inline int ** particleTypes() const {return NULL;}
+       virtual label particleType(label index) const {return -1;}
 
        //access to the particle's rotation and torque data
-       virtual inline double ** DEMTorques() const {return NULL;};
-       virtual inline double ** omegaArray() const {return NULL;};
-       virtual vector omega(int) const {return Foam::vector(0,0,0);};
+       virtual inline double ** DEMTorques() const {return NULL;}
+       virtual inline double ** omegaArray() const {return NULL;}
+       virtual vector omega(int) const {return Foam::vector(0,0,0);}
 
        //access to the particles' orientation information
-       virtual inline double ** exArray() const {return NULL;};
-       virtual vector ex(int) const {return Foam::vector(0,0,0);};
+       virtual inline double ** exArray() const {return NULL;}
+       virtual vector ex(int) const {return Foam::vector(0,0,0);}
 
        //Detector if SRF module is enable or not
        virtual inline bool SRFOn(){return false;}
