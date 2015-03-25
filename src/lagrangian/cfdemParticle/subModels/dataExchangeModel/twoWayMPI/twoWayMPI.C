@@ -91,7 +91,8 @@ twoWayMPI::twoWayMPI
     if (liggghts == 1) lmp = new LAMMPS_NS::LAMMPS(0,NULL,comm_liggghts);
 
     MPI_Bcast(&n,1,MPI_INT,0,MPI_COMM_WORLD);
-    if (n > 0) {
+    if (n > 0)
+    {
         MPI_Bcast(liggghtsPathChar,n,MPI_CHAR,0,MPI_COMM_WORLD);
         if (liggghts == 1) lmp->input->file(liggghtsPathChar);
     }
@@ -115,7 +116,7 @@ void twoWayMPI::getData
     word name,
     word type,
     double ** const& field,
-    label step
+    label /*step*/
 ) const
 {
     data_liggghts_to_of(name.c_str(), type.c_str(), lmp, (void*&) field, "double");
@@ -126,7 +127,7 @@ void twoWayMPI::getData
     word name,
     word type,
     int ** const& field,
-    label step
+    label /*step*/
 ) const
 {
     data_liggghts_to_of(name.c_str(), type.c_str(), lmp, (void*&) field, "int");
@@ -176,9 +177,10 @@ void Foam::twoWayMPI::destroy(double** array,int len) const
 
     //for ( int i = 0; i < len; i++ ) // does not work
     for ( int i = 0; i < 1; i++ )
-        free(array[i]); 
+        free(array[i]);
 
     free(array);
+    array = NULL;
 }
 
 //============
@@ -207,15 +209,17 @@ void Foam::twoWayMPI::allocateArray
     char* charLength= const_cast<char*> (length);
     allocate_external_int(array, width,charLength,initVal,lmp);
 }
+
 void Foam::twoWayMPI::destroy(int** array,int len) const
 {
     if (array == NULL) return;
 
     //for ( int i = 0; i < len; i++ ) // does not work
     for ( int i = 0; i < 1; i++ )
-        free(array[i]); 
+        free(array[i]);
 
     free(array);
+    array = NULL;
 }
 //============
 // int *
@@ -223,6 +227,7 @@ void Foam::twoWayMPI::destroy(int* array) const
 {
     if (array == NULL) return;
     free(array);
+    array = NULL;
 }
 //============
 // double *
@@ -230,6 +235,7 @@ void Foam::twoWayMPI::destroy(double* array) const
 {
     if (array == NULL) return;
     free(array);
+    array = NULL;
 }
 //============
 
@@ -285,7 +291,7 @@ bool Foam::twoWayMPI::couple() const
                         ind = len-i-1;
                         if(ind>0)
                             DEMstepsToInterrupt[ind] -= DEMstepsToInterrupt[ind-1];
-                    }                    
+                    }
 
                     Info << "Foam::twoWayMPI::couple(): interruptTimes=" << interruptTimes << endl;
                     Info << "Foam::twoWayMPI::couple(): DEMstepsToInterrupt=" << DEMstepsToInterrupt << endl;
@@ -304,16 +310,16 @@ bool Foam::twoWayMPI::couple() const
                 //    sort interrupt list within this run period
                 //    keep track of corresponding liggghtsCommand
                 int DEMstepsRun(0);
-                
+
                 forAll(interruptTimes,j)
-                {                  
+                {
                     // set run command till interrupt
-                    DEMstepsRun += DEMstepsToInterrupt[j];          
+                    DEMstepsRun += DEMstepsToInterrupt[j];
                     particleCloud_.liggghtsCommand()[runComNr]().set(DEMstepsToInterrupt[j]);
                     const char* command = particleCloud_.liggghtsCommand()[runComNr]().command(0);
                     Info << "Executing run command: '"<< command <<"'"<< endl;
                     lmp->input->one(command);
-    
+
                     // run liggghts command with exact timing
                     command = particleCloud_.liggghtsCommand()[lcModel[j]]().command(0);
                     Info << "Executing command: '"<< command <<"'"<< endl;
@@ -396,7 +402,7 @@ int Foam::twoWayMPI::getNumberOfClumps() const
     #endif
 
     Warning << "liggghts_get_maxtag_ms(lmp) is not available here!" << endl;
-    return -1;       
+    return -1;
 }
 
 int Foam::twoWayMPI::getNumberOfTypes() const
@@ -415,7 +421,7 @@ double* Foam::twoWayMPI::getTypeVol() const
     #endif
 
     Warning << "liggghts_get_vclump_ms(lmp) is not available here!" << endl;
-    return NULL;       
+    return NULL;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
