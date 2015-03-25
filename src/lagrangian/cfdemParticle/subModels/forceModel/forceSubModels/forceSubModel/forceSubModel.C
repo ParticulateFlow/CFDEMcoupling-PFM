@@ -179,8 +179,9 @@ void forceSubModel::partToArray
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-void forceSubModel::explicitInterpCorr
+void forceSubModel::explicitCorr
 (
+    vector& dragImplicit,
     vector& dragExplicit,
     scalar& dragCoefficient,
     vector& Ufluid,
@@ -218,11 +219,15 @@ void forceSubModel::readSwitches() const
         particleCloud_.impDEMdrag_=true;
 
         // do sanity check
+        // This can work if the accumulator is used, but is explicitely applied on the CFD side
+        // Sanity check is therefore not necessary here
+        /*
         if(switches_[0]) // treatExplicit=true
         {
-            FatalError << "Please check your settings, treatExplicit together with implForceDEM does not work!." 
+            FatalError << "Please check your settings, treatExplicit together with implForceDEM does not work!."
                        << abort(FatalError);
         }
+        */
     }
 
     if(switches_[7]) // implForceDEMaccumulated=true
@@ -320,7 +325,7 @@ const volVectorField& forceSubModel::divTauField(const volVectorField& U) const
 const volVectorField& forceSubModel::IBDragPerV(const volVectorField& U,const volScalarField& p) const
 {
     #ifdef compre
-        IBDragPerV_ = muField()*fvc::laplacian(U)-fvc::grad(p)
+        IBDragPerV_ = muField()*fvc::laplacian(U)-fvc::grad(p);
     #else
         IBDragPerV_ = rhoField()*(nuField()*fvc::laplacian(U)-fvc::grad(p));
     #endif

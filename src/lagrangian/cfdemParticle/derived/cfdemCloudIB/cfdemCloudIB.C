@@ -101,19 +101,20 @@ bool Foam::cfdemCloudIB::evolve()
     arraysReallocated_=false;
     bool doCouple=false;
 
-    if (dataExchangeM().couple())
+    if (dataExchangeM().doCoupleNow())
     {
         Info << "\n timeStepFraction() = " << dataExchangeM().timeStepFraction() << endl;
+        dataExchangeM().couple(0);
         doCouple=true;
 
-//        Info << "skipLagrangeToEulerMapping_: " << skipLagrangeToEulerMapping_ 
+//        Info << "skipLagrangeToEulerMapping_: " << skipLagrangeToEulerMapping_
 //             << " haveEvolvedOnce_: " << haveEvolvedOnce_ << endl;
         if(!skipLagrangeToEulerMapping_ || !haveEvolvedOnce_)
         {
           if(verbose_) Info << "- getDEMdata()" << endl;
           getDEMdata();
           Info << "nr particles = " << numberOfParticles() << endl;
-        
+
           // search cellID of particles
           if(verbose_) Info << "- findCell()" << endl;
           locateM().findCell(NULL,positions_,cellIDs_,numberOfParticles());
@@ -124,7 +125,7 @@ bool Foam::cfdemCloudIB::evolve()
           voidFractionM().setvoidFraction(NULL,voidfractions_,particleWeights_,particleVolumes_,particleV_);
           if(verbose_) Info << "setvoidFraction done." << endl;
         }
-        
+
         // set particles forces
         if(verbose_) Info << "- setForce(forces_)" << endl;
         for(int index = 0;index <  numberOfParticles_; ++index){
@@ -140,7 +141,9 @@ bool Foam::cfdemCloudIB::evolve()
         // write DEM data
         if(verbose_) Info << " -giveDEMdata()" << endl;
         giveDEMdata();
-        
+
+        dataExchangeM().couple(1);
+
         haveEvolvedOnce_=true;
     }
     Info << "evolve done." << endl;
@@ -197,11 +200,11 @@ void Foam::cfdemCloudIB::calcVelocityCorrection
     (
         fvm::laplacian(phiIB) == fvc::div(U) + fvc::ddt(voidfraction)
     );
-     if(phiIB.needReference()) 
-     {
-         phiIBEqn.setReference(pRefCell_, pRefValue_);
-     }
-    
+    if(phiIB.needReference())
+    {
+        phiIBEqn.setReference(pRefCell_, pRefValue_);
+    }
+
     phiIBEqn.solve();
 
     U=U-fvc::grad(phiIB);
@@ -211,18 +214,18 @@ void Foam::cfdemCloudIB::calcVelocityCorrection
     p=p+phiIB/U.mesh().time().deltaT();  // do we have to  account for rho here?
     p.correctBoundaryConditions();
 
-     if (couplingProperties_.found("checkinterface"))
-       {
-          Info << "checking no-slip on interface..." << endl;
+    if (couplingProperties_.found("checkinterface"))
+    {
+        Info << "checking no-slip on interface..." << endl;
 //          #include "checkInterfaceVelocity.H" //TODO: check carefully!
-       }
+    }
 
 }
 
 vector Foam::cfdemCloudIB::angularVelocity(int index)
 {
     vector vel;
-    for(int i=0;i<3;i++) vel[i] = angularVelocities_[index][i]; 
+    for(int i=0;i<3;i++) vel[i] = angularVelocities_[index][i];
     return vel;
 }
 

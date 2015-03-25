@@ -388,11 +388,10 @@ void inline Foam::twoWayMany2Many::destroy(int* array) const
 //==============
 
 
-bool Foam::twoWayMany2Many::couple() const
+bool Foam::twoWayMany2Many::couple(int i) const
 {
     bool coupleNow = false;
-    label commandLines(0);
-    if (doCoupleNow())
+    if (i==0)
     {
         couplingStep_++;
         coupleNow = true;
@@ -408,7 +407,7 @@ bool Foam::twoWayMany2Many::couple() const
 
                 if (particleCloud_.liggghtsCommand()[i]().runCommand(couplingStep()))
                 {
-                    commandLines=particleCloud_.liggghtsCommand()[i]().commandLines();
+                    label commandLines = particleCloud_.liggghtsCommand()[i]().commandLines();
                     for (int j=0; j<commandLines; j++)
                     {
                         const char* command = particleCloud_.liggghtsCommand()[i]().command(j);
@@ -443,7 +442,7 @@ bool Foam::twoWayMany2Many::couple() const
         setPositions(nlocal_foam_,pos_foam_);
         setCellIDs(nlocal_foam_,cellID_foam_);
 
-        Info <<"Foam::twoWayMany2Many::couple() done." << endl;
+        Info <<"Foam::twoWayMany2Many::couple(i) done." << endl;
     }
     return coupleNow;
 }

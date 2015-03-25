@@ -26,6 +26,9 @@ FoamFile
 //===========================================================================//
 // sub-models & settings
 
+syncMode false;
+//verbose;
+
 modelType "A"; // A or B
 
 couplingInterval 100;
@@ -171,7 +174,7 @@ KochHillDragProps
     //);
     implForceDEM true;
     //implForceDEMaccumulated true;
-    //explicitInterpCorr true;
+    //explicitCorr true;
 }
 
 BeetstraDragProps

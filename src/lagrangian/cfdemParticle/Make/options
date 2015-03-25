@@ -4,6 +4,7 @@ sinclude $(RULES)/mplib$(WM_MPLIB)
 GIT_VERSION := $(shell git describe --abbrev=4 --dirty --always --tags)
 PFLAGS+= -DGITVERSION=\"$(GIT_VERSION)\"
 
+include $(CFDEM_ADD_LIBS_DIR)/additionalLibs
 
 EXE_INC = \
      $(PFLAGS) \

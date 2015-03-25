@@ -93,6 +93,7 @@ Foam::cfdemCloud::cfdemCloud
     particleVolumes_(NULL),
     particleV_(NULL),
     numberOfParticles_(0),
+    d32_(-1),
     numberOfParticlesChanged_(false),
     arraysReallocated_(false),
     forceModels_(couplingProperties_.lookup("forceModels")),
@@ -456,12 +457,12 @@ label Foam::cfdemCloud::liggghtsCommandModelIndex(word name)
     return index;
 }
 
-std::vector<double*>* Foam::cfdemCloud::getVprobe()
+std::vector< std::vector<double*> >* Foam::cfdemCloud::getVprobe()
 {
  return probeModel_->getVprobe();
 }
 
-std::vector<double>* Foam::cfdemCloud::getSprobe()
+std::vector< std::vector<double> >* Foam::cfdemCloud::getSprobe()
 {
  return probeModel_->getSprobe();
 }
@@ -480,13 +481,13 @@ bool Foam::cfdemCloud::evolve
     numberOfParticlesChanged_ = false;
     arraysReallocated_=false;
     bool doCouple=false;
-    probeModel_->clearProbes();
 
     if(!ignore())
     {
-        if (dataExchangeM().couple())
+        if (dataExchangeM().doCoupleNow())
         {
             Info << "\n Coupling..." << endl;
+            dataExchangeM().couple(0);
             doCouple=true;
 
             // reset vol Fields
@@ -591,6 +592,8 @@ bool Foam::cfdemCloud::evolve
             clockM().start(23,"giveDEMdata");
             giveDEMdata();
             clockM().stop("giveDEMdata");
+
+            dataExchangeM().couple(1);
         }//end dataExchangeM().couple()
 
 

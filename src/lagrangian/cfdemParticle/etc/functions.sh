@@ -931,6 +931,52 @@ checkDirComment()
 }
 
 #========================================#
+#- function to check if a variable exits
+checkEnv()
+{
+    #--------------------------------------------------------------------------------#
+    #- define variables
+    var="$1"
+    #--------------------------------------------------------------------------------#
+    if [[ $var == "" ]]; then
+        echo "false"
+    else
+        echo "true"
+    fi
+}
+
+#========================================#
+#- function to check if a variable exits
+checkEnvComment()
+{
+    #--------------------------------------------------------------------------------#
+    #- define variables
+    var="$1"
+    varName="$2"
+    critical="$3"
+    #--------------------------------------------------------------------------------#
+    if [ $(checkEnv $var) == "true" ]; then
+         echo "valid:yes critical:$critical - $varName = $var" 
+    else
+        echo "valid:NO  critical:$critical - $varName = $var variable not set!" 
+    fi
+}
+
+#========================================#
+#- function to print a header to terminal
+printHeader()
+{
+    echo ""
+    echo "*********************************************"
+    echo "* C F D E M (R) c o u p l i n g             *"
+    echo "*                                           *"
+    echo "* by DCS Computing GmbH                     *"
+    echo "* www.dcs-computing.com                     *"
+    echo "*********************************************"
+    echo "" 
+}
+
+#========================================#
 #- track memory usage
 trackMem()
 {

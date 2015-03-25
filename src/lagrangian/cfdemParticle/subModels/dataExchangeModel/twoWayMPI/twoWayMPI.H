@@ -91,9 +91,10 @@ private:
 
     MPI_Comm comm_liggghts;
 
-    LAMMPS_NS::LAMMPS *lmp;
-
   // private member functions
+
+protected:
+    LAMMPS_NS::LAMMPS *lmp;
 
 public:
 
@@ -158,7 +159,7 @@ public:
         void destroy(int*) const;
         //==============
 
-        bool couple() const;
+        bool couple(int) const;
 
         int getNumberOfParticles() const;
         int getNumberOfClumps() const;

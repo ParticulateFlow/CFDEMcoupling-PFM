@@ -69,7 +69,6 @@ protected:
         int couplingInterval_;
 
     // Protected member functions
-        void setNumberOfParticles(int) const;
 
 public:
 
@@ -116,6 +115,8 @@ public:
 
 
     // Member Function
+        void setNumberOfParticles(int) const;
+
         inline const int& maxNumberOfParticles() const { return maxNumberOfParticles_; }
 
         template <typename T>
@@ -175,7 +176,7 @@ public:
         virtual void destroy(double*) const;
         //====
 
-        virtual bool couple() const;
+        virtual bool couple(int) const;
 
         virtual scalar timeStepFraction() const;
 

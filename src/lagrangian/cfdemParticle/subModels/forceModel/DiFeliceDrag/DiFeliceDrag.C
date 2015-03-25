@@ -128,7 +128,7 @@ void DiFeliceDrag::setForce() const
     vector Ufluid(0,0,0);
     vector drag(0,0,0);
     vector dragExplicit(0,0,0);
-  	scalar dragCoefficient(0);
+    scalar dragCoefficient(0);
     label cellI=0;
     vector Us(0,0,0);
     vector Ur(0,0,0);
@@ -198,7 +198,7 @@ void DiFeliceDrag::setForce() const
 
                     drag = dragCoefficient*Ur; //total drag force!
 
-                    forceSubM(0).explicitInterpCorr(dragExplicit,dragCoefficient,Ufluid,U_[cellI],Us,UsField_[cellI],forceSubM(0).verbose(),index);
+                    forceSubM(0).explicitCorr(drag,dragExplicit,dragCoefficient,Ufluid,U_[cellI],Us,UsField_[cellI],forceSubM(0).verbose(),index);
                 }
 
                 if(forceSubM(0).verbose() && index >-1 && index <102)

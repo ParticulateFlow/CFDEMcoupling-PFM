@@ -196,7 +196,7 @@ void Foam::dataExchangeModel::destroy(double* array) const
 //====
 
 
-bool Foam::dataExchangeModel::couple() const
+bool Foam::dataExchangeModel::couple(int i) const
 {
     bool coupleNow = false;
     if (doCoupleNow())

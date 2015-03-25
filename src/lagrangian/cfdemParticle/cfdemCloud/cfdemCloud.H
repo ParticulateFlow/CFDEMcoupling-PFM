@@ -127,6 +127,8 @@ protected:
 
     int numberOfParticles_;
 
+    scalar d32_;
+
     bool numberOfParticlesChanged_;
 
     mutable bool arraysReallocated_;
@@ -305,6 +307,7 @@ public:
 
        virtual inline double d(int);
 
+       inline scalar d32(bool recalc=true);
        virtual inline double dMin() {return -1;}
        virtual inline double dMax() {return -1;}
        virtual inline int minType() {return -1;}
@@ -399,9 +402,9 @@ public:
 
         void resetArray(double**&,int,int,double resetVal=0.);
 
-        std::vector<double*>* getVprobe();
-         
-        std::vector<double>* getSprobe();
+        std::vector< std::vector<double*> >* getVprobe();
+
+        std::vector< std::vector<double> >* getSprobe();
 };
 
 

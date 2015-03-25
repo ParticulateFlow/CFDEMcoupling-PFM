@@ -19,5 +19,5 @@ else
 fi
 
 #- run parallel CFD-DEM in new terminal
-gnome-terminal --title='cfdemSolverPiso settlingTest CFD'  -e "bash $casePath/parCFDDEMrun.sh" 
-
+#gnome-terminal --title='cfdemSolverPiso settlingTest CFD'  -e "bash $casePath/parCFDDEMrun.sh"
+bash $casePath/parCFDDEMrun.sh

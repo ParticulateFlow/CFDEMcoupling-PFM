@@ -108,7 +108,9 @@ twoWayMPI::twoWayMPI
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 twoWayMPI::~twoWayMPI()
-{}
+{
+    if (liggghts == 1) delete lmp;
+}
 
 // * * * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * * //
 void twoWayMPI::getData
@@ -239,10 +241,10 @@ void Foam::twoWayMPI::destroy(double* array) const
 }
 //============
 
-bool Foam::twoWayMPI::couple() const
+bool Foam::twoWayMPI::couple(int i) const
 {
     bool coupleNow = false;
-    if (doCoupleNow())
+    if (i==0)
     {
         couplingStep_++;
         coupleNow = true;
@@ -293,9 +295,9 @@ bool Foam::twoWayMPI::couple() const
                             DEMstepsToInterrupt[ind] -= DEMstepsToInterrupt[ind-1];
                     }
 
-                    Info << "Foam::twoWayMPI::couple(): interruptTimes=" << interruptTimes << endl;
-                    Info << "Foam::twoWayMPI::couple(): DEMstepsToInterrupt=" << DEMstepsToInterrupt << endl;
-                    Info << "Foam::twoWayMPI::couple(): lcModel=" << lcModel << endl;
+                    Info << "Foam::twoWayMPI::couple(i): interruptTimes=" << interruptTimes << endl;
+                    Info << "Foam::twoWayMPI::couple(i): DEMstepsToInterrupt=" << DEMstepsToInterrupt << endl;
+                    Info << "Foam::twoWayMPI::couple(i): lcModel=" << lcModel << endl;
                 }
 
                 if(particleCloud_.liggghtsCommand()[i]().type()=="runLiggghts")

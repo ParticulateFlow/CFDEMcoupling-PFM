@@ -223,8 +223,8 @@ void GidaspowDrag::setForce() const
 
                 drag = dragCoefficient * Ur;
 
-                // explicitInterpCorr
-                forceSubM(0).explicitInterpCorr(dragExplicit,dragCoefficient,Ufluid,U_[cellI],Us,UsField_[cellI],forceSubM(0).verbose());
+                // explicitCorr
+                forceSubM(0).explicitCorr(drag,dragExplicit,dragCoefficient,Ufluid,U_[cellI],Us,UsField_[cellI],forceSubM(0).verbose());
 
                 if(forceSubM(0).verbose() && index >=0 && index <2)
                 {

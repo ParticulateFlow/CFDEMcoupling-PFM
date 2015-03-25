@@ -201,7 +201,7 @@ public:
         void inline destroy(int*) const;
         //==============
 
-        bool couple() const;
+        bool couple(int) const;
 
         int getNumberOfParticles() const;
         int getNumberOfClumps() const;

@@ -353,8 +353,8 @@ void KochHillRWDrag::setForce() const
 
                     drag = dragCoefficient * Ur;
 
-                    // explicitInterpCorr
-                    forceSubM(0).explicitInterpCorr(dragExplicit,dragCoefficient,Ufluid,U_[cellI],Us,UsField_[cellI],verbose_);
+                    // explicitCorr
+                    forceSubM(0).explicitCorr(drag,dragExplicit,dragCoefficient,Ufluid,U_[cellI],Us,UsField_[cellI],verbose_);
                 }
 
                 if(verbose_ && index >=0 && index <2)

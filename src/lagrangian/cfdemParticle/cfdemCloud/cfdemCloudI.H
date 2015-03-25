@@ -197,6 +197,25 @@ inline double cfdemCloud::d(int index)
     return 2*radii_[index][0];
 }
 
+inline double cfdemCloud::d32(bool recalc)
+{
+    if(d32_<0 || recalc)
+    {
+        scalar Ntot(0);
+        scalar Dtot(0);
+        scalar r(0);
+        for(int index = 0;index <  numberOfParticles(); ++index)
+        {
+            r=radii_[index][0];
+            Ntot+=2*r*r*r;
+            Dtot+=r*r;
+        }
+        d32_=Ntot/Dtot;
+    }
+
+    return d32_;
+}
+
 inline int cfdemCloud::numberOfParticles() const
 {
     return numberOfParticles_;
