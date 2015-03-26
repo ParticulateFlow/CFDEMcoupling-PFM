@@ -54,7 +54,7 @@ void Foam::clockModel::start(int pos) const
     return;
 }
 
-void Foam::clockModel::start(int pos,std::string ident) const
+void Foam::clockModel::start(int pos, const std::string& ident) const
 {
     if (particleCloud_.mesh().time().value() > startTime_)
     {
@@ -96,7 +96,7 @@ void Foam::clockModel::stop() const
     return;
 }
 
-void Foam::clockModel::stop(std::string ident) const
+void Foam::clockModel::stop(const std::string& ident) const
 {
     if (particleCloud_.mesh().time().value() > startTime_)
     {
@@ -303,7 +303,7 @@ void Foam::clockModel::normHist() const
     return;
 }
 
-void Foam::clockModel::plotHist(double buffIn,std::string identifier,int numprocs,int myrank) const
+void Foam::clockModel::plotHist(double buffIn,const std::string& identifier,int numprocs,int myrank) const
 {
     double* globalTime_all = NULL;
     if (myrank == 0) globalTime_all = new double[numprocs];
