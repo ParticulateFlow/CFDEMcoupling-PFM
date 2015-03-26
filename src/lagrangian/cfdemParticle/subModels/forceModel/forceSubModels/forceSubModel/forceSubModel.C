@@ -60,9 +60,9 @@ forceSubModel::forceSubModel
     particleCloud_(sm),
     forceModel_(fm),
     nrDefaultSwitches_(9),                                          // !!!
-    switchesNameList_(wordList(nrDefaultSwitches_)),
-    switchesList_(List<Switch>(nrDefaultSwitches_)),
-    switches_(List<Switch>(nrDefaultSwitches_)),
+    switchesNameList_(nrDefaultSwitches_),
+    switchesList_(nrDefaultSwitches_),
+    switches_(nrDefaultSwitches_),
     nu_
     (
         IOobject
@@ -114,14 +114,8 @@ forceSubModel::forceSubModel
     switchesNameList_[iCounter]="interpolation";iCounter++;         //4
     switchesNameList_[iCounter]="useFilteredDragModel";iCounter++;  //5
     switchesNameList_[iCounter]="useParcelSizeDependentFilteredDrag";iCounter++;  //6
-	switchesNameList_[iCounter]="implForceDEMaccumulated";iCounter++;             //7
-	switchesNameList_[iCounter]="scalarViscosity";iCounter++;                     //8
-
-    for(int i=0;i<switchesList_.size();i++)
-    {
-        switchesList_[i]=false;
-        switches_[i]=false;
-    }
+    switchesNameList_[iCounter]="implForceDEMaccumulated";iCounter++;             //7
+    switchesNameList_[iCounter]="scalarViscosity";iCounter++;                     //8
 
     // sanity check of what is defined above
     if(switchesNameList_.size() != nrDefaultSwitches_)
@@ -202,7 +196,7 @@ void forceSubModel::readSwitches() const
     Info << "\nreading switches for forceSubModel:" << myType() << endl;
     forAll(switchesNameList_,i)
     {
-        if(switchesList_[i] > 0+SMALL) //check if switch is required
+        if(switchesList_[i]) //check if switch is required
         {
             Info << "  looking for " << switchesNameList_[i] << " ..." << endl;
             if (dict_.found(switchesNameList_[i]))

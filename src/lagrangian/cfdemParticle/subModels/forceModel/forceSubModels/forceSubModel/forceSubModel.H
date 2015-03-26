@@ -136,29 +136,29 @@ public:
 
     // Access
 
-        inline bool verbose() const      { return switches_[3]; };
+        inline bool verbose() const      { return switches_[3]; }
 
-        inline bool interpolation() const { return switches_[4]; };
+        inline bool interpolation() const { return switches_[4]; }
 
-        inline bool useFilteredDragModel() const { return switches_[5]; };
+        inline bool useFilteredDragModel() const { return switches_[5]; }
 
-        inline bool useParcelSizeDependentFilteredDrag() const { return switches_[6]; };
+        inline bool useParcelSizeDependentFilteredDrag() const { return switches_[6]; }
 
         virtual word myType() const=0;
 
-        inline forceModel& myForceM() const { return forceModel_;};
+        inline forceModel& myForceM() const { return forceModel_;}
 
-        inline const List<Switch>& switches() const { return switches_;};
+        inline const List<Switch>& switches() const { return switches_;}
 
-        inline const wordList& switchesNameList() const { return switchesNameList_;};
+        inline const wordList& switchesNameList() const { return switchesNameList_;}
 
-        void setSwitchesList(label i, bool v) const { switchesList_[i] = label(v);};
+        void setSwitchesList(label i, bool v) const { switchesList_[i] = v;}
 
-        void setSwitches(label i, Switch v) const { switches_[i] = v;};
+        void setSwitches(label i, Switch v) const { switches_[i] = v;}
 
         virtual void readSwitches() const;
 
-        const label& nrDefaultSwitches() const {return nrDefaultSwitches_;};
+        const label& nrDefaultSwitches() const {return nrDefaultSwitches_;}
 
         const volScalarField& nuField() const;
 
