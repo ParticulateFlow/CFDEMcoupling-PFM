@@ -122,7 +122,7 @@ int main(int argc, char *argv[])
                 // --- PISO loop
 
                 //for (int corr=0; corr<nCorr; corr++)
-                int nCorrSoph = nCorr + 5 * pow((1-particleCloud.dataExchangeM().timeStepFraction()),1);
+                int nCorrSoph = nCorr + 5. * (1. - particleCloud.dataExchangeM().timeStepFraction());
 
                 for (int corr=0; corr<nCorrSoph; corr++)
                 {
