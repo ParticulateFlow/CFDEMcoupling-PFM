@@ -120,172 +120,115 @@ void Foam::clockModel::stop(std::string ident) const
 
 std::string Foam::clockModel::eval() const
 {
-	std::string msg = "Measurements in CPU-seconds:";
-	msg.append("\n");
-	msg.append("Name \t deltaT \t nOfRuns \t level \t parentNr \t parentName \n");
-	std::ostringstream strs;
-	strs.setf(std::ios_base::scientific);
-	std::vector<int> shifts = calcShift();
+    std::ostringstream strs("Measurements in CPU-seconds:\n");
+    strs << "Name\tdeltaT\tnOfRuns\tlevel\tparentNr\tparentName\n";
+    strs.setf(std::ios_base::scientific);
+    std::vector<int> shifts = calcShift();
 
-	for (int i=0;i<n_;i++)
-	{
-		if (parent_[i] != -2)
-		{
-			msg.append(identifier_[i]);
-			msg.append("\t");
-			strs << (double(deltaT_[i])/(CLOCKS_PER_SEC));
-			msg.append(strs.str());
-			msg.append("\t");
-			strs.str("");
+    for (int i=0; i<n_; i++)
+    {
+        if (parent_[i] != -2)
+        {
+            strs << identifier_[i] << "\t";
+            strs << static_cast<double>(deltaT_[i])/(CLOCKS_PER_SEC) << "\t";
+            strs << nOfRuns_[i] << "\t";
+            strs << level_[i] << "\t";
 
-			strs << nOfRuns_[i];
-			msg.append(strs.str());
-			msg.append("\t");
-			strs.str("");
-
-			strs << level_[i];
-			msg.append(strs.str());
-			msg.append("\t");
-			strs.str("");
-
-			if (parent_[i] >= 0)
-			{
-				strs << (shifts[parent_[i]]);
-			}
-			else
-			{
-				strs << parent_[i];
-			}
-			msg.append(strs.str());
-			msg.append("\t");
-			strs.str("");
-
-			if (parent_[i] >= 0)
-			{
-				strs << identifier_[parent_[i]];
-			}
-			else
-			{
-				strs << "none";
-			}
-
-			msg.append(strs.str());
-			msg.append("\n");
-			strs.str("");
-		}
-	}
-	return msg;
+            if (parent_[i] >= 0)
+            {
+                strs << (shifts[parent_[i]]) << "\t";
+                strs << identifier_[parent_[i]] << "\n";
+            }
+            else
+            {
+                strs << parent_[i] << "\t";
+                strs << "none\n";
+            }
+        }
+    }
+    return strs.str();
 }
 
 void Foam::clockModel::evalFile() const
 {
-	std::ofstream outFile;
-	std::string fileName(path_/"timeEval.txt");
-	outFile.open(fileName.data(),ios_base::trunc);
-	outFile << "Time Evaluation"<<nl;
-	outFile << eval();
-	outFile.close();
-
+    std::ofstream outFile;
+    std::string fileName(path_/"timeEval.txt");
+    outFile.open(fileName.c_str(),ios_base::trunc);
+    outFile << "Time Evaluation" << nl;
+    outFile << eval();
+    outFile.close();
 }
 
 void Foam::clockModel::evalPar() const
 {
-	int myrank=-10;
-	MPI_Comm_rank(MPI_COMM_WORLD,&myrank);
-	int numprocs=-10;
-	MPI_Comm_size(MPI_COMM_WORLD, &numprocs);
-	std::ofstream outFile;
-	std::ostringstream strs;
-	strs.setf(std::ios_base::scientific);
-	std::string fileName(path_/"timeEval_");
-	strs << myrank;
-	fileName.append(strs.str());
-	fileName.append(".txt");
-	outFile.open(fileName.data(),ios_base::trunc);
-	outFile << "Time Evaluation for Processor Nr." << myrank <<nl;
-	outFile << eval();
-	outFile.close();
+    int myrank, numprocs;
+    MPI_Comm_rank(MPI_COMM_WORLD,&myrank);
+    MPI_Comm_size(MPI_COMM_WORLD, &numprocs);
 
-	// MPI_REDUCE SUM NODES
-	MPI_Barrier(MPI_COMM_WORLD);
-	strs.str("");
-	std::string msg = "Parallel Measurements in CPU-seconds of all Processors (starting after first t.s.):";
-	msg.append("\n");
-	msg.append("Name \t avgdeltaT \t maxdeltaT \t nOfRuns \t level \t parentNr \t parentName \n");
-	double buffOut=0.;
-    double buffIn=0.;
-	std::vector<int> shifts = calcShift();
+    std::ofstream outFile;
+    std::ostringstream strs;
+    strs.setf(std::ios_base::scientific);
 
-	for (int i=0;i<n_;i++)
-	{
-		if (parent_[i]!=-2)
-		{
-			msg.append(identifier_[i]);
-			msg.append("\t");
+    std::string fileName(path_/"timeEval_");
+    strs << myrank << ".txt";
+    fileName.append(strs.str());
 
-			buffIn = double(deltaT_[i])/(CLOCKS_PER_SEC);
-			MPI_Reduce(&buffIn, &buffOut, 1, MPI_DOUBLE, MPI_SUM,0 , MPI_COMM_WORLD);
-			MPI_Barrier(MPI_COMM_WORLD);
-			strs << (buffOut)/(numprocs);
-			msg.append(strs.str());
-			msg.append("\t");
-			strs.str("");
+    outFile.open(fileName.c_str(),ios_base::trunc);
+    outFile << "Time Evaluation for Processor Nr." << myrank << nl;
+    outFile << eval();
+    outFile.close();
 
-			//buffIn = double(deltaT[i])/(CLOCKS_PER_SEC);
-			MPI_Reduce(&buffIn, &buffOut, 1, MPI_DOUBLE, MPI_MAX,0 , MPI_COMM_WORLD);
-			MPI_Barrier(MPI_COMM_WORLD);
-			strs << (buffOut);
-			msg.append(strs.str());
-			msg.append("\t");
-			strs.str("");
+    // MPI_REDUCE SUM NODES
+    MPI_Barrier(MPI_COMM_WORLD);
+    strs.str("Parallel Measurements in CPU-seconds of all Processors (starting after first t.s.):\n");
+    strs << "Name\tavgdeltaT\tmaxdeltaT\tnOfRuns\tlevel\tparentNr\tparentName\n";
+    double buffOut = 0.;
+    double buffIn = 0.;
+    std::vector<int> shifts = calcShift();
 
-			strs << nOfRuns_[i];
-			msg.append(strs.str());
-			msg.append("\t");
-			strs.str("");
+    for (int i=0; i<n_; i++)
+    {
+        if (parent_[i] != -2)
+        {
+            strs << identifier_[i] << "\t";
 
-			strs << level_[i];
-			msg.append(strs.str());
-			msg.append("\t");
-			strs.str("");
+            buffIn = static_cast<double>(deltaT_[i])/(CLOCKS_PER_SEC);
 
-			if (parent_[i] >= 0)
-			{
-				strs << (shifts[parent_[i]]);
-			}
-			else
-			{
-				strs << parent_[i];
-			}
-			msg.append(strs.str());
-			msg.append("\t");
-			strs.str("");
+            MPI_Reduce(&buffIn, &buffOut, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+            MPI_Barrier(MPI_COMM_WORLD);
 
-			if (parent_[i] >= 0)
-			{
-				strs << identifier_[parent_[i]];
-			}
-			else
-			{
-				strs << "none";
-			}
+            strs << buffOut/numprocs << "\t";
 
-			msg.append(strs.str());
-			msg.append("\n");
-			strs.str("");
-		}
-	}
-	MPI_Barrier(MPI_COMM_WORLD);
+            MPI_Reduce(&buffIn, &buffOut, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+            MPI_Barrier(MPI_COMM_WORLD);
 
-	if(myrank == 0)
-	{
+            strs << buffOut << "\t";
+            strs << nOfRuns_[i] << "\t";
+            strs << level_[i] << "\t";
+
+            if (parent_[i] >= 0)
+            {
+                strs << (shifts[parent_[i]]) << "\t";
+                strs << identifier_[parent_[i]] << "\n";
+            }
+            else
+            {
+                strs << parent_[i] << "\t";
+                strs << "none\n";
+            }
+        }
+    }
+    MPI_Barrier(MPI_COMM_WORLD);
+
+    if (myrank == 0)
+    {
         std::string fileName(path_/"timeEvalFull.txt");
-		outFile.open(fileName.data(),ios_base::trunc);
-		outFile << msg;
-		outFile.close();
-	}
+        outFile.open(fileName.data(),ios_base::trunc);
+        outFile << strs.str();
+        outFile.close();
+    }
 
-	return;
+    return;
 }
 
 
@@ -477,12 +420,12 @@ Foam::clockModel::clockModel
     startTime_(sm.mesh().time().startTime().value()+sm.mesh().time().deltaT().value()+SMALL),  // delay start of measurement by deltaT
     //startTime_(0),                                //no delay
     n_(30),
-    deltaT_(std::vector<clock_t> (n_)),
-    identifier_(std::vector<std::string> (n_)),
-    nOfRuns_(std::vector<int> (n_)),
-    level_(std::vector<short> (n_)),
+    deltaT_(n_),
+    identifier_(n_),
+    nOfRuns_(n_),
+    level_(n_),
     curLev_(0),
-    parent_(std::vector<int> (n_)),
+    parent_(n_),
     curParent_(0)
 {
 
