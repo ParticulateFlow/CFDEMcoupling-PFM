@@ -94,7 +94,7 @@ inline bool spheroidGeometry(double radius, double aspectRatio, //inputs
     ai = radius * std::pow(aspectRatio*aspectRatio,0.33333333333333333333333);
     bi = ai / aspectRatio;
     ei = std::sqrt( 1.0 - 1.0 / (aspectRatio*aspectRatio) );
-    Le = std::log( 1.0+ei) / (1.0-ei) );
+    Le = std::log( (1.0+ei) / (1.0-ei) );
 
     return true;
 }
