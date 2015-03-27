@@ -58,9 +58,9 @@ inline void outerProduct(double *vec1, double *vec2, double **m)
 {
   int i, j;
   //debug output
-  for( i = 0; i < 3; ++i )
+//  for( i = 0; i < 3; ++i )
 //    printf("OUTER PRODUCT: Input: vec1 element %d = %g", i, vec1[i]);
-  for( i = 0; i < 3; ++i )
+//  for( i = 0; i < 3; ++i )
 //    printf("OUTER PRODUCT: Input: vec2 element %d=%g", i, vec2[i]);
   
   //calculation
