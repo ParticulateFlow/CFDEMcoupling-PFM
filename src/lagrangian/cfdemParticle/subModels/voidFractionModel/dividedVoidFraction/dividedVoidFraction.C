@@ -35,6 +35,7 @@ Description
 #include "addToRunTimeSelectionTable.H"
 #include "locateModel.H"
 #include "dataExchangeModel.H"
+#include <math.h>
 
 //#include <mpi.h>
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -107,7 +108,6 @@ void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfra
     else
         reAllocArrays();
 
-    scalar pi = M_PI;
     vector position(0.,0.,0.);
     label cellID = -1;
     scalar radius(-1.);
@@ -153,13 +153,10 @@ void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfra
                 const scalar delta_r = 0.293976*radius;
                 for (scalar r = 0.623926*radius; r < radius; r+=delta_r)
                 {
-                    const scalar _2pi = 6.28318530717958647692; // 2pi
-                    const scalar _pi2 = 1.57079632679489661923; // pi/2
-                    const scalar _pi4 = 0.78539816339744830962; // pi/4
                     // try 8 subpoint derived from spherical coordinates
-                    for (scalar zeta=_pi4; zeta<_2pi; zeta+=_pi2)
+                    for (scalar zeta=M_PI_4; zeta<2.*M_PI; zeta+=M_PI_2)
                     {
-                        for (scalar theta=_pi4; theta<pi; theta+=_pi2)
+                        for (scalar theta=M_PI_4; theta<M_PI; theta+=M_PI_2)
                         {
                             offset[0] = r * Foam::sin(theta) * Foam::cos(zeta);
                             offset[1] = r * Foam::sin(theta) * Foam::sin(zeta);
