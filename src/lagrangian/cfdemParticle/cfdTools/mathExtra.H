@@ -62,7 +62,7 @@ inline void outerProduct(double *vec1, double *vec2, double **m)
 //    printf("OUTER PRODUCT: Input: vec1 element %d = %g", i, vec1[i]);
 //  for( i = 0; i < 3; ++i )
 //    printf("OUTER PRODUCT: Input: vec2 element %d=%g", i, vec2[i]);
-  
+
   //calculation
   for( i = 0; i < 3; ++i )
     for( j = 0; j < 3; ++j )
@@ -70,15 +70,13 @@ inline void outerProduct(double *vec1, double *vec2, double **m)
       m[i][j] = vec1[i] * vec2[j];
       printf("OUTER PRODUCT: Result: m[%d][%d]=%g", i, j, m[i][j]);
     }
-    
-    
 }
 //--------------------------------------------------------------------
 // Compute the major, minor axis and eccentricity parameters of a prolate spheroid
-inline bool spheroidGeometry(double radius, double aspectRatio,  //inputs
-                                 double& ai,    double& bi,              //outputs
-                                 double& ei,    double& Le              //outputs
-                                ) //
+inline bool spheroidGeometry(double radius, double aspectRatio, //inputs
+                             double& ai,    double& bi,         //outputs
+                             double& ei,    double& Le          //outputs
+                            )
 {
     //INPUT
     //  radius      ...volume-equivalent radius of the spheroid
@@ -93,18 +91,12 @@ inline bool spheroidGeometry(double radius, double aspectRatio,  //inputs
     if(radius<=0.0)     //avoid troubles in case radius is 0 or negative
         return false;
 
- 	ai = radius * std::pow(aspectRatio*aspectRatio,0.33333333333333333333333);
+    ai = radius * std::pow(aspectRatio*aspectRatio,0.33333333333333333333333);
     bi = ai / aspectRatio;
- 	ei = std::sqrt( 
- 	                1.0
-                   - 1.0 / (aspectRatio*aspectRatio)
- 	              );
- 	Le = std::log(
- 		           (1.0+ei)
- 		          /(1.0-ei)
-                 );
+    ei = std::sqrt( 1.0 - 1.0 / (aspectRatio*aspectRatio) );
+    Le = std::log( 1.0+ei) / (1.0-ei) );
 
-	return true; 		    
+    return true;
 }
 
 //--------------------------------------------------------------------
@@ -117,12 +109,12 @@ inline double Pi()
 
 //--------------------------------------------------------------------
 // Compute the major, minor axis and eccentricity parameters of a prolate spheroid
-inline bool spheroidGeometry2(double radius, double aspectRatio,  //inputs
-                                 double& ai,     double& bi,           //outputs
-                                 double& XAe,    double& YAe,         //outputs
-                                 double& XCe,    double& YCe,         //outputs
+inline bool spheroidGeometry2(double radius,  double aspectRatio, //inputs
+                                 double& ai,  double& bi,         //outputs
+                                 double& XAe, double& YAe,        //outputs
+                                 double& XCe, double& YCe,        //outputs
                                  double& YHe
-                                ) //
+                                )
 {
     //INPUT
     //  radius      ...volume-equivalent radius of the spheroid
@@ -135,36 +127,34 @@ inline bool spheroidGeometry2(double radius, double aspectRatio,  //inputs
     //  XCe  ...Eccentricity dependet parameter
     //  YCe  ...Eccentricity dependet parameter
     //  YHe  ...Eccentricity dependet parameter
-  
 
-    double ei(0.0), Le(0.0);  
-    bool   result = 
-          spheroidGeometry(radius, aspectRatio,  //inputs
-                                 ai,     bi,              //outputs
-                                 ei,    Le              //outputs
-                              );
+    double ei(0.0), Le(0.0);
+    bool   result = spheroidGeometry(radius, aspectRatio, //inputs
+                                     ai,     bi,          //outputs
+                                     ei,     Le           //outputs
+                                    );
     if(!result)
         return false;
-        
+
     XAe= 2.6666666666666666666666667
          *ei*ei*ei
-         /(-2.0*ei+(1.0+ei*ei)*Le); 
+         /(-2.0*ei+(1.0+ei*ei)*Le);
     YAe= 5.333333333333333333333333333
         *ei*ei*ei
-        /(2.0*ei+(3*ei*ei-1.0)*Le);
+        /(2.0*ei+(3.0*ei*ei-1.0)*Le);
     XCe= 1.333333333333333333333333333
-        *ei*ei*ei
-        *(1.0-ei*ei)
-        /(2.0*ei-(1.0-ei*ei)*Le);
+         *ei*ei*ei
+         *(1.0-ei*ei)
+         /(2.0*ei-(1.0-ei*ei)*Le);
     YCe= 1.3333333333333333333333
-        *ei*ei*ei
-        *(2.0-ei*ei)
-        /(-2.0*ei+(1.0+ei*ei)*Le);
+         *ei*ei*ei
+         *(2.0-ei*ei)
+         /(-2.0*ei+(1.0+ei*ei)*Le);
     YHe= 1.3333333333333333333333
-        *ei*ei*ei*ei*ei
-        /(-2.0*ei+(1.0+ei*ei)*Le);
+         *ei*ei*ei*ei*ei
+         /(-2.0*ei+(1.0+ei*ei)*Le);
 
-	return true; 		    
+    return true;
 
 }
 
@@ -201,22 +191,22 @@ inline void multiply333(double scalar, double tensor[3][3][3] )
 inline void permutationTensor(double tensor[3][3][3] )
 {
     zeroize333(tensor);
-    tensor[0][1][2] = 1.0; 
-    tensor[1][2][0] = 1.0; 
-    tensor[2][0][1] = 1.0; 
-    tensor[0][2][1] =-1.0; 
-    tensor[2][1][0] =-1.0; 
-    tensor[1][0][2] =-1.0; 
+    tensor[0][1][2] = 1.0;
+    tensor[1][2][0] = 1.0;
+    tensor[2][0][1] = 1.0;
+    tensor[0][2][1] =-1.0;
+    tensor[2][1][0] =-1.0;
+    tensor[1][0][2] =-1.0;
 }
 
 
 
 //--------------------------------------------------------------------
-// Compute a dot product of the permutation tensor and 
+// Compute a dot product of the permutation tensor and
 // then a dyadic product of with a vector
-inline bool permutationDotDyadic( 
-                                 double vector[3], 
-                                 double  tensor[3][3][3]      
+inline bool permutationDotDyadic(
+                                 double vector[3],
+                                 double  tensor[3][3][3]
                                 )
 {
     //Generate permutation tensor
@@ -244,7 +234,7 @@ inline bool permutationDotDyadic(
 
 //--------------------------------------------------------------------
 // Compute a dot and dyadic product of with a vector
-inline bool doubleDotTensor333Tensor33(double tensor333[3][3][3], 
+inline bool doubleDotTensor333Tensor33(double tensor333[3][3][3],
                                        double tensor33[3][3],
                                        double result[3]
                                       )
@@ -260,6 +250,6 @@ inline bool doubleDotTensor333Tensor33(double tensor333[3][3][3],
 }
 
 
-}; //end of namespace
+} //end of namespace
 
 #endif
