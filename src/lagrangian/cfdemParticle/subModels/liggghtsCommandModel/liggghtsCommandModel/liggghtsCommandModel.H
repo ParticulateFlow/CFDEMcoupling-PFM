@@ -174,7 +174,7 @@ public:
 
         label commandLines(){return commandLines_;}
 
-        void parseCommandList(wordList&, labelList&, scalarList&, word&, dictionary&, bool=false);
+        void parseCommandList(wordList&, labelList&, scalarList&, word&, dictionary&, bool&);
 };
 
 

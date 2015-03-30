@@ -247,7 +247,7 @@ bool liggghtsCommandModel::checkPath(fileName path)
 }
 
 
-void liggghtsCommandModel::parseCommandList(wordList& commandList,labelList& labelList,scalarList& scalarList,word& command, dictionary& propsDict, bool timeStamp)
+void liggghtsCommandModel::parseCommandList(wordList& commandList,labelList& labelList,scalarList& scalarList,word& command, dictionary& propsDict, bool& timeStamp)
 {
     bool addBlank = true;  // std no blanks after each word
     fileName add;
@@ -256,7 +256,7 @@ void liggghtsCommandModel::parseCommandList(wordList& commandList,labelList& lab
 
     forAll(commandList,i)
     {
-        add = word(commandList[i]);
+        add = commandList[i];
 
         //- handle symbols
         if (add == "$couplingInterval")
@@ -276,7 +276,7 @@ void liggghtsCommandModel::parseCommandList(wordList& commandList,labelList& lab
         {
             add = "";
             addBlank = true;
-        }else if (add=="timeStamp") // next command will be a number read from labelList
+        }else if (add=="timeStamp") // add a time stamp
         {
             add = "";
             timeStamp=true;
