@@ -139,7 +139,6 @@ void LaEuScalarTemp::manipulateScalarField(volScalarField& EuField) const
     const volScalarField& rhoField = forceSubM(0).rhoField();
 
     // calc La based heat flux
-    vector position(0,0,0);
     scalar voidfraction(1);
     vector Ufluid(0,0,0);
     scalar Tfluid(0);
@@ -148,11 +147,10 @@ void LaEuScalarTemp::manipulateScalarField(volScalarField& EuField) const
     scalar ds(0);
     scalar nuf(0);
     scalar magUr(0);
-    scalar As(0);
     scalar Rep(0);
     scalar Pr(0);
     scalar Nup(0);
-    scalar n = 3.5; // model parameter
+    const scalar n = 3.5; // model parameter (found suitable for 3-mm polymer pellets when modelling dilute flows)
 
     interpolationCellPoint<scalar> voidfractionInterpolator_(voidfraction_);
     interpolationCellPoint<vector> UInterpolator_(U_);
@@ -167,39 +165,41 @@ void LaEuScalarTemp::manipulateScalarField(volScalarField& EuField) const
             {
                 if(forceSubM(0).interpolation())
                 {
-	                position = particleCloud_.position(index);
+                    vector position = particleCloud_.position(index);
                     voidfraction = voidfractionInterpolator_.interpolate(position,cellI);
                     Ufluid = UInterpolator_.interpolate(position,cellI);
                     Tfluid = TInterpolator_.interpolate(position,cellI);
-                }else
+                }
+                else
                 {
-					voidfraction = voidfraction_[cellI];
+                    voidfraction = voidfraction_[cellI];
                     Ufluid = U_[cellI];
                     Tfluid = tempField_[cellI];
                 }
 
                 // calc relative velocity
                 Us = particleCloud_.velocity(index);
-                magUr = mag(Ufluid-Us);
-                ds = 2*particleCloud_.radius(index);
-                As = ds*ds*M_PI;
+                magUr = mag(Ufluid - Us);
+                ds = 2.*particleCloud_.radius(index);
                 nuf = nufField[cellI];
-                Rep = ds*magUr/nuf;
-                Pr = max(SMALL,Cp_*nuf*rhoField[cellI]/lambda_);
+                Rep = ds * magUr / nuf;
+                Pr = max(SMALL, Cp_ * nuf * rhoField[cellI] / lambda_);
 
-                if (Rep < 200)
+                if (Rep < 200.)
                 {
-                    Nup = 2+0.6*pow(voidfraction,n)*sqrt(Rep)*pow(Pr,0.33);
+                    Nup = 2. + 0.6 * pow(voidfraction,n) * sqrt(Rep) * pow(Pr,0.33);
                 }
-                else if (Rep < 1500)
+                else if (Rep < 1500.)
                 {
                     Nup = 2. + (0.5 * sqrt(Rep) + 0.02 * pow(Rep,0.8)) * pow(voidfraction,n) * pow(Pr,0.33);
                 }
                 else
                 {
-                    Nup = 2+0.000045*pow(voidfraction,n)*pow(Rep,1.8);
+                    Nup = 2. + 0.000045 * pow(voidfraction,n) * pow(Rep,1.8);
                 }
-                scalar h = lambda_*Nup/(ds);
+
+                scalar h = lambda_ * Nup / ds;
+                scalar As = ds * ds * M_PI; // surface area of sphere
 
                 // calc convective heat flux [W]
                 scalar partHeatFlux = h * As * (Tfluid - partTemp_[index][0]);
@@ -216,7 +216,7 @@ void LaEuScalarTemp::manipulateScalarField(volScalarField& EuField) const
                     Info << "Pr = " << Pr << endl;
                     Info << "Nup = " << Nup << endl;
                     Info << "voidfraction = " << voidfraction << endl;
-                    Info << "partTemp_[index][0] = " << partTemp_[index][0] << endl  ;
+                    Info << "partTemp_[index][0] = " << partTemp_[index][0] << endl;
                     Info << "Tfluid = " << Tfluid << endl  ;
                 }
             }
@@ -235,10 +235,9 @@ void LaEuScalarTemp::manipulateScalarField(volScalarField& EuField) const
     EuField.internalField() /= -rhoField.internalField()*Cp_*EuField.mesh().V();
 
     // limit source term
-    scalar EuFieldInCell;
     forAll(EuField,cellI)
     {
-        EuFieldInCell = EuField[cellI];
+        scalar EuFieldInCell = EuField[cellI];
 
         if(mag(EuFieldInCell) > maxSource_ )
         {
