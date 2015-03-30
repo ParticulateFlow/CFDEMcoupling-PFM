@@ -158,8 +158,6 @@ void LaEuScalarTemp::manipulateScalarField(volScalarField& EuField) const
     interpolationCellPoint<vector> UInterpolator_(U_);
     interpolationCellPoint<scalar> TInterpolator_(tempField_);
 
-    scalar h1(0);
-    scalar h2(0);
     for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)
     {
         //if(particleCloud_.regionM().inRegion()[index][0])
@@ -195,9 +193,7 @@ void LaEuScalarTemp::manipulateScalarField(volScalarField& EuField) const
                 }
                 else if (Rep < 1500)
                 {
-                    h1=pow(voidfraction,n);
-                    h2=pow(Pr,0.33);
-                    Nup = 2+0.5*h1*sqrt(Rep)*h2+0.02*h1*pow(Rep,0.8)*h2;
+                    Nup = 2. + (0.5 * sqrt(Rep) + 0.02 * pow(Rep,0.8)) * pow(voidfraction,n) * pow(Pr,0.33);
                 }
                 else
                 {
