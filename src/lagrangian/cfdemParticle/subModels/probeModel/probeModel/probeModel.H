@@ -97,8 +97,8 @@ public:
             (
                 const dictionary& dict,
                 cfdemCloud& sm,
-                word   typeName,
-                const char*  logFileName
+                const word& typeName,
+                const char* logFileName
             ),
             (dict,sm,typeName,logFileName)
         );
@@ -111,8 +111,8 @@ public:
         (
             const dictionary& dict,
             cfdemCloud& sm,
-            word   typeName,
-            const char*  logFileName
+            const word& typeName,
+            const char* logFileName
         );
 
 
@@ -127,8 +127,8 @@ public:
         (
             const dictionary& dict,
             cfdemCloud& sm,
-            word   typeName,
-            const char *logFileName
+            const word& typeName,
+            const char* logFileName
         );
 
     // Member Functions

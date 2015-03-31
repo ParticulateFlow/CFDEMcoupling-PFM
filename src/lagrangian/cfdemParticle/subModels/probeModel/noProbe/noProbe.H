@@ -71,8 +71,8 @@ public:
         (
             const dictionary& dict,
             cfdemCloud& sm,
-            word   typeName,
-            const char*  logFileName
+            const word& typeName,
+            const char* logFileName
         );
 
     // Destructor
