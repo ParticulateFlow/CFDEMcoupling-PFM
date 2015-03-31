@@ -120,68 +120,59 @@ void particleProbe::setOutputFile() const
 
 void particleProbe::initialize(word typeName, word logFileName) const
 {
-  //update the list of items to be sampled
-  itemCounter_ += 1;
-  itemsToSample_.append(logFileName);
+    //update the list of items to be sampled
+    ++itemCounter_;
+    itemsToSample_.append(logFileName);
 
-  // init environment
-  //propsDict_ = particleCloud_.couplingProperties().subDict(typeName + "Props");
-  name_ = typeName;
-  const char* fileNameOut_ = logFileName.c_str();
+    // init environment
+    //propsDict_ = particleCloud_.couplingProperties().subDict(typeName + "Props");
+    name_ = typeName;
 
-  if(verboseToFile_)
-  {
+    if (verboseToFile_)
+    {
+        Info << "Will sample these particle IDs: " << particleIDsToSample_ << " every " << printEvery_ << endl;
 
-    Info << "Will sample these particle IDs: " << particleIDsToSample_ << " every " <<  printEvery_ <<  endl;
+        //initialize the output files
+        MPI_Comm_rank(MPI_COMM_WORLD, &rank_);
 
-    //initialize the output files
-    int myrank_(-1);
-    int numprocs_(-1);
-    MPI_Comm_rank(MPI_COMM_WORLD,&myrank_);
-    MPI_Comm_size(MPI_COMM_WORLD, &numprocs_);
-    rank_=myrank_;
+        //open a separate file for each processor
+        char* filecurrent_ = new char[strlen(logFileName.c_str()) + 4]; //reserve 4 chars for processor name
+        sprintf(filecurrent_,"%s%s%d", logFileName.c_str(), ".", rank_);
 
-    //open a separate file for each processor
-    char* filecurrent_;
-    filecurrent_= new char[strlen(fileNameOut_) + 4]; //reserve 4 chars for processor name
-    if (myrank_ < numprocs_)  
-             sprintf(filecurrent_,"%s%s%d", fileNameOut_, ".", myrank_);
-    else  //open one file for proc 0
-            sprintf(filecurrent_,"%s", fileNameOut_); 
-     word file_(filecurrent_);
-     Info << "particleProbe for model " <<  name_ << " will write to file " << file_ << endl;
+        Info << "particleProbe for model " << name_ << " will write to file " << filecurrent_ << endl;
 
-      //generate the file streams
-      fileName probeSubDir = dirName_;
-      if (particleCloud_.mesh().name() != polyMesh::defaultRegion)
-      {
-                probeSubDir = probeSubDir/particleCloud_.mesh().name();
-       }
-      probeSubDir = probeSubDir/particleCloud_.mesh().time().timeName();
+        //generate the file streams
+        fileName probeSubDir = dirName_;
+        if (particleCloud_.mesh().name() != polyMesh::defaultRegion)
+        {
+            probeSubDir = probeSubDir/particleCloud_.mesh().name();
+        }
+        probeSubDir = probeSubDir/particleCloud_.mesh().time().timeName();
 
-       fileName probeDir_;
-       if (Pstream::parRun())
-       {
-                // Put in undecomposed case
-                // (Note: gives problems for distributed data running)
-               probeDir_ = particleCloud_.mesh().time().path()/".."/probeSubDir;
+        fileName probeDir_;
+        if (Pstream::parRun())
+        {
+            // Put in undecomposed case
+            // (Note: gives problems for distributed data running)
+            probeDir_ = particleCloud_.mesh().time().path()/".."/probeSubDir;
         }
         else
         {
-              probeDir_ = particleCloud_.mesh().time().path()/probeSubDir;
+            probeDir_ = particleCloud_.mesh().time().path()/probeSubDir;
         }
 
-    //manage files and OFstreams
-    mkDir(probeDir_);
-    sPtr = new OFstream(probeDir_/file_);
-    sPtrList_.append(sPtr);
+        //manage files and OFstreams
+        mkDir(probeDir_);
+        sPtr = new OFstream(probeDir_/filecurrent_);
+        sPtrList_.append(sPtr);
 
-    //Clear the containers for the fields to be probed
-    scalarFields_.clear();
-    vectorFields_.clear();
-  }
-  return;
+        delete [] filecurrent_;
+        //Clear the containers for the fields to be probed
+        scalarFields_.clear();
+        vectorFields_.clear();
+    }
 
+    return;
 }
 
 void particleProbe::writeHeader() const
