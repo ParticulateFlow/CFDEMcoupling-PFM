@@ -138,7 +138,7 @@ public:
         {
             if (propsDict.found("weight")) weight_ = readScalar(propsDict.lookup("weight"));
             if (propsDict.found("porosity")) porosity_ = readScalar(propsDict.lookup("porosity"));
-        };
+        }
 
         void resetVoidFractions() const;
 

@@ -123,7 +123,7 @@ public:
         (
                 const point& pStart,
                 const point& pEnd
-        ) const {return -1;};
+        ) const {return -1;}
 };
 
 

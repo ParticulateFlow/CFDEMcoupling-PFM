@@ -62,10 +62,6 @@ protected:
 
         cfdemCloud& particleCloud_;
 
-        //Switch treatExplicit_;                      // marker to treat force in implicit way (otherwise explicit)
-        //Switch treatDEM_;                           // marker to use the force only on DEM side
-        //Switch implDEM_;                           // marker to use the implicit force on DEM side
-
         mutable volVectorField impParticleForces_;  // sum of implicit particle forces [N]
 
         mutable volVectorField expParticleForces_;  // sum of explicit particle forces [N]
@@ -75,7 +71,7 @@ protected:
         const word modelType_;
 
         bool probeIt_;
-        
+
         bool requiresEx_;           //requires a orientation vector
 
         wordList forceSubModels_;
@@ -135,35 +131,35 @@ public:
         virtual void manipulateScalarField(volScalarField&) const;
 
     // Access
-        word modelType(){ return modelType_; };
+        word modelType() { return modelType_; }
 
-        inline volVectorField& impParticleForces() const { return impParticleForces_;};
+        inline volVectorField& impParticleForces() const { return impParticleForces_; }
 
-        inline volVectorField& expParticleForces() const { return expParticleForces_;};
+        inline volVectorField& expParticleForces() const { return expParticleForces_; }
 
-        inline double ** impForces() const { return particleCloud_.impForces_;};
+        inline double ** impForces() const { return particleCloud_.impForces_; }
 
-        inline double ** expForces() const { return particleCloud_.expForces_;};
+        inline double ** expForces() const { return particleCloud_.expForces_; }
 
-        inline double ** DEMForces() const { return particleCloud_.DEMForces_;};
+        inline double ** DEMForces() const { return particleCloud_.DEMForces_; }
 
-        inline double ** Cds() const { return particleCloud_.Cds_;};
+        inline double ** Cds() const { return particleCloud_.Cds_; }
 
-        inline double ** fluidVel() const { return particleCloud_.fluidVel_;};
+        inline double ** fluidVel() const { return particleCloud_.fluidVel_; }
 
-        inline const bool& coupleForce() const { return coupleForce_;};
+        inline const bool& coupleForce() const { return coupleForce_; }
 
-        virtual inline bool& requiresEx() { return requiresEx_;};
-        
+        virtual inline bool& requiresEx() { return requiresEx_; }
+
         void repartitionImExForces() const; //Repartition Implixit/Explicit forces
 
         void treatVoidCells() const;
 
-        inline const wordList& forceSubModels(){ return forceSubModels_; };
+        inline const wordList& forceSubModels(){ return forceSubModels_; }
 
-        inline const forceSubModel& forceSubM(int i) const { return forceSubModel_[i]; };
+        inline const forceSubModel& forceSubM(int i) const { return forceSubModel_[i]; }
 
-        inline int nrForceSubModels(){ return forceSubModels_.size(); };
+        inline int nrForceSubModels(){ return forceSubModels_.size(); }
 
         void setForceSubModels(dictionary& dict);
 };

@@ -96,7 +96,7 @@ public:
 
     // Member Functions
 
-    word name(){return myName_;};
+    word name(){return myName_;}
 
     const char* command(int);
 

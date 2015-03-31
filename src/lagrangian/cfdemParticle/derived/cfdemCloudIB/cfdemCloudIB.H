@@ -95,7 +95,7 @@ public:
         inline double ** angularVelocities() const
         {
             return angularVelocities_;
-        };
+        }
 
 };
 

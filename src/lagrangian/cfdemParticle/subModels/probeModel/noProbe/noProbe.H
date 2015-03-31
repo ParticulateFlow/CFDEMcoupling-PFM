@@ -80,7 +80,7 @@ public:
         ~noProbe();
 
     // Member Functions
-        bool active() const {return false;}; 
+        bool active() const {return false;}
 };
 
 
