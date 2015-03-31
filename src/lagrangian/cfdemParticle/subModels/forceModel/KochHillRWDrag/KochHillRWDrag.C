@@ -250,10 +250,11 @@ void KochHillRWDrag::setForce() const
                   partTime_[index][0] = t;
                 // -------------------------
 
+                ds = 2.*particleCloud_.radius(index);
+
                 //Pout << "RW-TEST: t = " << t << " partTime_ = " << partTime_[index][0] << endl; // TEST-Output
                 if(t>=partTime_[index][0])
                 {
-                    scalar ds = 2*particleCloud_.radius(index);
                     mu = mufField[cellI];
                     k = kField[cellI];
                     epsilon = epsilonField[cellI];
@@ -312,7 +313,7 @@ void KochHillRWDrag::setForce() const
 
                 // -----------------
 
-                ds = 2*particleCloud_.radius(index);
+                scalar ds_scaled = ds/scale_;
                 nuf = nufField[cellI];
                 rho = rhoField[cellI];
 				Rep = 0;
@@ -321,7 +322,7 @@ void KochHillRWDrag::setForce() const
                 if (magUr > 0)
                 {
                     // calc particle Re Nr
-                    Rep = ds/scale_*voidfraction*magUr/(nuf+SMALL);
+                    Rep = ds_scaled*voidfraction*magUr/(nuf+SMALL);
 
                     // calc model coefficient F0
                     scalar F0=0.;
@@ -344,7 +345,7 @@ void KochHillRWDrag::setForce() const
                     scalar F = voidfraction * (F0 + 0.5*F3*Rep);
 
                     // calc drag model coefficient betaP
-                    betaP = 18.*nuf*rho/(ds/scale_*ds/scale_)*voidfraction*F;
+                    betaP = (18.*nuf*rho/(ds_scaled*ds_scaled))*voidfraction*F;
 
                     // calc particle's drag
                     dragCoefficient = Vs*betaP;//*scaleDrag_;
@@ -363,7 +364,7 @@ void KochHillRWDrag::setForce() const
                     Pout << "Us = " << Us << endl;
                     Pout << "Ur = " << Ur << endl;
                     Pout << "ds = " << ds << endl;
-                    Pout << "ds/scale = " << ds/scale_ << endl;
+                    Pout << "ds/scale = " << ds_scaled << endl;
                     Pout << "rho = " << rho << endl;
                     Pout << "nuf = " << nuf << endl;
                     Pout << "voidfraction = " << voidfraction << endl;

@@ -182,6 +182,7 @@ void KochHillDrag::setForce() const
                 Us = particleCloud_.velocity(index);
                 Ur = Ufluid-Us;
                 ds = particleCloud_.d(index);
+                scalar ds_scaled = ds/scaleDia_;
                 nuf = nufField[cellI];
                 rho = rhoField[cellI];
                 magUr = mag(Ur);
@@ -192,7 +193,7 @@ void KochHillDrag::setForce() const
                 if (magUr > 0)
                 {
                     // calc particle Re Nr
-                    Rep = ds/scaleDia_*voidfraction*magUr/(nuf+SMALL);
+                    Rep = ds_scaled*voidfraction*magUr/(nuf+SMALL);
 
                     // calc model coefficient F0
                     scalar F0=0.;
@@ -216,7 +217,7 @@ void KochHillDrag::setForce() const
                     scalar F = voidfraction * (F0 + 0.5*F3*Rep);
 
                     // calc drag model coefficient betaP
-                    betaP = 18.*nuf*rho/(ds/scaleDia_*ds/scaleDia_)*voidfraction*F;
+                    betaP = (18.*nuf*rho/(ds_scaled*ds_scaled))*voidfraction*F;
 
                     // calc particle's drag
                     dragCoefficient = Vs*betaP*scaleDrag_;
@@ -243,7 +244,7 @@ void KochHillDrag::setForce() const
                     Pout << "Us = " << Us << endl;
                     Pout << "Ur = " << Ur << endl;
                     Pout << "ds = " << ds << endl;
-                    Pout << "ds/scale = " << ds/scaleDia_ << endl;
+                    Pout << "ds/scale = " << ds_scaled << endl;
                     Pout << "rho = " << rho << endl;
                     Pout << "nuf = " << nuf << endl;
                     Pout << "voidfraction = " << voidfraction << endl;
