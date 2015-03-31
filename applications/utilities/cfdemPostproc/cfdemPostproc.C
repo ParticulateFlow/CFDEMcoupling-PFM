@@ -72,8 +72,8 @@ int main(int argc, char *argv[])
     double **particleWeights_;
     double **particleVolumes_;
     double **particleV_;
-    double **cellIDs_;
-    
+    int **cellIDs_;
+
     particleCloud.dataExchangeM().allocateArray(positions_,0.,3);
     particleCloud.dataExchangeM().allocateArray(velocities_,0.,3);
     particleCloud.get_radii(radii_);  // get ref to radii

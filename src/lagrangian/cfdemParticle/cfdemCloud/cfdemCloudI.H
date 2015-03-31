@@ -159,12 +159,12 @@ inline void cfdemCloud::get_radii(double **& values) const
     values=radii_;
 }
 
-inline double ** cfdemCloud::cellIDs() const
+inline int ** cfdemCloud::cellIDs() const
 {
     return cellIDs_;
 }
 
-inline void cfdemCloud::get_cellIDs(double **& values) const
+inline void cfdemCloud::get_cellIDs(int **& values) const
 {
 //    // make a copy of the array entries
 //    for (int i=0;i<numberOfParticles_;i++)

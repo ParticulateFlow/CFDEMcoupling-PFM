@@ -61,7 +61,7 @@ class cfdemCloudMS
 private:
     mutable double **positionsCM_;
     mutable double **velocitiesCM_;
-    mutable double **cellIDsCM_;
+    mutable int **cellIDsCM_;
     mutable int **bodies_;
     mutable int **nrigids_;
 

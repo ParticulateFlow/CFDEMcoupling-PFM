@@ -89,16 +89,11 @@ label engineSearchIB::findCell
 (
     double** const& mask,
     double**& positions,
-    double**& cellIDs,
+    int**& cellIDs,
     int size
 ) const
 {
-
-    int numprocs, me;
-    MPI_Comm_size(MPI_COMM_WORLD, &numprocs);
-    MPI_Comm_rank(MPI_COMM_WORLD, &me);
     const boundBox& globalBb = particleCloud_.mesh().bounds();
-
 
     vector position;
     for(int index = 0;index < size; ++index)

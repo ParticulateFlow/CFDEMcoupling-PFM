@@ -84,7 +84,7 @@ label turboEngineSearch::findCell
 (
     double** const& mask,
     double**& positions,
-    double**& cellIDs,
+    int**& cellIDs,
     int size
 ) const
 {
@@ -101,18 +101,18 @@ label turboEngineSearch::findCell
             // find cell
             if(first)
             {
-                cellIDs[index][0] =searchEngine_.findCell(position,cellIDs[index][0],treeSearch_);
+                cellIDs[index][0] = searchEngine_.findCell(position,cellIDs[index][0],treeSearch_);
                 first=false;
             }
             else
             {
                 if(bb_.contains(position))
-                    cellIDs[index][0] =searchEngine_.findCell(position,cellIDs[index][0],treeSearch_);
+                    cellIDs[index][0] = searchEngine_.findCell(position,cellIDs[index][0],treeSearch_);
                 else
-                    cellIDs[index][0] =-1;
+                    cellIDs[index][0] = -1;
             }
         }
-        else cellIDs[index][0]=-1;
+        else cellIDs[index][0] = -1;
     }
 
     return 1;

@@ -117,7 +117,7 @@ protected:
 
     mutable double **voidfractions_;
 
-    mutable double **cellIDs_;
+    mutable int **cellIDs_;
 
     mutable double **particleWeights_;
 
@@ -293,9 +293,9 @@ public:
 
        inline void get_radii(double**&) const;
 
-       inline double ** cellIDs() const;
+       inline int ** cellIDs() const;
 
-       inline void get_cellIDs(double**&) const;
+       inline void get_cellIDs(int**&) const;
 
        inline double ** particleWeights() const;
 

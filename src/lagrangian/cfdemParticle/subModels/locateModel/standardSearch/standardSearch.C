@@ -75,7 +75,7 @@ label standardSearch::findCell
 (
     double** const& mask,
     double**& positions,
-    double**& cellIDs,
+    int**& cellIDs,
     int size
 ) const
 {
@@ -95,7 +95,7 @@ label standardSearch::findCell
                 cellIDs[index][0] = particleCloud_.mesh().findCell(position, polyMesh::FACEPLANES);
             #endif
         }
-        else cellIDs[index][0]=-1;
+        else cellIDs[index][0] = -1;
     }
 
     return 1;
