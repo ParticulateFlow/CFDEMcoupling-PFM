@@ -115,8 +115,8 @@ public:
 
         virtual label findSingleCell
         (
-            vector& position,
-            label& oldCellID
+            const vector& position,
+            label oldCellID
         ) const = 0;
 
         virtual label intersection

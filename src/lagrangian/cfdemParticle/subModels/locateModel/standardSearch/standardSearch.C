@@ -103,8 +103,8 @@ label standardSearch::findCell
 
 label standardSearch::findSingleCell
 (
-    vector& position,
-    label& oldCellID
+    const vector& position,
+    label oldCellID
 ) const
 {
     // find cell

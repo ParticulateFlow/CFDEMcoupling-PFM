@@ -106,8 +106,8 @@ label engineSearch::findCell
 
 label engineSearch::findSingleCell
 (
-    vector& position,
-    label& oldCellID
+    const vector& position,
+    label oldCellID
 ) const
 {
     return searchEngine_.findCell(position,oldCellID,treeSearch_);

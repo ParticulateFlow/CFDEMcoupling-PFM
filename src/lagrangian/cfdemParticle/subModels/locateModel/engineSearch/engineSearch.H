@@ -100,8 +100,8 @@ public:
 
         label findSingleCell
         (
-            vector& position,
-            label& oldCellID
+            const vector& position,
+            label oldCellID
         ) const;
 };
 

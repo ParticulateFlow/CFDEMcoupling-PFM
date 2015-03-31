@@ -120,8 +120,8 @@ label turboEngineSearch::findCell
 
 label turboEngineSearch::findSingleCell
 (
-    vector& position,
-    label& oldCellID
+    const vector& position,
+    label oldCellID
 ) const
 {
     // find cell
