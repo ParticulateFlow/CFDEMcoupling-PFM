@@ -327,8 +327,8 @@ void KochHillRWDrag::setForce() const
                     scalar F0=0.;
                     if(volumefraction < 0.4)
                     {
-                        F0 = (1+3*sqrt((volumefraction)/2)+135/64*volumefraction*log(volumefraction)
-                              +16.14*volumefraction
+                        F0 = (1. + 3.*sqrt(volumefraction/2.) + (135./64.)*volumefraction*log(volumefraction)
+                              + 16.14*volumefraction
                              )/
                              (1+0.681*volumefraction-8.48*sqr(volumefraction)
                               +8.16*volumefraction*volumefraction*volumefraction
