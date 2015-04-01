@@ -124,17 +124,6 @@ KochHillRWDrag::~KochHillRWDrag()
     delete partUfluct_;
 }
 
-
-// * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
-void KochHillRWDrag::allocateMyArrays() const
-{
-    // get memory for 2d arrays
-    double initVal=0.0;
-    particleCloud_.dataExchangeM().allocateArray(partTime_,initVal,1);  // field/initVal/with/lenghtFromLigghts
-    particleCloud_.dataExchangeM().allocateArray(partUfluct_,initVal,3);
-}
-
-
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 void KochHillRWDrag::setForce() const
@@ -393,13 +382,15 @@ void KochHillRWDrag::setForce() const
 }
 
 
-void Foam::KochHillRWDrag::reAllocArrays() const
+void KochHillRWDrag::reAllocArrays() const
 {
     if (particleCloud_.numberOfParticlesChanged())
     {
-        double initVal=0.0;
-        particleCloud_.dataExchangeM().allocateArray(partTime_,initVal,1);  // field/initVal/with/lenghtFromLigghts
-        particleCloud_.dataExchangeM().allocateArray(partUfluct_,initVal,3);
+        particleCloud_.dataExchangeM().destroy(partTime_,1);
+        particleCloud_.dataExchangeM().destroy(partUfluct_,3);
+
+        particleCloud_.dataExchangeM().allocateArray(partTime_,0.0,1);  // field/initVal/with/lenghtFromLigghts
+        particleCloud_.dataExchangeM().allocateArray(partUfluct_,0.0,3);
     }
 }
 
