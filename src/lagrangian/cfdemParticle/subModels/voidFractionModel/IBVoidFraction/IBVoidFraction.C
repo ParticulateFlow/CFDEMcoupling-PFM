@@ -92,10 +92,6 @@ IBVoidFraction::~IBVoidFraction()
 
 void IBVoidFraction::setvoidFraction(double** const& mask,double**& voidfractions,double**& particleWeights,double**& particleVolumes,double**& particleV) const
 {
-
-    int numprocs, me;
-    MPI_Comm_size(MPI_COMM_WORLD, &numprocs);
-    MPI_Comm_rank(MPI_COMM_WORLD, &me);
     const boundBox& globalBb = particleCloud_.mesh().bounds();
 
     reAllocArrays();
@@ -336,9 +332,6 @@ void IBVoidFraction::buildLabelHashSet
     bool initialInsert //initial insertion of own cell
 )const
 {
-    int me;
-    MPI_Comm_rank(MPI_COMM_WORLD, &me);
-
     if(initialInsert)  hashSett.insert(cellID);
 
     const labelList& nc = particleCloud_.mesh().cellCells()[cellID];
