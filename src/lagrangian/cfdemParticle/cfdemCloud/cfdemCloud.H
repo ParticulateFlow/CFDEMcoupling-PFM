@@ -206,6 +206,10 @@ protected:
 
     virtual void setVectorAverages();
 
+    virtual void destroyArrays();
+    virtual void allocArrays();
+    virtual void allocArrays(int nP);
+
 public:
 
     friend class dataExchangeModel;
@@ -379,9 +383,9 @@ public:
       // write cfdemCloud internal data
         virtual bool evolve(volScalarField&,volVectorField&,volVectorField&);
 
-        virtual bool reAllocArrays() const;
+        virtual bool reAllocArrays();
 
-        virtual bool reAllocArrays(int nP, bool forceRealloc) const;  //force number of particles during reallocation
+        virtual bool reAllocArrays(int nP, bool forceRealloc);  //force number of particles during reallocation
 
 
     // IO

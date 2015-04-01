@@ -96,25 +96,7 @@ cfdemCloudMS::cfdemCloudMS
 
 cfdemCloudMS::~cfdemCloudMS()
 {
-    dataExchangeM().destroy(positionsCM_,3);
-    dataExchangeM().destroy(velocitiesCM_,3);
-    dataExchangeM().destroy(cellIDsCM_,1);
-    dataExchangeM().destroy(bodies_,1);
-    dataExchangeM().destroy(nrigids_,1);
-    dataExchangeM().destroy(clumpType_,1);
-    dataExchangeM().destroy(clumpVol_,1);
-    dataExchangeM().destroy(clumpDH_,1);
-    dataExchangeM().destroy(clumpWeights_,1);
-    //delete exCM_;
-    //delete eyCM_;
-    //delete ezCM_;
-    //delete SclumpCM_;
-    //delete scalingCM_;
-    //delete Cclump_ex_;
-    //delete Cclump_ey_;
-    dataExchangeM().destroy(impForcesCM_,3);
-    dataExchangeM().destroy(expForcesCM_,3);
-    dataExchangeM().destroy(DEMForcesCM_,3);
+    destroyArrays();
 }
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
@@ -194,30 +176,48 @@ bool cfdemCloudMS::evolve
     return false;
 }
 
-bool cfdemCloudMS::reAllocArrays() const
+void cfdemCloudMS::destroyArrays()
 {
-    if(cfdemCloud::reAllocArrays())
+    cfdemCloud::destroyArrays();
+    dataExchangeM().destroy(positionsCM_,3);
+    dataExchangeM().destroy(velocitiesCM_,3);
+    dataExchangeM().destroy(cellIDsCM_,1);
+    dataExchangeM().destroy(bodies_,1);
+    dataExchangeM().destroy(nrigids_,1);
+    dataExchangeM().destroy(clumpType_,1);
+    dataExchangeM().destroy(clumpVol_,1);
+    dataExchangeM().destroy(clumpDH_,1);
+    dataExchangeM().destroy(clumpWeights_,1);
+    dataExchangeM().destroy(impForcesCM_,3);
+    dataExchangeM().destroy(expForcesCM_,3);
+    dataExchangeM().destroy(DEMForcesCM_,3);
+}
+
+void cfdemCloudMS::allocArrays()
+{
+    cfdemCloud::allocArrays();
+    dataExchangeM().allocateArray(positionsCM_,0,3,"nbodies");
+    dataExchangeM().allocateArray(velocitiesCM_,0,3,"nbodies");
+    dataExchangeM().allocateArray(cellIDsCM_,-1,1,"nbodies");
+    dataExchangeM().allocateArray(bodies_,0,1);
+    dataExchangeM().allocateArray(nrigids_,0,1,"nbodies");
+    dataExchangeM().allocateArray(clumpType_,0,1,"nbodies");
+    dataExchangeM().allocateArray(clumpVol_,0,1,"nbodies");
+    dataExchangeM().allocateArray(clumpDH_,1.,1,"nbodies");
+    dataExchangeM().allocateArray(clumpWeights_,1,1,"nbodies");
+    dataExchangeM().allocateArray(impForcesCM_,0,3,"nbodies");
+    dataExchangeM().allocateArray(expForcesCM_,0,3,"nbodies");
+    dataExchangeM().allocateArray(DEMForcesCM_,0,3,"nbodies");
+}
+
+bool cfdemCloudMS::reAllocArrays()
+{
+    if(numberOfParticlesChanged_ && !arraysReallocated_)
     {
+        destroyArrays();
         // get arrays of new length
-        dataExchangeM().allocateArray(positionsCM_,0,3,"nbodies");
-        dataExchangeM().allocateArray(velocitiesCM_,0,3,"nbodies");
-        dataExchangeM().allocateArray(cellIDsCM_,-1,1,"nbodies");
-        dataExchangeM().allocateArray(bodies_,0,1);
-        dataExchangeM().allocateArray(nrigids_,0,1,"nbodies");      
-        dataExchangeM().allocateArray(clumpType_,0,1,"nbodies");
-        dataExchangeM().allocateArray(clumpVol_,0,1,"nbodies");
-        dataExchangeM().allocateArray(clumpDH_,1.,1,"nbodies");
-        dataExchangeM().allocateArray(clumpWeights_,1,1,"nbodies");
-        //dataExchangeM().allocateArray(exCM_,0,3,"nbodies");
-        //dataExchangeM().allocateArray(eyCM_,0,3,"nbodies");
-        //dataExchangeM().allocateArray(ezCM_,0,3,"nbodies");
-        //dataExchangeM().allocateArray(SclumpCM_,0,3,nClumpTypes);
-        //dataExchangeM().allocateArray(scalingCM_,0,3,"nbodies");
-        //dataExchangeM().allocateArray(Cclump_ex_,0,3,nClumpTypes);
-        //dataExchangeM().allocateArray(Cclump_ey_,0,3,nClumpTypes);
-        dataExchangeM().allocateArray(impForcesCM_,0,3,"nbodies");
-        dataExchangeM().allocateArray(expForcesCM_,0,3,"nbodies");
-        dataExchangeM().allocateArray(DEMForcesCM_,0,3,"nbodies");
+        allocArrays();
+        arraysReallocated_ = true;
         return true;
     }
     return false;

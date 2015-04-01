@@ -95,7 +95,9 @@ private:
 // Private member functions
     void getDEMdata();
     void giveDEMdata();
-    bool reAllocArrays() const;
+    void destroyArrays();
+    void allocArrays();
+    bool reAllocArrays();
     void setNumberOfParticles(int);
     void findCells();
     void setForces();

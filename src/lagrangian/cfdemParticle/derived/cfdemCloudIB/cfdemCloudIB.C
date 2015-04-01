@@ -74,7 +74,7 @@ cfdemCloudIB::cfdemCloudIB
 
 cfdemCloudIB::~cfdemCloudIB()
 {
-    delete angularVelocities_;
+    destroyArrays();
 }
 
 
@@ -86,13 +86,29 @@ void Foam::cfdemCloudIB::getDEMdata()
     //dataExchangeM().getData("omega","vector-atom",angularVelocities_);
 }
 
-bool Foam::cfdemCloudIB::reAllocArrays() const
+void cfdemCloudIB::destroyArrays()
 {
-    if(cfdemCloud::reAllocArrays())
+    cfdemCloud::destroyArrays();
+    dataExchangeM().destroy(angularVelocities_,3);
+}
+
+void cfdemCloudIB::allocArrays()
+{
+    cfdemCloud::allocArrays();
+    dataExchangeM().allocateArray(angularVelocities_,0,3);
+}
+
+bool cfdemCloudIB::reAllocArrays()
+{
+    if(numberOfParticlesChanged_ && !arraysReallocated_)
     {
-        dataExchangeM().allocateArray(angularVelocities_,0,3);
+        destroyArrays();
+        // get arrays of new length
+        allocArrays();
+        arraysReallocated_ = true;
+        return true;
     }
-    return true;
+    return false;
 }
 
 bool Foam::cfdemCloudIB::evolve()
