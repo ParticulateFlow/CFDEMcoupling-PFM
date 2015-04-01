@@ -107,7 +107,7 @@ void bigParticleVoidFraction::setvoidFraction(double** const& mask,double**& voi
                 particleWeights[index][subcell]=0;
                 particleVolumes[index][subcell]=0;
             }
-            cellsPerParticle_[index][0]=1.0;
+            cellsPerParticle_[index][0]=1;
             particleV[index][0]=0;
 
             //collecting data
@@ -128,7 +128,7 @@ void bigParticleVoidFraction::setvoidFraction(double** const& mask,double**& voi
 
 
                 //generating list with cell and subcells
-                scalar hashSetLength = hashSett.size();
+                label hashSetLength = hashSett.size();
                 if (hashSetLength > maxCellsPerParticle_)
                 {
                     FatalError<< "big particle algo found more cells ("<< hashSetLength

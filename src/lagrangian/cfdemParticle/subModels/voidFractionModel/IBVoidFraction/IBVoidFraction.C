@@ -108,7 +108,7 @@ void IBVoidFraction::setvoidFraction(double** const& mask,double**& voidfraction
                 particleWeights[index][subcell]=0;
                 particleVolumes[index][subcell]=0;
             }
-            cellsPerParticle_[index][0]=1.0;
+            cellsPerParticle_[index][0]=1;
             particleV[index][0]=0;
 
             //collecting data
@@ -284,7 +284,7 @@ void IBVoidFraction::setvoidFraction(double** const& mask,double**& voidfraction
                 } //end checkPeriodicCells_
 
 
-                scalar hashSetLength = hashSett.size();
+                label hashSetLength = hashSett.size();
                 if (hashSetLength > maxCellsPerParticle_)
                 {
                     FatalError<< "big particle algo found more cells ("<< hashSetLength 

@@ -67,7 +67,7 @@ protected:
 
         mutable volScalarField voidfractionNext_;
 
-        mutable double ** cellsPerParticle_;
+        mutable int ** cellsPerParticle_;
 
         int maxCellsPerParticle_;
 
@@ -144,7 +144,7 @@ public:
 
         //void undoVoidFractions(double**const&) const;
 
-        double** const& cellsPerParticle() const;
+        int** const& cellsPerParticle() const;
 
         int maxCellsPerParticle() const;
 

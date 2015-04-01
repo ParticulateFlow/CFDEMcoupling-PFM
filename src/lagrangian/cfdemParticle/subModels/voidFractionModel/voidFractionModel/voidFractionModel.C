@@ -158,7 +158,7 @@ void Foam::voidFractionModel::resetVoidFractions() const
     }
 }*/
 
-double** const& Foam::voidFractionModel::cellsPerParticle() const
+int** const& voidFractionModel::cellsPerParticle() const
 {
     return cellsPerParticle_;
 }

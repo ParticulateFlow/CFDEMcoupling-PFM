@@ -131,7 +131,7 @@ void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfra
             }
             particleV[index][0] = 0.;
 
-            cellsPerParticle_[index][0] = 1.;
+            cellsPerParticle_[index][0] = 1;
             position = particleCloud_.position(index);
             cellID = particleCloud_.cellIDs()[index][0];
             radius = particleCloud_.radius(index);
