@@ -151,7 +151,7 @@ void cfdemCloudMS::getDEMdata()
     //dataExchangeM().getScalarData("Cclump_ey",Cclump_ey_);   // cross section of the clump in ey normal direction
 }
 
-void Foam::cfdemCloudMS::giveDEMdata()
+void cfdemCloudMS::giveDEMdata()
 {
     /*for(int index = 0;index < numberOfClumps(); ++index)
     {
@@ -223,7 +223,7 @@ bool cfdemCloudMS::reAllocArrays()
     return false;
 }
 
-void Foam::cfdemCloudMS::setNumberOfParticles(int nP)
+void cfdemCloudMS::setNumberOfParticles(int nP)
 {
     cfdemCloud::setNumberOfParticles(nP);
     int nC = dataExchangeM().getNumberOfClumps();
@@ -238,13 +238,13 @@ void Foam::cfdemCloudMS::setNumberOfParticles(int nP)
     numberOfClumps_ = min(numberOfParticles(),numberOfClumps_);
 }
 
-void Foam::cfdemCloudMS::findCells()
+void cfdemCloudMS::findCells()
 {
     cfdemCloud::findCells();
     locateM().findCell(NULL,positionsCM_,cellIDsCM_,numberOfClumps());
 }
 
-void Foam::cfdemCloudMS::setForces()
+void cfdemCloudMS::setForces()
 {
     resetArray(impForces_,numberOfParticles(),3);
     resetArray(expForces_,numberOfParticles(),3);
@@ -258,7 +258,7 @@ void Foam::cfdemCloudMS::setForces()
     for (int i=0;i<cfdemCloudMS::nrForceModels();i++) cfdemCloudMS::forceM(i).setForce();
 }
 
-void Foam::cfdemCloudMS::setParticleForceField()
+void cfdemCloudMS::setParticleForceField()
 {
     // set forces per particle
     cfdemCloud::setParticleForceField();
@@ -287,7 +287,7 @@ void Foam::cfdemCloudMS::setParticleForceField()
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 //             PUBLIC MEMBER FUNCTIONS
 
-const forceModel& Foam::cfdemCloudMS::forceM(int i)
+const forceModel& cfdemCloudMS::forceM(int i)
 {
     return forceModel_[i];
 }

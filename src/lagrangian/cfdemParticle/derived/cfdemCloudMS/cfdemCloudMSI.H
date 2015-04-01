@@ -29,12 +29,14 @@ Description
     and OpenFOAM(R). Note: this code is not part of OpenFOAM(R) (see DISCLAIMER).
 \*---------------------------------------------------------------------------*/
 
+#include "cfdemCloudMS.H"
+
 namespace Foam
 {
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-inline label Foam::cfdemCloudMS::body(int index)
+inline label cfdemCloudMS::body(int index)
 {
     return bodies_[0][index]-1;
 }
@@ -54,31 +56,31 @@ inline double cfdemCloudMS::particleVolume(int index)
     return Vp;
 }
 
-inline vector Foam::cfdemCloudMS::positionCM(int index)
+inline vector cfdemCloudMS::positionCM(int index)
 {
     vector pos;
     for(int i=0;i<3;i++) pos[i] = positionsCM()[index][i];
     return pos;
 }
 
-inline vector Foam::cfdemCloudMS::velocityCM(int index)
+inline vector cfdemCloudMS::velocityCM(int index)
 {
     vector vel;
     for(int i=0;i<3;i++) vel[i] = velocitiesCM()[index][i];
     return vel;
 }
 
-inline label Foam::cfdemCloudMS::cellIDCM(int index)
+inline label cfdemCloudMS::cellIDCM(int index)
 {
     return cellIDsCM_[index][0];
 }
 
-inline label Foam::cfdemCloudMS::nrigid(int index)
+inline label cfdemCloudMS::nrigid(int index)
 {
     return nrigids_[0][index];
 }
 
-inline int Foam::cfdemCloudMS::nrForceModels()
+inline int cfdemCloudMS::nrForceModels()
 {
     return forceModels_.size();
 }

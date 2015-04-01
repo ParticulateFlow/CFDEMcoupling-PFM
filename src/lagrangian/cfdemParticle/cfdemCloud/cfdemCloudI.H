@@ -177,7 +177,7 @@ inline double ** cfdemCloud::particleWeights() const
     return particleWeights_;
 }
 
-inline label Foam::cfdemCloud::body(int index)
+inline label cfdemCloud::body(int index)
 {
     return index;
 }

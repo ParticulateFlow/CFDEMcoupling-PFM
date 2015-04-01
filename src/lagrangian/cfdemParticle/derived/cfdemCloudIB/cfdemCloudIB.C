@@ -79,7 +79,7 @@ cfdemCloudIB::~cfdemCloudIB()
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-void Foam::cfdemCloudIB::getDEMdata()
+void cfdemCloudIB::getDEMdata()
 {
     cfdemCloud::getDEMdata();
     Info << "=== cfdemCloudIB::getDEMdata() === particle rotation not considered in CFD" << endl;
@@ -111,7 +111,7 @@ bool cfdemCloudIB::reAllocArrays()
     return false;
 }
 
-bool Foam::cfdemCloudIB::evolve()
+bool cfdemCloudIB::evolve()
 {
     numberOfParticlesChanged_ = false;
     arraysReallocated_=false;
@@ -172,7 +172,7 @@ bool Foam::cfdemCloudIB::evolve()
     return doCouple;
 }
 
-void Foam::cfdemCloudIB::calcVelocityCorrection
+void cfdemCloudIB::calcVelocityCorrection
 (
     volScalarField& p,
     volVectorField& U,
@@ -238,7 +238,7 @@ void Foam::cfdemCloudIB::calcVelocityCorrection
 
 }
 
-vector Foam::cfdemCloudIB::angularVelocity(int index)
+vector cfdemCloudIB::angularVelocity(int index)
 {
     vector vel;
     for(int i=0;i<3;i++) vel[i] = angularVelocities_[index][i];

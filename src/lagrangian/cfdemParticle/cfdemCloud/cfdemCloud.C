@@ -45,8 +45,11 @@ Description
 #include "smoothingModel.H"
 #include "liggghtsCommandModel.H"
 
+namespace Foam
+{
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
-Foam::cfdemCloud::cfdemCloud
+cfdemCloud::cfdemCloud
 (
     const fvMesh& mesh
 )
@@ -279,14 +282,14 @@ Foam::cfdemCloud::cfdemCloud
 }
 
 // * * * * * * * * * * * * * * * * Destructors  * * * * * * * * * * * * * * //
-Foam::cfdemCloud::~cfdemCloud()
+cfdemCloud::~cfdemCloud()
 {
     clockM().evalPar();
     clockM().normHist();
     destroyArrays();
 }
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
-void Foam::cfdemCloud::getDEMdata()
+void cfdemCloud::getDEMdata()
 {
     dataExchangeM().getData("radius","scalar-atom",radii_);
     dataExchangeM().getData("x","vector-atom",positions_);
@@ -296,7 +299,7 @@ void Foam::cfdemCloud::getDEMdata()
         dataExchangeM().getData("dragAcc","vector-atom",fAcc_); // array is used twice - might be necessary to clean it first
 }
 
-void Foam::cfdemCloud::giveDEMdata()
+void cfdemCloud::giveDEMdata()
 {
     if(forceM(0).coupleForce())
     {
@@ -316,7 +319,7 @@ void Foam::cfdemCloud::giveDEMdata()
 
 // * * * * * * * * * * * * * * * protected Member Functions  * * * * * * * * * * * * * //
 
-void Foam::cfdemCloud::setNumberOfParticles(int nP)
+void cfdemCloud::setNumberOfParticles(int nP)
 {
     if(nP != numberOfParticles())
     {
@@ -325,12 +328,12 @@ void Foam::cfdemCloud::setNumberOfParticles(int nP)
     }
 }
 
-void Foam::cfdemCloud::findCells()
+void cfdemCloud::findCells()
 {
     locateM().findCell(NULL,positions_,cellIDs_,numberOfParticles());
 }
 
-void Foam::cfdemCloud::setForces()
+void cfdemCloud::setForces()
 {
     resetArray(fluidVel_,numberOfParticles(),3);
     resetArray(impForces_,numberOfParticles(),3);
@@ -340,7 +343,7 @@ void Foam::cfdemCloud::setForces()
     for (int i=0;i<cfdemCloud::nrForceModels();i++) cfdemCloud::forceM(i).setForce();
 }
 
-void Foam::cfdemCloud::setParticleForceField()
+void cfdemCloud::setParticleForceField()
 {
     averagingM().setVectorSum
     (
@@ -358,7 +361,7 @@ void Foam::cfdemCloud::setParticleForceField()
     );
 }
 
-void Foam::cfdemCloud::setVectorAverages()
+void cfdemCloud::setVectorAverages()
 {
     if(verbose_) Info << "- setVectorAverage(Us,velocities_,weights_)" << endl;
     averagingM().setVectorAverage
@@ -372,12 +375,12 @@ void Foam::cfdemCloud::setVectorAverages()
     if(verbose_) Info << "setVectorAverage done." << endl;
 }
 // * * * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * * //
-void Foam::cfdemCloud::checkCG(bool ok)
+void cfdemCloud::checkCG(bool ok)
 {
     if(!cgOK_) return;
     if(!ok) cgOK_ = ok;
 }
-void Foam::cfdemCloud::setPos(double**& pos)
+void cfdemCloud::setPos(double**& pos)
 {
     for(int index = 0;index <  numberOfParticles(); ++index)
     {
@@ -388,49 +391,49 @@ void Foam::cfdemCloud::setPos(double**& pos)
 }
 // * * * * * * * * * * * * * * * ACCESS  * * * * * * * * * * * * * //
 
-label Foam::cfdemCloud::particleCell(int index)
+label cfdemCloud::particleCell(int index)
 {
     label cellI = cellIDs()[index][0];
     return cellI;
 }
 
-vector Foam::cfdemCloud::position(int index)
+vector cfdemCloud::position(int index)
 {
     vector pos;
     for(int i=0;i<3;i++) pos[i] = positions()[index][i];
     return pos;
 }
 
-vector Foam::cfdemCloud::velocity(int index)
+vector cfdemCloud::velocity(int index)
 {
     vector vel;
     for(int i=0;i<3;i++) vel[i] = velocities()[index][i];
     return vel;
 }
 
-vector Foam::cfdemCloud::fluidVel(int index)
+vector cfdemCloud::fluidVel(int index)
 {
     vector vel;
     for(int i=0;i<3;i++) vel[i] = fluidVels()[index][i];
     return vel;
 }
 
-const forceModel& Foam::cfdemCloud::forceM(int i)
+const forceModel& cfdemCloud::forceM(int i)
 {
     return forceModel_[i];
 }
 
-int Foam::cfdemCloud::nrForceModels()
+int cfdemCloud::nrForceModels()
 {
     return forceModels_.size();
 }
 
-scalar Foam::cfdemCloud::voidfraction(int index)
+scalar cfdemCloud::voidfraction(int index)
 {
     return voidfractions()[index][0];
 }
 
-label Foam::cfdemCloud::liggghtsCommandModelIndex(word name)
+label cfdemCloud::liggghtsCommandModelIndex(word name)
 {
     int index=-1;
     forAll(liggghtsCommandModelList_,i)
@@ -444,12 +447,12 @@ label Foam::cfdemCloud::liggghtsCommandModelIndex(word name)
     return index;
 }
 
-std::vector< std::vector<double*> >* Foam::cfdemCloud::getVprobe()
+std::vector< std::vector<double*> >* cfdemCloud::getVprobe()
 {
  return probeModel_->getVprobe();
 }
 
-std::vector< std::vector<double> >* Foam::cfdemCloud::getSprobe()
+std::vector< std::vector<double> >* cfdemCloud::getSprobe()
 {
  return probeModel_->getSprobe();
 }
@@ -458,7 +461,7 @@ std::vector< std::vector<double> >* Foam::cfdemCloud::getSprobe()
 
 // * * *   write cfdemCloud internal data   * * * //
 
-bool Foam::cfdemCloud::evolve
+bool cfdemCloud::evolve
 (
     volScalarField& alpha,
     volVectorField& Us,
@@ -597,7 +600,7 @@ bool Foam::cfdemCloud::evolve
     return doCouple;
 }
 
-void Foam::cfdemCloud::destroyArrays()
+void cfdemCloud::destroyArrays()
 {
     dataExchangeM().destroy(positions_,3);
     dataExchangeM().destroy(velocities_,3);
@@ -615,7 +618,7 @@ void Foam::cfdemCloud::destroyArrays()
     dataExchangeM().destroy(particleV_,1);
 }
 
-void Foam::cfdemCloud::allocArrays()
+void cfdemCloud::allocArrays()
 {
     dataExchangeM().allocateArray(positions_,0.,3);
     dataExchangeM().allocateArray(velocities_,0.,3);
@@ -633,7 +636,7 @@ void Foam::cfdemCloud::allocArrays()
     dataExchangeM().allocateArray(particleV_,0.,1);
 }
 
-void Foam::cfdemCloud::allocArrays(int nP)
+void cfdemCloud::allocArrays(int nP)
 {
    dataExchangeM().allocateArray(positions_,0.,3,nP);
    dataExchangeM().allocateArray(velocities_,0.,3,nP);
@@ -649,7 +652,7 @@ void Foam::cfdemCloud::allocArrays(int nP)
    dataExchangeM().allocateArray(particleVolumes_,0.,voidFractionM().maxCellsPerParticle(),nP);
 }
 
-bool Foam::cfdemCloud::reAllocArrays()
+bool cfdemCloud::reAllocArrays()
 {
     if(numberOfParticlesChanged_ && !arraysReallocated_)
     {
@@ -663,7 +666,7 @@ bool Foam::cfdemCloud::reAllocArrays()
     return false;
 }
 
-bool Foam::cfdemCloud::reAllocArrays(int nP, bool forceRealloc)
+bool cfdemCloud::reAllocArrays(int nP, bool forceRealloc)
 {
     if( (numberOfParticlesChanged_ && !arraysReallocated_) || forceRealloc)
     {
@@ -746,8 +749,9 @@ void cfdemCloud::resetArray(double**& array,int length,int width,double resetVal
         }
     }
 }
-// * * * * * * * * * * * * * * * *  IOStream operators * * * * * * * * * * * //
 
-#include "cfdemCloudIO.C"
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace Foam
 
 // ************************************************************************* //
