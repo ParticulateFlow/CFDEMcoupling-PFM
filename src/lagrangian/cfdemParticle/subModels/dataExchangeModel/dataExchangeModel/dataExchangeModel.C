@@ -64,13 +64,16 @@ void Foam::dataExchangeModel::allocateArray
 ) const
 {
     // allocate and init double array
+    destroy(array, -1);
+    double *data = new double[width*length];
+    std::fill_n(data, width*length, initVal);
     array = new double*[length];
+
+    int n = 0;
     for (int i=0; i<length; i++)
     {
-        array[i] = new double [width];
-
-        // init array
-        for (int j=0; j<width; j++) array[i][j] = initVal;
+        array[i] = &data[n];
+        n += width;
     }
 }
 
@@ -89,12 +92,11 @@ void Foam::dataExchangeModel::allocateArray
     allocateArray(array,initVal,width,len);
 }
 
-void Foam::dataExchangeModel::destroy(double** array,int len) const
+void Foam::dataExchangeModel::destroy(double** array,int /*len*/) const
 {
     if (array == NULL) return;
 
-    for (int i = 0; i < len; i++)
-        delete [] array[i];
+    if(array[0]) delete [] array[0];
 
     delete [] array;
 }
@@ -109,14 +111,17 @@ void Foam::dataExchangeModel::allocateArray
     int length
 ) const
 {
-    // allocate and init double array
+    // allocate and init int array
+    destroy(array, -1);
+    int *data = new int[width*length];
+    std::fill_n(data, width*length, initVal);
     array = new int*[length];
+
+    int n = 0;
     for (int i=0; i<length; i++)
     {
-        array[i] = new int [width];
-
-        // init array
-        for (int j=0; j<width; j++) array[i][j] = initVal;
+        array[i] = &data[n];
+        n += width;
     }
 }
 
@@ -135,12 +140,11 @@ void Foam::dataExchangeModel::allocateArray
     allocateArray(array,initVal,width,len);
 }
 
-void Foam::dataExchangeModel::destroy(int** array,int len) const
+void Foam::dataExchangeModel::destroy(int** array,int /*len*/) const
 {
     if (array == NULL) return;
 
-    for ( int i = 0; i < len; i++ )
-        delete [] array[i];
+    if(array[0]) delete [] array[0];
 
     delete [] array;
 }
@@ -155,6 +159,7 @@ void Foam::dataExchangeModel::allocateArray
     int length
 ) const
 {
+    destroy(array);
     // allocate and init int array
     array = new int[length];
     for (int i=0; i<length; i++)
@@ -177,6 +182,7 @@ void Foam::dataExchangeModel::allocateArray
     int length
 ) const
 {
+    destroy(array);
     // allocate and init double array
     array = new double[length];
     for (int i=0; i<length; i++)
