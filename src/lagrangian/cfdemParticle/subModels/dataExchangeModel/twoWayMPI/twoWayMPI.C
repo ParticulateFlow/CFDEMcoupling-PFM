@@ -156,7 +156,6 @@ void Foam::twoWayMPI::destroy(double** array,int /*len*/) const
     if (array[0]) free(array[0]);
 
     free(array);
-    array = NULL;
 }
 
 //============
@@ -190,7 +189,6 @@ void Foam::twoWayMPI::destroy(int** array,int /*len*/) const
     if (array[0]) free(array[0]);
 
     free(array);
-    array = NULL;
 }
 //============
 // int *
@@ -198,7 +196,6 @@ void Foam::twoWayMPI::destroy(int* array) const
 {
     if (array == NULL) return;
     free(array);
-    array = NULL;
 }
 //============
 // double *
@@ -206,7 +203,6 @@ void Foam::twoWayMPI::destroy(double* array) const
 {
     if (array == NULL) return;
     free(array);
-    array = NULL;
 }
 //============
 

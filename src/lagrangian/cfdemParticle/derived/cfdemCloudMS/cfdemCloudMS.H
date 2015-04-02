@@ -95,9 +95,6 @@ private:
 // Private member functions
     void getDEMdata();
     void giveDEMdata();
-    void destroyArrays();
-    void allocArrays();
-    bool reAllocArrays();
     void setNumberOfParticles(int);
     void findCells();
     void setForces();
@@ -165,6 +162,8 @@ public:
        inline bool useforcePerClump() const;
 
        const forceModel& forceM(int);
+
+       bool reAllocArrays();
 
        bool evolve(volScalarField&,volVectorField&,volVectorField&);
 };

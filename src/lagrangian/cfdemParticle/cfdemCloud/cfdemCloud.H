@@ -206,10 +206,6 @@ protected:
 
     virtual void setVectorAverages();
 
-    virtual void destroyArrays();
-    virtual void allocArrays();
-    virtual void allocArrays(int nP);
-
 public:
 
     friend class dataExchangeModel;

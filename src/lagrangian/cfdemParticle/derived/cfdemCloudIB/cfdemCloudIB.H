@@ -65,9 +65,6 @@ protected:
     mutable bool haveEvolvedOnce_;
     mutable bool skipLagrangeToEulerMapping_;
 
-    void destroyArrays();
-    void allocArrays();
-
 public:
 
     // Constructors

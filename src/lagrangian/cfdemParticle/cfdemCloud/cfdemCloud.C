@@ -286,8 +286,22 @@ cfdemCloud::~cfdemCloud()
 {
     clockM().evalPar();
     clockM().normHist();
-    destroyArrays();
+    dataExchangeM().destroy(positions_,3);
+    dataExchangeM().destroy(velocities_,3);
+    dataExchangeM().destroy(fluidVel_,3);
+    dataExchangeM().destroy(fAcc_,3);
+    dataExchangeM().destroy(impForces_,3);
+    dataExchangeM().destroy(expForces_,3);
+    dataExchangeM().destroy(DEMForces_,3);
+    dataExchangeM().destroy(Cds_,1);
+    dataExchangeM().destroy(radii_,1);
+    dataExchangeM().destroy(voidfractions_,1);
+    dataExchangeM().destroy(cellIDs_,1);
+    dataExchangeM().destroy(particleWeights_,1);
+    dataExchangeM().destroy(particleVolumes_,1);
+    dataExchangeM().destroy(particleV_,1);
 }
+
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
 void cfdemCloud::getDEMdata()
 {
@@ -600,65 +614,25 @@ bool cfdemCloud::evolve
     return doCouple;
 }
 
-void cfdemCloud::destroyArrays()
-{
-    dataExchangeM().destroy(positions_,3);
-    dataExchangeM().destroy(velocities_,3);
-    dataExchangeM().destroy(fluidVel_,3);
-    dataExchangeM().destroy(fAcc_,3);
-    dataExchangeM().destroy(impForces_,3);
-    dataExchangeM().destroy(expForces_,3);
-    dataExchangeM().destroy(DEMForces_,3);
-    dataExchangeM().destroy(Cds_,1);
-    dataExchangeM().destroy(radii_,1);
-    dataExchangeM().destroy(voidfractions_,1);
-    dataExchangeM().destroy(cellIDs_,1);
-    dataExchangeM().destroy(particleWeights_,1);
-    dataExchangeM().destroy(particleVolumes_,1);
-    dataExchangeM().destroy(particleV_,1);
-}
-
-void cfdemCloud::allocArrays()
-{
-    dataExchangeM().allocateArray(positions_,0.,3);
-    dataExchangeM().allocateArray(velocities_,0.,3);
-    dataExchangeM().allocateArray(fluidVel_,0.,3);
-    dataExchangeM().allocateArray(fAcc_,0.,3);
-    dataExchangeM().allocateArray(impForces_,0.,3);
-    dataExchangeM().allocateArray(expForces_,0.,3);
-    dataExchangeM().allocateArray(DEMForces_,0.,3);
-    dataExchangeM().allocateArray(Cds_,0.,1);
-    dataExchangeM().allocateArray(radii_,0.,1);
-    dataExchangeM().allocateArray(voidfractions_,1.,voidFractionM().maxCellsPerParticle());
-    dataExchangeM().allocateArray(cellIDs_,-1,voidFractionM().maxCellsPerParticle());
-    dataExchangeM().allocateArray(particleWeights_,0.,voidFractionM().maxCellsPerParticle());
-    dataExchangeM().allocateArray(particleVolumes_,0.,voidFractionM().maxCellsPerParticle());
-    dataExchangeM().allocateArray(particleV_,0.,1);
-}
-
-void cfdemCloud::allocArrays(int nP)
-{
-   dataExchangeM().allocateArray(positions_,0.,3,nP);
-   dataExchangeM().allocateArray(velocities_,0.,3,nP);
-   dataExchangeM().allocateArray(fluidVel_,0.,3,nP);
-   dataExchangeM().allocateArray(impForces_,0.,3,nP);
-   dataExchangeM().allocateArray(expForces_,0.,3,nP);
-   dataExchangeM().allocateArray(DEMForces_,0.,3,nP);
-   dataExchangeM().allocateArray(Cds_,0.,1,nP);
-   dataExchangeM().allocateArray(radii_,0.,1,nP);
-   dataExchangeM().allocateArray(voidfractions_,1.,voidFractionM().maxCellsPerParticle(),nP);
-   dataExchangeM().allocateArray(cellIDs_,-1,voidFractionM().maxCellsPerParticle(),nP);
-   dataExchangeM().allocateArray(particleWeights_,0.,voidFractionM().maxCellsPerParticle(),nP);
-   dataExchangeM().allocateArray(particleVolumes_,0.,voidFractionM().maxCellsPerParticle(),nP);
-}
-
 bool cfdemCloud::reAllocArrays()
 {
     if(numberOfParticlesChanged_ && !arraysReallocated_)
     {
         // get arrays of new length
-        allocArrays();
-
+        dataExchangeM().allocateArray(positions_,0.,3);
+        dataExchangeM().allocateArray(velocities_,0.,3);
+        dataExchangeM().allocateArray(fluidVel_,0.,3);
+        dataExchangeM().allocateArray(fAcc_,0.,3);
+        dataExchangeM().allocateArray(impForces_,0.,3);
+        dataExchangeM().allocateArray(expForces_,0.,3);
+        dataExchangeM().allocateArray(DEMForces_,0.,3);
+        dataExchangeM().allocateArray(Cds_,0.,1);
+        dataExchangeM().allocateArray(radii_,0.,1);
+        dataExchangeM().allocateArray(voidfractions_,1.,voidFractionM().maxCellsPerParticle());
+        dataExchangeM().allocateArray(cellIDs_,-1,voidFractionM().maxCellsPerParticle());
+        dataExchangeM().allocateArray(particleWeights_,0.,voidFractionM().maxCellsPerParticle());
+        dataExchangeM().allocateArray(particleVolumes_,0.,voidFractionM().maxCellsPerParticle());
+        dataExchangeM().allocateArray(particleV_,0.,1);
         arraysReallocated_ = true;
         return true;
     }
@@ -670,7 +644,18 @@ bool cfdemCloud::reAllocArrays(int nP, bool forceRealloc)
     if( (numberOfParticlesChanged_ && !arraysReallocated_) || forceRealloc)
     {
         // get arrays of new length
-        allocArrays(nP);
+        dataExchangeM().allocateArray(positions_,0.,3,nP);
+        dataExchangeM().allocateArray(velocities_,0.,3,nP);
+        dataExchangeM().allocateArray(fluidVel_,0.,3,nP);
+        dataExchangeM().allocateArray(impForces_,0.,3,nP);
+        dataExchangeM().allocateArray(expForces_,0.,3,nP);
+        dataExchangeM().allocateArray(DEMForces_,0.,3,nP);
+        dataExchangeM().allocateArray(Cds_,0.,1,nP);
+        dataExchangeM().allocateArray(radii_,0.,1,nP);
+        dataExchangeM().allocateArray(voidfractions_,1.,voidFractionM().maxCellsPerParticle(),nP);
+        dataExchangeM().allocateArray(cellIDs_,-1,voidFractionM().maxCellsPerParticle(),nP);
+        dataExchangeM().allocateArray(particleWeights_,0.,voidFractionM().maxCellsPerParticle(),nP);
+        dataExchangeM().allocateArray(particleVolumes_,0.,voidFractionM().maxCellsPerParticle(),nP);
         arraysReallocated_ = true;
         return true;
     }

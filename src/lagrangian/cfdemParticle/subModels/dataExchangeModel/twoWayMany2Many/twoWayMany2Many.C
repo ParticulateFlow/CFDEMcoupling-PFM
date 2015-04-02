@@ -313,7 +313,6 @@ void Foam::twoWayMany2Many::allocateArray
 void inline Foam::twoWayMany2Many::destroy(double** array,int len) const
 {
     lmp->memory->destroy(array);
-    array = NULL;
 }
 
 //============
@@ -351,7 +350,6 @@ void Foam::twoWayMany2Many::allocateArray
 void inline Foam::twoWayMany2Many::destroy(int** array,int len) const
 {
     lmp->memory->destroy(array);
-    array = NULL;
 }
 
 //============
@@ -367,7 +365,6 @@ void Foam::twoWayMany2Many::allocateArray(double*& array, double initVal, int le
 void inline Foam::twoWayMany2Many::destroy(double* array) const
 {
     lmp->memory->destroy(array);
-    array = NULL;
 }
 
 //==============
@@ -383,7 +380,6 @@ void Foam::twoWayMany2Many::allocateArray(int*& array, int initVal, int length) 
 void inline Foam::twoWayMany2Many::destroy(int* array) const
 {
     lmp->memory->destroy(array);
-    array = NULL;
 }
 //==============
 

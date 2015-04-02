@@ -97,7 +97,6 @@ void Foam::dataExchangeModel::destroy(double** array,int len) const
         delete [] array[i];
 
     delete [] array;
-    array = NULL;
 }
 
 //====
@@ -144,7 +143,6 @@ void Foam::dataExchangeModel::destroy(int** array,int len) const
         delete [] array[i];
 
     delete [] array;
-    array = NULL;
 }
 //====
 
@@ -167,7 +165,6 @@ void Foam::dataExchangeModel::destroy(int* array) const
 {
     if (array == NULL) return;
     delete [] array;
-    array = NULL;
 }
 //====
 
@@ -191,7 +188,6 @@ void Foam::dataExchangeModel::destroy(double* array) const
     if (array == NULL) return;
 
     delete [] array;
-    array = NULL;
 }
 //====
 
