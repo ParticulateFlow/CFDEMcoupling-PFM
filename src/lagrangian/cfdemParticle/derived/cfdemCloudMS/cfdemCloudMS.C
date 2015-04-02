@@ -214,7 +214,6 @@ bool cfdemCloudMS::reAllocArrays()
 {
     if(numberOfParticlesChanged_ && !arraysReallocated_)
     {
-        destroyArrays();
         // get arrays of new length
         allocArrays();
         arraysReallocated_ = true;

@@ -172,7 +172,6 @@ void voidFractionModel::reAllocArrays() const
 {
     if(particleCloud_.numberOfParticlesChanged())
     {
-        particleCloud_.dataExchangeM().destroy(cellsPerParticle_,1);
         // get arrays of new length
         particleCloud_.dataExchangeM().allocateArray(cellsPerParticle_,1,1);
     }
@@ -182,7 +181,6 @@ void voidFractionModel::reAllocArrays(int nP) const
 {
     if(particleCloud_.numberOfParticlesChanged())
     {
-        particleCloud_.dataExchangeM().destroy(cellsPerParticle_,1);
         // get arrays of new length
         particleCloud_.dataExchangeM().allocateArray(cellsPerParticle_,1,1,nP);
     }

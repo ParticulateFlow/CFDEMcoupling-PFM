@@ -656,7 +656,6 @@ bool cfdemCloud::reAllocArrays()
 {
     if(numberOfParticlesChanged_ && !arraysReallocated_)
     {
-        destroyArrays();
         // get arrays of new length
         allocArrays();
 
@@ -670,7 +669,6 @@ bool cfdemCloud::reAllocArrays(int nP, bool forceRealloc)
 {
     if( (numberOfParticlesChanged_ && !arraysReallocated_) || forceRealloc)
     {
-        destroyArrays();
         // get arrays of new length
         allocArrays(nP);
         arraysReallocated_ = true;

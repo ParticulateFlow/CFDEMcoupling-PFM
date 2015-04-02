@@ -386,9 +386,6 @@ void KochHillRWDrag::reAllocArrays() const
 {
     if (particleCloud_.numberOfParticlesChanged())
     {
-        particleCloud_.dataExchangeM().destroy(partTime_,1);
-        particleCloud_.dataExchangeM().destroy(partUfluct_,3);
-
         particleCloud_.dataExchangeM().allocateArray(partTime_,0.0,1);  // field/initVal/with/lenghtFromLigghts
         particleCloud_.dataExchangeM().allocateArray(partUfluct_,0.0,3);
     }
