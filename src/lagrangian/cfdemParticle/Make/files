@@ -46,6 +46,7 @@ $(forceModels)/MeiLift/MeiLift.C
 $(forceModels)/particleCellVolume/particleCellVolume.C
 $(forceModels)/fieldTimeAverage/fieldTimeAverage.C
 $(forceModels)/volWeightedAverage/volWeightedAverage.C
+$(forceModels)/BeetstraDrag/BeetstraDrag.C
 
 $(forceModelsMS)/forceModelMS/forceModelMS.C
 $(forceModelsMS)/forceModelMS/newForceModelMS.C
