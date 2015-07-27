@@ -186,7 +186,7 @@ void BeetstraDrag::setForce() const
                 dragCoefficient = 10.0*localPhiP/(voidfraction*voidfraction) +
                                   voidfraction*voidfraction*(1.0+1.5*Foam::sqrt(localPhiP)) +
                                   0.413*Rep/(24*voidfraction*voidfraction)*(1.0/voidfraction+3*voidfraction*localPhiP+8.4*Foam::pow(Rep,-0.343))/
-                                  (1+Foam::pow(10,3*localPhiP)*Foam::pow(Rep,0.5*(1+4*localPhiP)));
+                                  (1+Foam::pow(10,3*localPhiP)*Foam::pow(Rep,-0.5*(1+4*localPhiP)));
 
                 // calc particle's drag
                 dragCoefficient *= 3*M_PI*ds*nuf*rho*voidfraction*scaleDrag_;
