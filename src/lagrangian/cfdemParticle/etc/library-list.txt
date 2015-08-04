@@ -1,2 +1,3 @@
 lagrangian/cfdemParticle/dir
+lagrangian/cfdemParticleComp/dir
 finiteVolume/dir
