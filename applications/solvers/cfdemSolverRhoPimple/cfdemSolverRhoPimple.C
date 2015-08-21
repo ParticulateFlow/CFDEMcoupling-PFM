@@ -46,7 +46,8 @@ Description
 #include "implicitCouple.H"
 #include "clockModel.H"
 #include "smoothingModel.H"
-#include "forceModel.H"
+// #include "forceModel.H"
+#include "LaEuScalarEnergy.H"
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -113,7 +114,7 @@ int main(int argc, char *argv[])
         {
             #include "rhoEqn.H"
         }
-	volScalarField rhoeps("rhoeps",rho*voidfraction);
+        volScalarField rhoeps("rhoeps",rho*voidfraction);
         // --- Pressure-velocity PIMPLE corrector loop
         while (pimple.loop())
         {

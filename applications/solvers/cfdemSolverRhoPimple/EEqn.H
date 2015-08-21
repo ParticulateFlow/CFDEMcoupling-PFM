@@ -2,6 +2,11 @@
 // Crowe et al.: "Multiphase flows with droplets and particles", CRC Press 1998
 {
     volScalarField& he = thermo.he();
+    volScalarField& T = thermo.T();
+    volScalarField keff = voidfraction*turbulence->kappaEff()
+            + (1-voidfraction)*particleCloud.forceM(1).thermCondPart();
+    particleCloud.forceM(1).partFluidHeatTrans(Qsource);
+    Qsource.correctBoundaryConditions();
 
     fvScalarMatrix EEqn
     (
@@ -17,10 +22,15 @@
             )
           : -dpdt
         )
-      // + particle-fluid energy transfer (work + heat)
-      - fvm::laplacian(voidfraction*turbulence->alphaEff(), he)
+      // + particle-fluid energy transfer due to work:
+            //- fvc::div(fvc::interpolate(Us),(1-voidfraction)*p) +
+      // + fluid energy dissipation due to shearing
+     // net heat transfer from particles to fluid
+      - Qsource
+     // thermal conduction of the fluid with effective conductivity
+      - fvc::laplacian(keff, T)
      ==
-        fvOptions(rho, he)
+        fvOptions(rho, he, T)
     );
 
     EEqn.relax();

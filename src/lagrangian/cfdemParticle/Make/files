@@ -39,6 +39,7 @@ $(forceModels)/ShirgaonkarIB/ShirgaonkarIB.C
 $(forceModels)/KochHillDrag/KochHillDrag.C
 $(forceModels)/KochHillRWDrag/KochHillRWDrag.C
 $(forceModels)/LaEuScalarTemp/LaEuScalarTemp.C
+$(forceModels)/LaEuScalarEnergy/LaEuScalarEnergy.C
 $(forceModels)/virtualMassForce/virtualMassForce.C
 $(forceModels)/gradPForce/gradPForce.C
 $(forceModels)/viscForce/viscForce.C

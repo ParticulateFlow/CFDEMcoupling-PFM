@@ -51,6 +51,20 @@
         mesh
     );
 
+    Info<< "\nCreating fluid-particle heat flux field\n" << endl;
+    volScalarField Qsource
+    (
+        IOobject
+        (
+            "Qsource",
+            runTime.timeName(),
+            mesh,
+            IOobject::MUST_READ,
+            IOobject::AUTO_WRITE
+        ),
+        mesh
+    );
+
     #ifndef compressibleCreatePhi_H
     #define compressibleCreatePhi_H
     Info<< "Reading/calculating face flux field phi\n" << endl;
