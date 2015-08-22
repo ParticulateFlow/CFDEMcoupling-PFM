@@ -2,6 +2,7 @@ path = ../cfdemParticle
 cfdemCloud = $(path)/cfdemCloud
 derived = $(path)/derived
 cfdTools = $(path)/cfdTools
+energyModels = $(path)/subModels/energyModel
 forceModels = $(path)/subModels/forceModel
 forceSubModels = $(path)/subModels/forceModel/forceSubModels
 IOModels = $(path)/subModels/IOModel
@@ -19,9 +20,14 @@ probeModels = $(path)/subModels/probeModel
 
 $(cfdemCloud)/cfdemCloud.C
 $(derived)/cfdemCloudIB/cfdemCloudIB.C
+$(derived)/cfdemCloudEnergy/cfdemCloudEnergy.C
 
 $(cfdTools)/global.C
 $(cfdTools)/newGlobal.C
+
+$(energyModels)/heatTransferModel/heatTransferModel/heatTransferModel.C
+$(energyModels)/heatTransferModel/heatTransferModel/newHeatTransferModel.C
+$(energyModels)/heatTransferModel/noHeatTransfer/noHeatTransfer.C
 
 $(forceModels)/forceModel/forceModel.C
 $(forceModels)/forceModel/newForceModel.C

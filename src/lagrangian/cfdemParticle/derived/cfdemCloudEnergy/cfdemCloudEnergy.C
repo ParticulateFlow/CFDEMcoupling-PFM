@@ -1,0 +1,86 @@
+/*---------------------------------------------------------------------------*\
+    CFDEMcoupling - Open Source CFD-DEM coupling
+
+    CFDEMcoupling is part of the CFDEMproject
+    www.cfdem.com
+                                Thomas Lichtenegger, thomas.lichtenegger@jku.at
+                                Copyright 2009-2012 JKU Linz
+                                Copyright 2012-2015 DCS Computing GmbH, Linz
+                                Copyright 2015- JKU Linz
+-------------------------------------------------------------------------------
+License
+    This file is part of CFDEMcoupling.
+
+    CFDEMcoupling is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation; either version 3 of the License, or (at your
+    option) any later version.
+
+    CFDEMcoupling is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with CFDEMcoupling; if not, write to the Free Software Foundation,
+    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+
+Description
+    This code is designed to realize coupled CFD-DEM simulations using LIGGGHTS
+    and OpenFOAM(R). Note: this code is not part of OpenFOAM(R) (see DISCLAIMER).
+\*---------------------------------------------------------------------------*/
+
+#include "fileName.H"
+#include "cfdemCloudEnergy.H"
+#include "heatTransferModel.H"
+#include <mpi.h>
+#include "IOmanip.H"
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+namespace Foam
+{
+
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+
+// Construct from components
+cfdemCloudEnergy::cfdemCloudEnergy
+(
+    const fvMesh& mesh
+)
+:
+    cfdemCloud(mesh),
+    heatTransferModel_
+    (
+        heatTransferModel::New
+        (
+            couplingProperties_,
+            *this
+        )
+    )
+{
+
+}
+
+
+// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
+
+cfdemCloudEnergy::~cfdemCloudEnergy()
+{
+
+}
+
+
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+inline const heatTransferModel& cfdemCloudEnergy::heatTransferM() const
+{
+    return heatTransferModel_;  
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace Foam
+
+// ************************************************************************* //

@@ -42,12 +42,11 @@ Description
 #include "pimpleControl.H"
 #include "fvIOoptionList.H"
 
-#include "cfdemCloud.H"
+#include "cfdemCloudEnergy.H"
 #include "implicitCouple.H"
 #include "clockModel.H"
 #include "smoothingModel.H"
-// #include "forceModel.H"
-#include "LaEuScalarEnergy.H"
+#include "forceModel.H"
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -66,7 +65,7 @@ int main(int argc, char *argv[])
     
     // create cfdemCloud
     #include "readGravitationalAcceleration.H"
-    cfdemCloud particleCloud(mesh);
+    cfdemCloudEnergy particleCloud(mesh);
     #include "checkModelType.H"
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

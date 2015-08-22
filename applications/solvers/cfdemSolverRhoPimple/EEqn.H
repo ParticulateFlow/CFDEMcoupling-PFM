@@ -4,8 +4,8 @@
     volScalarField& he = thermo.he();
     volScalarField& T = thermo.T();
     volScalarField keff = voidfraction*turbulence->kappaEff()
-            + (1-voidfraction)*particleCloud.forceM(1).thermCondPart();
-    particleCloud.forceM(1).partFluidHeatTrans(Qsource);
+            + (1-voidfraction)*particleCloud.heatTransferM().thermCondPart();
+    particleCloud.heatTransferM().partFluidHeatTrans(Qsource);
     Qsource.correctBoundaryConditions();
 
     fvScalarMatrix EEqn
