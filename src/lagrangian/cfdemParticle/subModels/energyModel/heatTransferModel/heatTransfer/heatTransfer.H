@@ -55,14 +55,39 @@ class heatTransfer
 :
     public heatTransferModel
 {
+private:
 
-protected:
+    dictionary propsDict_;
 
-    // Protected data
-        const dictionary& dict_;
+    word tempFieldName_;
 
-        cfdemCloudEnergy& particleCloud_;
+    const volScalarField& tempField_;            // ref to temperature field
 
+    word voidfractionFieldName_;
+
+    const volScalarField& voidfraction_;    // ref to voidfraction field
+
+    scalar maxSource_;                           // max (limited) value of src field
+
+    word velFieldName_;
+
+    const volVectorField& U_;
+
+    word partTempName_;
+
+    mutable double **partTemp_;                          // Lagrangian array
+
+    word partHeatFluxName_;
+
+    mutable double **partHeatFlux_;              // Lagrangian array
+
+    scalar lambda_;                              // fluid thermal conductivity [W/(m*K)]
+    
+    scalar lambdaPart_;                          // particle thermal conductivity
+
+    scalar Cp_;                                  // specific heat capacity [W*s/(kg*K)]
+    
+    void allocateMyArrays() const;
        
 public:
 

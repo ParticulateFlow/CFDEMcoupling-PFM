@@ -28,6 +28,7 @@ $(cfdTools)/newGlobal.C
 $(energyModels)/heatTransferModel/heatTransferModel/heatTransferModel.C
 $(energyModels)/heatTransferModel/heatTransferModel/newHeatTransferModel.C
 $(energyModels)/heatTransferModel/noHeatTransfer/noHeatTransfer.C
+$(energyModels)/heatTransferModel/heatTransfer/heatTransfer.C
 
 $(forceModels)/forceModel/forceModel.C
 $(forceModels)/forceModel/newForceModel.C

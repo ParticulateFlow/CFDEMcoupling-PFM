@@ -3,9 +3,10 @@
 
     CFDEMcoupling is part of the CFDEMproject
     www.cfdem.com
-                                Christoph Goniva, christoph.goniva@cfdem.com
+                                Thomas Lichtenegger, thomas.lichtenegger@jku.at
                                 Copyright 2009-2012 JKU Linz
-                                Copyright 2012-     DCS Computing GmbH, Linz
+                                Copyright 2012-2015 DCS Computing GmbH, Linz
+                                Copyright 2015- JKU Linz
 -------------------------------------------------------------------------------
 License
     This file is part of CFDEMcoupling.
@@ -27,79 +28,24 @@ License
 Description
     This code is designed to realize coupled CFD-DEM simulations using LIGGGHTS
     and OpenFOAM(R). Note: this code is not part of OpenFOAM(R) (see DISCLAIMER).
-
-Class
-    noHeatTransfer
-
-SourceFiles
-    noHeatTransfer.C
-
 \*---------------------------------------------------------------------------*/
 
-#ifndef noHeatTransfer_H
-#define noHeatTransfer_H
 
-#include "fvCFD.H"
 #include "cfdemCloudEnergy.H"
-#include "heatTransferModel.H"
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-/*---------------------------------------------------------------------------*\
-                           Class noHeatTransfer Declaration
-\*---------------------------------------------------------------------------*/
-
-class noHeatTransfer
-:
-    public heatTransferModel
-{
-
-protected:
-
-    // Protected data
-    //    const dictionary& dict_;
-
-   //     cfdemCloudEnergy& particleCloud_;
-
-       
-public:
-
-    //- Runtime type information
-    TypeName("noHeatTransfer");
-
-    // Constructors
-
-        //- Construct from components
-        noHeatTransfer
-        (
-            const dictionary& dict,
-            cfdemCloudEnergy& sm
-        );
-
-
-    // Destructor
-
-        virtual ~noHeatTransfer();
-
-
-      // Member Functions
-
-
-        void partFluidHeatTransfer(volScalarField&) const;
-	scalar partThermCond() const;
-
-
-};
-
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+ inline const heatTransferModel& cfdemCloudEnergy::heatTransferM() const
+ {
+     return heatTransferModel_;  
+ }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#endif
 
 // ************************************************************************* //

@@ -81,7 +81,7 @@ public:
 
 
     // Access
-        inline const heatTransferModel& heatTransferM() const;
+       inline const heatTransferModel& heatTransferM() const;
 
 };
 
@@ -91,6 +91,8 @@ public:
 } // End namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#include "cfdemCloudEnergyI.H"
 
 #endif
 

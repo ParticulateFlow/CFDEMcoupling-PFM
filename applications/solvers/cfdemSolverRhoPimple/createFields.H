@@ -8,6 +8,7 @@
     thermo.validate(args.executable(), "h", "e");
 
     volScalarField& p = thermo.p();
+    volScalarField& T = thermo.T();
     const volScalarField& psi = thermo.psi();
 
     volScalarField rho

@@ -42,6 +42,8 @@ SourceFiles
 #include "fvCFD.H"
 #include "cfdemCloudEnergy.H"
 #include "probeModel.H"
+#include "forceModel.H"
+#include "interpolationCellPoint.H"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam

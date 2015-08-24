@@ -2,10 +2,9 @@
 // Crowe et al.: "Multiphase flows with droplets and particles", CRC Press 1998
 {
     volScalarField& he = thermo.he();
-    volScalarField& T = thermo.T();
     volScalarField keff = voidfraction*turbulence->kappaEff()
-            + (1-voidfraction)*particleCloud.heatTransferM().thermCondPart();
-    particleCloud.heatTransferM().partFluidHeatTrans(Qsource);
+            + (1-voidfraction)*particleCloud.heatTransferM().partThermCond();
+    particleCloud.heatTransferM().partFluidHeatTransfer(Qsource);
     Qsource.correctBoundaryConditions();
 
     fvScalarMatrix EEqn

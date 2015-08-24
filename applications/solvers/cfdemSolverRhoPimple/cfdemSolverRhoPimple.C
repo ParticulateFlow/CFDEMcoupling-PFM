@@ -47,6 +47,7 @@ Description
 #include "clockModel.H"
 #include "smoothingModel.H"
 #include "forceModel.H"
+#include "heatTransferModel.H"
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

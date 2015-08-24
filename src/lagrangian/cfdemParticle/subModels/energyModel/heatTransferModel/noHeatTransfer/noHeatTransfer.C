@@ -52,9 +52,9 @@ noHeatTransfer::noHeatTransfer
     cfdemCloudEnergy& sm
 )
 :
-    heatTransferModel(dict,sm),
-    dict_(dict),
-    particleCloud_(sm)
+    heatTransferModel(dict,sm)//,
+    //dict_(dict),
+    //particleCloud_(sm)
 {}
 
 

@@ -74,10 +74,6 @@ cfdemCloudEnergy::~cfdemCloudEnergy()
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-inline const heatTransferModel& cfdemCloudEnergy::heatTransferM() const
-{
-    return heatTransferModel_;  
-}
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
