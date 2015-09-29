@@ -1,0 +1,3 @@
+cfdemSolverRecurrence.C
+
+EXE=$(CFDEM_APP_DIR)/cfdemSolverRecurrence

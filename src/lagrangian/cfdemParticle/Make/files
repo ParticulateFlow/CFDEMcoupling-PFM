@@ -22,6 +22,7 @@ $(cfdemCloud)/cfdemCloudIO.C
 derived/cfdemCloudIB/cfdemCloudIB.C
 derived/cfdemCloudMS/cfdemCloudMS.C
 derived/cfdemCloudEnergy/cfdemCloudEnergy.C
+derived/cfdemCloudEnergy/cfdemCloudRec.C
 
 $(cfdTools)/global.C
 $(cfdTools)/newGlobal.C
