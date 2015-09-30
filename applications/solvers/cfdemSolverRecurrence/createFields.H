@@ -6,10 +6,10 @@
             "p",
             runTime.timeName(),
             mesh,
-            IOobject::MUST_READ,
-            IOobject::AUTO_WRITE
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
         ),
-        mesh
+        dimensionedScalar("p", dimensionSet(1, 2, -2, 0, 0), 1.0)
     );
 
     Info<< "Reading physical velocity field U" << endl;
@@ -21,10 +21,10 @@
             "U",
             runTime.timeName(),
             mesh,
-            IOobject::MUST_READ,
-            IOobject::AUTO_WRITE
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
         ),
-        mesh
+        dimensionedVector("U",dimVelocity,vector(0,0,0))
     );
 
     Info<< "\nCreating dummy density field rho\n" << endl;
@@ -35,10 +35,10 @@
             "rho",
             runTime.timeName(),
             mesh,
-            IOobject::MUST_READ,
-            IOobject::AUTO_WRITE
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
         ),
-        dimensionedScalar("0", dimensionSet(1, -3, 0, 0, 0), 1.0)
+        dimensionedScalar("rho", dimensionSet(1, -3, 0, 0, 0), 1.0)
     );
 //===============================
 // particle interaction modelling
@@ -53,10 +53,10 @@
             "voidfraction",
             runTime.timeName(),
             mesh,
-            IOobject::MUST_READ,
-            IOobject::AUTO_WRITE
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
         ),
-        mesh
+        dimensionedScalar("voidfraction", dimensionSet(0, -3, 0, 0, 0), 1.0)
     );
 
     Info<< "Reading particle velocity field Us\n" << endl;
@@ -67,10 +67,10 @@
             "Us",
             runTime.timeName(),
             mesh,
-            IOobject::MUST_READ,
-            IOobject::AUTO_WRITE
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
         ),
-        mesh
+        dimensionedVector("Us",dimVelocity,vector(0,0,0))
     );
 
 //===============================

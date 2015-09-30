@@ -55,7 +55,13 @@ Foam::recModel::recModel
     recTime("dataBase", "", "../system", "../constant", false),
     timeDirs(recTime.times()),
     timeIndexList(label(timeDirs.size())-1),
-    timeValueList(label(timeDirs.size())-1)
+    timeValueList(label(timeDirs.size())-1),
+    contTimeIndex(0),
+    sequenceStart(0),
+    sequenceStart2(0),
+    sequenceStartOld(0),
+    virtualTimeIndex(0),
+    virtualStartIndex(0)
 {
     if (verbose)
     {
@@ -78,7 +84,7 @@ Foam::recModel::~recModel()
 
 // * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * //
 
-virtual bool Foam::recModel::updateRecFields()
+virtual void Foam::recModel::updateRecFields()
 {}
 
 // * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * //

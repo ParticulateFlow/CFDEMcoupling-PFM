@@ -42,7 +42,6 @@ Rules
 
 #include "fvCFD.H"
 #include "fvIOoptionList.H"	// no solver = no fvOptions
-#include "HashTable.H"
 
 #include "mathematicalConstants.H" // provides: e, pi, 2pi and pi/2
 
@@ -95,7 +94,7 @@ int main(int argc, char *argv[])
     
     label recTimeIndex(0);
     
-    
+    particleCloud.initRecFields();
     while (runTime.run())
     {
         // advance time
@@ -110,7 +109,7 @@ int main(int argc, char *argv[])
 
         // do particle stuff
         particleCloud.clockM().start(2,"Coupling");
-	particleCloud.updateRecFields();
+
         particleCloud.evolve(voidfraction,Us,U);
 
 
@@ -119,19 +118,12 @@ int main(int argc, char *argv[])
 
         particleCloud.clockM().start(26,"Flow");
         
-        
-        // recurrent time step
-        //
-        //if ( runTime.outputTime() && (runTime.timeOutputValue() / ((recTimeIndex+1)*dtCur) >= 1.0) )
         if ( runTime.timeOutputValue() / ((recTimeIndex+1)*dtCur) >= 1.0 )
         {
-        	// compute concentration field from particle-based species mass
-        	//magicParticles.calcConcField();
-        	
-        	// compute new particle-based species mass
-        	// magicParticles.updateParticleConc();
         	
         	// advance!
+	  	particleCloud.updateRecFields();
+		
         	virtualTimeIndex++;
         	recTimeIndex++;
         	

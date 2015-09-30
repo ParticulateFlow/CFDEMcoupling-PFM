@@ -24,7 +24,7 @@
     	Info << "recTime.caseName() " << recTime.caseName() << endl;
     	Info << "recTime.path() " << recTime.path() << endl;
     	Info << "recTime.timePath() " << recTime.timePath() << endl;
-	    Info << "recTime.timeName() " << recTime.timeName() << endl;
+	Info << "recTime.timeName() " << recTime.timeName() << endl;
     }
     
     // all time directories including constant

@@ -28,6 +28,7 @@ License
 
 #include "cfdemCloud.H"
 #include "dataExchangeModel.H"
+#include "HashTable.H"
 
 namespace Foam
 {
@@ -52,12 +53,18 @@ protected:
     //	constant will not be contained
     //	runTimeIndex -> continuousIndex
     HashTable<label,word> timeIndexList;
-    label contTimeIndex(0);
+    label contTimeIndex;
     
     // create a data structure for the time values
     //	constant will not be contained
     //	continuousIndex -> time.value()
     HashTable<label,scalar> timeValueList;
+    
+    label sequenceStart);
+    label sequenceStart2;
+    label sequenceStartOld;
+    label virtualTimeIndex;
+    label virtualStartIndex;
     
 private:
   
@@ -109,8 +116,9 @@ public:
 
 
     // Member Functions
-
-    virtual bool updateRecFields();     
+    
+    virtual void initRecFields(volScalarField&,volScalarField&,volVectorField&,volVectorField&) = 0; 
+    virtual void updateRecFields(volScalarField&,volScalarField&,volVectorField&,volVectorField&) = 0;
     virtual void readFieldSeries() = 0;
     virtual void computeRecMatrix() = 0;
     void writeRecMatrix();

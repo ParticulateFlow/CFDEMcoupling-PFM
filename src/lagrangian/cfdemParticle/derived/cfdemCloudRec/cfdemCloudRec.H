@@ -40,7 +40,7 @@ SourceFiles
 #define cfdemCloudRec_H
 
 #include "cfdemCloud.H"
-
+#include "recModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -57,9 +57,11 @@ protected:
 
     autoPtr<recModel> recModel_;
 
-    virtual void getDEMdata();
+    void getDEMdata();
 
-    virtual void giveDEMdata();
+    void giveDEMdata();
+    
+    void setForces();
 
 public:
 
@@ -83,14 +85,14 @@ public:
 
     virtual bool evolve(volScalarField&,volVectorField&,volVectorField&);
     
-    inline const recModel& cfdemCloud::recM() const
+    inline const recModel& recM() const
     {
         return recModel_;
     }
 
-    bool updateRecFields();
-
-   
+    void initRecFields(volScalarField&,volScalarField&,volVectorField&,volVectorField&);
+    void updateRecFields(volScalarField&,volScalarField&,volVectorField&,volVectorField&);
+    
 };
 
 

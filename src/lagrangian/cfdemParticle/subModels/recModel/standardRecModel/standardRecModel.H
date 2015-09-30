@@ -65,6 +65,8 @@ public:
 	
     void readFieldSeries();
     void computeRecMatrix();
+    void initRecFields(volScalarField&,volScalarField&,volVectorField&,volVectorField&);
+    void updateRecFields(volScalarField&,volScalarField&,volVectorField&,volVectorField&);
 	
 private:
     PtrList<volScalarField> alpha1pl(label(timeIndexList.size()));

@@ -67,6 +67,28 @@ standardRecModel::~standardRecModel()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
+void standardRecModel::initRecFields(volScalarField& alpha1,volScalarField& alpha2,volVectorField& U1,volVectorField& U2)
+{
+  alpha1 = alpha1pl[0];
+  alpha2 = alpha2pl[0];
+  U1 = U1pl[0];
+  U2 = U2pl[0];
+}
+
+void standardRecModel::updateRecFields(volScalarField& alpha1,volScalarField& alpha2,volVectorField& U1,volVectorField& U2)
+{
+ // if(jump condition)
+ // {
+ //   jump
+ // }
+  virtualTimeIndex++;
+  alpha1 = alpha1pl[virtualTimeIndex];
+  alpha2 = alpha2pl[virtualTimeIndex];
+  U1 = U1pl[virtualTimeIndex];
+  U2 = U2pl[virtualTimeIndex];
+}
+
+
 void standardRecModel::readFieldSeries()
 {
      Info << "Reading fields" << endl;

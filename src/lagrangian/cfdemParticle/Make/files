@@ -1,5 +1,6 @@
 cfdemCloud = cfdemCloud
 cfdTools = cfdTools
+recModels = subModels/recModel
 energyModels = subModels/energyModel
 forceModels = subModels/forceModel
 forceSubModels = subModels/forceModel/forceSubModels
@@ -22,10 +23,14 @@ $(cfdemCloud)/cfdemCloudIO.C
 derived/cfdemCloudIB/cfdemCloudIB.C
 derived/cfdemCloudMS/cfdemCloudMS.C
 derived/cfdemCloudEnergy/cfdemCloudEnergy.C
-derived/cfdemCloudEnergy/cfdemCloudRec.C
+derived/cfdemCloudRec/cfdemCloudRec.C
 
 $(cfdTools)/global.C
 $(cfdTools)/newGlobal.C
+
+$(recModels)/recModel/recModel.C
+$(recModels)/recModel/newRecModel.C
+$(recModels)/standardRecModel/standardRecModel.C
 
 $(energyModels)/heatTransferModel/heatTransferModel/heatTransferModel.C
 $(energyModels)/heatTransferModel/heatTransferModel/newHeatTransferModel.C
