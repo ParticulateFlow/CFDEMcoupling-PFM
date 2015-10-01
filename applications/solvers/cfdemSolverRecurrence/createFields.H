@@ -1,4 +1,4 @@
-    Info<< "Reading field p\n" << endl;
+    // dummy fields
     volScalarField p
     (
         IOobject
@@ -11,23 +11,7 @@
         ),
         dimensionedScalar("p", dimensionSet(1, 2, -2, 0, 0), 1.0)
     );
-
-    Info<< "Reading physical velocity field U" << endl;
-    Info<< "Note: only if voidfraction at boundary is 1, U is superficial velocity!!!\n" << endl;
-    volVectorField U
-    (
-        IOobject
-        (
-            "U",
-            runTime.timeName(),
-            mesh,
-            IOobject::NO_READ,
-            IOobject::NO_WRITE
-        ),
-        dimensionedVector("U",dimVelocity,vector(0,0,0))
-    );
-
-    Info<< "\nCreating dummy density field rho\n" << endl;
+    
     volScalarField rho
     (
         IOobject
@@ -40,12 +24,48 @@
         ),
         dimensionedScalar("rho", dimensionSet(1, -3, 0, 0, 0), 1.0)
     );
-//===============================
-// particle interaction modelling
-//===============================
 
+    // recurrence fields
+    volVectorField URec
+    (
+        IOobject
+        (
+            "URec",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        dimensionedVector("URec",dimVelocity,vector(0,0,0))
+    );
 
-    Info<< "\nReading voidfraction field voidfraction = (Vgas/Vparticle)\n" << endl;
+    volScalarField voidfractionRec
+    (
+        IOobject
+        (
+            "voidfractionRec",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        dimensionedScalar("voidfractionRec", dimensionSet(0, -3, 0, 0, 0), 1.0)
+    );
+
+    volVectorField UsRec
+    (
+        IOobject
+        (
+            "UsRec",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        dimensionedVector("UsRec",dimVelocity,vector(0,0,0))
+    );
+    
+    // calculated fields
     volScalarField voidfraction
     (
         IOobject
@@ -54,12 +74,11 @@
             runTime.timeName(),
             mesh,
             IOobject::NO_READ,
-            IOobject::NO_WRITE
+            IOobject::AUTO_WRITE
         ),
         dimensionedScalar("voidfraction", dimensionSet(0, -3, 0, 0, 0), 1.0)
     );
-
-    Info<< "Reading particle velocity field Us\n" << endl;
+    
     volVectorField Us
     (
         IOobject
@@ -68,7 +87,7 @@
             runTime.timeName(),
             mesh,
             IOobject::NO_READ,
-            IOobject::NO_WRITE
+            IOobject::AUTO_WRITE
         ),
         dimensionedVector("Us",dimVelocity,vector(0,0,0))
     );
@@ -89,20 +108,6 @@ surfaceScalarField phi
         IOobject::READ_IF_PRESENT,
         IOobject::AUTO_WRITE
      ),
-     linearInterpolate(U*voidfraction) & mesh.Sf()
+     linearInterpolate(URec*voidfractionRec) & mesh.Sf()
  );
 #endif
-
-
-
-    label pRefCell = 0;
-    scalar pRefValue = 0.0;
-    setRefCell(p, mesh.solutionDict().subDict("PISO"), pRefCell, pRefValue);
-
-
-    singlePhaseTransportModel laminarTransport(U, phi);
-
-    autoPtr<incompressible::turbulenceModel> turbulence
-    (
-        incompressible::turbulenceModel::New(U, phi, laminarTransport)
-    );

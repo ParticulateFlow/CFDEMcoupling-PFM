@@ -45,9 +45,6 @@ Rules
 
 #include "mathematicalConstants.H" // provides: e, pi, 2pi and pi/2
 
-#include "singlePhaseTransportModel.H"
-#include "turbulenceModel.H"
-
 #include "cfdemCloudRec.H"
 #include "clockModel.H"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -57,14 +54,11 @@ int main(int argc, char *argv[])
     #include "setRootCase.H"
     #include "createTime.H"
     #include "createMesh.H"
-    #include "createRecurrentFields.H"
     #include "createFields.H"
     #include "createFvOptions.H"	// no solver = no fvOptions
   
     cfdemCloudRec particleCloud(mesh);
     #include "checkModelType.H"
-
-    //simpleControl simple(mesh);	// no solver = no solution control
     
     // random recurrence stuff
     #include "Random.H"	// random numbers

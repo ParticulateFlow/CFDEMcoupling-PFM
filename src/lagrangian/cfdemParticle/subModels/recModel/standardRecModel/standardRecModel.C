@@ -53,9 +53,17 @@ standardRecModel::standardRecModel
     cfdemCloud& sm
 )
 :
-    recModel(dict,sm)
+    recModel(dict,sm),
+    propsDict_(dict.subDict(typeName + "Props")),
+    velFieldName_(propsDict_.lookup("velRecFieldName")),
+    URec_(sm.mesh().lookupObject<volVectorField> (velFieldName_)),
+    voidfractionFieldName_(propsDict_.lookup("voidfractionRecFieldName")),
+    voidfractionRec_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
+    UsFieldName_(propsDict_.lookup("granVelRecFieldName")),
+    UsRec_(sm.mesh().lookupObject<volVectorField> (UsFieldName_)),
 {
     readFieldSeries();
+    computeRecMatrix();
 }
 
 
@@ -67,25 +75,25 @@ standardRecModel::~standardRecModel()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void standardRecModel::initRecFields(volScalarField& alpha1,volScalarField& alpha2,volVectorField& U1,volVectorField& U2)
+void standardRecModel::initRecFields()
 {
-  alpha1 = alpha1pl[0];
-  alpha2 = alpha2pl[0];
-  U1 = U1pl[0];
-  U2 = U2pl[0];
+  voidfractionRec_ = voidfractionRecpl[0];
+  URec = URecpl[0];
+  UsRec = UsRecpl[0];
 }
 
-void standardRecModel::updateRecFields(volScalarField& alpha1,volScalarField& alpha2,volVectorField& U1,volVectorField& U2)
+void standardRecModel::updateRecFields()
 {
  // if(jump condition)
  // {
  //   jump
  // }
   virtualTimeIndex++;
-  alpha1 = alpha1pl[virtualTimeIndex];
-  alpha2 = alpha2pl[virtualTimeIndex];
-  U1 = U1pl[virtualTimeIndex];
-  U2 = U2pl[virtualTimeIndex];
+  voidfractionRec_ = voidfractionRecpl[virtualTimeIndex];
+  URec_ = URecpl[virtualTimeIndex];
+  UsRec_ = UsRecpl[virtualTimeIndex];
+  
+  correctBC?
 }
 
 
@@ -109,7 +117,7 @@ void standardRecModel::readFieldSeries()
         	Info << "Reading at t = " << recTime.timeName() << endl;
         }
         
-        alpha1pl.set
+        voidfractionRecpl.set
         (
             timeIndexList(recTime.timeName()),
             new volScalarField
@@ -125,57 +133,10 @@ void standardRecModel::readFieldSeries()
                 mesh
             )
         );
-        
-        IOobject headerAlpha2
+            
+        URecpl.set
         (
-            "particlefraction",
-            recTime.timePath(),
-            mesh,
-            IOobject::NO_READ
-        );
-        
-        if (headerAlpha2.headerOk())
-        {
-	        alpha2pl.set
-    	    (
-    	        timeIndexList(recTime.timeName()),
-    	        new volScalarField
-    	        (
-    	            IOobject
-    	            (
-    	                "particlefraction",
-                    	recTime.timePath(),
-    	                mesh,
-    	                IOobject::MUST_READ,
-    	                IOobject::NO_WRITE
-    	            ),
-    	            mesh
-    	        )
-    	    );
-    	}
-    	else
-    	{
-    		alpha2pl.set
-    	    (
-    	        timeIndexList(recTime.timeName()),
-    	        new volScalarField
-    	        (
-    	            IOobject
-    	            (
-    	                "particlefraction",
-                    	recTime.timePath(),
-    	                mesh,
-    	                IOobject::NO_READ,
-    	                IOobject::NO_WRITE
-    	            ),
-    	            scalar(1.0) - alpha1pl[timeIndexList(recTime.timeName())]
-    	        )
-    	    );
-    	}
-        
-        U1pl.set
-        (
-        	timeIndexList(recTime.timeName()),
+            timeIndexList(recTime.timeName()),
             new volVectorField
             (
                 IOobject
@@ -189,9 +150,9 @@ void standardRecModel::readFieldSeries()
                 mesh
             )
         );
-        U2pl.set
+        UsRecpl.set
         (
-        	timeIndexList(recTime.timeName()),
+            timeIndexList(recTime.timeName()),
             new volVectorField
             (
                 IOobject

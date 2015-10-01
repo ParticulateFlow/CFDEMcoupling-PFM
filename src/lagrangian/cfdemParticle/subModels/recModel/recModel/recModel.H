@@ -60,7 +60,7 @@ protected:
     //	continuousIndex -> time.value()
     HashTable<label,scalar> timeValueList;
     
-    label sequenceStart);
+    label sequenceStart;
     label sequenceStart2;
     label sequenceStartOld;
     label virtualTimeIndex;
@@ -117,8 +117,8 @@ public:
 
     // Member Functions
     
-    virtual void initRecFields(volScalarField&,volScalarField&,volVectorField&,volVectorField&) = 0; 
-    virtual void updateRecFields(volScalarField&,volScalarField&,volVectorField&,volVectorField&) = 0;
+    virtual void initRecFields() = 0; 
+    virtual void updateRecFields() = 0;
     virtual void readFieldSeries() = 0;
     virtual void computeRecMatrix() = 0;
     void writeRecMatrix();
