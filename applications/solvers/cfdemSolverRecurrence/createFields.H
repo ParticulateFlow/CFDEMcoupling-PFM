@@ -66,6 +66,19 @@
     );
     
     // calculated fields
+    volVectorField U
+    (
+        IOobject
+        (
+            "U",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        dimensionedVector("U",dimVelocity,vector(0,0,0))
+    );
+    
     volScalarField voidfraction
     (
         IOobject

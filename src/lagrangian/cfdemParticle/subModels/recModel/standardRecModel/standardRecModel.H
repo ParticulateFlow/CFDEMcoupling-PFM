@@ -40,6 +40,11 @@ class standardRecModel
 :
     public recModel
 {
+protected:
+  
+  void computeRecMatrix();
+  void computeRecPath();
+  void readFieldSeries();
 
 public:
 
@@ -61,26 +66,20 @@ public:
         ~standardRecModel();
 
 
-    // Member Functions
-	
-    void readFieldSeries();
-    void computeRecMatrix();
     void initRecFields();
     void updateRecFields();
 	
 private:
+  
     dictionary propsDict_;
   
     word velFieldName_;
-
     const volVectorField& URec_;
 
     word voidfractionFieldName_;
-
     const volScalarField& voidfractionRec_;
 
     word UsFieldName_;   
-
     const volVectorField& UsRec_; 
   
     PtrList<volScalarField> voidfractionRecpl(label(timeIndexList.size()));

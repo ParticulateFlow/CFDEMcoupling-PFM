@@ -64,6 +64,12 @@ standardRecModel::standardRecModel
 {
     readFieldSeries();
     computeRecMatrix();
+    
+    if( root proc)
+      computeRecPath();
+    
+    MPI_Bcast();
+    
 }
 
 
@@ -216,6 +222,11 @@ void standardRecModel::computeRecMatrix()
     		recurrenceMatrix[ti][tj] /= maxElemVal;
     	}
     } 
+}
+
+void standardRecModel::computeRecPath()
+{
+  
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

@@ -91,7 +91,6 @@ int main(int argc, char *argv[])
     particleCloud.initRecFields();
     while (runTime.run())
     {
-        // advance time
         runTime++;
         
         // do stuff (every lagrangian time step)
@@ -101,7 +100,6 @@ int main(int argc, char *argv[])
 
         #include "CourantNo.H"
 
-        // do particle stuff
         particleCloud.clockM().start(2,"Coupling");
 
         particleCloud.evolve(voidfraction,Us,U);

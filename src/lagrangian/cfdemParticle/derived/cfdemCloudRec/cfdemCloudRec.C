@@ -91,14 +91,14 @@ void cfdemCloud::setForces()
 }
 // * * * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * * //
 
-void cfdemCloudRec::initRecFields(volScalarField& alpha1,volScalarField& alpha2,volVectorField& U1,volVectorField& U2)
+void cfdemCloudRec::initRecFields()
 {
-    recM().initRecFields(volScalarField& alpha1,volScalarField& alpha2,volVectorField& U1,volVectorField& U2); 
+    recM().initRecFields(); 
 }
 
-void cfdemCloudRec::updateRecFields(volScalarField& alpha1,volScalarField& alpha2,volVectorField& U1,volVectorField& U2)
+void cfdemCloudRec::updateRecFields()
 {
-    recM().updateRecFields(volScalarField& alpha1,volScalarField& alpha2,volVectorField& U1,volVectorField& U2); 
+    recM().updateRecFields(); 
 }
 
 bool cfdemCloudRec::evolve

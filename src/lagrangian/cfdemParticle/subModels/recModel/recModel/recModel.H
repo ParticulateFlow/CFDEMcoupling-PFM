@@ -43,6 +43,7 @@ protected:
 
     // Protected data
     const dictionary& dict_;
+    const dictionary& controlDict_;
     cfdemCloud& particleCloud_;
     
     SymmetricSquareMatrix<scalar> recurrenceMatrix;
@@ -65,6 +66,16 @@ protected:
     label sequenceStartOld;
     label virtualTimeIndex;
     label virtualStartIndex;
+    
+    scalar startTime_;
+    scalar endTime_;
+    label totRecSteps;
+    
+    HashTable<label,label> virtualTimeIndexList;
+    
+    virtual void computeRecMatrix() = 0;
+    virtual void computeRecPath() = 0;
+    virtual void readFieldSeries() = 0;
     
 private:
   
@@ -119,8 +130,6 @@ public:
     
     virtual void initRecFields() = 0; 
     virtual void updateRecFields() = 0;
-    virtual void readFieldSeries() = 0;
-    virtual void computeRecMatrix() = 0;
     void writeRecMatrix();
 };
 

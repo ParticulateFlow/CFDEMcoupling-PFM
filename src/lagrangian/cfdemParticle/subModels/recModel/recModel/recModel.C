@@ -52,6 +52,18 @@ Foam::recModel::recModel
 :
     dict_(dict),
     particleCloud_(sm),
+    controlDict_
+    (
+        IOobject
+        (
+            "controlDict",
+            system(),
+            *this,
+            IOobject::NO_READ,
+            IOobject::NO_WRITE,
+            false
+        )
+    ),
     recTime("dataBase", "", "../system", "../constant", false),
     timeDirs(recTime.times()),
     timeIndexList(label(timeDirs.size())-1),
@@ -61,7 +73,9 @@ Foam::recModel::recModel
     sequenceStart2(0),
     sequenceStartOld(0),
     virtualTimeIndex(0),
-    virtualStartIndex(0)
+    virtualStartIndex(0),
+    startTime_(controlDict_.lookup("startTime")),
+    endTime_(controlDict_.lookup("endTime"))
 {
     if (verbose)
     {
@@ -75,6 +89,9 @@ Foam::recModel::recModel
     }
     readTimeSeries();
     checkTimeStep();
+    totRecSteps= 1+static_cast<label> ((endTime_-startTime_) / recTime.deltaTValue());
+    timeValueList(totRecSteps);
+    
 }
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
