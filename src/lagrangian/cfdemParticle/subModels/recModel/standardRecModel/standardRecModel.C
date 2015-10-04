@@ -65,11 +65,19 @@ standardRecModel::standardRecModel
     readFieldSeries();
     computeRecMatrix();
     
-    if( root proc)
-      computeRecPath();
+    // make sure each processor has the same sequence of fields
+    int root=0;
+    int rank;
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+        
+    computeRecPath();
+    int listSizeBytes = 2*sizeof(sequenceStart)*virtualTimeIndexList.size();
     
-    MPI_Bcast();
+    MPI_Bcast(&virtualTimeIndeList[0], listSizeBytes, MPI_BYTE, root, MPI_COMM_WORLD); 
     
+    sequenceStart=virtualTimeIndexList[0].first();
+    sequenceEnd=virtualTimeIndexList[0].second();
+    virtualTimeIndex=sequenceStart;
 }
 
 
@@ -86,15 +94,20 @@ void standardRecModel::initRecFields()
   voidfractionRec_ = voidfractionRecpl[0];
   URec = URecpl[0];
   UsRec = UsRecpl[0];
+  
+    correctBC?
 }
 
 void standardRecModel::updateRecFields()
 {
- // if(jump condition)
- // {
- //   jump
- // }
   virtualTimeIndex++;
+  if(virtualTimeIndex>sequenceEnd)
+  {
+    virtualTimeIndexListPos++;
+    sequenceStart=virtualTimeIndexList[virtualTimeIndexListPos].first();
+    sequenceEnd=virtualTimeIndexList[virtualTimeIndexListPos].second();
+    virtualTimeIndex=sequenceStart;
+  }
   voidfractionRec_ = voidfractionRecpl[virtualTimeIndex];
   URec_ = URecpl[virtualTimeIndex];
   UsRec_ = UsRecpl[virtualTimeIndex];
@@ -226,7 +239,57 @@ void standardRecModel::computeRecMatrix()
 
 void standardRecModel::computeRecPath()
 {
-  
+ // random recurrence stuff
+    #include "Random.H"	// random numbers
+    Random ranGen(osRandomInteger());
+    
+    label virtualTimeIndex=0;
+    label recSteps=0;
+    label seqStart=0;
+    label seqLength=0;
+    labelPair seqStartEnd(0,0);
+   
+    while(recSteps<=totRecSteps)
+    {
+        label startLoop = 0;
+        label endLoop = 0;
+        seqLength = ranGen.integer(lowerSeqLim, upperSeqLim);
+        scalar nextMinimum(GREAT);
+        	
+        // search the other half of the recurrence matrix for 
+        // the new starting point of the next sequence
+        if (virtualTimeIndex < recurrenceMatrix.n()/2)
+        {
+        	startLoop = recurrenceMatrix.n()/2;
+        	endLoop = recurrenceMatrix.n()-1;
+        }
+        else
+        {
+        	startLoop = 0;
+        	endLoop = recurrenceMatrix.n()/2-1;
+        }
+        
+        for (label j = startLoop; j < endLoop; j++)
+        {
+        	if (recurrenceMatrix[j][virtualTimeIndex] < nextMinimum)
+        	{
+        		nextMinimum = recurrenceMatrix[j][virtualTimeIndex];
+        		seqStart = j+1;
+        		continue;
+        	}
+        }
+        
+        // trim new sequence length
+        if (seqStart + seqLength > timeIndexList.size()-1)
+        {
+        	seqLength = timeIndexList.size()-1 - seqStart;
+        }
+      
+        labelPair seqStartEnd(seqStart,seqStart+seqLength-1);
+        virtualTimeIndexList.append(seqStartEnd);
+	virtualTimeIndex = seqStart+seqLength-1;
+        recSteps+=seqLength;
+    }
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

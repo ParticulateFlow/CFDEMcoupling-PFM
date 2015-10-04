@@ -27,8 +27,10 @@ License
 
 
 #include "cfdemCloud.H"
-#include "dataExchangeModel.H"
+//#include "dataExchangeModel.H"
 #include "HashTable.H"
+#include "labelPair.H"
+#include <mpi.h>
 
 namespace Foam
 {
@@ -62,16 +64,23 @@ protected:
     HashTable<label,scalar> timeValueList;
     
     label sequenceStart;
-    label sequenceStart2;
-    label sequenceStartOld;
-    label virtualTimeIndex;
+    label sequenceEnd;
+    const label lowerSeqLim;
+    const label upperSeqLim;
+   
     label virtualStartIndex;
     
     scalar startTime_;
     scalar endTime_;
+    scalar timeStep_;
+    scalar recTimeStep_;
+    
     label totRecSteps;
     
-    HashTable<label,label> virtualTimeIndexList;
+    label virtualTimeIndex;
+    // list of pairs (start value, end value)
+    labelPairList virtualTimeIndexList;
+    label virtualTimeIndexListPos;
     
     virtual void computeRecMatrix() = 0;
     virtual void computeRecPath() = 0;
@@ -130,6 +139,10 @@ public:
     
     virtual void initRecFields() = 0; 
     virtual void updateRecFields() = 0;
+    scalar recTimeStep()
+    {
+        return recTimeStep_;
+    }
     void writeRecMatrix();
 };
 

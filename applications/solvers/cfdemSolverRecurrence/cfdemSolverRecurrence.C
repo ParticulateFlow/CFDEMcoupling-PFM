@@ -60,33 +60,13 @@ int main(int argc, char *argv[])
     cfdemCloudRec particleCloud(mesh);
     #include "checkModelType.H"
     
-    // random recurrence stuff
-    #include "Random.H"	// random numbers
-    Random ranGen(osRandomInteger());
-    
-    label sequenceLength(0);
-    
-    // minimum sequence length = the larger of 1 or a twentieth of all
-    const label lowerSeqLim(max(1, label(timeIndexList.size()/20)));
-    
-    // maximum sequence length = a fifth of all
-    const label upperSeqLim(label(timeIndexList.size()/5));
-    
-    sequenceLength = ranGen.integer(lowerSeqLim, upperSeqLim);
-    
-    scalar nextBestMinimum(GREAT);
-    scalar secondBestMinimum(GREAT);
-    label sequenceStart(0);
-    label sequenceStart2(0);
-    label sequenceStartOld(0);
-    label virtualTimeIndex(0);
-    label virtualStartIndex(0);
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
     Info<< "\nCalculating particle trajectories based on recurrence statistics\n" << endl;
     
     label recTimeIndex(0);
+    scalar recTimeStep_=particleCloud.recM().recTimeStep();
     
     particleCloud.initRecFields();
     while (runTime.run())
@@ -112,37 +92,17 @@ int main(int argc, char *argv[])
         
         if ( runTime.timeOutputValue() / ((recTimeIndex+1)*dtCur) >= 1.0 )
         {
-        	
-        	// advance!
-	  	particleCloud.updateRecFields();
-		
-        	virtualTimeIndex++;
-        	recTimeIndex++;
-        	
-        	alpha2 = alpha2pl[virtualTimeIndex];
-        	U2 = U2pl[virtualTimeIndex];
-        	
-        	if (!verbose)
+            particleCloud.updateRecFields();
+            recTimeIndex++;
+        }
+
+        if (!verbose)
         	{
         		Info << nl << "Time = " << runTime.timeName() << endl;
         		Info<< "ExecutionTime = "
             		<< runTime.elapsedCpuTime()
             		<< " s\n\n" << endl;
         	}
-        	
-        	
-        	timeSequenceFile << virtualTimeIndex << endl;
-        }
-        
-        
-        
-        #include "recurrenceTreatment.H"
-        
-      
-
-       
-        
-        
         // write stuff at output time
         if (runTime.outputTime())
         {        	

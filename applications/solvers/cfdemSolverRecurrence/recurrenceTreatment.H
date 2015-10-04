@@ -35,7 +35,7 @@
         	
         	timeSequenceFile << "vti: " << virtualTimeIndex << " st " << startLoop << " end " << endLoop;
         	
-        	for (int j = startLoop; j < endLoop; j++)
+        	for (label j = startLoop; j < endLoop; j++)
         	{
         		if (recurrenceMatrix[j][virtualTimeIndex] < nextBestMinimum)
         		{

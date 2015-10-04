@@ -70,12 +70,16 @@ Foam::recModel::recModel
     timeValueList(label(timeDirs.size())-1),
     contTimeIndex(0),
     sequenceStart(0),
-    sequenceStart2(0),
-    sequenceStartOld(0),
+    sequenceEnd(0),
     virtualTimeIndex(0),
     virtualStartIndex(0),
     startTime_(controlDict_.lookup("startTime")),
-    endTime_(controlDict_.lookup("endTime"))
+    endTime_(controlDict_.lookup("endTime")),
+    timeStep_(controlDict_.lookup("deltaT")),
+    virtualTimeIndexList(0),
+    virtualTimeIndexListPos(0),
+    lowerSeqLim(max(1, label(timeIndexList.size()/20))),
+    upperSeqLim(label(timeIndexList.size()/5))
 {
     if (verbose)
     {
@@ -88,10 +92,8 @@ Foam::recModel::recModel
 	Info << "timeDirs " << timeDirs << endl;
     }
     readTimeSeries();
-    checkTimeStep();
-    totRecSteps= 1+static_cast<label> ((endTime_-startTime_) / recTime.deltaTValue());
-    timeValueList(totRecSteps);
-    
+    recTimeStep_=checkTimeStep();
+    totRecSteps= 1+static_cast<label> ((endTime_-startTime_) / recTimeStep_);
 }
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
@@ -154,7 +156,7 @@ void Foam::recModel::readTimeSeries()
     }
 }
 
-void Foam::recModel::checkTimeStep()
+scalar Foam::recModel::checkTimeStep()
 {
    // check time step of provided data
     scalar dtCur(0.0);
@@ -204,14 +206,15 @@ void Foam::recModel::checkTimeStep()
     }
         
     // set deltaT
-	recTime.setDeltaT(dtCur, false);
+    recTime.setDeltaT(dtCur, false);
 	
 	if (verbose)
     {
 		Info << "Setting deltaT to " << dtCur << endl;
 		Info << "Actual recTime.deltaT = " << recTime.deltaTValue() << endl;
-		Info << "Actual runTime.deltaT = " << runTime.deltaTValue() << endl;
+		Info << "Actual runTime.deltaT = " << timeStep_ << endl;
     }
+    return dtCur;
 }
 
 void Foam::recModel::writeRecMatrix()
