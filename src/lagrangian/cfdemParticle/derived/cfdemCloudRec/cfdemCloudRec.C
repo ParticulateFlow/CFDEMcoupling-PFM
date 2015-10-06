@@ -67,7 +67,7 @@ void cfdemCloudRec::giveDEMdata()
     if(verbose_) Info << "giveDEMdata done." << endl;
 }
 
-void cfdemCloud::setForces()
+void cfdemCloudRec::setForces()
 {
   //  resetArray(fluidVel_,numberOfParticles(),3);
   //  resetArray(impForces_,numberOfParticles(),3);
@@ -80,25 +80,22 @@ void cfdemCloud::setForces()
 // * * *   write top level fields   * * * //
 
 // * * * * * * * * * * * * * * * protected Member Functions  * * * * * * * * * * * * * //
-void cfdemCloud::setForces()
-{
-  //  resetArray(fluidVel_,numberOfParticles(),3);
-  //  resetArray(impForces_,numberOfParticles(),3);
-  //  resetArray(expForces_,numberOfParticles(),3);
-  //  resetArray(DEMForces_,numberOfParticles(),3);
-  //  resetArray(Cds_,numberOfParticles(),1);
-  //  for (int i=0;i<cfdemCloud::nrForceModels();i++) cfdemCloud::forceM(i).setForce();
-}
+
 // * * * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * * //
 
 void cfdemCloudRec::initRecFields()
 {
-    recM().initRecFields(); 
+    recModel_->initRecFields();
 }
 
 void cfdemCloudRec::updateRecFields()
 {
-    recM().updateRecFields(); 
+    recModel_->updateRecFields(); 
+}
+
+void cfdemCloudRec::writeRecFields()
+{
+    recModel_->writeRecFields(); 
 }
 
 bool cfdemCloudRec::evolve
@@ -213,11 +210,6 @@ bool cfdemCloudRec::evolve
             clockM().stop("giveDEMdata");
 
             dataExchangeM().couple(1);
-        }
-
-
-        if(verbose_){
-            #include "debugInfo.H"
         }
 
         clockM().start(25,"dumpDEMdata");

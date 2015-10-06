@@ -57,31 +57,33 @@ Foam::recModel::recModel
         IOobject
         (
             "controlDict",
-            system(),
-            *this,
-            IOobject::NO_READ,
-            IOobject::NO_WRITE,
-            false
+            sm.mesh().time().system(),
+            sm.mesh(),
+            IOobject::MUST_READ,
+            IOobject::NO_WRITE
         )
     ),
+    verbose_(sm.verbose()),
     recTime("dataBase", "", "../system", "../constant", false),
     timeDirs(recTime.times()),
-    timeIndexList(label(timeDirs.size())-1),
-    timeValueList(label(timeDirs.size())-1),
+    numRecFields(label(timeDirs.size())),
+    timeIndexList(numRecFields-1),
+    timeValueList(numRecFields-1),
+    recurrenceMatrix(numRecFields,numRecFields,scalar(0)),
     contTimeIndex(0),
     sequenceStart(0),
     sequenceEnd(0),
     virtualTimeIndex(0),
     virtualStartIndex(0),
-    startTime_(controlDict_.lookup("startTime")),
-    endTime_(controlDict_.lookup("endTime")),
-    timeStep_(controlDict_.lookup("deltaT")),
+    startTime_(readScalar(controlDict_.lookup("startTime"))),
+    endTime_(readScalar(controlDict_.lookup("endTime"))),
+    timeStep_(readScalar(controlDict_.lookup("deltaT"))),
     virtualTimeIndexList(0),
     virtualTimeIndexListPos(0),
-    lowerSeqLim(max(1, label(timeIndexList.size()/20))),
-    upperSeqLim(label(timeIndexList.size()/5))
+    lowerSeqLim(max(1, label(numRecFields/20))),
+    upperSeqLim(label(numRecFields/5))
 {
-    if (verbose)
+    if (verbose_)
     {
     	// be informative on properties of the "recTime" Time-object
     	Info << "recTime.rootPath() " << recTime.rootPath() << endl;
@@ -103,8 +105,6 @@ Foam::recModel::~recModel()
 
 // * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * //
 
-virtual void Foam::recModel::updateRecFields()
-{}
 
 // * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * //
 
@@ -128,7 +128,7 @@ void Foam::recModel::readTimeSeries()
         timeIndexList.insert(recTime.timeName(), contTimeIndex);
         
         
-        if (verbose)
+        if (verbose_)
     	{
     		Info << "current time " << recTime.timeName() << endl;
     		Info << "insert " << recTime.timeName() << " , " << contTimeIndex << endl;
@@ -141,13 +141,13 @@ void Foam::recModel::readTimeSeries()
         // increment continuousIndex
         contTimeIndex++;
         
-        if (verbose)
+        if (verbose_)
     	{
         	Info << "contTimeIndex " << contTimeIndex << endl;
         }
     }
 
-    if (verbose)
+    if (verbose_)
     {
     	Info << endl;
     	Info << "Found " << label(timeDirs.size()) << " time folders" << endl;
@@ -162,7 +162,7 @@ scalar Foam::recModel::checkTimeStep()
     scalar dtCur(0.0);
     scalar dtOld(0.0);
     
-    if (verbose)
+    if (verbose_)
     {
     	Info << "timeValueList : " << timeValueList << endl;
     }
@@ -172,7 +172,7 @@ scalar Foam::recModel::checkTimeStep()
     	// compute time step
     	if (timeDirs[i].value() == timeDirs.last().value())
     	{
-    		if (verbose)
+    		if (verbose_)
     		{
     			Info << ".. leaving loop at " << timeDirs[i] << endl;
     		}
@@ -180,7 +180,7 @@ scalar Foam::recModel::checkTimeStep()
     		break;
     	}
     	
-    	if (verbose)
+    	if (verbose_)
     	{
     		Info << "timeDirs.fcIndex(i)].value(),  timeDirs[i].value() : " 
     			<< timeDirs[timeDirs.fcIndex(i)].value() << "   " << timeDirs[i].value()
@@ -208,7 +208,7 @@ scalar Foam::recModel::checkTimeStep()
     // set deltaT
     recTime.setDeltaT(dtCur, false);
 	
-	if (verbose)
+	if (verbose_)
     {
 		Info << "Setting deltaT to " << dtCur << endl;
 		Info << "Actual recTime.deltaT = " << recTime.deltaTValue() << endl;

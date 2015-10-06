@@ -90,8 +90,9 @@ public:
         return recModel_;
     }
 
-    void initRecFields(volScalarField&,volScalarField&,volVectorField&,volVectorField&);
-    void updateRecFields(volScalarField&,volScalarField&,volVectorField&,volVectorField&);
+    void initRecFields();
+    void updateRecFields();
+    void writeRecFields();
     
 };
 

@@ -23,7 +23,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "error.H"
-#include "IOModel.H"
+#include "Random.H"
 #include "standardRecModel.H"
 #include "addToRunTimeSelectionTable.H"
 
@@ -55,12 +55,12 @@ standardRecModel::standardRecModel
 :
     recModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
-    velFieldName_(propsDict_.lookup("velRecFieldName")),
-    URec_(sm.mesh().lookupObject<volVectorField> (velFieldName_)),
+    UFieldName_(propsDict_.lookup("velRecFieldName")),
     voidfractionFieldName_(propsDict_.lookup("voidfractionRecFieldName")),
-    voidfractionRec_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
     UsFieldName_(propsDict_.lookup("granVelRecFieldName")),
-    UsRec_(sm.mesh().lookupObject<volVectorField> (UsFieldName_)),
+    voidfractionRecpl(numRecFields),
+    URecpl(numRecFields),
+    UsRecpl(numRecFields)
 {
     readFieldSeries();
     computeRecMatrix();
@@ -73,7 +73,7 @@ standardRecModel::standardRecModel
     computeRecPath();
     int listSizeBytes = 2*sizeof(sequenceStart)*virtualTimeIndexList.size();
     
-    MPI_Bcast(&virtualTimeIndeList[0], listSizeBytes, MPI_BYTE, root, MPI_COMM_WORLD); 
+    MPI_Bcast(&virtualTimeIndexList[0], listSizeBytes, MPI_BYTE, root, MPI_COMM_WORLD); 
     
     sequenceStart=virtualTimeIndexList[0].first();
     sequenceEnd=virtualTimeIndexList[0].second();
@@ -91,11 +91,6 @@ standardRecModel::~standardRecModel()
 
 void standardRecModel::initRecFields()
 {
-  voidfractionRec_ = voidfractionRecpl[0];
-  URec = URecpl[0];
-  UsRec = UsRecpl[0];
-  
-    correctBC?
 }
 
 void standardRecModel::updateRecFields()
@@ -108,11 +103,15 @@ void standardRecModel::updateRecFields()
     sequenceEnd=virtualTimeIndexList[virtualTimeIndexListPos].second();
     virtualTimeIndex=sequenceStart;
   }
-  voidfractionRec_ = voidfractionRecpl[virtualTimeIndex];
-  URec_ = URecpl[virtualTimeIndex];
-  UsRec_ = UsRecpl[virtualTimeIndex];
+}
+
+void standardRecModel::writeRecFields()
+{
+ // need to check if this writes to the correct destination 
   
-  correctBC?
+ // voidfractionRecpl[virtualTimeIndex].write();
+ // URecpl[virtualTimeIndex].write();
+ // UsRecpl[virtualTimeIndex].write();
 }
 
 
@@ -131,7 +130,7 @@ void standardRecModel::readFieldSeries()
         	continue;
         }
         
-        if (verbose)
+        if (verbose_)
     	{
         	Info << "Reading at t = " << recTime.timeName() << endl;
         }
@@ -143,13 +142,13 @@ void standardRecModel::readFieldSeries()
             (
                 IOobject
                 (
-                    "voidfraction",
+                    voidfractionFieldName_,
                     recTime.timePath(),
-                    mesh,
+                    particleCloud_.mesh(),
                     IOobject::MUST_READ,
                     IOobject::NO_WRITE
                 ),
-                mesh
+                particleCloud_.mesh()
             )
         );
             
@@ -160,13 +159,13 @@ void standardRecModel::readFieldSeries()
             (
                 IOobject
                 (
-                    "U",
+                    UFieldName_,
                     recTime.timePath(),
-                    mesh,
+                    particleCloud_.mesh(),
                     IOobject::MUST_READ,
                     IOobject::NO_WRITE
                 ),
-                mesh
+                particleCloud_.mesh()
             )
         );
         UsRecpl.set
@@ -176,23 +175,23 @@ void standardRecModel::readFieldSeries()
             (
                 IOobject
                 (
-                    "Us",
+                    UsFieldName_,
                     recTime.timePath(),
-                    mesh,
+                    particleCloud_.mesh(),
                     IOobject::MUST_READ,
                     IOobject::NO_WRITE
                 ),
-                mesh
+                particleCloud_.mesh()
             )
         );
         
-    } 
+    }
 }
 
 void standardRecModel::computeRecMatrix()
 {
     Info<< "\nComputing recurrence matrix\n" << endl;
-    recurrenceMatrix(timeIndexList.size(), timeIndexList.size(), scalar(0));
+    recurrenceMatrix=0.0;
     scalar maxElemVal(0.0);
     
     // compute recurrence matrix elements
@@ -215,8 +214,7 @@ void standardRecModel::computeRecMatrix()
     		
     		// compute elements
     		recurrenceMatrix[ti][tj]
-    			= sumSqr(alpha1pl[ti].internalField() - alpha1pl[tj].internalField())
-    			+ sum(magSqr(U1pl[ti].internalField() - U1pl[tj].internalField()));
+    			= sumSqr(voidfractionRecpl[ti].internalField() - voidfractionRecpl[tj].internalField());
     		
     		recurrenceMatrix[tj][ti] = recurrenceMatrix[ti][tj];
     		
@@ -239,15 +237,16 @@ void standardRecModel::computeRecMatrix()
 
 void standardRecModel::computeRecPath()
 {
- // random recurrence stuff
-    #include "Random.H"	// random numbers
     Random ranGen(osRandomInteger());
     
     label virtualTimeIndex=0;
     label recSteps=0;
     label seqStart=0;
-    label seqLength=0;
-    labelPair seqStartEnd(0,0);
+    label seqLength=ranGen.integer(lowerSeqLim, upperSeqLim);
+    labelPair seqStartEnd(seqStart,seqStart+seqLength-1);
+    virtualTimeIndexList.append(seqStartEnd);
+    virtualTimeIndex = seqStart+seqLength-1;
+    recSteps+=seqLength;
    
     while(recSteps<=totRecSteps)
     {

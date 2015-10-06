@@ -26,6 +26,7 @@ License
 #define standardRecModel_H
 
 #include "recModel.H"
+//#include "PtrList.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -68,23 +69,19 @@ public:
 
     void initRecFields();
     void updateRecFields();
+    void writeRecFields();
 	
 private:
   
     dictionary propsDict_;
   
-    word velFieldName_;
-    const volVectorField& URec_;
-
+    word UFieldName_;
     word voidfractionFieldName_;
-    const volScalarField& voidfractionRec_;
-
-    word UsFieldName_;   
-    const volVectorField& UsRec_; 
+    word UsFieldName_;
   
-    PtrList<volScalarField> voidfractionRecpl(label(timeIndexList.size()));
-    PtrList<volVectorField> URecpl(label(timeIndexList.size()));
-    PtrList<volVectorField> UsRecpl(label(timeIndexList.size()));
+    PtrList<volScalarField> voidfractionRecpl;
+    PtrList<volVectorField> URecpl;
+    PtrList<volVectorField> UsRecpl;
 
 };
 

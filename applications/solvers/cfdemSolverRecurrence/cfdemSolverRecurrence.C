@@ -104,14 +104,14 @@ int main(int argc, char *argv[])
             		<< " s\n\n" << endl;
         	}
         // write stuff at output time
-        if (runTime.outputTime())
+   /*     if (runTime.outputTime())
         {        	
         //	magicParticles.writeConcField();
         	
         	alpha2.write();
         	U2.write();
         }
-        
+    */    
         runTime.write(); // does not work, yet
 	
 	

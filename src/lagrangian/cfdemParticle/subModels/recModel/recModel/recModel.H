@@ -27,7 +27,7 @@ License
 
 
 #include "cfdemCloud.H"
-//#include "dataExchangeModel.H"
+#include "fvCFD.H"
 #include "HashTable.H"
 #include "labelPair.H"
 #include <mpi.h>
@@ -45,8 +45,9 @@ protected:
 
     // Protected data
     const dictionary& dict_;
-    const dictionary& controlDict_;
     cfdemCloud& particleCloud_;
+    const IOdictionary& controlDict_;
+    bool verbose_;
     
     SymmetricSquareMatrix<scalar> recurrenceMatrix;
     Foam::Time recTime;
@@ -75,6 +76,7 @@ protected:
     scalar timeStep_;
     scalar recTimeStep_;
     
+    label numRecFields;
     label totRecSteps;
     
     label virtualTimeIndex;
@@ -89,7 +91,7 @@ protected:
 private:
   
     void readTimeSeries();
-    void checkTimeStep();
+    scalar checkTimeStep();
 
 public:
 
@@ -139,6 +141,7 @@ public:
     
     virtual void initRecFields() = 0; 
     virtual void updateRecFields() = 0;
+    virtual void writeRecFields() = 0;
     scalar recTimeStep()
     {
         return recTimeStep_;
