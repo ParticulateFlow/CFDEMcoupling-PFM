@@ -41,10 +41,7 @@ Rules
 \*---------------------------------------------------------------------------*/
 
 #include "fvCFD.H"
-#include "fvIOoptionList.H"	// no solver = no fvOptions
-
-#include "mathematicalConstants.H" // provides: e, pi, 2pi and pi/2
-
+//#include "fvIOoptionList.H"	// no solver = no fvOptions
 #include "cfdemCloudRec.H"
 #include "clockModel.H"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -68,7 +65,6 @@ int main(int argc, char *argv[])
     label recTimeIndex(0);
     scalar recTimeStep_=particleCloud.recM().recTimeStep();
     
-    particleCloud.initRecFields();
     while (runTime.run())
     {
         runTime++;
@@ -90,7 +86,7 @@ int main(int argc, char *argv[])
 
         particleCloud.clockM().start(26,"Flow");
         
-        if ( runTime.timeOutputValue() / ((recTimeIndex+1)*dtCur) >= 1.0 )
+        if ( runTime.timeOutputValue()  >= (recTimeIndex+1)*recTimeStep_ )
         {
             particleCloud.updateRecFields();
             recTimeIndex++;
@@ -104,17 +100,12 @@ int main(int argc, char *argv[])
             		<< " s\n\n" << endl;
         	}
         // write stuff at output time
-   /*     if (runTime.outputTime())
+        if (runTime.outputTime())
         {        	
-        //	magicParticles.writeConcField();
-        	
-        	alpha2.write();
-        	U2.write();
+            particleCloud.recM().write();
         }
-    */    
-        runTime.write(); // does not work, yet
-	
-	
+        
+        runTime.write();	
 
         particleCloud.clockM().stop("Flow");
         particleCloud.clockM().stop("Global");

@@ -27,7 +27,8 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include "cfdemCloudRec.H"
-
+#include "recModel.H"
+#include "forceModelRec.H"
 namespace Foam
 {
 
@@ -45,8 +46,20 @@ cfdemCloudRec::cfdemCloudRec
             couplingProperties_,
             *this
         )
-    )
-    {}
+    ),
+    forceModels_(couplingProperties_.lookup("forceModelsRec"))
+    {
+        forceModel_ = new autoPtr<forceModelRec>[nrForceModels()];
+        for (int i=0;i<nrForceModels();i++)
+        {
+            forceModel_[i] = forceModelRec::New
+            (
+                couplingProperties_,
+                *this,
+                forceModels_[i]
+            );
+        }
+    }
 
 // * * * * * * * * * * * * * * * * Destructors  * * * * * * * * * * * * * * //
 cfdemCloudRec::~cfdemCloudRec()
@@ -62,19 +75,16 @@ void cfdemCloudRec::getDEMdata()
 
 void cfdemCloudRec::giveDEMdata()
 {
-    dataExchangeM().giveData("v","vector-atom",velocities_);
+    dataExchangeM().giveData("v","vector-atom",fluidVel_);
     dataExchangeM().giveData("dragforce","vector-atom",DEMForces_);
     if(verbose_) Info << "giveDEMdata done." << endl;
 }
 
 void cfdemCloudRec::setForces()
 {
-  //  resetArray(fluidVel_,numberOfParticles(),3);
-  //  resetArray(impForces_,numberOfParticles(),3);
-  //  resetArray(expForces_,numberOfParticles(),3);
-  //  resetArray(DEMForces_,numberOfParticles(),3);
-  //  resetArray(Cds_,numberOfParticles(),1);
-  //  for (int i=0;i<cfdemCloud::nrForceModels();i++) cfdemCloud::forceM(i).setForce();
+    resetArray(fluidVel_,numberOfParticles(),3);
+    resetArray(DEMForces_,numberOfParticles(),3);
+ //   for (int i=0;i<cfdemCloud::nrForceModels();i++) cfdemCloud::forceM(i).setForce();
 }
 
 // * * *   write top level fields   * * * //

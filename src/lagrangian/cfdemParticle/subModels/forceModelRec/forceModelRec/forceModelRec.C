@@ -22,76 +22,57 @@ License
     along with CFDEMcoupling academic.  If not, see <http://www.gnu.org/licenses/>.
 \*---------------------------------------------------------------------------*/
 
-#ifndef standardRecModel_H
-#define standardRecModel_H
-
-#include "recModel.H"
-
+#include "error.H"
+#include "forceModelRec.H"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-/*---------------------------------------------------------------------------*\
-                           Class standardRecModel Declaration
-\*---------------------------------------------------------------------------*/
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-class standardRecModel
+defineTypeNameAndDebug(forceModelRec, 0);
+
+defineRunTimeSelectionTable(forceModelRec, dictionary);
+
+// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+
+// Construct from components
+forceModelRec::forceModelRec
+(
+    const dictionary& dict,
+    cfdemCloudRec& sm
+)
 :
-    public recModel
+    dict_(dict),
+    particleCloud_(sm),
+    modelType_(sm.modelType())
+{}
+
+
+// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
+
+forceModelRec::~forceModelRec()
+{}
+
+// * * * * * * * * * * * * * * * * Member Fct  * * * * * * * * * * * * * * * //
+void forceModelRec::partToArray
+(
+    label& index,
+    const vector& dragTot,
+    const vector& Ufluid
+) const
 {
-protected:
-  
-  void computeRecMatrix();
-  void computeRecPath();
-  void readFieldSeries();
+        for(int j=0;j<3;j++)
+           fluidVel()[index][j]=Ufluid[j];
 
-public:
-
-    //- Runtime type information
-    TypeName("standardRecModel");
-
-
-    // Constructors
-
-        //- Construct from components
-        standardRecModel
-        (
-            const dictionary& dict,
-            cfdemCloud& sm
-        );
-
-    // Destructor
-
-        ~standardRecModel();
-
-
-    void initRecFields();
-    void updateRecFields();
-    void writeRecFields();
-    const volVectorField& U() const;
-	
-private:
-  
-    dictionary propsDict_;
-  
-    word UFieldName_;
-    word voidfractionFieldName_;
-    word UsFieldName_;
-  
-    PtrList<volScalarField> voidfractionRecpl;
-    PtrList<volVectorField> URecpl;
-    PtrList<volVectorField> UsRecpl;
-
-};
-
-
+        for(int j=0;j<3;j++) 
+            DEMForces()[index][j] += dragTot[j];  
+}
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#endif
 
 // ************************************************************************* //

@@ -22,67 +22,90 @@ License
     along with CFDEMcoupling academic.  If not, see <http://www.gnu.org/licenses/>.
 \*---------------------------------------------------------------------------*/
 
-#ifndef standardRecModel_H
-#define standardRecModel_H
+#ifndef forceModelRec_H
+#define forceModelRec_H
 
-#include "recModel.H"
-
+#include "fvCFD.H"
+#include "cfdemCloudRec.H"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class standardRecModel Declaration
+                           Class forceModelRec Declaration
 \*---------------------------------------------------------------------------*/
 
-class standardRecModel
-:
-    public recModel
+class forceModelRec
 {
+
 protected:
-  
-  void computeRecMatrix();
-  void computeRecPath();
-  void readFieldSeries();
+
+    // Protected data
+        const dictionary& dict_;
+
+        cfdemCloudRec& particleCloud_;
+
+        const word modelType_;
+
 
 public:
 
     //- Runtime type information
-    TypeName("standardRecModel");
+    TypeName("forceModelRec");
+
+    // Declare runtime constructor selection table
+
+        declareRunTimeSelectionTable
+        (
+            autoPtr,
+            forceModelRec,
+            dictionary,
+            (
+                const dictionary& dict,
+                cfdemCloudRec& sm
+            ),
+            (dict,sm)
+        );
 
 
     // Constructors
 
         //- Construct from components
-        standardRecModel
+        forceModelRec
         (
             const dictionary& dict,
-            cfdemCloud& sm
+            cfdemCloudRec& sm
         );
+
 
     // Destructor
 
-        ~standardRecModel();
+        virtual ~forceModelRec();
 
 
-    void initRecFields();
-    void updateRecFields();
-    void writeRecFields();
-    const volVectorField& U() const;
-	
-private:
-  
-    dictionary propsDict_;
-  
-    word UFieldName_;
-    word voidfractionFieldName_;
-    word UsFieldName_;
-  
-    PtrList<volScalarField> voidfractionRecpl;
-    PtrList<volVectorField> URecpl;
-    PtrList<volVectorField> UsRecpl;
+    // Selector
 
+        static autoPtr<forceModelRec> New
+        (
+            const dictionary& dict,
+            cfdemCloudRec& sm,
+            word forceType
+        );
+
+
+    // Member Functions
+        virtual void setForce() const = 0;
+
+
+    // Access
+        word modelType() { return modelType_; }
+
+        inline double ** DEMForces() const { return particleCloud_.DEMForces_; }
+
+        inline double ** fluidVel() const { return particleCloud_.fluidVel_; }
+        
+        void partToArray(label&, const vector&, const vector&) const;
 };
 
 

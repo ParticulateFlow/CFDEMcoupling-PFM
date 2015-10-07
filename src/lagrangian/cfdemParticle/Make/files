@@ -5,6 +5,7 @@ energyModels = subModels/energyModel
 forceModels = subModels/forceModel
 forceSubModels = subModels/forceModel/forceSubModels
 forceModelsMS = subModels/forceModelMS
+forceModelsRec = subModels/forceModelRec
 IOModels = subModels/IOModel
 voidFractionModels = subModels/voidFractionModel
 locateModels = subModels/locateModel
@@ -63,6 +64,10 @@ $(forceModels)/volWeightedAverage/volWeightedAverage.C
 $(forceModelsMS)/forceModelMS/forceModelMS.C
 $(forceModelsMS)/forceModelMS/newForceModelMS.C
 $(forceModelsMS)/DiFeliceDragMS/DiFeliceDragMS.C
+
+$(forceModelsRec)/forceModelRec/forceModelRec.C
+$(forceModelsRec)/forceModelRec/newForceModelRec.C
+$(forceModelsRec)/freeStreaming/freeStreaming.C
 
 $(forceSubModels)/forceSubModel/newForceSubModel.C
 $(forceSubModels)/forceSubModel/forceSubModel.C

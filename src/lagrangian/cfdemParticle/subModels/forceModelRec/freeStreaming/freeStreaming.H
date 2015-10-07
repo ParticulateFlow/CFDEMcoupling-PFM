@@ -2,7 +2,7 @@
     CFDEMcoupling academic - Open Source CFD-DEM coupling
     
     Contributing authors:
-    Thomas Lichtenegger, Gerhard Holzinger
+    Thomas Lichtenegger
     Copyright (C) 2015- Johannes Kepler University, Linz
 -------------------------------------------------------------------------------
 License
@@ -22,10 +22,11 @@ License
     along with CFDEMcoupling academic.  If not, see <http://www.gnu.org/licenses/>.
 \*---------------------------------------------------------------------------*/
 
-#ifndef standardRecModel_H
-#define standardRecModel_H
+#ifndef freeStreaming_H
+#define freeStreaming_H
 
-#include "recModel.H"
+#include "forceModelRec.H"
+#include "interpolationCellPoint.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -33,56 +34,40 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class standardRecModel Declaration
+                           Class freeStreaming Declaration
 \*---------------------------------------------------------------------------*/
 
-class standardRecModel
+class freeStreaming
 :
-    public recModel
+    public forceModelRec
 {
-protected:
-  
-  void computeRecMatrix();
-  void computeRecPath();
-  void readFieldSeries();
+private:
+    dictionary propsDict_;
+    
+    bool interpolate_;
 
 public:
 
     //- Runtime type information
-    TypeName("standardRecModel");
+    TypeName("freeStreaming");
 
 
     // Constructors
 
         //- Construct from components
-        standardRecModel
+        freeStreaming
         (
             const dictionary& dict,
-            cfdemCloud& sm
+            cfdemCloudRec& sm
         );
 
     // Destructor
 
-        ~standardRecModel();
+        ~freeStreaming();
 
 
-    void initRecFields();
-    void updateRecFields();
-    void writeRecFields();
-    const volVectorField& U() const;
-	
-private:
-  
-    dictionary propsDict_;
-  
-    word UFieldName_;
-    word voidfractionFieldName_;
-    word UsFieldName_;
-  
-    PtrList<volScalarField> voidfractionRecpl;
-    PtrList<volVectorField> URecpl;
-    PtrList<volVectorField> UsRecpl;
-
+    // Member Functions
+        void setForce() const;
 };
 
 

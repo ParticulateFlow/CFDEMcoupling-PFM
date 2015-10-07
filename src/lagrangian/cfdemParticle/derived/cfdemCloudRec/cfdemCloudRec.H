@@ -40,13 +40,13 @@ SourceFiles
 #define cfdemCloudRec_H
 
 #include "cfdemCloud.H"
-#include "recModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 class recModel;
+class forceModelRec;
 /*---------------------------------------------------------------------------*\
                            Class cfdemCloudRec Declaration
 \*---------------------------------------------------------------------------*/
@@ -56,6 +56,10 @@ class cfdemCloudRec : public cfdemCloud
 protected:
 
     autoPtr<recModel> recModel_;
+    
+    autoPtr<forceModelRec>* forceModel_;
+    
+    const wordList forceModels_;
 
     void getDEMdata();
 
@@ -67,8 +71,7 @@ public:
 
     friend class dataExchangeModel;
     friend class voidFractionModel;
-    friend class forceModel;
-    friend class forceSubModel;
+    friend class forceModelRec;
 
 // Constructors
 

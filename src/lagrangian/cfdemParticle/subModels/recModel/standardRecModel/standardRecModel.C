@@ -114,6 +114,10 @@ void standardRecModel::writeRecFields()
  // UsRecpl[virtualTimeIndex].write();
 }
 
+const volVectorField& standardRecModel::U() const
+{
+  return URecpl[virtualTimeIndex];
+}
 
 void standardRecModel::readFieldSeries()
 {

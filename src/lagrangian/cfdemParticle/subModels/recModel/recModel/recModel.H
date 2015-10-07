@@ -142,6 +142,7 @@ public:
     virtual void initRecFields() = 0; 
     virtual void updateRecFields() = 0;
     virtual void writeRecFields() = 0;
+    virtual const volVectorField& U() const = 0;
     scalar recTimeStep()
     {
         return recTimeStep_;

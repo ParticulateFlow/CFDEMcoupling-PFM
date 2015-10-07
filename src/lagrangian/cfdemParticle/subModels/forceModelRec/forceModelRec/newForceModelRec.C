@@ -22,76 +22,49 @@ License
     along with CFDEMcoupling academic.  If not, see <http://www.gnu.org/licenses/>.
 \*---------------------------------------------------------------------------*/
 
-#ifndef standardRecModel_H
-#define standardRecModel_H
-
-#include "recModel.H"
+#include "error.H"
+#include "forceModelRec.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-/*---------------------------------------------------------------------------*\
-                           Class standardRecModel Declaration
-\*---------------------------------------------------------------------------*/
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-class standardRecModel
-:
-    public recModel
+autoPtr<forceModelRec> forceModelRec::New
+(
+    const dictionary& dict,
+    cfdemCloudRec& sm,
+    word forceType
+)
 {
-protected:
-  
-  void computeRecMatrix();
-  void computeRecPath();
-  void readFieldSeries();
+    Info<< "Selecting forceModelRec "
+         << forceType << endl;
 
-public:
+    dictionaryConstructorTable::iterator cstrIter =
+        dictionaryConstructorTablePtr_->find(forceType);
 
-    //- Runtime type information
-    TypeName("standardRecModel");
+    if (cstrIter == dictionaryConstructorTablePtr_->end())
+    {
+        FatalError
+            << "forceModelRec::New(const dictionary&, const spray&) : "
+            << endl
+            << "    unknown forceModelRecType type "
+            << forceType
+            << ", constructor not in hash table" << endl << endl
+            << "    Valid forceModelRec types are :"
+            << endl;
+        Info<< dictionaryConstructorTablePtr_->toc()
+            << abort(FatalError);
+    }
 
-
-    // Constructors
-
-        //- Construct from components
-        standardRecModel
-        (
-            const dictionary& dict,
-            cfdemCloud& sm
-        );
-
-    // Destructor
-
-        ~standardRecModel();
-
-
-    void initRecFields();
-    void updateRecFields();
-    void writeRecFields();
-    const volVectorField& U() const;
-	
-private:
-  
-    dictionary propsDict_;
-  
-    word UFieldName_;
-    word voidfractionFieldName_;
-    word UsFieldName_;
-  
-    PtrList<volScalarField> voidfractionRecpl;
-    PtrList<volVectorField> URecpl;
-    PtrList<volVectorField> UsRecpl;
-
-};
+    return autoPtr<forceModelRec>(cstrIter()(dict,sm));
+}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#endif
 
 // ************************************************************************* //
