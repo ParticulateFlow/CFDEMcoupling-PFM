@@ -47,8 +47,7 @@ forceModelRec::forceModelRec
 )
 :
     dict_(dict),
-    particleCloud_(sm),
-    modelType_(sm.modelType())
+    particleCloud_(sm)
 {}
 
 

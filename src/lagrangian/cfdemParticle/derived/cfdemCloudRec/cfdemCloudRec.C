@@ -39,6 +39,7 @@ cfdemCloudRec::cfdemCloudRec
 )
 :
     cfdemCloud(mesh),
+    forceModels_(couplingProperties_.lookup("forceModelsRec")),
     recModel_
     (
         recModel::New
@@ -46,13 +47,12 @@ cfdemCloudRec::cfdemCloudRec
             couplingProperties_,
             *this
         )
-    ),
-    forceModels_(couplingProperties_.lookup("forceModelsRec"))
+    )
     {
-        forceModel_ = new autoPtr<forceModelRec>[nrForceModels()];
+        forceModelRec_ = new autoPtr<forceModelRec>[nrForceModels()];
         for (int i=0;i<nrForceModels();i++)
         {
-            forceModel_[i] = forceModelRec::New
+            forceModelRec_[i] = forceModelRec::New
             (
                 couplingProperties_,
                 *this,
@@ -103,7 +103,7 @@ void cfdemCloudRec::updateRecFields()
     recModel_->updateRecFields(); 
 }
 
-void cfdemCloudRec::writeRecFields()
+void cfdemCloudRec::writeRecFields() const
 {
     recModel_->writeRecFields(); 
 }

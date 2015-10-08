@@ -25,7 +25,6 @@ License
 #ifndef forceModelRec_H
 #define forceModelRec_H
 
-#include "fvCFD.H"
 #include "cfdemCloudRec.H"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -45,9 +44,6 @@ protected:
         const dictionary& dict_;
 
         cfdemCloudRec& particleCloud_;
-
-        const word modelType_;
-
 
 public:
 
@@ -99,8 +95,6 @@ public:
 
 
     // Access
-        word modelType() { return modelType_; }
-
         inline double ** DEMForces() const { return particleCloud_.DEMForces_; }
 
         inline double ** fluidVel() const { return particleCloud_.fluidVel_; }

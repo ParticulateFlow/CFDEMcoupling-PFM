@@ -47,7 +47,7 @@ defineRunTimeSelectionTable(recModel, dictionary);
 Foam::recModel::recModel
 (
     const dictionary& dict,
-    cfdemCloud& sm
+    cfdemCloudRec& sm
 )
 :
     dict_(dict),
@@ -64,24 +64,24 @@ Foam::recModel::recModel
         )
     ),
     verbose_(sm.verbose()),
+    recurrenceMatrix(numRecFields,numRecFields,scalar(0)),
     recTime("dataBase", "", "../system", "../constant", false),
     timeDirs(recTime.times()),
     numRecFields(label(timeDirs.size())),
     timeIndexList(numRecFields-1),
     timeValueList(numRecFields-1),
-    recurrenceMatrix(numRecFields,numRecFields,scalar(0)),
     contTimeIndex(0),
     sequenceStart(0),
     sequenceEnd(0),
-    virtualTimeIndex(0),
-    virtualStartIndex(0),
+    lowerSeqLim(max(1, label(numRecFields/20))),
+    upperSeqLim(label(numRecFields/5)),
     startTime_(readScalar(controlDict_.lookup("startTime"))),
     endTime_(readScalar(controlDict_.lookup("endTime"))),
     timeStep_(readScalar(controlDict_.lookup("deltaT"))),
+    virtualStartIndex(0),
+    virtualTimeIndex(0),
     virtualTimeIndexList(0),
-    virtualTimeIndexListPos(0),
-    lowerSeqLim(max(1, label(numRecFields/20))),
-    upperSeqLim(label(numRecFields/5))
+    virtualTimeIndexListPos(0)
 {
     if (verbose_)
     {
@@ -217,7 +217,7 @@ scalar Foam::recModel::checkTimeStep()
     return dtCur;
 }
 
-void Foam::recModel::writeRecMatrix()
+void Foam::recModel::writeRecMatrix() const
 {
     // create output file
     std::ostringstream str_pid;

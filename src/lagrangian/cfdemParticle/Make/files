@@ -29,10 +29,6 @@ derived/cfdemCloudRec/cfdemCloudRec.C
 $(cfdTools)/global.C
 $(cfdTools)/newGlobal.C
 
-$(recModels)/recModel/recModel.C
-$(recModels)/recModel/newRecModel.C
-$(recModels)/standardRecModel/standardRecModel.C
-
 $(energyModels)/heatTransferModel/heatTransferModel/heatTransferModel.C
 $(energyModels)/heatTransferModel/heatTransferModel/newHeatTransferModel.C
 $(energyModels)/heatTransferModel/noHeatTransfer/noHeatTransfer.C
@@ -73,6 +69,10 @@ $(forceSubModels)/forceSubModel/newForceSubModel.C
 $(forceSubModels)/forceSubModel/forceSubModel.C
 $(forceSubModels)/ImEx/ImEx.C
 
+$(recModels)/recModel/recModel.C
+$(recModels)/recModel/newRecModel.C
+$(recModels)/standardRecModel/standardRecModel.C
+
 $(probeModels)/probeModel/probeModel.C
 $(probeModels)/probeModel/newProbeModel.C
 $(probeModels)/noProbe/noProbe.C
@@ -101,7 +101,6 @@ $(locateModels)/engineSearch/engineSearch.C
 $(locateModels)/turboEngineSearch/turboEngineSearch.C
 $(locateModels)/engineSearchMany2Many/engineSearchMany2Many.C
 $(locateModels)/engineSearchIB/engineSearchIB.C
-
 
 $(meshMotionModels)/meshMotionModel/meshMotionModel.C
 $(meshMotionModels)/meshMotionModel/newMeshMotionModel.C

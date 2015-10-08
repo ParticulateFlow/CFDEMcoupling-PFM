@@ -50,7 +50,7 @@ addToRunTimeSelectionTable
 standardRecModel::standardRecModel
 (
     const dictionary& dict,
-    cfdemCloud& sm
+    cfdemCloudRec& sm
 )
 :
     recModel(dict,sm),
@@ -105,7 +105,7 @@ void standardRecModel::updateRecFields()
   }
 }
 
-void standardRecModel::writeRecFields()
+void standardRecModel::writeRecFields() const
 {
  // need to check if this writes to the correct destination 
   

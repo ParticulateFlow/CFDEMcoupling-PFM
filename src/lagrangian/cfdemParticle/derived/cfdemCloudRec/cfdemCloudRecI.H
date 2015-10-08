@@ -36,74 +36,18 @@ SourceFiles
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef cfdemCloudRec_H
-#define cfdemCloudRec_H
-
-#include "cfdemCloud.H"
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+#include "recModel.H"
 
 namespace Foam
 {
-class recModel;
-class forceModelRec;
-/*---------------------------------------------------------------------------*\
-                           Class cfdemCloudRec Declaration
-\*---------------------------------------------------------------------------*/
 
-class cfdemCloudRec : public cfdemCloud
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+inline const recModel& cfdemCloudRec::recM() const
 {
-protected:
-    const wordList forceModels_;
-    
-    autoPtr<recModel> recModel_;
-    
-    autoPtr<forceModelRec>* forceModelRec_;
-    
-    void getDEMdata();
-
-    void giveDEMdata();
-    
-    void setForces();
-
-public:
-
-    friend class dataExchangeModel;
-    friend class voidFractionModel;
-    friend class forceModelRec;
-
-// Constructors
-
-    //- Construct from mesh and a list of particles
-    cfdemCloudRec
-    (
-            const fvMesh& mesh
-    );
-
-    //- Destructor
-    virtual ~cfdemCloudRec();
-
-// public Member Functions
-
-    virtual bool evolve(volScalarField&,volVectorField&,volVectorField&);
-    
-    inline const recModel& recM() const;
-
-    void initRecFields();
-    void updateRecFields();
-    void writeRecFields() const;
-    
-};
+    return recModel_;
+}
 
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace Foam
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#include "cfdemCloudRecI.H"
-
-#endif
-
+}
 // ************************************************************************* //

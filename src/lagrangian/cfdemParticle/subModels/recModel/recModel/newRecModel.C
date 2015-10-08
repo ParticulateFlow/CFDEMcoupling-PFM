@@ -37,7 +37,7 @@ namespace Foam
 autoPtr<recModel> recModel::New
 (
     const dictionary& dict,
-    cfdemCloud& sm
+    cfdemCloudRec& sm
 )
 {
     word recModelType

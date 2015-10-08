@@ -26,7 +26,7 @@ License
 #define recModel_H
 
 
-#include "cfdemCloud.H"
+#include "cfdemCloudRec.H"
 #include "fvCFD.H"
 #include "HashTable.H"
 #include "labelPair.H"
@@ -45,44 +45,41 @@ protected:
 
     // Protected data
     const dictionary& dict_;
-    cfdemCloud& particleCloud_;
-    const IOdictionary& controlDict_;
+    cfdemCloudRec& particleCloud_;
+    IOdictionary controlDict_;
     bool verbose_;
     
     SymmetricSquareMatrix<scalar> recurrenceMatrix;
     Foam::Time recTime;
     instantList timeDirs;
+    label numRecFields;
     
     // create a data structure for the time indices
     //	constant will not be contained
     //	runTimeIndex -> continuousIndex
     HashTable<label,word> timeIndexList;
-    label contTimeIndex;
     
     // create a data structure for the time values
     //	constant will not be contained
     //	continuousIndex -> time.value()
     HashTable<label,scalar> timeValueList;
+    label contTimeIndex;
     
     label sequenceStart;
     label sequenceEnd;
     const label lowerSeqLim;
     const label upperSeqLim;
-   
-    label virtualStartIndex;
     
     scalar startTime_;
     scalar endTime_;
     scalar timeStep_;
     scalar recTimeStep_;
-    
-    label numRecFields;
-    label totRecSteps;
-    
+    label virtualStartIndex;
     label virtualTimeIndex;
     // list of pairs (start value, end value)
     labelPairList virtualTimeIndexList;
     label virtualTimeIndexListPos;
+    label totRecSteps;
     
     virtual void computeRecMatrix() = 0;
     virtual void computeRecPath() = 0;
@@ -107,7 +104,7 @@ public:
             dictionary,
             (
                 const dictionary& dict,
-                cfdemCloud& sm
+                cfdemCloudRec& sm
             ),
             (dict,sm)
         );
@@ -119,7 +116,7 @@ public:
         recModel
         (
             const dictionary& dict,
-            cfdemCloud& sm
+            cfdemCloudRec& sm
         );
 
 
@@ -133,7 +130,7 @@ public:
         static autoPtr<recModel> New
         (
             const dictionary& dict,
-            cfdemCloud& sm
+            cfdemCloudRec& sm
         );
 
 
@@ -141,13 +138,13 @@ public:
     
     virtual void initRecFields() = 0; 
     virtual void updateRecFields() = 0;
-    virtual void writeRecFields() = 0;
+    virtual void writeRecFields() const = 0;
     virtual const volVectorField& U() const = 0;
-    scalar recTimeStep()
+    scalar recTimeStep() const
     {
         return recTimeStep_;
     }
-    void writeRecMatrix();
+    void writeRecMatrix() const;
 };
 
 

@@ -58,7 +58,7 @@ public:
         standardRecModel
         (
             const dictionary& dict,
-            cfdemCloud& sm
+            cfdemCloudRec& sm
         );
 
     // Destructor
@@ -68,7 +68,7 @@ public:
 
     void initRecFields();
     void updateRecFields();
-    void writeRecFields();
+    void writeRecFields() const;
     const volVectorField& U() const;
 	
 private:

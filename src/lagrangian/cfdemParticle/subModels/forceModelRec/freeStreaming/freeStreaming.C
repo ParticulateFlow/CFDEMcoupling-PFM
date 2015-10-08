@@ -25,6 +25,7 @@ License
 #include "error.H"
 
 #include "freeStreaming.H"
+#include "recModel.H"
 #include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
