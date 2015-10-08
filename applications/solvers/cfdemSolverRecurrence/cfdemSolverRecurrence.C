@@ -78,7 +78,7 @@ int main(int argc, char *argv[])
 
         particleCloud.clockM().start(2,"Coupling");
 
-        particleCloud.evolve(voidfraction,Us,U);
+        particleCloud.evolve(voidfraction,Us,URec);
 
         particleCloud.clockM().stop("Coupling");
 
@@ -87,16 +87,12 @@ int main(int argc, char *argv[])
         if ( runTime.timeOutputValue()  >= (recTimeIndex+1)*recTimeStep_ )
         {
             particleCloud.updateRecFields();
+	    URec=particleCloud.recM().tU();
+	    voidfractionRec=cfdemCloudRec.recM().tvoidfraction();
+	    UsRec=particleCloud.recM().tUs();
             recTimeIndex++;
         }
 
-       
-       // write stuff at output time
-        if (runTime.outputTime())
-        {        	
-            particleCloud.recM().writeRecFields();
-        }
-        
         runTime.write();	
 
         particleCloud.clockM().stop("Flow");

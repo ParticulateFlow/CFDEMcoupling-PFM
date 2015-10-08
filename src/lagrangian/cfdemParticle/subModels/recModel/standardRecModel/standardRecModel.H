@@ -69,8 +69,14 @@ public:
     void initRecFields();
     void updateRecFields();
     void writeRecFields() const;
+    
+    const volScalarField& voidfraction() const;
     const volVectorField& U() const;
     const volVectorField& Us() const;
+    
+    tmp<volScalarField> tvoidfraction() const;
+    tmp<volVectorField> tU() const;
+    tmp<volVectorField> tUs() const;
 	
 private:
   

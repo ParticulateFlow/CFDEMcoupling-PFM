@@ -138,8 +138,14 @@ public:
     virtual void initRecFields() = 0; 
     virtual void updateRecFields() = 0;
     virtual void writeRecFields() const = 0;
+    
+    virtual const volScalarField& voidfraction() const = 0;
     virtual const volVectorField& U() const = 0;
     virtual const volVectorField& Us() const = 0;
+    
+    virtual tmp<volScalarField> tvoidfraction() const = 0;
+    virtual tmp<volVectorField> tU() const = 0;
+    virtual tmp<volVectorField> tUs() const = 0;
     scalar recTimeStep() const
     {
         return recTimeStep_;

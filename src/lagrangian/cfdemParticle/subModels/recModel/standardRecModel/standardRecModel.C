@@ -115,12 +115,32 @@ void standardRecModel::writeRecFields() const
  // UsRecpl[virtualTimeIndex].writeRecFields();
 }
 
+const volScalarField& standardRecModel::voidfraction() const
+{
+  return voidfractionRecpl[virtualTimeIndex];
+}
+
 const volVectorField& standardRecModel::U() const
 {
   return URecpl[virtualTimeIndex];
 }
 
 const volVectorField& standardRecModel::Us() const
+{
+  return UsRecpl[virtualTimeIndex];
+}
+
+tmp<volScalarField> standardRecModel::tvoidfraction() const
+{
+  return voidfractionRecpl[virtualTimeIndex];
+}
+
+tmp<volVectorField> standardRecModel::tU() const
+{
+  return URecpl[virtualTimeIndex];
+}
+
+tmp<volVectorField> standardRecModel::tUs() const
 {
   return UsRecpl[virtualTimeIndex];
 }

@@ -28,20 +28,6 @@
     );
     
     // calculated fields
-    volVectorField U
-    (
-        IOobject
-        (
-            "U",
-            runTime.timeName(),
-            mesh,
-            IOobject::NO_READ,
-            IOobject::AUTO_WRITE
-        ),
-        mesh,
-        dimensionedVector("U",dimVelocity,vector(0,0,0))
-    );
-    
     volScalarField voidfraction
     (
         IOobject
@@ -52,8 +38,9 @@
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
-        mesh,
-        dimensionedScalar("voidfraction", dimensionSet(0, -3, 0, 0, 0), 1.0)
+         particleCloud.recM().tvoidfraction()
+       // mesh,
+       // dimensionedScalar("voidfraction", dimensionSet(0, -3, 0, 0, 0), 1.0)
     );
     
     volVectorField Us
@@ -66,8 +53,49 @@
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
-        mesh,
-        dimensionedVector("Us",dimVelocity,vector(0,0,0))
+        particleCloud.recM().tUs()
+        //mesh,
+        //dimensionedVector("Us",dimVelocity,vector(0,0,0))
+    );
+    
+    // recurrence fields
+    volVectorField URec
+    (
+        IOobject
+        (
+            "URec",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        particleCloud.recM().tU()
+    );
+    
+    volScalarField voidfractionRec
+    (
+        IOobject
+        (
+            "voidfractionRec",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        particleCloud.recM().tvoidfraction()
+    );
+    
+    volVectorField UsRec
+    (
+        IOobject
+        (
+            "UsRec",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        particleCloud.recM().tUs()
     );
 
 //===============================
