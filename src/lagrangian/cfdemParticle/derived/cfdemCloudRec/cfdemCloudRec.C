@@ -84,7 +84,7 @@ void cfdemCloudRec::setForces()
 {
     resetArray(fluidVel_,numberOfParticles(),3);
     resetArray(DEMForces_,numberOfParticles(),3);
- //   for (int i=0;i<cfdemCloud::nrForceModels();i++) cfdemCloud::forceM(i).setForce();
+    for (int i=0;i<cfdemCloud::nrForceModels();i++) forceMRec(i).setForce();
 }
 
 // * * *   write top level fields   * * * //
@@ -106,6 +106,11 @@ void cfdemCloudRec::updateRecFields()
 void cfdemCloudRec::writeRecFields() const
 {
     recModel_->writeRecFields(); 
+}
+
+const forceModelRec& cfdemCloudRec::forceMRec(int i)
+{
+    return forceModelRec_[i];
 }
 
 bool cfdemCloudRec::evolve

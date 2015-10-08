@@ -51,10 +51,10 @@ int main(int argc, char *argv[])
     #include "setRootCase.H"
     #include "createTime.H"
     #include "createMesh.H"
-    #include "createFields.H"
-    #include "createFvOptions.H"	// no solver = no fvOptions
+  //  #include "createFvOptions.H"	// no solver = no fvOptions
   
     cfdemCloudRec particleCloud(mesh);
+    #include "createFields.H"
     #include "checkModelType.H"
     
 
@@ -74,14 +74,12 @@ int main(int argc, char *argv[])
 
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
-        #include "CourantNo.H"
+      //  #include "CourantNo.H"
 
         particleCloud.clockM().start(2,"Coupling");
 
         particleCloud.evolve(voidfraction,Us,U);
 
-
-        #include "solverDebugInfo.H"
         particleCloud.clockM().stop("Coupling");
 
         particleCloud.clockM().start(26,"Flow");
@@ -92,17 +90,11 @@ int main(int argc, char *argv[])
             recTimeIndex++;
         }
 
-        if (!verbose)
-        	{
-        		Info << nl << "Time = " << runTime.timeName() << endl;
-        		Info<< "ExecutionTime = "
-            		<< runTime.elapsedCpuTime()
-            		<< " s\n\n" << endl;
-        	}
-        // write stuff at output time
+       
+       // write stuff at output time
         if (runTime.outputTime())
         {        	
-            particleCloud.recM().write();
+            particleCloud.recM().writeRecFields();
         }
         
         runTime.write();	
@@ -110,12 +102,10 @@ int main(int argc, char *argv[])
         particleCloud.clockM().stop("Flow");
         particleCloud.clockM().stop("Global");
         
-        if (verbose)
-        {
-        	 Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
-            << "  ClockTime = " << runTime.elapsedClockTime() << " s"
-            << nl << endl;
-        }
+        Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
+        << "  ClockTime = " << runTime.elapsedClockTime() << " s"
+        << nl << endl;
+        
     }
     
     Info<< "End\n" << endl;

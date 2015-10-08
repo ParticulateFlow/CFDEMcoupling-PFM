@@ -70,6 +70,7 @@ public:
     void updateRecFields();
     void writeRecFields() const;
     const volVectorField& U() const;
+    const volVectorField& Us() const;
 	
 private:
   

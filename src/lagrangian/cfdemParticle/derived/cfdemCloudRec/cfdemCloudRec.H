@@ -88,6 +88,8 @@ public:
     virtual bool evolve(volScalarField&,volVectorField&,volVectorField&);
     
     inline const recModel& recM() const;
+    
+    const forceModelRec& forceMRec(int);
 
     void initRecFields();
     void updateRecFields();

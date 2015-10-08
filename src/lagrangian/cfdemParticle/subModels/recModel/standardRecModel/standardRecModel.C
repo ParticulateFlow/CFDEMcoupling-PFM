@@ -26,6 +26,7 @@ License
 #include "Random.H"
 #include "standardRecModel.H"
 #include "addToRunTimeSelectionTable.H"
+#include <mpi.h>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -109,14 +110,19 @@ void standardRecModel::writeRecFields() const
 {
  // need to check if this writes to the correct destination 
   
- // voidfractionRecpl[virtualTimeIndex].write();
- // URecpl[virtualTimeIndex].write();
- // UsRecpl[virtualTimeIndex].write();
+ // voidfractionRecpl[virtualTimeIndex].writeRecFields();
+ // URecpl[virtualTimeIndex].writeRecFields();
+ // UsRecpl[virtualTimeIndex].writeRecFields();
 }
 
 const volVectorField& standardRecModel::U() const
 {
   return URecpl[virtualTimeIndex];
+}
+
+const volVectorField& standardRecModel::Us() const
+{
+  return UsRecpl[virtualTimeIndex];
 }
 
 void standardRecModel::readFieldSeries()

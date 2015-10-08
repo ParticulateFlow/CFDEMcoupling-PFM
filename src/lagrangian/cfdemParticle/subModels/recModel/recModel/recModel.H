@@ -30,7 +30,6 @@ License
 #include "fvCFD.H"
 #include "HashTable.H"
 #include "labelPair.H"
-#include <mpi.h>
 
 namespace Foam
 {
@@ -140,6 +139,7 @@ public:
     virtual void updateRecFields() = 0;
     virtual void writeRecFields() const = 0;
     virtual const volVectorField& U() const = 0;
+    virtual const volVectorField& Us() const = 0;
     scalar recTimeStep() const
     {
         return recTimeStep_;

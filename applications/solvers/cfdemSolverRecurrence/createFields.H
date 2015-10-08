@@ -9,6 +9,7 @@
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
+        mesh,
         dimensionedScalar("p", dimensionSet(1, 2, -2, 0, 0), 1.0)
     );
     
@@ -22,6 +23,7 @@
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
+        mesh,
         dimensionedScalar("rho", dimensionSet(1, -3, 0, 0, 0), 1.0)
     );
     
@@ -36,6 +38,7 @@
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
+        mesh,
         dimensionedVector("U",dimVelocity,vector(0,0,0))
     );
     
@@ -49,6 +52,7 @@
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
+        mesh,
         dimensionedScalar("voidfraction", dimensionSet(0, -3, 0, 0, 0), 1.0)
     );
     
@@ -62,6 +66,7 @@
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
+        mesh,
         dimensionedVector("Us",dimVelocity,vector(0,0,0))
     );
 

@@ -70,11 +70,11 @@ freeStreaming::~freeStreaming()
 
 void freeStreaming::setForce() const
 {
-    const volVectorField& Urec(particleCloud_.recM().U());
+    const volVectorField& Usrec(particleCloud_.recM().Us());
     vector position(0,0,0);
-    vector Ufluid(0,0,0);
+    vector Us(0,0,0);
     label cellI=0;
-    interpolationCellPoint<vector> UInterpolator_(Urec);
+    interpolationCellPoint<vector> UInterpolator_(Usrec);
    
     // dummy variables
     vector drag(0,0,0);
@@ -82,21 +82,21 @@ void freeStreaming::setForce() const
     for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
     {
             cellI = particleCloud_.cellIDs()[index][0];
-            Ufluid =vector(0,0,0);
+            Us =vector(0,0,0);
             if (cellI > -1) // particle Found
             {
 
                 if( interpolate_ )
                 {
                   position = particleCloud_.position(index);
-                    Ufluid = UInterpolator_.interpolate(position,cellI);
+                  Us = UInterpolator_.interpolate(position,cellI);
                 }
                 else
                 {
-                    Ufluid = Urec[cellI];
+                    Us = Usrec[cellI];
                 }
             // write particle based data to global array
-                partToArray(index,drag,Ufluid);
+                partToArray(index,drag,Us);
 	    }
     }
 }
