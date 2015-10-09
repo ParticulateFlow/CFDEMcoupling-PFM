@@ -64,10 +64,10 @@ Foam::recModel::recModel
         )
     ),
     verbose_(sm.verbose()),
-    recurrenceMatrix(numRecFields,numRecFields,scalar(0)),
     recTime("dataBase", "", "../system", "../constant", false),
     timeDirs(recTime.times()),
     numRecFields(label(timeDirs.size())),
+    recurrenceMatrix(numRecFields,numRecFields,scalar(0)),
     timeIndexList(numRecFields-1),
     timeValueList(numRecFields-1),
     contTimeIndex(0),
@@ -151,7 +151,6 @@ void Foam::recModel::readTimeSeries()
     {
     	Info << endl;
     	Info << "Found " << label(timeDirs.size()) << " time folders" << endl;
-    	Info << "Used " << (label(timeDirs.size())-1) << " time folders" << endl;
         Info << "Found " << label(timeIndexList.size()) << " time steps" << endl;
     }
 }
@@ -210,7 +209,7 @@ scalar Foam::recModel::checkTimeStep()
 	
 	if (verbose_)
     {
-		Info << "Setting deltaT to " << dtCur << endl;
+		Info << "Setting deltaRecT to " << dtCur << endl;
 		Info << "Actual recTime.deltaT = " << recTime.deltaTValue() << endl;
 		Info << "Actual runTime.deltaT = " << timeStep_ << endl;
     }

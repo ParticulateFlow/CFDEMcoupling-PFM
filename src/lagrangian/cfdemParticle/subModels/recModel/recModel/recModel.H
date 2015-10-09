@@ -48,10 +48,10 @@ protected:
     IOdictionary controlDict_;
     bool verbose_;
     
-    SymmetricSquareMatrix<scalar> recurrenceMatrix;
     Foam::Time recTime;
     instantList timeDirs;
     label numRecFields;
+    SymmetricSquareMatrix<scalar> recurrenceMatrix;
     
     // create a data structure for the time indices
     //	constant will not be contained
@@ -62,6 +62,7 @@ protected:
     //	constant will not be contained
     //	continuousIndex -> time.value()
     HashTable<label,scalar> timeValueList;
+    
     label contTimeIndex;
     
     label sequenceStart;

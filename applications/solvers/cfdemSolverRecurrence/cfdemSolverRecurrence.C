@@ -41,7 +41,8 @@ Rules
 \*---------------------------------------------------------------------------*/
 
 #include "fvCFD.H"
-//#include "fvIOoptionList.H"	// no solver = no fvOptions
+#include "singlePhaseTransportModel.H"
+#include "turbulenceModel.H"
 #include "cfdemCloudRec.H"
 #include "clockModel.H"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -51,12 +52,15 @@ int main(int argc, char *argv[])
     #include "setRootCase.H"
     #include "createTime.H"
     #include "createMesh.H"
-  //  #include "createFvOptions.H"	// no solver = no fvOptions
-  
-    cfdemCloudRec particleCloud(mesh);
     #include "createFields.H"
+    cfdemCloudRec particleCloud(mesh);
+    // init recurrence fields for t=t_start
+    #include "readFields.H"
     #include "checkModelType.H"
     
+    // init calculated fields for t=t_start
+    voidfraction=voidfractionRec;
+    Us=UsRec;
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -64,6 +68,8 @@ int main(int argc, char *argv[])
     
     label recTimeIndex(0);
     scalar recTimeStep_=particleCloud.recM().recTimeStep();
+    
+    runTime.write();
     
     while (runTime.run())
     {
@@ -87,9 +93,7 @@ int main(int argc, char *argv[])
         if ( runTime.timeOutputValue()  >= (recTimeIndex+1)*recTimeStep_ )
         {
             particleCloud.updateRecFields();
-	    URec=particleCloud.recM().tU();
-	    voidfractionRec=cfdemCloudRec.recM().tvoidfraction();
-	    UsRec=particleCloud.recM().tUs();
+	    #include "readFields.H"
             recTimeIndex++;
         }
 

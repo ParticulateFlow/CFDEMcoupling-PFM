@@ -69,12 +69,12 @@ standardRecModel::standardRecModel
     // make sure each processor has the same sequence of fields
     int root=0;
     int rank;
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+ //   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
         
     computeRecPath();
-    int listSizeBytes = 2*sizeof(sequenceStart)*virtualTimeIndexList.size();
+ //   int listSizeBytes = 2*sizeof(sequenceStart)*virtualTimeIndexList.size();
     
-    MPI_Bcast(&virtualTimeIndexList[0], listSizeBytes, MPI_BYTE, root, MPI_COMM_WORLD); 
+ //   MPI_Bcast(&virtualTimeIndexList[0], listSizeBytes, MPI_BYTE, root, MPI_COMM_WORLD); 
     
     sequenceStart=virtualTimeIndexList[0].first();
     sequenceEnd=virtualTimeIndexList[0].second();
@@ -216,19 +216,23 @@ void standardRecModel::readFieldSeries()
         );
         
     }
+    Info << "Reading fields done" << endl;
 }
 
 void standardRecModel::computeRecMatrix()
 {
     Info<< "\nComputing recurrence matrix\n" << endl;
-    recurrenceMatrix=0.0;
-    scalar maxElemVal(0.0);
+    //scalar maxElemVal(0.0);
     
     // compute recurrence matrix elements
     forAll(timeIndexList, ti)
     {
     	forAll(timeIndexList, tj)
     	{
+	        if(verbose_)
+		{
+		    Info<<"\n Doing calculation for element " << ti << " " << tj << "\n" << endl;
+		}
     		// main diagonal
     		if (ti == tj)
     		{
@@ -248,25 +252,27 @@ void standardRecModel::computeRecMatrix()
     		
     		recurrenceMatrix[tj][ti] = recurrenceMatrix[ti][tj];
     		
-    		if (maxElemVal < recurrenceMatrix[ti][tj])
-    		{
-    			maxElemVal = recurrenceMatrix[ti][tj];
-    		}
+    	//	if (maxElemVal < recurrenceMatrix[ti][tj])
+    	//	{
+    	//		maxElemVal = recurrenceMatrix[ti][tj];
+    	//	}
     	}
     }
     
     // normalize matrix elements
-    forAll(timeIndexList, ti)
-    {
-    	forAll(timeIndexList, tj)
-    	{
-    		recurrenceMatrix[ti][tj] /= maxElemVal;
-    	}
-    } 
+    //forAll(timeIndexList, ti)
+    //{
+    //	forAll(timeIndexList, tj)
+    //	{
+    //		recurrenceMatrix[ti][tj] /= maxElemVal;
+    //	}
+    //} 
+    Info<< "\nComputing recurrence matrix done\n" << endl;
 }
 
 void standardRecModel::computeRecPath()
 {
+    Info<< "\nComputing recurrence path\n" << endl;
     Random ranGen(osRandomInteger());
     
     label virtualTimeIndex=0;
@@ -319,6 +325,7 @@ void standardRecModel::computeRecPath()
 	virtualTimeIndex = seqStart+seqLength-1;
         recSteps+=seqLength;
     }
+    Info<< "\nComputing recurrence path done\n" << endl;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

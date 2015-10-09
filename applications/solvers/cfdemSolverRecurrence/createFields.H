@@ -1,4 +1,5 @@
     // dummy fields
+    Info<< "\nCreating dummy pressure and density fields\n" << endl;
     volScalarField p
     (
         IOobject
@@ -28,6 +29,7 @@
     );
     
     // calculated fields
+    Info<< "\nCreating fields subject to calculation\n" << endl;
     volScalarField voidfraction
     (
         IOobject
@@ -38,9 +40,8 @@
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
-         particleCloud.recM().tvoidfraction()
-       // mesh,
-       // dimensionedScalar("voidfraction", dimensionSet(0, -3, 0, 0, 0), 1.0)
+        mesh,
+        dimensionedScalar("voidfraction", dimensionSet(0, -3, 0, 0, 0), 1.0)
     );
     
     volVectorField Us
@@ -53,12 +54,12 @@
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
-        particleCloud.recM().tUs()
-        //mesh,
-        //dimensionedVector("Us",dimVelocity,vector(0,0,0))
+        mesh,
+        dimensionedVector("Us",dimVelocity,vector(0,0,0))
     );
     
     // recurrence fields
+    Info<< "\nCreating recurrence fields.\n" << endl;
     volVectorField URec
     (
         IOobject
@@ -69,7 +70,8 @@
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
-        particleCloud.recM().tU()
+        mesh,
+        dimensionedVector("URec",dimVelocity,vector(0,0,0))
     );
     
     volScalarField voidfractionRec
@@ -82,7 +84,8 @@
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
-        particleCloud.recM().tvoidfraction()
+        mesh,
+        dimensionedScalar("voidfraction", dimensionSet(0, -3, 0, 0, 0), 1.0)
     );
     
     volVectorField UsRec
@@ -95,13 +98,32 @@
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
-        particleCloud.recM().tUs()
+        mesh,
+        dimensionedVector("UsRec",dimVelocity,vector(0,0,0))
     );
 
 //===============================
 
 #ifndef createPhi_H
 #define createPhi_H
-Info<< "Reading/calculating face flux field phi\n" << endl;
-// create phi in recModel and put reference here
+Info<< "Calculating face flux field phi\n" << endl;
+surfaceScalarField phiRec
+ (
+     IOobject
+     (
+        "phiRec",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::AUTO_WRITE
+     ),
+     linearInterpolate(URec*voidfractionRec) & mesh.Sf()
+ );
 #endif
+ 
+  singlePhaseTransportModel laminarTransport(URec, phiRec);
+
+    autoPtr<incompressible::turbulenceModel> turbulence
+    (
+        incompressible::turbulenceModel::New(URec, phiRec, laminarTransport)
+    );
