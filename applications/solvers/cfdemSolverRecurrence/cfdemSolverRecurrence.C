@@ -54,13 +54,7 @@ int main(int argc, char *argv[])
     #include "createMesh.H"
     #include "createFields.H"
     cfdemCloudRec particleCloud(mesh);
-    // init recurrence fields for t=t_start
-    #include "readFields.H"
     #include "checkModelType.H"
-    
-    // init calculated fields for t=t_start
-    voidfraction=voidfractionRec;
-    Us=UsRec;
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -68,8 +62,6 @@ int main(int argc, char *argv[])
     
     label recTimeIndex(0);
     scalar recTimeStep_=particleCloud.recM().recTimeStep();
-    
-    runTime.write();
     
     while (runTime.run())
     {

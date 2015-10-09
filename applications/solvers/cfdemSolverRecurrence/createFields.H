@@ -28,6 +28,47 @@
         dimensionedScalar("rho", dimensionSet(1, -3, 0, 0, 0), 1.0)
     );
     
+    // recurrence fields
+    Info<< "\nCreating recurrence fields.\n" << endl;
+    volVectorField URec
+    (
+        IOobject
+        (
+            "URec",
+            runTime.timeName(),
+            mesh,
+            IOobject::MUST_READ,
+            IOobject::AUTO_WRITE
+        ),
+        mesh
+    );
+    
+    volScalarField voidfractionRec
+    (
+        IOobject
+        (
+            "voidfractionRec",
+            runTime.timeName(),
+            mesh,
+            IOobject::MUST_READ,
+            IOobject::AUTO_WRITE
+        ),
+        mesh
+    );
+    
+    volVectorField UsRec
+    (
+        IOobject
+        (
+            "UsRec",
+            runTime.timeName(),
+            mesh,
+            IOobject::MUST_READ,
+            IOobject::AUTO_WRITE
+        ),
+        mesh
+    );
+
     // calculated fields
     Info<< "\nCreating fields subject to calculation\n" << endl;
     volScalarField voidfraction
@@ -40,10 +81,9 @@
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
-        mesh,
-        dimensionedScalar("voidfraction", dimensionSet(0, -3, 0, 0, 0), 1.0)
+        voidfractionRec
     );
-    
+        
     volVectorField Us
     (
         IOobject
@@ -51,57 +91,15 @@
             "Us",
             runTime.timeName(),
             mesh,
-            IOobject::NO_READ,
+            IOobject::MUST_READ,
             IOobject::AUTO_WRITE
         ),
-        mesh,
-        dimensionedVector("Us",dimVelocity,vector(0,0,0))
+        UsRec
     );
     
-    // recurrence fields
-    Info<< "\nCreating recurrence fields.\n" << endl;
-    volVectorField URec
-    (
-        IOobject
-        (
-            "URec",
-            runTime.timeName(),
-            mesh,
-            IOobject::NO_READ,
-            IOobject::AUTO_WRITE
-        ),
-        mesh,
-        dimensionedVector("URec",dimVelocity,vector(0,0,0))
-    );
-    
-    volScalarField voidfractionRec
-    (
-        IOobject
-        (
-            "voidfractionRec",
-            runTime.timeName(),
-            mesh,
-            IOobject::NO_READ,
-            IOobject::AUTO_WRITE
-        ),
-        mesh,
-        dimensionedScalar("voidfraction", dimensionSet(0, -3, 0, 0, 0), 1.0)
-    );
-    
-    volVectorField UsRec
-    (
-        IOobject
-        (
-            "UsRec",
-            runTime.timeName(),
-            mesh,
-            IOobject::NO_READ,
-            IOobject::AUTO_WRITE
-        ),
-        mesh,
-        dimensionedVector("UsRec",dimVelocity,vector(0,0,0))
-    );
-
+    // write fields for t=t_start
+    voidfraction.write();
+    Us.write();
 //===============================
 
 #ifndef createPhi_H
