@@ -75,7 +75,7 @@ void cfdemCloudRec::getDEMdata()
 
 void cfdemCloudRec::giveDEMdata()
 {
-    dataExchangeM().giveData("v","vector-atom",fluidVel_);
+    dataExchangeM().giveData("vrec","vector-atom",fluidVel_);
     dataExchangeM().giveData("dragforce","vector-atom",DEMForces_);
     if(verbose_) Info << "giveDEMdata done." << endl;
 }
