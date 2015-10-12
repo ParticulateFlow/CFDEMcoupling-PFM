@@ -182,6 +182,7 @@ compileLIGGGHTS()
         echo "cleaning LIGGGHTS"
     fi
     cmake $CFDEM_LIGGGHTS_SRC_DIR
+    cd $CFDEM_LIGGGHTS_SRC_DIR
     if [[ $WM_NCOMPPROCS == "" ]]; then
         echo "compiling LIGGGHTS on one CPU"
         make 2>&1 | tee -a $logpath/$logfileName
