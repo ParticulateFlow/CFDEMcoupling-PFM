@@ -82,7 +82,8 @@ Foam::recModel::recModel
     virtualStartIndex(0),
     virtualTimeIndex(0),
     virtualTimeIndexList(0),
-    virtualTimeIndexListPos(0)
+    virtualTimeIndexListPos(0),
+    numRecIntervals(0)
 {
     if (verbose_)
     {

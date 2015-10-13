@@ -86,11 +86,24 @@ standardRecModel::standardRecModel
         MPI_COMM_WORLD
       );
     
-    computeRecPath();
-    int listSizeBytes = 2*sizeof(sequenceStart)*virtualTimeIndexList.size();
+    // root proc computes recurrence path, other processors need to reserve enough space
+    if(rank==root)
+    {
+      computeRecPath();
+      numRecIntervals=virtualTimeIndexList.size();
+    }
+    
+    MPI_Bcast(&numRecIntervals,sizeof(numRecIntervals),MPI_BYTE,root,MPI_COMM_WORLD);
+    
+    if(rank!=root)
+      virtualTimeIndexList.setSize(numRecIntervals);
+    
+    int listSizeBytes = 2*sizeof(sequenceStart)*numRecIntervals;
     
     MPI_Bcast(&virtualTimeIndexList[0], listSizeBytes, MPI_BYTE, root, MPI_COMM_WORLD); 
-
+    if(verbose_)
+      Info << "\nRecurrence path communicated to all processors.\n" << endl;
+    
     sequenceStart=virtualTimeIndexList[0].first();
     sequenceEnd=virtualTimeIndexList[0].second();
     virtualTimeIndex=sequenceStart;

@@ -81,6 +81,7 @@ protected:
     labelPairList virtualTimeIndexList;
     label virtualTimeIndexListPos;
     label totRecSteps;
+    label numRecIntervals;
     
     virtual void computeRecMatrix() = 0;
     virtual void computeRecPath() = 0;
