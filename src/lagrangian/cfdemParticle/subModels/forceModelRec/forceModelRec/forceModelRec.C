@@ -64,6 +64,8 @@ void forceModelRec::partToArray
     const vector& Ufluid
 ) const
 {
+  
+  // need to make sure that force models don't overwrite velocities
         for(int j=0;j<3;j++)
            fluidVel()[index][j]=Ufluid[j];
 

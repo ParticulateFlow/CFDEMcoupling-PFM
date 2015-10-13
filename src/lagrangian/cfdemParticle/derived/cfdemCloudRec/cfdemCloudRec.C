@@ -59,6 +59,14 @@ cfdemCloudRec::cfdemCloudRec
                 forceModels_[i]
             );
         }
+        if(nrForceModels()>1)
+	{
+	  coupleRecForce_=true;
+	}
+	else
+	{
+	  coupleRecForce_=false;
+	}
     }
 
 // * * * * * * * * * * * * * * * * Destructors  * * * * * * * * * * * * * * //
@@ -76,7 +84,8 @@ void cfdemCloudRec::getDEMdata()
 void cfdemCloudRec::giveDEMdata()
 {
     dataExchangeM().giveData("vrec","vector-atom",fluidVel_);
-    dataExchangeM().giveData("dragforce","vector-atom",DEMForces_);
+    if(coupleRecForce_)
+        dataExchangeM().giveData("dragforce","vector-atom",DEMForces_);
     if(verbose_) Info << "giveDEMdata done." << endl;
 }
 

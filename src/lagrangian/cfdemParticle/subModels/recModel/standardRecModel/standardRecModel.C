@@ -64,21 +64,39 @@ standardRecModel::standardRecModel
     UsRecpl(numRecFields)
 {
     readFieldSeries();
-    computeRecMatrix();
     
     // make sure each processor has the same sequence of fields
     int root=0;
     int rank;
- //   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-        
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
+    computeRecMatrix();
+
+    if(verbose_)
+      Info << "\nSumming recurrence matrix over all processors.\n" << endl;
+    
+    for(int i = 0; i < numRecFields; ++i)
+      MPI_Allreduce
+      (
+        &recurrenceMatrixLocal[i][0],
+        &recurrenceMatrix[i][0],
+        numRecFields,
+        MPI_DOUBLE,
+        MPI_SUM,
+        MPI_COMM_WORLD
+      );
+    
     computeRecPath();
- //   int listSizeBytes = 2*sizeof(sequenceStart)*virtualTimeIndexList.size();
+    int listSizeBytes = 2*sizeof(sequenceStart)*virtualTimeIndexList.size();
     
- //   MPI_Bcast(&virtualTimeIndexList[0], listSizeBytes, MPI_BYTE, root, MPI_COMM_WORLD); 
-    
+    MPI_Bcast(&virtualTimeIndexList[0], listSizeBytes, MPI_BYTE, root, MPI_COMM_WORLD); 
+
     sequenceStart=virtualTimeIndexList[0].first();
     sequenceEnd=virtualTimeIndexList[0].second();
     virtualTimeIndex=sequenceStart;
+
+    writeRecMatrix();    
+    writeRecPath();
 }
 
 
@@ -230,13 +248,11 @@ void standardRecModel::computeRecMatrix()
     	forAll(timeIndexList, tj)
     	{
 	        if(verbose_)
-		{
-		    Info<<"\n Doing calculation for element " << ti << " " << tj << "\n" << endl;
-		}
+		  Info<<"\n Doing calculation for element " << ti << " " << tj << "\n" << endl;
     		// main diagonal
     		if (ti == tj)
     		{
-    			recurrenceMatrix[ti][tj] = 1;
+    			recurrenceMatrixLocal[ti][tj] = 0;
     			continue;
     		}
     		
@@ -247,14 +263,14 @@ void standardRecModel::computeRecMatrix()
     		}
     		
     		// compute elements
-    		recurrenceMatrix[ti][tj]
+    		recurrenceMatrixLocal[ti][tj]
     			= sumSqr(voidfractionRecpl[ti].internalField() - voidfractionRecpl[tj].internalField());
     		
-    		recurrenceMatrix[tj][ti] = recurrenceMatrix[ti][tj];
+    		recurrenceMatrixLocal[tj][ti] = recurrenceMatrixLocal[ti][tj];
     		
-    	//	if (maxElemVal < recurrenceMatrix[ti][tj])
+    	//	if (maxElemVal < recurrenceMatrixLocal[ti][tj])
     	//	{
-    	//		maxElemVal = recurrenceMatrix[ti][tj];
+    	//		maxElemVal = recurrenceMatrixLocal[ti][tj];
     	//	}
     	}
     }
@@ -264,7 +280,7 @@ void standardRecModel::computeRecMatrix()
     //{
     //	forAll(timeIndexList, tj)
     //	{
-    //		recurrenceMatrix[ti][tj] /= maxElemVal;
+    //		recurrenceMatrixLocal[ti][tj] /= maxElemVal;
     //	}
     //} 
     Info<< "\nComputing recurrence matrix done\n" << endl;
@@ -279,24 +295,23 @@ void standardRecModel::computeRecPath()
     label recSteps=0;
     label seqStart=0;
     label seqLength=ranGen.integer(lowerSeqLim, upperSeqLim);
-    labelPair seqStartEnd(seqStart,seqStart+seqLength-1);
+    virtualTimeIndex=seqEnd(seqStart,seqLength);
+    labelPair seqStartEnd(seqStart,virtualTimeIndex);
     virtualTimeIndexList.append(seqStartEnd);
-    virtualTimeIndex = seqStart+seqLength-1;
     recSteps+=seqLength;
    
     while(recSteps<=totRecSteps)
     {
         label startLoop = 0;
         label endLoop = 0;
-        seqLength = ranGen.integer(lowerSeqLim, upperSeqLim);
-        scalar nextMinimum(GREAT);
-        	
+
         // search the other half of the recurrence matrix for 
         // the new starting point of the next sequence
         if (virtualTimeIndex < recurrenceMatrix.n()/2)
         {
         	startLoop = recurrenceMatrix.n()/2;
         	endLoop = recurrenceMatrix.n()-1;
+		endLoop--; // start of next sequence one snapshot AFTER minimum position
         }
         else
         {
@@ -304,6 +319,8 @@ void standardRecModel::computeRecPath()
         	endLoop = recurrenceMatrix.n()/2-1;
         }
         
+
+        scalar nextMinimum(GREAT);
         for (label j = startLoop; j < endLoop; j++)
         {
         	if (recurrenceMatrix[j][virtualTimeIndex] < nextMinimum)
@@ -314,18 +331,20 @@ void standardRecModel::computeRecPath()
         	}
         }
         
-        // trim new sequence length
-        if (seqStart + seqLength > timeIndexList.size()-1)
-        {
-        	seqLength = timeIndexList.size()-1 - seqStart;
-        }
-      
-        labelPair seqStartEnd(seqStart,seqStart+seqLength-1);
+        seqLength = ranGen.integer(lowerSeqLim, upperSeqLim);  
+        virtualTimeIndex=seqEnd(seqStart,seqLength);
+        labelPair seqStartEnd(seqStart,virtualTimeIndex);
         virtualTimeIndexList.append(seqStartEnd);
-	virtualTimeIndex = seqStart+seqLength-1;
         recSteps+=seqLength;
     }
     Info<< "\nComputing recurrence path done\n" << endl;
+}
+
+label standardRecModel::seqEnd(label seqStart, label & seqLength)
+{
+  if(seqStart+seqLength>numRecFields-1)
+      seqLength=numRecFields-1-seqStart;
+  return seqStart+seqLength;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

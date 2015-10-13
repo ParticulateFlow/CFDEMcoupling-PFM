@@ -89,6 +89,8 @@ private:
     PtrList<volScalarField> voidfractionRecpl;
     PtrList<volVectorField> URecpl;
     PtrList<volVectorField> UsRecpl;
+    
+    label seqEnd(label, label&);
 
 };
 

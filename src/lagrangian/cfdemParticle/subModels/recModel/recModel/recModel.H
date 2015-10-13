@@ -51,6 +51,7 @@ protected:
     Foam::Time recTime;
     instantList timeDirs;
     label numRecFields;
+    SymmetricSquareMatrix<scalar> recurrenceMatrixLocal;
     SymmetricSquareMatrix<scalar> recurrenceMatrix;
     
     // create a data structure for the time indices
@@ -152,6 +153,7 @@ public:
         return recTimeStep_;
     }
     void writeRecMatrix() const;
+    void writeRecPath() const;
 };
 
 

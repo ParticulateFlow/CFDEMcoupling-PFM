@@ -67,6 +67,7 @@ Foam::recModel::recModel
     recTime("dataBase", "", "../system", "../constant", false),
     timeDirs(recTime.times()),
     numRecFields(label(timeDirs.size())),
+    recurrenceMatrixLocal(numRecFields,numRecFields,scalar(0)),
     recurrenceMatrix(numRecFields,numRecFields,scalar(0)),
     timeIndexList(numRecFields-1),
     timeValueList(numRecFields-1),
@@ -218,13 +219,31 @@ scalar Foam::recModel::checkTimeStep()
 
 void Foam::recModel::writeRecMatrix() const
 {
-    // create output file
-    std::ostringstream str_pid;
+  // version for all processors
+  /*  std::ostringstream str_pid;
     str_pid << pid();
     const std::string my_pid(str_pid.str());
     OFstream matrixFile("recurrenceMatrix."+my_pid);
-     // write recurrence matrix
-    matrixFile << recurrenceMatrix;
+  */
+    
+  // write recurrence matrix
+  OFstream matrixFile("recurrenceMatrix");
+  matrixFile << recurrenceMatrix;
+}
+
+void Foam::recModel::writeRecPath() const
+{
+   // version for all processors
+  /*
+    std::ostringstream str_pid;
+    str_pid << pid();
+    const std::string my_pid(str_pid.str());
+    OFstream listFile("recurrencePath."+my_pid);
+  */
+  
+  // write recurrence matrix
+  OFstream listFile("recurrencePath");
+  listFile << virtualTimeIndexList;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

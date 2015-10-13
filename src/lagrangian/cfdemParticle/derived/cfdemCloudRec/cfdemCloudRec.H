@@ -65,6 +65,8 @@ protected:
     void giveDEMdata();
     
     void setForces();
+    
+    bool coupleRecForce_;
 
 public:
 
