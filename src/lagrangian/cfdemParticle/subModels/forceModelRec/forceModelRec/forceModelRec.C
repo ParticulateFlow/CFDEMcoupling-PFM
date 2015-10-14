@@ -60,17 +60,21 @@ forceModelRec::~forceModelRec()
 void forceModelRec::partToArray
 (
     label& index,
-    const vector& dragTot,
+    const vector& dragTot
+) const
+{
+        for(int j=0;j<3;j++) 
+            DEMForces()[index][j] += dragTot[j];  
+}
+
+void forceModelRec::partToArrayU
+(
+    label& index,
     const vector& Ufluid
 ) const
 {
-  
-  // need to make sure that force models don't overwrite velocities
         for(int j=0;j<3;j++)
-           fluidVel()[index][j]=Ufluid[j];
-
-        for(int j=0;j<3;j++) 
-            DEMForces()[index][j] += dragTot[j];  
+           fluidVel()[index][j]=Ufluid[j]; 
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

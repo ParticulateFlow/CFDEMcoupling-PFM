@@ -95,8 +95,8 @@ void freeStreaming::setForce() const
                 {
                     Us = Usrec_[cellI];
                 }
-            // write particle based data to global array
-                partToArray(index,drag,Us);
+                // write particle based data to global array
+                partToArrayU(index,Us);
 	    }
     }
 }

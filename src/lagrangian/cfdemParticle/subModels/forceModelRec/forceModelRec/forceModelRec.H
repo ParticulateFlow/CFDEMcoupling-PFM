@@ -99,7 +99,9 @@ public:
 
         inline double ** fluidVel() const { return particleCloud_.fluidVel_; }
         
-        void partToArray(label&, const vector&, const vector&) const;
+        void partToArray(label&, const vector&) const;
+	
+	void partToArrayU(label&, const vector&) const;
 };
 
 
