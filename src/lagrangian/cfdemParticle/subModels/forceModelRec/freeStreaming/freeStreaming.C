@@ -56,7 +56,8 @@ freeStreaming::freeStreaming
 :
     forceModelRec(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
-    interpolate_(propsDict_.lookupOrDefault<bool>("interpolation", false))
+    interpolate_(propsDict_.lookupOrDefault<bool>("interpolation", false)),
+    Usrec_(particleCloud_.recM().Us())
 {}
 
 
@@ -70,11 +71,10 @@ freeStreaming::~freeStreaming()
 
 void freeStreaming::setForce() const
 {
-    const volVectorField& Usrec(particleCloud_.recM().Us());
     vector position(0,0,0);
     vector Us(0,0,0);
     label cellI=0;
-    interpolationCellPoint<vector> UInterpolator_(Usrec);
+    interpolationCellPoint<vector> UInterpolator_(Usrec_);
    
     // dummy variables
     vector drag(0,0,0);
@@ -93,7 +93,7 @@ void freeStreaming::setForce() const
                 }
                 else
                 {
-                    Us = Usrec[cellI];
+                    Us = Usrec_[cellI];
                 }
             // write particle based data to global array
                 partToArray(index,drag,Us);

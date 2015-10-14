@@ -45,6 +45,8 @@ private:
     dictionary propsDict_;
     
     bool interpolate_;
+    
+    const volVectorField& Usrec_;
 
 public:
 
