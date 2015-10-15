@@ -57,7 +57,8 @@ freeStreaming::freeStreaming
     forceModelRec(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
     interpolate_(propsDict_.lookupOrDefault<bool>("interpolation", false)),
-    Usrec_(particleCloud_.recM().Us())
+    UsRecFieldName_(propsDict_.lookupOrDefault<word>("granVelRecFieldName","UsRec")),
+    UsRec_(sm.mesh().lookupObject<volVectorField> (UsRecFieldName_))
 {}
 
 
@@ -74,7 +75,7 @@ void freeStreaming::setForce() const
     vector position(0,0,0);
     vector Us(0,0,0);
     label cellI=0;
-    interpolationCellPoint<vector> UInterpolator_(Usrec_);
+    interpolationCellPoint<vector> UInterpolator_(UsRec_);
    
     // dummy variables
     vector drag(0,0,0);
@@ -93,7 +94,7 @@ void freeStreaming::setForce() const
                 }
                 else
                 {
-                    Us = Usrec_[cellI];
+                    Us = UsRec_[cellI];
                 }
                 // write particle based data to global array
                 partToArrayU(index,Us);

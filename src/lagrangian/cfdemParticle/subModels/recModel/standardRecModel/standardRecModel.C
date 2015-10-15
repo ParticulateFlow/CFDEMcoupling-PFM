@@ -61,7 +61,10 @@ standardRecModel::standardRecModel
     UsFieldName_(propsDict_.lookup("granVelRecFieldName")),
     voidfractionRecpl(numRecFields),
     URecpl(numRecFields),
-    UsRecpl(numRecFields)
+    UsRecpl(numRecFields),
+    voidfractionRec_(NULL),
+    URec_(NULL),
+    UsRec_(NULL)
 {
     readFieldSeries();
     
@@ -107,7 +110,11 @@ standardRecModel::standardRecModel
     sequenceStart=virtualTimeIndexList[0].first();
     sequenceEnd=virtualTimeIndexList[0].second();
     virtualTimeIndex=sequenceStart;
-
+    
+    voidfractionRec_.reset(voidfractionRecpl(virtualTimeIndex));
+    URec_.reset(URecpl(virtualTimeIndex));
+    UsRec_.reset(UsRecpl(virtualTimeIndex));
+    
     writeRecMatrix();    
     writeRecPath();
 }
@@ -135,6 +142,9 @@ void standardRecModel::updateRecFields()
     sequenceEnd=virtualTimeIndexList[virtualTimeIndexListPos].second();
     virtualTimeIndex=sequenceStart;
   }
+  voidfractionRec_.reset(voidfractionRecpl(virtualTimeIndex));
+  URec_.reset(URecpl(virtualTimeIndex));
+  UsRec_.reset(UsRecpl(virtualTimeIndex));
 }
 
 void standardRecModel::writeRecFields() const
@@ -146,19 +156,19 @@ void standardRecModel::writeRecFields() const
  // UsRecpl[virtualTimeIndex].writeRecFields();
 }
 
-const volScalarField& standardRecModel::voidfraction() const
+autoPtr<const volScalarField> standardRecModel::voidfraction() const
 {
-  return voidfractionRecpl[virtualTimeIndex];
+  return voidfractionRec_;
 }
 
-const volVectorField& standardRecModel::U() const
+autoPtr<const volVectorField> standardRecModel::U() const
 {
-  return URecpl[virtualTimeIndex];
+  return URec_;
 }
 
-const volVectorField& standardRecModel::Us() const
+autoPtr<const volVectorField> standardRecModel::Us() const
 {
-  return UsRecpl[virtualTimeIndex];
+  return UsRec_;
 }
 
 tmp<volScalarField> standardRecModel::tvoidfraction() const

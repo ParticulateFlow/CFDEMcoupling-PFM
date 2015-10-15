@@ -70,9 +70,9 @@ public:
     void updateRecFields();
     void writeRecFields() const;
     
-    const volScalarField& voidfraction() const;
-    const volVectorField& U() const;
-    const volVectorField& Us() const;
+    autoPtr<const volScalarField> voidfraction() const;
+    autoPtr<const volVectorField> U() const;
+    autoPtr<const volVectorField> Us() const;
     
     tmp<volScalarField> tvoidfraction() const;
     tmp<volVectorField> tU() const;
@@ -89,6 +89,10 @@ private:
     PtrList<volScalarField> voidfractionRecpl;
     PtrList<volVectorField> URecpl;
     PtrList<volVectorField> UsRecpl;
+    
+    autoPtr<const volScalarField> voidfractionRec_;
+    autoPtr<const volVectorField> URec_;
+    autoPtr<const volVectorField> UsRec_;
     
     label seqEnd(label, label&);
 

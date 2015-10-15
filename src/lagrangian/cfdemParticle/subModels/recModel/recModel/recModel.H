@@ -142,9 +142,9 @@ public:
     virtual void updateRecFields() = 0;
     virtual void writeRecFields() const = 0;
     
-    virtual const volScalarField& voidfraction() const = 0;
-    virtual const volVectorField& U() const = 0;
-    virtual const volVectorField& Us() const = 0;
+    virtual autoPtr<const volScalarField> voidfraction() const = 0;
+    virtual autoPtr<const volVectorField> U() const = 0;
+    virtual autoPtr<const volVectorField> Us() const = 0;
     
     virtual tmp<volScalarField> tvoidfraction() const = 0;
     virtual tmp<volVectorField> tU() const = 0;
