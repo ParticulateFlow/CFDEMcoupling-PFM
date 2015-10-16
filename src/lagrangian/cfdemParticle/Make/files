@@ -64,6 +64,7 @@ $(forceModelsMS)/DiFeliceDragMS/DiFeliceDragMS.C
 $(forceModelsRec)/forceModelRec/forceModelRec.C
 $(forceModelsRec)/forceModelRec/newForceModelRec.C
 $(forceModelsRec)/freeStreaming/freeStreaming.C
+$(forceModelsRec)/gradConcentration/gradConcentration.C
 
 $(forceSubModels)/forceSubModel/newForceSubModel.C
 $(forceSubModels)/forceSubModel/forceSubModel.C

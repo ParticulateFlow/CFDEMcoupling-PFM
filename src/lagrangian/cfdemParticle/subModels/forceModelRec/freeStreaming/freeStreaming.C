@@ -59,8 +59,7 @@ freeStreaming::freeStreaming
     interpolate_(propsDict_.lookupOrDefault<bool>("interpolation", false)),
     UsRecFieldName_(propsDict_.lookupOrDefault<word>("granVelRecFieldName","UsRec")),
     UsRec_(sm.mesh().lookupObject<volVectorField> (UsRecFieldName_))
-{
-}
+{}
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
@@ -77,9 +76,6 @@ void freeStreaming::setForce() const
     vector Us(0,0,0);
     label cellI=0;
     interpolationCellPoint<vector> UInterpolator_(UsRec_);
-   
-    // dummy variables
-    vector drag(0,0,0);
 
     for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
     {
