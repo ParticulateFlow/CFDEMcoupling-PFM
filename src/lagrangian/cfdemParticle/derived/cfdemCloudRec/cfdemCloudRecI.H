@@ -48,6 +48,10 @@ inline const recModel& cfdemCloudRec::recM() const
     return recModel_;
 }
 
+inline int cfdemCloudRec::nrForceModelsRec() const
+{
+    return forceModelsRec_.size();
+}
 
 }
 // ************************************************************************* //

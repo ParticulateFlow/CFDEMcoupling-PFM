@@ -39,7 +39,7 @@ cfdemCloudRec::cfdemCloudRec
 )
 :
     cfdemCloud(mesh),
-    forceModels_(couplingProperties_.lookup("forceModelsRec")),
+    forceModelsRec_(couplingProperties_.lookup("forceModelsRec")),
     recModel_
     (
         recModel::New
@@ -49,17 +49,18 @@ cfdemCloudRec::cfdemCloudRec
         )
     )
     {
-        forceModelRec_ = new autoPtr<forceModelRec>[nrForceModels()];
-        for (int i=0;i<nrForceModels();i++)
+        forceModelRec_ = new autoPtr<forceModelRec>[nrForceModelsRec()];
+        for (int i=0;i<nrForceModelsRec();i++)
         {
+	  Info << "\n selecting " <<nrForceModelsRec() << " forceModelRec: " << forceModelsRec_[0] << "\n" << endl;
             forceModelRec_[i] = forceModelRec::New
             (
                 couplingProperties_,
                 *this,
-                forceModels_[i]
+                forceModelsRec_[i]
             );
         }
-        if(nrForceModels()>1)
+        if(nrForceModelsRec()>1)
 	{
 	  coupleRecForce_=true;
 	}
@@ -93,7 +94,7 @@ void cfdemCloudRec::setForces()
 {
     resetArray(fluidVel_,numberOfParticles(),3);
     resetArray(DEMForces_,numberOfParticles(),3);
-    for (int i=0;i<cfdemCloud::nrForceModels();i++) forceMRec(i).setForce();
+    for (int i=0;i<nrForceModelsRec();i++) forceMRec(i).setForce();
 }
 
 // * * *   write top level fields   * * * //

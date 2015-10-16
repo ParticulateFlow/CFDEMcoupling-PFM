@@ -54,7 +54,7 @@ class forceModelRec;
 class cfdemCloudRec : public cfdemCloud
 {
 protected:
-    const wordList forceModels_;
+    const wordList forceModelsRec_;
     
     autoPtr<recModel> recModel_;
     
@@ -67,7 +67,7 @@ protected:
     void setForces();
     
     bool coupleRecForce_;
-
+    
 public:
 
     friend class dataExchangeModel;
@@ -87,11 +87,13 @@ public:
 
 // public Member Functions
 
-    virtual bool evolve(volScalarField&,volVectorField&,volVectorField&);
+    bool evolve(volScalarField&,volVectorField&,volVectorField&);
     
     inline const recModel& recM() const;
     
     const forceModelRec& forceMRec(int);
+    
+    inline int nrForceModelsRec() const;
 
     void initRecFields();
     void updateRecFields();

@@ -54,7 +54,6 @@ int main(int argc, char *argv[])
     #include "createMesh.H"
     #include "createFields.H"
     cfdemCloudRec particleCloud(mesh);
-    #include "checkModelType.H"
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

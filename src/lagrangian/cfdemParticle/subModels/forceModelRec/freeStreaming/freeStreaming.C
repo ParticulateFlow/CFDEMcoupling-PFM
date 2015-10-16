@@ -59,7 +59,8 @@ freeStreaming::freeStreaming
     interpolate_(propsDict_.lookupOrDefault<bool>("interpolation", false)),
     UsRecFieldName_(propsDict_.lookupOrDefault<word>("granVelRecFieldName","UsRec")),
     UsRec_(sm.mesh().lookupObject<volVectorField> (UsRecFieldName_))
-{}
+{
+}
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
