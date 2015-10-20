@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
 
         particleCloud.clockM().start(26,"Flow");
         
-        if ( runTime.timeOutputValue()  >= (recTimeIndex+1)*recTimeStep_ )
+        if ( runTime.timeOutputValue() - (recTimeIndex+1)*recTimeStep_ + 1.0e-5 > 0.0 )
         {
             particleCloud.updateRecFields();
 	    #include "readFields.H"

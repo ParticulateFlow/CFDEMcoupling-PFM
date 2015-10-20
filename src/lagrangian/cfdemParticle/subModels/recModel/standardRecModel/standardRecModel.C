@@ -111,9 +111,9 @@ standardRecModel::standardRecModel
     sequenceEnd=virtualTimeIndexList[0].second();
     virtualTimeIndex=sequenceStart;
     
-    voidfractionRec_.reset(voidfractionRecpl(virtualTimeIndex));
-    URec_.reset(URecpl(virtualTimeIndex));
-    UsRec_.reset(UsRecpl(virtualTimeIndex));
+    voidfractionRec_=voidfractionRecpl(virtualTimeIndex);
+    URec_=URecpl(virtualTimeIndex);
+    UsRec_=UsRecpl(virtualTimeIndex);
     
     writeRecMatrix();    
     writeRecPath();
@@ -142,9 +142,21 @@ void standardRecModel::updateRecFields()
     sequenceEnd=virtualTimeIndexList[virtualTimeIndexListPos].second();
     virtualTimeIndex=sequenceStart;
   }
-  voidfractionRec_.reset(voidfractionRecpl(virtualTimeIndex));
-  URec_.reset(URecpl(virtualTimeIndex));
-  UsRec_.reset(UsRecpl(virtualTimeIndex));
+  if (!voidfractionRecpl(virtualTimeIndex) || !URecpl(virtualTimeIndex) || !UsRecpl(virtualTimeIndex))
+  {
+     FatalError
+            << "standardRecModel::updateRecFields() : "
+            << endl
+            << "    trying to set pointer to non-existent field. "<< endl << endl
+            << abort(FatalError); 
+  }
+  if(verbose_)
+      Info << "\nUpdating virtual time index to " << virtualTimeIndex << ".\n" << endl;  
+  voidfractionRec_=voidfractionRecpl(virtualTimeIndex);
+  URec_=URecpl(virtualTimeIndex);
+  UsRec_=UsRecpl(virtualTimeIndex);
+  if(verbose_)
+      Info << "Recurrence fields reset.\n" << endl;
 }
 
 void standardRecModel::writeRecFields() const
@@ -156,17 +168,17 @@ void standardRecModel::writeRecFields() const
  // UsRecpl[virtualTimeIndex].writeRecFields();
 }
 
-autoPtr<const volScalarField> standardRecModel::voidfraction() const
+const volScalarField* standardRecModel::voidfraction() const
 {
   return voidfractionRec_;
 }
 
-autoPtr<const volVectorField> standardRecModel::U() const
+const volVectorField* standardRecModel::U() const
 {
   return URec_;
 }
 
-autoPtr<const volVectorField> standardRecModel::Us() const
+const volVectorField* standardRecModel::Us() const
 {
   return UsRec_;
 }
