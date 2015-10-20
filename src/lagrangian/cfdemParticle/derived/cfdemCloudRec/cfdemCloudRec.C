@@ -52,7 +52,6 @@ cfdemCloudRec::cfdemCloudRec
         forceModelRec_ = new autoPtr<forceModelRec>[nrForceModelsRec()];
         for (int i=0;i<nrForceModelsRec();i++)
         {
-	  Info << "\n selecting " <<nrForceModelsRec() << " forceModelRec: " << forceModelsRec_[0] << "\n" << endl;
             forceModelRec_[i] = forceModelRec::New
             (
                 couplingProperties_,
