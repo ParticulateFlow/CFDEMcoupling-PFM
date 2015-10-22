@@ -81,6 +81,7 @@ Foam::recModel::recModel
     timeStep_(readScalar(controlDict_.lookup("deltaT"))),
     virtualStartIndex(0),
     virtualTimeIndex(0),
+    virtualTimeIndexNext(1),
     virtualTimeIndexList(0),
     virtualTimeIndexListPos(0),
     numRecIntervals(0)

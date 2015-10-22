@@ -110,6 +110,7 @@ standardRecModel::standardRecModel
     sequenceStart=virtualTimeIndexList[0].first();
     sequenceEnd=virtualTimeIndexList[0].second();
     virtualTimeIndex=sequenceStart;
+    virtualTimeIndexNext=virtualTimeIndex+1;
     
     voidfractionRec_=voidfractionRecpl(virtualTimeIndex);
     URec_=URecpl(virtualTimeIndex);
@@ -134,13 +135,14 @@ void standardRecModel::initRecFields()
 
 void standardRecModel::updateRecFields()
 {
-  virtualTimeIndex++;
-  if(virtualTimeIndex>sequenceEnd)
+  virtualTimeIndex=virtualTimeIndexNext;
+  virtualTimeIndexNext++;
+  if(virtualTimeIndexNext>sequenceEnd)
   {
     virtualTimeIndexListPos++;
     sequenceStart=virtualTimeIndexList[virtualTimeIndexListPos].first();
     sequenceEnd=virtualTimeIndexList[virtualTimeIndexListPos].second();
-    virtualTimeIndex=sequenceStart;
+    virtualTimeIndexNext=sequenceStart;
   }
   if (!voidfractionRecpl(virtualTimeIndex) || !URecpl(virtualTimeIndex) || !UsRecpl(virtualTimeIndex))
   {
@@ -381,6 +383,7 @@ label standardRecModel::seqEnd(label seqStart, label & seqLength)
       seqLength=numRecFields-1-seqStart;
   return seqStart+seqLength;
 }
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam

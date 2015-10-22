@@ -47,7 +47,8 @@ cfdemCloudRec::cfdemCloudRec
             couplingProperties_,
             *this
         )
-    )
+    ),
+    coupleRecForce_(true)
     {
         forceModelRec_ = new autoPtr<forceModelRec>[nrForceModelsRec()];
         for (int i=0;i<nrForceModelsRec();i++)
@@ -59,14 +60,6 @@ cfdemCloudRec::cfdemCloudRec
                 forceModelsRec_[i]
             );
         }
-        if(nrForceModelsRec()>1)
-	{
-	  coupleRecForce_=true;
-	}
-	else
-	{
-	  coupleRecForce_=false;
-	}
     }
 
 // * * * * * * * * * * * * * * * * Destructors  * * * * * * * * * * * * * * //
@@ -84,7 +77,7 @@ void cfdemCloudRec::getDEMdata()
 void cfdemCloudRec::giveDEMdata()
 {
     dataExchangeM().giveData("vrec","vector-atom",fluidVel_);
-    if(coupleRecForce_)
+  //  if(coupleRecForce_)
         dataExchangeM().giveData("dragforce","vector-atom",DEMForces_);
     if(verbose_) Info << "giveDEMdata done." << endl;
 }

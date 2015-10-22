@@ -77,6 +77,7 @@ protected:
     scalar recTimeStep_;
     label virtualStartIndex;
     label virtualTimeIndex;
+    label virtualTimeIndexNext;
     // list of pairs (start value, end value)
     labelPairList virtualTimeIndexList;
     label virtualTimeIndexListPos;

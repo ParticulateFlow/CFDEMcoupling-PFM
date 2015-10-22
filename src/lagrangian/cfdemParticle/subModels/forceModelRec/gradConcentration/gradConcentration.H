@@ -22,8 +22,8 @@ License
     along with CFDEMcoupling academic.  If not, see <http://www.gnu.org/licenses/>.
 \*---------------------------------------------------------------------------*/
 
-#ifndef freeStreaming_H
-#define freeStreaming_H
+#ifndef gradConcentration_H
+#define gradConcentration_H
 
 #include "forceModelRec.H"
 #include "interpolationCellPoint.H"
@@ -34,10 +34,10 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class freeStreaming Declaration
+                           Class gradConcentration Declaration
 \*---------------------------------------------------------------------------*/
 
-class freeStreaming
+class gradConcentration
 :
     public forceModelRec
 {
@@ -46,30 +46,28 @@ private:
     
     bool interpolate_;
     
-    word UsRecFieldName_;
-    
-    const volVectorField& UsRec_;
+    scalar scalingFactor_;
     
     word voidfractionRecFieldName_;
     
     const volScalarField& voidfractionRec_;
     
-    scalar critVoidfraction_;
+    word voidfractionFieldName_;
     
-    scalar particleDensity_;
+    const volScalarField& voidfraction_;
     
-    const vector gravAcc_;
+    mutable volScalarField deltaVoidfraction_;
 
 public:
 
     //- Runtime type information
-    TypeName("freeStreaming");
+    TypeName("gradConcentration");
 
 
     // Constructors
 
         //- Construct from components
-        freeStreaming
+        gradConcentration
         (
             const dictionary& dict,
             cfdemCloudRec& sm
@@ -77,7 +75,7 @@ public:
 
     // Destructor
 
-        ~freeStreaming();
+        ~gradConcentration();
 
 
     // Member Functions

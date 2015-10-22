@@ -99,6 +99,8 @@ public:
 
         inline double ** fluidVel() const { return particleCloud_.fluidVel_; }
         
+        inline double ** particleVel() const { return particleCloud_.velocities_; }
+        
         void partToArray(label&, const vector&) const;
 	
 	void partToArrayU(label&, const vector&) const;

@@ -24,9 +24,10 @@ License
 
 #include "error.H"
 
-#include "freeStreaming.H"
+#include "gradConcentration.H"
 #include "recModel.H"
 #include "addToRunTimeSelectionTable.H"
+#include "fvcSmooth.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -35,12 +36,12 @@ namespace Foam
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-defineTypeNameAndDebug(freeStreaming, 0);
+defineTypeNameAndDebug(gradConcentration, 0);
 
 addToRunTimeSelectionTable
 (
     forceModelRec,
-    freeStreaming,
+    gradConcentration,
     dictionary
 );
 
@@ -48,7 +49,7 @@ addToRunTimeSelectionTable
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 // Construct from components
-freeStreaming::freeStreaming
+gradConcentration::gradConcentration
 (
     const dictionary& dict,
     cfdemCloudRec& sm
@@ -57,68 +58,71 @@ freeStreaming::freeStreaming
     forceModelRec(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
     interpolate_(propsDict_.lookupOrDefault<bool>("interpolation", false)),
-    UsRecFieldName_(propsDict_.lookupOrDefault<word>("granVelRecFieldName","UsRec")),
-    UsRec_(sm.mesh().lookupObject<volVectorField> (UsRecFieldName_)),
+    scalingFactor_(propsDict_.lookupOrDefault<scalar>("scalingFactor", 1.0)),
     voidfractionRecFieldName_(propsDict_.lookupOrDefault<word>("voidfractionRecFieldName","voidfractionRec")),
     voidfractionRec_(sm.mesh().lookupObject<volScalarField> (voidfractionRecFieldName_)),
-    critVoidfraction_(propsDict_.lookupOrDefault<scalar>("critVoidfraction", 1.0)),
-    particleDensity_(propsDict_.lookupOrDefault<scalar>("particleDensity",0.0)),
-    gravAcc_(propsDict_.lookupOrDefault<vector>("g",vector(0.0,0.0,-9.81)))
+    voidfractionFieldName_(propsDict_.lookupOrDefault<word>("voidfractionFieldName","voidfraction")),
+    voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
+    deltaVoidfraction_
+    (   IOobject
+        (
+            "deltaVoidfraction",
+            sm.mesh().time().timeName(),
+            sm.mesh(),
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        voidfractionRec_
+    )
 {}
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-freeStreaming::~freeStreaming()
+gradConcentration::~gradConcentration()
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void freeStreaming::setForce() const
+void gradConcentration::setForce() const
 {
+    deltaVoidfraction_ = voidfraction_-voidfractionRec_;
+    volVectorField gradDeltaVoidfraction_ = fvc::grad(deltaVoidfraction_);
     vector position(0,0,0);
-    vector Us(0,0,0);
+    vector force(0,0,0);
     label cellI=0;
-    scalar radius=0.0;
-    scalar mass=0.0;
-    vector grav(0,0,0);
-    interpolationCellPoint<vector> UInterpolator_(UsRec_);
+    scalar scalDConc=0.0;
+    interpolationCellPoint<scalar> dConcInterpolator_(deltaVoidfraction_);
+    interpolationCellPoint<vector> gradConcInterpolator_(gradDeltaVoidfraction_);
 
     for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
     {
             cellI = particleCloud_.cellIDs()[index][0];
-            Us =vector(0,0,0);
+            force =vector(0,0,0);
             if (cellI > -1) // particle Found
             {
-	        // let particles in empty regions follow trajectories subject to gravity, ohterwise stream
-		if(voidfractionRec_[cellI] < critVoidfraction_)
-		{
-                    if( interpolate_ )
-                    {
-                      position = particleCloud_.position(index);
-                      Us = UInterpolator_.interpolate(position,cellI);
-                    }
-                    else
-                    {
-                        Us = UsRec_[cellI];
-                    }
-		}
-		else
-		{
-		    radius = particleCloud_.radius(index);
-                    mass = 4.188790205*radius*radius*radius * particleDensity_;
-		    grav = mass*gravAcc_;	    
-		    partToArray(index,grav);
-		    for(int j=0;j<3;j++)
-		      Us[j]=particleVel()[index][j];  
-		}
+
+                if( interpolate_ )
+                {
+                  position = particleCloud_.position(index);
+		  scalDConc=dConcInterpolator_.interpolate(position,cellI);
+		  if(scalDConc<0)
+                      force = gradConcInterpolator_.interpolate(position,cellI);
+                }
+                else
+                {
+		    if(deltaVoidfraction_[cellI]<0)
+                        force = gradDeltaVoidfraction_[cellI];
+                }
+                // need a prefactor to relate concentration gradient to force
+                 force*= scalingFactor_;
+                
                 // write particle based data to global array
-                partToArrayU(index,Us);
+                partToArray(index,force);
 	    }
     }
 }
-
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
