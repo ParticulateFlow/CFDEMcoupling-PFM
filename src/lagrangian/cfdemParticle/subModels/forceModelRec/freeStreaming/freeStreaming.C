@@ -57,6 +57,8 @@ freeStreaming::freeStreaming
     forceModelRec(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
     interpolate_(propsDict_.lookupOrDefault<bool>("interpolation", false)),
+    UsFieldName_(propsDict_.lookupOrDefault<word>("granVelFieldName","Us")),
+    Us_(sm.mesh().lookupObject<volVectorField> (UsFieldName_)),
     UsRecFieldName_(propsDict_.lookupOrDefault<word>("granVelRecFieldName","UsRec")),
     UsRec_(sm.mesh().lookupObject<volVectorField> (UsRecFieldName_)),
     voidfractionRecFieldName_(propsDict_.lookupOrDefault<word>("voidfractionRecFieldName","voidfractionRec")),
@@ -79,16 +81,20 @@ void freeStreaming::setForce() const
 {
     vector position(0,0,0);
     vector Us(0,0,0);
+    vector UsRec(0,0,0);
+    vector deltaUs(0,0,0);
     label cellI=0;
     scalar radius=0.0;
     scalar mass=0.0;
     vector grav(0,0,0);
-    interpolationCellPoint<vector> UInterpolator_(UsRec_);
+    interpolationCellPoint<vector> UsRecInterpolator_(UsRec_);
+    interpolationCellPoint<vector> UsInterpolator_(Us_);
 
     for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
     {
             cellI = particleCloud_.cellIDs()[index][0];
             Us =vector(0,0,0);
+	    UsRec =vector(0,0,0);
             if (cellI > -1) // particle Found
             {
 	        // let particles in empty regions follow trajectories subject to gravity, ohterwise stream
@@ -97,24 +103,25 @@ void freeStreaming::setForce() const
                     if( interpolate_ )
                     {
                       position = particleCloud_.position(index);
-                      Us = UInterpolator_.interpolate(position,cellI);
+                      Us = UsInterpolator_.interpolate(position,cellI);
+		      UsRec = UsRecInterpolator_.interpolate(position,cellI);
                     }
                     else
                     {
-                        Us = UsRec_[cellI];
+		        Us = Us_[cellI];
+                        UsRec = UsRec_[cellI];
                     }
+                    // write particle based data to global array
+                    deltaUs=UsRec-Us;
+                    partToArrayU(index,deltaUs);
 		}
 		else
 		{
 		    radius = particleCloud_.radius(index);
                     mass = 4.188790205*radius*radius*radius * particleDensity_;
 		    grav = mass*gravAcc_;	    
-		    partToArray(index,grav);
-		    for(int j=0;j<3;j++)
-		      Us[j]=particleVel()[index][j];  
+		    partToArray(index,grav); 
 		}
-                // write particle based data to global array
-                partToArrayU(index,Us);
 	    }
     }
 }

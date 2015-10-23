@@ -46,6 +46,10 @@ private:
     
     bool interpolate_;
     
+    word UsFieldName_;
+    
+    const volVectorField& Us_;
+    
     word UsRecFieldName_;
     
     const volVectorField& UsRec_;

@@ -76,8 +76,9 @@ void cfdemCloudRec::getDEMdata()
 
 void cfdemCloudRec::giveDEMdata()
 {
+    // ab use fluidVel_ as difference between recurrence velocity and mean particle velocity
     dataExchangeM().giveData("vrec","vector-atom",fluidVel_);
-  //  if(coupleRecForce_)
+    if(coupleRecForce_)
         dataExchangeM().giveData("dragforce","vector-atom",DEMForces_);
     if(verbose_) Info << "giveDEMdata done." << endl;
 }
