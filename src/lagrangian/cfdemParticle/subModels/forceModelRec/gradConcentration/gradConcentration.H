@@ -57,6 +57,8 @@ private:
     const volScalarField& voidfraction_;
     
     mutable volScalarField deltaVoidfraction_;
+    
+    void smoothField(volScalarField&);
 
 public:
 

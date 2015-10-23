@@ -124,6 +124,11 @@ void gradConcentration::setForce() const
     }
 }
 
+void gradConcentration::smoothField(volScalarField& field)
+{
+  
+}
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
