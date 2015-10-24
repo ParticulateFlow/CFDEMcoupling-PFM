@@ -70,11 +70,11 @@ void forceModelRec::partToArray
 void forceModelRec::partToArrayU
 (
     label& index,
-    const vector& deltaU
+    const vector& U
 ) const
 {
         for(int j=0;j<3;j++)
-           fluidVel()[index][j]=deltaU[j];
+           fluidVel()[index][j]=U[j];
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

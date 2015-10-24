@@ -46,6 +46,8 @@ private:
     
     bool interpolate_;
     
+    bool allowFluctuations_;
+    
     word UsFieldName_;
     
     const volVectorField& Us_;
@@ -53,6 +55,10 @@ private:
     word UsRecFieldName_;
     
     const volVectorField& UsRec_;
+    
+    word voidfractionFieldName_;
+    
+    const volScalarField& voidfraction_;
     
     word voidfractionRecFieldName_;
     
@@ -63,6 +69,8 @@ private:
     scalar particleDensity_;
     
     const vector gravAcc_;
+    
+    scalar scaleFluctuations(const scalar, const scalar);
 
 public:
 
