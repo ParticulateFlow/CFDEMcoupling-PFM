@@ -69,8 +69,10 @@ private:
     scalar particleDensity_;
     
     const vector gravAcc_;
+
+    scalar fluctuationAmplification_;
     
-    scalar scaleFluctuations(const scalar, const scalar);
+    scalar scaleFluctuations(const scalar, const scalar) const;
 
 public:
 

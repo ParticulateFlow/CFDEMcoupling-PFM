@@ -68,7 +68,8 @@ freeStreaming::freeStreaming
     voidfractionRec_(sm.mesh().lookupObject<volScalarField> (voidfractionRecFieldName_)),
     critVoidfraction_(propsDict_.lookupOrDefault<scalar>("critVoidfraction", 1.0)),
     particleDensity_(propsDict_.lookupOrDefault<scalar>("particleDensity",0.0)),
-    gravAcc_(propsDict_.lookupOrDefault<vector>("g",vector(0.0,0.0,-9.81)))
+    gravAcc_(propsDict_.lookupOrDefault<vector>("g",vector(0.0,0.0,-9.81))),
+    fluctuationAmplification_(propsDict_.lookupOrDefault<scalar>("amplification",1.0))
 {}
 
 
@@ -130,7 +131,7 @@ void freeStreaming::setForce() const
 		    if(allowFluctuations_)
 		    {
 		        for(int j=0;j<3;j++)
-                            flucU[j]=particleVel()[index][j]-Us;
+                            flucU[j]=particleVel()[index][j]-Us[j];
 		        newUs+=scaleFluctuations(voidfractionRec,voidfraction)*flucU;
 		    }
                     partToArrayU(index,newUs);
@@ -139,10 +140,10 @@ void freeStreaming::setForce() const
 		{
 		    radius = particleCloud_.radius(index);
                     mass = 4.188790205*radius*radius*radius * particleDensity_;
-		    grav = mass*gravAcc_;	    
+		    grav = mass*gravAcc_;
 		    partToArray(index,grav);
 		    for(int j=0;j<3;j++)
-                            newUs[j]=particleVel()[index][j]
+                            newUs[j]=particleVel()[index][j];
 		    partToArrayU(index,newUs);
 		}
 	    }
@@ -150,7 +151,7 @@ void freeStreaming::setForce() const
 }
 
 
-scalar freeStreaming::scaleFluctuations(const scalar voidfracRec, const scalar voidfrac)
+scalar freeStreaming::scaleFluctuations(const scalar voidfracRec, const scalar voidfrac) const
 {
     scalar deltaVoidfrac=voidfracRec-voidfrac;
     if(deltaVoidfrac<0.0)
@@ -159,6 +160,7 @@ scalar freeStreaming::scaleFluctuations(const scalar voidfracRec, const scalar v
     }
     else
     {
+        deltaVoidfrac*=fluctuationAmplification_;
         return deltaVoidfrac;
     }
 }
