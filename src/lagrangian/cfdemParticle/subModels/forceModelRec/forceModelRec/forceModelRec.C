@@ -74,7 +74,7 @@ void forceModelRec::partToArrayU
 ) const
 {
         for(int j=0;j<3;j++)
-           fluidVel()[index][j]=U[j];
+           fluidVel()[index][j] += U[j];
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

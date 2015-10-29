@@ -22,11 +22,12 @@ License
     along with CFDEMcoupling academic.  If not, see <http://www.gnu.org/licenses/>.
 \*---------------------------------------------------------------------------*/
 
-#ifndef freeStreaming_H
-#define freeStreaming_H
+#ifndef isotropicFluctuations_H
+#define isotropicFluctuations_H
 
 #include "forceModelRec.H"
 #include "interpolationCellPoint.H"
+#include "Random.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -34,10 +35,10 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class freeStreaming Declaration
+                           Class isotropicFluctuations Declaration
 \*---------------------------------------------------------------------------*/
 
-class freeStreaming
+class isotropicFluctuations
 :
     public forceModelRec
 {
@@ -46,9 +47,9 @@ private:
     
     bool interpolate_;
     
-    word UsRecFieldName_;
+    word voidfractionFieldName_;
     
-    const volVectorField& UsRec_;
+    const volScalarField& voidfraction_;
     
     word voidfractionRecFieldName_;
     
@@ -56,20 +57,22 @@ private:
     
     scalar critVoidfraction_;
     
-    scalar particleDensity_;
+    scalar maxFluctuation_;
+
+    scalar scaleFluctuations(const scalar) const;
     
-    const vector gravAcc_;
+    mutable Random ranGen_;
 
 public:
 
     //- Runtime type information
-    TypeName("freeStreaming");
+    TypeName("isotropicFluctuations");
 
 
     // Constructors
 
         //- Construct from components
-        freeStreaming
+        isotropicFluctuations
         (
             const dictionary& dict,
             cfdemCloudRec& sm
@@ -77,7 +80,7 @@ public:
 
     // Destructor
 
-        ~freeStreaming();
+        ~isotropicFluctuations();
 
 
     // Member Functions

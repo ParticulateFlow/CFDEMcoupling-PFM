@@ -24,7 +24,7 @@ License
 
 #include "error.H"
 
-#include "freeStreaming.H"
+#include "isotropicFluctuations.H"
 #include "recModel.H"
 #include "addToRunTimeSelectionTable.H"
 
@@ -35,12 +35,12 @@ namespace Foam
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-defineTypeNameAndDebug(freeStreaming, 0);
+defineTypeNameAndDebug(isotropicFluctuations, 0);
 
 addToRunTimeSelectionTable
 (
     forceModelRec,
-    freeStreaming,
+    isotropicFluctuations,
     dictionary
 );
 
@@ -48,7 +48,7 @@ addToRunTimeSelectionTable
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 // Construct from components
-freeStreaming::freeStreaming
+isotropicFluctuations::isotropicFluctuations
 (
     const dictionary& dict,
     cfdemCloudRec& sm
@@ -57,69 +57,88 @@ freeStreaming::freeStreaming
     forceModelRec(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
     interpolate_(propsDict_.lookupOrDefault<bool>("interpolation", false)),
-    UsRecFieldName_(propsDict_.lookupOrDefault<word>("granVelRecFieldName","UsRec")),
-    UsRec_(sm.mesh().lookupObject<volVectorField> (UsRecFieldName_)),
+    voidfractionFieldName_(propsDict_.lookupOrDefault<word>("voidfractionFieldName","voidfraction")),
+    voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
     voidfractionRecFieldName_(propsDict_.lookupOrDefault<word>("voidfractionRecFieldName","voidfractionRec")),
     voidfractionRec_(sm.mesh().lookupObject<volScalarField> (voidfractionRecFieldName_)),
     critVoidfraction_(propsDict_.lookupOrDefault<scalar>("critVoidfraction", 1.0)),
-    particleDensity_(propsDict_.lookupOrDefault<scalar>("particleDensity",0.0)),
-    gravAcc_(propsDict_.lookupOrDefault<vector>("g",vector(0.0,0.0,-9.81)))
+    maxFluctuation_(readScalar(propsDict_.lookup("maxFluctuation"))),
+    ranGen_(osRandomInteger())
 {}
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-freeStreaming::~freeStreaming()
+isotropicFluctuations::~isotropicFluctuations()
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void freeStreaming::setForce() const
+void isotropicFluctuations::setForce() const
 {
     vector position(0,0,0);
-    vector UNew(0,0,0);
+    scalar voidfraction(0.0);
+    scalar voidfractionRec(0.0);
+    scalar deltaVoidfrac(0.0);
+
+    vector flucU(0,0,0);
     label cellI=0;
-    scalar radius=0.0;
-    scalar mass=0.0;
-    vector grav(0,0,0);
-    interpolationCellPoint<vector> UsRecInterpolator_(UsRec_);
+   
+    interpolationCellPoint<scalar> voidfractionInterpolator_(voidfraction_);
     interpolationCellPoint<scalar> voidfractionRecInterpolator_(voidfractionRec_);
     
     for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
     {
             cellI = particleCloud_.cellIDs()[index][0];
-	    UNew =vector(0,0,0);
+	    flucU =vector(0,0,0);
+	    voidfraction=0.0;
+	    voidfractionRec=0.0;
+	    deltaVoidfrac=0.0;
             if (cellI > -1) // particle Found
             {
-	        // let particles in empty regions follow trajectories subject to gravity, ohterwise stream
+	        // particles in empty regions follow trajectories subject to gravity
 		if(voidfractionRec_[cellI] < critVoidfraction_)
 		{
                     if( interpolate_ )
                     {
-                        position = particleCloud_.position(index);
-		        UNew = UsRecInterpolator_.interpolate(position,cellI);
+                      position = particleCloud_.position(index);
+		      voidfraction = voidfractionInterpolator_.interpolate(position,cellI);
+		      voidfractionRec = voidfractionRecInterpolator_.interpolate(position,cellI);
                     }
                     else
                     {
-                        UNew = UsRec_[cellI];
+			voidfraction = voidfraction_[cellI];
+			voidfractionRec = voidfractionRec_[cellI];
                     }
+                    // write particle based data to global array
+                    
+                    deltaVoidfrac=voidfractionRec-voidfraction;
+		    if(deltaVoidfrac>0)
+		    {
+		        for(int j=0;j<3;j++)
+                            flucU[j]=2*(ranGen_.scalar01()-0.5);
+		        flucU*=scaleFluctuations(deltaVoidfrac);
+			partToArrayU(index,flucU);
+		    }              
 		}
-		else
-		{
-		    radius = particleCloud_.radius(index);
-                    mass = 4.188790205*radius*radius*radius * particleDensity_;
-		    grav = mass*gravAcc_;
-		    partToArray(index,grav);
-		    for(int j=0;j<3;j++)
-                            UNew[j]=particleVel()[index][j];
-		}
-		// write particle based data to global array
-                partToArrayU(index,UNew);
 	    }
     }
 }
 
+scalar isotropicFluctuations::scaleFluctuations(const scalar deltaVoidfrac) const
+{
+    scalar fluctuation;
+    if(deltaVoidfrac<0.0)
+    {
+        return 0.0;
+    }
+    else
+    {
+        fluctuation=deltaVoidfrac*maxFluctuation_;
+        return fluctuation;
+    }
+}
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
