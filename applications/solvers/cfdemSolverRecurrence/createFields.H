@@ -112,11 +112,12 @@ surfaceScalarField phiRec
         "phiRec",
         runTime.timeName(),
         mesh,
-        IOobject::NO_READ,
+        IOobject::READ_IF_PRESENT,
         IOobject::AUTO_WRITE
      ),
      linearInterpolate(URec*voidfractionRec) & mesh.Sf()
  );
+phiRec.write();
 #endif
  
   singlePhaseTransportModel laminarTransport(URec, phiRec);

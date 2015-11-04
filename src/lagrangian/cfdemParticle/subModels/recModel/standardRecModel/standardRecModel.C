@@ -56,18 +56,23 @@ standardRecModel::standardRecModel
 :
     recModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
-    UFieldName_(propsDict_.lookup("velRecFieldName")),
     voidfractionFieldName_(propsDict_.lookup("voidfractionRecFieldName")),
+    UFieldName_(propsDict_.lookup("velRecFieldName")),
     UsFieldName_(propsDict_.lookup("granVelRecFieldName")),
-    flux_(propsDict_.lookupOrDefault<bool>("flux",false)),
+    phiFieldName_(propsDict_.lookup("phiRecFieldName")),
+    phiSFieldName_(propsDict_.lookup("granPhiRecFieldName")),
+    readPhi_(propsDict_.lookupOrDefault<bool>("readPhi",false)),
+    readPhiS_(propsDict_.lookupOrDefault<bool>("readPhiS",false)),
     voidfractionRecpl(numRecFields),
     URecpl(numRecFields),
     UsRecpl(numRecFields),
     phiRecpl(numRecFields),
+    phiSRecpl(numRecFields),
     voidfractionRec_(NULL),
     URec_(NULL),
     UsRec_(NULL),
     phiRec_(NULL),
+    phiSRec_(NULL),
     normType_(propsDict_.lookup("normType")),
     refVol_(readScalar(propsDict_.lookup("refVol"))),
     refVel_(1.0)
@@ -121,9 +126,7 @@ standardRecModel::standardRecModel
     virtualTimeIndex=sequenceStart;
     virtualTimeIndexNext=virtualTimeIndex+1;
     
-    voidfractionRec_=voidfractionRecpl(virtualTimeIndex);
-    URec_=URecpl(virtualTimeIndex);
-    UsRec_=UsRecpl(virtualTimeIndex);
+    setRecFields();
     
     writeRecMatrix();    
     writeRecPath();
@@ -159,13 +162,18 @@ void standardRecModel::updateRecFields()
   }
   if (verbose_)
       Info << "\nUpdating virtual time index to " << virtualTimeIndex << ".\n" << endl;  
+  setRecFields();
+}
+
+void standardRecModel::setRecFields()
+{
   voidfractionRec_=voidfractionRecpl(virtualTimeIndex);
   URec_=URecpl(virtualTimeIndex);
   UsRec_=UsRecpl(virtualTimeIndex);
-  if (flux_)
-      phiRec_=phiRecpl(virtualTimeIndex);
+  phiRec_=phiRecpl(virtualTimeIndex);
+  phiSRec_=phiSRecpl(virtualTimeIndex);
   if (verbose_)
-      Info << "Recurrence fields reset.\n" << endl;
+      Info << "Recurrence fields set.\n" << endl;
 }
 
 const volScalarField* standardRecModel::voidfraction() const
@@ -186,6 +194,11 @@ const volVectorField* standardRecModel::Us() const
 const surfaceScalarField* standardRecModel::phi() const
 {
   return phiRec_;
+}
+
+const surfaceScalarField* standardRecModel::phiS() const
+{
+  return phiSRec_;
 }
 
 tmp<volScalarField> standardRecModel::tvoidfraction() const
@@ -272,9 +285,28 @@ void standardRecModel::readFieldSeries()
                 particleCloud_.mesh()
             )
         );
-	
-	if(flux_)
+
+	if (readPhi_)
 	{
+            phiRecpl.set
+            (
+                timeIndexList(recTime.timeName()),
+                new surfaceScalarField
+                (
+                    IOobject
+                    (
+                        phiFieldName_,
+                        recTime.timePath(),
+                        particleCloud_.mesh(),
+                        IOobject::MUST_READ,
+                        IOobject::NO_WRITE
+                    ),
+                    particleCloud_.mesh()
+                )
+            );
+        }
+        else
+        {
 	    phiRecpl.set
 	    (
 	        timeIndexList(recTime.timeName()),
@@ -282,7 +314,7 @@ void standardRecModel::readFieldSeries()
                 (
                     IOobject
                     (
-                         "phiRec",
+                         phiFieldName_,
                          recTime.timePath(),
                          particleCloud_.mesh(),
                          IOobject::NO_READ,
@@ -292,6 +324,46 @@ void standardRecModel::readFieldSeries()
                 )
 	    );
 	}
+	
+	if (readPhiS_)
+	{
+	    phiSRecpl.set
+            (
+                timeIndexList(recTime.timeName()),
+                new surfaceScalarField
+                (
+                    IOobject
+                    (
+                        phiSFieldName_,
+                        recTime.timePath(),
+                        particleCloud_.mesh(),
+                        IOobject::MUST_READ,
+                        IOobject::NO_WRITE
+                    ),
+                    particleCloud_.mesh()
+                )
+            );
+	}
+        else
+        {
+            phiSRecpl.set
+            (
+                timeIndexList(recTime.timeName()),
+                new surfaceScalarField
+                (
+                    IOobject
+                    (
+                         phiSFieldName_,
+                         recTime.timePath(),
+                         particleCloud_.mesh(),
+                         IOobject::NO_READ,
+                         IOobject::NO_WRITE
+                    ),
+                    linearInterpolate(UsRecpl.last()*(1-voidfractionRecpl.last())) & particleCloud_.mesh().Sf()
+                )
+            );
+        }
+
         
     }
     Info << "Reading fields done" << endl;
@@ -405,7 +477,6 @@ scalar standardRecModel::norm(label ti, label tj)
 	            voidfractionRecpl[ti]-voidfractionRecpl[tj]
 	        )
 	    );
-//        diff=sumSqr(voidfractionRecpl[ti].internalField() - voidfractionRecpl[tj].internalField());
     }
     else if (normType_=="solidPhaseMomentum")
     {
@@ -416,13 +487,7 @@ scalar standardRecModel::norm(label ti, label tj)
 	            voidfractionRecpl[ti]*UsRecpl[ti]-voidfractionRecpl[tj]*UsRecpl[tj]
 	        )
 	    );
-     
-     //   diff=sum (
-	//    magSqr (
-	  //      voidfractionRecpl[ti].internalField()*UsRecpl[ti].internalField()-
-	  //      voidfractionRecpl[tj].internalField()*UsRecpl[tj].internalField()
-	  //  )
-//	);	    
+
 	tDiff/=(refVel_*refVel_);
     }
     else

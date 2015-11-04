@@ -142,11 +142,13 @@ public:
     // Member Functions
     
     virtual void updateRecFields() = 0;
+    virtual void setRecFields() = 0;
     
     virtual const volScalarField* voidfraction() const = 0;
     virtual const volVectorField* U() const = 0;
     virtual const volVectorField* Us() const = 0;
     virtual const surfaceScalarField* phi() const = 0;
+    virtual const surfaceScalarField* phiS() const = 0;
     
     virtual tmp<volScalarField> tvoidfraction() const = 0;
     virtual tmp<volVectorField> tU() const = 0;
