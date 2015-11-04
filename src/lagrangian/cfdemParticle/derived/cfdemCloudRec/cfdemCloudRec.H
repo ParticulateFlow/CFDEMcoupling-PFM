@@ -95,9 +95,7 @@ public:
     
     inline int nrForceModelsRec() const;
 
-    void initRecFields();
     void updateRecFields();
-    void writeRecFields() const;
     
 };
 

@@ -221,31 +221,14 @@ scalar Foam::recModel::checkTimeStep()
 
 void Foam::recModel::writeRecMatrix() const
 {
-  // version for all processors
-  /*  std::ostringstream str_pid;
-    str_pid << pid();
-    const std::string my_pid(str_pid.str());
-    OFstream matrixFile("recurrenceMatrix."+my_pid);
-  */
-    
-  // write recurrence matrix
-  OFstream matrixFile("recurrenceMatrix");
-  matrixFile << recurrenceMatrix;
+    OFstream matrixFile("recurrenceMatrix");
+    matrixFile << recurrenceMatrix;
 }
 
 void Foam::recModel::writeRecPath() const
 {
-   // version for all processors
-  /*
-    std::ostringstream str_pid;
-    str_pid << pid();
-    const std::string my_pid(str_pid.str());
-    OFstream listFile("recurrencePath."+my_pid);
-  */
-  
-  // write recurrence matrix
-  OFstream listFile("recurrencePath");
-  listFile << virtualTimeIndexList;
+    OFstream listFile("recurrencePath");
+    listFile << virtualTimeIndexList;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

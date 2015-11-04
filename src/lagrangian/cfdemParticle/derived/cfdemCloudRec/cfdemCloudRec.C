@@ -95,20 +95,9 @@ void cfdemCloudRec::setForces()
 // * * * * * * * * * * * * * * * protected Member Functions  * * * * * * * * * * * * * //
 
 // * * * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * * //
-
-void cfdemCloudRec::initRecFields()
-{
-    recModel_->initRecFields();
-}
-
 void cfdemCloudRec::updateRecFields()
 {
     recModel_->updateRecFields(); 
-}
-
-void cfdemCloudRec::writeRecFields() const
-{
-    recModel_->writeRecFields(); 
 }
 
 const forceModelRec& cfdemCloudRec::forceMRec(int i)

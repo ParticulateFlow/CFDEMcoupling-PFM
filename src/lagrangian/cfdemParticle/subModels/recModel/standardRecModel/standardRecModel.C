@@ -59,13 +59,22 @@ standardRecModel::standardRecModel
     UFieldName_(propsDict_.lookup("velRecFieldName")),
     voidfractionFieldName_(propsDict_.lookup("voidfractionRecFieldName")),
     UsFieldName_(propsDict_.lookup("granVelRecFieldName")),
+    flux_(propsDict_.lookupOrDefault<bool>("flux",false)),
     voidfractionRecpl(numRecFields),
     URecpl(numRecFields),
     UsRecpl(numRecFields),
+    phiRecpl(numRecFields),
     voidfractionRec_(NULL),
     URec_(NULL),
-    UsRec_(NULL)
+    UsRec_(NULL),
+    phiRec_(NULL),
+    normType_(propsDict_.lookup("normType")),
+    refVol_(readScalar(propsDict_.lookup("refVol"))),
+    refVel_(1.0)
 {
+    if (normType_=="solidPhaseMomentum")
+        refVel_=readScalar(propsDict_.lookup("refVel"));
+    
     readFieldSeries();
     
     // make sure each processor has the same sequence of fields
@@ -129,15 +138,11 @@ standardRecModel::~standardRecModel()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void standardRecModel::initRecFields()
-{
-}
-
 void standardRecModel::updateRecFields()
 {
   virtualTimeIndex=virtualTimeIndexNext;
   virtualTimeIndexNext++;
-  if(virtualTimeIndexNext>sequenceEnd)
+  if (virtualTimeIndexNext>sequenceEnd)
   {
     virtualTimeIndexListPos++;
     sequenceStart=virtualTimeIndexList[virtualTimeIndexListPos].first();
@@ -152,22 +157,15 @@ void standardRecModel::updateRecFields()
             << "    trying to set pointer to non-existent field. "<< endl << endl
             << abort(FatalError); 
   }
-  if(verbose_)
+  if (verbose_)
       Info << "\nUpdating virtual time index to " << virtualTimeIndex << ".\n" << endl;  
   voidfractionRec_=voidfractionRecpl(virtualTimeIndex);
   URec_=URecpl(virtualTimeIndex);
   UsRec_=UsRecpl(virtualTimeIndex);
-  if(verbose_)
+  if (flux_)
+      phiRec_=phiRecpl(virtualTimeIndex);
+  if (verbose_)
       Info << "Recurrence fields reset.\n" << endl;
-}
-
-void standardRecModel::writeRecFields() const
-{
- // need to check if this writes to the correct destination 
-  
- // voidfractionRecpl[virtualTimeIndex].writeRecFields();
- // URecpl[virtualTimeIndex].writeRecFields();
- // UsRecpl[virtualTimeIndex].writeRecFields();
 }
 
 const volScalarField* standardRecModel::voidfraction() const
@@ -183,6 +181,11 @@ const volVectorField* standardRecModel::U() const
 const volVectorField* standardRecModel::Us() const
 {
   return UsRec_;
+}
+
+const surfaceScalarField* standardRecModel::phi() const
+{
+  return phiRec_;
 }
 
 tmp<volScalarField> standardRecModel::tvoidfraction() const
@@ -269,6 +272,26 @@ void standardRecModel::readFieldSeries()
                 particleCloud_.mesh()
             )
         );
+	
+	if(flux_)
+	{
+	    phiRecpl.set
+	    (
+	        timeIndexList(recTime.timeName()),
+                new surfaceScalarField
+                (
+                    IOobject
+                    (
+                         "phiRec",
+                         recTime.timePath(),
+                         particleCloud_.mesh(),
+                         IOobject::NO_READ,
+                         IOobject::NO_WRITE
+                    ),
+                    linearInterpolate(URecpl.last()*voidfractionRecpl.last()) & particleCloud_.mesh().Sf()
+                )
+	    );
+	}
         
     }
     Info << "Reading fields done" << endl;
@@ -277,7 +300,6 @@ void standardRecModel::readFieldSeries()
 void standardRecModel::computeRecMatrix()
 {
     Info<< "\nComputing recurrence matrix\n" << endl;
-    //scalar maxElemVal(0.0);
     
     // compute recurrence matrix elements
     forAll(timeIndexList, ti)
@@ -301,25 +323,11 @@ void standardRecModel::computeRecMatrix()
     		
     		// compute elements
     		recurrenceMatrixLocal[ti][tj]
-    			= sumSqr(voidfractionRecpl[ti].internalField() - voidfractionRecpl[tj].internalField());
+    			= norm(ti,tj);
     		
     		recurrenceMatrixLocal[tj][ti] = recurrenceMatrixLocal[ti][tj];
-    		
-    	//	if (maxElemVal < recurrenceMatrixLocal[ti][tj])
-    	//	{
-    	//		maxElemVal = recurrenceMatrixLocal[ti][tj];
-    	//	}
     	}
     }
-    
-    // normalize matrix elements
-    //forAll(timeIndexList, ti)
-    //{
-    //	forAll(timeIndexList, tj)
-    //	{
-    //		recurrenceMatrixLocal[ti][tj] /= maxElemVal;
-    //	}
-    //} 
     Info<< "\nComputing recurrence matrix done\n" << endl;
 }
 
@@ -382,6 +390,52 @@ label standardRecModel::seqEnd(label seqStart, label & seqLength)
   if(seqStart+seqLength>numRecFields-1)
       seqLength=numRecFields-1-seqStart;
   return seqStart+seqLength;
+}
+
+scalar standardRecModel::norm(label ti, label tj)
+{
+    scalar diff=0.0;
+    scalarField tDiff;
+    if (normType_=="volumeFraction")
+    {
+        tDiff=fvc::volumeIntegrate
+            (
+	        sqr
+                (
+	            voidfractionRecpl[ti]-voidfractionRecpl[tj]
+	        )
+	    );
+//        diff=sumSqr(voidfractionRecpl[ti].internalField() - voidfractionRecpl[tj].internalField());
+    }
+    else if (normType_=="solidPhaseMomentum")
+    {
+        tDiff=fvc::volumeIntegrate
+            (
+	        magSqr
+                (
+	            voidfractionRecpl[ti]*UsRecpl[ti]-voidfractionRecpl[tj]*UsRecpl[tj]
+	        )
+	    );
+     
+     //   diff=sum (
+	//    magSqr (
+	  //      voidfractionRecpl[ti].internalField()*UsRecpl[ti].internalField()-
+	  //      voidfractionRecpl[tj].internalField()*UsRecpl[tj].internalField()
+	  //  )
+//	);	    
+	tDiff/=(refVel_*refVel_);
+    }
+    else
+    {
+      FatalError
+            << "standardRecModel::norm(label,label) : "
+            << endl
+            << "    unknown norm. "<< endl << endl
+            << abort(FatalError); 
+    }
+    diff=sum(tDiff);
+    diff/=refVol_;
+    return diff;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

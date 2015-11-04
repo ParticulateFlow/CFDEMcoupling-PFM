@@ -66,6 +66,7 @@ $(forceModelsRec)/forceModelRec/newForceModelRec.C
 $(forceModelsRec)/freeStreaming/freeStreaming.C
 $(forceModelsRec)/isotropicFluctuations/isotropicFluctuations.C
 $(forceModelsRec)/gradConcentration/gradConcentration.C
+$(forceModelsRec)/tracerPointSource/tracerPointSource.C
 
 $(forceSubModels)/forceSubModel/newForceSubModel.C
 $(forceSubModels)/forceSubModel/forceSubModel.C

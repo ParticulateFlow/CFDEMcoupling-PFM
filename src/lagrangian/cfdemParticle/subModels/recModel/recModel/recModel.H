@@ -88,6 +88,8 @@ protected:
     virtual void computeRecPath() = 0;
     virtual void readFieldSeries() = 0;
     
+    virtual scalar norm(label,label) = 0;
+    
 private:
   
     void readTimeSeries();
@@ -139,13 +141,12 @@ public:
 
     // Member Functions
     
-    virtual void initRecFields() = 0; 
     virtual void updateRecFields() = 0;
-    virtual void writeRecFields() const = 0;
     
     virtual const volScalarField* voidfraction() const = 0;
     virtual const volVectorField* U() const = 0;
     virtual const volVectorField* Us() const = 0;
+    virtual const surfaceScalarField* phi() const = 0;
     
     virtual tmp<volScalarField> tvoidfraction() const = 0;
     virtual tmp<volVectorField> tU() const = 0;

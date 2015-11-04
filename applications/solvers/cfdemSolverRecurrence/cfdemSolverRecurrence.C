@@ -32,11 +32,6 @@ Rules
 	Solution data to compute the recurrence statistics from, needs to 
 		reside in $CASE_ROOT/dataBase
 	Time step data in dataBase needs to be evenly spaced in time
-	Hardcoded Eulerian set-up
-		The species is part of/ transported by the continuous phase
-		"water" is the continuous phase
-		"air" is the dispersed
-		Make a donation to the get selectable phase names implemented
 
 \*---------------------------------------------------------------------------*/
 
@@ -70,8 +65,6 @@ int main(int argc, char *argv[])
         particleCloud.clockM().start(1,"Global");
 
         Info<< "Time = " << runTime.timeName() << nl << endl;
-
-      //  #include "CourantNo.H"
 
         particleCloud.clockM().start(2,"Coupling");
 

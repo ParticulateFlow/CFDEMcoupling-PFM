@@ -42,9 +42,10 @@ class standardRecModel
 {
 protected:
   
-  void computeRecMatrix();
-  void computeRecPath();
-  void readFieldSeries();
+    void computeRecMatrix();
+    void computeRecPath();
+    void readFieldSeries();
+    scalar norm(label,label);
 
 public:
 
@@ -66,13 +67,12 @@ public:
         ~standardRecModel();
 
 
-    void initRecFields();
     void updateRecFields();
-    void writeRecFields() const;
     
     const volScalarField* voidfraction() const;
     const volVectorField* U() const;
     const volVectorField* Us() const;
+    const surfaceScalarField* phi() const;
     
     tmp<volScalarField> tvoidfraction() const;
     tmp<volVectorField> tU() const;
@@ -85,14 +85,21 @@ private:
     word UFieldName_;
     word voidfractionFieldName_;
     word UsFieldName_;
+    bool flux_;
   
     PtrList<volScalarField> voidfractionRecpl;
     PtrList<volVectorField> URecpl;
     PtrList<volVectorField> UsRecpl;
+    PtrList<surfaceScalarField> phiRecpl;
     
     const volScalarField *voidfractionRec_;
     const volVectorField *URec_;
     const volVectorField *UsRec_;
+    const surfaceScalarField *phiRec_;
+    
+    word normType_;
+    scalar refVol_;
+    scalar refVel_;
     
     label seqEnd(label, label&);
 
