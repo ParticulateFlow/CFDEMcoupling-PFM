@@ -45,6 +45,7 @@ protected:
 
         cfdemCloudRec& particleCloud_;
 
+        void coupleRecForce();
 public:
 
     //- Runtime type information

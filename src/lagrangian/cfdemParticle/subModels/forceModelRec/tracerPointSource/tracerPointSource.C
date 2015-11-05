@@ -86,8 +86,10 @@ tracerPointSource::tracerPointSource
             << abort(FatalError);  
     }
     
-    // distribute source strength by number of receiving particles
-    sourceStrength_/=numReceiverPart_;
+    // distribute source strength by number of receiving particles and over the number of steps per time
+    sourceStrength_*=particleCloud_.mesh().time().deltaTValue()/numReceiverPart_;  // need time step
+    
+    Info<< "\nSource strength set to " << sourceStrength_ << " per receiver and time step.\n" << endl;
     
     receiverIDs_.reserve(numReceiverPart_);
     receiverDist_.reserve(numReceiverPart_);
@@ -124,7 +126,7 @@ void tracerPointSource::setForce() const
     tracerConcentrationField_.internalField() = 0.0;
 
     // get DEM data
-    particleCloud_.dataExchangeM().getData("tracerConcentration","scalar-atom",tracerConcentrationPart_);
+   // particleCloud_.dataExchangeM().getData("tracerconcentration","scalar-atom",tracerConcentrationPart_);
     
     label cellI=0;
     scalar distance=0.0;
@@ -181,7 +183,7 @@ void tracerPointSource::setForce() const
         NULL
     );
     // give DEM data
-    particleCloud_.dataExchangeM().giveData("tracerConcentration","scalar-atom", tracerConcentrationPart_);
+    particleCloud_.dataExchangeM().giveData("tracerconcentration","scalar-atom", tracerConcentrationPart_);
 }
 
 

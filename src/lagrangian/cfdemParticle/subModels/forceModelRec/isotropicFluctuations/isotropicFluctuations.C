@@ -62,9 +62,21 @@ isotropicFluctuations::isotropicFluctuations
     voidfractionRecFieldName_(propsDict_.lookupOrDefault<word>("voidfractionRecFieldName","voidfractionRec")),
     voidfractionRec_(sm.mesh().lookupObject<volScalarField> (voidfractionRecFieldName_)),
     critVoidfraction_(propsDict_.lookupOrDefault<scalar>("critVoidfraction", 1.0)),
-    maxFluctuation_(readScalar(propsDict_.lookup("maxFluctuation"))),
+    fluctuationAmp_(readScalar(propsDict_.lookup("fluctuationAmp"))),
     ranGen_(osRandomInteger())
-{}
+{
+    // get the average cell side length to set reference fluctuation velocity
+    scalar totalVolume(0.0);
+    label numCells(0);
+    scalar avLength(0.0);
+    forAll(particleCloud_.mesh().cells(),cellI)
+    {
+        totalVolume += particleCloud_.mesh().V()[cellI];
+	numCells++;
+    }
+    avLength=Foam::pow(totalVolume/numCells,1.0/3.0);
+    refFluctuationVel_=avLength/particleCloud_.mesh().time().deltaTValue();
+}
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
@@ -135,7 +147,7 @@ scalar isotropicFluctuations::scaleFluctuations(const scalar deltaVoidfrac) cons
     }
     else
     {
-        fluctuation=deltaVoidfrac*maxFluctuation_;
+        fluctuation=deltaVoidfrac*refFluctuationVel_*fluctuationAmp_;
         return fluctuation;
     }
 }

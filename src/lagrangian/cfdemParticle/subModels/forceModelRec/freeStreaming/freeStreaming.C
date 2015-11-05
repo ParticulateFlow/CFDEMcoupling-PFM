@@ -86,13 +86,13 @@ void freeStreaming::setForce() const
     interpolationCellPoint<vector> UsRecInterpolator_(UsRec_);
     interpolationCellPoint<scalar> voidfractionRecInterpolator_(voidfractionRec_);
     
-    for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
+   for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
     {
             cellI = particleCloud_.cellIDs()[index][0];
 	    UNew =vector(0,0,0);
-            if (cellI > -1) // particle Found
+            if (cellI > -1) // particle found
             {
-	        // let particles in empty regions follow trajectories subject to gravity, ohterwise stream
+	        // let particles in empty regions follow trajectories subject to gravity, otherwise stream
 		if(voidfractionRec_[cellI] < critVoidfraction_)
 		{
                     if( interpolate_ )
@@ -118,6 +118,7 @@ void freeStreaming::setForce() const
                 partToArrayU(index,UNew);
 	    }
     }
+   
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

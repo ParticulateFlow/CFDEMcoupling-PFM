@@ -76,6 +76,11 @@ void forceModelRec::partToArrayU
         for(int j=0;j<3;j++)
            fluidVel()[index][j] += U[j];
 }
+
+void forceModelRec::coupleRecForce()
+{
+    particleCloud_.coupleRecForce_=true;
+}
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam

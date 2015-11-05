@@ -57,7 +57,9 @@ private:
     
     scalar critVoidfraction_;
     
-    scalar maxFluctuation_;
+    scalar refFluctuationVel_;
+    
+    scalar fluctuationAmp_;
 
     scalar scaleFluctuations(const scalar) const;
     

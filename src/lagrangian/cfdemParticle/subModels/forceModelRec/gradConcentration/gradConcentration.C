@@ -74,7 +74,9 @@ gradConcentration::gradConcentration
         ),
         voidfractionRec_
     )
-{}
+{
+    coupleRecForce();
+}
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
