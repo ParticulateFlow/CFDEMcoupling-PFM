@@ -115,7 +115,10 @@ void tracerPointSource::allocateMyArrays() const
 
 void tracerPointSource::setForce() const
 {
-    scalar currTime=particleCloud_.mesh().time().value();
+   // not working yet, information lost on reallocation
+   // procedure moved to LIGGGHTS code
+  
+ /*   scalar currTime=particleCloud_.mesh().time().value();
     if (currTime < beginTime_ || currTime > endTime_)
         return;
     
@@ -125,8 +128,8 @@ void tracerPointSource::setForce() const
     // reset Scalar field
     tracerConcentrationField_.internalField() = 0.0;
 
-    // get DEM data
-   // particleCloud_.dataExchangeM().getData("tracerconcentration","scalar-atom",tracerConcentrationPart_);
+    //get DEM data
+    // particleCloud_.dataExchangeM().getData("tracerconcentration","scalar-atom",tracerConcentrationPart_);
     
     label cellI=0;
     scalar distance=0.0;
@@ -168,13 +171,6 @@ void tracerPointSource::setForce() const
             << abort(FatalError);  
     }
     
-    
-    for(int i=0;i<numReceiverPart_;i++)
-    {
-        int index=receiverIDs_[i];
-        tracerConcentrationPart_[index][0] += sourceStrength_;
-    }
-
     particleCloud_.averagingM().setScalarSum
     (
         tracerConcentrationField_,
@@ -184,6 +180,7 @@ void tracerPointSource::setForce() const
     );
     // give DEM data
     particleCloud_.dataExchangeM().giveData("tracerconcentration","scalar-atom", tracerConcentrationPart_);
+*/ 
 }
 
 
