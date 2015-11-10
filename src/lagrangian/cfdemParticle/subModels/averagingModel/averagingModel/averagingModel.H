@@ -98,6 +98,14 @@ public:
             cfdemCloud& sm
         );
 
+        //- Construct from components, specifiy initial value of fields
+        averagingModel
+        (
+            const dictionary& dict,
+            cfdemCloud& sm,
+            const vector u0
+        );
+
 
     // Destructor
 

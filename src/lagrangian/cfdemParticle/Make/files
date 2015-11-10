@@ -96,6 +96,7 @@ $(voidFractionModels)/dividedVoidFractionMS/dividedVoidFractionMS.C
 $(voidFractionModels)/bigParticleVoidFraction/bigParticleVoidFraction.C
 $(voidFractionModels)/GaussVoidFraction/GaussVoidFraction.C
 $(voidFractionModels)/IBVoidFraction/IBVoidFraction.C
+$(voidFractionModels)/noVoidFraction/noVoidFraction.C
 
 $(locateModels)/locateModel/locateModel.C
 $(locateModels)/locateModel/newLocateModel.C
@@ -131,6 +132,7 @@ $(averagingModels)/averagingModel/averagingModel.C
 $(averagingModels)/averagingModel/newAveragingModel.C
 $(averagingModels)/dilute/dilute.C
 $(averagingModels)/dense/dense.C
+$(averagingModels)/noAveraging/noAveraging.C
 
 $(clockModels)/clockModel/clockModel.C
 $(clockModels)/clockModel/newClockModel.C

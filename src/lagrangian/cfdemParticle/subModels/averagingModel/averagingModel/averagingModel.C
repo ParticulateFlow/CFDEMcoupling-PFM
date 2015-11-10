@@ -415,6 +415,55 @@ averagingModel::averagingModel
     )
 {}
 
+// Construct from components, specify initial value for fields
+averagingModel::averagingModel
+(
+    const dictionary& dict,
+    cfdemCloud& sm,
+    const vector u0
+)
+:
+    dict_(dict),
+    particleCloud_(sm),
+    UsWeightField_
+    (
+        IOobject
+        (
+            "UsWeightField_",
+            particleCloud_.mesh().time().timeName(),
+            particleCloud_.mesh(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        particleCloud_.mesh(),
+        dimensionedScalar("zero", dimensionSet(0,0,0,0,0), 0.0)
+    ),
+    UsPrev_
+    (   IOobject
+        (
+            "UsPrev",
+            sm.mesh().time().timeName(),
+            sm.mesh(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        sm.mesh(),
+        dimensionedVector("zero", dimensionSet(0,1,-1,0,0),u0)
+    ),
+    UsNext_
+    (   IOobject
+        (
+            "UsNext",
+            sm.mesh().time().timeName(),
+            sm.mesh(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        sm.mesh(),
+        dimensionedVector("zero", dimensionSet(0,1,-1,0,0),u0)
+    )
+{}
+
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 

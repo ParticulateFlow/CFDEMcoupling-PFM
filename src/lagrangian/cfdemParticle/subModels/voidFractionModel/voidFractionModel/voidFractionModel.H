@@ -106,6 +106,14 @@ public:
             cfdemCloud& sm
         );
 
+        //- Construct from components, specifiy initial value of fields
+        voidFractionModel
+        (
+            const dictionary& dict,
+            cfdemCloud& sm,
+            const scalar initVoidfraction
+        );
+
 
     // Destructor
 
