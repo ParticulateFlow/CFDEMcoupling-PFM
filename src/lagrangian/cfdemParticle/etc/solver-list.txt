@@ -1,4 +1,5 @@
 cfdemSolverRecurrence/dir
+tfmSolverRecurrence/dir
 cfdemSolverRhoPimple/dir
 cfdemSolverPisoMS/dir
 cfdemSolverPiso/dir
