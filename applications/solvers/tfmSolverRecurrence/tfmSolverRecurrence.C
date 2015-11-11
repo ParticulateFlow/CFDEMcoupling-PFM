@@ -74,6 +74,8 @@ int main(int argc, char *argv[])
         
         if ( runTime.timeOutputValue() - (recTimeIndex+1)*recTimeStep_ + 1.0e-5 > 0.0 )
         {
+	    Info << "Updating fields at run time " << runTime.timeOutputValue()
+	        << " corresponding to recurrence time " << (recTimeIndex+1)*recTimeStep_ << ".\n" << endl;
             particleCloud.updateRecFields();
 	    #include "readFields.H"
             recTimeIndex++;

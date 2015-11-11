@@ -34,7 +34,7 @@
     (
         IOobject
         (
-            "U1Rec",
+            "U.1Rec",
             runTime.timeName(),
             mesh,
             IOobject::MUST_READ,
@@ -47,7 +47,7 @@
     (
         IOobject
         (
-            "alpha1Rec",
+            "alpha.1Rec",
             runTime.timeName(),
             mesh,
             IOobject::MUST_READ,
@@ -60,7 +60,7 @@
     (
         IOobject
         (
-            "U2Rec",
+            "U.2Rec",
             runTime.timeName(),
             mesh,
             IOobject::MUST_READ,
@@ -75,7 +75,7 @@
     (
         IOobject
         (
-            "alpha2Rec",
+            "alpha.2Rec",
             runTime.timeName(),
             mesh,
             IOobject::NO_READ,
@@ -97,7 +97,7 @@ surfaceScalarField phi2Rec
  (
      IOobject
      (
-        "phi2Rec",
+        "phi.2Rec",
         runTime.timeName(),
         mesh,
         IOobject::READ_IF_PRESENT,
