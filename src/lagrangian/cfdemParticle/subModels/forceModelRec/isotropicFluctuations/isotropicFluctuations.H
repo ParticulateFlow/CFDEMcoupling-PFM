@@ -61,6 +61,8 @@ private:
     
     scalar fluctuationAmp_;
 
+    vector unitRndVec() const;
+    
     scalar scaleFluctuations(const scalar) const;
     
     mutable Random ranGen_;

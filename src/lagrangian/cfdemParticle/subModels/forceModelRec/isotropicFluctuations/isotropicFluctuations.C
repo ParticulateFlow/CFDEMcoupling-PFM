@@ -76,6 +76,9 @@ isotropicFluctuations::isotropicFluctuations
     }
     avLength=Foam::pow(totalVolume/numCells,1.0/3.0);
     refFluctuationVel_=avLength/particleCloud_.mesh().time().deltaTValue();
+    Info << "\nUsing isotropic fluctuations with\n" << endl;
+    Info << "\t\treference fluctuation velocity " << refFluctuationVel_ << " and\n" << endl;
+    Info << "\t\tfluctuation amplification factor " << fluctuationAmp_ << ".\n" << endl;
 }
 
 
@@ -96,6 +99,7 @@ void isotropicFluctuations::setForce() const
 
     vector flucU(0,0,0);
     label cellI=0;
+    scalar pFluc(0.0);
    
     interpolationCellPoint<scalar> voidfractionInterpolator_(voidfraction_);
     interpolationCellPoint<scalar> voidfractionRecInterpolator_(voidfractionRec_);
@@ -126,11 +130,10 @@ void isotropicFluctuations::setForce() const
                     // write particle based data to global array
                     
                     deltaVoidfrac=voidfractionRec-voidfraction;
-		    if(deltaVoidfrac>0)
+		    pFluc=deltaVoidfrac/(1-voidfraction+SMALL);
+		    if(deltaVoidfrac>0 && ranGen_.scalar01()<pFluc)
 		    {
-		        for(int j=0;j<3;j++)
-                            flucU[j]=2*(ranGen_.scalar01()-0.5);
-		        flucU*=scaleFluctuations(deltaVoidfrac);
+                        flucU=unitRndVec()*scaleFluctuations(deltaVoidfrac);
 			partToArrayU(index,flucU);
 		    }              
 		}
@@ -147,9 +150,31 @@ scalar isotropicFluctuations::scaleFluctuations(const scalar deltaVoidfrac) cons
     }
     else
     {
-        fluctuation=deltaVoidfrac*refFluctuationVel_*fluctuationAmp_;
+        fluctuation=refFluctuationVel_*fluctuationAmp_;
         return fluctuation;
     }
+}
+
+vector isotropicFluctuations::unitRndVec() const
+{
+    // algorithm according to:
+    // Marsaglia. "Choosing a point from the surface of a sphere." The Annals of Mathematical Statistics 43.2 (1972): 645-646.
+    scalar v1(0.0);
+    scalar v2(0.0);
+    scalar s(10.0);
+    scalar s2(0.0);
+    vector rvec(0,0,0);
+    while(s>1.0)
+    {
+        v1=2*(ranGen_.scalar01()-0.5);
+	v2=2*(ranGen_.scalar01()-0.5);
+	s=v1*v1+v2*v2;
+    }
+    s2=Foam::sqrt(1-s);
+    rvec[1]=2*v1*s2;
+    rvec[2]=2*v2*s2;
+    rvec[3]=1-2*s;
+    return rvec;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
