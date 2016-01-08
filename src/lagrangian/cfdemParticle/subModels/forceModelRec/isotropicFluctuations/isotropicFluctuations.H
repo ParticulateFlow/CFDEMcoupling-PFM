@@ -57,13 +57,13 @@ private:
     
     scalar critVoidfraction_;
     
-    scalar refFluctuationVel_;
+    scalar D0_;
     
-    scalar fluctuationAmp_;
+    scalar dt_;
 
     vector unitRndVec() const;
     
-    scalar scaleFluctuations(const scalar) const;
+    scalar fluctuationMag(const scalar) const;
     
     mutable Random ranGen_;
 

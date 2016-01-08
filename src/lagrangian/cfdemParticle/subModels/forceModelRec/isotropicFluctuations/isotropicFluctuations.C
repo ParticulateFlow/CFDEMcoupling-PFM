@@ -62,23 +62,10 @@ isotropicFluctuations::isotropicFluctuations
     voidfractionRecFieldName_(propsDict_.lookupOrDefault<word>("voidfractionRecFieldName","voidfractionRec")),
     voidfractionRec_(sm.mesh().lookupObject<volScalarField> (voidfractionRecFieldName_)),
     critVoidfraction_(propsDict_.lookupOrDefault<scalar>("critVoidfraction", 1.0)),
-    fluctuationAmp_(readScalar(propsDict_.lookup("fluctuationAmp"))),
+    D0_(readScalar(propsDict_.lookup("D0"))),
     ranGen_(osRandomInteger())
 {
-    // get the average cell side length to set reference fluctuation velocity
-    scalar totalVolume(0.0);
-    label numCells(0);
-    scalar avLength(0.0);
-    forAll(particleCloud_.mesh().cells(),cellI)
-    {
-        totalVolume += particleCloud_.mesh().V()[cellI];
-	numCells++;
-    }
-    avLength=Foam::pow(totalVolume/numCells,1.0/3.0);
-    refFluctuationVel_=avLength/particleCloud_.mesh().time().deltaTValue();
-    Info << "\nUsing isotropic fluctuations with\n" << endl;
-    Info << "\t\treference fluctuation velocity " << refFluctuationVel_ << " and\n" << endl;
-    Info << "\t\tfluctuation amplification factor " << fluctuationAmp_ << ".\n" << endl;
+    dt_=particleCloud_.mesh().time().deltaTValue();
 }
 
 
@@ -99,7 +86,7 @@ void isotropicFluctuations::setForce() const
 
     vector flucU(0,0,0);
     label cellI=0;
-    scalar pFluc(0.0);
+    scalar relVolfractionExcess(0.0);
    
     interpolationCellPoint<scalar> voidfractionInterpolator_(voidfraction_);
     interpolationCellPoint<scalar> voidfractionRecInterpolator_(voidfractionRec_);
@@ -130,10 +117,10 @@ void isotropicFluctuations::setForce() const
                     // write particle based data to global array
                     
                     deltaVoidfrac=voidfractionRec-voidfraction;
-		    pFluc=deltaVoidfrac/(1-voidfraction+SMALL);
-		    if(deltaVoidfrac>0 && ranGen_.scalar01()<pFluc)
+		    relVolfractionExcess=deltaVoidfrac/(1-voidfraction+SMALL);
+		    if(deltaVoidfrac>0)
 		    {
-                        flucU=unitRndVec()*scaleFluctuations(deltaVoidfrac);
+                        flucU=unitRndVec()*fluctuationMag(relVolfractionExcess);
 			partToArrayU(index,flucU);
 		    }              
 		}
@@ -141,16 +128,18 @@ void isotropicFluctuations::setForce() const
     }
 }
 
-scalar isotropicFluctuations::scaleFluctuations(const scalar deltaVoidfrac) const
+scalar isotropicFluctuations::fluctuationMag(const scalar relVolfractionExcess) const
 {
+    // magnitude of steps dr = sqrt(6*D0*relVolfractionExcess * dt)
+    // fluctuation velocity v = dr / dt
     scalar fluctuation;
-    if(deltaVoidfrac<0.0)
+    if(relVolfractionExcess<0.0)
     {
         return 0.0;
     }
     else
     {
-        fluctuation=refFluctuationVel_*fluctuationAmp_;
+	fluctuation=Foam::sqrt(6*D0_*relVolfractionExcess/dt_);
         return fluctuation;
     }
 }
