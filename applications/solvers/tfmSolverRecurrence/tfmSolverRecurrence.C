@@ -68,9 +68,10 @@ int main(int argc, char *argv[])
 
         Info<< "Time = " << runTime.timeName() << nl << endl;
 	
+	particleCloud.clockM().start(2,"Flow");
         #include "TEq.H"
+	particleCloud.clockM().stop("Flow");
 
-        particleCloud.clockM().start(26,"Flow");
         
         if ( runTime.timeOutputValue() - (recTimeIndex+1)*recTimeStep_ + 1.0e-5 > 0.0 )
         {
@@ -81,9 +82,10 @@ int main(int argc, char *argv[])
             recTimeIndex++;
         }
 
-        runTime.write();	
+        particleCloud.clockM().start(27,"Output");
+        runTime.write();
+        particleCloud.clockM().stop("Output");	
 
-        particleCloud.clockM().stop("Flow");
         particleCloud.clockM().stop("Global");
         
         Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
