@@ -5,6 +5,7 @@ cfdTools = $(path)/cfdTools
 energyModels = $(path)/subModels/energyModel
 forceModels = $(path)/subModels/forceModel
 forceSubModels = $(path)/subModels/forceModel/forceSubModels
+speciesModels = $(path)/subModels/speciesModel
 IOModels = $(path)/subModels/IOModel
 voidFractionModels = $(path)/subModels/voidFractionModel
 locateModels = $(path)/subModels/locateModel
@@ -25,10 +26,10 @@ $(derived)/cfdemCloudEnergy/cfdemCloudEnergy.C
 $(cfdTools)/global.C
 $(cfdTools)/newGlobal.C
 
-$(energyModels)/heatTransferModel/heatTransferModel/heatTransferModel.C
-$(energyModels)/heatTransferModel/heatTransferModel/newHeatTransferModel.C
-$(energyModels)/heatTransferModel/noHeatTransfer/noHeatTransfer.C
-$(energyModels)/heatTransferModel/heatTransfer/heatTransfer.C
+$(energyModels)/energyModel/energyModel.C
+$(energyModels)/energyModel/newEnergyModel.C
+$(energyModels)/heatTransfer/heatTransfer.C
+$(energyModels)/reactionHeat/reactionHeat.C
 
 $(forceModels)/forceModel/forceModel.C
 $(forceModels)/forceModel/newForceModel.C
@@ -44,7 +45,6 @@ $(forceModels)/interface/interface.C
 $(forceModels)/ShirgaonkarIB/ShirgaonkarIB.C
 $(forceModels)/KochHillDrag/KochHillDrag.C
 $(forceModels)/LaEuScalarTemp/LaEuScalarTemp.C
-$(forceModels)/LaEuScalarEnergy/LaEuScalarEnergy.C
 $(forceModels)/virtualMassForce/virtualMassForce.C
 $(forceModels)/gradPForce/gradPForce.C
 $(forceModels)/viscForce/viscForce.C
@@ -54,6 +54,10 @@ $(forceModels)/particleCellVolume/particleCellVolume.C
 $(forceSubModels)/forceSubModel/newForceSubModel.C
 $(forceSubModels)/forceSubModel/forceSubModel.C
 $(forceSubModels)/ImEx/ImEx.C
+
+$(speciesModels)/speciesModel/speciesModel.C
+$(speciesModels)/speciesModel/newSpeciesModel.C
+$(speciesModels)/standardSpeciesModel/standardSpeciesModel.C
 
 $(probeModels)/probeModel/probeModel.C
 $(probeModels)/probeModel/newProbeModel.C
