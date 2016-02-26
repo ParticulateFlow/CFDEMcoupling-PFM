@@ -1,49 +1,24 @@
 /*---------------------------------------------------------------------------*\
-    CFDEMcoupling - Open Source CFD-DEM coupling
-
-    CFDEMcoupling is part of the CFDEMproject
-    www.cfdem.com
-                                Copyright 2009-2012 JKU Linz
-                                Copyright 2012-2014 DCS Computing GmbH
-                                Copyright 2015 JKU Linz
-
-    Contributing authors: Christoph Goniva (JKU Linz, DCS)
-                          Thomas Lichtenegger (JKU Linz) 
--------------------------------------------------------------------------------
 License
-    This file is part of CFDEMcoupling.
-
-    CFDEMcoupling is free software; you can redistribute it and/or modify it
-    under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 3 of the License, or (at your
-    option) any later version.
-
-    CFDEMcoupling is distributed in the hope that it will be useful, but WITHOUT
+    This is free software: you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+    This code is distributed in the hope that it will be useful, but WITHOUT
     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
     FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
     for more details.
-
     You should have received a copy of the GNU General Public License
-    along with CFDEMcoupling; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with this code.  If not, see <http://www.gnu.org/licenses/>.
+
+    Copyright (C) 2015- Thomas Lichtenegger, JKU Linz, Austria
 
 Description
-    This code is designed to realize coupled CFD-DEM simulations using LIGGGHTS
-    and OpenFOAM(R). Note: this code is not part of OpenFOAM(R) (see DISCLAIMER).
-
-References
-    Van der Hoef et al.: "Drag force of intermediate Reynolds number flow past
-    mono‐and bidisperse arrays of spheres.", AIChE Journal (2007)
-    Deen et al.: "Review of discrete particle modeling of fluidized beds",
-    Chem. Eng. Sci. (2007)
-
-    
-Class
-    BeetstraDrag
+    drag law for monodisperse systems according to
+    Beetstra et al. AIChE J 53.2 (2007)
 
 SourceFiles
     BeetstraDrag.C
-
 \*---------------------------------------------------------------------------*/
 
 #ifndef BeetstraDrag_H
