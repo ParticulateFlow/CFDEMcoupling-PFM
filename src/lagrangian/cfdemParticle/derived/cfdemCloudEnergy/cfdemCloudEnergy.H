@@ -18,7 +18,8 @@ License
 
 
 Description
-    cloud class managing DEM data for CFD-DEM coupling of compressible, reacting flows
+    cloud class managing DEM data for CFD-DEM coupling with energy models,
+    e.g. for compressible, reacting flows
 
 Class
     Foam::cfdemCloudEnergy derived from cfdemCloud
