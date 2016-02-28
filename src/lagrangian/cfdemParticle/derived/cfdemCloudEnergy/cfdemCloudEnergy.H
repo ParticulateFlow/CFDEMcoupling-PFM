@@ -53,6 +53,8 @@ protected:
     const wordList energyModels_;
 
     autoPtr<energyModel>* energyModel_;
+    
+    void calcEnergyContributions();
 
 public:
 
@@ -80,6 +82,10 @@ public:
        int nrEnergyModels();
 
        inline const wordList& energyModels();
+       
+       void energyContributions(volScalarField&);
+       
+       bool evolve(volScalarField&,volVectorField&,volVectorField&);
 
 };
 

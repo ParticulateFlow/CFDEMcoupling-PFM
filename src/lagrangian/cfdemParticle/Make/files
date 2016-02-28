@@ -29,7 +29,7 @@ $(cfdTools)/newGlobal.C
 
 $(energyModels)/energyModel/energyModel.C
 $(energyModels)/energyModel/newEnergyModel.C
-$(energyModels)/heatTransfer/heatTransfer.C
+$(energyModels)/heatTransferGunn/heatTransferGunn.C
 $(energyModels)/reactionHeat/reactionHeat.C
 
 $(forceModels)/forceModel/forceModel.C

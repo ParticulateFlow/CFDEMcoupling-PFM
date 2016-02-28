@@ -94,9 +94,9 @@ public:
     // Member Functions
 
 
-        virtual void energyContribution(volScalarField&) const;
+        virtual void addEnergyContribution(volScalarField&) const;
 	
-	virtual void temperatureContribution(volScalarField&) const;
+	virtual void calcEnergyContribution();
 
 
 };

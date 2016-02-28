@@ -40,7 +40,7 @@ cfdemCloudEnergy::cfdemCloudEnergy
 )
 :
     cfdemCloud(mesh),
-    energyModels_(couplingProperties_.lookup("energyModels"))
+    energyModels_(couplingProperties_.lookup("energyModels")),
 {
     energyModel_ = new autoPtr<energyModel>[nrEnergyModels()];
     for (int i=0;i<nrEnergyModels();i++)
@@ -62,6 +62,13 @@ cfdemCloudEnergy::~cfdemCloudEnergy()
 
 }
 
+// * * * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * * //
+
+void cfdemCloudEnergy::calcEnergyContributions()
+{
+    for (int i=0;i<nrEnergyModels();i++)
+        energyM(i).calcEnergyContribution();
+}
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 int cfdemCloudEnergy::nrEnergyModels()
@@ -73,6 +80,34 @@ const energyModel& cfdemCloudEnergy::energyM(int i)
 {
     return energyModel_[i];
 }
+
+void cfdemCloudEnergy::energyContributions(volScalarField& Qsource)
+{
+    Qsource=0.0;
+    for (int i=0;i<nrEnergyModels();i++)
+        energyM(i).addEnergyContribution(Qsource);
+}
+
+bool cfdemCloudEnergy::evolve
+(
+    volScalarField& alpha,
+    volVectorField& Us,
+    volVectorField& U
+)
+{
+    cfdemCloud::evolve(alpha, Us, U);
+    if(doCouple)
+    {
+        // calc energy contributions
+        clockM().start(26,"calcEnergyContributions");
+        if(verbose_) Info << "- calcEnergyContributions" << endl;
+        calcEnergyContributions();
+        if(verbose_) Info << "calcEnergyContributions done." << endl;
+        clockM().stop("calcEnergyContributions");
+    }  
+}
+
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam

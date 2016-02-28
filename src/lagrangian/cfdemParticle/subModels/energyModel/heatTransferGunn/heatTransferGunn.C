@@ -43,13 +43,29 @@ heatTransferGunn::heatTransferGunn
 :
     energyModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
-    tempFieldName_(propsDict_.lookup("tempFieldName")),
+    interpolation_(propsDict_.lookupOrDefault<bool>("interpolation",false)),
+    QPartFluidName_(propsDict_.lookupOrDefault<word>("QPartFluidName","QPartFluid")),
+    QPartFluid_
+    (   IOobject
+        (
+            QPartFluidName_,
+            sm.mesh().time().timeName(),
+            sm.mesh(),
+            IOobject::READ_IF_PRESENT,
+            IOobject::AUTO_WRITE
+        ),
+        sm.mesh(),
+        dimensionedScalar"zero", dimensionSet(1,2,-2,0,0,0,0), 0.0)
+    ),
+    tempFieldName_(propsDict_.lookupOrDefault<word>("tempFieldName","T")),
     tempField_(sm.mesh().lookupObject<volScalarField> (tempFieldName_)),
     voidfractionFieldName_(propsDict_.lookup("voidfractionFieldName")),
     voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
     maxSource_(1e30),
-    velFieldName_(propsDict_.lookup("velFieldName")),
+    velFieldName_(propsDict_.lookupOrDefault<word>("velFieldName","U")),
     U_(sm.mesh().lookupObject<volVectorField> (velFieldName_)),
+    densityFieldName_(propsDict_.lookupOrDefault<word>("densityFieldName","rho")),
+    rho_(sm.mesh().lookupObject<volScalarField> (densityFieldName_))
     partTempName_(propsDict_.lookup("partTempName")),
     partTemp_(NULL),
     partHeatFluxName_(propsDict_.lookup("partHeatFluxName")),
@@ -64,20 +80,6 @@ heatTransferGunn::heatTransferGunn
         maxSource_=readScalar(propsDict_.lookup ("maxSource"));
         Info << "limiting eulerian source field to: " << maxSource_ << endl;
     }
-
-    // init force sub model
-    setForceSubModels(propsDict_);
-
-    // define switches which can be read from dict
-    forceSubM(0).setSwitchesList(3,true); // activate search for verbose switch
-    forceSubM(0).setSwitchesList(4,true); // activate search for interpolate switch
-    forceSubM(0).setSwitchesList(8,true); // activate scalarViscosity switch
-
-    // read those switches defined above, if provided in dict
-    forceSubM(0).readSwitches();
-
-
-    particleCloud_.checkCG(false);
 }
 
 
@@ -100,19 +102,18 @@ void heatTransferGunn::allocateMyArrays() const
 
 // * * * * * * * * * * * * * * * * Member Fct  * * * * * * * * * * * * * * * //
 
-void heatTransferGunn::temperatureContribution(volScalarField& EuField) const
+void heatTransferGunn::calcEnergyContribution()
 {
    // realloc the arrays
     allocateMyArrays();
 
     // reset Scalar field
-    EuField.internalField() = 0.0;
+    QPartFluid_.internalField() = 0.0;
 
     // get DEM data
     particleCloud_.dataExchangeM().getData(partTempName_,"scalar-atom",partTemp_);
 
-    const volScalarField& nufField = forceSubM(0).nuField();
-    const volScalarField& rhoField = forceSubM(0).rhoField();
+    const volScalarField& mufField = particleCloud_.turbulence().mu();
 
     // calc La based heat flux
     scalar voidfraction(1);
@@ -121,12 +122,12 @@ void heatTransferGunn::temperatureContribution(volScalarField& EuField) const
     label cellI=0;
     vector Us(0,0,0);
     scalar ds(0);
-    scalar nuf(0);
+    scalar muf(0);
     scalar magUr(0);
     scalar Rep(0);
     scalar Pr(0);
     scalar Nup(0);
-    const scalar n = 3.5; // model parameter (found suitable for 3-mm polymer pellets when modelling dilute flows)
+
 
     interpolationCellPoint<scalar> voidfractionInterpolator_(voidfraction_);
     interpolationCellPoint<vector> UInterpolator_(U_);
@@ -134,12 +135,10 @@ void heatTransferGunn::temperatureContribution(volScalarField& EuField) const
 
     for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)
     {
-        //if(particleCloud_.regionM().inRegion()[index][0])
-        //{
             cellI = particleCloud_.cellIDs()[index][0];
             if(cellI >= 0)
             {
-                if(forceSubM(0).interpolation())
+                if(interpolation_)
                 {
                     vector position = particleCloud_.position(index);
                     voidfraction = voidfractionInterpolator_.interpolate(position,cellI);
@@ -157,11 +156,14 @@ void heatTransferGunn::temperatureContribution(volScalarField& EuField) const
                 Us = particleCloud_.velocity(index);
                 magUr = mag(Ufluid - Us);
                 ds = 2.*particleCloud_.radius(index);
-                nuf = nufField[cellI];
-                Rep = ds * magUr * voidfraction / nuf;
-                Pr = max(SMALL, Cp_ * nuf * rhoField[cellI] / lambda_);
+                muf = mufField[cellI];
+                Rep = ds * magUr * voidfraction * rho_[cellI]/ muf;
+                Pr = max(SMALL, Cp_ * muf / lambda_);
 
-                Nup = 
+                Nup = (7 - 10 * voidfraction + 5 * voidfraction * voidfraction) *
+                        (1 + 0.7 * Foam::pow(Rep,0.2) * Foam::pow(Pr,0.33)) +
+			(1.33 - 2.4 * voidfraction + 1.2 * voidfraction * voidfraction) *
+			Foam::pow(Rep,0.7) * Foam::pow(Pr,0.33);                      
                 
 
                 scalar h = lambda_ * Nup / ds;
@@ -170,58 +172,39 @@ void heatTransferGunn::temperatureContribution(volScalarField& EuField) const
                 // calc convective heat flux [W]
                 scalar partHeatFlux = h * As * (Tfluid - partTemp_[index][0]);
                 partHeatFlux_[index][0] = partHeatFlux;
-
-
-                if(forceSubM(0).verbose() && index >=0 && index <2)
-                {
-                    Info << "partHeatFlux = " << partHeatFlux << endl;
-                    Info << "magUr = " << magUr << endl;
-                    Info << "As = " << As << endl;
-                    Info << "nuf = " << nuf << endl;
-                    Info << "Rep = " << Rep << endl;
-                    Info << "Pr = " << Pr << endl;
-                    Info << "Nup = " << Nup << endl;
-                    Info << "voidfraction = " << voidfraction << endl;
-                    Info << "partTemp_[index][0] = " << partTemp_[index][0] << endl;
-                    Info << "Tfluid = " << Tfluid << endl  ;
-                }
             }
-        //}
     }
 
     particleCloud_.averagingM().setScalarSum
     (
-        EuField,
+        QPartFluid_,
         partHeatFlux_,
         particleCloud_.particleWeights(),
         NULL
     );
 
-    // scale with -1/(Vcell*rho*Cp)
-    EuField.internalField() /= -rhoField.internalField()*Cp_*EuField.mesh().V();
+    QPartFluid_.internalField() *= -1.0;
 
     // limit source term
-    forAll(EuField,cellI)
+    forAll(QPartFluid_,cellI)
     {
-        scalar EuFieldInCell = EuField[cellI];
+        scalar EuFieldInCell = QPartFluid_[cellI];
 
         if(mag(EuFieldInCell) > maxSource_ )
         {
-             EuField[cellI] = sign(EuFieldInCell) * maxSource_;
+             QPartFluid_[cellI] = sign(EuFieldInCell) * maxSource_;
         }
     }
 
-    Info << "total convective particle-fluid heat flux [W] (Eulerian) = " << gSum(EuField*rhoField*Cp_*EuField.mesh().V()) << endl;
+    Info << "total convective particle-fluid heat flux [W] (Eulerian) = " << gSum(QPartFluid_) << endl;
 
     // give DEM data
     particleCloud_.dataExchangeM().giveData(partHeatFluxName_,"scalar-atom", partHeatFlux_); 
 }
 
-void heatTransferGunn::energyContribution(volScalarField& EuField) const
+void heatTransferGunn::addEnergyContribution(volScalarField& Qsource) const
 {
-    const volScalarField& rhoField = forceSubM(0).rhoField();
-    temperatureContribution(EuField);
-    EuField.internalField() *= rhoField.internalField()*Cp_;
+    Qsource += QPartFluid_;
 }
 
 

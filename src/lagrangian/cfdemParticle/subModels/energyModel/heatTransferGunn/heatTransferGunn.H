@@ -44,6 +44,12 @@ class heatTransferGunn
 private:
 
     dictionary propsDict_;
+    
+    bool interpolation_;
+    
+    word QPartFluidName_;
+        
+    volScalarField QPartFluid_;
 
     word tempFieldName_;
 
@@ -58,6 +64,10 @@ private:
     word velFieldName_;
 
     const volVectorField& U_;
+    
+    word densityFieldName_;
+    
+    const volScalarField& rho_;
 
     word partTempName_;
 
@@ -96,9 +106,9 @@ public:
       // Member Functions
 
 
-        void energyContribution(volScalarField&) const;
+        void addEnergyContribution(volScalarField&) const;
 	
-	void temperatureContribution(volScalarField&) const;
+	void calcEnergyContribution();
 
 
 };
