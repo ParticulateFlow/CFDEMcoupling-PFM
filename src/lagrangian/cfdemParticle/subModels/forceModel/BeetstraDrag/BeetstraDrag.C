@@ -115,6 +115,8 @@ void BeetstraDrag::setForce() const
     vector Us(0,0,0);
     vector Ur(0,0,0);
     scalar ds(0);
+    scalar ds_scaled(0);
+    scalar scaleDia3 = scaleDia_*scaleDia_*scaleDia_;
     scalar nuf(0);
     scalar rho(0);
     scalar magUr(0);
@@ -131,8 +133,6 @@ void BeetstraDrag::setForce() const
 
     for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
     {
-        //if(mask[index][0])
-        //{
             cellI = particleCloud_.cellIDs()[index][0];
             drag = vector(0,0,0);
             dragExplicit = vector(0,0,0);
@@ -140,7 +140,7 @@ void BeetstraDrag::setForce() const
             voidfraction=0;
             dragCoefficient = 0;
 
-            if (cellI > -1) // particle Found
+            if (cellI > -1) // particle found
             {
 
                 if( forceSubM(0).interpolation() )
@@ -163,22 +163,23 @@ void BeetstraDrag::setForce() const
                 Ur = Ufluid-Us;
                 magUr = mag(Ur);
                 ds = 2*particleCloud_.radius(index);
+		ds_scaled = ds/scaleDia_;
                 rho = rhoField[cellI];
                 nuf = nufField[cellI];
 
                 Rep=0.0;
                 localPhiP = 1.0f-voidfraction+SMALL;
 
-                // calc particle's drag coefficient (i.e., Force per unit slip velocity and per m³ PARTICLE)
+                // calc particle's drag coefficient (i.e., Force per unit slip velocity and Stokes drag)
                
-                Rep=ds/scaleDia_*voidfraction*magUr/nuf+SMALL;
+                Rep=ds_scaled*voidfraction*magUr/nuf+SMALL;
                 dragCoefficient = 10.0*localPhiP/(voidfraction*voidfraction) +
                                   voidfraction*voidfraction*(1.0+1.5*Foam::sqrt(localPhiP)) +
                                   0.413*Rep/(24*voidfraction*voidfraction)*(1.0/voidfraction+3*voidfraction*localPhiP+8.4*Foam::pow(Rep,-0.343))/
                                   (1+Foam::pow(10,3*localPhiP)*Foam::pow(Rep,-0.5*(1+4*localPhiP)));
 
                 // calc particle's drag
-                dragCoefficient *= 3*M_PI*ds*nuf*rho*voidfraction*scaleDrag_;
+                dragCoefficient *= 3*M_PI*ds_scaled*nuf*rho*voidfraction*scaleDia3*scaleDrag_;
                 if (modelType_=="B")
                     dragCoefficient /= voidfraction;
 
@@ -216,9 +217,7 @@ void BeetstraDrag::setForce() const
 
             // write particle based data to global array
             forceSubM(0).partToArray(index,drag,dragExplicit,Ufluid,dragCoefficient);
-
-        //}// end if mask
-    }// end loop particles
+    }
 }
 
 

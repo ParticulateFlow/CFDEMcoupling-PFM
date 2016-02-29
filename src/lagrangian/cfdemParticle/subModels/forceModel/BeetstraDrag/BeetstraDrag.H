@@ -53,7 +53,7 @@ private:
 
     word UsFieldName_;   
 
-    const volVectorField& UsField_;  // the average particle velocity field
+    const volVectorField& UsField_;
 
     mutable scalar scaleDia_;
 
