@@ -5,6 +5,7 @@ cfdTools = $(path)/cfdTools
 energyModels = $(path)/subModels/energyModel
 forceModels = $(path)/subModels/forceModel
 forceSubModels = $(path)/subModels/forceModel/forceSubModels
+thermCondModels = $(path)/subModels/thermCondModel
 speciesModels = $(path)/subModels/speciesModel
 IOModels = $(path)/subModels/IOModel
 voidFractionModels = $(path)/subModels/voidFractionModel
@@ -30,6 +31,10 @@ $(energyModels)/energyModel/energyModel.C
 $(energyModels)/energyModel/newEnergyModel.C
 $(energyModels)/heatTransferGunn/heatTransferGunn.C
 $(energyModels)/reactionHeat/reactionHeat.C
+
+$(thermCondModels)/thermCondModel/thermCondModel.C
+$(thermCondModels)/thermCondModel/newThermCondModel.C
+$(thermCondModels)/SyamlalThermCond/SyamlalThermCond.C
 
 $(forceModels)/forceModel/forceModel.C
 $(forceModels)/forceModel/newForceModel.C

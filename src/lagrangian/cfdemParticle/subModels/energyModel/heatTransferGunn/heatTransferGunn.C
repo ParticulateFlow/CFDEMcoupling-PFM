@@ -55,7 +55,7 @@ heatTransferGunn::heatTransferGunn
             IOobject::AUTO_WRITE
         ),
         sm.mesh(),
-        dimensionedScalar"zero", dimensionSet(1,2,-2,0,0,0,0), 0.0)
+        dimensionedScalar("zero", dimensionSet(1,2,-2,0,0,0,0), 0.0)
     ),
     tempFieldName_(propsDict_.lookupOrDefault<word>("tempFieldName","T")),
     tempField_(sm.mesh().lookupObject<volScalarField> (tempFieldName_)),
@@ -65,13 +65,11 @@ heatTransferGunn::heatTransferGunn
     velFieldName_(propsDict_.lookupOrDefault<word>("velFieldName","U")),
     U_(sm.mesh().lookupObject<volVectorField> (velFieldName_)),
     densityFieldName_(propsDict_.lookupOrDefault<word>("densityFieldName","rho")),
-    rho_(sm.mesh().lookupObject<volScalarField> (densityFieldName_))
+    rho_(sm.mesh().lookupObject<volScalarField> (densityFieldName_)),
     partTempName_(propsDict_.lookup("partTempName")),
     partTemp_(NULL),
     partHeatFluxName_(propsDict_.lookup("partHeatFluxName")),
-    partHeatFlux_(NULL),
-    lambda_(readScalar(propsDict_.lookup("lambda"))),
-    Cp_(readScalar(propsDict_.lookup("Cp")))
+    partHeatFlux_(NULL)
 {
      allocateMyArrays();
 
@@ -113,7 +111,12 @@ void heatTransferGunn::calcEnergyContribution()
     // get DEM data
     particleCloud_.dataExchangeM().getData(partTempName_,"scalar-atom",partTemp_);
 
-    const volScalarField& mufField = particleCloud_.turbulence().mu();
+    #ifdef compre
+       const volScalarField mufField = particleCloud_.turbulence().mu();
+    #else
+       const volScalarField mufField = particleCloud_.turbulence().nu()*rho_;
+    #endif
+    
 
     // calc La based heat flux
     scalar voidfraction(1);
@@ -158,7 +161,7 @@ void heatTransferGunn::calcEnergyContribution()
                 ds = 2.*particleCloud_.radius(index);
                 muf = mufField[cellI];
                 Rep = ds * magUr * voidfraction * rho_[cellI]/ muf;
-                Pr = max(SMALL, Cp_ * muf / lambda_);
+                Pr = max(SMALL, Cp_ * muf / kf0_);
 
                 Nup = (7 - 10 * voidfraction + 5 * voidfraction * voidfraction) *
                         (1 + 0.7 * Foam::pow(Rep,0.2) * Foam::pow(Pr,0.33)) +
@@ -166,7 +169,7 @@ void heatTransferGunn::calcEnergyContribution()
 			Foam::pow(Rep,0.7) * Foam::pow(Pr,0.33);                      
                 
 
-                scalar h = lambda_ * Nup / ds;
+                scalar h = kf0_ * Nup / ds;
                 scalar As = ds * ds * M_PI; // surface area of sphere
 
                 // calc convective heat flux [W]
@@ -183,7 +186,8 @@ void heatTransferGunn::calcEnergyContribution()
         NULL
     );
 
-    QPartFluid_.internalField() *= -1.0;
+    QPartFluid_.internalField() /= -QPartFluid_.mesh().V();
+
 
     // limit source term
     forAll(QPartFluid_,cellI)

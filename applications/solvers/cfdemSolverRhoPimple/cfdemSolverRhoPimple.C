@@ -40,7 +40,8 @@ Description
 #include "clockModel.H"
 #include "smoothingModel.H"
 #include "forceModel.H"
-#include "heatTransferModel.H"
+#include "thermCondModel.H"
+#include "energyModel.H"
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

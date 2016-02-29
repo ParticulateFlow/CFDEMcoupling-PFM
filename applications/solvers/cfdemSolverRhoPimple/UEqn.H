@@ -2,7 +2,7 @@
 
 tmp<fvVectorMatrix> UEqn
 (
-    fvm::ddt(rhoeps, U)
+    fvm::ddt(voidfraction,rho, U)
    + fvm::div(phi, U)
    + particleCloud.divVoidfractionTau(U, voidfraction)
    + fvm::Sp(Ksl,U)

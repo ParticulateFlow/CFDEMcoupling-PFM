@@ -20,7 +20,6 @@ License
 
 #include "error.H"
 #include "energyModel.H"
-#include "mathExtra.H"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -44,7 +43,20 @@ energyModel::energyModel
 )
 :
     dict_(dict),
-    particleCloud_(sm)
+    particleCloud_(sm),
+    transportProperties_
+    (
+        IOobject
+        (
+            "transportProperties",
+            sm.mesh().time().constant(),
+            sm.mesh(),
+            IOobject::MUST_READ_IF_MODIFIED,
+            IOobject::NO_WRITE
+        )
+    ),
+    kf0_(readScalar(transportProperties_.lookup("kf"))),
+    Cp_(readScalar(transportProperties_.lookup("Cp")))
 {}
 
 
@@ -55,7 +67,10 @@ energyModel::~energyModel()
 
 // * * * * * * * * * * * * * * * * Member Fct  * * * * * * * * * * * * * * * //
 
-
+scalar energyModel::Cp() const
+{
+    return Cp_; 
+}
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

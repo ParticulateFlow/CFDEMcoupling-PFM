@@ -4,6 +4,7 @@ energyModels = subModels/energyModel
 forceModels = subModels/forceModel
 forceSubModels = subModels/forceModel/forceSubModels
 forceModelsMS = subModels/forceModelMS
+thermCondModels = subModels/thermCondModel
 speciesModels = subModels/speciesModel
 IOModels = subModels/IOModel
 voidFractionModels = subModels/voidFractionModel
@@ -31,6 +32,10 @@ $(energyModels)/energyModel/energyModel.C
 $(energyModels)/energyModel/newEnergyModel.C
 $(energyModels)/heatTransferGunn/heatTransferGunn.C
 $(energyModels)/reactionHeat/reactionHeat.C
+
+$(thermCondModels)/thermCondModel/thermCondModel.C
+$(thermCondModels)/thermCondModel/newThermCondModel.C
+$(thermCondModels)/SyamlalThermCond/SyamlalThermCond.C
 
 $(forceModels)/forceModel/forceModel.C
 $(forceModels)/forceModel/newForceModel.C

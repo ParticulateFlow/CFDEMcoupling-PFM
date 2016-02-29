@@ -18,11 +18,9 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "fileName.H"
 #include "cfdemCloudEnergy.H"
 #include "energyModel.H"
-#include <mpi.h>
-#include "IOmanip.H"
+#include "thermCondModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -41,6 +39,14 @@ cfdemCloudEnergy::cfdemCloudEnergy
 :
     cfdemCloud(mesh),
     energyModels_(couplingProperties_.lookup("energyModels")),
+    thermCondModel_
+    (
+        thermCondModel::New
+        (
+            couplingProperties_,
+            *this
+        )
+    )
 {
     energyModel_ = new autoPtr<energyModel>[nrEnergyModels()];
     for (int i=0;i<nrEnergyModels();i++)
@@ -67,7 +73,7 @@ cfdemCloudEnergy::~cfdemCloudEnergy()
 void cfdemCloudEnergy::calcEnergyContributions()
 {
     for (int i=0;i<nrEnergyModels();i++)
-        energyM(i).calcEnergyContribution();
+        energyModel_[i]().calcEnergyContribution();
 }
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
@@ -79,6 +85,11 @@ int cfdemCloudEnergy::nrEnergyModels()
 const energyModel& cfdemCloudEnergy::energyM(int i)
 {
     return energyModel_[i];
+}
+
+const thermCondModel& cfdemCloudEnergy::thermCondM()
+{
+    return thermCondModel_;
 }
 
 void cfdemCloudEnergy::energyContributions(volScalarField& Qsource)
@@ -95,8 +106,7 @@ bool cfdemCloudEnergy::evolve
     volVectorField& U
 )
 {
-    cfdemCloud::evolve(alpha, Us, U);
-    if(doCouple)
+    if (cfdemCloud::evolve(alpha, Us, U))
     {
         // calc energy contributions
         clockM().start(26,"calcEnergyContributions");
@@ -104,7 +114,9 @@ bool cfdemCloudEnergy::evolve
         calcEnergyContributions();
         if(verbose_) Info << "calcEnergyContributions done." << endl;
         clockM().stop("calcEnergyContributions");
-    }  
+	return true;
+    }
+    return false;
 }
 
 

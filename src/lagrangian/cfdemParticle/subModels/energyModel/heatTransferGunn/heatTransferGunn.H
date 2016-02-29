@@ -77,10 +77,6 @@ private:
 
     mutable double **partHeatFlux_;              // Lagrangian array
 
-    scalar lambda_;                              // fluid thermal conductivity [W/(m*K)]
-
-    scalar Cp_;                                  // specific heat capacity [W*s/(kg*K)]
-
     void allocateMyArrays() const;
        
 public:
@@ -103,8 +99,7 @@ public:
         virtual ~heatTransferGunn();
 
 
-      // Member Functions
-
+    // Member Functions
 
         void addEnergyContribution(volScalarField&) const;
 	

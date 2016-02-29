@@ -40,6 +40,7 @@ namespace Foam
 {
 // forward declarations
 class energyModel;
+class thermCondModel;
 /*---------------------------------------------------------------------------*\
                            Class cfdemCloudEnergy Declaration
 \*---------------------------------------------------------------------------*/
@@ -54,8 +55,10 @@ protected:
 
     autoPtr<energyModel>* energyModel_;
     
+    autoPtr<thermCondModel> thermCondModel_;
+    
     void calcEnergyContributions();
-
+    
 public:
 
     friend class energyModel;
@@ -76,8 +79,9 @@ public:
     // Member Functions
 
 
-    // Access
        const energyModel& energyM(int);
+       
+       const thermCondModel& thermCondM();
 
        int nrEnergyModels();
 

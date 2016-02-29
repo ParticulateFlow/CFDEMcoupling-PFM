@@ -24,7 +24,6 @@ License
 #include "fvCFD.H"
 #include "cfdemCloudEnergy.H"
 #include "probeModel.H"
-#include "forceModel.H"
 #include "interpolationCellPoint.H"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -44,7 +43,12 @@ protected:
         const dictionary& dict_;
 
         cfdemCloudEnergy& particleCloud_;
+	
+	IOdictionary transportProperties_;
+	
+	scalar kf0_;                              // fluid thermal conductivity [W/(m*K)]
 
+        scalar Cp_;                                  // specific heat capacity [W*s/(kg*K)]
        
 public:
 
@@ -93,10 +97,11 @@ public:
 
     // Member Functions
 
-
-        virtual void addEnergyContribution(volScalarField&) const;
+        virtual void addEnergyContribution(volScalarField&) const = 0;
 	
-	virtual void calcEnergyContribution();
+	virtual void calcEnergyContribution() = 0;
+	
+	scalar Cp() const;
 
 
 };
