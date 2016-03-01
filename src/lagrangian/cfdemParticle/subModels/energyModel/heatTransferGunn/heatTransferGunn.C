@@ -55,11 +55,11 @@ heatTransferGunn::heatTransferGunn
             IOobject::AUTO_WRITE
         ),
         sm.mesh(),
-        dimensionedScalar("zero", dimensionSet(1,2,-2,0,0,0,0), 0.0)
+        dimensionedScalar("zero", dimensionSet(1,1,-3,0,0,0,0), 0.0)
     ),
     tempFieldName_(propsDict_.lookupOrDefault<word>("tempFieldName","T")),
     tempField_(sm.mesh().lookupObject<volScalarField> (tempFieldName_)),
-    voidfractionFieldName_(propsDict_.lookup("voidfractionFieldName")),
+    voidfractionFieldName_(propsDict_.lookupOrDefault<word>("voidfractionFieldName","voidfraction")),
     voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
     maxSource_(1e30),
     velFieldName_(propsDict_.lookupOrDefault<word>("velFieldName","U")),
@@ -188,7 +188,6 @@ void heatTransferGunn::calcEnergyContribution()
 
     QPartFluid_.internalField() /= -QPartFluid_.mesh().V();
 
-
     // limit source term
     forAll(QPartFluid_,cellI)
     {
@@ -199,8 +198,10 @@ void heatTransferGunn::calcEnergyContribution()
              QPartFluid_[cellI] = sign(EuFieldInCell) * maxSource_;
         }
     }
+    
+    QPartFluid_.correctBoundaryConditions();
 
-    Info << "total convective particle-fluid heat flux [W] (Eulerian) = " << gSum(QPartFluid_) << endl;
+    Info << "total convective particle-fluid heat flux [W] (Eulerian) = " << gSum(QPartFluid_*1.0*QPartFluid_.mesh().V()) << endl;
 
     // give DEM data
     particleCloud_.dataExchangeM().giveData(partHeatFluxName_,"scalar-atom", partHeatFlux_); 

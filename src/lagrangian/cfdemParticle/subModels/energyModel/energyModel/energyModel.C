@@ -55,10 +55,15 @@ energyModel::energyModel
             IOobject::NO_WRITE
         )
     ),
-    kf0_(readScalar(transportProperties_.lookup("kf"))),
-    Cp_(readScalar(transportProperties_.lookup("Cp")))
+    kf0_
+    (
+        dimensionedScalar(transportProperties_.lookup("kf")).value()
+    ),
+    Cp_
+    (
+        dimensionedScalar(transportProperties_.lookup("Cp")).value()
+    )
 {}
-
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 

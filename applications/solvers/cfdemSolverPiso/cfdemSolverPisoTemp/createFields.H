@@ -43,7 +43,6 @@
             IOobject::AUTO_WRITE
         ),
         mesh
-        //dimensionedScalar("0", dimensionSet(0, 0, -1, 0, 0), 1.0)
     );
 
     Info<< "\nReading voidfraction field voidfraction = (Vgas/Vparticle)\n" << endl;
@@ -71,8 +70,7 @@
             IOobject::READ_IF_PRESENT,
             IOobject::AUTO_WRITE
         ),
-        mesh,
-        dimensionedScalar("0", dimensionSet(1, -3, 0, 0, 0), 1.0)
+        mesh
     );
 
     Info<< "Reading particle velocity field Us\n" << endl;
@@ -120,6 +118,21 @@
         ),
         mesh
     );
+    
+    IOdictionary transportProperties
+    (
+        IOobject
+        (
+            "transportProperties",
+            mesh.time().constant(),
+            mesh,
+            IOobject::MUST_READ_IF_MODIFIED,
+            IOobject::NO_WRITE
+        )
+    );
+    
+    dimensionedScalar Cp(transportProperties.lookup("Cp"));
+
 
 //========================
 

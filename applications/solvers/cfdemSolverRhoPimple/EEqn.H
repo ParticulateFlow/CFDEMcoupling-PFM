@@ -5,7 +5,7 @@
     // dim he = J / kg
     volScalarField& he = thermo.he();
     particleCloud.energyContributions(Qsource);
-    Qsource.correctBoundaryConditions();
+
 
     fvScalarMatrix EEqn
     (
