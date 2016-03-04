@@ -15,91 +15,76 @@ License
     along with this code.  If not, see <http://www.gnu.org/licenses/>.
 
     Copyright (C) 2015- Thomas Lichtenegger, JKU Linz, Austria
-
-
-Description
-    cloud class managing DEM data for CFD-DEM coupling with energy models,
-    e.g. for compressible, reacting flows
-
-Class
-    Foam::cfdemCloudEnergy derived from cfdemCloud
-
-SourceFiles
-    cfdemCloudEnergy.C
+    
+    Description
+    Model to communicate species concentration and changes due to reactions
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef cfdemCloudEnergy_H
-#define cfdemCloudEnergy_H
+#ifndef species_H
+#define species_H
 
-#include "cfdemCloud.H"
-
+#include "fvCFD.H"
+#include "cfdemCloudEnergy.H"
+#include "chemistryModel.H"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
-// forward declarations
-class energyModel;
-class thermCondModel;
+
 /*---------------------------------------------------------------------------*\
-                           Class cfdemCloudEnergy Declaration
+                           Class species Declaration
 \*---------------------------------------------------------------------------*/
 
-class cfdemCloudEnergy
+// for future use:
+// + communicate every N steps
+
+class species
 :
-    public cfdemCloud
+    public chemistryModel
 {
-protected:
+private:
 
-    const wordList energyModels_;
+    dictionary propsDict_;
     
-    const wordList chemistryModels_;
-
-    autoPtr<energyModel>* energyModel_;
+    bool interpolation_;
     
-    autoPtr<thermCondModel> thermCondModel_;
+    // const wordList speciesNames_;
     
-    autoPtr<chemistryModel>* chemistryModel_;
+    // List<double**> concentrations_;
     
-    void calcEnergyContributions();
+    // List<double**> changeOfConcentrations_;
     
+    // List<volScalarField> changeOfConcentrationFields_;
+    
+    void allocateMyArrays() const;
+       
 public:
 
-    friend class energyModel;
+    //- Runtime type information
+    TypeName("species");
 
     // Constructors
 
         //- Construct from components
-        cfdemCloudEnergy
+        species
         (
-            const fvMesh& mesh
+            const dictionary& dict,
+            cfdemCloudEnergy& sm
         );
+
 
     // Destructor
 
-        ~cfdemCloudEnergy();
+        virtual ~species();
 
 
     // Member Functions
 
+    void execute();
+    
+    //
 
-       const energyModel& energyM(int);
-       
-       const thermCondModel& thermCondM();
-       
-       const chemistryModel& chemistryM(int);
-
-       int nrEnergyModels();
-       
-       int nrChemistryModels();
-
-       inline const wordList& energyModels();
-       
-       inline const wordList& chemistryModels();
-       
-       void energyContributions(volScalarField&);
-       
-       bool evolve(volScalarField&,volVectorField&,volVectorField&);
 
 };
 
@@ -109,8 +94,6 @@ public:
 } // End namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#include "cfdemCloudEnergyI.H"
 
 #endif
 

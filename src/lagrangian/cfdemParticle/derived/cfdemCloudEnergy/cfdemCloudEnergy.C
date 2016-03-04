@@ -39,6 +39,7 @@ cfdemCloudEnergy::cfdemCloudEnergy
 :
     cfdemCloud(mesh),
     energyModels_(couplingProperties_.lookup("energyModels")),
+    chemistryModels_(couplingProperties_.lookup("energyModels")),
     thermCondModel_
     (
         thermCondModel::New
@@ -56,6 +57,16 @@ cfdemCloudEnergy::cfdemCloudEnergy
             couplingProperties_,
             *this,
             energyModels_[i]
+        );
+    }
+    chemistryModel_ = new autoPtr<chemistryModel>[nrChemistryModels()];
+    for (int i=0;i<nrChemistryModels();i++)
+    {
+        chemistryModel_[i] = chemistryModel::New
+        (
+            couplingProperties_,
+            *this,
+            chemistryModels_[i]
         );
     }
 }
@@ -82,9 +93,19 @@ int cfdemCloudEnergy::nrEnergyModels()
     return energyModels_.size();
 }
 
+int cfdemCloudEnergy::nrChemistryModels()
+{
+    return chemistryModels_.size();
+}
+
 const energyModel& cfdemCloudEnergy::energyM(int i)
 {
     return energyModel_[i];
+}
+
+const chemistryModel& cfdemCloudEnergy::chemistryM(int i)
+{
+    return chemistryModel_[i];
 }
 
 const thermCondModel& cfdemCloudEnergy::thermCondM()

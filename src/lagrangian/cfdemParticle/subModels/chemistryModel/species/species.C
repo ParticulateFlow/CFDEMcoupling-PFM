@@ -18,22 +18,59 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-
+#include "error.H"
+#include "species.H"
+#include "addToRunTimeSelectionTable.H"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-inline const wordList& cfdemCloudEnergy::energyModels()
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+
+defineTypeNameAndDebug(species, 0);
+
+addToRunTimeSelectionTable(chemistryModel, species, dictionary);
+
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+
+// Construct from components
+species::species
+(
+    const dictionary& dict,
+    cfdemCloudEnergy& sm
+)
+:
+    energyModel(dict,sm),
+    propsDict_(dict.subDict(typeName + "Props")),
+    interpolation_(propsDict_.lookupOrDefault<bool>("interpolation",false))
 {
-    return energyModels_;
+     allocateMyArrays();
+
+    
 }
 
-inline const wordList& cfdemCloudEnergy::chemistryModels()
+
+// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
+
+species::~species()
 {
-    return chemistryModels_;
+
 }
+
+// * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
+void species::allocateMyArrays() const
+{
+
+}
+
+// * * * * * * * * * * * * * * * * Member Fct  * * * * * * * * * * * * * * * //
+
+void species::execute()
+{
+  
+}
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

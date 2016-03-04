@@ -18,22 +18,47 @@ License
 
 \*---------------------------------------------------------------------------*/
 
+#include "error.H"
+
+#include "chemistryModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-inline const wordList& cfdemCloudEnergy::energyModels()
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+
+autoPtr<chemistryModel> chemistryModel::New
+(
+    const dictionary& dict,
+    cfdemCloudEnergy& sm,
+    word chemistryType
+)
 {
-    return energyModels_;
+    Info<< "Selecting chemistryModel "
+         << chemistryType << endl;
+
+    dictionaryConstructorTable::iterator cstrIter =
+        dictionaryConstructorTablePtr_->find(chemistryType);
+
+    if (cstrIter == dictionaryConstructorTablePtr_->end())
+    {
+        FatalError
+            << "chemistryModel::New(const dictionary&, const spray&) : "
+            << endl
+            << "    unknown chemistryModelType type "
+            << chemistryType
+            << ", constructor not in hash table" << endl << endl
+            << "    Valid chemistryModel types are :"
+            << endl;
+        Info<< dictionaryConstructorTablePtr_->toc()
+            << abort(FatalError);
+    }
+
+    return autoPtr<chemistryModel>(cstrIter()(dict,sm));
 }
 
-inline const wordList& cfdemCloudEnergy::chemistryModels()
-{
-    return chemistryModels_;
-}
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

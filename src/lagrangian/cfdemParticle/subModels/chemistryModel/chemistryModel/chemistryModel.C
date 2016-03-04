@@ -18,22 +18,41 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-
+#include "error.H"
+#include "chemistryModel.H"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-inline const wordList& cfdemCloudEnergy::energyModels()
-{
-    return energyModels_;
-}
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-inline const wordList& cfdemCloudEnergy::chemistryModels()
-{
-    return chemistryModels_;
-}
+defineTypeNameAndDebug(chemistryModel, 0);
+
+defineRunTimeSelectionTable(chemistryModel, dictionary);
+
+// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+
+// Construct from components
+chemistryModel::chemistryModel
+(
+    const dictionary& dict,
+    cfdemCloudEnergy& sm
+)
+:
+    dict_(dict),
+    particleCloud_(sm)
+{}
+
+// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
+
+chemistryModel::~chemistryModel()
+{}
+
+// * * * * * * * * * * * * * * * * Member Fct  * * * * * * * * * * * * * * * //
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
