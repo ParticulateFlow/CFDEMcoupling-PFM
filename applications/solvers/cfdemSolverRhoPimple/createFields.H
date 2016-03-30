@@ -1,4 +1,4 @@
-    Info<< "Reading thermophysical properties\n" << endl;
+Info<< "Reading thermophysical properties\n" << endl;
 
     autoPtr<psiThermo> pThermo
     (
@@ -23,6 +23,8 @@
         ),
         thermo.rho()
     );
+
+
 
     Info<< "Reading field U\n" << endl;
     volVectorField U

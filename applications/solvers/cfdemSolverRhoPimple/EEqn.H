@@ -24,7 +24,8 @@
      // net heat transfer from particles to fluid
       - Qsource
      // thermal conduction of the fluid with effective conductivity
-      - fvc::laplacian(rhoeps*particleCloud.thermCondM().thermDiff(),he)
+      - fvc::laplacian(rhoeps*particleCloud.thermCondM().thermDiff(),he) 
+          
       // + particle-fluid energy transfer due to work
       // + fluid energy dissipation due to shearing
      ==
