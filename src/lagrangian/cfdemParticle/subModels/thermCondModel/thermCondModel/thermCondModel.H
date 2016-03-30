@@ -18,86 +18,97 @@ License
 
 
 Description
-    cloud class managing DEM data for CFD-DEM coupling with energy models,
-    e.g. for compressible, reacting flows
+    model for thermal conductivity of fluid phase in presence of particles
 
 Class
-    Foam::cfdemCloudEnergy derived from cfdemCloud
+    thermCondModel
 
 SourceFiles
-    cfdemCloudEnergy.C
+    thermCondModel.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef cfdemCloudEnergy_H
-#define cfdemCloudEnergy_H
+#ifndef thermCondModel_H
+#define thermCondModel_H
 
+#include "fvCFD.H"
 #include "cfdemCloud.H"
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
-// forward declarations
-class energyModel;
-class thermCondModel;
-class chemistryModel;
+
 /*---------------------------------------------------------------------------*\
-                           Class cfdemCloudEnergy Declaration
+                           Class thermCondModel Declaration
 \*---------------------------------------------------------------------------*/
 
-class cfdemCloudEnergy
-:
-    public cfdemCloud
+class thermCondModel
 {
+
 protected:
 
-    const wordList energyModels_;
-    
-    const wordList chemistryModels_;
+    // Protected data
+        const dictionary& dict_;
 
-    autoPtr<energyModel>* energyModel_;
-    
-    autoPtr<thermCondModel> thermCondModel_;
-    
-    autoPtr<chemistryModel> chemistryModel_;
-    
-    void calcEnergyContributions();
-    
+        cfdemCloud& particleCloud_;
+	
+	IOdictionary transportProperties_;
+	
+	dimensionedScalar kf0_;
+	
+	dimensionedScalar Cp_;
+	
+
 public:
 
-    friend class energyModel;
+    //- Runtime type information
+    TypeName("thermCondModel");
+
+    // Declare runtime constructor selection table
+
+        declareRunTimeSelectionTable
+        (
+            autoPtr,
+            thermCondModel,
+            dictionary,
+            (
+                const dictionary& dict,
+                cfdemCloud& sm
+            ),
+            (dict,sm)
+        );
+
 
     // Constructors
 
         //- Construct from components
-        cfdemCloudEnergy
+        thermCondModel
         (
-            const fvMesh& mesh
+            const dictionary& dict,
+            cfdemCloud& sm
         );
+
 
     // Destructor
 
-        ~cfdemCloudEnergy();
+        virtual ~thermCondModel();
+
+
+    // Selector
+
+        static autoPtr<thermCondModel> New
+        (
+            const dictionary& dict,
+            cfdemCloud& sm
+        );
 
 
     // Member Functions
-
-
-       const energyModel& energyM(int);
+	
+	virtual tmp<volScalarField> thermCond() const = 0;
+	
+	virtual tmp<volScalarField> thermDiff() const = 0;
        
-       const thermCondModel& thermCondM();
-       
-       const chemistryModel& chemistryM();
-
-       int nrEnergyModels();
-
-       inline const wordList& energyModels();
-       
-       void energyContributions(volScalarField&);
-       
-       bool evolve(volScalarField&,volVectorField&,volVectorField&);
-
 };
 
 
@@ -106,8 +117,6 @@ public:
 } // End namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#include "cfdemCloudEnergyI.H"
 
 #endif
 

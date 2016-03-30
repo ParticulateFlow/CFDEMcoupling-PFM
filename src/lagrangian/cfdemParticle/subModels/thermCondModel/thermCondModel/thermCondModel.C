@@ -19,48 +19,56 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "error.H"
-
-#include "chemistryModel.H"
+#include "thermCondModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+
+defineTypeNameAndDebug(thermCondModel, 0);
+
+defineRunTimeSelectionTable(thermCondModel, dictionary);
+
+// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-autoPtr<chemistryModel> chemistryModel::New
+// Construct from components
+thermCondModel::thermCondModel
 (
     const dictionary& dict,
-    cfdemCloudEnergy& sm
+    cfdemCloud& sm
 )
-{
-    word chemistryModelType
+:
+    dict_(dict),
+    particleCloud_(sm),
+    transportProperties_
     (
-        dict.lookup("chemistryModel")
-    );
-    Info<< "Selecting chemistryModel "
-         << chemistryModelType << endl;
+        IOobject
+        (
+            "transportProperties",
+            sm.mesh().time().constant(),
+            sm.mesh(),
+            IOobject::MUST_READ_IF_MODIFIED,
+            IOobject::NO_WRITE
+        )
+    ),
+    kf0_(transportProperties_.lookup("kf")),
+    Cp_(transportProperties_.lookup("Cp"))
+//      kf0_(readScalar(transportProperties_.lookup("kf"))),
+//      Cp_(readScalar(transportProperties_.lookup("Cp")))
+{}
 
-    dictionaryConstructorTable::iterator cstrIter =
-        dictionaryConstructorTablePtr_->find(chemistryModelType);
 
-    if (cstrIter == dictionaryConstructorTablePtr_->end())
-    {
-        FatalError
-            << "chemistryModel::New(const dictionary&, cfdemCloudEnergy&) : "
-            << endl
-            << "    unknown chemistryModelType type "
-            << chemistryModelType
-            << ", constructor not in hash table" << endl << endl
-            << "    Valid chemistryModel types are :"
-            << endl;
-        Info<< dictionaryConstructorTablePtr_->toc()
-            << abort(FatalError);
-    }
+// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-    return autoPtr<chemistryModel>(cstrIter()(dict,sm));
-}
+thermCondModel::~thermCondModel()
+{}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

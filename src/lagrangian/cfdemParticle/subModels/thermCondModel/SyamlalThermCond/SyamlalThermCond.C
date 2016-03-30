@@ -19,8 +19,9 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "error.H"
-#include "species.H"
+#include "SyamlalThermCond.H"
 #include "addToRunTimeSelectionTable.H"
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -28,62 +29,53 @@ namespace Foam
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-defineTypeNameAndDebug(species, 0);
+defineTypeNameAndDebug(SyamlalThermCond, 0);
 
-addToRunTimeSelectionTable(chemistryModel, species, dictionary);
+addToRunTimeSelectionTable
+(
+    thermCondModel,
+    SyamlalThermCond,
+    dictionary
+);
+
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 // Construct from components
-species::species
+SyamlalThermCond::SyamlalThermCond
 (
     const dictionary& dict,
-    cfdemCloudEnergy& sm
+    cfdemCloud& sm
 )
 :
-    chemistryModel(dict,sm),
+    thermCondModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
-    interpolation_(propsDict_.lookupOrDefault<bool>("interpolation",false))
-{
-     allocateMyArrays();
-
-    
-}
+    voidfractionFieldName_(propsDict_.lookupOrDefault<word>("voidfractionFieldName","voidfraction")),
+    voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
+    rhoFieldName_(propsDict_.lookupOrDefault<word>("rhoFieldName","rho")),
+    rho_(sm.mesh().lookupObject<volScalarField> (rhoFieldName_))
+{}
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-species::~species()
-{
+SyamlalThermCond::~SyamlalThermCond()
+{}
 
+
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+tmp<volScalarField> SyamlalThermCond::thermCond() const
+{
+    return (1-sqrt(1-voidfraction_+SMALL)) / (voidfraction_+SMALL) * kf0_;
 }
 
-// * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
-void species::allocateMyArrays() const
+tmp<volScalarField> SyamlalThermCond::thermDiff() const
 {
-
+    // return (1-sqrt(1-voidfraction_+SMALL)) / (voidfraction_+SMALL) * kEff0_/(rho_*Cp_);
+  return thermCond()/(rho_*Cp_);
 }
 
-// * * * * * * * * * * * * * * * * Member Fct  * * * * * * * * * * * * * * * //
-
-void species::execute()
-{
-  
-  // get Y_i, T, rho at particle positions, fill arrays with them and push to LIGGGHTS
-  
-  // pull changeOfSpeciesMass_, transform onto fields changeOfSpeciesMassFields_, add them up on changeOfGasMassField_
-  
-}
-
-//tmp<Foam::fvScalarMatrix> species::Smi(const label i) const
-//{
-//    return tmp<fvScalarMatrix>(new fvScalarMatrix(changeOfSpeciesMassFields_[i], dimMass/dimTime)); 
-//}
-
-//tmp<Foam::fvScalarMatrix> species::Sm() const
-//{
-//    return tmp<fvScalarMatrix>(new fvScalarMatrix(changeOfGasMassField_, dimMass/dimTime)); 
-//}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

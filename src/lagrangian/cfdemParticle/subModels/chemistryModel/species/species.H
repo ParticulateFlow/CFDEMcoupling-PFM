@@ -53,9 +53,23 @@ private:
     
     // List<double**> concentrations_;
     
-    // List<double**> changeOfConcentrations_;
+    // List<double**> changeOfSpeciesMass_;
     
-    // List<volScalarField> changeOfConcentrationFields_;
+    // List<volScalarField> changeOfSpeciesMassFields_;
+    
+    // volScalarField changeOfGasMassField_;
+    
+    // word tempFieldName_;
+
+    // const volScalarField& tempField_;            // ref to gas temperature field
+    
+    // mutable double **partTemp_;                  // gas temperature at particle positions
+
+    // word densityFieldName_;
+    
+    // const volScalarField& rho_;
+    
+    // mutable double **partRho_;                   // gas density at particle positions
     
     void allocateMyArrays() const;
        
@@ -83,7 +97,11 @@ public:
 
     void execute();
     
-    //
+//     tmp<fvScalarMatrix> Smi(const label i) const;
+//     
+//     tmp<fvScalarMatrix> Sm() const;
+    
+    
 
 
 };

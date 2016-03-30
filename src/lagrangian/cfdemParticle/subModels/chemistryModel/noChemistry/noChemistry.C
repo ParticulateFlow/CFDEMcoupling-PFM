@@ -19,48 +19,53 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "error.H"
-
-#include "chemistryModel.H"
-
+#include "noChemistry.H"
+#include "addToRunTimeSelectionTable.H"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+
+defineTypeNameAndDebug(noChemistry, 0);
+
+addToRunTimeSelectionTable(chemistryModel, noChemistry, dictionary);
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-autoPtr<chemistryModel> chemistryModel::New
+// Construct from components
+noChemistry::noChemistry
 (
     const dictionary& dict,
     cfdemCloudEnergy& sm
 )
-{
-    word chemistryModelType
-    (
-        dict.lookup("chemistryModel")
-    );
-    Info<< "Selecting chemistryModel "
-         << chemistryModelType << endl;
+:
+    chemistryModel(dict,sm)
+{}
 
-    dictionaryConstructorTable::iterator cstrIter =
-        dictionaryConstructorTablePtr_->find(chemistryModelType);
 
-    if (cstrIter == dictionaryConstructorTablePtr_->end())
-    {
-        FatalError
-            << "chemistryModel::New(const dictionary&, cfdemCloudEnergy&) : "
-            << endl
-            << "    unknown chemistryModelType type "
-            << chemistryModelType
-            << ", constructor not in hash table" << endl << endl
-            << "    Valid chemistryModel types are :"
-            << endl;
-        Info<< dictionaryConstructorTablePtr_->toc()
-            << abort(FatalError);
-    }
+// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-    return autoPtr<chemistryModel>(cstrIter()(dict,sm));
-}
+noChemistry::~noChemistry()
+{}
+
+// * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
+
+// * * * * * * * * * * * * * * * * Member Fct  * * * * * * * * * * * * * * * //
+
+void noChemistry::execute()
+{}
+
+//tmp<Foam::fvScalarMatrix> noChemistry::Smi(const label i) const
+//{
+//    return tmp<fvScalarMatrix>(new fvScalarMatrix(0, dimMass/dimTime)); 
+//}
+
+//tmp<Foam::fvScalarMatrix> noChemistry::Sm() const
+//{
+//    return tmp<fvScalarMatrix>(new fvScalarMatrix(0, dimMass/dimTime)); 
+//}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

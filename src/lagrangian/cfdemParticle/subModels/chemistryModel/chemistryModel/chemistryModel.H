@@ -86,14 +86,17 @@ public:
         static autoPtr<chemistryModel> New
         (
             const dictionary& dict,
-            cfdemCloudEnergy& sm,
-            word chemistryType
+            cfdemCloudEnergy& sm
         );
 
 
     // Member Functions
 
-       void execute() = 0;
+       virtual void execute() = 0;
+       
+//        virtual tmp<fvScalarMatrix> Smi (const label i) const = 0;
+//        
+//        virtual tmp<fvScalarMatrix> Sm () const = 0;
 
 
 };

@@ -20,7 +20,7 @@ License
 
 #include "error.H"
 
-#include "chemistryModel.H"
+#include "thermCondModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -29,37 +29,39 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-autoPtr<chemistryModel> chemistryModel::New
+autoPtr<thermCondModel> thermCondModel::New
 (
     const dictionary& dict,
-    cfdemCloudEnergy& sm
+    cfdemCloud& sm
 )
 {
-    word chemistryModelType
+    word thermCondModelType
     (
-        dict.lookup("chemistryModel")
+        dict.lookup("thermCondModel")
     );
-    Info<< "Selecting chemistryModel "
-         << chemistryModelType << endl;
+
+    Info<< "Selecting thermCondModel "
+         << thermCondModelType << endl;
+
 
     dictionaryConstructorTable::iterator cstrIter =
-        dictionaryConstructorTablePtr_->find(chemistryModelType);
+        dictionaryConstructorTablePtr_->find(thermCondModelType);
 
     if (cstrIter == dictionaryConstructorTablePtr_->end())
     {
         FatalError
-            << "chemistryModel::New(const dictionary&, cfdemCloudEnergy&) : "
+            << "thermCondModel::New(const dictionary&, const spray&) : "
             << endl
-            << "    unknown chemistryModelType type "
-            << chemistryModelType
+            << "    unknown thermCondModelType type "
+            << thermCondModelType
             << ", constructor not in hash table" << endl << endl
-            << "    Valid chemistryModel types are :"
+            << "    Valid thermCondModel types are :"
             << endl;
         Info<< dictionaryConstructorTablePtr_->toc()
             << abort(FatalError);
     }
 
-    return autoPtr<chemistryModel>(cstrIter()(dict,sm));
+    return autoPtr<thermCondModel>(cstrIter()(dict,sm));
 }
 
 

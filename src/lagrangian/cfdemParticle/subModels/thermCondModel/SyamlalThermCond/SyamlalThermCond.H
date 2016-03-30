@@ -18,86 +18,76 @@ License
 
 
 Description
-    cloud class managing DEM data for CFD-DEM coupling with energy models,
-    e.g. for compressible, reacting flows
+    thermal conductivity of fluid phase in presence of particles according to
+    Syamlal, M. and Gidaspow, M. AIChE Journal 31.1 (1985)
 
 Class
-    Foam::cfdemCloudEnergy derived from cfdemCloud
+    SyamlalThermCond
 
 SourceFiles
-    cfdemCloudEnergy.C
+    SyamlalThermCond.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef cfdemCloudEnergy_H
-#define cfdemCloudEnergy_H
 
-#include "cfdemCloud.H"
+#ifndef SyamlalThermCond_H
+#define SyamlalThermCond_H
+
+#include "thermCondModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
-// forward declarations
-class energyModel;
-class thermCondModel;
-class chemistryModel;
+
 /*---------------------------------------------------------------------------*\
-                           Class cfdemCloudEnergy Declaration
+                           Class SyamlalThermCond Declaration
 \*---------------------------------------------------------------------------*/
 
-class cfdemCloudEnergy
+class SyamlalThermCond
 :
-    public cfdemCloud
+    public thermCondModel
 {
-protected:
+  
+private:
+  
+    dictionary propsDict_;
+  
+    word voidfractionFieldName_;
+  
+    const volScalarField& voidfraction_;
+    
+    word rhoFieldName_;
+    
+    const volScalarField& rho_;
 
-    const wordList energyModels_;
-    
-    const wordList chemistryModels_;
-
-    autoPtr<energyModel>* energyModel_;
-    
-    autoPtr<thermCondModel> thermCondModel_;
-    
-    autoPtr<chemistryModel> chemistryModel_;
-    
-    void calcEnergyContributions();
-    
 public:
 
-    friend class energyModel;
+    //- Runtime type information
+    TypeName("SyamlalThermCond");
+
 
     // Constructors
 
         //- Construct from components
-        cfdemCloudEnergy
+        SyamlalThermCond
         (
-            const fvMesh& mesh
+            const dictionary& dict,
+            cfdemCloud& sm
         );
 
     // Destructor
 
-        ~cfdemCloudEnergy();
+        ~SyamlalThermCond();
 
 
     // Member Functions
-
-
-       const energyModel& energyM(int);
+	
+	tmp<volScalarField> thermCond() const;
+	
+	tmp<volScalarField> thermDiff() const;
        
-       const thermCondModel& thermCondM();
        
-       const chemistryModel& chemistryM();
-
-       int nrEnergyModels();
-
-       inline const wordList& energyModels();
-       
-       void energyContributions(volScalarField&);
-       
-       bool evolve(volScalarField&,volVectorField&,volVectorField&);
-
 };
 
 
@@ -106,8 +96,6 @@ public:
 } // End namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#include "cfdemCloudEnergyI.H"
 
 #endif
 

@@ -15,56 +15,73 @@ License
     along with this code.  If not, see <http://www.gnu.org/licenses/>.
 
     Copyright (C) 2015- Thomas Lichtenegger, JKU Linz, Austria
+    
+    Description
+    Chemistry turned off
 
 \*---------------------------------------------------------------------------*/
 
-#include "error.H"
+#ifndef noChemistry_H
+#define noChemistry_H
 
+#include "fvCFD.H"
+#include "cfdemCloudEnergy.H"
 #include "chemistryModel.H"
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+/*---------------------------------------------------------------------------*\
+                           Class noChemistry Declaration
+\*---------------------------------------------------------------------------*/
 
-autoPtr<chemistryModel> chemistryModel::New
-(
-    const dictionary& dict,
-    cfdemCloudEnergy& sm
-)
+
+class noChemistry
+:
+    public chemistryModel
 {
-    word chemistryModelType
-    (
-        dict.lookup("chemistryModel")
-    );
-    Info<< "Selecting chemistryModel "
-         << chemistryModelType << endl;
+private:
 
-    dictionaryConstructorTable::iterator cstrIter =
-        dictionaryConstructorTablePtr_->find(chemistryModelType);
+       
+public:
 
-    if (cstrIter == dictionaryConstructorTablePtr_->end())
-    {
-        FatalError
-            << "chemistryModel::New(const dictionary&, cfdemCloudEnergy&) : "
-            << endl
-            << "    unknown chemistryModelType type "
-            << chemistryModelType
-            << ", constructor not in hash table" << endl << endl
-            << "    Valid chemistryModel types are :"
-            << endl;
-        Info<< dictionaryConstructorTablePtr_->toc()
-            << abort(FatalError);
-    }
+    //- Runtime type information
+    TypeName("off");
 
-    return autoPtr<chemistryModel>(cstrIter()(dict,sm));
-}
+    // Constructors
+
+        //- Construct from components
+        noChemistry
+        (
+            const dictionary& dict,
+            cfdemCloudEnergy& sm
+        );
+
+
+    // Destructor
+
+        virtual ~noChemistry();
+
+
+    // Member Functions
+
+    void execute();
+    
+//     tmp<fvScalarMatrix> Smi(const label i) const;
+//     
+//     tmp<fvScalarMatrix> Sm() const;
+
+
+};
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#endif
 
 // ************************************************************************* //
