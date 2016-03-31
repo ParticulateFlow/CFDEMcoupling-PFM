@@ -43,6 +43,7 @@ Description
 #include "forceModel.H"
 #include "thermCondModel.H"
 #include "energyModel.H"
+#include "chemistryModel.H"
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

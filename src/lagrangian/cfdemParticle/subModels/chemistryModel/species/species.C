@@ -61,7 +61,7 @@ species::~species()
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
 void species::allocateMyArrays() const
 {
-
+  // could be implemented similarly as forcemodel LaEuScalarTemp
 }
 
 // * * * * * * * * * * * * * * * * Member Fct  * * * * * * * * * * * * * * * //
