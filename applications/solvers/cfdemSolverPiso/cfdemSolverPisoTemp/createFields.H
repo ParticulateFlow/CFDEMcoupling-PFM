@@ -119,6 +119,34 @@
         mesh
     );
     
+    Info<< "\nCreating thermal diffusivity field\n" << endl;
+    volScalarField thDiff
+    (
+        IOobject
+        (
+            "thDiff",
+            runTime.timeName(),
+            mesh,
+            IOobject::MUST_READ,
+            IOobject::AUTO_WRITE
+        ),
+        mesh
+    );
+    
+    Info<< "\nCreating temperature gradient field\n" << endl;
+    volVectorField gradT
+    (
+        IOobject
+        (
+            "gradT",
+            runTime.timeName(),
+            mesh,
+            IOobject::MUST_READ,
+            IOobject::AUTO_WRITE
+        ),
+        mesh
+    );
+    
     IOdictionary transportProperties
     (
         IOobject
