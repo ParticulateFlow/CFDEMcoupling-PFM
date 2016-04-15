@@ -38,7 +38,7 @@ cfdemCloudRec::cfdemCloudRec
     const fvMesh& mesh
 )
 :
-    cfdemCloud(mesh),
+    baseCloud(mesh),
     forceModelsRec_(couplingProperties_.lookup("forceModelsRec")),
     recModel_
     (
@@ -67,12 +67,17 @@ cfdemCloudRec::~cfdemCloudRec()
 {}
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
+
+// shouldn't be needed anymore
+// getDEMdata of base class sufficient
+/*
 void cfdemCloudRec::getDEMdata()
 {
     dataExchangeM().getData("radius","scalar-atom",radii_);
     dataExchangeM().getData("x","vector-atom",positions_);
     dataExchangeM().getData("v","vector-atom",velocities_);
 }
+*/
 
 void cfdemCloudRec::giveDEMdata()
 {
@@ -90,6 +95,9 @@ void cfdemCloudRec::setForces()
     for (int i=0;i<nrForceModelsRec();i++) forceMRec(i).setForce();
 }
 
+void cfdemCloudRec::setParticleForceField()
+{}
+
 // * * *   write top level fields   * * * //
 
 // * * * * * * * * * * * * * * * protected Member Functions  * * * * * * * * * * * * * //
@@ -105,6 +113,10 @@ const forceModelRec& cfdemCloudRec::forceMRec(int i)
     return forceModelRec_[i];
 }
 
+
+// shouldn't be needed anymore
+// evolve of base class sufficient, override setForces() with rec. forces
+/*
 bool cfdemCloudRec::evolve
 (
     volScalarField& alpha,
@@ -227,7 +239,7 @@ bool cfdemCloudRec::evolve
     return doCouple;
 }
 
-
+*/
 
 
 

@@ -56,6 +56,7 @@ $(forceModels)/MeiLift/MeiLift.C
 $(forceModels)/particleCellVolume/particleCellVolume.C
 $(forceModels)/fieldTimeAverage/fieldTimeAverage.C
 $(forceModels)/volWeightedAverage/volWeightedAverage.C
+$(forceModels)/deactivateForce/deactivateForce.C
 
 $(forceModelsMS)/forceModelMS/forceModelMS.C
 $(forceModelsMS)/forceModelMS/newForceModelMS.C
@@ -115,6 +116,7 @@ $(momCoupleModels)/momCoupleModel/newMomCoupleModel.C
 $(momCoupleModels)/explicitCouple/explicitCouple.C
 $(momCoupleModels)/implicitCouple/implicitCouple.C
 $(momCoupleModels)/noCouple/noCouple.C
+$(momCoupleModels)/deactivateCouple/deactivateCouple.C
 
 $(regionModels)/regionModel/regionModel.C
 $(regionModels)/regionModel/newRegionModel.C

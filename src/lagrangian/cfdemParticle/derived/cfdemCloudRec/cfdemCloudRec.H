@@ -50,8 +50,8 @@ class forceModelRec;
 /*---------------------------------------------------------------------------*\
                            Class cfdemCloudRec Declaration
 \*---------------------------------------------------------------------------*/
-
-class cfdemCloudRec : public cfdemCloud
+template <class baseCloud>
+class cfdemCloudRec : public baseCloud
 {
 protected:
     const wordList forceModelsRec_;
@@ -60,11 +60,13 @@ protected:
     
     autoPtr<forceModelRec>* forceModelRec_;
     
-    void getDEMdata();
+  //  void getDEMdata();
 
     void giveDEMdata();
     
     void setForces();
+    
+    void setParticleForceField();
     
     bool coupleRecForce_;
     
@@ -87,7 +89,7 @@ public:
 
 // public Member Functions
 
-    bool evolve(volScalarField&,volVectorField&,volVectorField&);
+ //   bool evolve(volScalarField&,volVectorField&,volVectorField&);
     
     inline const recModel& recM() const;
     
