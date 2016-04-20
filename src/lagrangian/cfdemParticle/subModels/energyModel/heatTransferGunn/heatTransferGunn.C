@@ -175,6 +175,20 @@ void heatTransferGunn::calcEnergyContribution()
                 // calc convective heat flux [W]
                 scalar partHeatFlux = h * As * (Tfluid - partTemp_[index][0]);
                 partHeatFlux_[index][0] = partHeatFlux;
+		
+		if(particleCloud_.verbose() && index >=0 && index <2)
+                {
+                    Info << "partHeatFlux = " << partHeatFlux << endl;
+                    Info << "magUr = " << magUr << endl;
+                    Info << "As = " << As << endl;
+                    Info << "muf = " << muf << endl;
+                    Info << "Rep = " << Rep << endl;
+                    Info << "Pr = " << Pr << endl;
+                    Info << "Nup = " << Nup << endl;
+                    Info << "voidfraction = " << voidfraction << endl;
+                    Info << "partTemp_[index][0] = " << partTemp_[index][0] << endl;
+                    Info << "Tfluid = " << Tfluid << endl  ;
+                }
             }
     }
 

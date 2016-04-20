@@ -67,7 +67,10 @@ SyamlalThermCond::~SyamlalThermCond()
 
 tmp<volScalarField> SyamlalThermCond::thermCond() const
 {
-    return (1-sqrt(1-voidfraction_+SMALL)) / (voidfraction_+SMALL) * kf0_;
+    return (1-sqrt(1-voidfraction_)) / (voidfraction_) * kf0_;
+  
+  	// just testing: throw away void fraction near boundaries...
+  //return kf0_/voidfraction_;
 }
 
 tmp<volScalarField> SyamlalThermCond::thermDiff() const
