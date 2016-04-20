@@ -63,11 +63,15 @@ private:
 
     // const volScalarField& tempField_;            // ref to gas temperature field
     
+    // word partTempName_;
+
     // mutable double **partTemp_;                  // gas temperature at particle positions
 
     // word densityFieldName_;
     
     // const volScalarField& rho_;
+
+    // word partRhoName_;
     
     // mutable double **partRho_;                   // gas density at particle positions
     
