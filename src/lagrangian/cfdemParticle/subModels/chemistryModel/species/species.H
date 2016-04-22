@@ -75,6 +75,15 @@ private:
     
     // mutable double **partRho_;                   // gas density at particle positions
     
+    // word velFieldName_;                          // Can be uncommented when velocity is to be calculated in the species source code
+
+    // const volVectorField& U_;
+
+    // word voidfractionFieldName_;                 // Can be uncommented when voidfraction is to be calculated in the species source code
+
+    // const volScalarField& voidfraction_;
+
+
     void allocateMyArrays() const;
        
 public:

@@ -23,6 +23,9 @@ License
 #include "addToRunTimeSelectionTable.H"
 
 #include "dataExchangeModel.H"
+//#include "IFstream.H"
+
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -51,15 +54,21 @@ species::species
     chemistryModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
     interpolation_(propsDict_.lookupOrDefault<bool>("interpolation",false)),
-    //speciesNames_(propsDict_.lookup("speciesNames"));
-    //Y_(sm.mesh().lookup<volScalarField> (speciesNames_)),
 
 
-    //concentrations_(),
-    //changeOfSpeciesMass_(),
+    // species names are written in the coupling Properties under "species"
+    speciesNames_(propsDict_.lookup("species"))
+{
+    Y_.setSize(speciesNames_.size());
 
-    //changeOfSpeciesMassFields_(sm.mesh().lookup<volScalarField> (changeOfSpeciesMassFields)),
-    //changeOfGasMassFields_(sm.mesh().lookup<volScalarField> (changeOfGasMassField_)),
+    for (int i=0; i<speciesNames_.size(); i++);
+    {
+        Info << "Reading Species Fields" << speciesNames_[i] <<endl;
+        Y_[i](sm.mesh().lookupObject<volScalarField>(speciesNames_[i]));
+    }
+}
+    concentrations_(NULL),
+    changeOfSpeciesMass_(NULL),
 
     tempFieldName_(propsDict_.lookupOrDefault<word>("tempFieldName","T")),
     tempField_(sm.mesh().lookupObject<volScalarField> (tempFieldName_)),
@@ -69,18 +78,32 @@ species::species
     densityFieldName_(propsDict_.lookupOrDefault<word>("densityFieldName","rho")),
     rho_(sm.mesh().lookupObject<volScalarField> (densityFieldName_)),
     partRhoName_(propsDict_.lookup("partRhoName")),
-    partRho_(NULL),
+    partRho_(NULL)
+{
 
+        allocateMyArrays();
 
-    /*  voidfractionFieldName_(propsDict_.lookup("voidfractionFieldName")),
+}
+
+    /*// define a file name in the coupling properties that contains the species
+    speciesNames_
+    (
+        IFstream
+        (
+            fileName(propsDict_.lookup("ChemistryFile")).expand()
+        )()
+    ),*/
+
+    //changeOfSpeciesMass_(),
+    //changeOfSpeciesMassFields_(sm.mesh().lookup<volScalarField> (changeOfSpeciesMassFields)),
+    //changeOfGasMassFields_(sm.mesh().lookup<volScalarField> (changeOfGasMassField_)),
+
+    // voidfraction and velocity fields can be included by wish
+/*  voidfractionFieldName_(propsDict_.lookup("voidfractionFieldName")),
     voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
     velFieldName_(propsDict_.lookup("velFieldName")),
     U_(sm.mesh().lookup<volVectorField> (velFieldName_)),*/
 
-{
-     allocateMyArrays();
-
-}
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
@@ -89,6 +112,7 @@ species::~species()
 {
     delete partTemp_;
     delete partRho_;
+    delete concentrations_;
 }
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
@@ -100,6 +124,8 @@ void species::allocateMyArrays() const
     double initVal=0.0;
     particleCloud_.dataExchangeM().allocateArray(partRho_,initVal,1);
     particleCloud_.dataExchangeM().allocateArray(partTemp_,initVal,1);
+    particleCloud_.dataExchangeM().allocateArray(concentrations_,initVal,1);
+
     //particleCloud_.dataExchangeM().allocateArray(Y_,initVal,1);
 
 }
@@ -111,20 +137,20 @@ void species::execute()
   // realloc the arrays
     allocateMyArrays();
 
-  // get DEM data
-    particleCloud_.dataExchangeM().getData(partTempName_,'scalar-atom',partTemp_);
-    //particleCloud_.dataExchangeM().getData(partRhoName_,'scalar-atom',partRho_);
-
   // get Y_i, T, rho at particle positions, fill arrays with them and push to LIGGGHTS
 
-    scalar Tfluid(0);
     label  cellI=0;
-    scalar rho(0);
-    scalar Yfluid(0);
+    scalar Tfluid(0);
+    scalar rhofluid(0);
+    scalar Yfluid_[i](0);
 
     interpolationCellPoint<scalar> TInterpolator_(tempField_);
     interpolationCellPoint<scalar> rhoInterpolator_(rho_);
-    itnerpolationCellPoint<scalar> YInterpolator_(Y_);
+
+    for (int i=0; i<speciesNames_.size(); i++) // must check
+    {
+        interpolationCellPoint<scalar> YInterpolator_[i](Y_[i]);
+    }
 
     for (int index=0; index<particleCloud_.numberOfParticles(); index++)
     {
@@ -132,29 +158,40 @@ void species::execute()
         if (cellI >=0)
         {
             if(interpolation_)
-          //if(chemistryM(0).interpolation())
             {
                 vector position = particleCloud_.position(index);
                 Tfluid = TInterpolator_.interpolate(poistion,cellI);
-                rho=rhoInterpolator_.interpolate(position,cellI);
-                Yfluid=YInterpolator_.interpolate(position,cellI);
+                rhofluid=rhoInterpolator_.interpolate(position,cellI);
+                for (int i=0; i<speciesNames_.size();i++)
+                {
+                    Yfluid_[i]=YInterpolator_[i].interpolate(position,cellI);
+                }
             }
             else
             {
                 Tfluid = tempField_[cellI];
                 rho=rho_[cellI];
-                Yfluid=Y_[cellI];
+                for (int i=0; i<speciesNames_.size();i++)
+                {
+                    Yfluid_[i][0]=Y_[i][cellI];  // iki tane bilinmeyenli array olacak (yanlis)
+                }
             }
 
-            // calculate T, rho, Y_i
-
             //fill arrays
-            partTemp_[index][0]=;
-            partRho_[index][0]=;
+            partTemp_[index][0]=Tfluid;
+            partRho_[index][0]=rhofluid;
+            for (int i=0; i<speciesNames_.size();i++)
+            {
+                concentrations_[i][index][0]=Yfluid_[i]; // iki tane bilinmeyenli array olacak
+            }
 
 
         }
     }
+
+    // give DEM data
+    particleCloud_.dataExchangeM().giveData(partTempName_,'scalar-atom',partTemp_);
+    particleCloud_.dataExchangeM().giveData(partRhoName_,'scalar-atom', partRho_);
 
 
 
