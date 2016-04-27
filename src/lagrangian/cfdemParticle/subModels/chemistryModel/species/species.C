@@ -56,19 +56,11 @@ species::species
     interpolation_(propsDict_.lookupOrDefault<bool>("interpolation",false)),
 
 
-    // species names are written in the coupling Properties under "species"
-    speciesNames_(propsDict_.lookup("species"))
-{
-    Y_.setSize(speciesNames_.size());
-
-    for (int i=0; i<speciesNames_.size(); i++);
-    {
-        Info << "Reading Species Fields" << speciesNames_[i] <<endl;
-        Y_[i](sm.mesh().lookupObject<volScalarField>(speciesNames_[i]));
-    }
-}
-    concentrations_(NULL),
-    changeOfSpeciesMass_(NULL),
+    // species names are written in the coupling properties under "species"
+    speciesNames_(propsDict_.lookup("species")),
+    Y_(speciesNames_.size()),
+    concentrations_(),
+    // changeOfSpeciesMass_(),
 
     tempFieldName_(propsDict_.lookupOrDefault<word>("tempFieldName","T")),
     tempField_(sm.mesh().lookupObject<volScalarField> (tempFieldName_)),
@@ -79,13 +71,42 @@ species::species
     rho_(sm.mesh().lookupObject<volScalarField> (densityFieldName_)),
     partRhoName_(propsDict_.lookup("partRhoName")),
     partRho_(NULL)
-{
 
-        allocateMyArrays();
+{ 
+
+    //Y_.setSize(speciesNames_.size());
+
+    for (int i=0; i<speciesNames_.size(); i++)
+    {
+
+        Y_[i]=sm.mesh().lookupObject<volScalarField>(speciesNames_[i]);
+        /*word fieldName = "Y_" + speciesNames_[i];
+
+        Y_.set
+        (
+        i,
+        new volVectorField
+            (
+            IOobject
+                (
+                fieldName,
+                sm.mesh().time().timeName(),
+                sm.mesh(),
+                IOobject::MUST_READ,
+                IOobject::NO_WRITE
+                ),
+            sm.mesh(),
+            dimensionedScalar("zero",sm.mesh().lookupObject<volScalarField>(speciesNames_[i]).dimensions(), 0)
+            )
+        );*/
+    }
+
+
+    allocateMyArrays();
 
 }
 
-    /*// define a file name in the coupling properties that contains the species
+    /* define a file name in the coupling properties that contains the species
     speciesNames_
     (
         IFstream
@@ -94,11 +115,8 @@ species::species
         )()
     ),*/
 
-    //changeOfSpeciesMass_(),
-    //changeOfSpeciesMassFields_(sm.mesh().lookup<volScalarField> (changeOfSpeciesMassFields)),
-    //changeOfGasMassFields_(sm.mesh().lookup<volScalarField> (changeOfGasMassField_)),
 
-    // voidfraction and velocity fields can be included by wish
+// voidfraction and velocity fields can be included by wish
 /*  voidfractionFieldName_(propsDict_.lookup("voidfractionFieldName")),
     voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
     velFieldName_(propsDict_.lookup("velFieldName")),
@@ -112,7 +130,7 @@ species::~species()
 {
     delete partTemp_;
     delete partRho_;
-    delete concentrations_;
+
 }
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
@@ -124,9 +142,9 @@ void species::allocateMyArrays() const
     double initVal=0.0;
     particleCloud_.dataExchangeM().allocateArray(partRho_,initVal,1);
     particleCloud_.dataExchangeM().allocateArray(partTemp_,initVal,1);
-    particleCloud_.dataExchangeM().allocateArray(concentrations_,initVal,1);
 
-    //particleCloud_.dataExchangeM().allocateArray(Y_,initVal,1);
+  //particleCloud_.dataExchangeM().allocateArray(concentrations_,initVal,1,numberOfParticles_);
+
 
 }
 
@@ -142,15 +160,11 @@ void species::execute()
     label  cellI=0;
     scalar Tfluid(0);
     scalar rhofluid(0);
-    scalar Yfluid_[i](0);
 
-    interpolationCellPoint<scalar> TInterpolator_(tempField_);
-    interpolationCellPoint<scalar> rhoInterpolator_(rho_);
 
-    for (int i=0; i<speciesNames_.size(); i++) // must check
-    {
-        interpolationCellPoint<scalar> YInterpolator_[i](Y_[i]);
-    }
+
+    interpolationCellPoint <scalar> TInterpolator_(tempField_);
+    interpolationCellPoint <scalar> rhoInterpolator_(rho_);
 
     for (int index=0; index<particleCloud_.numberOfParticles(); index++)
     {
@@ -159,39 +173,56 @@ void species::execute()
         {
             if(interpolation_)
             {
-                vector position = particleCloud_.position(index);
-                Tfluid = TInterpolator_.interpolate(poistion,cellI);
-                rhofluid=rhoInterpolator_.interpolate(position,cellI);
-                for (int i=0; i<speciesNames_.size();i++)
+                vector position     =   particleCloud_.position(index);
+                Tfluid              =   TInterpolator_.interpolate(position,cellI);
+                rhofluid            =   rhoInterpolator_.interpolate(position,cellI);
+
+                /*for (int i=0;i<speciesNames_.size();i++)
                 {
-                    Yfluid_[i]=YInterpolator_[i].interpolate(position,cellI);
-                }
+                    interpolationCellPoint <scalar> YInterpolator_[i](Y_[i]);
+
+                    scalar Yfluid_i = YInterpolator_[i].interpolate(position,cellI);
+                }*/
             }
             else
             {
                 Tfluid = tempField_[cellI];
-                rho=rho_[cellI];
-                for (int i=0; i<speciesNames_.size();i++)
+                rhofluid=rho_[cellI];
+                /*for (int i=0; i<speciesNames_.size();i++)
                 {
-                    Yfluid_[i][0]=Y_[i][cellI];  // iki tane bilinmeyenli array olacak (yanlis)
-                }
+                    Yfluid_[i][0]=Y_[i][position][cellI];
+                }*/
             }
 
             //fill arrays
             partTemp_[index][0]=Tfluid;
             partRho_[index][0]=rhofluid;
-            for (int i=0; i<speciesNames_.size();i++)
+            /*for (int i=0; i<speciesNames_.size();i++)
             {
-                concentrations_[i][index][0]=Yfluid_[i]; // iki tane bilinmeyenli array olacak
-            }
+                concentrations_[i][index][0]=Yfluid_[i];*/
 
 
         }
     }
 
+
+    /*for (int i=0;i<speciesNames_.size();i++);
+    {
+        Yfluid_[i](0);
+    }*/
+
+    //Yfluid_.setSize(speciesNames_size());
+
+    //for (int i=0; i<speciesNames_.size();i++)
+    //{
+    //    Yfluid_[i](0);
+    //    interpolationCellPoint<scalar> YInterpolator_[i](Y_[i]);
+    //}
+
+
     // give DEM data
-    particleCloud_.dataExchangeM().giveData(partTempName_,'scalar-atom',partTemp_);
-    particleCloud_.dataExchangeM().giveData(partRhoName_,'scalar-atom', partRho_);
+    particleCloud_.dataExchangeM().giveData(partTempName_, "scalar-atom", partTemp_);
+    particleCloud_.dataExchangeM().giveData(partRhoName_, "scalar-atom", partRho_);
 
 
 
