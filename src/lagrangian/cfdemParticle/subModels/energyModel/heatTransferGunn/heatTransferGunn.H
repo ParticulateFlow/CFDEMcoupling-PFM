@@ -50,6 +50,8 @@ private:
     word QPartFluidName_;
         
     volScalarField QPartFluid_;
+    
+    volScalarField partTempField_;
 
     word tempFieldName_;
 
