@@ -23,7 +23,8 @@ License
 #include "addToRunTimeSelectionTable.H"
 
 #include "dataExchangeModel.H"
-//#include "IFstream.H"
+#include "IFstream.H"
+
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -55,12 +56,22 @@ species::species
     propsDict_(dict.subDict(typeName + "Props")),
     interpolation_(propsDict_.lookupOrDefault<bool>("interpolation",false)),
 
+    // define a file name in the coupling properties that contains the species
+    specDict_
+    (
+        IFstream
+        (
+            fileName(propsDict_.lookup("ChemistryFile")).expand()
+        )()
+    ),
+    // create a list from the Species table in the specified species dictionary
+    speciesNames_(specDict_.lookup("species")),
 
     // species names are written in the coupling properties under "species"
-    speciesNames_(propsDict_.lookup("species")),
+    // speciesNames_(propsDict_.lookup("species")),
     Y_(speciesNames_.size()),
-    concentrations_(),
-    // changeOfSpeciesMass_(),
+    concentrations_(speciesNames_.size()),
+    changeOfSpeciesMass_(speciesNames_.size()),
 
     tempFieldName_(propsDict_.lookupOrDefault<word>("tempFieldName","T")),
     tempField_(sm.mesh().lookupObject<volScalarField> (tempFieldName_)),
@@ -73,48 +84,15 @@ species::species
     partRho_(NULL)
 
 { 
-
-    //Y_.setSize(speciesNames_.size());
-
-    for (int i=0; i<speciesNames_.size(); i++)
+     for (int i=0; i<speciesNames_.size(); i++)
     {
-
         Y_[i]=sm.mesh().lookupObject<volScalarField>(speciesNames_[i]);
-        /*word fieldName = "Y_" + speciesNames_[i];
-
-        Y_.set
-        (
-        i,
-        new volVectorField
-            (
-            IOobject
-                (
-                fieldName,
-                sm.mesh().time().timeName(),
-                sm.mesh(),
-                IOobject::MUST_READ,
-                IOobject::NO_WRITE
-                ),
-            sm.mesh(),
-            dimensionedScalar("zero",sm.mesh().lookupObject<volScalarField>(speciesNames_[i]).dimensions(), 0)
-            )
-        );*/
     }
 
 
     allocateMyArrays();
 
 }
-
-    /* define a file name in the coupling properties that contains the species
-    speciesNames_
-    (
-        IFstream
-        (
-            fileName(propsDict_.lookup("ChemistryFile")).expand()
-        )()
-    ),*/
-
 
 // voidfraction and velocity fields can be included by wish
 /*  voidfractionFieldName_(propsDict_.lookup("voidfractionFieldName")),
@@ -143,9 +121,11 @@ void species::allocateMyArrays() const
     particleCloud_.dataExchangeM().allocateArray(partRho_,initVal,1);
     particleCloud_.dataExchangeM().allocateArray(partTemp_,initVal,1);
 
-  //particleCloud_.dataExchangeM().allocateArray(concentrations_,initVal,1,numberOfParticles_);
-
-
+    for (int i=0; i<speciesNames_.size(); i++)
+    {
+        particleCloud_.dataExchangeM().allocateArray(concentrations_[i],initVal,1);
+        particleCloud_.dataExchangeM().allocateArray(changeOfSpeciesMass_[i],initVal,1);
+    }
 }
 
 // * * * * * * * * * * * * * * * * Member Fct  * * * * * * * * * * * * * * * //

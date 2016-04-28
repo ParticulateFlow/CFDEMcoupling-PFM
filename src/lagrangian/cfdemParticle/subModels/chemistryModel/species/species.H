@@ -27,6 +27,9 @@ License
 #include "fvCFD.H"
 #include "cfdemCloudEnergy.H"
 #include "chemistryModel.H"
+
+#include "HashPtrTable.H"
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -46,16 +49,19 @@ class species
 private:
 
     dictionary propsDict_;
-    
+
     bool interpolation_;
-    
+
+    // Species dictionary - To be read where the species are from
+    dictionary specDict_;
+
     const wordList speciesNames_;
     
     PtrList<volScalarField> Y_;
 
-    List<double**> concentrations_;
+    mutable List<double**> concentrations_;
     
-    // List<double**> changeOfSpeciesMass_;
+    mutable List<double**> changeOfSpeciesMass_;
 
     //List<volScalarField> changeOfSpeciesMassFields_;
     
