@@ -123,12 +123,13 @@ void heatTransferGunn::calcEnergyContribution()
     // get DEM data
     particleCloud_.dataExchangeM().getData(partTempName_,"scalar-atom",partTemp_);
     
+    double **particleWeights=particleCloud_.particleWeights();
     particleCloud_.averagingM().resetWeightFields();
     particleCloud_.averagingM().setScalarAverage
     (
         partTempField_,
         partTemp_,
-        particleCloud_.particleWeights(),
+        particleWeights,
         particleCloud_.averagingM().UsWeightField(),
         NULL
     );
