@@ -49,39 +49,41 @@ private:
     
     bool interpolation_;
     
-    // const wordList speciesNames_;
+    const wordList speciesNames_;
     
-    // List<double**> concentrations_;
+    PtrList<volScalarField> Y_;
+
+    List<double**> concentrations_;
     
     // List<double**> changeOfSpeciesMass_;
-    
-    // List<volScalarField> changeOfSpeciesMassFields_;
-    
-    // volScalarField changeOfGasMassField_;
-    
-    // word tempFieldName_;
 
-    // const volScalarField& tempField_;            // ref to gas temperature field
+    //List<volScalarField> changeOfSpeciesMassFields_;
     
-    // word partTempName_;
-
-    // mutable double **partTemp_;                  // gas temperature at particle positions
-
-    // word densityFieldName_;
+    //volScalarField changeOfGasMassField_;
     
-    // const volScalarField& rho_;
+    word tempFieldName_;
 
-    // word partRhoName_;
+    const volScalarField& tempField_;            // ref to gas temperature field
+
+    word partTempName_;
+
+    mutable double **partTemp_;                  // gas temperature at particle positions
+
+    word densityFieldName_;
+
+    const volScalarField& rho_;
+
+    word partRhoName_;
     
-    // mutable double **partRho_;                   // gas density at particle positions
+    mutable double **partRho_;                   // gas density at particle positions
     
-    // word velFieldName_;                          // Can be uncommented when velocity is to be calculated in the species source code
+    //word velFieldName_;                          // Can be uncommented when velocity is to be calculated in the species source code
 
-    // const volVectorField& U_;
+    //const volVectorField& U_;
 
-    // word voidfractionFieldName_;                 // Can be uncommented when voidfraction is to be calculated in the species source code
+    //word voidfractionFieldName_;                 // Can be uncommented when voidfraction is to be calculated in the species source code
 
-    // const volScalarField& voidfraction_;
+    //const volScalarField& voidfraction_;
 
 
     void allocateMyArrays() const;
