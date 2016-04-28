@@ -57,6 +57,18 @@ heatTransferGunn::heatTransferGunn
         sm.mesh(),
         dimensionedScalar("zero", dimensionSet(1,1,-3,0,0,0,0), 0.0)
     ),
+    partTempField_
+    (   IOobject
+        (
+            "particleTemp",
+            sm.mesh().time().timeName(),
+            sm.mesh(),
+            IOobject::READ_IF_PRESENT,
+            IOobject::AUTO_WRITE
+        ),
+        sm.mesh(),
+        dimensionedScalar("zero", dimensionSet(0,0,0,1,0,0,0), 0.0)
+    ),
     tempFieldName_(propsDict_.lookupOrDefault<word>("tempFieldName","T")),
     tempField_(sm.mesh().lookupObject<volScalarField> (tempFieldName_)),
     voidfractionFieldName_(propsDict_.lookupOrDefault<word>("voidfractionFieldName","voidfraction")),
@@ -110,6 +122,16 @@ void heatTransferGunn::calcEnergyContribution()
 
     // get DEM data
     particleCloud_.dataExchangeM().getData(partTempName_,"scalar-atom",partTemp_);
+    
+    particleCloud_.averagingM().resetWeightFields();
+    particleCloud_.averagingM().setScalarAverage
+    (
+        partTempField_,
+        partTemp_,
+        particleCloud_.particleWeights(),
+        particleCloud_.averagingM().UsWeightField(),
+        NULL
+    );
 
     #ifdef compre
        const volScalarField mufField = particleCloud_.turbulence().mu();
