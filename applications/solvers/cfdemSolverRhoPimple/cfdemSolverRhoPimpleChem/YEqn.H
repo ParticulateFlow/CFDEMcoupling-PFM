@@ -24,7 +24,7 @@ tmp<fv::convectionScheme<scalar> > mvConvection
 
             fvScalarMatrix YiEqn
             (
-                fvm::ddt(voidfraction, rho, Yi)
+                fvm::ddt(rhoeps, Yi)
               + mvConvection->fvmDiv(phi, Yi)
               - fvm::laplacian(voidfraction*turbulence->muEff(), Yi)
               ==

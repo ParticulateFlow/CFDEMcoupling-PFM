@@ -9,8 +9,8 @@
 
     fvScalarMatrix EEqn
     (
-        fvm::ddt(voidfraction, rho, he) + fvm::div(phi, he)
-      + fvc::ddt(voidfraction, rho, K) + fvc::div(phi, K)
+        fvm::ddt(rhoeps, he) + fvm::div(phi, he)
+      + fvc::ddt(rhoeps, K) + fvc::div(phi, K)
       + (
             he.name() == "e"
           ? fvc::div

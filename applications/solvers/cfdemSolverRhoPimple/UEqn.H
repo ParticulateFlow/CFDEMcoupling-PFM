@@ -1,8 +1,9 @@
 // Solve the Momentum equation
 
 tmp<fvVectorMatrix> UEqn
+
 (
-    fvm::ddt(voidfraction,rho, U)
+    fvm::ddt(rhoeps,U)
    + fvm::div(phi, U)
    + particleCloud.divVoidfractionTau(U, voidfraction)
    + fvm::Sp(Ksl,U)
