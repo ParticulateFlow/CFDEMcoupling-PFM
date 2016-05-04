@@ -30,6 +30,7 @@ License
 
 #include "HashPtrTable.H"
 
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -52,10 +53,12 @@ private:
 
     bool interpolation_;
 
+    const fvMesh& mesh_;
+
     // Species dictionary - To be read where the species are from
     dictionary specDict_;
 
-    const wordList speciesNames_;
+    wordList speciesNames_;
     
     PtrList<volScalarField> Y_;
 

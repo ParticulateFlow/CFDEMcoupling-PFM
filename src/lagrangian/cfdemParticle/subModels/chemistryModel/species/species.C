@@ -55,6 +55,7 @@ species::species
     chemistryModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
     interpolation_(propsDict_.lookupOrDefault<bool>("interpolation",false)),
+    mesh_(sm.mesh()),
 
     // define a file name in the coupling properties that contains the species
     specDict_
@@ -64,11 +65,12 @@ species::species
             fileName(propsDict_.lookup("ChemistryFile")).expand()
         )()
     ),
+
     // create a list from the Species table in the specified species dictionary
     speciesNames_(specDict_.lookup("species")),
 
     // species names are written in the coupling properties under "species"
-    // speciesNames_(propsDict_.lookup("species")),
+    //speciesNames_(propsDict_.lookup("species")),
     Y_(speciesNames_.size()),
     concentrations_(speciesNames_.size()),
     changeOfSpeciesMass_(speciesNames_.size()),
@@ -84,10 +86,17 @@ species::species
     partRho_(NULL)
 
 { 
-     for (int i=0; i<speciesNames_.size(); i++)
+    Info << " Read species list from: " << specDict_.name() << endl;
+    Info << " Reading species list: " << speciesNames_ << endl;
+
+    for (int i=0; i<speciesNames_.size(); i++)
     {
-        Y_[i]=sm.mesh().lookupObject<volScalarField>(speciesNames_[i]);
-    }
+        Info << " Looking up species fields " << speciesNames_[i] << endl;
+        volScalarField& Y = const_cast<volScalarField&>
+                (sm.mesh().lookupObject<volScalarField>(speciesNames_[i]));
+        Y_.set(i, &Y);
+        //Y_[i]=sm.mesh().lookupObject<volScalarField>(speciesNames_[i]);
+     }
 
 
     allocateMyArrays();
@@ -140,9 +149,9 @@ void species::execute()
     label  cellI=0;
     scalar Tfluid(0);
     scalar rhofluid(0);
+    List<scalar> Yfluid_;
 
-
-
+    // defining interpolators for T, rho
     interpolationCellPoint <scalar> TInterpolator_(tempField_);
     interpolationCellPoint <scalar> rhoInterpolator_(rho_);
 
@@ -157,52 +166,45 @@ void species::execute()
                 Tfluid              =   TInterpolator_.interpolate(position,cellI);
                 rhofluid            =   rhoInterpolator_.interpolate(position,cellI);
 
-                /*for (int i=0;i<speciesNames_.size();i++)
-                {
-                    interpolationCellPoint <scalar> YInterpolator_[i](Y_[i]);
 
-                    scalar Yfluid_i = YInterpolator_[i].interpolate(position,cellI);
-                }*/
+               for (int i=0;i<speciesNames_.size();i++)
+                {
+                interpolationCellPoint <scalar> YInterpolator_[i](Y_[i]);
+                Yfluid_[i]          =  YInterpolator_[i].interpolate(position,cellI);
+                // const volScalarField& Yfluid_ = mesh_.lookupObject<volScalarField>(speciesNames_[i]);
+                // interpolationCellPoint <scalar> YInterpolator_(Y_[i]);
+                //const volScalarField& Yfluid_ = mesh_.lookupObject<volScalarField>(Y_[i]);
+                // interpolationCellPoint <scalar> YInterpolator_(Y_[i].name());
+                // Yfluid_ = YInterpolator_.interpolate(position,cellI);
+                }
             }
             else
             {
                 Tfluid = tempField_[cellI];
                 rhofluid=rho_[cellI];
-                /*for (int i=0; i<speciesNames_.size();i++)
+                for (int i=0; i<speciesNames_.size();i++)
                 {
-                    Yfluid_[i][0]=Y_[i][position][cellI];
-                }*/
+                    Yfluid_[i] = Y_[i][cellI];
+                }
             }
 
             //fill arrays
             partTemp_[index][0]=Tfluid;
             partRho_[index][0]=rhofluid;
-            /*for (int i=0; i<speciesNames_.size();i++)
+            for (int i=0; i<speciesNames_.size();i++)
             {
-                concentrations_[i][index][0]=Yfluid_[i];*/
-
-
+                concentrations_[i][index][0]=Yfluid_[i];
+            }
         }
     }
-
-
-    /*for (int i=0;i<speciesNames_.size();i++);
-    {
-        Yfluid_[i](0);
-    }*/
-
-    //Yfluid_.setSize(speciesNames_size());
-
-    //for (int i=0; i<speciesNames_.size();i++)
-    //{
-    //    Yfluid_[i](0);
-    //    interpolationCellPoint<scalar> YInterpolator_[i](Y_[i]);
-    //}
-
 
     // give DEM data
     particleCloud_.dataExchangeM().giveData(partTempName_, "scalar-atom", partTemp_);
     particleCloud_.dataExchangeM().giveData(partRhoName_, "scalar-atom", partRho_);
+    for (int i=0; i<speciesNames_.size();i++)
+    {
+        particleCloud_.dataExchangeM().giveData(speciesNames_[i],"scalar-atom",concentrations_[i]);
+    };
 
 
 
