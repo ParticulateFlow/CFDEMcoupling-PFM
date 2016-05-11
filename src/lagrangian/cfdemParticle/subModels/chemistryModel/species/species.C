@@ -56,7 +56,6 @@ species::species
     propsDict_(dict.subDict(typeName + "Props")),
     interpolation_(propsDict_.lookupOrDefault<bool>("interpolation",false)),
     mesh_(sm.mesh()),
-
     // define a file name in the coupling properties that contains the species
     specDict_
     (
@@ -65,25 +64,38 @@ species::species
             fileName(propsDict_.lookup("ChemistryFile")).expand()
         )()
     ),
-
     // create a list from the Species table in the specified species dictionary
     speciesNames_(specDict_.lookup("species")),
-
-    // species names are written in the coupling properties under "species"
-    //speciesNames_(propsDict_.lookup("species")),
     Y_(speciesNames_.size()),
-    concentrations_(speciesNames_.size()),
-    changeOfSpeciesMass_(speciesNames_.size()),
-
+    concentrations_(speciesNames_.size(),NULL),
+    changeOfSpeciesMass_(speciesNames_.size(),NULL),
+    changeOfSpeciesMassFields_(speciesNames_.size()),
+    changeOfGasMassField_
+    (
+        IOobject
+        (
+            "changeOfGasMassField_",
+            mesh_.time().timeName(),
+            mesh_,
+            IOobject::READ_IF_PRESENT,
+            IOobject::AUTO_WRITE
+         ),
+        mesh_,
+        dimensionedScalar("zero",dimensionSet(0,0,0,0,0,0,0),0.0)
+    ),
     tempFieldName_(propsDict_.lookupOrDefault<word>("tempFieldName","T")),
     tempField_(sm.mesh().lookupObject<volScalarField> (tempFieldName_)),
     partTempName_(propsDict_.lookup("partTempName")),
     partTemp_(NULL),
-
     densityFieldName_(propsDict_.lookupOrDefault<word>("densityFieldName","rho")),
     rho_(sm.mesh().lookupObject<volScalarField> (densityFieldName_)),
     partRhoName_(propsDict_.lookup("partRhoName")),
     partRho_(NULL)
+  // voidfraction and velocity fields can be included by wish
+  /*  voidfractionFieldName_(propsDict_.lookup("voidfractionFieldName")),
+      voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
+      velFieldName_(propsDict_.lookup("velFieldName")),
+      U_(sm.mesh().lookup<volVectorField> (velFieldName_)),*/
 
 { 
     Info << " Read species list from: " << specDict_.name() << endl;
@@ -91,25 +103,32 @@ species::species
 
     for (int i=0; i<speciesNames_.size(); i++)
     {
+        // Defining the Species volume scalar fields
         Info << " Looking up species fields " << speciesNames_[i] << endl;
         volScalarField& Y = const_cast<volScalarField&>
                 (sm.mesh().lookupObject<volScalarField>(speciesNames_[i]));
         Y_.set(i, &Y);
-        //Y_[i]=sm.mesh().lookupObject<volScalarField>(speciesNames_[i]);
-     }
-
-
+        // Create new volScalarFields for the changed values of the species mass fields
+        changeOfSpeciesMassFields_.set
+        (
+            i,
+            new volScalarField
+            (
+                IOobject
+                (
+                "New"+Y_[i].name(),
+                mesh_.time().timeName(),
+                mesh_,
+                IOobject::NO_READ,
+                IOobject::AUTO_WRITE
+                ),
+                mesh_,
+                dimensionedScalar("0",mesh_.lookupObject<volScalarField>(speciesNames_[i]).dimensions(), 0)
+            )
+         );
+    }
     allocateMyArrays();
-
 }
-
-// voidfraction and velocity fields can be included by wish
-/*  voidfractionFieldName_(propsDict_.lookup("voidfractionFieldName")),
-    voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
-    velFieldName_(propsDict_.lookup("velFieldName")),
-    U_(sm.mesh().lookup<volVectorField> (velFieldName_)),*/
-
-
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
@@ -150,6 +169,9 @@ void species::execute()
     scalar Tfluid(0);
     scalar rhofluid(0);
     List<scalar> Yfluid_;
+    Yfluid_.setSize(speciesNames_.size());
+    List<scalar> changedField_;
+    changedField_.setSize(speciesNames_.size());
 
     // defining interpolators for T, rho
     interpolationCellPoint <scalar> TInterpolator_(tempField_);
@@ -203,14 +225,32 @@ void species::execute()
     particleCloud_.dataExchangeM().giveData(partRhoName_, "scalar-atom", partRho_);
     for (int i=0; i<speciesNames_.size();i++)
     {
-        particleCloud_.dataExchangeM().giveData(speciesNames_[i],"scalar-atom",concentrations_[i]);
+        particleCloud_.dataExchangeM().giveData(Y_[i].name(),"scalar-atom",concentrations_[i]);
     };
 
-
-
-
   // pull changeOfSpeciesMass_, transform onto fields changeOfSpeciesMassFields_, add them up on changeOfGasMassField_
-  
+  for (int i=0; i<speciesNames_.size();i++)
+  {
+
+      particleCloud_.dataExchangeM().getData(Y_[i].name(),"scalar-atom",changeOfSpeciesMass_[i]);
+      for (int index=0; index<particleCloud_.numberOfParticles();index++)
+      {
+          cellI=particleCloud_.cellIDs()[index][0];
+          changedField_[i] =   changeOfSpeciesMass_[i][index][0];
+          changeOfSpeciesMassFields_[i].internalField()=changedField_[i];
+
+          //changeOfSpeciesMassFields_.set(i, changeOfSpeciesMass_);
+          //const volScalarField& changedfield = mesh_.lookupObject<volScalarField> changeOfSpeciesMass_[i];
+
+      particleCloud_.averagingM().setScalarSum
+      (
+        changeOfGasMassField_,
+        changeOfSpeciesMass_[i],
+        particleCloud_.particleWeights(),
+        NULL
+       );
+      }
+  }
 }
 
 //tmp<Foam::fvScalarMatrix> species::Smi(const label i) const

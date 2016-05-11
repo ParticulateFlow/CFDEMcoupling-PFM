@@ -66,17 +66,17 @@ private:
     
     mutable List<double**> changeOfSpeciesMass_;
 
-    //List<volScalarField> changeOfSpeciesMassFields_;
+    PtrList<volScalarField> changeOfSpeciesMassFields_;
     
-    //volScalarField changeOfGasMassField_;
+    volScalarField changeOfGasMassField_;
     
     word tempFieldName_;
 
-    const volScalarField& tempField_;            // ref to gas temperature field
+    const volScalarField& tempField_;              // ref to gas temperature field
 
     word partTempName_;
 
-    mutable double **partTemp_;                  // gas temperature at particle positions
+    mutable double **partTemp_;                    // gas temperature at particle positions
 
     word densityFieldName_;
 
@@ -84,13 +84,13 @@ private:
 
     word partRhoName_;
     
-    mutable double **partRho_;                   // gas density at particle positions
+    mutable double **partRho_;                     // gas density at particle positions
     
-    //word velFieldName_;                          // Can be uncommented when velocity is to be calculated in the species source code
+    //word velFieldName_;                          // when velocity is to be calculated in the species source code
 
     //const volVectorField& U_;
 
-    //word voidfractionFieldName_;                 // Can be uncommented when voidfraction is to be calculated in the species source code
+    //word voidfractionFieldName_;                 // when voidfraction is to be calculated in the species source code
 
     //const volScalarField& voidfraction_;
 
