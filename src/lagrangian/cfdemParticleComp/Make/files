@@ -35,6 +35,7 @@ $(energyModels)/reactionHeat/reactionHeat.C
 $(thermCondModels)/thermCondModel/thermCondModel.C
 $(thermCondModels)/thermCondModel/newThermCondModel.C
 $(thermCondModels)/SyamlalThermCond/SyamlalThermCond.C
+$(thermCondModels)/noTherm/noThermCond.C
 
 $(forceModels)/forceModel/forceModel.C
 $(forceModels)/forceModel/newForceModel.C
