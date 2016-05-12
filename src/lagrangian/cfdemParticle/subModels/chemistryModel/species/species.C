@@ -191,8 +191,8 @@ void species::execute()
 
                for (int i=0;i<speciesNames_.size();i++)
                 {
-                interpolationCellPoint <scalar> YInterpolator_[i](Y_[i]);
-                Yfluid_[i]          =  YInterpolator_[i].interpolate(position,cellI);
+      //          interpolationCellPoint <scalar> YInterpolator_[i](Y_[i]);
+      //          Yfluid_[i]          =  YInterpolator_[i].interpolate(position,cellI);
                 // const volScalarField& Yfluid_ = mesh_.lookupObject<volScalarField>(speciesNames_[i]);
                 // interpolationCellPoint <scalar> YInterpolator_(Y_[i]);
                 //const volScalarField& Yfluid_ = mesh_.lookupObject<volScalarField>(Y_[i]);
@@ -206,7 +206,7 @@ void species::execute()
                 rhofluid=rho_[cellI];
                 for (int i=0; i<speciesNames_.size();i++)
                 {
-                    Yfluid_[i] = Y_[i][cellI];
+        //            Yfluid_[i] = Y_[i][cellI];
                 }
             }
 
@@ -215,6 +215,7 @@ void species::execute()
             partRho_[index][0]=rhofluid;
             for (int i=0; i<speciesNames_.size();i++)
             {
+	        Yfluid_[i] = Y_[i][cellI];
                 concentrations_[i][index][0]=Yfluid_[i];
             }
         }
@@ -229,27 +230,31 @@ void species::execute()
     };
 
   // pull changeOfSpeciesMass_, transform onto fields changeOfSpeciesMassFields_, add them up on changeOfGasMassField_
+  changeOfGasMassField_.internalField() = 0.0;
   for (int i=0; i<speciesNames_.size();i++)
   {
 
       particleCloud_.dataExchangeM().getData(Y_[i].name(),"scalar-atom",changeOfSpeciesMass_[i]);
-      for (int index=0; index<particleCloud_.numberOfParticles();index++)
-      {
-          cellI=particleCloud_.cellIDs()[index][0];
-          changedField_[i] =   changeOfSpeciesMass_[i][index][0];
-          changeOfSpeciesMassFields_[i].internalField()=changedField_[i];
+//       for (int index=0; index<particleCloud_.numberOfParticles();index++)
+//       {
+//           cellI=particleCloud_.cellIDs()[index][0];
+//           changedField_[i] =   changeOfSpeciesMass_[i][index][0];
+//           changeOfSpeciesMassFields_[i].internalField()=changedField_[i];
 
           //changeOfSpeciesMassFields_.set(i, changeOfSpeciesMass_);
           //const volScalarField& changedfield = mesh_.lookupObject<volScalarField> changeOfSpeciesMass_[i];
 
+	  // sum or average???
+      changeOfSpeciesMassFields_[i].internalField() = 0.0;
       particleCloud_.averagingM().setScalarSum
       (
-        changeOfGasMassField_,
+        changeOfSpeciesMassFields_[i],
         changeOfSpeciesMass_[i],
         particleCloud_.particleWeights(),
         NULL
        );
-      }
+      changeOfGasMassField_ += changeOfSpeciesMassFields_[i];
+     // }
   }
 }
 
