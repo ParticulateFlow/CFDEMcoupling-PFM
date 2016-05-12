@@ -55,7 +55,7 @@ heatTransferGunn::heatTransferGunn
             IOobject::AUTO_WRITE
         ),
         sm.mesh(),
-        dimensionedScalar("zero", dimensionSet(1,1,-3,0,0,0,0), 0.0)
+        dimensionedScalar("zero", dimensionSet(1,-1,-3,0,0,0,0), 0.0)
     ),
     partTempField_
     (   IOobject
