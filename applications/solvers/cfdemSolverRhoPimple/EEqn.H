@@ -1,11 +1,12 @@
 // contributions to internal energy equation can be found in
 // Crowe et al.: "Multiphase flows with droplets and particles", CRC Press 1998
-
 {
     // dim he = J / kg
     volScalarField& he = thermo.he();
     particleCloud.energyContributions(Qsource);
-
+    
+    thDiff=rhoeps*particleCloud.thermCondM().thermDiff();
+    thDiff.correctBoundaryConditions();
 
     fvScalarMatrix EEqn
     (
@@ -24,14 +25,14 @@
      // net heat transfer from particles to fluid
       - Qsource
      // thermal conduction of the fluid with effective conductivity
-      - fvc::laplacian(rhoeps*particleCloud.thermCondM().thermDiff(),he) 
+      - fvc::laplacian(thDiff,he) 
           
       // + particle-fluid energy transfer due to work
       // + fluid energy dissipation due to shearing
      ==
         fvOptions(rho, he)
     );
-
+	  Info << "\nX\n" << endl;
     EEqn.relax();
 
     fvOptions.constrain(EEqn);

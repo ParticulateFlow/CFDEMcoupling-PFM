@@ -67,6 +67,20 @@ Info<< "Reading thermophysical properties\n" << endl;
         ),
         mesh
     );
+    
+    Info<< "\nCreating thermal diffusivity field\n" << endl;
+    volScalarField thDiff
+    (
+        IOobject
+        (
+            "thDiff",
+            runTime.timeName(),
+            mesh,
+            IOobject::MUST_READ,
+            IOobject::AUTO_WRITE
+        ),
+        mesh
+    );
 
     #ifndef compressibleCreatePhi_H
     #define compressibleCreatePhi_H
