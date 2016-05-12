@@ -217,7 +217,6 @@ void species::execute()
   for (int i=0; i<speciesNames_.size();i++)
   {
       particleCloud_.dataExchangeM().getData(Y_[i].name(),"scalar-atom",changeOfSpeciesMass_[i]);
-	  // sum or average???
       changeOfSpeciesMassFields_[i].internalField() = 0.0;
       changeOfSpeciesMassFields_[i].boundaryField() = 0.0;
       particleCloud_.averagingM().setScalarSum
@@ -232,7 +231,7 @@ void species::execute()
       changeOfSpeciesMassFields_[i].internalField() /= changeOfSpeciesMassFields_[i].mesh().V();
       changeOfSpeciesMassFields_[i].correctBoundaryConditions();
       changeOfGasMassField_ += changeOfSpeciesMassFields_[i];
-      Info << "total conversion of species" << speciesNames_[i] << "=" << gSum(changeOfSpeciesMassFields_[i]*1.0*changeOfSpeciesMassFields_[i].mesh().V()) << endl;
+      Info << "total conversion of species" << speciesNames_[i] << " = " << gSum(changeOfSpeciesMassFields_[i]*1.0*changeOfSpeciesMassFields_[i].mesh().V()) << endl;
   }
 }
 
