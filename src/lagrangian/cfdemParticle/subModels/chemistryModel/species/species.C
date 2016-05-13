@@ -81,7 +81,7 @@ species::species
             IOobject::AUTO_WRITE
          ),
         mesh_,
-        dimensionedScalar("zero",dimMass/dimVolume,0.0)
+        dimensionedScalar("zero",dimMass/dimTime,0.0)
     ),
     tempFieldName_(propsDict_.lookupOrDefault<word>("tempFieldName","T")),
     tempField_(sm.mesh().lookupObject<volScalarField> (tempFieldName_)),
