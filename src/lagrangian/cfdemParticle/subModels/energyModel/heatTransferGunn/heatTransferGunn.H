@@ -52,6 +52,12 @@ private:
     volScalarField QPartFluid_;
     
     volScalarField partTempField_;
+    
+    volScalarField partRelTempField_;
+    
+    scalar partRefTemp_;
+    
+    bool calcPartTempField_;
 
     word tempFieldName_;
 

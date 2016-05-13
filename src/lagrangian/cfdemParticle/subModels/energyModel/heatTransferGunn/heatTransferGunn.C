@@ -63,12 +63,26 @@ heatTransferGunn::heatTransferGunn
             "particleTemp",
             sm.mesh().time().timeName(),
             sm.mesh(),
-            IOobject::READ_IF_PRESENT,
+            IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
         sm.mesh(),
         dimensionedScalar("zero", dimensionSet(0,0,0,1,0,0,0), 0.0)
     ),
+    partRelTempField_
+    (   IOobject
+        (
+            "particleRelTemp",
+            sm.mesh().time().timeName(),
+            sm.mesh(),
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        sm.mesh(),
+        dimensionedScalar("zero", dimensionSet(0,0,0,1,0,0,0), 0.0)
+    ),
+    partRefTemp_(0.0),
+    calcPartTempField_(propsDict_.lookupOrDefault<bool>("calcPartTempField",false)),
     tempFieldName_(propsDict_.lookupOrDefault<word>("tempFieldName","T")),
     tempField_(sm.mesh().lookupObject<volScalarField> (tempFieldName_)),
     voidfractionFieldName_(propsDict_.lookupOrDefault<word>("voidfractionFieldName","voidfraction")),
@@ -89,6 +103,11 @@ heatTransferGunn::heatTransferGunn
     {
         maxSource_=readScalar(propsDict_.lookup ("maxSource"));
         Info << "limiting eulerian source field to: " << maxSource_ << endl;
+    }
+    if (calcPartTempField_)
+    {
+     // read ref temp etc
+     // switch field write options if not already set
     }
 }
 
@@ -123,16 +142,24 @@ void heatTransferGunn::calcEnergyContribution()
     // get DEM data
     particleCloud_.dataExchangeM().getData(partTempName_,"scalar-atom",partTemp_);
     
-    double **particleWeights=particleCloud_.particleWeights();
-    particleCloud_.averagingM().resetWeightFields();
-    particleCloud_.averagingM().setScalarAverage
-    (
-        partTempField_,
-        partTemp_,
-        particleWeights,
-        particleCloud_.averagingM().UsWeightField(),
-        NULL
-    );
+    if(calcPartTempField_)
+    {
+        scalar aveTemp(0.0);
+	partTempField_.internalField() = 0.0;
+        double **particleWeights=particleCloud_.particleWeights();
+        particleCloud_.averagingM().resetWeightFields();
+        particleCloud_.averagingM().setScalarAverage
+        (
+            partTempField_,
+            partTemp_,
+            particleWeights,
+            particleCloud_.averagingM().UsWeightField(),
+            NULL
+        );
+	// check for appropriate averaging function
+	//aveTemp = gSum(partTempField_
+	partRelTempField_ = (partTempField_ - aveTemp) / (aveTemp - partRefTemp_);
+    }
 
     #ifdef compre
        const volScalarField mufField = particleCloud_.turbulence().mu();
