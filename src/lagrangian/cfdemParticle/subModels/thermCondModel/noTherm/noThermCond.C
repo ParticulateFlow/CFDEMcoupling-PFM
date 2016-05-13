@@ -53,9 +53,59 @@ noThermCond::~noThermCond()
 
 // * * * * * * * * * * * * * * * * Member Fct  * * * * * * * * * * * * * * * //
 
-tmp<volScalarField> noThermCond::thermCond() const{return volScalarField::null();}
+tmp<volScalarField> noThermCond::thermCond() const
+{
+    tmp<volScalarField> tcond
+    (
+        new volScalarField
+        (
+            IOobject
+            (
+                "fake1",
+                particleCloud_.mesh().time().timeName(),
+                particleCloud_.mesh(),
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+             ),
+             particleCloud_.mesh(),
+             dimensionedScalar
+             (
+              "zero",
+              dimensionSet(0,2,-1,0,0,0,0),
+              0.0
+             )
+        )
+    );
 
-tmp<volScalarField> noThermCond::thermDiff() const{return volScalarField::null();}
+    return tcond;
+}
+
+tmp<volScalarField> noThermCond::thermDiff() const
+{
+    tmp<volScalarField> tdif
+    (
+        new volScalarField
+        (
+            IOobject
+            (
+                "fake1",
+                particleCloud_.mesh().time().timeName(),
+                particleCloud_.mesh(),
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+             ),
+             particleCloud_.mesh(),
+             dimensionedScalar
+             (
+              "zero",
+              dimensionSet(0,2,-1,0,0,0,0),
+              0.0
+             )
+        )
+    );
+
+    return tdif;
+}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

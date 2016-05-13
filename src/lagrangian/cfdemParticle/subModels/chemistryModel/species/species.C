@@ -74,14 +74,14 @@ species::species
     (
         IOobject
         (
-            "changeOfGasMassField_",
+            "changeOfGasMassField",
             mesh_.time().timeName(),
             mesh_,
             IOobject::READ_IF_PRESENT,
             IOobject::AUTO_WRITE
          ),
         mesh_,
-        dimensionedScalar("zero",dimensionSet(0,0,0,0,0,0,0),0.0)
+        dimensionedScalar("zero",dimMass/dimTime,0.0)
     ),
     tempFieldName_(propsDict_.lookupOrDefault<word>("tempFieldName","T")),
     tempField_(sm.mesh().lookupObject<volScalarField> (tempFieldName_)),
@@ -116,7 +116,7 @@ species::species
             (
                 IOobject
                 (
-                "New"+Y_[i].name(),
+                "ModSpeciesMassField_"+Y_[i].name(),
                 mesh_.time().timeName(),
                 mesh_,
                 IOobject::NO_READ,
@@ -170,8 +170,6 @@ void species::execute()
     scalar rhofluid(0);
     List<scalar> Yfluid_;
     Yfluid_.setSize(speciesNames_.size());
-    List<scalar> changedField_;
-    changedField_.setSize(speciesNames_.size());
 
     // defining interpolators for T, rho
     interpolationCellPoint <scalar> TInterpolator_(tempField_);
@@ -192,7 +190,6 @@ void species::execute()
             {
                 Tfluid = tempField_[cellI];
                 rhofluid=rho_[cellI];
-                for (int i=0; i<speciesNames_.size();i++)
             }
 
             //fill arrays
@@ -201,7 +198,7 @@ void species::execute()
             for (int i=0; i<speciesNames_.size();i++)
             {
 	        Yfluid_[i] = Y_[i][cellI];
-                concentrations_[i][index][0]=Yfluid_[i];
+            concentrations_[i][index][0]=Yfluid_[i];
             }
         }
     }
@@ -220,7 +217,6 @@ void species::execute()
   for (int i=0; i<speciesNames_.size();i++)
   {
       particleCloud_.dataExchangeM().getData(Y_[i].name(),"scalar-atom",changeOfSpeciesMass_[i]);
-
       changeOfSpeciesMassFields_[i].internalField() = 0.0;
       changeOfSpeciesMassFields_[i].boundaryField() = 0.0;
       particleCloud_.averagingM().setScalarSum
@@ -230,11 +226,12 @@ void species::execute()
         particleCloud_.particleWeights(),
         NULL
       );
+
       // take care for implementation in LIGGGHTS: species produced from particles defined positive
       changeOfSpeciesMassFields_[i].internalField() /= changeOfSpeciesMassFields_[i].mesh().V();
-      changeOfSpeciesMassFields_[i].correctBoundaryConditions();   
+      changeOfSpeciesMassFields_[i].correctBoundaryConditions();
       changeOfGasMassField_ += changeOfSpeciesMassFields_[i];
-      Info << "total conversion of species " << speciesNames_[i] << " = " << gSum(changeOfSpeciesMassFields_[i]*1.0*changeOfSpeciesMassFields_[i].mesh().V()) << endl; 
+      Info << "total conversion of species" << speciesNames_[i] << " = " << gSum(changeOfSpeciesMassFields_[i]*1.0*changeOfSpeciesMassFields_[i].mesh().V()) << endl;
   }
 }
 
