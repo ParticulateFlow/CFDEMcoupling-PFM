@@ -108,8 +108,8 @@ heatTransferGunn::heatTransferGunn
     {
         if (propsDict_.found("partRefTemp"))
 	    partRefTemp_=readScalar(propsDict_.lookup ("partRefTemp"));
-	partTempField_.writeOpt() = 0;
-	partRelTempField_.writeOpt() = 0;
+	partTempField_.writeOpt() = IOobject::AUTO_WRITE;
+	partRelTempField_.writeOpt() = IOobject::AUTO_WRITE;
 	Info <<  "Particle temperature field activated." << endl;
     }
 }
