@@ -79,9 +79,9 @@ heatTransferGunn::heatTransferGunn
             IOobject::NO_WRITE
         ),
         sm.mesh(),
-        dimensionedScalar("zero", dimensionSet(0,0,0,1,0,0,0), 0.0)
+        dimensionedScalar("zero", dimensionSet(0,0,0,0,0,0,0), 0.0)
     ),
-    partRefTemp_(0.0),
+    partRefTemp_("partRefTemp", dimensionSet(0,0,0,1,0,0,0), 0.0),
     calcPartTempField_(propsDict_.lookupOrDefault<bool>("calcPartTempField",false)),
     tempFieldName_(propsDict_.lookupOrDefault<word>("tempFieldName","T")),
     tempField_(sm.mesh().lookupObject<volScalarField> (tempFieldName_)),
@@ -107,7 +107,7 @@ heatTransferGunn::heatTransferGunn
     if (calcPartTempField_)
     {
         if (propsDict_.found("partRefTemp"))
-	    partRefTemp_=readScalar(propsDict_.lookup ("partRefTemp"));
+	    partRefTemp_.value()=readScalar(propsDict_.lookup ("partRefTemp"));
 	partTempField_.writeOpt() = IOobject::AUTO_WRITE;
 	partRelTempField_.writeOpt() = IOobject::AUTO_WRITE;
 	Info <<  "Particle temperature field activated." << endl;
@@ -147,12 +147,11 @@ void heatTransferGunn::calcEnergyContribution()
     
     if(calcPartTempField_)
     {
-        scalar aveTemp(0.0);
+        dimensionedScalar aveTemp("aveTemp", dimensionSet(0,0,0,1,0,0,0), 0.0);
         for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)
-	    aveTemp += partTemp_[index][0];
-	aveTemp /= particleCloud_.numberOfParticles();        
+	    aveTemp.value() += partTemp_[index][0];
+	aveTemp.value() /= particleCloud_.numberOfParticles();        
 	partTempField_.internalField() = 0.0;
-        double **particleWeights=particleCloud_.particleWeights();
         particleCloud_.averagingM().resetWeightFields();
         particleCloud_.averagingM().setScalarAverage
         (

@@ -55,7 +55,7 @@ private:
     
     volScalarField partRelTempField_;
     
-    scalar partRefTemp_;
+    dimensionedScalar partRefTemp_;
     
     bool calcPartTempField_;
 
