@@ -118,7 +118,7 @@ public:
         (
             volScalarField& field,
             double**& value,
-            double**& weight,
+            double**const& weight,
             volScalarField& weightField,
             double**const& mask
         ) const = 0;
@@ -127,7 +127,7 @@ public:
         (
             volVectorField& field,
             double**& value,
-            double**& weight,
+            double**const& weight,
             volScalarField& weightField,
             double**const& mask
         ) const = 0;
@@ -156,7 +156,7 @@ public:
         (
             volVectorField& field,
             double**& value,
-            double**& weight,
+            double**const& weight,
             double**const& mask
         ) const;
 
@@ -164,7 +164,7 @@ public:
         (
             volVectorField& field,
             double**& value,
-            double**& weight,
+            double**const& weight,
             int np
         ) const;
 
@@ -179,7 +179,7 @@ public:
         void setDSauter
         (
             volScalarField& dSauter,
-            double**& weight,
+            double**const& weight,
             volScalarField& weightField,
             label myParticleType = 0  // can be evaluated for a special type
         ) const;
