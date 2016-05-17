@@ -78,7 +78,7 @@ energyModels
 	//reactionHeat	
 );
 
-thermCondModel SyamlalThermCond;//thermCondModel;//off;
+thermCondModel off;//SyamlalThermCond;//thermCondModel;//off;
 
 chemistryModel	species;
 

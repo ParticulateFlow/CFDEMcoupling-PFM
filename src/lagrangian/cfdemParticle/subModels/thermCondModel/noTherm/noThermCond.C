@@ -88,7 +88,7 @@ tmp<volScalarField> noThermCond::thermDiff() const
         (
             IOobject
             (
-                "fake1",
+                "fake2",
                 particleCloud_.mesh().time().timeName(),
                 particleCloud_.mesh(),
                 IOobject::NO_READ,

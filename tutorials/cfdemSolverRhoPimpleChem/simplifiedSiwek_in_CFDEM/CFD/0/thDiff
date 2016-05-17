@@ -1,13 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-<<<<<<< HEAD
 |  \\    /   O peration     | Version:  1.6                                   |
 |   \\  /    A nd           | Web:      http://www.OpenFOAM.org               |
-=======
-|  \\    /   O peration     | Version:  2.3.0                                 |
-|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
->>>>>>> 8eb000e27b9eff183742ea5b6406b9d058456b80
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -15,54 +10,34 @@ FoamFile
     version     2.0;
     format      ascii;
     class       volScalarField;
-<<<<<<< HEAD
     object      thDiff;
-=======
     location    "0";
     object      T;
->>>>>>> 8eb000e27b9eff183742ea5b6406b9d058456b80
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 dimensions      [0 2 -1 0 0 0 0];
 
-<<<<<<< HEAD
 internalField   uniform 0.0;
-=======
-internalField   uniform 0;
->>>>>>> 8eb000e27b9eff183742ea5b6406b9d058456b80
 
 boundaryField
 {
     top
     {
         type            fixedValue;
-<<<<<<< HEAD
-        value           uniform 6e-05;
-=======
         value           uniform 2.3e-5;
->>>>>>> 8eb000e27b9eff183742ea5b6406b9d058456b80
     }
 
     bottom
     {
         type            fixedValue;
-<<<<<<< HEAD
-        value           uniform 6e-05;
-=======
         value           uniform 2.3e-5;
->>>>>>> 8eb000e27b9eff183742ea5b6406b9d058456b80
     }
 
     walls
     {
         type            fixedValue;
-<<<<<<< HEAD
-        value           uniform 6e-05;
-=======
         value           uniform 2.3e-5;
-    
->>>>>>> 8eb000e27b9eff183742ea5b6406b9d058456b80
     }
 
     symmetry
@@ -76,11 +51,5 @@ boundaryField
     }
 }
 
-<<<<<<< HEAD
 // ************************************************************************* //
 
-
-=======
-
-// ************************************************************************* //
->>>>>>> 8eb000e27b9eff183742ea5b6406b9d058456b80
