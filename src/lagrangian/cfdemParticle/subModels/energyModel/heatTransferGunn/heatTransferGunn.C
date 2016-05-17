@@ -110,6 +110,8 @@ heatTransferGunn::heatTransferGunn
 	    partRefTemp_.value()=readScalar(propsDict_.lookup ("partRefTemp"));
 	partTempField_.writeOpt() = IOobject::AUTO_WRITE;
 	partRelTempField_.writeOpt() = IOobject::AUTO_WRITE;
+	partTempField_.write();
+	partRelTempField_.write();
 	Info <<  "Particle temperature field activated." << endl;
     }
 }
@@ -146,11 +148,7 @@ void heatTransferGunn::calcEnergyContribution()
     particleCloud_.dataExchangeM().getData(partTempName_,"scalar-atom",partTemp_);
     
     if(calcPartTempField_)
-    {
-        dimensionedScalar aveTemp("aveTemp", dimensionSet(0,0,0,1,0,0,0), 0.0);
-        for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)
-	    aveTemp.value() += partTemp_[index][0];
-	aveTemp.value() /= particleCloud_.numberOfParticles();        
+    {       
 	partTempField_.internalField() = 0.0;
         particleCloud_.averagingM().resetWeightFields();
         particleCloud_.averagingM().setScalarAverage
@@ -161,6 +159,10 @@ void heatTransferGunn::calcEnergyContribution()
             particleCloud_.averagingM().UsWeightField(),
             NULL
         );
+	volScalarField volP (1 - voidfraction_);
+	volScalarField weigthedTp (volP * partTempField_);
+	// average per cell-value, not per volume * cell-value
+	dimensionedScalar aveTemp = weigthedTp.average() / volP.average();
 	partRelTempField_ = (partTempField_ - aveTemp) / (aveTemp - partRefTemp_);
     }
 
