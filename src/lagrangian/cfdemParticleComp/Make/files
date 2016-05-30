@@ -56,6 +56,7 @@ $(forceModels)/gradPForce/gradPForce.C
 $(forceModels)/viscForce/viscForce.C
 $(forceModels)/MeiLift/MeiLift.C
 $(forceModels)/particleCellVolume/particleCellVolume.C
+$(forceModels)/BeetstraDrag/BeetstraDrag.C
 
 $(forceSubModels)/forceSubModel/newForceSubModel.C
 $(forceSubModels)/forceSubModel/forceSubModel.C
