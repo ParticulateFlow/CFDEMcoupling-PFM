@@ -99,7 +99,13 @@ public:
 
         virtual void addEnergyContribution(volScalarField&) const = 0;
 	
+	virtual void addEnergyCoefficient(volScalarField&) const = 0;
+	
 	virtual void calcEnergyContribution() = 0;
+	
+	virtual void calcEnergyCoefficient() = 0;
+	
+	virtual void postEnergyTransfer() const = 0;
 	
 	scalar Cp() const;
 

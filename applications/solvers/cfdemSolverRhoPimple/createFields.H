@@ -62,10 +62,26 @@ Info<< "Reading thermophysical properties\n" << endl;
             "Qsource",
             runTime.timeName(),
             mesh,
-            IOobject::MUST_READ,
+            IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
-        mesh
+        mesh,
+        dimensionedScalar("zero", dimensionSet(1,-1,-3,0,0,0,0), 0.0)
+    );
+    
+    Info<< "\nCreating fluid-particle heat flux coefficient field\n" << endl;
+    volScalarField Qcoeff
+    (
+        IOobject
+        (
+            "Qcoeff",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        mesh,
+        dimensionedScalar("zero", dimensionSet(1,-1,-3,-1,0,0,0), 0.0)
     );
     
     Info<< "\nCreating thermal diffusivity field\n" << endl;

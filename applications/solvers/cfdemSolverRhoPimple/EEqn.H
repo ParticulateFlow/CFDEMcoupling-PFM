@@ -34,6 +34,13 @@
      ==
         fvOptions(rho, he)
     );
+    
+    
+    // work in progress:
+    // if (particleCloud.implicitEnergyModel)
+    // volScalarField& tpart (lookup ...)
+    // particleCloud.energyCoefficients(Qcoeff);
+    // EEqn += ...
 
     EEqn.relax();
 

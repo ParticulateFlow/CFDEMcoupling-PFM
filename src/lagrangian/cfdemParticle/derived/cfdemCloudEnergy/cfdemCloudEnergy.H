@@ -54,6 +54,8 @@ protected:
 
     const wordList energyModels_;
     
+    bool implicitEnergyModel_;
+    
     const wordList chemistryModels_;
 
     autoPtr<energyModel>* energyModel_;
@@ -94,7 +96,11 @@ public:
 
        inline const wordList& energyModels();
        
+       bool& implicitEnergyModel();
+       
        void energyContributions(volScalarField&);
+       
+       void energyCoefficients(volScalarField&);
        
        bool evolve(volScalarField&,volVectorField&,volVectorField&);
 

@@ -111,8 +111,13 @@ public:
 
         void addEnergyContribution(volScalarField&) const;
 	
+	void addEnergyCoefficient(volScalarField&) const {}
+	
 	void calcEnergyContribution();
-
+	
+	void calcEnergyCoefficient() {}
+	
+	void postEnergyTransfer() const {}
 
 };
 

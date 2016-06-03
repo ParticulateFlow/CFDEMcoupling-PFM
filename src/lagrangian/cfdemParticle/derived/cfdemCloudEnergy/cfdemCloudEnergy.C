@@ -40,6 +40,7 @@ cfdemCloudEnergy::cfdemCloudEnergy
 :
     cfdemCloud(mesh),
     energyModels_(couplingProperties_.lookup("energyModels")),
+    implicitEnergyModel_(false),
     thermCondModel_
     (
         thermCondModel::New
@@ -91,6 +92,11 @@ int cfdemCloudEnergy::nrEnergyModels()
     return energyModels_.size();
 }
 
+bool& cfdemCloudEnergy::implicitEnergyModel()
+{
+    return implicitEnergyModel_;
+}
+
 const energyModel& cfdemCloudEnergy::energyM(int i)
 {
     return energyModel_[i];
@@ -112,6 +118,14 @@ void cfdemCloudEnergy::energyContributions(volScalarField& Qsource)
     Qsource.boundaryField()=0.0;
     for (int i=0;i<nrEnergyModels();i++)
         energyM(i).addEnergyContribution(Qsource);
+}
+
+void cfdemCloudEnergy::energyCoefficients(volScalarField& Qcoeff)
+{
+    Qcoeff.internalField()=0.0;
+    Qcoeff.boundaryField()=0.0;
+    for (int i=0;i<nrEnergyModels();i++)
+        energyM(i).addEnergyCoefficient(Qcoeff);
 }
 
 bool cfdemCloudEnergy::evolve

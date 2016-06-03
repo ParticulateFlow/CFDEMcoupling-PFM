@@ -17,6 +17,12 @@
            Qsource/(rho*Cp)
         );
 	
+	    // work in progress:
+    // if (particleCloud.implicitEnergyModel)
+    // volScalarField& tpart (lookup ...)
+    // particleCloud.energyCoefficients(Qcoeff);
+    // TEqn += ...
+	
        // TEqn.relax();
         TEqn.solve();
 	
