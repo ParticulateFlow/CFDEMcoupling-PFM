@@ -5,8 +5,10 @@
     volScalarField& he = thermo.he();
     particleCloud.energyContributions(Qsource);
 
-    thDiff=particleCloud.thermCondM().thermDiff();
-    thDiff.correctBoundaryConditions();
+    thDiff=particleCloud.thermCondM().thermDiff();   
+    // BC for thDiff are calculated from its mathematical expression
+    // to enforce user-defined values, change thDiff to MUST_READ and do
+    // thDiff.correctBoundaryConditions();
 
     fvScalarMatrix EEqn
     (
@@ -25,7 +27,7 @@
      // net heat transfer from particles to fluid
       - Qsource
      // thermal conduction of the fluid with effective conductivity
-      - fvc::laplacian(rhoeps*thDiff,he) 
+      - fvm::laplacian(rhoeps*thDiff,he)
           
       // + particle-fluid energy transfer due to work
       // + fluid energy dissipation due to shearing

@@ -76,10 +76,11 @@ Info<< "Reading thermophysical properties\n" << endl;
             "thDiff",
             runTime.timeName(),
             mesh,
-            IOobject::MUST_READ,
+            IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
-        mesh
+        mesh,
+        dimensionedScalar("zero", dimensionSet(0,2,-1,0,0,0,0), 0.0)
     );
 
     #ifndef compressibleCreatePhi_H

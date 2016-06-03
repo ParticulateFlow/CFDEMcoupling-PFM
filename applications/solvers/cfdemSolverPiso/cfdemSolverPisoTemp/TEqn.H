@@ -3,15 +3,16 @@
 	
         // solve temperature transport equation assuming const. density and heat capacity
 	
-	thDiff=voidfraction*particleCloud.thermCondM().thermDiff();
-	thDiff.correctBoundaryConditions();
+ 	thDiff=particleCloud.thermCondM().thermDiff();
+        // BC for thDiff are calculated from its mathematical expression
+        // to enforce user-defined values, change thDiff to MUST_READ and do
+        // thDiff.correctBoundaryConditions();
 		
         fvScalarMatrix TEqn
         (
            fvm::ddt(voidfraction,T) + fvm::div(phi, T)
          - fvm::Sp(fvc::ddt(voidfraction),T) - fvm::Sp(fvc::div(phi),T)
-       //  - fvm::laplacian(voidfraction*particleCloud.thermCondM().thermDiff(), T)
-	 - fvm::laplacian(thDiff, T)
+	 - fvm::laplacian(voidfraction*thDiff, T)
          ==
            Qsource/(rho*Cp)
         );
