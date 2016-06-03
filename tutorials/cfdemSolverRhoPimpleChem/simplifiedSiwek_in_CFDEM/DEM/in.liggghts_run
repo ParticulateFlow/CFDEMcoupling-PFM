@@ -15,8 +15,9 @@ processors      2 2 1
 # read the restart file
 read_restart    ../DEM/post/restart/liggghts.restart
 
-neighbor        0.003 bin
-neigh_modify    delay 0 binsize 0.01
+neighbor        0.01 bin
+neigh_modify    delay 0 binsize 0.0 ##0.01
+
 
 # Material properties required for granular pair styles
 
@@ -30,7 +31,7 @@ pair_style  gran model hertz tangential history # Hertzian without cohesion
 pair_coeff  * *
 
 # timestep, gravity
-timestep    0.00001
+timestep    0.001 #0.00001
 fix         gravi all gravity 9.81 vector 0.0 -1.0 0.0
 
 # walls
@@ -39,47 +40,19 @@ fix     xwalls2 all wall/gran model hertz tangential history primitive type 1 xp
 fix     ywalls1 all wall/gran model hertz tangential history primitive type 1 yplane 0.0
 fix     ywalls2 all wall/gran model hertz tangential history primitive type 1 yplane 0.1
 fix     zwalls1 all wall/gran model hertz tangential history primitive type 1 zplane 0.0
-fix     zwalls2 all wall/gran model hertz tangential history primitive type 1 zplane 0.05
-
-# heat transfer
-fix         ftco all property/global thermalConductivity peratomtype 5. # lambda in [W/(K*m)]
-fix         ftca all property/global thermalCapacity peratomtype 0.1    # cp in [J/(kg*K)]
-fix         heattransfer all heat/gran initial_temperature 600.
-
-# set particle temperature for the bed
-run         0
-region      total block INF INF INF INF INF INF units box
-set         region total property/atom Temp 600.
-
-# change the particles density
-# set         group all density 2000
+fix     zwalls2 all wall/gran model hertz tangential history primitive type 1 zplane 0.1
 
 # cfd coupling
-fix     cfd all couple/cfd couple_every 100 mpi
+fix     cfd all couple/cfd couple_every 1 mpi
 fix     cfd2 all couple/cfd/force
 
-# this one invokes heat transfer calculation, transfers per-particle temperature and adds convective heat flux to particles
-fix     cfd3 all couple/cfd/convection T0 600
-
 # this should invoke chemistry
-fix     cfd4 all couple/cfd/chemistry n_species 6 species_names N2 O2 CH4 H2 CO2 H2O
+fix     cfd3 all couple/cfd/chemistry notequalto_n_species should give error
+
+#n_species 6 species_names_ N2 O2 CH4 H2 CO2 H2O
 
 # apply nve integration to all particles that are inserted as single particles
 fix     integr all nve/sphere
-
-# cfd coupling
-#fix        cfd all couple/cfd couple_every 100 mpi
-#fix        cfd2 all couple/cfd/force/implicit
-#fix        cfd2 all couple/cfd/force/accumulator RongDrag 10 1.5e-3
-#fix        cfd2 all couple/cfd/force/implicit/accumulated #CrankNicolson 0.5
-# apply nve integration to all particles that are inserted as single particles
-#fix        integr all nve/sphere
-
-# center of mass
-#compute     centerOfMass all com
-
-# compute total dragforce
-#compute     dragtotal all reduce sum f_dragforce[1] f_dragforce[2] f_dragforce[3]
 
 # screen output
 compute         rke all erotate/sphere
@@ -88,6 +61,6 @@ thermo          1000
 thermo_modify   lost ignore norm no
 compute_modify  thermo_temp dynamic yes
 
-dump        dmp all custom 50 ../DEM/post/dump.liggghts_run id type x y z ix iy iz vx vy vz fx fy fz omegax omegay omegaz radius f_Temp[0] f_heatFlux[0]
+dump        dmp all custom 50 ../DEM/post/dump.liggghts_run id type x y z ix iy iz vx vy vz fx fy fz omegax omegay omegaz radius
 
 run         1

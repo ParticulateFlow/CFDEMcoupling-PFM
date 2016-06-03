@@ -31,7 +31,7 @@ syncMode false;
 
 modelType "A"; // A or B
 
-couplingInterval 1000;
+couplingInterval 1;//1000;
 
 voidFractionModel divided;//centre;//
 
@@ -96,9 +96,9 @@ speciesProps
 {
 	ChemistryFile 		"$casePath/CFD/constant/foam.inp";
 	tempFieldName 		"T";
-	partTempName  		"Tp";
+	partTempName  		"partTemp";
 	densityFieldName 	"rho";
-	partRhoName		"rhop";
+	partRhoName		"partRho";
 }
 
 SyamlalThermCondProps
