@@ -31,7 +31,7 @@ syncMode false;
 
 modelType "A"; // A or B
 
-couplingInterval 100;
+couplingInterval 1000;
 
 voidFractionModel divided;//centre;//
 
