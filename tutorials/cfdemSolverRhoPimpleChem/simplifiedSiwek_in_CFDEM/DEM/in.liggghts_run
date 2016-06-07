@@ -15,8 +15,8 @@ processors      2 2 1
 # read the restart file
 read_restart    ../DEM/post/restart/liggghts.restart
 
-neighbor        0.01 bin
-neigh_modify    delay 0 binsize 0.0 ##0.01
+neighbor        0.002 bin
+neigh_modify    delay 0 binsize 0.01 ##0.01
 
 
 # Material properties required for granular pair styles
@@ -31,7 +31,7 @@ pair_style  gran model hertz tangential history # Hertzian without cohesion
 pair_coeff  * *
 
 # timestep, gravity
-timestep    0.001 #0.00001
+timestep    0.0001 #0.00001
 fix         gravi all gravity 9.81 vector 0.0 -1.0 0.0
 
 # walls
@@ -47,9 +47,7 @@ fix     cfd all couple/cfd couple_every 1 mpi
 fix     cfd2 all couple/cfd/force
 
 # this should invoke chemistry
-fix     cfd3 all couple/cfd/chemistry notequalto_n_species should give error
-
-#n_species 6 species_names_ N2 O2 CH4 H2 CO2 H2O
+fix     cfd3 all couple/cfd/chemistry n_species 6 species_names N2 O2 CH4 H2 CO2 H2O 
 
 # apply nve integration to all particles that are inserted as single particles
 fix     integr all nve/sphere

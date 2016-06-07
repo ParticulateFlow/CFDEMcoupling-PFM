@@ -14,7 +14,7 @@ processors      2 2 1
 region          reg block 0. 0.1 0. 0.1 0. 0.1 units box
 create_box      1 reg
 
-neighbor        0.01 bin
+neighbor        0.002 bin
 neigh_modify    delay 0 
 
 # Material properties required for granular pair styles
@@ -28,7 +28,7 @@ pair_style  gran model hertz tangential history # Hertzian without cohesion
 pair_coeff  * *
 
 # timestep, gravity
-timestep    0.001 #0.00001
+timestep    0.0001 #0.00001
 fix         gravi all gravity 9.81 vector 0.0 0.0 -1.0
 
 # walls
