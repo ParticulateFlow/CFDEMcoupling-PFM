@@ -53,8 +53,12 @@ SyamlalThermCond::SyamlalThermCond
     voidfractionFieldName_(propsDict_.lookupOrDefault<word>("voidfractionFieldName","voidfraction")),
     voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
     rhoFieldName_(propsDict_.lookupOrDefault<word>("rhoFieldName","rho")),
-    rho_(sm.mesh().lookupObject<volScalarField> (rhoFieldName_))
-{}
+    rho_(sm.mesh().lookupObject<volScalarField> (rhoFieldName_)),
+    wallLayerFactor_(1.0)
+{
+    if (propsDict_.found("wallLayerFactor"))
+         wallLayerFactor_=readScalar(propsDict_.lookup ("wallLayerFactor"));
+}
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
@@ -67,7 +71,30 @@ SyamlalThermCond::~SyamlalThermCond()
 
 tmp<volScalarField> SyamlalThermCond::thermCond() const
 {
-    return (1-sqrt(1-voidfraction_)) / (voidfraction_) * kf0_;
+    tmp<volScalarField> tvf
+    (
+        new volScalarField
+        (
+            IOobject
+            (
+                "tmpThCond",
+                voidfraction_.instance(),
+                voidfraction_.mesh(),
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+            ),
+            voidfraction_.mesh(),
+	    dimensionedScalar("zero", dimensionSet(1,1,-3,-1,0,0,0), 0.0)
+        )
+    );
+    volScalarField& svf = tvf();
+    
+    svf = (1-sqrt(1-voidfraction_)) / (voidfraction_) * kf0_;
+    
+    forAll(voidfraction_.boundaryField(), patchi)
+        svf.boundaryField()[patchi] *= wallLayerFactor_;
+  
+    return tvf;
 }
 
 tmp<volScalarField> SyamlalThermCond::thermDiff() const

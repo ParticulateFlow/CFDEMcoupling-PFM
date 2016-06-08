@@ -60,6 +60,9 @@ private:
     word rhoFieldName_;
     
     const volScalarField& rho_;
+    
+    // ratio of half-cell-size and near-wall film
+    scalar wallLayerFactor_;
 
 public:
 
