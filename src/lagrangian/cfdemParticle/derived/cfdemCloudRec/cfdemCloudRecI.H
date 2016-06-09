@@ -36,22 +36,22 @@ SourceFiles
 
 \*---------------------------------------------------------------------------*/
 
-#include "recModel.H"
+//#include "recModel.H"
 
 namespace Foam
 {
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-inline const recModel& cfdemCloudRec::recM() const
-{
-    return recModel_;
-}
-
-inline int cfdemCloudRec::nrForceModelsRec() const
-{
-    return forceModelsRec_.size();
-}
+// inline const recModel& cfdemCloudRec::recM() const
+// {
+//     return recModel_;
+// }
+// 
+// inline int cfdemCloudRec::nrForceModelsRec() const
+// {
+//     return forceModelsRec_.size();
+// }
 
 }
 // ************************************************************************* //

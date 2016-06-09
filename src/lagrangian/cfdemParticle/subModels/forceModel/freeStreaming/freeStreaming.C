@@ -25,7 +25,6 @@ License
 #include "error.H"
 
 #include "freeStreaming.H"
-#include "recModel.H"
 #include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -39,7 +38,7 @@ defineTypeNameAndDebug(freeStreaming, 0);
 
 addToRunTimeSelectionTable
 (
-    forceModelRec,
+    forceModel,
     freeStreaming,
     dictionary
 );
@@ -51,10 +50,10 @@ addToRunTimeSelectionTable
 freeStreaming::freeStreaming
 (
     const dictionary& dict,
-    cfdemCloudRec& sm
+    cfdemCloud& sm
 )
 :
-    forceModelRec(dict,sm),
+    forceModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
     interpolate_(propsDict_.lookupOrDefault<bool>("interpolation", false)),
     UsRecFieldName_(propsDict_.lookupOrDefault<word>("granVelRecFieldName","UsRec")),
@@ -64,7 +63,24 @@ freeStreaming::freeStreaming
     critVoidfraction_(propsDict_.lookupOrDefault<scalar>("critVoidfraction", 1.0)),
     particleDensity_(propsDict_.lookupOrDefault<scalar>("particleDensity",0.0)),
     gravAcc_(propsDict_.lookupOrDefault<vector>("g",vector(0.0,0.0,-9.81)))
-{}
+{
+    forceSubModels_.setSize(1, "recU");
+    forceSubModels_.append("recF");
+    delete[] forceSubModel_;
+    forceSubModel_ = new autoPtr<forceSubModel>[nrForceSubModels()];
+    Info << "nrForceSubModels()=" << nrForceSubModels() << endl;
+    for (int i=0;i<nrForceSubModels();i++)
+    {
+        forceSubModel_[i] = forceSubModel::New
+        (
+            dict,
+            particleCloud_,
+            *this,
+            forceSubModels_[i]
+        );
+    }
+  
+}
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
@@ -110,12 +126,11 @@ void freeStreaming::setForce() const
 		    radius = particleCloud_.radius(index);
                     mass = 4.188790205*radius*radius*radius * particleDensity_;
 		    grav = mass*gravAcc_;
-		    partToArray(index,grav);
-		    for(int j=0;j<3;j++)
-                            UNew[j]=particleVel()[index][j];
+		    forceSubM(1).partToArray(index,grav,vector::zero);
+		    UNew=particleCloud_.velocity(index);
 		}
 		// write particle based data to global array
-                partToArrayU(index,UNew);
+                forceSubM(0).partToArray(index,UNew,vector::zero);
 	    }
     }
    

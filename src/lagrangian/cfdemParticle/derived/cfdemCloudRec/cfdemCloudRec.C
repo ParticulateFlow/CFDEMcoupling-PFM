@@ -27,43 +27,33 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include "cfdemCloudRec.H"
-#include "recModel.H"
-#include "forceModelRec.H"
+//#include "recModel.H"
+#include "forceModel.H"
 namespace Foam
 {
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
-cfdemCloudRec::cfdemCloudRec
+template <class baseCloud>
+cfdemCloudRec<baseCloud>::cfdemCloudRec
 (
     const fvMesh& mesh
 )
 :
     baseCloud(mesh),
-    forceModelsRec_(couplingProperties_.lookup("forceModelsRec")),
-    recModel_
-    (
-        recModel::New
-        (
-            couplingProperties_,
-            *this
-        )
-    ),
+//     recModel_
+//     (
+//         recModel::New
+//         (
+//             couplingProperties_,
+//             *this
+//         )
+//     ),
     coupleRecForce_(true)
-    {
-        forceModelRec_ = new autoPtr<forceModelRec>[nrForceModelsRec()];
-        for (int i=0;i<nrForceModelsRec();i++)
-        {
-            forceModelRec_[i] = forceModelRec::New
-            (
-                couplingProperties_,
-                *this,
-                forceModelsRec_[i]
-            );
-        }
-    }
+{}
 
 // * * * * * * * * * * * * * * * * Destructors  * * * * * * * * * * * * * * //
-cfdemCloudRec::~cfdemCloudRec()
+template <class baseCloud>
+cfdemCloudRec<baseCloud>::~cfdemCloudRec()
 {}
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
@@ -78,24 +68,26 @@ void cfdemCloudRec::getDEMdata()
     dataExchangeM().getData("v","vector-atom",velocities_);
 }
 */
-
-void cfdemCloudRec::giveDEMdata()
+template <class baseCloud>
+void cfdemCloudRec<baseCloud>::giveDEMdata()
 {
     // ab use fluidVel_ as difference between recurrence velocity and mean particle velocity
-    dataExchangeM().giveData("vrec","vector-atom",fluidVel_);
+    baseCloud::dataExchangeM().giveData("vrec","vector-atom",baseCloud::fluidVel_);
     if(coupleRecForce_)
-        dataExchangeM().giveData("dragforce","vector-atom",DEMForces_);
-    if(verbose_) Info << "giveDEMdata done." << endl;
+        baseCloud::dataExchangeM().giveData("dragforce","vector-atom",baseCloud::DEMForces_);
+    if(baseCloud::verbose_) Info << "giveDEMdata done." << endl;
 }
 
-void cfdemCloudRec::setForces()
+template <class baseCloud>
+void cfdemCloudRec<baseCloud>::setForces()
 {
-    resetArray(fluidVel_,numberOfParticles(),3);
-    resetArray(DEMForces_,numberOfParticles(),3);
-    for (int i=0;i<nrForceModelsRec();i++) forceMRec(i).setForce();
+    baseCloud::resetArray(baseCloud::fluidVel_,baseCloud::numberOfParticles(),3);
+    baseCloud::resetArray(baseCloud::DEMForces_,baseCloud::numberOfParticles(),3);
+    for (int i=0;i<baseCloud::nrForceModelsRec();i++) baseCloud::forceM(i).setForce();
 }
 
-void cfdemCloudRec::setParticleForceField()
+template <class baseCloud>
+void cfdemCloudRec<baseCloud>::setParticleForceField()
 {}
 
 // * * *   write top level fields   * * * //
@@ -103,15 +95,11 @@ void cfdemCloudRec::setParticleForceField()
 // * * * * * * * * * * * * * * * protected Member Functions  * * * * * * * * * * * * * //
 
 // * * * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * * //
-void cfdemCloudRec::updateRecFields()
-{
-    recModel_->updateRecFields(); 
-}
+// void cfdemCloudRec::updateRecFields()
+// {
+//     recModel_->updateRecFields(); 
+// }
 
-const forceModelRec& cfdemCloudRec::forceMRec(int i)
-{
-    return forceModelRec_[i];
-}
 
 
 // shouldn't be needed anymore

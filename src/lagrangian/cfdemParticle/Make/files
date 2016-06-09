@@ -5,7 +5,6 @@ energyModels = subModels/energyModel
 forceModels = subModels/forceModel
 forceSubModels = subModels/forceModel/forceSubModels
 forceModelsMS = subModels/forceModelMS
-forceModelsRec = subModels/forceModelRec
 IOModels = subModels/IOModel
 voidFractionModels = subModels/voidFractionModel
 locateModels = subModels/locateModel
@@ -57,21 +56,18 @@ $(forceModels)/particleCellVolume/particleCellVolume.C
 $(forceModels)/fieldTimeAverage/fieldTimeAverage.C
 $(forceModels)/volWeightedAverage/volWeightedAverage.C
 $(forceModels)/deactivateForce/deactivateForce.C
+$(forceModels)/freeStreaming/freeStreaming.C
+$(forceModels)/isotropicFluctuations/isotropicFluctuations.C
 
 $(forceModelsMS)/forceModelMS/forceModelMS.C
 $(forceModelsMS)/forceModelMS/newForceModelMS.C
 $(forceModelsMS)/DiFeliceDragMS/DiFeliceDragMS.C
 
-$(forceModelsRec)/forceModelRec/forceModelRec.C
-$(forceModelsRec)/forceModelRec/newForceModelRec.C
-$(forceModelsRec)/freeStreaming/freeStreaming.C
-$(forceModelsRec)/isotropicFluctuations/isotropicFluctuations.C
-$(forceModelsRec)/gradConcentration/gradConcentration.C
-$(forceModelsRec)/tracerPointSource/tracerPointSource.C
-
 $(forceSubModels)/forceSubModel/newForceSubModel.C
 $(forceSubModels)/forceSubModel/forceSubModel.C
 $(forceSubModels)/ImEx/ImEx.C
+$(forceSubModels)/recF/recF.C
+$(forceSubModels)/recU/recU.C
 
 $(recModels)/recModel/recModel.C
 $(recModels)/recModel/newRecModel.C

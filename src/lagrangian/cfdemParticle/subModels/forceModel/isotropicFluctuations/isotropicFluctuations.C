@@ -25,7 +25,6 @@ License
 #include "error.H"
 
 #include "isotropicFluctuations.H"
-#include "recModel.H"
 #include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -39,7 +38,7 @@ defineTypeNameAndDebug(isotropicFluctuations, 0);
 
 addToRunTimeSelectionTable
 (
-    forceModelRec,
+    forceModel,
     isotropicFluctuations,
     dictionary
 );
@@ -51,10 +50,10 @@ addToRunTimeSelectionTable
 isotropicFluctuations::isotropicFluctuations
 (
     const dictionary& dict,
-    cfdemCloudRec& sm
+    cfdemCloud& sm
 )
 :
-    forceModelRec(dict,sm),
+    forceModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
     interpolate_(propsDict_.lookupOrDefault<bool>("interpolation", false)),
     voidfractionFieldName_(propsDict_.lookupOrDefault<word>("voidfractionFieldName","voidfraction")),
@@ -66,6 +65,21 @@ isotropicFluctuations::isotropicFluctuations
     ranGen_(osRandomInteger())
 {
     dt_=particleCloud_.mesh().time().deltaTValue();
+    
+    forceSubModels_.setSize(1, "recU");
+    delete[] forceSubModel_;
+    forceSubModel_ = new autoPtr<forceSubModel>[nrForceSubModels()];
+    Info << "nrForceSubModels()=" << nrForceSubModels() << endl;
+    for (int i=0;i<nrForceSubModels();i++)
+    {
+        forceSubModel_[i] = forceSubModel::New
+        (
+            dict,
+            particleCloud_,
+            *this,
+            forceSubModels_[i]
+        );
+    }
 }
 
 
@@ -121,7 +135,7 @@ void isotropicFluctuations::setForce() const
 		    if(deltaVoidfrac>0)
 		    {
                         flucU=unitRndVec()*fluctuationMag(relVolfractionExcess);
-			partToArrayU(index,flucU);
+			forceSubM(0).partToArray(index,flucU,vector::zero);
 		    }              
 		}
 	    }

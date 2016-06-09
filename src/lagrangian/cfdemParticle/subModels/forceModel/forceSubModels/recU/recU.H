@@ -22,55 +22,62 @@ License
     along with CFDEMcoupling academic.  If not, see <http://www.gnu.org/licenses/>.
 \*---------------------------------------------------------------------------*/
 
-#include "error.H"
+#ifndef recU_H
+#define recU_H
 
-#include "deactivateForce.H"
-#include "addToRunTimeSelectionTable.H"
+#include "forceSubModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+/*---------------------------------------------------------------------------*\
+                           Class recU Declaration
+\*---------------------------------------------------------------------------*/
 
-defineTypeNameAndDebug(deactivateForce, 0);
-
-addToRunTimeSelectionTable
-(
-    forceModel,
-    deactivateForce,
-    dictionary
-);
-
-
-// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
-
-// Construct from components
-deactivateForce::deactivateForce
-(
-    const dictionary& dict,
-    cfdemCloud& sm
-)
+class recU
 :
-    forceModel(dict,sm)
-{}
+    public forceSubModel
+{
+private:
 
 
-// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
+public:
 
-deactivateForce::~deactivateForce()
-{}
+    //- Runtime type information
+    TypeName("recU");
 
 
-// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+    // Constructors
 
-void deactivateForce::setForce() const
-{}
+        //- Construct from components
+        recU
+        (
+            const dictionary& dict,
+            cfdemCloud& sm,
+            forceModel& fm
+        );
+
+    // Destructor
+
+        ~recU();
+
+
+    // Member Functions
+	
+	void partToArray(label&, vector&, const vector&, const vector& dummy2=vector::zero, scalar dummy3=scalar(0)) const;
+
+        word myType() const{return typeName; };
+};
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#endif
 
 // ************************************************************************* //

@@ -24,7 +24,8 @@ License
 
 #include "error.H"
 
-#include "deactivateForce.H"
+#include "recF.H"
+#include "forceModel.H"
 #include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -34,12 +35,12 @@ namespace Foam
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-defineTypeNameAndDebug(deactivateForce, 0);
+defineTypeNameAndDebug(recF, 0);
 
 addToRunTimeSelectionTable
 (
-    forceModel,
-    deactivateForce,
+    forceSubModel,
+    recF,
     dictionary
 );
 
@@ -47,28 +48,37 @@ addToRunTimeSelectionTable
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 // Construct from components
-deactivateForce::deactivateForce
+recF::recF
 (
     const dictionary& dict,
-    cfdemCloud& sm
+    cfdemCloud& sm,
+    forceModel& fm
 )
 :
-    forceModel(dict,sm)
+    forceSubModel(dict,sm,fm)
 {}
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-deactivateForce::~deactivateForce()
+recF::~recF()
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void deactivateForce::setForce() const
-{}
-
-
+void recF::partToArray
+(
+    label& index,
+    vector& dragTot,
+    const vector& dummy1,
+    const vector& dummy2,
+    scalar dummy3
+) const
+{
+        for(int j=0;j<3;j++) 
+            myForceM().DEMForces()[index][j] += dragTot[j];  
+}
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam

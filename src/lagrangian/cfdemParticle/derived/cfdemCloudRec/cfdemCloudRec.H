@@ -46,7 +46,7 @@ SourceFiles
 namespace Foam
 {
 class recModel;
-class forceModelRec;
+class forceModel;
 /*---------------------------------------------------------------------------*\
                            Class cfdemCloudRec Declaration
 \*---------------------------------------------------------------------------*/
@@ -54,11 +54,8 @@ template <class baseCloud>
 class cfdemCloudRec : public baseCloud
 {
 protected:
-    const wordList forceModelsRec_;
     
-    autoPtr<recModel> recModel_;
-    
-    autoPtr<forceModelRec>* forceModelRec_;
+  //  autoPtr<recModel> recModel_;
     
   //  void getDEMdata();
 
@@ -74,7 +71,7 @@ public:
 
     friend class dataExchangeModel;
     friend class voidFractionModel;
-    friend class forceModelRec;
+    friend class forceModel;
 
 // Constructors
 
@@ -91,13 +88,9 @@ public:
 
  //   bool evolve(volScalarField&,volVectorField&,volVectorField&);
     
-    inline const recModel& recM() const;
-    
-    const forceModelRec& forceMRec(int);
-    
-    inline int nrForceModelsRec() const;
-
-    void updateRecFields();
+//     inline const recModel& recM() const;
+// 
+//     void updateRecFields();
     
 };
 
