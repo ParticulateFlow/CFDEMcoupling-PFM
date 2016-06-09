@@ -61,8 +61,12 @@ private:
     
     const volScalarField& rho_;
     
+    word wallQFactorName_;
+    
     // ratio of half-cell-size and near-wall film
-    scalar wallLayerFactor_;
+    volScalarField wallQFactor_;
+    
+    bool hasWallQFactor_;
 
 public:
 
