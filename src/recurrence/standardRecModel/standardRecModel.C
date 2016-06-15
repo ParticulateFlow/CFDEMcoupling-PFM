@@ -51,10 +51,10 @@ addToRunTimeSelectionTable
 standardRecModel::standardRecModel
 (
     const dictionary& dict,
-    cfdemCloudRec& sm
+    recBase& base
 )
 :
-    recModel(dict,sm),
+    recModel(dict,base),
     propsDict_(dict.subDict(typeName + "Props")),
     voidfractionFieldName_(propsDict_.lookup("voidfractionRecFieldName")),
     UFieldName_(propsDict_.lookup("velRecFieldName")),
@@ -245,11 +245,11 @@ void standardRecModel::readFieldSeries()
                 (
                     voidfractionFieldName_,
                     recTime.timePath(),
-                    particleCloud_.mesh(),
+                    base_.mesh(),
                     IOobject::MUST_READ,
                     IOobject::NO_WRITE
                 ),
-                particleCloud_.mesh()
+                base_.mesh()
             )
         );
             
@@ -262,11 +262,11 @@ void standardRecModel::readFieldSeries()
                 (
                     UFieldName_,
                     recTime.timePath(),
-                    particleCloud_.mesh(),
+                    base_.mesh(),
                     IOobject::MUST_READ,
                     IOobject::NO_WRITE
                 ),
-                particleCloud_.mesh()
+                base_.mesh()
             )
         );
         UsRecpl.set
@@ -278,11 +278,11 @@ void standardRecModel::readFieldSeries()
                 (
                     UsFieldName_,
                     recTime.timePath(),
-                    particleCloud_.mesh(),
+                    base_.mesh(),
                     IOobject::MUST_READ,
                     IOobject::NO_WRITE
                 ),
-                particleCloud_.mesh()
+                base_.mesh()
             )
         );
 
@@ -297,11 +297,11 @@ void standardRecModel::readFieldSeries()
                     (
                         phiFieldName_,
                         recTime.timePath(),
-                        particleCloud_.mesh(),
+                        base_.mesh(),
                         IOobject::MUST_READ,
                         IOobject::NO_WRITE
                     ),
-                    particleCloud_.mesh()
+                    base_.mesh()
                 )
             );
         }
@@ -316,11 +316,11 @@ void standardRecModel::readFieldSeries()
                     (
                          phiFieldName_,
                          recTime.timePath(),
-                         particleCloud_.mesh(),
+                         base_.mesh(),
                          IOobject::NO_READ,
                          IOobject::NO_WRITE
                     ),
-                    linearInterpolate(URecpl.last()*voidfractionRecpl.last()) & particleCloud_.mesh().Sf()
+                    linearInterpolate(URecpl.last()*voidfractionRecpl.last()) & base_.mesh().Sf()
                 )
 	    );
 	}
@@ -336,11 +336,11 @@ void standardRecModel::readFieldSeries()
                     (
                         phiSFieldName_,
                         recTime.timePath(),
-                        particleCloud_.mesh(),
+                        base_.mesh(),
                         IOobject::MUST_READ,
                         IOobject::NO_WRITE
                     ),
-                    particleCloud_.mesh()
+                    base_.mesh()
                 )
             );
 	}
@@ -355,11 +355,11 @@ void standardRecModel::readFieldSeries()
                     (
                          phiSFieldName_,
                          recTime.timePath(),
-                         particleCloud_.mesh(),
+                         base_.mesh(),
                          IOobject::NO_READ,
                          IOobject::NO_WRITE
                     ),
-                    linearInterpolate(UsRecpl.last()*(1-voidfractionRecpl.last())) & particleCloud_.mesh().Sf()
+                    linearInterpolate(UsRecpl.last()*(1-voidfractionRecpl.last())) & base_.mesh().Sf()
                 )
             );
         }

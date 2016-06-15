@@ -1,0 +1,37 @@
+sinclude $(GENERAL_RULES)/mplib$(WM_MPLIB)
+sinclude $(RULES)/mplib$(WM_MPLIB)
+
+GIT_VERSION := $(shell git describe --abbrev=4 --dirty --always --tags)
+PFLAGS+= -DGITVERSION=\"$(GIT_VERSION)\"
+
+include $(CFDEM_ADD_LIBS_DIR)/additionalLibs
+
+EXE_INC = \
+     $(PFLAGS) \
+     $(PINC) \
+    -I ./cfdemParticle \
+    -I$(LIB_SRC)/finiteVolume/lnInclude \
+    -I$(LIB_SRC)/transportModels \
+    -I$(LIB_SRC)/turbulenceModels/incompressible/turbulenceModel \
+    -I$(LIB_SRC)/meshTools/lnInclude \
+    -I$(LIB_SRC)/lagrangian/basic/lnInclude \
+    -I$(LIB_SRC)/OpenFOAM/containers/HashTables/labelHashSet \
+    -I$(CFDEM_LIGGGHTS_SRC_DIR) \
+    -I$(CFDEM_M2MLIB_PATH) \
+    -I$(CFDEM_SRC_DIR)/cfdTools \
+
+
+LIB_LIBS = \
+     $(PLIBS) \
+    -L$(CFDEM_LIB_DIR) \
+    -lfiniteVolume \
+    -lincompressibleRASModels \
+    -lincompressibleLESModels \
+    -lmeshTools \
+    -llagrangian \
+    -lmpi_cxx \
+    -Wl,-rpath,$(CFDEM_LIGGGHTS_BIN_DIR) \
+    -L$(CFDEM_LIGGGHTS_BIN_DIR) \
+    -lliggghts \
+    -L$(CFDEM_Many2ManyLIB_PATH) \
+    -lcoupleMany2Many

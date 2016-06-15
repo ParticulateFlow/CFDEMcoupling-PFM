@@ -25,11 +25,11 @@ License
 #ifndef recModel_H
 #define recModel_H
 
-
-#include "cfdemCloudRec.H"
+#include "recBase.H"
 #include "fvCFD.H"
 #include "HashTable.H"
 #include "labelPair.H"
+#include "OFstream.H"
 
 namespace Foam
 {
@@ -43,9 +43,12 @@ class recModel
 protected:
 
     // Protected data
-    const dictionary& dict_;
-    cfdemCloudRec& particleCloud_;
+    recBase& base_;
+    
+    const dictionary& recProperties_;
+    
     IOdictionary controlDict_;
+    
     bool verbose_;
     
     Foam::Time recTime;
@@ -109,9 +112,9 @@ public:
             dictionary,
             (
                 const dictionary& dict,
-                cfdemCloudRec& sm
+                recBase& base
             ),
-            (dict,sm)
+            (dict,base)
         );
 
 
@@ -121,7 +124,7 @@ public:
         recModel
         (
             const dictionary& dict,
-            cfdemCloudRec& sm
+            recBase& base
         );
 
 
@@ -135,7 +138,7 @@ public:
         static autoPtr<recModel> New
         (
             const dictionary& dict,
-            cfdemCloudRec& sm
+            recBase& base
         );
 
 

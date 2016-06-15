@@ -44,26 +44,26 @@ defineRunTimeSelectionTable(recModel, dictionary);
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 // Construct from components
-Foam::recModel::recModel
+recModel::recModel
 (
     const dictionary& dict,
-    cfdemCloudRec& sm
+    recBase& base
 )
 :
-    dict_(dict),
-    particleCloud_(sm),
+    base_(base),
+    recProperties_(dict),
     controlDict_
     (
         IOobject
         (
             "controlDict",
-            sm.mesh().time().system(),
-            sm.mesh(),
+            base.mesh().time().system(),
+            base.mesh(),
             IOobject::MUST_READ,
             IOobject::NO_WRITE
         )
     ),
-    verbose_(sm.verbose()),
+    verbose_(false),
     recTime("dataBase", "", "../system", "../constant", false),
     timeDirs(recTime.times()),
     numRecFields(label(timeDirs.size())),
@@ -86,6 +86,7 @@ Foam::recModel::recModel
     virtualTimeIndexListPos(0),
     numRecIntervals(0)
 {
+    if (recProperties_.found("verbose")) verbose_=true;
     if (verbose_)
     {
     	// be informative on properties of the "recTime" Time-object
@@ -103,7 +104,7 @@ Foam::recModel::recModel
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-Foam::recModel::~recModel()
+recModel::~recModel()
 {}
 
 // * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * //
@@ -111,7 +112,7 @@ Foam::recModel::~recModel()
 
 // * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * //
 
-void Foam::recModel::readTimeSeries()
+void recModel::readTimeSeries()
 {
   // fill the data structure for the time indices
     for (instantList::iterator it=timeDirs.begin(); it != timeDirs.end(); ++it)
@@ -158,7 +159,7 @@ void Foam::recModel::readTimeSeries()
     }
 }
 
-scalar Foam::recModel::checkTimeStep()
+scalar recModel::checkTimeStep()
 {
    // check time step of provided data
     scalar dtCur(0.0);
@@ -219,13 +220,13 @@ scalar Foam::recModel::checkTimeStep()
     return dtCur;
 }
 
-void Foam::recModel::writeRecMatrix() const
+void recModel::writeRecMatrix() const
 {
     OFstream matrixFile("recurrenceMatrix");
     matrixFile << recurrenceMatrix;
 }
 
-void Foam::recModel::writeRecPath() const
+void recModel::writeRecPath() const
 {
     OFstream listFile("recurrencePath");
     listFile << virtualTimeIndexList;

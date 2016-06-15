@@ -68,10 +68,14 @@ public:
     
     // public Member Functions
     
-     const recModel& recM() const;
+    const fvMesh& mesh() const;
+    
+    const recModel& recM() const;
  
-     void updateRecFields();
+    void updateRecFields();
   
 };
 
 }
+
+#endif

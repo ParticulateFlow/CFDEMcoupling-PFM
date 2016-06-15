@@ -59,7 +59,7 @@ public:
         standardRecModel
         (
             const dictionary& dict,
-            cfdemCloudRec& sm
+            recBase& base
         );
 
     // Destructor

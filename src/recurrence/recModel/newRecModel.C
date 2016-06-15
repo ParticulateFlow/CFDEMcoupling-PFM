@@ -25,7 +25,6 @@ License
 #include "error.H"
 
 #include "recModel.H"
-#include "standardSearch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -37,7 +36,7 @@ namespace Foam
 autoPtr<recModel> recModel::New
 (
     const dictionary& dict,
-    cfdemCloudRec& sm
+    recBase& base
 )
 {
     word recModelType
@@ -66,7 +65,7 @@ autoPtr<recModel> recModel::New
             << abort(FatalError);
     }
 
-    return autoPtr<recModel>(cstrIter()(dict,sm));
+    return autoPtr<recModel>(cstrIter()(dict,base));
 }
 
 

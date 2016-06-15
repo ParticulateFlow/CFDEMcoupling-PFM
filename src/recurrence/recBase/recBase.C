@@ -23,6 +23,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "recBase.H"
+#include "recModel.H"
 
 namespace Foam
 {
@@ -60,6 +61,11 @@ recBase::~recBase()
 {}
 
 // * * * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * * //
+
+const fvMesh& recBase::mesh() const
+{
+    return mesh_;
+}
 
 const recModel& recBase::recM() const
 {
