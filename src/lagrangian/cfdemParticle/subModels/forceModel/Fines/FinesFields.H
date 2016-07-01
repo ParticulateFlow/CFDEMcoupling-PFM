@@ -58,6 +58,8 @@ private:
     
     volScalarField dSauterMix_;
     
+    volScalarField dHydMix_;
+    
     volScalarField alphaP_;
 
     volScalarField alphaSt_;
@@ -67,6 +69,8 @@ private:
     volVectorField uDyn_;
     
     volScalarField Sds_;
+    
+    volScalarField Froude_;
     
     scalar estimatedVelFrac_;
     
@@ -79,6 +83,8 @@ private:
     scalar nCrit_;
     
     scalar alphaMax_;
+    
+    const dimensiondScalar g_;
         
     void calcSource();
     
@@ -118,6 +124,10 @@ public:
     scalar rhoDyn() const;
     
     scalar uDyn(label) const;
+    
+    scalar Froude(label) const;
+    
+    scalar dHydMix(label) const;
 };
 
 

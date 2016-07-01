@@ -99,12 +99,11 @@ void Fines::setForce() const
 {
     finesFields_.update();
 
-    const volScalarField& nufField = forceSubM(0).nuField();
-    const volScalarField& rhoField = forceSubM(0).rhoField();
+    
 
     vector position(0,0,0);
     scalar voidfraction(1);
-    vector Ufluid(0,0,0);
+    vector UDyn(0,0,0);
     vector drag(0,0,0);
     label cellI=0;
 
@@ -113,17 +112,14 @@ void Fines::setForce() const
     scalar ds(0);
     scalar ds_scaled(0);
     scalar scaleDia3 = scaleDia_*scaleDia_*scaleDia_;
-    scalar nuf(0);
-    scalar rho(0);
+   
     scalar magUr(0);
-    scalar Rep(0);
-    scalar localPhiP(0);
+    scalar Froude(0);
+
 
     vector dragExplicit(0,0,0);
     scalar dragCoefficient(0);
     
-    interpolationCellPoint<scalar> voidfractionInterpolator_(voidfraction_);
-    interpolationCellPoint<vector> UInterpolator_(U_);
 
     #include "setupProbeModel.H"
 
@@ -132,47 +128,24 @@ void Fines::setForce() const
             cellI = particleCloud_.cellIDs()[index][0];
             drag = vector(0,0,0);
             dragExplicit = vector(0,0,0);
-            Ufluid =vector(0,0,0);
+            UDyn = vector(0,0,0);
             voidfraction=0;
             dragCoefficient = 0;
 
             if (cellI > -1) // particle found
             {
-
-                if( forceSubM(0).interpolation() )
-                {
-                    position     = particleCloud_.position(index);
-                    voidfraction = voidfractionInterpolator_.interpolate(position,cellI);
-                    Ufluid       = UInterpolator_.interpolate(position,cellI);
-                    //Ensure interpolated void fraction to be meaningful
-                    // Info << " --> voidfraction: " << voidfraction << endl;
-                    if(voidfraction>1.00) voidfraction = 1.0;
-                    if(voidfraction<0.10) voidfraction = 0.10;
-                }
-                else
-                {
-                    voidfraction = voidfraction_[cellI];
-                    Ufluid = U_[cellI];
-                }
-
-                Us = particleCloud_.velocity(index);
-                Ur = Ufluid-Us;
+                voidfraction = voidfraction_[cellI];
+                UDyn = finesFields_.uDyn(cellI);
+                Us = UsField_.[cellI];
+                Ur = UDyn-Us;
                 magUr = mag(Ur);
                 ds = 2*particleCloud_.radius(index);
 		ds_scaled = ds/scaleDia_;
-                rho = rhoField[cellI];
-                nuf = nufField[cellI];
-
-                Rep=0.0;
-                localPhiP = 1.0f-voidfraction+SMALL;
-
-                // calc particle's drag coefficient (i.e., Force per unit slip velocity and Stokes drag)
                
-                Rep=ds_scaled*voidfraction*magUr/nuf+SMALL;
-                dragCoefficient = 10.0*localPhiP/(voidfraction*voidfraction) +
-                                  voidfraction*voidfraction*(1.0+1.5*Foam::sqrt(localPhiP)) +
-                                  0.413*Rep/(24*voidfraction*voidfraction)*(1.0/voidfraction+3*voidfraction*localPhiP+8.4*Foam::pow(Rep,-0.343))/
-                                  (1+Foam::pow(10,3*localPhiP)*Foam::pow(Rep,-0.5*(1+4*localPhiP)));
+		// scalinge!!
+                Froude=finesFields_.Froude(cellI);
+                ds_scaled*voidfraction*magUr/nuf+SMALL;
+                dragCoefficient = 
 
                 // calc particle's drag
                 dragCoefficient *= 3*M_PI*ds_scaled*nuf*rho*voidfraction*scaleDia3*scaleDrag_;
@@ -183,32 +156,6 @@ void Fines::setForce() const
 
                 // explicitCorr
                 forceSubM(0).explicitCorr(drag,dragExplicit,dragCoefficient,Ufluid,U_[cellI],Us,UsField_[cellI],forceSubM(0).verbose());
-
-                if(forceSubM(0).verbose() && index >=0 && index <2)
-                {
-                    Pout << "cellI = " << cellI << endl;
-                    Pout << "index = " << index << endl;
-                    Pout << "Us = " << Us << endl;
-                    Pout << "Ur = " << Ur << endl;
-                    Pout << "ds = " << ds << endl;
-                    Pout << "ds/scale = " << ds/scaleDia_ << endl;
-                    Pout << "rho = " << rho << endl;
-                    Pout << "nuf = " << nuf << endl;
-                    Pout << "voidfraction = " << voidfraction << endl;
-                    Pout << "Rep = " << Rep << endl;
-                    Pout << "drag = " << drag << endl;
-                }
-
-                //Set value fields and write the probe
-                if(probeIt_)
-                {
-                    #include "setupProbeModelfields.H"
-                    vValues.append(drag);   //first entry must the be the force
-                    vValues.append(Ur);
-                    sValues.append(Rep);
-                    sValues.append(voidfraction);
-                    particleCloud_.probeM().writeProbe(index, sValues, vValues);
-                }
             }
 
             // write particle based data to global array

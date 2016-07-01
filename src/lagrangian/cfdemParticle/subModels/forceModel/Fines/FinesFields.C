@@ -59,6 +59,18 @@ FinesFields::FinesFields
         sm.mesh(),
 	dimensionedScalar("zero", dimensionSet(0,1,0,0,0), 0)
     ),
+    dHydMix_
+    (   IOobject
+        (
+            "dHydMix",
+            sm.mesh().time().timeName(),
+            sm.mesh(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        sm.mesh(),
+	dimensionedScalar("zero", dimensionSet(0,1,0,0,0), 0)
+    ),
     alphaP_
     (   IOobject
         (
@@ -116,12 +128,25 @@ FinesFields::FinesFields
         sm.mesh(),
 	dimensionedScalar("zero", dimensionSet(0,0,0,0,0), 0)
     ),
+    Froude_
+    (   IOobject
+        (
+            "Froude",
+            sm.mesh().time().timeName(),
+            sm.mesh(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        sm.mesh(),
+	dimensionedScalar("zero", dimensionSet(0,0,0,0,0), 0)
+    ),
     estimatedVelFrac_(readScalar(propsDict_.lookup ("estimatedVelFrac"))),
     dFine_("dFine", dimensionSet(0,1,0,0,0), 0.0),
     depRate_(readScalar(propsDict_.lookup ("depRate"))),
     rhoDyn_(readScalar(propsDict_.lookup ("rhoDyn"))),
     nCrit_(readScalar(propsDict_.lookup ("nCrit"))),
-    alphaMax_(readScalar(propsDict_.lookup ("alphaMax")))
+    alphaMax_(readScalar(propsDict_.lookup ("alphaMax"))),
+    g("g",dimensionSet(0,1,-2,0,0),9.81)
 {
     dFine_.value()=readScalar(propsDict_.lookup ("dFine"));
     Sds_.write();
@@ -150,6 +175,8 @@ void FinesFields::update()
     alphaP_ = 1.0 - voidfraction_;
     calcSource();
     updateDSauter();
+    dHydMix_ = 2*(1 - alphaP_ - alphaSt_) / (3*(alphaP_ + alphaSt_) ) * dSauterMix_;
+    Froude_ = mag(uDyn_ - UsField_) / Foam::sqrt(dHydMix_*g_); 
     updateUDyn();
     updateFields();
 }
@@ -249,6 +276,16 @@ scalar FinesFields::rhoDyn() const
 vector FinesFields::uDyn(label I) const
 {
     return uDyn_[I];
+}
+
+scalar FinesFields::Froude(label I) const
+{
+    return Froude_[I];
+}
+
+scalar FinesFields::dHydMix(label I) const
+{
+    return dHydMix_[I];
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
