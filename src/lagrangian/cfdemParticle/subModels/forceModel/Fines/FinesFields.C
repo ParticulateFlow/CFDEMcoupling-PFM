@@ -46,6 +46,31 @@ FinesFields::FinesFields
     voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
     UsFieldName_(propsDict_.lookup("granVelFieldName")),
     UsField_(sm.mesh().lookupObject<volVectorField> (UsFieldName_)),
+    dSauter_(sm.mesh().lookupObject<volScalarField> ("dSauter")),
+    dSauterMix_
+    (   IOobject
+        (
+            "dSauterMix",
+            sm.mesh().time().timeName(),
+            sm.mesh(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        sm.mesh(),
+	dimensionedScalar("zero", dimensionSet(0,1,0,0,0), 0)
+    ),
+    alphaP_
+    (   IOobject
+        (
+            "alphaP",
+            sm.mesh().time().timeName(),
+            sm.mesh(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        sm.mesh(),
+	dimensionedScalar("zero", dimensionSet(0,0,0,0,0), 0)
+    ),
     alphaSt_
     (   IOobject
         (
@@ -91,12 +116,14 @@ FinesFields::FinesFields
         sm.mesh(),
 	dimensionedScalar("zero", dimensionSet(0,0,0,0,0), 0)
     ),
-    estimatedVelFrac_(0.2)
+    estimatedVelFrac_(readScalar(propsDict_.lookup ("estimatedVelFrac"))),
+    dFine_("dFine", dimensionSet(0,1,0,0,0), 0.0),
+    depRate_(readScalar(propsDict_.lookup ("depRate"))),
+    rhoDyn_(readScalar(propsDict_.lookup ("rhoDyn"))),
+    nCrit_(readScalar(propsDict_.lookup ("nCrit"))),
+    alphaMax_(readScalar(propsDict_.lookup ("alphaMax")))
 {
-    if (propsDict_.found("estimatedVelFrac"))
-    {
-        estimatedVelFrac_=readScalar(propsDict_.lookup ("estimatedVelFrac"));
-    }
+    dFine_.value()=readScalar(propsDict_.lookup ("dFine"));
     Sds_.write();
     // init force sub model
  //   setForceSubModels(propsDict_);
@@ -116,7 +143,65 @@ FinesFields::~FinesFields()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
+void FinesFields::update()
+{
+    // the sequence is important: for the source terms, the Sauter mean diameter of the large particles
+    // is needed, for the force calculation, the static hold-up's contribution needs to be included
+    alphaP_ = 1.0 - voidfraction_;
+    calcSource();
+    updateDSauter();
+    updateUDyn();
+    updateFields();
+}
 
+void FinesFields::updateDSauter() 
+{
+  dSauterMix_ = (alphaP_ + alphaSt_) / ( alphaP_/dSauter_ + alphaSt_/dFine_ );
+  
+  // manipulate voidfraction field
+  
+}
+
+void FinesFields::calcSource() 
+{
+    Sds_=0;
+    label cellI=0;
+    scalar f(0.0);
+    scalar critpore(0.0);
+    scalar deltaAlpha(0.0);
+    
+    forAll(Sds_,cellI)
+    {
+        critpore = nCrit_*dFine_.value()/dSauter_[cellI];
+        // mean pore diameter \approx 0.2 mean particle diameter, width +- 0.075 particle diameters
+        f = (critpore*critpore*critpore - 0.0019531) / (0.020797 - 0.0019531);
+	if (f<0)
+	{
+	    f=0.0;
+	}
+	else if (f>1.0)
+	{
+	    f=1.0;
+        }
+	
+	// at this point, voidfraction is still calculated from the true particle sizes
+	deltaAlpha = f * (alphaMax_ - alphaP_[cellI]) - alphaSt_[cellI];
+	
+	if (deltaAlpha < 0)
+	{
+	    Sds_[cellI] = deltaAlpha;
+	}
+	else if (deltaAlpha > alphaDyn_[cellI])
+	{
+	    Sds_[cellI] = alphaDyn_[cellI];
+	}
+	else
+	{
+	    Sds_[cellI] = depRate_ * deltaAlpha;
+	}
+    }
+  
+}
 
 void FinesFields::updateUDyn() 
 {
@@ -127,14 +212,7 @@ void FinesFields::updateUDyn()
   
 }
 
-void FinesFields::calcSource() 
-{
-    Sds_=0;
-  
-  
-}
-
-void FinesFields::updateFields() 
+void FinesFields::integrateFields() 
 {
   
     surfaceScalarField phiSt(linearInterpolate(UsField_) & particleCloud_.mesh().Sf());
@@ -156,6 +234,21 @@ void FinesFields::updateFields()
     );
     alphaStEqn.solve();
     alphaDynEqn.solve();
+}
+
+scalar FinesFields::alphaDyn(label I) const
+{
+    return alphaDyn_[I];
+}
+
+scalar FinesFields::rhoDyn() const
+{
+    return rhoDyn_;
+}
+
+vector FinesFields::uDyn(label I) const
+{
+    return uDyn_[I];
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

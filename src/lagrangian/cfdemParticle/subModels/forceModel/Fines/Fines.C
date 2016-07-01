@@ -97,9 +97,7 @@ Fines::~Fines()
 
 void Fines::setForce() const
 {
-    finesFields_.updateUDyn();
-    finesFields_.calcSource();
-    finesFields_.updateFields();
+    finesFields_.update();
 
     const volScalarField& nufField = forceSubM(0).nuField();
     const volScalarField& rhoField = forceSubM(0).rhoField();

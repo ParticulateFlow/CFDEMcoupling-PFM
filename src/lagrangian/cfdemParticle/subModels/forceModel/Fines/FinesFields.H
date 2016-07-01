@@ -53,6 +53,12 @@ private:
     word UsFieldName_;   
 
     const volVectorField& UsField_;
+    
+    const volScalarField& dSauter_;
+    
+    volScalarField dSauterMix_;
+    
+    volScalarField alphaP_;
 
     volScalarField alphaSt_;
     
@@ -63,6 +69,24 @@ private:
     volScalarField Sds_;
     
     scalar estimatedVelFrac_;
+    
+    dimensionedScalar dFine_;
+    
+    scalar rhoDyn_;
+    
+    scalar depRate_;
+    
+    scalar nCrit_;
+    
+    scalar alphaMax_;
+        
+    void calcSource();
+    
+    void updateDSauter();
+    
+    void updateUDyn();
+
+    void integrateFields();
 
 public:
 
@@ -85,11 +109,15 @@ public:
 
 
     // Member Functions
-    void updateUDyn();
+
     
-    void calcSource();
+    void update();
     
-    void updateFields();
+    scalar alphaDyn(label) const;
+    
+    scalar rhoDyn() const;
+    
+    scalar uDyn(label) const;
 };
 
 
