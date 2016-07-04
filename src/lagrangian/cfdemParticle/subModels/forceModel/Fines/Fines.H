@@ -42,26 +42,6 @@ class Fines
 {
 private:
     mutable FinesFields finesFields_;
-  
-    dictionary propsDict_;
-
-    word velFieldName_;
-
-    const volVectorField& U_;
-
-    word voidfractionFieldName_;
-
-    const volScalarField& voidfraction_;
-
-    word UsFieldName_;   
-
-    const volVectorField& UsField_;
-
-    mutable scalar scaleDia_;
-
-    mutable scalar scaleDrag_;
-    
-
     
 
 public:

@@ -13,18 +13,19 @@ License
 
     Copyright (C) 2015- Thomas Lichtenegger, JKU Linz, Austria
 
-Description
-    class managing fines fields
+Class
+    ErgunStatFines
 
 SourceFiles
-    finesFields.C
+    ErgunStatFines.C
+
 \*---------------------------------------------------------------------------*/
 
-#ifndef FinesFields_H
-#define FinesFields_H
+#ifndef ErgunStatFines_H
+#define ErgunStatFines_H
 
-#include "fvCFD.H"
-#include "cfdemCloud.H"
+#include "forceModel.H"
+#include "interpolationCellPoint.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -32,14 +33,14 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class FinesFields Declaration
+                           Class ErgunStatFines Declaration
 \*---------------------------------------------------------------------------*/
 
-class FinesFields
+class ErgunStatFines
+:
+    public forceModel
 {
 private:
-    cfdemCloud& particleCloud_;
-  
     dictionary propsDict_;
 
     word velFieldName_;
@@ -48,62 +49,36 @@ private:
 
     word voidfractionFieldName_;
 
-    volScalarField& voidfraction_;
-
-    word UsFieldName_;   
-
-    const volVectorField& UsField_;
+    const volScalarField& voidfraction_;
     
     const volScalarField& dSauter_;
     
-    volScalarField dSauterMix_;
+    const volScalarField& dSauterMix_;
     
-    volScalarField dHydMix_;
-    
-    volScalarField alphaP_;
+    const volScalarField& alphaP_;
 
-    volScalarField alphaSt_;
-    
-    volScalarField alphaDyn_;
-    
-    volVectorField uDyn_;
-    
-    volScalarField Sds_;
-    
-    volScalarField Froude_;
-    
-    dimensionedScalar dFine_;
-    
-    scalar rhoDyn_;
-    
-    scalar depRate_;
-    
-    scalar nCrit_;
-    
-    scalar alphaMax_;
-    
-    scalar critVoidfraction_;
-    
-    const dimensiondScalar g_;
-        
-    void calcSource();
-    
-    void updateDSauter();
-    
-    void updateUDyn();
+    const scalar phi_;
 
-    void integrateFields();
+    word UsFieldName_;   
+
+    const volVectorField& UsField_;  // the average particle velocity field
+
+    mutable scalar scaleDia_;
+
+    mutable scalar scaleDrag_;
+
+    mutable scalar switchingVoidfraction_; //voidfraction above which dilute formulation will be used
 
 public:
 
     //- Runtime type information
-    TypeName("FinesFields");
+    TypeName("ErgunStatFines");
 
 
     // Constructors
 
         //- Construct from components
-        FinesFields
+        ErgunStatFines
         (
             const dictionary& dict,
             cfdemCloud& sm
@@ -111,13 +86,11 @@ public:
 
     // Destructor
 
-        ~FinesFields();
+        ~ErgunStatFines();
 
 
     // Member Functions
-
-    
-    void update();
+        void setForce() const;
 };
 
 
@@ -130,4 +103,3 @@ public:
 #endif
 
 // ************************************************************************* //
-

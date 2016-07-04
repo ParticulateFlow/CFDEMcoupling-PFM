@@ -14,17 +14,18 @@ License
     Copyright (C) 2015- Thomas Lichtenegger, JKU Linz, Austria
 
 Description
-    class managing fines fields
+    fines influence on particles
 
 SourceFiles
-    finesFields.C
+    FinesDynFanning.C
 \*---------------------------------------------------------------------------*/
 
-#ifndef FinesFields_H
-#define FinesFields_H
+#ifndef FinesDynFanning_H
+#define FinesDynFanning_H
 
-#include "fvCFD.H"
-#include "cfdemCloud.H"
+#include "forceModel.H"
+#include "interpolationCellPoint.H"
+#include "FinesDynFanningFields.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -32,13 +33,14 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class FinesFields Declaration
+                           Class FinesDynFanning Declaration
 \*---------------------------------------------------------------------------*/
 
-class FinesFields
+class FinesDynFanning
+:
+    public forceModel
 {
 private:
-    cfdemCloud& particleCloud_;
   
     dictionary propsDict_;
 
@@ -48,62 +50,47 @@ private:
 
     word voidfractionFieldName_;
 
-    volScalarField& voidfraction_;
+    const volScalarField& voidfraction_;
 
     word UsFieldName_;   
 
     const volVectorField& UsField_;
     
+    const volVectorField& UDyn_;
+    
+    const volScalarField& alphaDyn_;
+    
+    const volScalarField& alphaP_;
+    
+    const volScalarField& dHydMix_;
+    
     const volScalarField& dSauter_;
     
-    volScalarField dSauterMix_;
-    
-    volScalarField dHydMix_;
-    
-    volScalarField alphaP_;
-
-    volScalarField alphaSt_;
-    
-    volScalarField alphaDyn_;
-    
-    volVectorField uDyn_;
-    
-    volScalarField Sds_;
-    
-    volScalarField Froude_;
-    
-    dimensionedScalar dFine_;
+    const volScalarField& Froude_;
     
     scalar rhoDyn_;
     
-    scalar depRate_;
+    scalar prefactor_;
     
-    scalar nCrit_;
-    
-    scalar alphaMax_;
-    
-    scalar critVoidfraction_;
-    
-    const dimensiondScalar g_;
-        
-    void calcSource();
-    
-    void updateDSauter();
-    
-    void updateUDyn();
+    scalar exponent_;
 
-    void integrateFields();
+    mutable scalar scaleDia_;
+
+    mutable scalar scaleDrag_;
+    
+
+    
 
 public:
 
     //- Runtime type information
-    TypeName("FinesFields");
+    TypeName("FinesDynFanning");
 
 
     // Constructors
 
         //- Construct from components
-        FinesFields
+        FinesDynFanning
         (
             const dictionary& dict,
             cfdemCloud& sm
@@ -111,13 +98,11 @@ public:
 
     // Destructor
 
-        ~FinesFields();
+        ~FinesDynFanning();
 
 
     // Member Functions
-
-    
-    void update();
+        void setForce() const;
 };
 
 
@@ -130,4 +115,3 @@ public:
 #endif
 
 // ************************************************************************* //
-

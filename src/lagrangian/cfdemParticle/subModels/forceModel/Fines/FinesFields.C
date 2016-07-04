@@ -43,7 +43,8 @@ FinesFields::FinesFields
     velFieldName_(propsDict_.lookup("velFieldName")),
     U_(sm.mesh().lookupObject<volVectorField> (velFieldName_)),
     voidfractionFieldName_(propsDict_.lookup("voidfractionFieldName")),
-    voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
+    // this is probably really bad
+    voidfraction_(const_cast<volScalarField&>(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_))),
     UsFieldName_(propsDict_.lookup("granVelFieldName")),
     UsField_(sm.mesh().lookupObject<volVectorField> (UsFieldName_)),
     dSauter_(sm.mesh().lookupObject<volScalarField> ("dSauter")),
@@ -146,6 +147,7 @@ FinesFields::FinesFields
     rhoDyn_(readScalar(propsDict_.lookup ("rhoDyn"))),
     nCrit_(readScalar(propsDict_.lookup ("nCrit"))),
     alphaMax_(readScalar(propsDict_.lookup ("alphaMax"))),
+    critVoidfraction_(readScalar(propsDict_.lookup ("critVoidfraction"))),
     g("g",dimensionSet(0,1,-2,0,0),9.81)
 {
     dFine_.value()=readScalar(propsDict_.lookup ("dFine"));
@@ -176,9 +178,10 @@ void FinesFields::update()
     calcSource();
     updateDSauter();
     dHydMix_ = 2*(1 - alphaP_ - alphaSt_) / (3*(alphaP_ + alphaSt_) ) * dSauterMix_;
-    Froude_ = mag(uDyn_ - UsField_) / Foam::sqrt(dHydMix_*g_); 
+    Froude_ = alphaDyn_*mag(uDyn_ - UsField_) / Foam::sqrt(dHydMix_*g_); 
     updateUDyn();
-    updateFields();
+    integrateFields();
+    updateVoidfraction();
 }
 
 void FinesFields::updateDSauter() 
@@ -204,7 +207,7 @@ void FinesFields::calcSource()
         f = (critpore*critpore*critpore - 0.0019531) / (0.020797 - 0.0019531);
 	if (f<0)
 	{
-	    f=0.0;
+	    f=0.0;    
 	}
 	else if (f>1.0)
 	{
@@ -232,10 +235,10 @@ void FinesFields::calcSource()
 
 void FinesFields::updateUDyn() 
 {
-  volVectorField U0 = estimatedVelFrac_*U_ + (1-estimatedVelFrac_)*UsField_;
+  
   
   // more implementation to follow
-  uDyn_ = U0;
+
   
 }
 
@@ -263,30 +266,21 @@ void FinesFields::integrateFields()
     alphaDynEqn.solve();
 }
 
-scalar FinesFields::alphaDyn(label I) const
+void FinesFields::updateVoidfraction() 
 {
-    return alphaDyn_[I];
+  forAll(voidfraction_,cellI)
+  {
+      if(voidfraction_[cellI] - alphaSt_[cellI] > critVoidfraction_)
+      {
+	  voidfraction_[cellI] -= alphaSt_[cellI];
+      }
+      else
+      {
+	  voidfraction_[cellI] = critVoidfraction_;
+      }
+  }
 }
 
-scalar FinesFields::rhoDyn() const
-{
-    return rhoDyn_;
-}
-
-vector FinesFields::uDyn(label I) const
-{
-    return uDyn_[I];
-}
-
-scalar FinesFields::Froude(label I) const
-{
-    return Froude_[I];
-}
-
-scalar FinesFields::dHydMix(label I) const
-{
-    return dHydMix_[I];
-}
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
