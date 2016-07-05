@@ -170,6 +170,18 @@ FinesFields::FinesFields
         sm.mesh(),
         dimensionedScalar("zero", dimensionSet(0,0,0,0,0), 0)
     ),
+    massFluxDyn_
+    (   IOobject
+        (
+            "massFluxDyn",
+            sm.mesh().time().timeName(),
+            sm.mesh(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        sm.mesh(),
+	dimensionedVector("zero", dimensionSet(1,-2,-1,0,0), vector::zero)
+    ),
     uDyn_
     (   IOobject
         (
@@ -192,7 +204,6 @@ FinesFields::FinesFields
     nCrit_(readScalar(propsDict_.lookup ("nCrit"))),
     prefactor_(14.98) 
 {
-    dFine_.value()=readScalar(propsDict_.lookup ("dFine"));
     Sds_.write();
 
     if (propsDict_.found("prefactor"))
@@ -380,7 +391,9 @@ void FinesFields::updateUDyn()
         num -= alphaDyn_ * fvc::grad(p_) ;
     volScalarField denom = FanningCoeff_ + DragCoeff_;
   
-    uDyn_ = num / denom;  
+    uDyn_ = num / denom;
+    
+    massFluxDyn_ = rhoFine_ * alphaDyn_ * uDyn_;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

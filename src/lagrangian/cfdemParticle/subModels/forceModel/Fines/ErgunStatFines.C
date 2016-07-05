@@ -167,7 +167,7 @@ void ErgunStatFines::setForce() const
                 }
                 else
                 {
-					voidfraction = voidfraction_[cellI];
+		    voidfraction = voidfraction_[cellI];
                     Ufluid = U_[cellI];
                 }
 

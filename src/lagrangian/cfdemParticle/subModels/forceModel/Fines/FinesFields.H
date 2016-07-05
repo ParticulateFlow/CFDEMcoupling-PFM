@@ -84,6 +84,8 @@ private:
     
     volScalarField Sds_;
     
+    volVectorField massFluxDyn_;
+    
     volVectorField uDyn_;
 
     dimensionedScalar dFine_;
