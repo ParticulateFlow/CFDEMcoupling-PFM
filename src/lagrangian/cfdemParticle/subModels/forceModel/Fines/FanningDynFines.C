@@ -17,7 +17,7 @@ License
 
 #include "error.H"
 
-#include "FinesDynFanning.H"
+#include "FanningDynFines.H"
 #include "addToRunTimeSelectionTable.H"
 #include "averagingModel.H"
 
@@ -28,12 +28,12 @@ namespace Foam
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-defineTypeNameAndDebug(FinesDynFanning, 0);
+defineTypeNameAndDebug(FanningDynFines, 0);
 
 addToRunTimeSelectionTable
 (
     forceModel,
-    FinesDynFanning,
+    FanningDynFines,
     dictionary
 );
 
@@ -41,7 +41,7 @@ addToRunTimeSelectionTable
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 // Construct from components
-FinesDynFanning::FinesDynFanning
+FanningDynFines::FanningDynFines
 (
     const dictionary& dict,
     cfdemCloud& sm
@@ -56,14 +56,9 @@ FinesDynFanning::FinesDynFanning
     UsFieldName_(propsDict_.lookup("granVelFieldName")),
     UsField_(sm.mesh().lookupObject<volVectorField> (UsFieldName_)),
     UDyn_(sm.mesh().lookupObject<volVectorField> ("uDyn")),
-    alphaDyn_(sm.mesh().lookupObject<volScalarField> ("alphaDyn")),
+    FanningCoeff_(sm.mesh().lookupObject<volScalarField> ("FanningCoeff")),
     alphaP_(sm.mesh().lookupObject<volScalarField> ("alphaP")),
-    dHydMix_(sm.mesh().lookupObject<volScalarField> ("dHydMix")),
     dSauter_(sm.mesh().lookupObject<volScalarField> ("dSauter")),
-    Froude_(sm.mesh().lookupObject<volScalarField> ("Froude")),
-    rhoDyn_(readScalar(propsDict_.lookup ("rhoDyn"))),
-    prefactor_(readScalar(propsDict_.lookup ("prefactor"))),
-    exponent_(readScalar(propsDict_.lookup ("exponent"))),
     scaleDia_(1.),
     scaleDrag_(1.)
 {
@@ -87,13 +82,13 @@ FinesDynFanning::FinesDynFanning
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-FinesDynFanning::~FinesDynFanning()
+FanningDynFines::~FanningDynFines()
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void FinesDynFanning::setForce() const
+void FanningDynFines::setForce() const
 {
     vector UDyn(0,0,0);
     vector drag(0,0,0);
@@ -104,11 +99,7 @@ void FinesDynFanning::setForce() const
     scalar ds(0);
     scalar ds_scaled(0);
     scalar scaleDia3 = scaleDia_*scaleDia_*scaleDia_;
-   
-    scalar magUr(0);
-    scalar Fk(0);
 
-    vector dragExplicit(0,0,0);
     scalar dragCoefficient(0);
     
 
@@ -118,7 +109,6 @@ void FinesDynFanning::setForce() const
     {
             cellI = particleCloud_.cellIDs()[index][0];
             drag = vector(0,0,0);
-            dragExplicit = vector(0,0,0);
             UDyn = vector(0,0,0);
             dragCoefficient = 0;
 
@@ -127,16 +117,13 @@ void FinesDynFanning::setForce() const
                 UDyn = UDyn_[cellI];
                 Us = UsField_[cellI];
                 Ur = UDyn-Us;
-                magUr = mag(Ur);
                 ds = 2*particleCloud_.radius(index);
 		ds_scaled = ds/scaleDia_;
 		
-		Fk = prefactor_*Foam::pow(Froude_[cellI], exponent_);
-		
-                dragCoefficient = alphaDyn_[cellI] * rhoDyn_ * magUr * Fk / (2 * dHydMix_[cellI] )
+                dragCoefficient = FanningCoeff_[cellI];
 
                 // calc particle's drag
-                dragCoefficient *= M_PI/6 * ds_scaled * ds_scaled / alphaP_[cellI] * dSauter_[cellI] *scaleDia3*scaleDrag_;
+                dragCoefficient *= M_PI/6 * ds_scaled * ds_scaled / alphaP_[cellI] * dSauter_[cellI] * scaleDia3 * scaleDrag_;
                 if (modelType_=="B")
                     dragCoefficient /= voidfraction_[cellI];
 
@@ -144,7 +131,7 @@ void FinesDynFanning::setForce() const
             }
 
             // write particle based data to global array
-            forceSubM(0).partToArray(index,drag,dragExplicit);
+            forceSubM(0).partToArray(index,drag,vector::zero);
     }
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

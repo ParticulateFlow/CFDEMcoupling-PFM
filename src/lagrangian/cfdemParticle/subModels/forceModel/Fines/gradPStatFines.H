@@ -13,19 +13,20 @@ License
 
     Copyright (C) 2015- Thomas Lichtenegger, JKU Linz, Austria
 
-Description
-    fines influence on particles
+
+Class
+    gradPStatFines
 
 SourceFiles
-    FinesDynFanning.C
+    gradPStatFines.C
+
 \*---------------------------------------------------------------------------*/
 
-#ifndef FinesDynFanning_H
-#define FinesDynFanning_H
+#ifndef gradPStatFines_H
+#define gradPStatFines_H
 
 #include "forceModel.H"
 #include "interpolationCellPoint.H"
-#include "FinesDynFanningFields.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -33,64 +34,44 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class FinesDynFanning Declaration
+                           Class gradPStatFines Declaration
 \*---------------------------------------------------------------------------*/
 
-class FinesDynFanning
+class gradPStatFines
 :
     public forceModel
 {
 private:
-  
     dictionary propsDict_;
 
-    word velFieldName_;
+    word pFieldName_;
+
+    const volScalarField& p_;
+
+    word velocityFieldName_;
 
     const volVectorField& U_;
-
-    word voidfractionFieldName_;
-
-    const volScalarField& voidfraction_;
-
-    word UsFieldName_;   
-
-    const volVectorField& UsField_;
-    
-    const volVectorField& UDyn_;
-    
-    const volScalarField& alphaDyn_;
     
     const volScalarField& alphaP_;
     
-    const volScalarField& dHydMix_;
-    
-    const volScalarField& dSauter_;
-    
-    const volScalarField& Froude_;
-    
-    scalar rhoDyn_;
-    
-    scalar prefactor_;
-    
-    scalar exponent_;
+    const volScalarField& alphaSt_;
 
-    mutable scalar scaleDia_;
+    bool useRho_;
 
-    mutable scalar scaleDrag_;
-    
+    bool useU_;          // if false: substitution p=0.5*rho*U^2
 
-    
+    mutable double addedMassCoeff_; //added mass coefficient
 
 public:
 
     //- Runtime type information
-    TypeName("FinesDynFanning");
+    TypeName("gradPStatFines");
 
 
     // Constructors
 
         //- Construct from components
-        FinesDynFanning
+        gradPStatFines
         (
             const dictionary& dict,
             cfdemCloud& sm
@@ -98,7 +79,7 @@ public:
 
     // Destructor
 
-        ~FinesDynFanning();
+        ~gradPStatFines();
 
 
     // Member Functions

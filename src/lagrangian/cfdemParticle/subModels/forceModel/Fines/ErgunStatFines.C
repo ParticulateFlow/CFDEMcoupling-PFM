@@ -188,7 +188,7 @@ void ErgunStatFines::setForce() const
                 if(voidfraction > switchingVoidfraction_) //dilute
                 {
                     Rep=dSauterMix*voidfraction*magUr/nuf;
-                    CdMagUrLag = (24.0*nuf/(ddSauterMix*voidfraction)) //1/magUr missing here, but compensated in expression for betaP!
+                    CdMagUrLag = (24.0*nuf/(dSauterMix*voidfraction)) //1/magUr missing here, but compensated in expression for betaP!
                                  *(scalar(1.0)+0.15*Foam::pow(Rep, 0.687));
 
                     betaP = 0.75* localPhiP * ( 
