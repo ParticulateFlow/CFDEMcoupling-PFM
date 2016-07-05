@@ -15,6 +15,7 @@ clockModels = subModels/clockModel
 liggghtsCommandModels = subModels/liggghtsCommandModel
 smoothingModels = subModels/smoothingModel
 probeModels = subModels/probeModel
+otherForceModels = subModels/otherForceModel
 
 $(cfdemCloud)/cfdemCloud.C
 $(cfdemCloud)/cfdemCloudIO.C
@@ -54,7 +55,6 @@ $(forceModels)/Fines/FanningDynFines.C
 $(forceModels)/Fines/ErgunStatFines.C
 $(forceModels)/Fines/gradPStatFines.C
 
-
 $(forceModelsMS)/forceModelMS/forceModelMS.C
 $(forceModelsMS)/forceModelMS/newForceModelMS.C
 $(forceModelsMS)/DiFeliceDragMS/DiFeliceDragMS.C
@@ -62,6 +62,12 @@ $(forceModelsMS)/DiFeliceDragMS/DiFeliceDragMS.C
 $(forceSubModels)/forceSubModel/newForceSubModel.C
 $(forceSubModels)/forceSubModel/forceSubModel.C
 $(forceSubModels)/ImEx/ImEx.C
+
+$(otherForceModels)/otherForceModel/otherForceModel.C
+$(otherForceModels)/otherForceModel/newOtherForceModel.C
+$(otherForceModels)/gravity/gravity.C
+$(otherForceModels)/weightSecondaryPhase/weightSecondaryPhase.C
+$(otherForceModels)/expParticleForces/expParticleForces.C
 
 $(probeModels)/probeModel/probeModel.C
 $(probeModels)/probeModel/newProbeModel.C
