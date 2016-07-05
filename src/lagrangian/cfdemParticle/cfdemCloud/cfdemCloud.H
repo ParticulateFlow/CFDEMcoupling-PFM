@@ -73,6 +73,7 @@ class smoothingModel;
 class momCoupleModel;
 class meshMotionModel;
 class liggghtsCommandModel;
+class otherForceModel;
 
 /*---------------------------------------------------------------------------*\
                            Class cfdemCloud Declaration
@@ -138,6 +139,8 @@ protected:
     const wordList momCoupleModels_;
 
     const wordList liggghtsCommandModelList_;
+    
+    const wordList otherForceModels_;
 
     const word turbulenceModelType_;
 
@@ -190,6 +193,8 @@ protected:
     autoPtr<meshMotionModel> meshMotionModel_;
 
     autoPtr<liggghtsCommandModel>* liggghtsCommand_;
+    
+    autoPtr<otherForceModel>* otherForceModel_;
 
 // Protected member functions
     virtual void getDEMdata();
@@ -244,6 +249,8 @@ public:
        virtual const forceModel& forceM(int);
 
        virtual int nrForceModels();
+       
+       virtual int nrMomCoupleModels();
 
        scalar voidfraction(int);
 
@@ -405,6 +412,8 @@ public:
         std::vector< std::vector<double*> >* getVprobe();
 
         std::vector< std::vector<double> >* getSprobe();
+	
+	void otherForces(volVectorField& );
 };
 
 
