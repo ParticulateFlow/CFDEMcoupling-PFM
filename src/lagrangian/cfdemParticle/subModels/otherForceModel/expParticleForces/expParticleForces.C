@@ -76,8 +76,9 @@ tmp<volVectorField> expParticleForces::exportForceField()
     
     volVectorField& source = tsource();
     
+    // negative sign in sum because force on particles = - force on fluid
     for(int i=0; i<particleCloud_.nrMomCoupleModels(); i++)
-        source += particleCloud_.momCoupleM(i).expMomSource();
+        source -= particleCloud_.momCoupleM(i).expMomSource();
     
     return tsource;
 }
