@@ -127,7 +127,6 @@ void ErgunStatFines::setForce() const
     scalar rho(0);
     scalar magUr(0);
     scalar Rep(0);
-    scalar Vs(0);
     scalar localPhiP(0);
 
     scalar CdMagUrLag(0);       //Cd of the very particle
@@ -149,7 +148,6 @@ void ErgunStatFines::setForce() const
             drag = vector(0,0,0);
             dragExplicit = vector(0,0,0);
             betaP = 0;
-            Vs = 0;
             Ufluid =vector(0,0,0);
             voidfraction=0;
             dragCoefficient = 0;

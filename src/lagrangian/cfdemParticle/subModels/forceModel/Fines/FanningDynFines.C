@@ -66,7 +66,6 @@ FanningDynFines::FanningDynFines
     setForceSubModels(propsDict_);
     // define switches which can be read from dict
     forceSubM(0).setSwitchesList(0,true); // activate treatExplicit switch
-    forceSubM(0).setSwitchesList(2,true); // activate implDEM switch
     forceSubM(0).setSwitchesList(3,true); // activate search for verbose switch
     forceSubM(0).readSwitches();
     forceSubM(0).setSwitches(0,true);
