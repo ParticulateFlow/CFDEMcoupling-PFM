@@ -77,7 +77,6 @@ public:
     // Member Functions
         void setForce() const;
 
-        void manipulateScalarField(volScalarField&) const;
 };
 
 
