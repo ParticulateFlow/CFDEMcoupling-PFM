@@ -28,6 +28,9 @@ namespace Foam
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
+//defineTypeNameAndDebug(FinesFields, 0);
+
+//defineRunTimeSelectionTable(FinesFields, dictionary);
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
@@ -39,7 +42,7 @@ FinesFields::FinesFields
 )
 :
     particleCloud_(sm),
-    propsDict_(dict.subDict(typeName + "Props")),
+    propsDict_(dict.subDict("FinesFieldsProps")),
     velFieldName_(propsDict_.lookupOrDefault<word>("velFieldName","U")),
     U_(sm.mesh().lookupObject<volVectorField> (velFieldName_)),
     voidfractionFieldName_(propsDict_.lookupOrDefault<word>("voidfractionFieldName","voidfraction")),
@@ -382,7 +385,7 @@ void FinesFields::updateFroude()
 }
 
 
-void FinesFields::updateUDyn() 
+void FinesFields::updateUDyn()
 {
     volVectorField num = rhoFine_ * alphaDyn_ * g_ + FanningCoeff_ * UsField_ + DragCoeff_ * U_;
     if (p_.dimensions()==dimensionSet(0,2,-2,0,0) )
@@ -390,9 +393,10 @@ void FinesFields::updateUDyn()
     else
         num -= alphaDyn_ * fvc::grad(p_) ;
     volScalarField denom = FanningCoeff_ + DragCoeff_;
-  
+
     uDyn_ = num / denom;
-    
+
+    alphaDyn_.correctBoundaryConditions();
     massFluxDyn_ = rhoFine_ * alphaDyn_ * uDyn_;
 }
 
