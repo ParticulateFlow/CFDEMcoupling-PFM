@@ -71,6 +71,8 @@ private:
     volScalarField alphaP_;
 
     volScalarField alphaSt_;
+
+    volScalarField alphaStRel_;
     
     volScalarField dHydMix_;
     

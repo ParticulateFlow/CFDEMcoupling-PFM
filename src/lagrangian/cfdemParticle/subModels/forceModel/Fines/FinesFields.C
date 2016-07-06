@@ -101,6 +101,18 @@ FinesFields::FinesFields
         ),
         sm.mesh()
     ),
+    alphaStRel_
+    (   IOobject
+        (
+            "alphaStRel",
+            sm.mesh().time().timeName(),
+            sm.mesh(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        sm.mesh(),
+        dimensionedScalar("zero", dimensionSet(0,0,0,0,0), 1.0)
+    ),
     dHydMix_
     (   IOobject
         (
@@ -314,6 +326,15 @@ void FinesFields::integrateFields()
     );
     alphaStEqn.solve();
     alphaDynEqn.solve();
+
+    forAll(alphaStRel_,cellI)
+    {
+        scalar aP = alphaP_[cellI];
+        if(aP>0.1)
+            alphaStRel_[cellI] = (alphaSt_[cellI] + aP) / aP;
+        else
+            alphaStRel_[cellI] = 1.0;
+    }
 }
 
 
