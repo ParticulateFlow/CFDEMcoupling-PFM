@@ -68,6 +68,7 @@ $(forceModels)/Fines/gradPStatFines.C
 $(forceSubModels)/forceSubModel/newForceSubModel.C
 $(forceSubModels)/forceSubModel/forceSubModel.C
 $(forceSubModels)/ImEx/ImEx.C
+$(forceSubModels)/ScaleForce/ScaleForce.C
 
 $(otherForceModels)/otherForceModel/otherForceModel.C
 $(otherForceModels)/otherForceModel/newOtherForceModel.C
