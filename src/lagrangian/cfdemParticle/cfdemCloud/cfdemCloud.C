@@ -103,7 +103,7 @@ cfdemCloud::cfdemCloud
     forceModels_(couplingProperties_.lookup("forceModels")),
     momCoupleModels_(couplingProperties_.lookup("momCoupleModels")),
     liggghtsCommandModelList_(liggghtsCommandDict_.lookup("liggghtsCommandModels")),
-    otherForceModels_(couplingProperties_.lookup("otherForceModels")),
+    otherForceModels_(couplingProperties_.lookupOrDefault<wordList>("otherForceModels",wordList(0))),
     turbulenceModelType_(couplingProperties_.lookup("turbulenceModelType")),
     cg_(1.),
     cgOK_(true),
