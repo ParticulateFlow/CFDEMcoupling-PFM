@@ -89,6 +89,9 @@ FanningDynFines::~FanningDynFines()
 
 void FanningDynFines::setForce() const
 {
+    if(forceSubM(0).verbose())
+        Info << "Entering force loop of FanningDynFines.\n" << endl;
+    
     vector UDyn(0,0,0);
     vector drag(0,0,0);
     label cellI=0;
@@ -132,6 +135,9 @@ void FanningDynFines::setForce() const
             // write particle based data to global array
             forceSubM(0).partToArray(index,drag,vector::zero);
     }
+    
+    if(forceSubM(0).verbose())
+        Info << "Leaving force loop of FanningDynFines.\n" << endl;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

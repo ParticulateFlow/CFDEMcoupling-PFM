@@ -69,8 +69,6 @@ private:
     mutable scalar scaleDrag_;
     
 
-    
-
 public:
 
     //- Runtime type information

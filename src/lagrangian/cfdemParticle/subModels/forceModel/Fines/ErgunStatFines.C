@@ -142,8 +142,9 @@ void ErgunStatFines::setForce() const
 
     for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
     {
-        //if(mask[index][0])
-        //{
+            if(forceSubM(0).verbose())
+                Info << "Entering force loop of ErgunStatFines.\n" << endl;
+	    
             cellI = particleCloud_.cellIDs()[index][0];
             drag = vector(0,0,0);
             dragExplicit = vector(0,0,0);
@@ -249,6 +250,9 @@ void ErgunStatFines::setForce() const
 
         //}// end if mask
     }// end loop particles
+    
+    if(forceSubM(0).verbose())
+        Info << "Entering force loop of ErgunStatFines.\n" << endl;
 }
 
 
