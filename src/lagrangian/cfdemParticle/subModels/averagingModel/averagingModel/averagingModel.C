@@ -135,7 +135,7 @@ void averagingModel::setVectorSum
 (
     volVectorField& field,
     double**& value,
-    double**& weight,
+    double**const& weight,
     double**const& mask
 ) const
 {
@@ -169,7 +169,7 @@ void averagingModel::setVectorSumSimple
 (
     volVectorField& field,
     double**& value,
-    double**& weight,
+    double**const& weight,
     int nP
 ) const
 {
@@ -232,7 +232,7 @@ void averagingModel::setScalarSum
 void averagingModel::setDSauter
 (
     volScalarField& dSauter,
-    double**& weight,
+    double**const& weight,
     volScalarField& weightField,
     label myParticleType
 ) const

@@ -1,0 +1,3 @@
+cfdemSolverPisoTemp.C
+
+EXE = $(CFDEM_APP_DIR)/cfdemSolverPisoTemp
