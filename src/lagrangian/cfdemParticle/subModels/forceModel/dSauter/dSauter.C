@@ -89,7 +89,8 @@ dSauter::dSauter
             IOobject::AUTO_WRITE
         ),
         sm.mesh(),
-        dimensionedScalar("zero", dimensionSet(0,1,0,0,0), 0)
+        dimensionedScalar("zero", dimensionSet(0,1,0,0,0), 0),
+	"zeroGradient"
     )
 {
     allocateMyArrays();
@@ -158,15 +159,17 @@ void dSauter::setForce() const
     
     forAll(dSauter_,cellI)
     {
-        if(d2Field_[cellI] > 1e-10 )
+        if(d2Field_[cellI] > ROOTVSMALL)
         {
              dSauter_[cellI] = d3Field_[cellI] / d2Field_[cellI];
         }
         else
 	{
-	  dSauter_[cellI] = 0.0;
+	  dSauter_[cellI] = SMALL;
 	}
     }
+    
+    dSauter_.correctBoundaryConditions();
 }
 
 

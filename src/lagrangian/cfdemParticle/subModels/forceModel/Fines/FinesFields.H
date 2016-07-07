@@ -41,6 +41,8 @@ private:
     cfdemCloud& particleCloud_;
   
     dictionary propsDict_;
+    
+    bool verbose_;
 
     word velFieldName_;
 

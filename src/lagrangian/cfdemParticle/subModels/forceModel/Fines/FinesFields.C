@@ -43,6 +43,7 @@ FinesFields::FinesFields
 :
     particleCloud_(sm),
     propsDict_(dict.subDict("FinesFieldsProps")),
+    verbose_(propsDict_.lookupOrDefault<bool>("verbose",false)),
     velFieldName_(propsDict_.lookupOrDefault<word>("velFieldName","U")),
     U_(sm.mesh().lookupObject<volVectorField> (velFieldName_)),
     voidfractionFieldName_(propsDict_.lookupOrDefault<word>("voidfractionFieldName","voidfraction")),
@@ -123,7 +124,8 @@ FinesFields::FinesFields
             IOobject::NO_WRITE
         ),
         sm.mesh(),
-        dimensionedScalar("zero", dimensionSet(0,1,0,0,0), 0)
+        dimensionedScalar("zero", dimensionSet(0,1,0,0,0), 0),
+	"zeroGradient"
     ),
     DragCoeff_
     (   IOobject
@@ -147,7 +149,8 @@ FinesFields::FinesFields
             IOobject::NO_WRITE
         ),
         sm.mesh(),
-        dimensionedScalar("zero", dimensionSet(0,1,0,0,0), 0)
+        dimensionedScalar("zero", dimensionSet(0,1,0,0,0), 0),
+	"zeroGradient"
     ),
     FanningCoeff_
     (   IOobject
@@ -183,7 +186,7 @@ FinesFields::FinesFields
             IOobject::AUTO_WRITE
         ),
         sm.mesh(),
-        dimensionedScalar("zero", dimensionSet(0,0,0,0,0), 0)
+        dimensionedScalar("zero", dimensionSet(0,0,-1,0,0), 0)
     ),
     massFluxDyn_
     (   IOobject
@@ -250,27 +253,36 @@ FinesFields::~FinesFields()
 
 void FinesFields::update()
 {
+    if(verbose_)  Info << "FinesFields: Updating alphaP.\n" << endl;
     updateAlphaP();
+    if(verbose_)  Info << "FinesFields: Updating alphaG.\n" << endl;
     updateAlphaG();
+    if(verbose_)  Info << "FinesFields: Calculating source terms.\n" << endl;
     calcSource();
+    if(verbose_)  Info << "FinesFields: Updating dSauter.\n" << endl;
     updateDSauter();
+    if(verbose_)  Info << "FinesFields: Updating dHydMix.\n" << endl;
     updateDHydMix();
+    if(verbose_)  Info << "FinesFields: Updating Froude.\n" << endl;
     updateFroude();
+    if(verbose_)  Info << "FinesFields: Updating FanningCoeff.\n" << endl;
     updateFanningCoeff();
+    if(verbose_)  Info << "FinesFields: Updating uDyn.\n" << endl;
     updateUDyn();
+    if(verbose_)  Info << "FinesFields: Integrating alphas.\n" << endl;
     integrateFields();
     // update voidfraction, probably really bad...
     voidfraction_ = alphaG_;
+    if(verbose_)  Info << "FinesFields: Update finished.\n" << endl;
 }
 
 
 void FinesFields::calcSource() 
 {
-    Sds_=0;
+    Sds_.internalField()=0;
     scalar f(0.0);
     scalar critpore(0.0);
     scalar deltaAlpha(0.0);
-    
     forAll(Sds_,cellI)
     {
         critpore = nCrit_*dFine_.value()/dSauter_[cellI];
@@ -287,7 +299,6 @@ void FinesFields::calcSource()
 	
 	// at this point, voidfraction is still calculated from the true particle sizes
 	deltaAlpha = f * (alphaMax_ - alphaP_[cellI]) - alphaSt_[cellI];
-	
 	if (deltaAlpha < 0)
 	{
 	    Sds_[cellI] = deltaAlpha;
@@ -300,7 +311,8 @@ void FinesFields::calcSource()
 	{
 	    Sds_[cellI] = depRate_ * deltaAlpha;
 	}
-    }
+}
+    
 }
 
 
@@ -340,17 +352,7 @@ void FinesFields::integrateFields()
 
 void FinesFields::updateAlphaG() 
 {
-  forAll(alphaG_,cellI)
-  {
-      if(voidfraction_[cellI] - alphaSt_[cellI] > critVoidfraction_)
-      {
-	  alphaG_[cellI] = voidfraction_[cellI] - alphaSt_[cellI];
-      }
-      else
-      {
-	  alphaG_[cellI] = critVoidfraction_;
-      }
-  }
+  alphaG_ = max(voidfraction_ - alphaSt_, critVoidfraction_);
 }
 
 
@@ -362,7 +364,15 @@ void FinesFields::updateAlphaP()
 
 void FinesFields::updateDHydMix() 
 {
-    dHydMix_ = 2*(1 - alphaP_ - alphaSt_) / (3*(alphaP_ + alphaSt_) ) * dSauterMix_;
+    forAll(dHydMix_,cellI)
+    {
+        scalar aPSt =  alphaP_[cellI] + alphaSt_[cellI];
+	if(aPSt < SMALL || aPSt > 1 - SMALL)
+	  dHydMix_[cellI] = SMALL;
+	else 
+	  dHydMix_[cellI] = 2*(1 - aPSt) / (3*aPSt ) * dSauterMix_[cellI];
+    }
+    dHydMix_.correctBoundaryConditions();
 }
 
 
@@ -372,6 +382,8 @@ void FinesFields::updateDragCoeff()
     volScalarField Ref = dFine_ * alphaG_ / nuAve_ * mag(U_ - uDyn_);
     scalar Cd(0.0);
     scalar Ref1(0.0);
+    
+    // calculate drag coefficient for cells
     forAll(DragCoeff_,cellI)
     {
         Ref1 = Ref[cellI];
@@ -383,26 +395,54 @@ void FinesFields::updateDragCoeff()
 	    Cd = 24 * (1.0 + 0.15 * Foam::pow(Ref1,0.687) ) / Ref1;
 	else
 	    Cd = 0.44;
-	DragCoeff_ = Cd * beta[cellI];
+	DragCoeff_[cellI] = Cd * beta[cellI];
     }
+    
+    // calculate drag coefficient for faces
+    forAll(DragCoeff_.boundaryField(), patchI)
+        forAll(DragCoeff_.boundaryField()[patchI], faceI)
+        {
+            Ref1 = Ref.boundaryField()[patchI][faceI];
+            if(Ref1 <= SMALL)
+	        Cd = 24.0 / SMALL;
+            else if(Ref1 <= 1.0)
+	        Cd = 24.0 / Ref1;
+	    else if(Ref1 <= 1000)
+	        Cd = 24 * (1.0 + 0.15 * Foam::pow(Ref1,0.687) ) / Ref1;
+	    else
+	        Cd = 0.44;
+	    DragCoeff_.boundaryField()[patchI][faceI] = Cd * beta.boundaryField()[patchI][faceI];
+        }
 }
 
 
 void FinesFields::updateDSauter() 
 {
-  dSauterMix_ = (alphaP_ + alphaSt_) / ( alphaP_/dSauter_ + alphaSt_/dFine_ );  
+    forAll(dSauterMix_,cellI)
+    {
+        scalar aP = alphaP_[cellI];
+	scalar aSt = alphaSt_[cellI];
+	if(aSt < SMALL)
+	    dSauterMix_[cellI] = dSauter_[cellI];
+	else if(aP < SMALL)
+	    dSauterMix_[cellI] = dFine_.value();
+	else
+	    dSauterMix_[cellI] = (aP + aSt) / (aP / dSauter_[cellI] + aSt / dFine_.value() );
+    }
+    dSauterMix_.correctBoundaryConditions();
 }
 
 
 void FinesFields::updateFanningCoeff()
 {
     FanningCoeff_ = alphaDyn_ * rhoFine_ * mag(uDyn_ - UsField_) * prefactor_ * Foam::pow(Froude_, exponent_) / (2 * dHydMix_);
+    FanningCoeff_ = max( FanningCoeff_, dimensionedScalar("SMALL", dimensionSet(1,-3,-1,0,0), SMALL) );
 }
 
 
 void FinesFields::updateFroude() 
 {
-    Froude_ = alphaDyn_ * mag(uDyn_ - UsField_) / Foam::sqrt(dHydMix_*mag(g_));
+    Froude_ = max( alphaDyn_ * mag(uDyn_ - UsField_) / Foam::sqrt(dHydMix_*mag(g_)), SMALL );
 }
 
 
