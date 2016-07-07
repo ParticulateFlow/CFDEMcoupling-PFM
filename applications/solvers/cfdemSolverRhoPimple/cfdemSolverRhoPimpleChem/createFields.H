@@ -128,6 +128,21 @@
         mesh,
         dimensionedScalar("zero", dimensionSet(0,2,-1,0,0,0,0), 0.0)
     );
+    
+    Info<< "\nCreating body force field\n" << endl;
+    volVectorField fOther
+    (
+        IOobject
+        (
+            "fOther",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        mesh,
+        dimensionedVector("zero", dimensionSet(1,-2,-2,0,0,0,0), vector::zero)
+    );
 
     #ifndef compressibleCreatePhi_H
     #define compressibleCreatePhi_H

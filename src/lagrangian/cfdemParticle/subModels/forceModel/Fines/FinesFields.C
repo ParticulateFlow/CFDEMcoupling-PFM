@@ -456,7 +456,29 @@ void FinesFields::updateUDyn()
     volScalarField denom = FanningCoeff_ + DragCoeff_;
 
     uDyn_ = num / denom;
-
+    
+    // limit uDyn for stability reasons
+    forAll(uDyn_,cellI)
+    {
+        scalar mU(mag(U_[cellI]));
+	scalar muDyn(mag(uDyn_[cellI]));
+        if(muDyn > mU && muDyn > SMALL)
+	{
+	    uDyn_[cellI] *= mU / muDyn;
+	}
+    }
+    
+    forAll(uDyn_.boundaryField(), patchI)
+        forAll(uDyn_.boundaryField()[patchI], faceI)
+        {
+	    scalar mU(mag(U_.boundaryField()[patchI][faceI]));
+	    scalar muDyn(mag(uDyn_.boundaryField()[patchI][faceI]));
+            if(muDyn > mU && muDyn > SMALL)
+	    {
+	        uDyn_.boundaryField()[patchI][faceI] *= mU / muDyn;
+	    }
+        }
+    
     alphaDyn_.correctBoundaryConditions();
     massFluxDyn_ = rhoFine_ * alphaDyn_ * uDyn_;
 }

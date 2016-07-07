@@ -753,7 +753,8 @@ void cfdemCloud::resetArray(double**& array,int length,int width,double resetVal
 
 void cfdemCloud::otherForces(volVectorField& forcefield)
 {
-  forcefield = vector::zero;
+  forcefield.internalField() = vector::zero;
+  forcefield.boundaryField() = vector::zero;
   for (int i=0;i<otherForceModels_.size();i++)
       forcefield += otherForceModel_[i]().exportForceField();
 }

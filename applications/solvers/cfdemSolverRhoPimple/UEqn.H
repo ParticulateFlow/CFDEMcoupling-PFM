@@ -1,4 +1,5 @@
 // Solve the Momentum equation
+particleCloud.otherForces(fOther);
 
 tmp<fvVectorMatrix> UEqn
 
@@ -16,14 +17,14 @@ UEqn().relax();
 fvOptions.constrain(UEqn());
 if (pimple.momentumPredictor() && (modelType=="B" || modelType=="Bfull"))
 {
-    solve(UEqn() == -fvc::grad(p)+ Ksl*Us);
+    solve(UEqn() == -fvc::grad(p)+ Ksl*Us + fOther);
 
     fvOptions.correct(U);
     K = 0.5*magSqr(U);
 }
 else if (pimple.momentumPredictor())
 {
-    solve(UEqn() == -voidfraction*fvc::grad(p)+ Ksl*Us);
+    solve(UEqn() == -voidfraction*fvc::grad(p)+ Ksl*Us + fOther);
 
     fvOptions.correct(U);
     K = 0.5*magSqr(U);

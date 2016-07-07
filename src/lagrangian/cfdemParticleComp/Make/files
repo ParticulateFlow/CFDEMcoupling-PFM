@@ -62,7 +62,7 @@ $(forceModels)/dSauter/dSauter.C
 $(forceModels)/Fines/Fines.C
 $(forceModels)/Fines/FinesFields.C
 $(forceModels)/Fines/FanningDynFines.C
-$(forceModels)/Fines/FinesStatErgun.C
+$(forceModels)/Fines/ErgunStatFines.C
 
 $(forceSubModels)/forceSubModel/newForceSubModel.C
 $(forceSubModels)/forceSubModel/forceSubModel.C

@@ -6,11 +6,11 @@ Info<< "Reading thermophysical properties\n" << endl;
     );
     psiThermo& thermo = pThermo();
     thermo.validate(args.executable(), "h", "e");
-
     volScalarField& p = thermo.p();
     volScalarField& T = thermo.T();
     const volScalarField& psi = thermo.psi();
 
+    Info<< "Reading field rho\n" << endl;
     volScalarField rho
     (
         IOobject
@@ -25,7 +25,7 @@ Info<< "Reading thermophysical properties\n" << endl;
     );
 
 
-
+    
     Info<< "Reading field U\n" << endl;
     volVectorField U
     (
@@ -97,6 +97,21 @@ Info<< "Reading thermophysical properties\n" << endl;
         ),
         mesh,
         dimensionedScalar("zero", dimensionSet(0,2,-1,0,0,0,0), 0.0)
+    );
+    
+    Info<< "\nCreating body force field\n" << endl;
+    volVectorField fOther
+    (
+        IOobject
+        (
+            "fOther",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        mesh,
+        dimensionedVector("zero", dimensionSet(1,-2,-2,0,0,0,0), vector::zero)
     );
 
     #ifndef compressibleCreatePhi_H
