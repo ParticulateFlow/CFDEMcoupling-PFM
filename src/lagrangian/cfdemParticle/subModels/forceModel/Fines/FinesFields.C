@@ -239,7 +239,25 @@ FinesFields::FinesFields
     if (propsDict_.found("nuAve"))
         nuAve_.value()=readScalar(propsDict_.lookup ("nuAve"));
     
-
+    if(verbose_)
+    {
+      alphaG_.writeOpt() = IOobject::AUTO_WRITE;
+      alphaG_.write();
+      alphaP_.writeOpt() = IOobject::AUTO_WRITE;
+      alphaP_.write();
+      alphaStRel_.writeOpt() = IOobject::AUTO_WRITE;
+      alphaStRel_.write();
+      dHydMix_.writeOpt() = IOobject::AUTO_WRITE;
+      dHydMix_.write();
+      DragCoeff_.writeOpt() = IOobject::AUTO_WRITE;
+      DragCoeff_.write();
+      dSauterMix_.writeOpt() = IOobject::AUTO_WRITE;
+      dSauterMix_.write();
+      FanningCoeff_.writeOpt() = IOobject::AUTO_WRITE;
+      FanningCoeff_.write();
+      Froude_.writeOpt() = IOobject::AUTO_WRITE;
+      Froude_.write();
+    }
 }
 
 
@@ -267,6 +285,8 @@ void FinesFields::update()
     updateFroude();
     if(verbose_)  Info << "FinesFields: Updating FanningCoeff.\n" << endl;
     updateFanningCoeff();
+    if(verbose_)  Info << "FinesFields: Updating DragCoeff.\n" << endl;
+    updateDragCoeff();
     if(verbose_)  Info << "FinesFields: Updating uDyn.\n" << endl;
     updateUDyn();
     if(verbose_)  Info << "FinesFields: Integrating alphas.\n" << endl;
@@ -303,7 +323,7 @@ void FinesFields::calcSource()
 	{
 	    Sds_[cellI] = deltaAlpha;
 	}
-	else if (deltaAlpha > alphaDyn_[cellI])
+	else if (depRate_ * deltaAlpha > alphaDyn_[cellI])
 	{
 	    Sds_[cellI] = alphaDyn_[cellI];
 	}
@@ -311,8 +331,7 @@ void FinesFields::calcSource()
 	{
 	    Sds_[cellI] = depRate_ * deltaAlpha;
 	}
-}
-    
+    }   
 }
 
 
@@ -338,6 +357,11 @@ void FinesFields::integrateFields()
     );
     alphaStEqn.solve();
     alphaDynEqn.solve();
+    
+    alphaSt_ = max(alphaSt_,0.0);
+    alphaDyn_ = max(alphaDyn_,0.0);
+    alphaSt_.correctBoundaryConditions();
+    alphaDyn_.correctBoundaryConditions();
 
     forAll(alphaStRel_,cellI)
     {
@@ -358,7 +382,7 @@ void FinesFields::updateAlphaG()
 
 void FinesFields::updateAlphaP() 
 {
-    alphaP_ = 1.0 - voidfraction_;
+    alphaP_ = 1.0 - voidfraction_ + SMALL;
 }
 
 
@@ -437,12 +461,14 @@ void FinesFields::updateFanningCoeff()
 {
     FanningCoeff_ = alphaDyn_ * rhoFine_ * mag(uDyn_ - UsField_) * prefactor_ * Foam::pow(Froude_, exponent_) / (2 * dHydMix_);
     FanningCoeff_ = max( FanningCoeff_, dimensionedScalar("SMALL", dimensionSet(1,-3,-1,0,0), SMALL) );
+    // FanningCoeff_ = min( FanningCoeff_, dimensionedScalar("LARGE", dimensionSet(1,-3,-1,0,0), 1e5) );
 }
 
 
 void FinesFields::updateFroude() 
 {
-    Froude_ = max( alphaDyn_ * mag(uDyn_ - UsField_) / Foam::sqrt(dHydMix_*mag(g_)), SMALL );
+    Froude_ = max( alphaDyn_ * mag(uDyn_ - UsField_) / Foam::sqrt(dHydMix_*mag(g_)), 5e-3 );
+    Froude_ = min( Froude_, 1e0 );
 }
 
 
@@ -479,6 +505,7 @@ void FinesFields::updateUDyn()
 	    }
         }
     
+    // uDyn_ = 0.2*U_;
     alphaDyn_.correctBoundaryConditions();
     massFluxDyn_ = rhoFine_ * alphaDyn_ * uDyn_;
 }
