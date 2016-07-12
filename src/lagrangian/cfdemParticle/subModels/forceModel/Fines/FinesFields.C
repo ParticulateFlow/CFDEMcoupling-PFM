@@ -467,8 +467,11 @@ void FinesFields::updateFanningCoeff()
 
 void FinesFields::updateFroude() 
 {
-    Froude_ = max( alphaDyn_ * mag(uDyn_ - UsField_) / Foam::sqrt(dHydMix_*mag(g_)), 5e-3 );
-    Froude_ = min( Froude_, 1e0 );
+    // seems like different authors use different conventions for the Froude number
+    // Chen et al. (1994) define it in terms of a superficial velocity,
+    // Shibata et a. (1991) in terms of the actual velocity
+    Froude_ = max( alphaG_ * mag(uDyn_ - UsField_) / Foam::sqrt(dHydMix_*mag(g_)), 5e-3 );
+  //  Froude_ = min( Froude_, 1e0 );
 }
 
 
