@@ -40,8 +40,8 @@ expParticleForces::expParticleForces
     cfdemCloud& sm
 )
 :
-    otherForceModel(dict,sm),
-    propsDict_(dict.subDict(typeName + "Props"))
+    otherForceModel(dict,sm)//,
+    //propsDict_(dict.subDict(typeName + "Props"))
 {}
 
 
@@ -78,7 +78,8 @@ tmp<volVectorField> expParticleForces::exportForceField()
     
     // negative sign in sum because force on particles = - force on fluid
     for(int i=0; i<particleCloud_.nrMomCoupleModels(); i++)
-        source -= particleCloud_.momCoupleM(i).expMomSource();
+        if (particleCloud_.momCoupleM(i).type() == "explicitCouple")
+            source -= particleCloud_.momCoupleM(i).expMomSource();
     
     return tsource;
 }

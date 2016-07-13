@@ -43,7 +43,7 @@ class expParticleForces
 protected:
 
     // Protected data
-        dictionary propsDict_;
+    //    dictionary propsDict_;
 
     
 public:
