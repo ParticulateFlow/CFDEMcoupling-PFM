@@ -10,7 +10,6 @@ volVectorField HbyA("HbyA", U);
 HbyA = rAU*UEqn().H();
 
 surfaceScalarField phiUs("phiUs", fvc::interpolate(rhoeps*rAU*Ksl*Us)& mesh.Sf());
-surfaceScalarField phiOther("phiOther", fvc::interpolate(rhoeps*rAU*fOther)& mesh.Sf());
 
 if (pimple.nCorrPISO() <= 1)
 {
@@ -78,7 +77,6 @@ else
           + fvc::div(phiHbyA)
           - fvm::laplacian(rhorAUf, p)
 	  + fvc::div(phiUs)
-	  + fvc::div(phiOther)
           ==
             fvOptions(psi, p, rho.name())
         );
@@ -89,7 +87,7 @@ else
 
         if (pimple.finalNonOrthogonalIter())
         {
-            phi = phiHbyA + pEqn.flux()+phiUs + phiOther;
+            phi = phiHbyA + pEqn.flux()+phiUs;
         }
     }
 }
@@ -109,7 +107,7 @@ rho.relax();
 Info<< "rho max/min : " << max(rho).value()
     << " " << min(rho).value() << endl;
 
-U = HbyA - rAU*(voidfraction*fvc::grad(p)-Ksl*Us - fOther);
+U = HbyA - rAU*(voidfraction*fvc::grad(p)-Ksl*Us);
 U.correctBoundaryConditions();
 fvOptions.correct(U);
 K = 0.5*magSqr(U);
