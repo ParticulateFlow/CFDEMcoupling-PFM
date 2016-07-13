@@ -67,6 +67,17 @@ else
     );
 
     fvOptions.makeRelative(fvc::interpolate(rho), phiHbyA);
+    
+    // shamelessly stolen from interFoam
+    setSnGrad<fixedFluxPressureFvPatchScalarField>
+    (
+        p.boundaryField(),
+        (
+            phiHbyA.boundaryField()
+	  + phiUs.boundaryField()
+          - fvOptions.relative(mesh.Sf().boundaryField() & U.boundaryField() * rhoeps.boundaryField())
+        )/(mesh.magSf().boundaryField()*rhorAUf.boundaryField())
+    );
 
     while (pimple.correctNonOrthogonal())
     {
@@ -107,7 +118,9 @@ rho.relax();
 Info<< "rho max/min : " << max(rho).value()
     << " " << min(rho).value() << endl;
 
-U = HbyA - rAU*(voidfraction*fvc::grad(p)-Ksl*Us);
+//U = HbyA - rAU*(voidfraction*fvc::grad(p)-Ksl*Us);
+    // shamelessly stolen from interFoam
+U = HbyA - rAU*(voidfraction*fvc::reconstruct((pEqn.flux())/rhorAUf) - Ksl*Us);
 U.correctBoundaryConditions();
 fvOptions.correct(U);
 K = 0.5*magSqr(U);

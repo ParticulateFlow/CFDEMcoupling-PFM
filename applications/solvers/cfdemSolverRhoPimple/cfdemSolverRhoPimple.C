@@ -34,6 +34,7 @@ Description
 #include "bound.H"
 #include "pimpleControl.H"
 #include "fvIOoptionList.H"
+#include "fixedFluxPressureFvPatchScalarField.H"
 
 #include "cfdemCloudEnergy.H"
 #include "implicitCouple.H"
