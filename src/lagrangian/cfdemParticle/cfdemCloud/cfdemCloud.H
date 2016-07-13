@@ -413,7 +413,7 @@ public:
 
         std::vector< std::vector<double> >* getSprobe();
 	
-	void otherForces(volVectorField& );
+	void otherForces(volVectorField&);
 };
 
 
