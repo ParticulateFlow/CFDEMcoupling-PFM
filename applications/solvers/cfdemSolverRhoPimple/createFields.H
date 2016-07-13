@@ -194,7 +194,60 @@ Info<< "Reading thermophysical properties\n" << endl;
 
 //===============================
 
+volScalarField divphi
+    (
+        IOobject
+        (
+            "divphi",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        mesh,
+        dimensionedScalar("0", dimensionSet(1, -3, -1, 0, 0), 0.0)
+    );
+    
+    volScalarField divphi2
+    (
+        IOobject
+        (
+            "divphi2",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        mesh,
+        dimensionedScalar("0", dimensionSet(1, -3, -1, 0, 0), 0.0)
+    );
 
+volVectorField gP
+    (
+        IOobject
+        (
+            "gP",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        mesh,
+        dimensionedVector("0", dimensionSet(1, -2, -2, 0, 0), vector::zero)
+    );
+//     
+// volVectorField gP2
+//     (
+//         IOobject
+//         (
+//             "gP2",
+//             runTime.timeName(),
+//             mesh,
+//             IOobject::NO_READ,
+//             IOobject::AUTO_WRITE
+//         ),
+//         mesh,
+//         dimensionedVector("0", dimensionSet(1, -2, -2, 0, 0), vector::zero)
+//     );
 
- //   singlePhaseTransportModel laminarTransport(U, phi);
 

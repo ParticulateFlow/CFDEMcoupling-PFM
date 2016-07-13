@@ -121,7 +121,9 @@ int main(int argc, char *argv[])
                 #include "pEqn.H"
 	      	rhoeps=rho*voidfraction;
             }
-
+//divphi = fvc::div(phi);
+//divphi2 = fvc::div(linearInterpolate(rho*U*voidfraction) & mesh.Sf());
+	gP = fvc::grad(p);
             if (pimple.turbCorr())
             {
                 turbulence->correct();
