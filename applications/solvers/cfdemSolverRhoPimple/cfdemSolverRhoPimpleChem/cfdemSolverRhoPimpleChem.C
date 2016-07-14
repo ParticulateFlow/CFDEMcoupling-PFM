@@ -35,6 +35,7 @@ Description
 #include "bound.H"
 #include "pimpleControl.H"
 #include "fvIOoptionList.H"
+#include "fixedFluxPressureFvPatchScalarField.H"
 
 #include "cfdemCloudEnergy.H"
 #include "implicitCouple.H"
@@ -59,6 +60,7 @@ int main(int argc, char *argv[])
     #include "createFields.H"
     #include "createFvOptions.H"
     #include "initContinuityErrs.H"
+    #include "createPcorrTypes.H"
     
     // create cfdemCloud
     #include "readGravitationalAcceleration.H"

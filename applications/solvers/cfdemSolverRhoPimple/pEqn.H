@@ -75,7 +75,8 @@ else
         (
             phiHbyA.boundaryField()
 	  + phiUs.boundaryField()
-          - fvOptions.relative(mesh.Sf().boundaryField() & U.boundaryField() * rhoeps.boundaryField())
+          - fvOptions.relative((mesh.Sf().boundaryField() & U.boundaryField()))
+	    * rhoeps.boundaryField()
         )/(mesh.magSf().boundaryField()*rhorAUf.boundaryField())
     );
 
@@ -99,16 +100,31 @@ else
         if (pimple.finalNonOrthogonalIter())
         {
             phi = phiHbyA + pEqn.flux()+phiUs;
+
+            // Explicitly relax pressure for momentum corrector
+            p.relax();
+
+            // shamelessly stolen from interFoam
+            U = HbyA + rAU*(voidfraction*fvc::reconstruct((pEqn.flux())/rhorAUf) + Ksl*Us);
+            U.correctBoundaryConditions();
+            fvOptions.correct(U);
+	    
+divphi = fvc::div(phi);
+divphi2 = fvc::div(linearInterpolate(rho*U*voidfraction) & mesh.Sf());
+gP = fvc::grad(p);
+gP2 = fvc::reconstruct((pEqn.flux())/rhorAUf);
         }
     }
 }
+
+
 
 #include "rhoEqn.H"
 
 #include "compressibleContinuityErrsPU.H"
 
 // Explicitly relax pressure for momentum corrector
-p.relax();
+//p.relax();
 
 // Recalculate density from the relaxed pressure
 rho = thermo.rho();
@@ -118,11 +134,10 @@ rho.relax();
 Info<< "rho max/min : " << max(rho).value()
     << " " << min(rho).value() << endl;
 
+    // old version to get U from p; can have problems at boundaries where grad(p) != snGrad(p)
 //U = HbyA - rAU*(voidfraction*fvc::grad(p)-Ksl*Us);
-    // shamelessly stolen from interFoam
-U = HbyA - rAU*(voidfraction*fvc::reconstruct((pEqn.flux())/rhorAUf) - Ksl*Us);
-U.correctBoundaryConditions();
-fvOptions.correct(U);
+//U.correctBoundaryConditions();
+//fvOptions.correct(U);
 K = 0.5*magSqr(U);
 
 if (thermo.dpdt())

@@ -56,6 +56,7 @@ int main(int argc, char *argv[])
     pimpleControl pimple(mesh);
 
     #include "createFields.H"
+    #include "createPcorrTypes.H"
     #include "createFvOptions.H"
     #include "initContinuityErrs.H"
     
@@ -109,7 +110,8 @@ int main(int argc, char *argv[])
         {
             #include "rhoEqn.H"
         }
-        volScalarField rhoeps("rhoeps",rho*voidfraction);
+        //volScalarField rhoeps("rhoeps",rho*voidfraction);
+	rhoeps=rho*voidfraction;
         // --- Pressure-velocity PIMPLE corrector loop
         while (pimple.loop())
         {
@@ -122,9 +124,7 @@ int main(int argc, char *argv[])
                 #include "pEqn.H"
 	      	rhoeps=rho*voidfraction;
             }
-//divphi = fvc::div(phi);
-//divphi2 = fvc::div(linearInterpolate(rho*U*voidfraction) & mesh.Sf());
-	gP = fvc::grad(p);
+
             if (pimple.turbCorr())
             {
                 turbulence->correct();

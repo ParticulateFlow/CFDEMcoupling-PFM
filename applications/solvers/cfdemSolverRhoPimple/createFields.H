@@ -234,20 +234,32 @@ volVectorField gP
         ),
         mesh,
         dimensionedVector("0", dimensionSet(1, -2, -2, 0, 0), vector::zero)
+);
+    
+volVectorField gP2
+    (
+        IOobject
+        (
+            "gP2",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        mesh,
+        dimensionedVector("0", dimensionSet(1, -2, -2, 0, 0), vector::zero)
+);
+
+    volScalarField rhoeps
+    (
+        IOobject
+        (
+            "rhoeps",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        mesh,
+        dimensionedScalar("0", dimensionSet(1, -3, 0, 0, 0), 0.0)
     );
-//     
-// volVectorField gP2
-//     (
-//         IOobject
-//         (
-//             "gP2",
-//             runTime.timeName(),
-//             mesh,
-//             IOobject::NO_READ,
-//             IOobject::AUTO_WRITE
-//         ),
-//         mesh,
-//         dimensionedVector("0", dimensionSet(1, -2, -2, 0, 0), vector::zero)
-//     );
-
-
