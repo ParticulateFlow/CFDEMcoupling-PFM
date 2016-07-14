@@ -437,6 +437,8 @@ void FinesFields::updateDragCoeff()
 	        Cd = 0.44;
 	    DragCoeff_.boundaryField()[patchI][faceI] = Cd * beta.boundaryField()[patchI][faceI];
         }
+        
+    DragCoeff_ = max( DragCoeff_, dimensionedScalar("SMALL", dimensionSet(1,-3,-1,0,0), SMALL) );
 }
 
 
@@ -497,7 +499,7 @@ void FinesFields::updateUDyn()
 	}
     }
     
-    forAll(uDyn_.boundaryField(), patchI)
+  /*  forAll(uDyn_.boundaryField(), patchI)
         forAll(uDyn_.boundaryField()[patchI], faceI)
         {
 	    scalar mU(mag(U_.boundaryField()[patchI][faceI]));
@@ -507,8 +509,8 @@ void FinesFields::updateUDyn()
 	        uDyn_.boundaryField()[patchI][faceI] *= mU / muDyn;
 	    }
         }
-    
-    // uDyn_ = 0.2*U_;
+    */
+    uDyn_.correctBoundaryConditions();
     alphaDyn_.correctBoundaryConditions();
     massFluxDyn_ = rhoFine_ * alphaDyn_ * uDyn_;
 }
