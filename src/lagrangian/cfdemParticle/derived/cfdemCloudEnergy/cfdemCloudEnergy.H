@@ -65,6 +65,8 @@ protected:
     autoPtr<chemistryModel> chemistryModel_;
     
     void calcEnergyContributions();
+
+    void speciesExecute();
     
 public:
 
