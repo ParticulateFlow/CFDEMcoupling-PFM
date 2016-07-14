@@ -15,6 +15,7 @@ License
     along with this code.  If not, see <http://www.gnu.org/licenses/>.
 
     Copyright (C) 2015- Thomas Lichtenegger, JKU Linz, Austria
+                        M.Efe Kinaci, JKU Linz, Austria
 
 \*---------------------------------------------------------------------------*/
 
@@ -209,6 +210,7 @@ void species::execute()
     for (int i=0; i<speciesNames_.size();i++)
     {
         particleCloud_.dataExchangeM().giveData(Y_[i].name(),"scalar-atom",concentrations_[i]);
+        printf("is Y_[i].name() printed correctly? : %s",Y_[i].name());
     };
 
   // pull changeOfSpeciesMass_, transform onto fields changeOfSpeciesMassFields_, add them up on changeOfGasMassField_
