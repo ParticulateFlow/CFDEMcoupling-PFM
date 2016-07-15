@@ -143,7 +143,8 @@ tmp<volVectorField> explicitCouple::expMomSource() const
             // limiter
             for (int i=0;i<3;i++)
             {
-                if (fNext_[cellI][i] > fLimit_[i]) fNext_[cellI][i] = fLimit_[i];
+                scalar magF = mag(fNext_[cellI][i]);
+                if (magF > fLimit_[i]) fNext_[cellI][i] *= fLimit_[i]/magF;
             }
         }
         tsource() = fPrev_;
