@@ -1,6 +1,6 @@
 cfdemSolverPisoMS/dir
 cfdemSolverPiso/dir
-cfdemSolverPiso/cfdemSolverPisoTemp/dir
+cfdemSolverPisoTemp/dir
 cfdemSolverRhoPimple/dir
 cfdemSolverRhoPimpleChem/dir
 cfdemSolverIB/dir
