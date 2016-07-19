@@ -200,6 +200,8 @@ void species::execute()
             {
 	        Yfluid_[i] = Y_[i][cellI];
             concentrations_[i][index][0]=Yfluid_[i];
+            printf("what are the concnetrations that are pushed (Y_i): %s \n", Y_[i].name());
+            printf("the concentrations pushed to DEM (concentrations_): %d \n", concentrations_[i]);
             }
         }
     }
