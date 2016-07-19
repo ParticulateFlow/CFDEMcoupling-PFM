@@ -52,6 +52,9 @@ int main(int argc, char *argv[])
     #include "setRootCase.H"
     #include "createTime.H"
     #include "createMesh.H"
+  
+    bool UfromPhi(runTime.controlDict().lookupOrDefault<bool>("UfromPhi",false));
+    Info << "UfromPhi = " << UfromPhi << endl;
 
     pimpleControl pimple(mesh);
 

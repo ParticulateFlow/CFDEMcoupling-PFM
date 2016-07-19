@@ -104,8 +104,11 @@ else
             // Explicitly relax pressure for momentum corrector
             p.relax();
 
-            // shamelessly stolen from interFoam
-            U = HbyA + rAU*(voidfraction*fvc::reconstruct((pEqn.flux())/rhorAUf) + Ksl*Us);
+            if (UfromPhi)
+	        U = fvc::reconstruct( phi/fvc::interpolate(rhoeps) );
+	    else
+                U = HbyA + rAU*(voidfraction*fvc::reconstruct((pEqn.flux())/rhorAUf) + Ksl*Us);
+	    
             U.correctBoundaryConditions();
             fvOptions.correct(U);
 	    
