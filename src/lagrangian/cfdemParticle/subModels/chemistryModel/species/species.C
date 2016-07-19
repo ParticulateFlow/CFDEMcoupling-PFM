@@ -127,6 +127,8 @@ species::species
                 dimensionedScalar("0",mesh_.lookupObject<volScalarField>(speciesNames_[i]).dimensions(), 0)
             )
          );
+
+        Info << "what are the concentration naems (Y_i): " << Y_[i].name() << endl;
     }
     allocateMyArrays();
 }
@@ -172,6 +174,13 @@ void species::execute()
     List<scalar> Yfluid_;
     Yfluid_.setSize(speciesNames_.size());
 
+    // reset Fields
+    for (int i=0;i<speciesNames_.size();i++)
+    {
+          changeOfSpeciesMassFields_[i].internalField() = 0.0;
+          changeOfGasMassField_.internalField() = 0.0;
+    }
+
     // defining interpolators for T, rho
     interpolationCellPoint <scalar> TInterpolator_(tempField_);
     interpolationCellPoint <scalar> rhoInterpolator_(rho_);
@@ -199,29 +208,17 @@ void species::execute()
             for (int i=0; i<speciesNames_.size();i++)
             {
 	        Yfluid_[i] = Y_[i][cellI];
+            Info << "What is Yfluid_ ? : " << Yfluid_[i] << endl;
             concentrations_[i][index][0]=Yfluid_[i];
-            printf("what are the concnetrations that are pushed (Y_i): %s \n", Y_[i].name());
-            printf("the concentrations pushed to DEM (concentrations_): %d \n", concentrations_[i]);
             }
         }
     }
 
-    // give DEM data
-    particleCloud_.dataExchangeM().giveData(partTempName_, "scalar-atom", partTemp_);
-    particleCloud_.dataExchangeM().giveData(partRhoName_, "scalar-atom", partRho_);
-    for (int i=0; i<speciesNames_.size();i++)
-    {
-        particleCloud_.dataExchangeM().giveData(Y_[i].name(),"scalar-atom",concentrations_[i]);
-        printf("is Y_[i].name() printed correctly? : %s",Y_[i].name());
-    };
-
   // pull changeOfSpeciesMass_, transform onto fields changeOfSpeciesMassFields_, add them up on changeOfGasMassField_
-  changeOfGasMassField_.internalField() = 0.0;
   changeOfGasMassField_.boundaryField() = 0.0;
   for (int i=0; i<speciesNames_.size();i++)
   {
       particleCloud_.dataExchangeM().getData(Y_[i].name(),"scalar-atom",changeOfSpeciesMass_[i]);
-      changeOfSpeciesMassFields_[i].internalField() = 0.0;
       changeOfSpeciesMassFields_[i].boundaryField() = 0.0;
       particleCloud_.averagingM().setScalarSum
       (
@@ -237,6 +234,16 @@ void species::execute()
       changeOfGasMassField_ += changeOfSpeciesMassFields_[i];
       Info << "total conversion of species" << speciesNames_[i] << " = " << gSum(changeOfSpeciesMassFields_[i]*1.0*changeOfSpeciesMassFields_[i].mesh().V()) << endl;
   }
+
+  // give DEM data
+  particleCloud_.dataExchangeM().giveData(partTempName_, "scalar-atom", partTemp_);
+  particleCloud_.dataExchangeM().giveData(partRhoName_, "scalar-atom", partRho_);
+  for (int i=0; i<speciesNames_.size();i++)
+  {
+      Info << "the concentrations pushed to DEM (concentrations_" << concentrations_[i] << endl;
+      particleCloud_.dataExchangeM().giveData(Y_[i].name(),"scalar-atom",concentrations_[i]);
+  };
+
 }
 
 //tmp<Foam::fvScalarMatrix> species::Smi(const label i) const

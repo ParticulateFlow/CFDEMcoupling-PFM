@@ -150,8 +150,8 @@ bool cfdemCloudEnergy::evolve
         if(verbose_) Info << "calcEnergyContributions done." << endl;
         clockM().stop("calcEnergyContributions");
 
-        /*// execute chemical model species
-        clockM().start(28,"speciesExecute");
+        // execute chemical model species
+        /*clockM().start(28,"speciesExecute");
         if(verbose_) Info << "- speciesExecute()" << endl;
         speciesExecute();
         if(verbose_) Info << "speciesExecute done" << endl;

@@ -14,7 +14,6 @@ EXE_INC = \
     -I$(LIB_SRC)/fvOptions/lnInclude \
     -I$(CFDEM_SRC_DIR)/lagrangian/cfdemParticle/lnInclude \
     -I$(CFDEM_SRC_DIR)/lagrangian/cfdemParticle/cfdTools \
-    -I$(CFDEM_SOLVER_DIR)/cfdemSolverRhoPimple \
     -I$(LIB_SRC)/thermophysicalModels/specie/lnInclude \
     -I$(LIB_SRC)/thermophysicalModels/basic/lnInclude \
     -I$(LIB_SRC)/thermophysicalModels/properties/liquidProperties/lnInclude \
@@ -27,14 +26,13 @@ EXE_INC = \
     -I$(LIB_SRC)/regionModels/surfaceFilmModels/lnInclude \
     -I$(LIB_SRC)/ODE/lnInclude \
     -I$(LIB_SRC)/combustionModels/lnInclude \
-    -I$(FOAM_SOLVERS)/combustion/reactingFoam
+    -I$(FOAM_SOLVERS)/combustion/reactingFoam \
 
 
 
 
 EXE_LIBS = \
     -L$(CFDEM_LIB_DIR)  \
-    -L$(CFDEM_SOLVER_DIR)   \
     -lfluidThermophysicalModels \
     -lspecie \
     -lcompressibleTurbulenceModel \
