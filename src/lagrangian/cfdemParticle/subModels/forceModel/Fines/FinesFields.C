@@ -215,6 +215,7 @@ FinesFields::FinesFields
     nuAve_("nuAve",dimensionSet(0,2,-1,0,0),1.6e-5),
     rhoFine_("rhoFine",dimensionSet(1,-3,0,0,0),0.0),
     g_("g",dimensionSet(0,1,-2,0,0),vector(0,0,-9.81)),
+    alphaDynMax_(0.1),
     alphaMax_(readScalar(propsDict_.lookup ("alphaMax"))),
     critVoidfraction_(readScalar(propsDict_.lookup ("critVoidfraction"))),
     depRate_(readScalar(propsDict_.lookup ("depRate"))),
@@ -238,6 +239,8 @@ FinesFields::FinesFields
         FatalError <<"Please specify rhoFine.\n" << abort(FatalError);  
     if (propsDict_.found("nuAve"))
         nuAve_.value()=readScalar(propsDict_.lookup ("nuAve"));
+    if (propsDict_.found("alphaDynMax"))
+        alphaDynMax_=readScalar(propsDict_.lookup ("alphaDynMax"));
     
     if(verbose_)
     {
@@ -358,8 +361,11 @@ void FinesFields::integrateFields()
     alphaStEqn.solve();
     alphaDynEqn.solve();
     
+    // limit hold-ups, should be done more elegantly
+    
     alphaSt_ = max(alphaSt_,0.0);
     alphaDyn_ = max(alphaDyn_,0.0);
+    alphaDyn_ = min(alphaDyn_, alphaDynMax_);
     alphaSt_.correctBoundaryConditions();
     alphaDyn_.correctBoundaryConditions();
 

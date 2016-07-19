@@ -100,6 +100,8 @@ private:
     
     const dimensionedVector g_;
     
+    scalar alphaDynMax_;
+    
     scalar alphaMax_;
     
     scalar critVoidfraction_;
