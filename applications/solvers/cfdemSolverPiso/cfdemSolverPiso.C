@@ -36,7 +36,8 @@ Description
 
 #include "fvCFD.H"
 #include "singlePhaseTransportModel.H"
-#include "turbulenceModel.H"
+#include "turbulentTransportModel.H"
+#include "pisoControl.H"
 
 #include "cfdemCloud.H"
 #include "implicitCouple.H"
@@ -51,6 +52,7 @@ int main(int argc, char *argv[])
     #include "setRootCase.H"
     #include "createTime.H"
     #include "createMesh.H"
+    #include "createControl.H"
     #include "createFields.H"
     #include "initContinuityErrs.H"
 
@@ -67,7 +69,6 @@ int main(int argc, char *argv[])
 
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
-        #include "readPISOControls.H"
         #include "CourantNo.H"
 
         // do particle stuff
@@ -85,7 +86,7 @@ int main(int argc, char *argv[])
 
        //Force Checks
        vector fTotal(0,0,0);
-       vector fImpTotal = sum(mesh.V()*Ksl.internalField()*(Us.internalField()-U.internalField()));
+       vector fImpTotal = sum(mesh.V()*Ksl.internalField()*(Us.internalField()-U.internalField())).value();
        reduce(fImpTotal, sumOp<vector>());
        Info << "TotalForceExp: " << fTotal << endl;
        Info << "TotalForceImp: " << fImpTotal << endl;
@@ -111,17 +112,14 @@ int main(int argc, char *argv[])
                 );
 
                 UEqn.relax();
-                if (momentumPredictor && (modelType=="B" || modelType=="Bfull"))
+                if (piso.momentumPredictor() && (modelType=="B" || modelType=="Bfull"))
                     solve(UEqn == - fvc::grad(p) + Ksl/rho*Us);
-                else if (momentumPredictor)
+                else if (piso.momentumPredictor())
                     solve(UEqn == - voidfraction*fvc::grad(p) + Ksl/rho*Us);
 
                 // --- PISO loop
 
-                //for (int corr=0; corr<nCorr; corr++)
-                int nCorrSoph = nCorr + 5. * (1. - particleCloud.dataExchangeM().timeStepFraction());
-
-                for (int corr=0; corr<nCorrSoph; corr++)
+                while (piso.correct())
                 {
                     volScalarField rUA = 1.0/UEqn.A();
 
@@ -131,13 +129,10 @@ int main(int argc, char *argv[])
 
                     U = rUA*UEqn.H();
 
-                    #ifdef version23
+
                     phi = ( fvc::interpolate(U*voidfraction) & mesh.Sf() )
                         + rUAfvoidfraction*fvc::ddtCorr(U, phi);
-                    #else
-                    phi = ( fvc::interpolate(U*voidfraction) & mesh.Sf() )
-                        + fvc::ddtPhiCorr(rUAvoidfraction, U, phi);
-                    #endif
+
                     surfaceScalarField phiS(fvc::interpolate(Us*voidfraction) & mesh.Sf());
                     surfaceScalarField phiGes = phi + rUAf*(fvc::interpolate(Ksl/rho) * phiS);
 
@@ -145,7 +140,7 @@ int main(int argc, char *argv[])
                         rUAvoidfraction = volScalarField("(voidfraction2|A(U))",rUA*voidfraction*voidfraction);
 
                     // Non-orthogonal pressure corrector loop
-                    for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
+                    while (piso.correctNonOrthogonal())
                     {
                         // Pressure corrector
                         fvScalarMatrix pEqn
@@ -154,20 +149,9 @@ int main(int argc, char *argv[])
                         );
                         pEqn.setReference(pRefCell, pRefValue);
 
-                        if
-                        (
-                            corr == nCorr-1
-                         && nonOrth == nNonOrthCorr
-                        )
-                        {
-                            pEqn.solve(mesh.solver("pFinal"));
-                        }
-                        else
-                        {
-                            pEqn.solve();
-                        }
+                        pEqn.solve(mesh.solver(p.select(piso.finalInnerIter())));
 
-                        if (nonOrth == nNonOrthCorr)
+                        if (piso.finalNonOrthogonalIter())
                         {
                             phiGes -= pEqn.flux();
                             phi = phiGes;
