@@ -67,6 +67,7 @@ species::species
     ),
     // create a list from the Species table in the specified species dictionary
     speciesNames_(specDict_.lookup("species")),
+    mod_spec_names_(speciesNames_.size()),
     Y_(speciesNames_.size()),
     concentrations_(speciesNames_.size(),NULL),
     changeOfSpeciesMass_(speciesNames_.size(),NULL),
@@ -82,7 +83,7 @@ species::species
             IOobject::AUTO_WRITE
          ),
         mesh_,
-        dimensionedScalar("zero",dimMass/dimTime,0.0)
+        dimensionedScalar("zero",dimMass/(dimVol*dimTime),0.0)
     ),
     tempFieldName_(propsDict_.lookupOrDefault<word>("tempFieldName","T")),
     tempField_(sm.mesh().lookupObject<volScalarField> (tempFieldName_)),
@@ -98,7 +99,7 @@ species::species
       velFieldName_(propsDict_.lookup("velFieldName")),
       U_(sm.mesh().lookup<volVectorField> (velFieldName_)),*/
 
-{ 
+{
     Info << " Read species list from: " << specDict_.name() << endl;
     Info << " Reading species list: " << speciesNames_ << endl;
 
@@ -109,6 +110,13 @@ species::species
         volScalarField& Y = const_cast<volScalarField&>
                 (sm.mesh().lookupObject<volScalarField>(speciesNames_[i]));
         Y_.set(i, &Y);
+
+        // define the modified species names
+        mod_spec_names_[i] = "Modified_" + Y_[i].name();
+
+        // Check if mod species are correct
+        Info << "Modified species names are: " << mod_spec_names_[i] << endl;
+
         // Create new volScalarFields for the changed values of the species mass fields
         changeOfSpeciesMassFields_.set
         (
@@ -124,11 +132,12 @@ species::species
                 IOobject::AUTO_WRITE
                 ),
                 mesh_,
-                dimensionedScalar("0",mesh_.lookupObject<volScalarField>(speciesNames_[i]).dimensions(), 0)
+                dimensionedScalar("0",dimMass/(dimVol*dimTime), 0)
             )
          );
 
-        Info << "what are the concentration naems (Y_i): " << Y_[i].name() << endl;
+        Info << "what are the concentration names (Y_i): " << Y_[i].name() << endl;
+
     }
     allocateMyArrays();
 }
@@ -174,13 +183,6 @@ void species::execute()
     List<scalar> Yfluid_;
     Yfluid_.setSize(speciesNames_.size());
 
-    // reset Fields
-    for (int i=0;i<speciesNames_.size();i++)
-    {
-          changeOfSpeciesMassFields_[i].internalField() = 0.0;
-          changeOfGasMassField_.internalField() = 0.0;
-    }
-
     // defining interpolators for T, rho
     interpolationCellPoint <scalar> TInterpolator_(tempField_);
     interpolationCellPoint <scalar> rhoInterpolator_(rho_);
@@ -208,17 +210,32 @@ void species::execute()
             for (int i=0; i<speciesNames_.size();i++)
             {
 	        Yfluid_[i] = Y_[i][cellI];
-            Info << "What is Yfluid_ ? : " << Yfluid_[i] << endl;
             concentrations_[i][index][0]=Yfluid_[i];
+            }
+        }
+
+        if(particleCloud_.verbose() && index >=0 && index < 2)
+        {
+            for(int i =0; i<speciesNames_.size();i++)
+            {
+                Info << "Y_i = " << Y_[i].name() << endl;
+                Info << "concentrations = " << concentrations_[i][index][0] << endl;
+                Info << "partRho_[index][0] = " << partRho_[index][0] << endl;
+                Info << "rhofluid =" << rhofluid << endl;
+                Info << "Yfluid = " << Yfluid_[i] << endl;
+                Info << "partTemp_[index][0] = " << partTemp_[index][0] << endl;
+                Info << "Tfluid = " << Tfluid << endl  ;
             }
         }
     }
 
   // pull changeOfSpeciesMass_, transform onto fields changeOfSpeciesMassFields_, add them up on changeOfGasMassField_
+  changeOfGasMassField_.internalField() = 0.0;
   changeOfGasMassField_.boundaryField() = 0.0;
   for (int i=0; i<speciesNames_.size();i++)
   {
-      particleCloud_.dataExchangeM().getData(Y_[i].name(),"scalar-atom",changeOfSpeciesMass_[i]);
+      particleCloud_.dataExchangeM().getData(mod_spec_names_[i],"scalar-atom",changeOfSpeciesMass_[i]);
+      changeOfSpeciesMassFields_[i].internalField() = 0.0;
       changeOfSpeciesMassFields_[i].boundaryField() = 0.0;
       particleCloud_.averagingM().setScalarSum
       (
@@ -234,8 +251,9 @@ void species::execute()
       changeOfGasMassField_ += changeOfSpeciesMassFields_[i];
       Info << "total conversion of species" << speciesNames_[i] << " = " << gSum(changeOfSpeciesMassFields_[i]*1.0*changeOfSpeciesMassFields_[i].mesh().V()) << endl;
   }
+   Info << "get data done" << endl;
 
-  // give DEM data
+   // give DEM data
   particleCloud_.dataExchangeM().giveData(partTempName_, "scalar-atom", partTemp_);
   particleCloud_.dataExchangeM().giveData(partRhoName_, "scalar-atom", partRho_);
   for (int i=0; i<speciesNames_.size();i++)
@@ -244,17 +262,19 @@ void species::execute()
       particleCloud_.dataExchangeM().giveData(Y_[i].name(),"scalar-atom",concentrations_[i]);
   };
 
+  Info << "give data done" << endl;
+
 }
 
-//tmp<Foam::fvScalarMatrix> species::Smi(const label i) const
-//{
-//    return tmp<fvScalarMatrix>(new fvScalarMatrix(changeOfSpeciesMassFields_[i], dimMass/dimTime)); 
-//}
+/*tmp<Foam::fvScalarMatrix> species::Smi(const label i) const
+{
+    return tmp<fvScalarMatrix>(new fvScalarMatrix(changeOfSpeciesMassFields_[i], dimMass/dimTime));
+}
 
-//tmp<Foam::fvScalarMatrix> species::Sm() const
-//{
-//    return tmp<fvScalarMatrix>(new fvScalarMatrix(changeOfGasMassField_, dimMass/dimTime)); 
-//}
+tmp<Foam::fvScalarMatrix> species::Sm() const
+{
+    return tmp<fvScalarMatrix>(new fvScalarMatrix(changeOfGasMassField_, dimMass/dimTime));
+}*/
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
