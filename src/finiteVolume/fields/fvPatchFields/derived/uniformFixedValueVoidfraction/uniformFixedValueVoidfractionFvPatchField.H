@@ -40,7 +40,7 @@ SourceFiles
 
 #include "Random.H"
 #include "fixedValueFvPatchFields.H"
-#include "DataEntry.H"
+#include "Function1.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -58,7 +58,7 @@ class uniformFixedValueVoidfractionFvPatchField
 {
     // Private data
 
-        autoPtr<DataEntry<Type> > uniformValue_;
+        autoPtr<Function1<Type> > uniformValue_;
 
         word voidfractionFieldName_;
 

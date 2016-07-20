@@ -73,7 +73,7 @@ uniformFixedValueVoidfractionFvPatchField<Type>::uniformFixedValueVoidfractionFv
 )
 :
     fixedValueFvPatchField<Type>(p, iF),
-    uniformValue_(DataEntry<Type>::New("uniformValue", dict)),
+    uniformValue_(Function1<Type>::New("uniformValue", dict)),
     voidfractionFieldName_("voidfraction")
 {
     const scalar t = this->db().time().timeOutputValue();

@@ -89,11 +89,7 @@ label standardSearch::findCell
             for(int i=0;i<3;i++) position[i] = positions[index][i];
 
             // find cell
-            #ifdef version16ext
-                cellIDs[index][0] = particleCloud_.mesh().findCell(position);
-            #elif defined(version21)
-                cellIDs[index][0] = particleCloud_.mesh().findCell(position, polyMesh::FACEPLANES);
-            #endif
+            cellIDs[index][0] = particleCloud_.mesh().findCell(position, polyMesh::FACE_PLANES);
         }
         else cellIDs[index][0] = -1;
     }
@@ -108,11 +104,7 @@ label standardSearch::findSingleCell
 ) const
 {
     // find cell
-    #ifdef version16ext
-        return particleCloud_.mesh().findCell(position);
-    #elif defined(version21)
-        return particleCloud_.mesh().findCell(position, polyMesh::FACEPLANES);
-    #endif
+    return particleCloud_.mesh().findCell(position, polyMesh::FACE_PLANES);
 }
 
 
