@@ -7,9 +7,12 @@ EXE_INC = \
     -I$(LIB_SRC)/finiteVolume/lnInclude \
     -I$(CFDEM_SRC_DIR)/lagrangian/cfdemParticle/lnInclude \
     -I$(CFDEM_SRC_DIR)/lagrangian/cfdemParticle/cfdTools \
+    -I$(CFDEM_SRC_DIR)/recurrence/lnInclude \
+    -I$(CFDEM_SRC_DIR)/lagrangian/cfdemParticle/derived/cfdemCloudRec
 
 EXE_LIBS = \
     -L$(CFDEM_LIB_DIR)\
+    -lrecurrence \
     -lincompressibleRASModels \
     -lincompressibleLESModels \
     -lincompressibleTransportModels \

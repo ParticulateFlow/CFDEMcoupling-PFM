@@ -1,4 +1,4 @@
-voidfractionRec=*(particleCloud.recM().voidfraction());
-URec=*(particleCloud.recM().U());
-UsRec=*(particleCloud.recM().Us());
-phiRec=*(particleCloud.recM().phi());
+voidfractionRec=*(recurrenceBase.recM().voidfraction());
+URec=*(recurrenceBase.recM().U());
+UsRec=*(recurrenceBase.recM().Us());
+phiRec=*(recurrenceBase.recM().phi());

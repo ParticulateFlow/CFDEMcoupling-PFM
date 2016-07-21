@@ -45,7 +45,6 @@ SourceFiles
 
 namespace Foam
 {
-class recModel;
 class forceModel;
 /*---------------------------------------------------------------------------*\
                            Class cfdemCloudRec Declaration
@@ -54,10 +53,6 @@ template <class baseCloud>
 class cfdemCloudRec : public baseCloud
 {
 protected:
-    
-  //  autoPtr<recModel> recModel_;
-    
-  //  void getDEMdata();
 
     void giveDEMdata();
     
@@ -101,7 +96,7 @@ public:
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#include "cfdemCloudRecI.H"
+#include "cfdemCloudRec.TPP"
 
 #endif
 
