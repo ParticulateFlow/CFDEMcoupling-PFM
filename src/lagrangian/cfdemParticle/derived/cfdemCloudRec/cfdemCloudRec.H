@@ -96,7 +96,7 @@ public:
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#include "cfdemCloudRec.TPP"
+#include "cfdemCloudRecI.H"
 
 #endif
 

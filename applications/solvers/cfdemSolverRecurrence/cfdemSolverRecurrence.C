@@ -39,10 +39,11 @@ Rules
 #include "singlePhaseTransportModel.H"
 #include "turbulenceModel.H"
 #include "cfdemCloudRec.H"
+#include "cfdemCloud.H"
 #include "recBase.H"
 #include "recModel.H"
 #include "clockModel.H"
-#include "cfdemCloud.H"
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 int main(int argc, char *argv[])

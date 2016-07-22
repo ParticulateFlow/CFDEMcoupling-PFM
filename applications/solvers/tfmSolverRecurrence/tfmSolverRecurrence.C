@@ -40,6 +40,9 @@ Rules
 #include "singlePhaseTransportModel.H"
 #include "turbulenceModel.H"
 #include "cfdemCloudRec.H"
+#include "cfdemCloud.H"
+#include "recBase.H"
+#include "recModel.H"
 #include "clockModel.H"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -50,14 +53,15 @@ int main(int argc, char *argv[])
     #include "createMesh.H"
     #include "createFields.H"
     #include "createFvOptions.H"
-    cfdemCloudRec particleCloud(mesh);
+    cfdemCloudRec<cfdemCloud> particleCloud(mesh);
+    recBase recurrenceBase(mesh);
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
     Info<< "\nCalculating particle trajectories based on recurrence statistics\n" << endl;
     
     label recTimeIndex(0);
-    scalar recTimeStep_=particleCloud.recM().recTimeStep();
+    scalar recTimeStep_=recurrenceBase.recM().recTimeStep();
     
     while (runTime.run())
     {
@@ -77,7 +81,7 @@ int main(int argc, char *argv[])
         {
 	    Info << "Updating fields at run time " << runTime.timeOutputValue()
 	        << " corresponding to recurrence time " << (recTimeIndex+1)*recTimeStep_ << ".\n" << endl;
-            particleCloud.updateRecFields();
+            recurrenceBase.updateRecFields();
 	    #include "readFields.H"
             recTimeIndex++;
         }
