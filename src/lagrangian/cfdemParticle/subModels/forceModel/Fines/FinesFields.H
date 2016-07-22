@@ -110,9 +110,13 @@ private:
     
     scalar exponent_;
     
-    scalar nCrit_; 
+    scalar nCrit_;
+    
+    scalar poresizeWidth_;
     
     scalar prefactor_;
+    
+    scalar ratioHydraulicPore_;
        
     void calcSource();
     

@@ -221,7 +221,9 @@ FinesFields::FinesFields
     depRate_(readScalar(propsDict_.lookup ("depRate"))),
     exponent_(-1.33),
     nCrit_(readScalar(propsDict_.lookup ("nCrit"))),
-    prefactor_(14.98) 
+    poresizeWidth_(readScalar(propsDict_.lookup ("poresizeWidth"))),
+    prefactor_(14.98),
+    ratioHydraulicPore_(1.5)
 {
     Sds_.write();
 
@@ -306,11 +308,21 @@ void FinesFields::calcSource()
     scalar f(0.0);
     scalar critpore(0.0);
     scalar deltaAlpha(0.0);
+    scalar dmean(0.0);
+    scalar d1(0.0);
+    scalar d2(0.0);
     forAll(Sds_,cellI)
     {
+        // calculate everything in units auf dSauter
         critpore = nCrit_*dFine_.value()/dSauter_[cellI];
-        // mean pore diameter \approx 0.2 mean particle diameter, width +- 0.075 particle diameters
-        f = (critpore*critpore*critpore - 0.0019531) / (0.020797 - 0.0019531);
+	// pore size from hydraulic radius
+	dmean = 2 * (1 - alphaP_[cellI]) / ( (1 + poresizeWidth_*poresizeWidth_/3) * 3 * alphaP_[cellI] );
+	// Sweeney and Martin, Acta Materialia 51 (2003): ratio of hydraulic to pore throat radius
+	dmean /= ratioHydraulicPore_;
+	d1 = dmean * (1 - poresizeWidth_);
+	d2 = dmean * (1 + poresizeWidth_);
+        
+        f = (critpore*critpore*critpore - d1 * d1 * d1) / (d2 * d2 * d2 - d1 * d1 * d1);
 	if (f<0)
 	{
 	    f=0.0;    
@@ -468,7 +480,7 @@ void FinesFields::updateDSauter()
 void FinesFields::updateFanningCoeff()
 {
     FanningCoeff_ = alphaDyn_ * rhoFine_ * mag(uDyn_ - UsField_) * prefactor_ * Foam::pow(Froude_, exponent_) / (2 * dHydMix_);
-    FanningCoeff_ = max( FanningCoeff_, dimensionedScalar("SMALL", dimensionSet(1,-3,-1,0,0), SMALL) );
+    // FanningCoeff_ = max( FanningCoeff_, dimensionedScalar("SMALL", dimensionSet(1,-3,-1,0,0), SMALL) );
     // FanningCoeff_ = min( FanningCoeff_, dimensionedScalar("LARGE", dimensionSet(1,-3,-1,0,0), 1e5) );
 }
 
