@@ -162,6 +162,12 @@ bool cfdemCloudEnergy::evolve
     return false;
 }
 
+void cfdemCloudEnergy::postFlow()
+{
+    cfdemCloud::postFlow();
+    for (int i=0;i<nrEnergyModels();i++)
+        energyModel_[i]().postFlow();
+}
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

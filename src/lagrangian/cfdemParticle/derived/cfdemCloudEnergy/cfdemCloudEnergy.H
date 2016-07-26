@@ -105,6 +105,8 @@ public:
        void energyCoefficients(volScalarField&);
        
        bool evolve(volScalarField&,volVectorField&,volVectorField&);
+       
+       void postFlow();
 
 };
 

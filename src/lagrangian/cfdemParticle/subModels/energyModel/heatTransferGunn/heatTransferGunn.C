@@ -218,22 +218,19 @@ void heatTransferGunn::calcEnergyContribution()
                 Rep = ds * magUr * voidfraction * rho_[cellI]/ muf;
                 Pr = max(SMALL, Cp_ * muf / kf0_);
 
-                Nup = (7 - 10 * voidfraction + 5 * voidfraction * voidfraction) *
-                        (1 + 0.7 * Foam::pow(Rep,0.2) * Foam::pow(Pr,0.33)) +
-			(1.33 - 2.4 * voidfraction + 1.2 * voidfraction * voidfraction) *
-			Foam::pow(Rep,0.7) * Foam::pow(Pr,0.33);                      
+                Nup = Nusselt(voidfraction, Rep, Pr);
                 
 
                 scalar h = kf0_ * Nup / ds;
                 scalar As = ds * ds * M_PI; // surface area of sphere
 
                 // calc convective heat flux [W]
-                scalar partHeatFlux = h * As * (Tfluid - partTemp_[index][0]);
-                partHeatFlux_[index][0] = partHeatFlux;
+                heatFlux(index, h, As, Tfluid);
+                heatFluxCoeff(index, h, As);
 		
 		if(particleCloud_.verbose() && index >=0 && index <2)
                 {
-                    Info << "partHeatFlux = " << partHeatFlux << endl;
+                    Info << "partHeatFlux = " << partHeatFlux_[index][0] << endl;
                     Info << "magUr = " << magUr << endl;
                     Info << "As = " << As << endl;
                     Info << "muf = " << muf << endl;
@@ -269,11 +266,9 @@ void heatTransferGunn::calcEnergyContribution()
     }
     
     QPartFluid_.correctBoundaryConditions();
+    
+    giveData(0);
 
-    Info << "total convective particle-fluid heat flux [W] (Eulerian) = " << gSum(QPartFluid_*1.0*QPartFluid_.mesh().V()) << endl;
-
-    // give DEM data
-    particleCloud_.dataExchangeM().giveData(partHeatFluxName_,"scalar-atom", partHeatFlux_); 
 }
 
 void heatTransferGunn::addEnergyContribution(volScalarField& Qsource) const
@@ -281,7 +276,36 @@ void heatTransferGunn::addEnergyContribution(volScalarField& Qsource) const
     Qsource += QPartFluid_;
 }
 
+scalar heatTransferGunn::Nusselt(scalar voidfraction, scalar Rep, scalar Pr) const
+{
+    scalar Nup(0.0);
+    Nup = (7 - 10 * voidfraction + 5 * voidfraction * voidfraction) *
+                        (1 + 0.7 * Foam::pow(Rep,0.2) * Foam::pow(Pr,0.33)) +
+			(1.33 - 2.4 * voidfraction + 1.2 * voidfraction * voidfraction) *
+			Foam::pow(Rep,0.7) * Foam::pow(Pr,0.33);
+                        
+    return Nup;
+}
 
+void heatTransferGunn::heatFlux(label index, scalar h, scalar As, scalar Tfluid)
+{
+    partHeatFlux_[index][0] = h * As * (Tfluid - partTemp_[index][0]);
+}
+
+void heatTransferGunn::heatFluxCoeff(label index, scalar h, scalar As)
+{
+   //no heat transfer coefficient in explicit model   
+}
+
+void heatTransferGunn::giveData(int call)
+{
+    if(call == 0)
+    {
+        Info << "total convective particle-fluid heat flux [W] (Eulerian) = " << gSum(QPartFluid_*1.0*QPartFluid_.mesh().V()) << endl;
+
+        particleCloud_.dataExchangeM().giveData(partHeatFluxName_,"scalar-atom", partHeatFlux_);    
+    }
+}
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam

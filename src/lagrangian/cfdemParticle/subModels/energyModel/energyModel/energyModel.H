@@ -103,9 +103,7 @@ public:
 	
 	virtual void calcEnergyContribution() = 0;
 	
-	virtual void calcEnergyCoefficient() = 0;
-	
-	virtual void postEnergyTransfer() const = 0;
+	virtual void postFlow() {}
 	
 	scalar Cp() const;
 
