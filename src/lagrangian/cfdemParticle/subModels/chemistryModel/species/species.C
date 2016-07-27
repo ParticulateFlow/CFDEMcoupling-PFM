@@ -68,11 +68,12 @@ species::species
     // create a list from the Species table in the specified species dictionary
     speciesNames_(specDict_.lookup("species")),
     mod_spec_names_(speciesNames_.size()),
-    Y_(speciesNames_.size()),
-    concentrations_(speciesNames_.size(),NULL),
-    changeOfSpeciesMass_(speciesNames_.size(),NULL),
-    changeOfSpeciesMassFields_(speciesNames_.size()),
-    changeOfGasMassField_
+    Y_(speciesNames_.size()),                           //volumeScalarFields created in the ts folders
+    concentrations_(speciesNames_.size(),NULL),         //the value of species concentration for every species
+    changeOfSpeciesMass_(speciesNames_.size(),NULL),    //the values that are received from DEM with the name of Modified_+species name
+    changeOfSpeciesMassFields_(speciesNames_.size()),   //the scalar fields generated with the values from Modified_+species names
+    changeOfGasMassField_                               //the total change of Gas Mass field (when the Modified species
+
     (
         IOobject
         (
@@ -87,11 +88,11 @@ species::species
     ),
     tempFieldName_(propsDict_.lookupOrDefault<word>("tempFieldName","T")),
     tempField_(sm.mesh().lookupObject<volScalarField> (tempFieldName_)),
-    partTempName_(propsDict_.lookup("partTempName")),
+    partTempName_(propsDict_.lookupOrDefault<word>("partTempName","partTemp")),
     partTemp_(NULL),
     densityFieldName_(propsDict_.lookupOrDefault<word>("densityFieldName","rho")),
     rho_(sm.mesh().lookupObject<volScalarField> (densityFieldName_)),
-    partRhoName_(propsDict_.lookup("partRhoName")),
+    partRhoName_(propsDict_.lookupOrDefault<word>("partRhoName","partRho")),
     partRho_(NULL)
   // voidfraction and velocity fields can be included by wish
   /*  voidfractionFieldName_(propsDict_.lookup("voidfractionFieldName")),
@@ -112,7 +113,7 @@ species::species
         Y_.set(i, &Y);
 
         // define the modified species names
-        mod_spec_names_[i] = "Modified_" + Y_[i].name();
+        mod_spec_names_[i] = "Modified_" + speciesNames_[i];
 
         // Check if mod species are correct
         Info << "Modified species names are: " << mod_spec_names_[i] << endl;
@@ -148,6 +149,9 @@ species::~species()
 {
     delete partTemp_;
     delete partRho_;
+
+    for (int i=0; i<speciesNames_.size();i++) delete [] concentrations_[i];
+    for (int i=0; i<speciesNames_.size();i++) delete [] changeOfSpeciesMass_[i];
 
 }
 
@@ -216,7 +220,7 @@ void species::execute()
 
         if(particleCloud_.verbose() && index >=0 && index < 2)
         {
-            for(int i =0; i<speciesNames_.size();i++)
+            /*for(int i =0; i<speciesNames_.size();i++)
             {
                 Info << "Y_i = " << Y_[i].name() << endl;
                 Info << "concentrations = " << concentrations_[i][index][0] << endl;
@@ -225,44 +229,45 @@ void species::execute()
                 Info << "Yfluid = " << Yfluid_[i] << endl;
                 Info << "partTemp_[index][0] = " << partTemp_[index][0] << endl;
                 Info << "Tfluid = " << Tfluid << endl  ;
-            }
+            }*/
         }
     }
 
-  // pull changeOfSpeciesMass_, transform onto fields changeOfSpeciesMassFields_, add them up on changeOfGasMassField_
-  changeOfGasMassField_.internalField() = 0.0;
-  changeOfGasMassField_.boundaryField() = 0.0;
-  for (int i=0; i<speciesNames_.size();i++)
-  {
-      particleCloud_.dataExchangeM().getData(mod_spec_names_[i],"scalar-atom",changeOfSpeciesMass_[i]);
-      changeOfSpeciesMassFields_[i].internalField() = 0.0;
-      changeOfSpeciesMassFields_[i].boundaryField() = 0.0;
-      particleCloud_.averagingM().setScalarSum
-      (
-        changeOfSpeciesMassFields_[i],
-        changeOfSpeciesMass_[i],
-        particleCloud_.particleWeights(),
-        NULL
-      );
+        // give DEM data
+        particleCloud_.dataExchangeM().giveData(partTempName_, "scalar-atom", partTemp_);
+        particleCloud_.dataExchangeM().giveData(partRhoName_, "scalar-atom", partRho_);
+        for (int i=0; i<speciesNames_.size();i++)
+        {
+            particleCloud_.dataExchangeM().giveData(Y_[i].name(),"scalar-atom",concentrations_[i]);
+        };
 
-      // take care for implementation in LIGGGHTS: species produced from particles defined positive
-      changeOfSpeciesMassFields_[i].internalField() /= changeOfSpeciesMassFields_[i].mesh().V();
-      changeOfSpeciesMassFields_[i].correctBoundaryConditions();
-      changeOfGasMassField_ += changeOfSpeciesMassFields_[i];
-      Info << "total conversion of species" << speciesNames_[i] << " = " << gSum(changeOfSpeciesMassFields_[i]*1.0*changeOfSpeciesMassFields_[i].mesh().V()) << endl;
-  }
-   Info << "get data done" << endl;
+        Info << "give data done" << endl;
 
-   // give DEM data
-  particleCloud_.dataExchangeM().giveData(partTempName_, "scalar-atom", partTemp_);
-  particleCloud_.dataExchangeM().giveData(partRhoName_, "scalar-atom", partRho_);
-  for (int i=0; i<speciesNames_.size();i++)
-  {
-      Info << "the concentrations pushed to DEM (concentrations_" << concentrations_[i] << endl;
-      particleCloud_.dataExchangeM().giveData(Y_[i].name(),"scalar-atom",concentrations_[i]);
-  };
 
-  Info << "give data done" << endl;
+
+        // pull changeOfSpeciesMass_, transform onto fields changeOfSpeciesMassFields_, add them up on changeOfGasMassField_
+        changeOfGasMassField_.internalField() = 0.0;
+        changeOfGasMassField_.boundaryField() = 0.0;
+        for (int i=0; i<speciesNames_.size();i++)
+        {
+            particleCloud_.dataExchangeM().getData(mod_spec_names_[i],"scalar-atom",changeOfSpeciesMass_[i]);
+            changeOfSpeciesMassFields_[i].internalField() = 0.0;
+            changeOfSpeciesMassFields_[i].boundaryField() = 0.0;
+            particleCloud_.averagingM().setScalarSum
+            (
+                changeOfSpeciesMassFields_[i],
+                changeOfSpeciesMass_[i],
+                particleCloud_.particleWeights(),
+                NULL
+            );
+
+            // take care for implementation in LIGGGHTS: species produced from particles defined positive
+            changeOfSpeciesMassFields_[i].internalField() /= changeOfSpeciesMassFields_[i].mesh().V();
+            changeOfSpeciesMassFields_[i].correctBoundaryConditions();
+            changeOfGasMassField_ += changeOfSpeciesMassFields_[i];
+            Info << "total conversion of species" << speciesNames_[i] << " = " << gSum(changeOfSpeciesMassFields_[i]*1.0*changeOfSpeciesMassFields_[i].mesh().V()) << endl;
+        }
+        Info << "get data done" << endl;
 
 }
 
