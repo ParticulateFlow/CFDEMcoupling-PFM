@@ -32,7 +32,7 @@ foamChemistryThermoFile     "$casePath/CFD/constant/foam.dat";
 
 foamChemistryFile           "$casePath/CFD/constant/foam.inp";
 
-inertSpecie     CO;     //N2;
+inertSpecie     CO2;     //N2;
 
 /*liquids
 {

@@ -61,7 +61,7 @@ O2
 }
 
 // added CO - Thermo data from combustion.berkeley.edu/gri-mech/data/species/thermo.dat
-CO
+/*CO
 {
     specie
     {
@@ -81,7 +81,7 @@ CO
         As              1.67212e-06;
         Ts              170.672;
     }
-}
+}*/
 
 
 

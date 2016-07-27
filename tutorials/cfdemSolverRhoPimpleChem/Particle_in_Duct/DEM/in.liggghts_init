@@ -40,8 +40,8 @@ fix     zwalls1 all wall/gran model hertz tangential history primitive type 1 zp
 fix     zwalls2 all wall/gran model hertz tangential history primitive type 1 zplane 0.5
 
 # create single particle in a specific spot
-create_atoms 1 single .75 .25 0.25  units box
-set atom 1 diameter 0.01 density 2267 vx 0 vy 0 vz 0
+create_atoms 1 single .75 .31 0.31  units box
+set atom 1 diameter 0.07 density 2267 vx 0 vy 0 vz 0
 
 
 # particle distributions and insertion
@@ -53,6 +53,12 @@ set atom 1 diameter 0.01 density 2267 vx 0 vy 0 vz 0
 
 # apply nve integration to all particles that are inserted as single particles
 #fix     integr all nve/sphere
+
+# print radius change according to timestep
+compute radChange all property/atom radius
+compute radreduce all reduce sum c_radChange
+fix     shrink all ave/time 100 1 100 c_radreduce file output.radius 
+
 
 # screen output
 compute         rke all erotate/sphere
