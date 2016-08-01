@@ -64,6 +64,9 @@ recModel::recModel
         )
     ),
     verbose_(false),
+    volScalarFieldNames_(recProperties_.lookup("volScalarFields")),
+    volVectorFieldNames_(recProperties_.lookup("volVectorFields")),
+    surfaceScalarFieldNames_(recProperties_.lookup("surfaceScalarFields")),
     recTime("dataBase", "", "../system", "../constant", false),
     timeDirs(recTime.times()),
     numRecFields(label(timeDirs.size())),

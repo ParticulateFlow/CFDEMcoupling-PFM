@@ -1,6 +1,6 @@
 recBase/recBase.C
-recModel/recModel.C
-recModel/newRecModel.C
-standardRecModel/standardRecModel.C
+recModel/recModel/recModel.C
+recModel/recModel/newRecModel.C
+recModel/standardRecModel/standardRecModel.C
 
 LIB = $(FOAM_USER_LIBBIN)/librecurrence

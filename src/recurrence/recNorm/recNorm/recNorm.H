@@ -2,7 +2,7 @@
     CFDEMcoupling academic - Open Source CFD-DEM coupling
     
     Contributing authors:
-    Thomas Lichtenegger, Gerhard Holzinger
+    Thomas Lichtenegger
     Copyright (C) 2015- Johannes Kepler University, Linz
 -------------------------------------------------------------------------------
 License
@@ -22,8 +22,8 @@ License
     along with CFDEMcoupling academic.  If not, see <http://www.gnu.org/licenses/>.
 \*---------------------------------------------------------------------------*/
 
-#ifndef recModel_H
-#define recModel_H
+#ifndef recNorm_H
+#define recNorm_H
 
 #include "recBase.H"
 #include "fvCFD.H"
@@ -35,10 +35,10 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class recModel Declaration
+                           Class recNorm Declaration
 \*---------------------------------------------------------------------------*/
 
-class recModel
+class recNorm
 {
 protected:
 
@@ -51,64 +51,21 @@ protected:
     
     bool verbose_;
     
-    Foam::Time recTime;
-    instantList timeDirs;
-    label numRecFields;
-    SymmetricSquareMatrix<scalar> recurrenceMatrixLocal;
-    SymmetricSquareMatrix<scalar> recurrenceMatrix;
+
     
-    // create a data structure for the time indices
-    //	constant will not be contained
-    //	runTimeIndex -> continuousIndex
-    HashTable<label,word> timeIndexList;
-    
-    // create a data structure for the time values
-    //	constant will not be contained
-    //	continuousIndex -> time.value()
-    HashTable<label,scalar> timeValueList;
-    
-    label contTimeIndex;
-    
-    label sequenceStart;
-    label sequenceEnd;
-    const label lowerSeqLim;
-    const label upperSeqLim;
-    
-    scalar startTime_;
-    scalar endTime_;
-    scalar timeStep_;
-    scalar recTimeStep_;
-    label virtualStartIndex;
-    label virtualTimeIndex;
-    label virtualTimeIndexNext;
-    // list of pairs (start value, end value)
-    labelPairList virtualTimeIndexList;
-    label virtualTimeIndexListPos;
-    label totRecSteps;
-    label numRecIntervals;
-    
-    virtual void computeRecMatrix() = 0;
-    virtual void computeRecPath() = 0;
-    virtual void readFieldSeries() = 0;
-    
-    virtual scalar norm(label,label) = 0;
-    
-private:
-  
-    void readTimeSeries();
-    scalar checkTimeStep();
+   
 
 public:
 
     //- Runtime type information
-    TypeName("recModel");
+    TypeName("recNorm");
 
     // Declare runtime constructor selection table
 
         declareRunTimeSelectionTable
         (
             autoPtr,
-            recModel,
+            recNorm,
             dictionary,
             (
                 const dictionary& dict,
@@ -121,7 +78,7 @@ public:
     // Constructors
 
         //- Construct from components
-        recModel
+        recNorm
         (
             const dictionary& dict,
             recBase& base
@@ -130,12 +87,12 @@ public:
 
     // Destructor
 
-        virtual ~recModel();
+        virtual ~recNorm();
 
 
     // Selector
 
-        static autoPtr<recModel> New
+        static autoPtr<recNorm> New
         (
             const dictionary& dict,
             recBase& base
@@ -144,24 +101,7 @@ public:
 
     // Member Functions
     
-    virtual void updateRecFields() = 0;
-    virtual void setRecFields() = 0;
-    
-    virtual const volScalarField* voidfraction() const = 0;
-    virtual const volVectorField* U() const = 0;
-    virtual const volVectorField* Us() const = 0;
-    virtual const surfaceScalarField* phi() const = 0;
-    virtual const surfaceScalarField* phiS() const = 0;
-    
-    virtual tmp<volScalarField> tvoidfraction() const = 0;
-    virtual tmp<volVectorField> tU() const = 0;
-    virtual tmp<volVectorField> tUs() const = 0;
-    scalar recTimeStep() const
-    {
-        return recTimeStep_;
-    }
-    void writeRecMatrix() const;
-    void writeRecPath() const;
+  
 };
 
 
