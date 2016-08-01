@@ -22,54 +22,68 @@ License
     along with CFDEMcoupling academic.  If not, see <http://www.gnu.org/licenses/>.
 \*---------------------------------------------------------------------------*/
 
-#include "error.H"
-#include "recNorm.H"
-#include <unistd.h>
+#ifndef simpleRandomPath_H
+#define simpleRandomPath_H
 
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+#include "recPath.H"
 
 namespace Foam
 {
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+/*---------------------------------------------------------------------------*\
+                           Class simpleRandomPath Declaration
+\*---------------------------------------------------------------------------*/
 
-defineTypeNameAndDebug(recNorm, 0);
-
-defineRunTimeSelectionTable(recNorm, dictionary);
-
-
-// * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * //
-
-// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
-
-// Construct from components
-recNorm::recNorm
-(
-    const dictionary& dict,
-    recBase& base
-)
+class simpleRandomPath
 :
-    base_(base),
-    recProperties_(dict),
-    verbose_(false)
+    public recPath
 {
+protected:
+
+    // Protected data
+
+    dictionary propsDict_;
+    
+    void getRecPath();
+
+    void computeRecPath();
+    
+    label seqEnd(label, label&);
+    
    
-}
 
-// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
+public:
 
-recNorm::~recNorm()
-{}
+    //- Runtime type information
+    TypeName("simpleRandomPath");
 
-// * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * //
+    // Constructors
+
+        //- Construct from components
+        simpleRandomPath
+        (
+            const dictionary& dict,
+            recBase& base
+        );
 
 
-// * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * //
+    // Destructor
+
+        virtual ~simpleRandomPath();
+
+
+    // Member Functions
+    
+  
+};
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#endif
 
 // ************************************************************************* //

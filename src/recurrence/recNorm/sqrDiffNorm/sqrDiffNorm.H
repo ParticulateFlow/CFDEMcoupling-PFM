@@ -22,54 +22,74 @@ License
     along with CFDEMcoupling academic.  If not, see <http://www.gnu.org/licenses/>.
 \*---------------------------------------------------------------------------*/
 
-#include "error.H"
+#ifndef sqrDiffNorm_H
+#define sqrDiffNorm_H
+
 #include "recNorm.H"
-#include <unistd.h>
-
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+/*---------------------------------------------------------------------------*\
+                           Class sqrDiffNorm Declaration
+\*---------------------------------------------------------------------------*/
 
-defineTypeNameAndDebug(recNorm, 0);
-
-defineRunTimeSelectionTable(recNorm, dictionary);
-
-
-// * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * //
-
-// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
-
-// Construct from components
-recNorm::recNorm
-(
-    const dictionary& dict,
-    recBase& base
-)
+class sqrDiffNorm
 :
-    base_(base),
-    recProperties_(dict),
-    verbose_(false)
+    public recNorm
 {
+protected:
+
+    // Protected data
+
+    dictionary propsDict_;
+
+    word fieldType_;
+    
+    word fieldName_;
+    
+    void computeRecMatrix();
+    
+    scalar normVSF(label, label);
+    
+    scalar normVVF(label, label);
+    
+    scalar normSSF(label, label);
+    
    
-}
 
-// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
+public:
 
-recNorm::~recNorm()
-{}
+    //- Runtime type information
+    TypeName("sqrDiffNorm");
 
-// * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * //
+    // Constructors
+
+        //- Construct from components
+        sqrDiffNorm
+        (
+            const dictionary& dict,
+            recBase& base
+        );
 
 
-// * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * //
+    // Destructor
+
+        virtual ~sqrDiffNorm();
+
+
+    // Member Functions
+    
+  
+};
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#endif
 
 // ************************************************************************* //

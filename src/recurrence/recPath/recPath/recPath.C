@@ -23,7 +23,8 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "error.H"
-#include "recNorm.H"
+#include "recPath.H"
+#include "recModel.H"
 #include <unistd.h>
 
 
@@ -34,9 +35,9 @@ namespace Foam
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-defineTypeNameAndDebug(recNorm, 0);
+defineTypeNameAndDebug(recPath, 0);
 
-defineRunTimeSelectionTable(recNorm, dictionary);
+defineRunTimeSelectionTable(recPath, dictionary);
 
 
 // * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * //
@@ -44,7 +45,7 @@ defineRunTimeSelectionTable(recNorm, dictionary);
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 // Construct from components
-recNorm::recNorm
+recPath::recPath
 (
     const dictionary& dict,
     recBase& base
@@ -52,14 +53,15 @@ recNorm::recNorm
 :
     base_(base),
     recProperties_(dict),
-    verbose_(false)
+    verbose_(false),
+    virtualTimeIndexList_( base_.recM().virtualTimeIndexList() )
 {
    
 }
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-recNorm::~recNorm()
+recPath::~recPath()
 {}
 
 // * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * //

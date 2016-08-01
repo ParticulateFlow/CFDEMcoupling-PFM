@@ -57,26 +57,26 @@ protected:
     
     Foam::Time recTime;
     instantList timeDirs;
-    label numRecFields;
-    SymmetricSquareMatrix<scalar> recurrenceMatrixLocal;
-    SymmetricSquareMatrix<scalar> recurrenceMatrix;
+    label numRecFields_;
+
+    SymmetricSquareMatrix<scalar> recurrenceMatrix_;
     
     // create a data structure for the time indices
     //	constant will not be contained
     //	runTimeIndex -> continuousIndex
-    HashTable<label,word> timeIndexList;
+    HashTable<label,word> timeIndexList_;
     
     // create a data structure for the time values
     //	constant will not be contained
     //	continuousIndex -> time.value()
-    HashTable<label,scalar> timeValueList;
+    HashTable<label,scalar> timeValueList_;
     
     label contTimeIndex;
     
     label sequenceStart;
     label sequenceEnd;
-    const label lowerSeqLim;
-    const label upperSeqLim;
+    const label lowerSeqLim_;
+    const label upperSeqLim_;
     
     scalar startTime_;
     scalar endTime_;
@@ -86,21 +86,19 @@ protected:
     label virtualTimeIndex;
     label virtualTimeIndexNext;
     // list of pairs (start value, end value)
-    labelPairList virtualTimeIndexList;
+    labelPairList virtualTimeIndexList_;
     label virtualTimeIndexListPos;
-    label totRecSteps;
-    label numRecIntervals;
+    label totRecSteps_;
     
-    virtual void computeRecMatrix() = 0;
-    virtual void computeRecPath() = 0;
     virtual void readFieldSeries() = 0;
-    
-    virtual scalar norm(label,label) = 0;
-    
+    virtual void init();
+     
     void readTimeSeries();
     scalar checkTimeStep();
 
 public:
+  
+    friend class recBase;
 
     //- Runtime type information
     TypeName("recModel");
@@ -147,18 +145,27 @@ public:
     // Member Functions
     
     virtual void updateRecFields() = 0;
-    virtual void setRecFields() = 0;
     
     virtual void exportVolScalarField(word, volScalarField&) const = 0;
     virtual void exportVolVectorField(word, volVectorField&) const = 0;
     virtual void exportSurfaceScalarField(word, surfaceScalarField&) const = 0;
     
-//     virtual const volScalarField* voidfraction() const = 0;
-//     virtual const volVectorField* U() const = 0;
-//     virtual const volVectorField* Us() const = 0;
-//     virtual const surfaceScalarField* phi() const = 0;
-//     virtual const surfaceScalarField* phiS() const = 0;
+    virtual const volScalarField& exportVolScalarField(word, label) const = 0;
+    virtual const volVectorField& exportVolVectorField(word, label) const = 0;
+    virtual const surfaceScalarField& exportSurfaceScalarField(word, label) const = 0;
     
+    const HashTable<label,word>& timeIndexList() const;
+    
+    SymmetricSquareMatrix<scalar>& recurrenceMatrix();
+    
+    label lowerSeqLim() const;
+    label upperSeqLim() const;
+    
+    labelPairList& virtualTimeIndexList();
+    
+    label numRecFields() const;
+    
+    label totRecSteps() const; 
 
     scalar recTimeStep() const
     {

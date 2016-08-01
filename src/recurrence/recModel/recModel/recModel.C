@@ -69,25 +69,23 @@ recModel::recModel
     surfaceScalarFieldNames_(recProperties_.lookup("surfaceScalarFields")),
     recTime("dataBase", "", "../system", "../constant", false),
     timeDirs(recTime.times()),
-    numRecFields(label(timeDirs.size())),
-    recurrenceMatrixLocal(numRecFields,numRecFields,scalar(0)),
-    recurrenceMatrix(numRecFields,numRecFields,scalar(0)),
-    timeIndexList(numRecFields-1),
-    timeValueList(numRecFields-1),
+    numRecFields_(label(timeDirs.size())),
+    recurrenceMatrix_(numRecFields_,numRecFields_,scalar(0)),
+    timeIndexList_(numRecFields_-1),
+    timeValueList_(numRecFields_-1),
     contTimeIndex(0),
     sequenceStart(0),
     sequenceEnd(0),
-    lowerSeqLim(max(1, label(numRecFields/20))),
-    upperSeqLim(label(numRecFields/5)),
+    lowerSeqLim_(max(1, label(numRecFields_/20))),
+    upperSeqLim_(label(numRecFields_/5)),
     startTime_(readScalar(controlDict_.lookup("startTime"))),
     endTime_(readScalar(controlDict_.lookup("endTime"))),
     timeStep_(readScalar(controlDict_.lookup("deltaT"))),
     virtualStartIndex(0),
     virtualTimeIndex(0),
     virtualTimeIndexNext(1),
-    virtualTimeIndexList(0),
-    virtualTimeIndexListPos(0),
-    numRecIntervals(0)
+    virtualTimeIndexList_(0),
+    virtualTimeIndexListPos(0)
 {
     if (recProperties_.found("verbose")) verbose_=true;
     if (verbose_)
@@ -101,8 +99,8 @@ recModel::recModel
 	Info << "timeDirs " << timeDirs << endl;
     }
     readTimeSeries();
-    recTimeStep_=checkTimeStep();
-    totRecSteps= 1+static_cast<label> ((endTime_-startTime_) / recTimeStep_);
+    recTimeStep_ = checkTimeStep();
+    totRecSteps_ = 1+static_cast<label> ((endTime_-startTime_) / recTimeStep_);
 }
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
@@ -111,8 +109,40 @@ recModel::~recModel()
 {}
 
 // * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * //
+const HashTable<label,word>& recModel::timeIndexList() const
+{
+    return timeIndexList_;
+}
 
+SymmetricSquareMatrix<scalar>& recModel::recurrenceMatrix()
+{
+    return recurrenceMatrix_;
+}
 
+label recModel::lowerSeqLim() const
+{
+    return lowerSeqLim_; 
+}
+
+label recModel::upperSeqLim() const
+{
+    return upperSeqLim_; 
+}
+
+labelPairList& recModel::virtualTimeIndexList()
+{
+    return virtualTimeIndexList_;
+}
+
+label recModel::numRecFields() const
+{
+    return numRecFields_;
+}
+
+label recModel::totRecSteps() const
+{
+    return totRecSteps_;
+}
 // * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * //
 
 void recModel::readTimeSeries()
@@ -132,7 +162,7 @@ void recModel::readTimeSeries()
         
         
         // insert the time name into the hash-table with a continuous second index
-        timeIndexList.insert(recTime.timeName(), contTimeIndex);
+        timeIndexList_.insert(recTime.timeName(), contTimeIndex);
         
         
         if (verbose_)
@@ -143,7 +173,7 @@ void recModel::readTimeSeries()
         
         
         // insert the time value
-        timeValueList.insert(contTimeIndex, recTime.timeOutputValue());
+        timeValueList_.insert(contTimeIndex, recTime.timeOutputValue());
         
         // increment continuousIndex
         contTimeIndex++;
@@ -158,7 +188,7 @@ void recModel::readTimeSeries()
     {
     	Info << endl;
     	Info << "Found " << label(timeDirs.size()) << " time folders" << endl;
-        Info << "Found " << label(timeIndexList.size()) << " time steps" << endl;
+        Info << "Found " << label(timeIndexList_.size()) << " time steps" << endl;
     }
 }
 
@@ -170,10 +200,10 @@ scalar recModel::checkTimeStep()
     
     if (verbose_)
     {
-    	Info << "timeValueList : " << timeValueList << endl;
+    	Info << "timeValueList : " << timeValueList_ << endl;
     }
     
-    forAll(timeValueList, i)
+    forAll(timeValueList_, i)
     {
     	// compute time step
     	if (timeDirs[i].value() == timeDirs.last().value())
@@ -223,16 +253,24 @@ scalar recModel::checkTimeStep()
     return dtCur;
 }
 
+void recModel::init()
+{
+    sequenceStart = virtualTimeIndexList_[0].first();
+    sequenceEnd = virtualTimeIndexList_[0].second();
+    virtualTimeIndex=sequenceStart;
+    virtualTimeIndexNext=virtualTimeIndex+1; 
+}
+
 void recModel::writeRecMatrix() const
 {
     OFstream matrixFile("recurrenceMatrix");
-    matrixFile << recurrenceMatrix;
+    matrixFile << recurrenceMatrix_;
 }
 
 void recModel::writeRecPath() const
 {
     OFstream listFile("recurrencePath");
-    listFile << virtualTimeIndexList;
+    listFile << virtualTimeIndexList_;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -21,67 +21,56 @@ License
     You should have received a copy of the GNU General Public License
     along with CFDEMcoupling academic.  If not, see <http://www.gnu.org/licenses/>.
 \*---------------------------------------------------------------------------*/
-#ifndef recBase_H
-#define recBase_H
 
-// choose version
-#include <vector>
+#include "error.H"
 
-#include "fvCFD.H"
-#include "IFstream.H"
+#include "recPath.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-// forward declarations
-class recModel;
-class recNorm;
-class recPath;
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-/*---------------------------------------------------------------------------*\
-                           Class recBase Declaration
-\*---------------------------------------------------------------------------*/
-
-class recBase
+autoPtr<recPath> recPath::New
+(
+    const dictionary& dict,
+    recBase& base
+)
 {
-  
-protected:
-    
-    const fvMesh& mesh_;
-
-    IOdictionary recProperties_;
-    
-    autoPtr<recModel> recModel_;
-    
-    autoPtr<recNorm> recNorm_;
-    
-    autoPtr<recPath> recPath_;
-    
-public:
-      
-      // Constructors
-
-    //- Construct from mesh and a list of particles
-    recBase
+    word recPathType
     (
-            const fvMesh& mesh
+        dict.lookup("recPath")
     );
-    
-    //- Destructor
-    virtual ~recBase();
-    
-    // public Member Functions
-    
-    const fvMesh& mesh() const;
-    
-    recModel& recM();
- 
-    void updateRecFields();
-  
-};
 
+    Info<< "Selecting recPath "
+         << recPathType << endl;
+
+
+    dictionaryConstructorTable::iterator cstrIter =
+        dictionaryConstructorTablePtr_->find(recPathType);
+
+    if (cstrIter == dictionaryConstructorTablePtr_->end())
+    {
+        FatalError
+            << "recPath::New(const dictionary&, const spray&) : "
+            << endl
+            << "    unknown recPathType type "
+            << recPathType
+            << ", constructor not in hash table" << endl << endl
+            << "    Valid recPath types are :"
+            << endl;
+        Info<< dictionaryConstructorTablePtr_->toc()
+            << abort(FatalError);
+    }
+
+    return autoPtr<recPath>(cstrIter()(dict,base));
 }
 
-#endif
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace Foam
+
+// ************************************************************************* //

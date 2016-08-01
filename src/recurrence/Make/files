@@ -2,5 +2,11 @@ recBase/recBase.C
 recModel/recModel/recModel.C
 recModel/recModel/newRecModel.C
 recModel/standardRecModel/standardRecModel.C
+recNorm/recNorm/recNorm.C
+recNorm/recNorm/newRecNorm.C
+recNorm/sqrDiffNorm/sqrDiffNorm.C
+recPath/recPath/recPath.C
+recPath/recPath/newRecPath.C
+recPath/simpleRandomPath/simpleRandomPath.C
 
 LIB = $(FOAM_USER_LIBBIN)/librecurrence

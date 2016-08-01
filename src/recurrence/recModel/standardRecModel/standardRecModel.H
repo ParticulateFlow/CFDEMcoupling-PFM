@@ -42,10 +42,7 @@ class standardRecModel
 {
 protected:
   
-    void computeRecMatrix();
-    void computeRecPath();
     void readFieldSeries();
-    scalar norm(label,label);
 
 public:
 
@@ -68,52 +65,22 @@ public:
 
 
     void updateRecFields();
-//    void setRecFields();
-    
-//     const volScalarField* voidfraction() const;
-//     const volVectorField* U() const;
-//     const volVectorField* Us() const;
-//     const surfaceScalarField* phi() const;
-//     const surfaceScalarField* phiS() const;
     
     void exportVolScalarField(word, volScalarField&) const;
     void exportVolVectorField(word, volVectorField&) const;
     void exportSurfaceScalarField(word, surfaceScalarField&) const;
     
+    const volScalarField& exportVolScalarField(word, label) const;
+    const volVectorField& exportVolVectorField(word, label) const;
+    const surfaceScalarField& exportSurfaceScalarField(word, label) const;
 	
 private:
   
     dictionary propsDict_;
-  
-//     word voidfractionFieldName_;
-//     word UFieldName_;
-//     word UsFieldName_;
-//     word phiFieldName_;
-//     word phiSFieldName_;
-//     bool readPhi_,readPhiS_;
-  
-//     PtrList<volScalarField> voidfractionRecpl;
-//     PtrList<volVectorField> URecpl;
-//     PtrList<volVectorField> UsRecpl;
-//     PtrList<surfaceScalarField> phiRecpl;
-//     PtrList<surfaceScalarField> phiSRecpl;
     
-    List<PtrList<volScalarField> volScalarFieldList_;
-    List<PtrList<volVectorField> volVectorFieldList_;
-    List<PtrList<surfaceScalarField> surfaceScalarFieldList_;
-    
-//     const volScalarField *voidfractionRec_;
-//     const volVectorField *URec_;
-//     const volVectorField *UsRec_;
-//     const surfaceScalarField *phiRec_;
-//     const surfaceScalarField *phiSRec_;
-    
-    word normType_;
-    scalar refVol_;
-    scalar refVel_;
-    
-    label seqEnd(label, label&);
-
+    List<PtrList<volScalarField> > volScalarFieldList_;
+    List<PtrList<volVectorField> > volVectorFieldList_;
+    List<PtrList<surfaceScalarField> > surfaceScalarFieldList_;
 };
 
 

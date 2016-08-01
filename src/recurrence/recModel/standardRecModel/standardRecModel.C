@@ -56,92 +56,24 @@ standardRecModel::standardRecModel
 :
     recModel(dict,base),
     propsDict_(dict.subDict(typeName + "Props")),
-//     voidfractionFieldName_(propsDict_.lookup("voidfractionRecFieldName")),
-//     UFieldName_(propsDict_.lookup("velRecFieldName")),
-//     UsFieldName_(propsDict_.lookup("granVelRecFieldName")),
-//     phiFieldName_(propsDict_.lookup("phiRecFieldName")),
-//     phiSFieldName_(propsDict_.lookup("granPhiRecFieldName")),
-//     readPhi_(propsDict_.lookupOrDefault<bool>("readPhi",false)),
-//     readPhiS_(propsDict_.lookupOrDefault<bool>("readPhiS",false)),
-//     voidfractionRecpl(numRecFields),
-//     URecpl(numRecFields),
-//     UsRecpl(numRecFields),
-//     phiRecpl(numRecFields),
-//     phiSRecpl(numRecFields),
     volScalarFieldList_(volScalarFieldNames_.size()),
     volVectorFieldList_(volVectorFieldNames_.size()),
-    surfaceScalarFieldList_(surfaceScalarFieldNames_.size()),
-  //  voidfractionRec_(NULL),
-  //  URec_(NULL),
-  //  UsRec_(NULL),
-  //  phiRec_(NULL),
-  //  phiSRec_(NULL),
-    normType_(propsDict_.lookup("normType")),
-    refVol_(readScalar(propsDict_.lookup("refVol"))),
-    refVel_(1.0)
+    surfaceScalarFieldList_(surfaceScalarFieldNames_.size())
 {
-    if (normType_=="solidPhaseMomentum")
-        refVel_=readScalar(propsDict_.lookup("refVel"));
-    
     for(int i=0; i<volScalarFieldNames_.size(); i++)
-        volScalarFieldList_[i].setSize(numRecFields);
+        volScalarFieldList_[i].setSize(numRecFields_);
     
     for(int i=0; i<volVectorFieldNames_.size(); i++)
-        volVectorFieldList_[i].setSize(numRecFields);
+        volVectorFieldList_[i].setSize(numRecFields_);
     
     for(int i=0; i<surfaceScalarFieldNames_.size(); i++)
-        surfaceScalarFieldList_[i].setSize(numRecFields);
+        surfaceScalarFieldList_[i].setSize(numRecFields_);
        
-    readFieldSeries();
-    
-    // make sure each processor has the same sequence of fields
-    int root=0;
-    int rank;
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-    computeRecMatrix();
-
-    if(verbose_)
-      Info << "\nSumming recurrence matrix over all processors.\n" << endl;
-    
-    for(int i = 0; i < numRecFields; ++i)
-      MPI_Allreduce
-      (
-        &recurrenceMatrixLocal[i][0],
-        &recurrenceMatrix[i][0],
-        numRecFields,
-        MPI_DOUBLE,
-        MPI_SUM,
-        MPI_COMM_WORLD
-      );
-    
-    // root proc computes recurrence path, other processors need to reserve enough space
-    if(rank==root)
-    {
-      computeRecPath();
-      numRecIntervals=virtualTimeIndexList.size();
-    }
-    
-    MPI_Bcast(&numRecIntervals,sizeof(numRecIntervals),MPI_BYTE,root,MPI_COMM_WORLD);
-    
-    if(rank!=root)
-      virtualTimeIndexList.setSize(numRecIntervals);
-    
-    int listSizeBytes = 2*sizeof(sequenceStart)*numRecIntervals;
-    
-    MPI_Bcast(&virtualTimeIndexList[0], listSizeBytes, MPI_BYTE, root, MPI_COMM_WORLD); 
-    if(verbose_)
-      Info << "\nRecurrence path communicated to all processors.\n" << endl;
-    
-    sequenceStart=virtualTimeIndexList[0].first();
-    sequenceEnd=virtualTimeIndexList[0].second();
-    virtualTimeIndex=sequenceStart;
-    virtualTimeIndexNext=virtualTimeIndex+1;
     
  //   setRecFields();
     
-    writeRecMatrix();    
-    writeRecPath();
+
 }
 
 
@@ -160,99 +92,80 @@ void standardRecModel::updateRecFields()
   if (virtualTimeIndexNext>sequenceEnd)
   {
     virtualTimeIndexListPos++;
-    sequenceStart=virtualTimeIndexList[virtualTimeIndexListPos].first();
-    sequenceEnd=virtualTimeIndexList[virtualTimeIndexListPos].second();
+    sequenceStart=virtualTimeIndexList_[virtualTimeIndexListPos].first();
+    sequenceEnd=virtualTimeIndexList_[virtualTimeIndexListPos].second();
     virtualTimeIndexNext=sequenceStart;
   }
-//   if (!voidfractionRecpl(virtualTimeIndex) || !URecpl(virtualTimeIndex) || !UsRecpl(virtualTimeIndex))
-//   {
-//      FatalError
-//             << "standardRecModel::updateRecFields() : "
-//             << endl
-//             << "    trying to set pointer to non-existent field. "<< endl << endl
-//             << abort(FatalError); 
-//   }
+  
   if (verbose_)
       Info << "\nUpdating virtual time index to " << virtualTimeIndex << ".\n" << endl;  
-//  setRecFields();
 }
 
-// void standardRecModel::setRecFields()
-// {
-//   voidfractionRec_=voidfractionRecpl(virtualTimeIndex);
-//   URec_=URecpl(virtualTimeIndex);
-//   UsRec_=UsRecpl(virtualTimeIndex);
-//   phiRec_=phiRecpl(virtualTimeIndex);
-//   phiSRec_=phiSRecpl(virtualTimeIndex);
-//   if (verbose_)
-//       Info << "Recurrence fields set.\n" << endl;
-// }
-
-// const volScalarField* standardRecModel::voidfraction() const
-// {
-//   return voidfractionRec_;
-// }
-// 
-// const volVectorField* standardRecModel::U() const
-// {
-//   return URec_;
-// }
-// 
-// const volVectorField* standardRecModel::Us() const
-// {
-//   return UsRec_;
-// }
-// 
-// const surfaceScalarField* standardRecModel::phi() const
-// {
-//   return phiRec_;
-// }
-// 
-// const surfaceScalarField* standardRecModel::phiS() const
-// {
-//   return phiSRec_;
-// }
 
 
-void standardRecModel::exportVolScalarField(word fieldname, volScalarField& field) const
+
+const volScalarField& standardRecModel::exportVolScalarField(word fieldname, label index) const
 {
+    if (index < 0 || index > numRecFields_ - 1)
+       FatalError<<"standardRecModel: Index out of bounds for volScalarField with name " << fieldname << abort(FatalError);	
+      
     for(int i=0; i<volScalarFieldNames_.size(); i++)
         if(volScalarFieldNames_[i].match(fieldname))
 	{
-	    field = volScalarFieldList_[i][virtualTimeIndex]; 
-	    return;
+	    return volScalarFieldList_[i][index];
 	}
 	
     FatalError<<"standardRecModel: Could not find volScalarField with name " << fieldname << abort(FatalError);	
 }
 
-void standardRecModel::exportVolVectorField(word fieldname, volVectorField& field) const
+const volVectorField& standardRecModel::exportVolVectorField(word fieldname, label index) const
 {
+     if (index < 0 || index > numRecFields_ - 1)
+       FatalError<<"standardRecModel: Index out of bounds for volVectorField with name " << fieldname << abort(FatalError);
+  
      for(int i=0; i<volVectorFieldNames_.size(); i++)
         if(volVectorFieldNames_[i].match(fieldname))
 	{
-	    field = volVectorFieldList_[i][virtualTimeIndex]; 
-	    return;
+	    return volVectorFieldList_[i][index];
 	}
 	
     FatalError<<"standardRecModel: Could not find volVectorField with name " << fieldname << abort(FatalError); 
 }
 
-void standardRecModel::exportSurfaceScalarField(word fieldname, surfaceScalarField& field) const
+const surfaceScalarField& standardRecModel::exportSurfaceScalarField(word fieldname, label index) const
 {
+    if (index < 0 || index > numRecFields_ - 1)
+       FatalError<<"standardRecModel: Index out of bounds for surfaceScalarField with name " << fieldname << abort(FatalError);
+  
     for(int i=0; i<surfaceScalarFieldNames_.size(); i++)
         if(surfaceScalarFieldNames_[i].match(fieldname))
 	{
-	    field = surfaceScalarFieldList_[i][virtualTimeIndex]; 
-	    return;
+	    return surfaceScalarFieldList_[i][index]; 
 	}
 	
     FatalError<<"standardRecModel: Could not find surfaceScalarField with name " << fieldname << abort(FatalError);	
 }
 
+void standardRecModel::exportVolScalarField(word fieldname, volScalarField& field) const
+{
+    field = exportVolScalarField(fieldname, virtualTimeIndex);
+}
+
+void standardRecModel::exportVolVectorField(word fieldname, volVectorField& field) const
+{
+    field = exportVolVectorField(fieldname, virtualTimeIndex);
+}
+
+void standardRecModel::exportSurfaceScalarField(word fieldname, surfaceScalarField& field) const
+{
+    field = exportSurfaceScalarField(fieldname, virtualTimeIndex);
+}
+
+
+
 void standardRecModel::readFieldSeries()
 {
-     Info << "Reading fields" << endl;
+    Info << "Reading fields" << endl;
     
     for (instantList::iterator it=timeDirs.begin(); it != timeDirs.end(); ++it)
     {
@@ -273,7 +186,7 @@ void standardRecModel::readFieldSeries()
         for(int i=0; i<volScalarFieldNames_.size(); i++)
             volScalarFieldList_[i].set
             (
-	        timeIndexList(recTime.timeName()),
+	        timeIndexList_(recTime.timeName()),
                 new volScalarField
                 (
                     IOobject
@@ -291,7 +204,7 @@ void standardRecModel::readFieldSeries()
 	for(int i=0; i<volVectorFieldNames_.size(); i++)
             volVectorFieldList_[i].set
             (
-	        timeIndexList(recTime.timeName()),
+	        timeIndexList_(recTime.timeName()),
                 new volVectorField
                 (
                     IOobject
@@ -309,7 +222,7 @@ void standardRecModel::readFieldSeries()
 	for(int i=0; i<surfaceScalarFieldNames_.size(); i++)
             surfaceScalarFieldList_[i].set
             (
-	        timeIndexList(recTime.timeName()),
+	        timeIndexList_(recTime.timeName()),
                 new surfaceScalarField
                 (
                     IOobject
@@ -322,273 +235,9 @@ void standardRecModel::readFieldSeries()
                     ),
                     base_.mesh()
                 )
-	    );    
-        
-//         voidfractionRecpl.set
-//         (
-//             timeIndexList(recTime.timeName()),
-//             new volScalarField
-//             (
-//                 IOobject
-//                 (
-//                     voidfractionFieldName_,
-//                     recTime.timePath(),
-//                     base_.mesh(),
-//                     IOobject::MUST_READ,
-//                     IOobject::NO_WRITE
-//                 ),
-//                 base_.mesh()
-//             )
-//         );
-//             
-//         URecpl.set
-//         (
-//             timeIndexList(recTime.timeName()),
-//             new volVectorField
-//             (
-//                 IOobject
-//                 (
-//                     UFieldName_,
-//                     recTime.timePath(),
-//                     base_.mesh(),
-//                     IOobject::MUST_READ,
-//                     IOobject::NO_WRITE
-//                 ),
-//                 base_.mesh()
-//             )
-//         );
-//         UsRecpl.set
-//         (
-//             timeIndexList(recTime.timeName()),
-//             new volVectorField
-//             (
-//                 IOobject
-//                 (
-//                     UsFieldName_,
-//                     recTime.timePath(),
-//                     base_.mesh(),
-//                     IOobject::MUST_READ,
-//                     IOobject::NO_WRITE
-//                 ),
-//                 base_.mesh()
-//             )
-//         );
-// 
-// 	if (readPhi_)
-// 	{
-//             phiRecpl.set
-//             (
-//                 timeIndexList(recTime.timeName()),
-//                 new surfaceScalarField
-//                 (
-//                     IOobject
-//                     (
-//                         phiFieldName_,
-//                         recTime.timePath(),
-//                         base_.mesh(),
-//                         IOobject::MUST_READ,
-//                         IOobject::NO_WRITE
-//                     ),
-//                     base_.mesh()
-//                 )
-//             );
-//         }
-//         else
-//         {
-// 	    phiRecpl.set
-// 	    (
-// 	        timeIndexList(recTime.timeName()),
-//                 new surfaceScalarField
-//                 (
-//                     IOobject
-//                     (
-//                          phiFieldName_,
-//                          recTime.timePath(),
-//                          base_.mesh(),
-//                          IOobject::NO_READ,
-//                          IOobject::NO_WRITE
-//                     ),
-//                     linearInterpolate(URecpl.last()*voidfractionRecpl.last()) & base_.mesh().Sf()
-//                 )
-// 	    );
-// 	}
-// 	
-// 	if (readPhiS_)
-// 	{
-// 	    phiSRecpl.set
-//             (
-//                 timeIndexList(recTime.timeName()),
-//                 new surfaceScalarField
-//                 (
-//                     IOobject
-//                     (
-//                         phiSFieldName_,
-//                         recTime.timePath(),
-//                         base_.mesh(),
-//                         IOobject::MUST_READ,
-//                         IOobject::NO_WRITE
-//                     ),
-//                     base_.mesh()
-//                 )
-//             );
-// 	}
-//         else
-//         {
-//             phiSRecpl.set
-//             (
-//                 timeIndexList(recTime.timeName()),
-//                 new surfaceScalarField
-//                 (
-//                     IOobject
-//                     (
-//                          phiSFieldName_,
-//                          recTime.timePath(),
-//                          base_.mesh(),
-//                          IOobject::NO_READ,
-//                          IOobject::NO_WRITE
-//                     ),
-//                     linearInterpolate(UsRecpl.last()*(1-voidfractionRecpl.last())) & base_.mesh().Sf()
-//                 )
-//             );
-//         }
-
-        
+            );    
     }
     Info << "Reading fields done" << endl;
-}
-
-void standardRecModel::computeRecMatrix()
-{
-    Info<< "\nComputing recurrence matrix\n" << endl;
-    
-    // compute recurrence matrix elements
-    forAll(timeIndexList, ti)
-    {
-    	forAll(timeIndexList, tj)
-    	{
-	        if(verbose_)
-		  Info<<"\n Doing calculation for element " << ti << " " << tj << "\n" << endl;
-    		// main diagonal
-    		if (ti == tj)
-    		{
-    			recurrenceMatrixLocal[ti][tj] = 0;
-    			continue;
-    		}
-    		
-    		// skip one half of the matrix
-    		if (ti > tj)
-    		{
-    			continue;
-    		}
-    		
-    		// compute elements
-    		recurrenceMatrixLocal[ti][tj]
-    			= norm(ti,tj);
-    		
-    		recurrenceMatrixLocal[tj][ti] = recurrenceMatrixLocal[ti][tj];
-    	}
-    }
-    Info<< "\nComputing recurrence matrix done\n" << endl;
-}
-
-void standardRecModel::computeRecPath()
-{
-    Info<< "\nComputing recurrence path\n" << endl;
-    Random ranGen(osRandomInteger());
-    
-    label virtualTimeIndex=0;
-    label recSteps=0;
-    label seqStart=0;
-    label seqLength=ranGen.integer(lowerSeqLim, upperSeqLim);
-    virtualTimeIndex=seqEnd(seqStart,seqLength);
-    labelPair seqStartEnd(seqStart,virtualTimeIndex);
-    virtualTimeIndexList.append(seqStartEnd);
-    recSteps+=seqLength;
-   
-    while(recSteps<=totRecSteps)
-    {
-        label startLoop = 0;
-        label endLoop = 0;
-
-        // search the other half of the recurrence matrix for 
-        // the new starting point of the next sequence
-        if (virtualTimeIndex < recurrenceMatrix.n()/2)
-        {
-        	startLoop = recurrenceMatrix.n()/2;
-        	endLoop = recurrenceMatrix.n()-1;
-		endLoop--; // start of next sequence one snapshot AFTER minimum position
-        }
-        else
-        {
-        	startLoop = 0;
-        	endLoop = recurrenceMatrix.n()/2-1;
-        }
-        
-
-        scalar nextMinimum(GREAT);
-        for (label j = startLoop; j < endLoop; j++)
-        {
-        	if (recurrenceMatrix[j][virtualTimeIndex] < nextMinimum)
-        	{
-        		nextMinimum = recurrenceMatrix[j][virtualTimeIndex];
-        		seqStart = j+1;
-        		continue;
-        	}
-        }
-        
-        seqLength = ranGen.integer(lowerSeqLim, upperSeqLim);  
-        virtualTimeIndex=seqEnd(seqStart,seqLength);
-        labelPair seqStartEnd(seqStart,virtualTimeIndex);
-        virtualTimeIndexList.append(seqStartEnd);
-        recSteps+=seqLength;
-    }
-    Info<< "\nComputing recurrence path done\n" << endl;
-}
-
-label standardRecModel::seqEnd(label seqStart, label & seqLength)
-{
-  if(seqStart+seqLength>numRecFields-1)
-      seqLength=numRecFields-1-seqStart;
-  return seqStart+seqLength;
-}
-
-scalar standardRecModel::norm(label ti, label tj)
-{
-    scalar diff=0.0;
-    scalarField tDiff;
-    if (normType_=="volumeFraction")
-    {
-        tDiff=fvc::volumeIntegrate
-            (
-	        sqr
-                (
-	            voidfractionRecpl[ti]-voidfractionRecpl[tj]
-	        )
-	    );
-    }
-    else if (normType_=="solidPhaseMomentum")
-    {
-        tDiff=fvc::volumeIntegrate
-            (
-	        magSqr
-                (
-	            voidfractionRecpl[ti]*UsRecpl[ti]-voidfractionRecpl[tj]*UsRecpl[tj]
-	        )
-	    );
-
-	tDiff/=(refVel_*refVel_);
-    }
-    else
-    {
-      FatalError
-            << "standardRecModel::norm(label,label) : "
-            << endl
-            << "    unknown norm. "<< endl << endl
-            << abort(FatalError); 
-    }
-    diff=sum(tDiff);
-    diff/=refVol_;
-    return diff;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

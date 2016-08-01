@@ -24,6 +24,8 @@ License
 
 #include "recBase.H"
 #include "recModel.H"
+#include "recNorm.H"
+#include "recPath.H"
 
 namespace Foam
 {
@@ -53,8 +55,25 @@ recBase::recBase
             recProperties_,
             *this
         )
+    ),
+    recNorm_
+    (
+        recNorm::New
+        (
+            recProperties_,
+            *this
+        )
     )
-{}
+{
+  recModel_ ->  readFieldSeries();
+  recNorm_  ->  computeRecMatrix();
+  recPath_  ->  getRecPath();
+ 
+  recModel_ ->  init();
+  
+  recModel_ ->  writeRecMatrix();    
+  recModel_ ->  writeRecPath();
+}
 
 // * * * * * * * * * * * * * * * * Destructors  * * * * * * * * * * * * * * //
 recBase::~recBase()
@@ -67,9 +86,9 @@ const fvMesh& recBase::mesh() const
     return mesh_;
 }
 
-const recModel& recBase::recM() const
+recModel& recBase::recM()
 {
-    return recModel_;
+    return recModel_();
 }
 
 void recBase::updateRecFields()

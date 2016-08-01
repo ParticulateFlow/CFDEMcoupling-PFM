@@ -22,23 +22,25 @@ License
     along with CFDEMcoupling academic.  If not, see <http://www.gnu.org/licenses/>.
 \*---------------------------------------------------------------------------*/
 
-#ifndef recNorm_H
-#define recNorm_H
+#ifndef recPath_H
+#define recPath_H
 
 #include "recBase.H"
 #include "fvCFD.H"
 #include "HashTable.H"
-// #include "labelPair.H"
+#include "labelPair.H"
 #include "OFstream.H"
+#include <mpi.h>
+
 
 namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class recNorm Declaration
+                           Class recPath Declaration
 \*---------------------------------------------------------------------------*/
 
-class recNorm
+class recPath
 {
 protected:
 
@@ -49,7 +51,11 @@ protected:
     
     bool verbose_;
     
-    virtual void computeRecMatrix() = 0;
+    labelPairList& virtualTimeIndexList_;
+    
+    virtual void getRecPath() = 0;
+    
+    virtual void computeRecPath() = 0;
     
    
 
@@ -58,14 +64,14 @@ public:
     friend class recBase;
 
     //- Runtime type information
-    TypeName("recNorm");
+    TypeName("recPath");
 
     // Declare runtime constructor selection table
 
         declareRunTimeSelectionTable
         (
             autoPtr,
-            recNorm,
+            recPath,
             dictionary,
             (
                 const dictionary& dict,
@@ -78,7 +84,7 @@ public:
     // Constructors
 
         //- Construct from components
-        recNorm
+        recPath
         (
             const dictionary& dict,
             recBase& base
@@ -87,12 +93,12 @@ public:
 
     // Destructor
 
-        virtual ~recNorm();
+        virtual ~recPath();
 
 
     // Selector
 
-        static autoPtr<recNorm> New
+        static autoPtr<recPath> New
         (
             const dictionary& dict,
             recBase& base
