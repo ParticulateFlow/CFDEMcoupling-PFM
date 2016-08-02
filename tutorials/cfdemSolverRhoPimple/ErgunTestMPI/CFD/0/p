@@ -29,8 +29,9 @@ boundaryField
     inlet
     {
        // type            zeroGradient;
-        type               fixedFluxPressure;
-        value              $internalField;
+      //  type               fixedFluxPressure;
+      //  value              $internalField;
+          type        fixedFluxExtrapolatedPressure;
     }
     outlet
     {
