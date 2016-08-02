@@ -92,7 +92,7 @@ void heatTransferGunnImplicit::calcEnergyContribution()
         NULL
     );
 
-    QPartFluidCoeff_.internalField() /= -QPartFluidCoeff_.mesh().V();
+    QPartFluidCoeff_.primitiveFieldRef() /= -QPartFluidCoeff_.mesh().V();
     
     QPartFluidCoeff_.correctBoundaryConditions();
 

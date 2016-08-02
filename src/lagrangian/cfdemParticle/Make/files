@@ -118,7 +118,6 @@ $(locateModels)/turboEngineSearch/turboEngineSearch.C
 $(locateModels)/engineSearchMany2Many/engineSearchMany2Many.C
 $(locateModels)/engineSearchIB/engineSearchIB.C
 
-
 $(meshMotionModels)/meshMotionModel/meshMotionModel.C
 $(meshMotionModels)/meshMotionModel/newMeshMotionModel.C
 $(meshMotionModels)/noMeshMotion/noMeshMotion.C
@@ -139,7 +138,6 @@ $(dataExchangeModels)/oneWayVTK/oneWayVTK.C
 $(dataExchangeModels)/twoWayFiles/twoWayFiles.C
 $(dataExchangeModels)/noDataExchange/noDataExchange.C
 $(dataExchangeModels)/twoWayMPI/twoWayMPI.C
-$(dataExchangeModels)/twoWayMany2Many/twoWayMany2Many.C
 
 $(averagingModels)/averagingModel/averagingModel.C
 $(averagingModels)/averagingModel/newAveragingModel.C

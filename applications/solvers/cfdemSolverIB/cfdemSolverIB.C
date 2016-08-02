@@ -39,7 +39,8 @@ Contributions
 
 #include "fvCFD.H"
 #include "singlePhaseTransportModel.H"
-#include "turbulenceModel.H"
+#include "turbulentTransportModel.H"
+#include "pisoControl.H"
 
 #include "cfdemCloudIB.H"
 #include "implicitCouple.H"
@@ -52,10 +53,9 @@ Contributions
 
 #include "cellSet.H"
 
-#if defined(version22)
-    #include "meshToMeshNew.H"
-    #include "fvIOoptionList.H"
-#endif
+#include "meshToMeshNew.H"
+#include "fvIOoptionList.H"
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -66,14 +66,14 @@ int main(int argc, char *argv[])
     #include "createTime.H"
 
     #include "createDynamicFvMesh.H"
+  
+    #include "createControl.H"
 
     #include "createFields.H"
 
     #include "initContinuityErrs.H"
 
-    #if defined(version22)
     #include "createFvOptions.H"
-    #endif
 
     // create cfdemCloud
     #include "readGravitationalAcceleration.H"
@@ -91,7 +91,6 @@ int main(int argc, char *argv[])
         interFace = mag(mesh.lookupObject<volScalarField>("voidfractionNext"));
         mesh.update(); //dyM
 
-        #include "readPISOControls.H"
         #include "CourantNo.H"
 
         // do particle stuff
@@ -107,45 +106,33 @@ int main(int argc, char *argv[])
                 fvm::ddt(voidfraction,U)
               + fvm::div(phi, U)
               + turbulence->divDevReff(U)
-                #if defined(version22)
                 ==
                 fvOptions(U)
-                #endif
             );
 
             UEqn.relax();
 
-            #if defined(version22)
             fvOptions.constrain(UEqn);
-            #endif
 
-            if (momentumPredictor)
+            if (piso.momentumPredictor())
             {
                 solve(UEqn == -fvc::grad(p));
             }
 
             // --- PISO loop
-            for (int corr=0; corr<nCorr; corr++)
+           while (piso.correct())
             {
                 volScalarField rUA = 1.0/UEqn.A();
                 surfaceScalarField rUAf(fvc::interpolate(rUA));
 
                 U = rUA*UEqn.H();
-                #ifdef version23
+
                 phi = (fvc::interpolate(U) & mesh.Sf())
                     + rUAf*fvc::ddtCorr(U, phi);
-                #else
-                phi = (fvc::interpolate(U) & mesh.Sf())
-                    + fvc::ddtPhiCorr(rUA, U, phi);
-                #endif
+
                 adjustPhi(phi, U, p);
 
-                #if defined(version22)
-                fvOptions.relativeFlux(phi);
-                #endif
-
-                // Non-orthogonal pressure corrector loop
-                for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
+                while (piso.correct())
                 {
                     // Pressure corrector
 
@@ -156,20 +143,9 @@ int main(int argc, char *argv[])
 
                     pEqn.setReference(pRefCell, pRefValue);
 
-                    if
-                    (
-                        corr == nCorr-1
-                     && nonOrth == nNonOrthCorr
-                    )
-                    {
-                        pEqn.solve(mesh.solver("pFinal"));
-                    }
-                    else
-                    {
-                        pEqn.solve();
-                    }
+                    pEqn.solve(mesh.solver(p.select(piso.finalInnerIter())));
 
-                    if (nonOrth == nNonOrthCorr)
+                    if (piso.finalNonOrthogonalIter())
                     {
                         phi -= pEqn.flux();
                     }

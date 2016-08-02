@@ -166,10 +166,10 @@ tmp<volScalarField> implicitCouple::impMomSource() const
             // limiter
             if (KslNext_[cellI] > KslLimit_) KslNext_[cellI] = KslLimit_;
         }
-        tsource() = KslPrev_;
+        tsource.ref() = KslPrev_;
     }else
     {
-        tsource() = (1 - tsf) * KslPrev_ + tsf * KslNext_;
+        tsource.ref() = (1 - tsf) * KslPrev_ + tsf * KslNext_;
     }
 
     return tsource;
@@ -177,8 +177,8 @@ tmp<volScalarField> implicitCouple::impMomSource() const
 
 void Foam::implicitCouple::resetMomSourceField() const
 {
-    KslPrev_.internalField() = KslNext_.internalField();
-    KslNext_.internalField() = 0;
+    KslPrev_.ref() = KslNext_.ref();
+    KslNext_.primitiveFieldRef() = 0;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

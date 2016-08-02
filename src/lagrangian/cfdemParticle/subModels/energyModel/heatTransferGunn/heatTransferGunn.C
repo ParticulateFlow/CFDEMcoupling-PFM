@@ -142,14 +142,14 @@ void heatTransferGunn::calcEnergyContribution()
     allocateMyArrays();
 
     // reset Scalar field
-    QPartFluid_.internalField() = 0.0;
+    QPartFluid_.primitiveFieldRef() = 0.0;
 
     // get DEM data
     particleCloud_.dataExchangeM().getData(partTempName_,"scalar-atom",partTemp_);
     
     if(calcPartTempField_)
     {       
-	partTempField_.internalField() = 0.0;
+	partTempField_.primitiveFieldRef() = 0.0;
         particleCloud_.averagingM().resetWeightFields();
         particleCloud_.averagingM().setScalarAverage
         (
@@ -252,7 +252,7 @@ void heatTransferGunn::calcEnergyContribution()
         NULL
     );
 
-    QPartFluid_.internalField() /= -QPartFluid_.mesh().V();
+    QPartFluid_.primitiveFieldRef() /= -QPartFluid_.mesh().V();
 
     // limit source term
     forAll(QPartFluid_,cellI)

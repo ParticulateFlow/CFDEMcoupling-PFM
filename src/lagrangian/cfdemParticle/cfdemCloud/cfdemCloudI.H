@@ -302,15 +302,7 @@ inline autoPtr<liggghtsCommandModel>* cfdemCloud::liggghtsCommand() const
     return liggghtsCommand_;
 }
 
-#if defined(version21) || defined(version16ext)
-    #ifdef compre
-        inline const compressible::turbulenceModel& cfdemCloud::turbulence() const
-    #else
-        inline const incompressible::turbulenceModel& cfdemCloud::turbulence() const
-    #endif
-#elif defined(version15)
-    inline const incompressible::RASModel& cfdemCloud::turbulence() const
-#endif
+inline const turbulenceModel& cfdemCloud::turbulence() const
 {
     return turbulence_;
 }

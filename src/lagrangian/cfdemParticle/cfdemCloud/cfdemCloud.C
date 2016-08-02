@@ -127,15 +127,7 @@ cfdemCloud::cfdemCloud
     ),
     turbulence_
     (
-        #if defined(version21) || defined(version16ext)
-            #ifdef compre
-                mesh.lookupObject<compressible::turbulenceModel>
-            #else
-                mesh.lookupObject<incompressible::turbulenceModel>
-            #endif
-        #elif defined(version15)
-            mesh.lookupObject<incompressible::RASModel>
-        #endif
+        mesh.lookupObject<turbulenceModel>
         (
             turbulenceModelType_
         )
@@ -753,8 +745,8 @@ void cfdemCloud::resetArray(double**& array,int length,int width,double resetVal
 
 void cfdemCloud::otherForces(volVectorField& forcefield)
 {
-  forcefield.internalField() = vector::zero;
-  forcefield.boundaryField() = vector::zero;
+  forcefield.primitiveFieldRef() = vector::zero;
+  forcefield.boundaryFieldRef() = vector::zero;
   for (int i=0;i<otherForceModels_.size();i++)
       forcefield += otherForceModel_[i]().exportForceField();
 }

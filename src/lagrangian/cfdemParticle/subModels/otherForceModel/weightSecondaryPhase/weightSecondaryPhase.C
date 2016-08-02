@@ -83,7 +83,7 @@ tmp<volVectorField> weightSecondaryPhase::exportForceField()
         )
     );
     
-    volVectorField& source = tsource();
+    volVectorField& source = tsource.ref();
     
     source = rho_ * alpha_ * g_;
     

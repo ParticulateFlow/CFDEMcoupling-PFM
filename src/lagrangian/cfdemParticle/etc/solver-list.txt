@@ -1,7 +1,5 @@
 cfdemSolverPisoMS/dir
 cfdemSolverPiso/dir
-cfdemSolverPisoTemp/dir
 cfdemSolverRhoPimple/dir
 cfdemSolverRhoPimpleChem/dir
-cfdemSolverIB/dir
 cfdemSolverPisoScalar/dir

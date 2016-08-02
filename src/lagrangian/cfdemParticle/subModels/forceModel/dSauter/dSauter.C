@@ -138,8 +138,8 @@ void dSauter::setForce() const
 	}
     }
     
-    d2Field_.internalField() = 0.0;
-    d3Field_.internalField() = 0.0;
+    d2Field_.primitiveFieldRef() = 0.0;
+    d3Field_.primitiveFieldRef() = 0.0;
     
     particleCloud_.averagingM().setScalarSum
     (

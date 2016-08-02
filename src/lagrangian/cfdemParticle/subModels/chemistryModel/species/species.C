@@ -246,13 +246,13 @@ void species::execute()
 
 
         // pull changeOfSpeciesMass_, transform onto fields changeOfSpeciesMassFields_, add them up on changeOfGasMassField_
-        changeOfGasMassField_.internalField() = 0.0;
-        changeOfGasMassField_.boundaryField() = 0.0;
+        changeOfGasMassField_.primitiveFieldRef() = 0.0;
+        changeOfGasMassField_.boundaryFieldRef() = 0.0;
         for (int i=0; i<speciesNames_.size();i++)
         {
             particleCloud_.dataExchangeM().getData(mod_spec_names_[i],"scalar-atom",changeOfSpeciesMass_[i]);
-            changeOfSpeciesMassFields_[i].internalField() = 0.0;
-            changeOfSpeciesMassFields_[i].boundaryField() = 0.0;
+            changeOfSpeciesMassFields_[i].primitiveFieldRef() = 0.0;
+            changeOfSpeciesMassFields_[i].boundaryFieldRef() = 0.0;
             particleCloud_.averagingM().setScalarSum
             (
                 changeOfSpeciesMassFields_[i],
@@ -262,7 +262,7 @@ void species::execute()
             );
 
             // take care for implementation in LIGGGHTS: species produced from particles defined positive
-            changeOfSpeciesMassFields_[i].internalField() /= changeOfSpeciesMassFields_[i].mesh().V();
+            changeOfSpeciesMassFields_[i].primitiveFieldRef() /= changeOfSpeciesMassFields_[i].mesh().V();
             changeOfSpeciesMassFields_[i].correctBoundaryConditions();
             changeOfGasMassField_ += changeOfSpeciesMassFields_[i];
             Info << "total conversion of species" << speciesNames_[i] << " = " << gSum(changeOfSpeciesMassFields_[i]*1.0*changeOfSpeciesMassFields_[i].mesh().V()) << endl;

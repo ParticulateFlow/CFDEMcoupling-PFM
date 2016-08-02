@@ -30,29 +30,7 @@ boundaryField
 
     inlet
     {
-        /*type            flowRateInletVelocity;
-        flowRate        0.001;
-        value           uniform (0 0 0);*/
-
-        /*type            fixedValue;
-        value           uniform (0 0 0.0001);*/
-
-        //type            zeroGradient;
-
-/*        type            groovyBC;
-        variables       "Uend=vector(0,0,0.02);tEnd=0.1;";
-        valueExpression "((time() < tEnd) ? Uend/tEnd*time():Uend)";
-        value           uniform (0 0 0);*/
-
-        /*// 2.0.x, 1.6,ext
-        type            timeVaryingUniformFixedValue;
-        fileName        "steps_0p1s";
-        outOfBounds     clamp;
-        value           uniform (0 0 0);*/
-
-        // 2.1.x
-		//type              uniformFixedValue;
-        type            uniformFixedValueVoidfraction;
+        type            uniformFixedValue;
         uniformValue     table
         (
             (0.000 (0 0 0.002))
@@ -62,9 +40,6 @@ boundaryField
 
     outlet
     {
-        /*type            fluxCorrectedVelocity; //inletOutlet;
-        value           uniform (0 0 0);
-        inletValue      uniform (0 0 0);*/
         type            zeroGradient;
     }
 }

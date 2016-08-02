@@ -122,3 +122,5 @@ surfaceScalarField phi
     (
         incompressible::turbulenceModel::New(U, phi, laminarTransport)
     );
+
+#include "createMRF.H"

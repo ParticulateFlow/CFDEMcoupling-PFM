@@ -304,7 +304,7 @@ void FinesFields::update()
 
 void FinesFields::calcSource() 
 {
-    Sds_.internalField()=0;
+    Sds_.primitiveFieldRef()=0;
     scalar f(0.0);
     scalar critpore(0.0);
     scalar deltaAlpha(0.0);
@@ -453,7 +453,7 @@ void FinesFields::updateDragCoeff()
 	        Cd = 24 * (1.0 + 0.15 * Foam::pow(Ref1,0.687) ) / Ref1;
 	    else
 	        Cd = 0.44;
-	    DragCoeff_.boundaryField()[patchI][faceI] = Cd * beta.boundaryField()[patchI][faceI];
+	    DragCoeff_.boundaryFieldRef()[patchI][faceI] = Cd * beta.boundaryFieldRef()[patchI][faceI];
         }
         
     DragCoeff_ = max( DragCoeff_, dimensionedScalar("SMALL", dimensionSet(1,-3,-1,0,0), SMALL) );

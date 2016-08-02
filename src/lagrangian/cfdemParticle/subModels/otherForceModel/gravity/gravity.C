@@ -79,7 +79,7 @@ tmp<volVectorField> gravity::exportForceField()
         )
     );
     
-    volVectorField& source = tsource();
+    volVectorField& source = tsource.ref();
     
     source = rhoG_ * voidfraction_ * g_;
     

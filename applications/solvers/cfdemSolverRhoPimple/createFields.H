@@ -114,8 +114,6 @@ Info<< "Reading thermophysical properties\n" << endl;
         dimensionedVector("zero", dimensionSet(1,-2,-2,0,0,0,0), vector::zero)
     );
 
-    #ifndef compressibleCreatePhi_H
-    #define compressibleCreatePhi_H
     Info<< "Reading/calculating face flux field phi\n" << endl;
     surfaceScalarField phi
     (
@@ -123,16 +121,34 @@ Info<< "Reading thermophysical properties\n" << endl;
         (
             "phi",
             runTime.timeName(),
-             mesh,
+            mesh,
             IOobject::READ_IF_PRESENT,
             IOobject::AUTO_WRITE
          ),
          linearInterpolate(rho*U*voidfraction) & mesh.Sf()
     );
-    #endif
 
-    dimensionedScalar rhoMax(pimple.dict().lookup("rhoMax"));
-    dimensionedScalar rhoMin(pimple.dict().lookup("rhoMin"));
+    dimensionedScalar rhoMax
+    (
+        dimensionedScalar::lookupOrDefault
+        (
+            "rhoMax",
+            pimple.dict(),
+            dimDensity,
+            GREAT
+        )
+    );
+
+    dimensionedScalar rhoMin
+    (
+        dimensionedScalar::lookupOrDefault
+        (
+            "rhoMin",
+            pimple.dict(),
+            dimDensity,
+            0
+        )
+    );
 
     Info<< "Creating turbulence model\n" << endl;
     autoPtr<compressible::turbulenceModel> turbulence
@@ -145,6 +161,8 @@ Info<< "Reading thermophysical properties\n" << endl;
             thermo
         )
     );
+    
+    mesh.setFluxRequired(p.name());
 
     Info<< "Creating field dpdt\n" << endl;
     volScalarField dpdt
@@ -193,73 +211,3 @@ Info<< "Reading thermophysical properties\n" << endl;
     );
 
 //===============================
-
-volScalarField divphi
-    (
-        IOobject
-        (
-            "divphi",
-            runTime.timeName(),
-            mesh,
-            IOobject::NO_READ,
-            IOobject::AUTO_WRITE
-        ),
-        mesh,
-        dimensionedScalar("0", dimensionSet(1, -3, -1, 0, 0), 0.0)
-    );
-    
-    volScalarField divphi2
-    (
-        IOobject
-        (
-            "divphi2",
-            runTime.timeName(),
-            mesh,
-            IOobject::NO_READ,
-            IOobject::AUTO_WRITE
-        ),
-        mesh,
-        dimensionedScalar("0", dimensionSet(1, -3, -1, 0, 0), 0.0)
-    );
-
-volVectorField gP
-    (
-        IOobject
-        (
-            "gP",
-            runTime.timeName(),
-            mesh,
-            IOobject::NO_READ,
-            IOobject::AUTO_WRITE
-        ),
-        mesh,
-        dimensionedVector("0", dimensionSet(1, -2, -2, 0, 0), vector::zero)
-);
-    
-volVectorField gP2
-    (
-        IOobject
-        (
-            "gP2",
-            runTime.timeName(),
-            mesh,
-            IOobject::NO_READ,
-            IOobject::AUTO_WRITE
-        ),
-        mesh,
-        dimensionedVector("0", dimensionSet(1, -2, -2, 0, 0), vector::zero)
-);
-
-    volScalarField rhoeps
-    (
-        IOobject
-        (
-            "rhoeps",
-            runTime.timeName(),
-            mesh,
-            IOobject::NO_READ,
-            IOobject::AUTO_WRITE
-        ),
-        mesh,
-        dimensionedScalar("0", dimensionSet(1, -3, 0, 0, 0), 0.0)
-    );
