@@ -26,12 +26,13 @@ EXE_INC = \
     -I$(LIB_SRC)/regionModels/surfaceFilmModels/lnInclude \
     -I$(LIB_SRC)/ODE/lnInclude \
     -I$(LIB_SRC)/combustionModels/lnInclude \
-    -I$(FOAM_SOLVERS)/combustion/reactingFoam
+    -I$(FOAM_SOLVERS)/combustion/reactingFoam \
+
 
 
 
 EXE_LIBS = \
-    -L$(CFDEM_LIB_DIR)\
+    -L$(CFDEM_LIB_DIR)  \
     -lfluidThermophysicalModels \
     -lspecie \
     -lcompressibleTurbulenceModel \

@@ -385,6 +385,8 @@ public:
 
       // write cfdemCloud internal data
         virtual bool evolve(volScalarField&,volVectorField&,volVectorField&);
+        
+        virtual void postFlow() {}
 
         virtual bool reAllocArrays();
 

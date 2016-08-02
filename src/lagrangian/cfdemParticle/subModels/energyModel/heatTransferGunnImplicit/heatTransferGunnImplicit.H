@@ -22,88 +22,50 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef heatTransferGunn_H
-#define heatTransferGunn_H
+#ifndef heatTransferGunnImplicit_H
+#define heatTransferGunnImplicit_H
 
 #include "fvCFD.H"
 #include "cfdemCloudEnergy.H"
-#include "energyModel.H"
+#include "heatTransferGunn.H"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class heatTransferGunn Declaration
+                           Class heatTransferGunnImplicit Declaration
 \*---------------------------------------------------------------------------*/
 
-class heatTransferGunn
+class heatTransferGunnImplicit
 :
-    public energyModel
+    public heatTransferGunn
 {
-protected:
-
-    dictionary propsDict_;
+private:
     
-    bool interpolation_;
-    
-    word QPartFluidName_;
+    word QPartFluidCoeffName_;
         
-    volScalarField QPartFluid_;
-    
-    volScalarField partTempField_;
-    
-    volScalarField partRelTempField_;
-    
-    dimensionedScalar partRefTemp_;
-    
-    bool calcPartTempField_;
+    volScalarField QPartFluidCoeff_;
 
-    word tempFieldName_;
-
-    const volScalarField& tempField_;            // ref to temperature field
-
-    word voidfractionFieldName_;
-
-    const volScalarField& voidfraction_;    // ref to voidfraction field
-
-    scalar maxSource_;                           // max (limited) value of src field
-
-    word velFieldName_;
-
-    const volVectorField& U_;
-    
-    word densityFieldName_;
-    
-    const volScalarField& rho_;
-
-    word partTempName_;
-
-    mutable double **partTemp_;                          // Lagrangian array
-
-    word partHeatFluxName_;
-
-    mutable double **partHeatFlux_;              // Lagrangian array
+    mutable double **partHeatFluxCoeff_;              // Lagrangian array
 
     void allocateMyArrays() const;
     
-    scalar Nusselt(scalar, scalar, scalar) const;
+    void giveData(int);
     
-    virtual void giveData(int);
+    void heatFlux(label, scalar, scalar, scalar);
     
-    virtual void heatFlux(label, scalar, scalar, scalar);
-    
-    virtual void heatFluxCoeff(label, scalar, scalar);
+    void heatFluxCoeff(label, scalar, scalar);
        
 public:
 
     //- Runtime type information
-    TypeName("heatTransferGunn");
+    TypeName("heatTransferGunnImplicit");
 
     // Constructors
 
         //- Construct from components
-        heatTransferGunn
+        heatTransferGunnImplicit
         (
             const dictionary& dict,
             cfdemCloudEnergy& sm
@@ -112,16 +74,17 @@ public:
 
     // Destructor
 
-        virtual ~heatTransferGunn();
+        virtual ~heatTransferGunnImplicit();
 
 
     // Member Functions
-
-        void addEnergyContribution(volScalarField&) const;
 	
-	void addEnergyCoefficient(volScalarField&) const {}
+	void addEnergyCoefficient(volScalarField&) const;
 	
 	void calcEnergyContribution();
+	
+	void postFlow();
+
 };
 
 

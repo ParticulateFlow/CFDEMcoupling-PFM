@@ -60,6 +60,8 @@ private:
 
     wordList speciesNames_;
     
+    wordList mod_spec_names_;
+
     PtrList<volScalarField> Y_;
 
     mutable List<double**> concentrations_;
@@ -120,10 +122,10 @@ public:
     // Member Functions
 
     void execute();
-    
-//     tmp<fvScalarMatrix> Smi(const label i) const;
-//     
-//     tmp<fvScalarMatrix> Sm() const;
+
+    /*tmp<fvScalarMatrix> Smi(const label i) const;
+
+    tmp<fvScalarMatrix> Sm() const;*/
     
     
 

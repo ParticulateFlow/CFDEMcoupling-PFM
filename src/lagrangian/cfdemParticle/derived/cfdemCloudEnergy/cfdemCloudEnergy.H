@@ -65,6 +65,8 @@ protected:
     autoPtr<chemistryModel> chemistryModel_;
     
     void calcEnergyContributions();
+
+    void speciesExecute();
     
 public:
 
@@ -103,6 +105,8 @@ public:
        void energyCoefficients(volScalarField&);
        
        bool evolve(volScalarField&,volVectorField&,volVectorField&);
+       
+       void postFlow();
 
 };
 

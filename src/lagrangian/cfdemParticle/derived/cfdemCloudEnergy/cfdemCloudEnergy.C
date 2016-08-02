@@ -86,6 +86,11 @@ void cfdemCloudEnergy::calcEnergyContributions()
         energyModel_[i]().calcEnergyContribution();
 }
 
+void cfdemCloudEnergy::speciesExecute()
+{
+        chemistryModel_().execute();
+}
+
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 int cfdemCloudEnergy::nrEnergyModels()
 {
@@ -138,16 +143,31 @@ bool cfdemCloudEnergy::evolve
     if (cfdemCloud::evolve(alpha, Us, U))
     {
         // calc energy contributions
-        clockM().start(26,"calcEnergyContributions");
+        // position 26 was already defined as Flow in clockModels and RhoPimpleChem solver.
+        clockM().start(27,"calcEnergyContributions");
         if(verbose_) Info << "- calcEnergyContributions" << endl;
         calcEnergyContributions();
         if(verbose_) Info << "calcEnergyContributions done." << endl;
         clockM().stop("calcEnergyContributions");
+
+        // execute chemical model species
+        clockM().start(28,"speciesExecute");
+        if(verbose_) Info << "- speciesExecute()" << endl;
+        speciesExecute();
+        if(verbose_) Info << "speciesExecute done" << endl;
+        clockM().stop("speciesExecute");
+
 	return true;
     }
     return false;
 }
 
+void cfdemCloudEnergy::postFlow()
+{
+    cfdemCloud::postFlow();
+    for (int i=0;i<nrEnergyModels();i++)
+        energyModel_[i]().postFlow();
+}
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
