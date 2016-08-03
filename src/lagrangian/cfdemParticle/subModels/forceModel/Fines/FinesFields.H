@@ -138,6 +138,8 @@ private:
       
     void updateUDyn();
 
+    void updateVoidfraction();
+    
 public:
 
     //- Runtime type information

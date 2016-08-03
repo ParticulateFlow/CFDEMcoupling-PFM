@@ -297,7 +297,8 @@ void FinesFields::update()
     if(verbose_)  Info << "FinesFields: Integrating alphas.\n" << endl;
     integrateFields();
     // update voidfraction, probably really bad...
-    voidfraction_ = alphaG_;
+    if(verbose_)  Info << "FinesFields: Updating voidfraction.\n" << endl;
+    updateVoidfraction();
     if(verbose_)  Info << "FinesFields: Update finished.\n" << endl;
 }
 
@@ -394,7 +395,7 @@ void FinesFields::integrateFields()
 
 void FinesFields::updateAlphaG() 
 {
-  alphaG_ = max(voidfraction_ - alphaSt_, critVoidfraction_);
+  alphaG_ = max(voidfraction_ - alphaSt_ - alphaDyn_, critVoidfraction_);
 }
 
 
@@ -531,6 +532,12 @@ void FinesFields::updateUDyn()
     uDyn_.correctBoundaryConditions();
     alphaDyn_.correctBoundaryConditions();
     massFluxDyn_ = rhoFine_ * alphaDyn_ * uDyn_;
+}
+
+void FinesFields::updateVoidfraction()
+{
+    updateAlphaG();
+    voidfraction_ = alphaG_;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
