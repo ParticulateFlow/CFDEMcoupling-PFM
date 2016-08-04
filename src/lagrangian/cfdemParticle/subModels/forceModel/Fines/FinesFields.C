@@ -213,6 +213,7 @@ FinesFields::FinesFields
         sm.mesh()
     ),
     dFine_("dFine", dimensionSet(0,1,0,0,0), 0.0),
+    diffCoeff_("diffCoeff",dimensionSet(0,2,-1,0,0,0,0),0.0),
     nuAve_("nuAve",dimensionSet(0,2,-1,0,0),1.6e-5),
     rhoFine_("rhoFine",dimensionSet(1,-3,0,0,0),0.0),
     g_("g",dimensionSet(0,1,-2,0,0),vector(0,0,-9.81)),
@@ -236,6 +237,8 @@ FinesFields::FinesFields
         dFine_.value()=readScalar(propsDict_.lookup ("dFine"));
     else
         FatalError <<"Please specify dFine.\n" << abort(FatalError);
+    if (propsDict_.found("diffCoeff"))
+        diffCoeff_.value()=readScalar(propsDict_.lookup ("diffCoeff"));
     if (propsDict_.found("rhoFine"))
         rhoFine_.value()=readScalar(propsDict_.lookup ("rhoFine"));
     else
@@ -369,6 +372,7 @@ void FinesFields::integrateFields()
     (
         fvm::ddt(alphaDyn_)
 	+ fvm::div(phiDyn,alphaDyn_)
+	- fvm::laplacian(diffCoeff_,alphaDyn_)
 	==
 	-Sds_
     );

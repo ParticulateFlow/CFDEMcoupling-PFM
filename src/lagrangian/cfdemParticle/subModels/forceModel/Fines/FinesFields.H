@@ -96,6 +96,8 @@ private:
 
     dimensionedScalar dFine_;
     
+    dimensionedScalar diffCoeff_;
+    
     dimensionedScalar nuAve_;
     
     dimensionedScalar rhoFine_;
