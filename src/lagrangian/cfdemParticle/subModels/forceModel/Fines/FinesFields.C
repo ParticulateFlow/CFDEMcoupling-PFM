@@ -20,7 +20,7 @@ License
 #include "FinesFields.H"
 #include "addToRunTimeSelectionTable.H"
 #include "averagingModel.H"
-
+#include "smoothingModel.H"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -373,6 +373,8 @@ void FinesFields::integrateFields()
     );
     alphaStEqn.solve();
     alphaDynEqn.solve();
+    
+    particleCloud_.smoothingM().smoothen(alphaDyn_);
     
     // limit hold-ups, should be done more elegantly
     
