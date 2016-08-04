@@ -73,7 +73,6 @@ species::species
     changeOfSpeciesMass_(speciesNames_.size(),NULL),    //the values that are received from DEM with the name of Modified_+species name
     changeOfSpeciesMassFields_(speciesNames_.size()),   //the scalar fields generated with the values from Modified_+species names
     changeOfGasMassField_                               //the total change of Gas Mass field (when the Modified species
-
     (
         IOobject
         (
@@ -107,7 +106,7 @@ species::species
     for (int i=0; i<speciesNames_.size(); i++)
     {
         // Defining the Species volume scalar fields
-        Info << " Looking up species fields " << speciesNames_[i] << endl;
+        Info << " Looking up species fields \n " << speciesNames_[i] << endl;
         volScalarField& Y = const_cast<volScalarField&>
                 (sm.mesh().lookupObject<volScalarField>(speciesNames_[i]));
         Y_.set(i, &Y);
@@ -116,7 +115,7 @@ species::species
         mod_spec_names_[i] = "Modified_" + speciesNames_[i];
 
         // Check if mod species are correct
-        Info << "Modified species names are: " << mod_spec_names_[i] << endl;
+        Info << "Modified species names are: \n" << mod_spec_names_[i] << endl;
 
         // Create new volScalarFields for the changed values of the species mass fields
         changeOfSpeciesMassFields_.set
@@ -137,7 +136,7 @@ species::species
             )
          );
 
-        Info << "what are the concentration names (Y_i): " << Y_[i].name() << endl;
+        Info << "The concentrations (Y_i): \n" << Y_[i].name() << endl;
 
     }
     allocateMyArrays();
@@ -186,6 +185,7 @@ void species::execute()
     scalar rhofluid(0);
     List<scalar> Yfluid_;
     Yfluid_.setSize(speciesNames_.size());
+    scalar deltaT = particleCloud_.mesh().time().deltaT().value();
 
     // defining interpolators for T, rho
     interpolationCellPoint <scalar> TInterpolator_(tempField_);
@@ -262,7 +262,7 @@ void species::execute()
             );
 
             // take care for implementation in LIGGGHTS: species produced from particles defined positive
-            changeOfSpeciesMassFields_[i].internalField() /= changeOfSpeciesMassFields_[i].mesh().V();
+            changeOfSpeciesMassFields_[i].internalField() /= (changeOfSpeciesMassFields_[i].mesh().V()*deltaT);
             changeOfSpeciesMassFields_[i].correctBoundaryConditions();
             changeOfGasMassField_ += changeOfSpeciesMassFields_[i];
             Info << "total conversion of species" << speciesNames_[i] << " = " << gSum(changeOfSpeciesMassFields_[i]*1.0*changeOfSpeciesMassFields_[i].mesh().V()) << endl;
@@ -271,15 +271,29 @@ void species::execute()
 
 }
 
-/*tmp<Foam::fvScalarMatrix> species::Smi(const label i) const
+tmp<Foam::fvScalarMatrix> species::Smi(const label i) const
 {
     return tmp<fvScalarMatrix>(new fvScalarMatrix(changeOfSpeciesMassFields_[i], dimMass/dimTime));
+    //return tmp<fvScalarMatrix>(new fvScalarMatrix(Y_[i], dimMass/dimTime));
 }
+
+/*tmp<fvScalarMatrix> Smi(const label i, volScalarField& changeOfSpeciesMassFields_[i]) const
+{
+    tmp<fvScalarMatrix> tfvm (new fvScalarMatrix(changeOfSpeciesMassFields_[i], dimMass/dimTime));
+    fvScalarMatrix& fvm = tfvm();
+
+    forAll (i, &fvm)
+    {
+        fvm += operator[](i).Smi(i, changeOfSpeciesMassFields_[i]);
+    }
+
+    return tfvm;
+}*/
 
 tmp<Foam::fvScalarMatrix> species::Sm() const
 {
     return tmp<fvScalarMatrix>(new fvScalarMatrix(changeOfGasMassField_, dimMass/dimTime));
-}*/
+}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
