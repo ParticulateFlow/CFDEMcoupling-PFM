@@ -43,6 +43,7 @@ FinesFields::FinesFields
 :
     particleCloud_(sm),
     propsDict_(dict.subDict("FinesFieldsProps")),
+    smoothing_(propsDict_.lookupOrDefault<bool>("smoothing",false)),
     verbose_(propsDict_.lookupOrDefault<bool>("verbose",false)),
     velFieldName_(propsDict_.lookupOrDefault<word>("velFieldName","U")),
     U_(sm.mesh().lookupObject<volVectorField> (velFieldName_)),
@@ -339,9 +340,9 @@ void FinesFields::calcSource()
 	{
 	    Sds_[cellI] = deltaAlpha;
 	}
-	else if (depRate_ * deltaAlpha > alphaDyn_[cellI])
+	else if (depRate_ * deltaAlpha > 0.8 * alphaDyn_[cellI])
 	{
-	    Sds_[cellI] = alphaDyn_[cellI];
+	    Sds_[cellI] = 0.8 * alphaDyn_[cellI];
 	}
 	else
 	{
@@ -374,7 +375,8 @@ void FinesFields::integrateFields()
     alphaStEqn.solve();
     alphaDynEqn.solve();
     
-    particleCloud_.smoothingM().smoothen(alphaDyn_);
+    if(smoothing_)
+        particleCloud_.smoothingM().smoothen(alphaDyn_);
     
     // limit hold-ups, should be done more elegantly
     

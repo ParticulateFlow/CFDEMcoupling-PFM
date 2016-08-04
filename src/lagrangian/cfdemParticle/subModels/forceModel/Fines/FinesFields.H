@@ -42,6 +42,8 @@ private:
   
     dictionary propsDict_;
     
+    bool smoothing_;
+    
     bool verbose_;
 
     word velFieldName_;
