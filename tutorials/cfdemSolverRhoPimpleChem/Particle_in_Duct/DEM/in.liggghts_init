@@ -54,12 +54,6 @@ set atom 1 diameter 0.07 density 2267 vx 0 vy 0 vz 0
 # apply nve integration to all particles that are inserted as single particles
 #fix     integr all nve/sphere
 
-# print radius change according to timestep
-compute radChange all property/atom radius
-compute radreduce all reduce sum c_radChange
-fix     shrink all ave/time 100 1 100 c_radreduce file output.radius 
-
-
 # screen output
 compute         rke all erotate/sphere
 thermo_style    custom step atoms ke c_rke vol 

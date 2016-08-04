@@ -9,6 +9,9 @@ source $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/functions.sh
 casePath="$(dirname "$(readlink -f ${BASH_SOURCE[0]})")"
 cd $casePath/CFD
 cleanCase
+rm $casePath/CFD/shrink.dat
+rm $casePath/log*
+rm $casePath/run_error.log
 #cp -R 0/Org/p 0/p
 #cp -R 0/Org/U 0/U
 #cp -R 0/Org/Us 0/Us
