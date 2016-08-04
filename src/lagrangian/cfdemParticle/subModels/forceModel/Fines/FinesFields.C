@@ -376,11 +376,40 @@ void FinesFields::integrateFields()
     
     // limit hold-ups, should be done more elegantly
     
-    alphaSt_ = max(alphaSt_,0.0);
-    alphaDyn_ = max(alphaDyn_,0.0);
-    alphaDyn_ = min(alphaDyn_, alphaDynMax_);
+    scalar alphaStErr(0.0);
+    scalar alphaDynErr1(0.0);
+    scalar alphaDynErr2(0.0);
+    forAll(alphaSt_, cellI)
+    {
+        if (alphaSt_[cellI] < 0.0)
+	{
+	    alphaStErr += alphaSt_[cellI] * particleCloud_.mesh().V()[cellI];
+	    alphaSt_[cellI] = 0.0;
+	}
+	
+	if (alphaDyn_[cellI] < 0.0)
+	{
+	    alphaDynErr1 += alphaDyn_[cellI] * particleCloud_.mesh().V()[cellI];
+	    alphaDyn_[cellI] = 0.0;
+	}
+	else if (alphaDyn_[cellI] > alphaDynMax_)
+	{
+	    alphaDynErr2 +=  (alphaDyn_[cellI] - alphaDynMax_) * particleCloud_.mesh().V()[cellI];
+	    alphaDyn_[cellI] = alphaDynMax_;
+	}
+    }
+    
+    if (verbose_)
+    {
+        Info << "amount of alphaSt added because of positivity requirement: " << -alphaStErr << endl;
+	Info << "amount of alphaDyn added because of positivity requirement: " << -alphaDynErr1 << endl;
+	Info << "amount of alphaDyn removed because of max. value: " << -alphaDynErr2 << endl;
+    }
+    
     alphaSt_.correctBoundaryConditions();
     alphaDyn_.correctBoundaryConditions();
+    
+    massFluxDyn_ = rhoFine_ * alphaDyn_ * uDyn_;
 
     forAll(alphaStRel_,cellI)
     {
@@ -530,8 +559,6 @@ void FinesFields::updateUDyn()
         }
     */
     uDyn_.correctBoundaryConditions();
-    alphaDyn_.correctBoundaryConditions();
-    massFluxDyn_ = rhoFine_ * alphaDyn_ * uDyn_;
 }
 
 void FinesFields::updateVoidfraction()
