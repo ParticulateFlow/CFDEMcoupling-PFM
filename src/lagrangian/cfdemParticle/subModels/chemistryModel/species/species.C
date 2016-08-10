@@ -159,15 +159,15 @@ species::species
 
 species::~species()
 {
-    // int len = particleCloud_.numberOfParticles();
+    int len = particleCloud_.numberOfParticles();
 
-    particleCloud_.dataExchangeM().destroy(partTemp_,1);
-    particleCloud_.dataExchangeM().destroy(partRho_,1);
+    particleCloud_.dataExchangeM().destroy(partTemp_,len);
+    particleCloud_.dataExchangeM().destroy(partRho_,len);
 
     for (int i=0; i<speciesNames_.size(); i++)
     {
-        particleCloud_.dataExchangeM().destroy(concentrations_[i],1);
-        particleCloud_.dataExchangeM().destroy(changeOfSpeciesMass_[i],1);
+        particleCloud_.dataExchangeM().destroy(concentrations_[i],len);
+        particleCloud_.dataExchangeM().destroy(changeOfSpeciesMass_[i],len);
     }
 }
 
