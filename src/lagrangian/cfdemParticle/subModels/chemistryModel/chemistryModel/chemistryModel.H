@@ -94,9 +94,9 @@ public:
 
        virtual void execute() = 0;
        
-       virtual tmp<fvScalarMatrix> Smi (const label i) const = 0;
+//       virtual tmp<fvScalarMatrix> Smi (const label i) const = 0;
 
-       virtual tmp<fvScalarMatrix> Sm () const = 0;
+//       virtual tmp<fvScalarMatrix> Sm () const = 0;
 
 
 };

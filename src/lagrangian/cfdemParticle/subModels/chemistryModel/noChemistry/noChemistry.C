@@ -57,7 +57,7 @@ noChemistry::~noChemistry()
 void noChemistry::execute()
 {}
 
-tmp<Foam::fvScalarMatrix> noChemistry::Smi(const label i) const
+/*tmp<Foam::fvScalarMatrix> noChemistry::Smi(const label i) const
 {
     tmp<volScalarField> mi
     (
@@ -109,7 +109,7 @@ tmp<Foam::fvScalarMatrix> noChemistry::Sm() const
     );
 
     return tmp<fvScalarMatrix>(new fvScalarMatrix(mi, dimMass/dimTime));
-}
+}*/
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
