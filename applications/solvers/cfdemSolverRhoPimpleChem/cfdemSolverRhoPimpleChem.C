@@ -81,7 +81,8 @@ int main(int argc, char *argv[])
 
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
-	// do particle stuff
+        // If DEM particle does not exist (because radius_[i] < rmin, stop coupling!
+        // do particle stuff
         particleCloud.clockM().start(2,"Coupling");
         bool hasEvolved = particleCloud.evolve(voidfraction,Us,U);
 
@@ -101,8 +102,12 @@ int main(int argc, char *argv[])
        Info << "TotalForceExp: " << fTotal << endl;
        Info << "TotalForceImp: " << fImpTotal << endl;
 
+       Info << "number of particles = " << particleCloud.numberOfParticles() << nl << endl;
+
         #include "solverDebugInfo.H"
         particleCloud.clockM().stop("Coupling");
+
+
 
         particleCloud.clockM().start(26,"Flow");
 	

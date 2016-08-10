@@ -28,9 +28,9 @@ tmp<fv::convectionScheme<scalar> > mvConvection
               + mvConvection->fvmDiv(phi, Yi)
               - fvm::laplacian(voidfraction*turbulence->muEff(), Yi)
               ==
-              combustion->R(Yi)
+               combustion->R(Yi)
              //+ particleCloud.chemistryM().Smi(i)
-             + fvOptions(rho, Yi)
+              + fvOptions(rho, Yi)
             );
 
             YiEqn.relax();
