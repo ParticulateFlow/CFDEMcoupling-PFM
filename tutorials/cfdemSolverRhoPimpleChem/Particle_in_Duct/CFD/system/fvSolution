@@ -69,12 +69,12 @@ solvers
         relTol          0;
     }
 
-    "(Yi|CO|CO2|O2)"
+    "(Yi|CO2|O2)"
     {
         $h;
     }
 
-    "(Yi|CO|CO2|O2)Final"
+    "(Yi|CO2|O2)Final"
     {
         $Yi;
         tolerance       1e-06;
