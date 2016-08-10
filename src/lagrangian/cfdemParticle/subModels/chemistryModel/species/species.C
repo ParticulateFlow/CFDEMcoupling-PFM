@@ -93,24 +93,38 @@ species::species
     rho_(sm.mesh().lookupObject<volScalarField> (densityFieldName_)),
     partRhoName_(propsDict_.lookupOrDefault<word>("partRhoName","partRho")),
     partRho_(NULL)
-  // voidfraction and velocity fields can be included by wish
-  /*  voidfractionFieldName_(propsDict_.lookup("voidfractionFieldName")),
-      voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
-      velFieldName_(propsDict_.lookup("velFieldName")),
-      U_(sm.mesh().lookup<volVectorField> (velFieldName_)),*/
 
 {
-    Info << " Read species list from: " << specDict_.name() << endl;
-    Info << " Reading species list: " << speciesNames_ << endl;
+//    Info << " Read species list from: " << specDict_.name() << endl;
+//    Info << " Reading species list: " << speciesNames_ << endl;
 
     for (int i=0; i<speciesNames_.size(); i++)
     {
         // Defining the Species volume scalar fields
         Info << " Looking up species fields \n " << speciesNames_[i] << endl;
-        volScalarField& Y = const_cast<volScalarField&>
+        /*volScalarField& Y = const_cast<volScalarField&>
                 (sm.mesh().lookupObject<volScalarField>(speciesNames_[i]));
-        Y_.set(i, &Y);
+        Y_.set(i, &Y); */
 
+        Y_.set
+        (
+            i,
+            new volScalarField
+            (
+                IOobject
+                (
+                 speciesNames_[i],
+                 mesh_.time().timeName(),
+                 mesh_,
+                 IOobject::READ_IF_PRESENT,
+                 IOobject::AUTO_WRITE
+                 ),
+                 mesh_,
+                 dimensionedScalar("0", dimless, 0)
+            )
+        );
+
+         Info << "The concentrations (Y_i): \n" << Y_[i].name() << endl;
         // define the modified species names
         mod_spec_names_[i] = "Modified_" + speciesNames_[i];
 
@@ -136,9 +150,8 @@ species::species
             )
          );
 
-        Info << "The concentrations (Y_i): \n" << Y_[i].name() << endl;
-
     }
+
     allocateMyArrays();
 }
 
@@ -146,12 +159,16 @@ species::species
 
 species::~species()
 {
-    delete partTemp_;
-    delete partRho_;
+    // int len = particleCloud_.numberOfParticles();
 
-    for (int i=0; i<speciesNames_.size();i++) delete [] concentrations_[i];
-    for (int i=0; i<speciesNames_.size();i++) delete [] changeOfSpeciesMass_[i];
+    particleCloud_.dataExchangeM().destroy(partTemp_,1);
+    particleCloud_.dataExchangeM().destroy(partRho_,1);
 
+    for (int i=0; i<speciesNames_.size(); i++)
+    {
+        particleCloud_.dataExchangeM().destroy(concentrations_[i],1);
+        particleCloud_.dataExchangeM().destroy(changeOfSpeciesMass_[i],1);
+    }
 }
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
@@ -161,13 +178,13 @@ void species::allocateMyArrays() const
 
     // get memory for 2d arrays
     double initVal=0.0;
-    particleCloud_.dataExchangeM().allocateArray(partRho_,initVal,1);
-    particleCloud_.dataExchangeM().allocateArray(partTemp_,initVal,1);
+    particleCloud_.dataExchangeM().allocateArray(partRho_,initVal,1,"nparticles");
+    particleCloud_.dataExchangeM().allocateArray(partTemp_,initVal,1,"nparticles");
 
     for (int i=0; i<speciesNames_.size(); i++)
     {
-        particleCloud_.dataExchangeM().allocateArray(concentrations_[i],initVal,1);
-        particleCloud_.dataExchangeM().allocateArray(changeOfSpeciesMass_[i],initVal,1);
+        particleCloud_.dataExchangeM().allocateArray(concentrations_[i],initVal,1,"nparticles");
+        particleCloud_.dataExchangeM().allocateArray(changeOfSpeciesMass_[i],initVal,1,"nparticles");
     }
 }
 
@@ -220,7 +237,7 @@ void species::execute()
 
         if(particleCloud_.verbose() && index >=0 && index < 2)
         {
-            /*for(int i =0; i<speciesNames_.size();i++)
+            for(int i =0; i<speciesNames_.size();i++)
             {
                 Info << "Y_i = " << Y_[i].name() << endl;
                 Info << "concentrations = " << concentrations_[i][index][0] << endl;
@@ -229,7 +246,7 @@ void species::execute()
                 Info << "Yfluid = " << Yfluid_[i] << endl;
                 Info << "partTemp_[index][0] = " << partTemp_[index][0] << endl;
                 Info << "Tfluid = " << Tfluid << endl  ;
-            }*/
+            }
         }
     }
 
@@ -271,11 +288,11 @@ void species::execute()
 
 }
 
-tmp<Foam::fvScalarMatrix> species::Smi(const label i) const
+/*tmp<Foam::fvScalarMatrix> species::Smi(const label i) const
 {
     return tmp<fvScalarMatrix>(new fvScalarMatrix(changeOfSpeciesMassFields_[i], dimMass/dimTime));
     //return tmp<fvScalarMatrix>(new fvScalarMatrix(Y_[i], dimMass/dimTime));
-}
+}*/
 
 /*tmp<fvScalarMatrix> Smi(const label i, volScalarField& changeOfSpeciesMassFields_[i]) const
 {
@@ -290,10 +307,10 @@ tmp<Foam::fvScalarMatrix> species::Smi(const label i) const
     return tfvm;
 }*/
 
-tmp<Foam::fvScalarMatrix> species::Sm() const
+/*tmp<Foam::fvScalarMatrix> species::Sm() const
 {
     return tmp<fvScalarMatrix>(new fvScalarMatrix(changeOfGasMassField_, dimMass/dimTime));
-}
+}*/
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
