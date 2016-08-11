@@ -88,20 +88,8 @@ private:
     
     mutable double **partRho_;                     // gas density at particle positions
 
-    int nP_ = particleCloud_.numberOfParticles();
-    
-    //word velFieldName_;                          // when velocity is to be calculated in the species source code
-
-    //const volVectorField& U_;
-
-    //word voidfractionFieldName_;                 // when voidfraction is to be calculated in the species source code
-
-    //const volScalarField& voidfraction_;
-
-
     void allocateMyArrays() const;
-  //  void reAllocMyArrays() const;
-       
+
 public:
 
     //- Runtime type information
@@ -116,17 +104,14 @@ public:
             cfdemCloudEnergy& sm
         );
 
-
     // Destructor
 
         virtual ~species();
 
-
     // Member Functions
+        void execute();
 
-
-
-    void execute();
+        void reAllocMyArrays() const;
 
 //    tmp<fvScalarMatrix> Smi(const label i) const;
     //tmp<fvScalarMatrix> Smi(const label i, volScalarField& changeOfSpeciesMassFields_) const;

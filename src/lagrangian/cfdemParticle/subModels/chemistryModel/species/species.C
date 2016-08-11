@@ -159,26 +159,25 @@ species::species
 
 species::~species()
 {
-     if (particleCloud_.dataExchangeM().maxNumberOfParticles() > 0)
-     {
-         particleCloud_.dataExchangeM().destroy(partTemp_,nP_);
-         particleCloud_.dataExchangeM().destroy(partRho_,nP_);
+    int nP_ = particleCloud_.numberOfParticles();
 
-         for (int i=0; i<speciesNames_.size(); i++)
-         {
-             particleCloud_.dataExchangeM().destroy(concentrations_[i],nP_);
-             particleCloud_.dataExchangeM().destroy(changeOfSpeciesMass_[i],nP_);
-         }
+    particleCloud_.dataExchangeM().destroy(partTemp_,nP_);
+    particleCloud_.dataExchangeM().destroy(partRho_,nP_);
+
+    for (int i=0; i<speciesNames_.size(); i++)
+    {
+        particleCloud_.dataExchangeM().destroy(concentrations_[i],nP_);
+        particleCloud_.dataExchangeM().destroy(changeOfSpeciesMass_[i],nP_);
      }
 }
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
 void species::allocateMyArrays() const
 {
+    double initVal=0.0;
     if (particleCloud_.dataExchangeM().maxNumberOfParticles() > 0)
     {
         // get memory for 2d arrays
-        double initVal=0.0;
         particleCloud_.dataExchangeM().allocateArray(partRho_,initVal,1,"nparticles");
         particleCloud_.dataExchangeM().allocateArray(partTemp_,initVal,1,"nparticles");
 
@@ -190,12 +189,30 @@ void species::allocateMyArrays() const
     }
 }
 
+
+void species::reAllocMyArrays() const
+{
+    if (particleCloud_.numberOfParticlesChanged())
+    {
+        double initVal=0.0;
+        particleCloud_.dataExchangeM().allocateArray(partRho_,initVal,1);
+        particleCloud_.dataExchangeM().allocateArray(partTemp_,initVal,1);
+
+        for (int i=0; i<speciesNames_.size(); i++)
+        {
+            particleCloud_.dataExchangeM().allocateArray(concentrations_[i],initVal,1);
+            particleCloud_.dataExchangeM().allocateArray(changeOfSpeciesMass_[i],initVal,1);
+        }
+    }
+}
+
 // * * * * * * * * * * * * * * * * Member Fct  * * * * * * * * * * * * * * * //
 
 void species::execute()
 {
   // realloc the arrays
-    allocateMyArrays();
+     //allocateMyArrays();
+     reAllocMyArrays();
 
   // get Y_i, T, rho at particle positions, fill arrays with them and push to LIGGGHTS
 
