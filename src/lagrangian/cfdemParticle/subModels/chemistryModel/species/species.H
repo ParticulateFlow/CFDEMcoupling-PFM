@@ -87,6 +87,8 @@ private:
     word partRhoName_;
     
     mutable double **partRho_;                     // gas density at particle positions
+
+    int nP_ = particleCloud_.numberOfParticles();
     
     //word velFieldName_;                          // when velocity is to be calculated in the species source code
 
@@ -98,6 +100,7 @@ private:
 
 
     void allocateMyArrays() const;
+  //  void reAllocMyArrays() const;
        
 public:
 
@@ -120,6 +123,8 @@ public:
 
 
     // Member Functions
+
+
 
     void execute();
 

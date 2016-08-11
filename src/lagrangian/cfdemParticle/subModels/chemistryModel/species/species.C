@@ -159,32 +159,34 @@ species::species
 
 species::~species()
 {
-    int len = particleCloud_.numberOfParticles();
+     if (particleCloud_.dataExchangeM().maxNumberOfParticles() > 0)
+     {
+         particleCloud_.dataExchangeM().destroy(partTemp_,nP_);
+         particleCloud_.dataExchangeM().destroy(partRho_,nP_);
 
-    particleCloud_.dataExchangeM().destroy(partTemp_,len);
-    particleCloud_.dataExchangeM().destroy(partRho_,len);
-
-    for (int i=0; i<speciesNames_.size(); i++)
-    {
-        particleCloud_.dataExchangeM().destroy(concentrations_[i],len);
-        particleCloud_.dataExchangeM().destroy(changeOfSpeciesMass_[i],len);
-    }
+         for (int i=0; i<speciesNames_.size(); i++)
+         {
+             particleCloud_.dataExchangeM().destroy(concentrations_[i],nP_);
+             particleCloud_.dataExchangeM().destroy(changeOfSpeciesMass_[i],nP_);
+         }
+     }
 }
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
 void species::allocateMyArrays() const
 {
-  // could be implemented similarly as forcemodel LaEuScalarTemp
-
-    // get memory for 2d arrays
-    double initVal=0.0;
-    particleCloud_.dataExchangeM().allocateArray(partRho_,initVal,1,"nparticles");
-    particleCloud_.dataExchangeM().allocateArray(partTemp_,initVal,1,"nparticles");
-
-    for (int i=0; i<speciesNames_.size(); i++)
+    if (particleCloud_.dataExchangeM().maxNumberOfParticles() > 0)
     {
-        particleCloud_.dataExchangeM().allocateArray(concentrations_[i],initVal,1,"nparticles");
-        particleCloud_.dataExchangeM().allocateArray(changeOfSpeciesMass_[i],initVal,1,"nparticles");
+        // get memory for 2d arrays
+        double initVal=0.0;
+        particleCloud_.dataExchangeM().allocateArray(partRho_,initVal,1,"nparticles");
+        particleCloud_.dataExchangeM().allocateArray(partTemp_,initVal,1,"nparticles");
+
+        for (int i=0; i<speciesNames_.size(); i++)
+        {
+            particleCloud_.dataExchangeM().allocateArray(concentrations_[i],initVal,1,"nparticles");
+            particleCloud_.dataExchangeM().allocateArray(changeOfSpeciesMass_[i],initVal,1,"nparticles");
+        }
     }
 }
 
