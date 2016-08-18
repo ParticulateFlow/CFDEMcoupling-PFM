@@ -29,7 +29,7 @@ tmp<fv::convectionScheme<scalar> > mvConvection
               - fvm::laplacian(voidfraction*turbulence->muEff(), Yi)
               ==
                combustion->R(Yi)
-             //+ particleCloud.chemistryM().Smi(i)
+              + particleCloud.chemistryM().Smi(i)
               + fvOptions(rho, Yi)
             );
 

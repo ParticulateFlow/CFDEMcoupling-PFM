@@ -98,6 +98,10 @@ public:
 
 //       virtual tmp<fvScalarMatrix> Sm () const = 0;
 
+        virtual tmp<volScalarField> Smi (const label i) const = 0;
+
+        virtual tmp<volScalarField> Sm () const = 0;
+
 
 };
 

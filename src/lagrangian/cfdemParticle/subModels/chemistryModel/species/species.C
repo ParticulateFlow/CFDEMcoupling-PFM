@@ -307,6 +307,16 @@ void species::execute()
 
 }
 
+tmp<volScalarField> species::Smi (const label i) const
+{
+    return tmp<volScalarField> (changeOfSpeciesMassFields_[i]);
+}
+
+tmp<volScalarField> species::Sm () const
+{
+    return tmp<volScalarField> (changeOfGasMassField_);
+}
+
 /*tmp<Foam::fvScalarMatrix> species::Smi(const label i) const
 {
     return tmp<fvScalarMatrix>(new fvScalarMatrix(changeOfSpeciesMassFields_[i], dimMass/dimTime));
@@ -330,7 +340,6 @@ void species::execute()
 {
     return tmp<fvScalarMatrix>(new fvScalarMatrix(changeOfGasMassField_, dimMass/dimTime));
 }*/
-
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

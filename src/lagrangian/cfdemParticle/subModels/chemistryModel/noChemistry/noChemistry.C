@@ -21,6 +21,8 @@ License
 #include "error.H"
 #include "noChemistry.H"
 #include "addToRunTimeSelectionTable.H"
+
+#include "IFstream.H"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -57,42 +59,39 @@ noChemistry::~noChemistry()
 void noChemistry::execute()
 {}
 
-/*tmp<Foam::fvScalarMatrix> noChemistry::Smi(const label i) const
+void noChemistry::tryout(const label i)
 {
-    tmp<volScalarField> mi
-    (
-        new volScalarField
-        (
-            IOobject
+    mi_.set
             (
-                "mi",
-                particleCloud_.mesh().time().timeName(),
-                particleCloud_.mesh(),
-                IOobject::NO_READ,
-                IOobject::NO_WRITE
-             ),
-             particleCloud_.mesh(),
-             dimensionedScalar
-             (
-              "zero",
-              dimensionSet(0,2,-1,0,0,0,0),
-              0.0
-             )
-        )
-    );
-
-    return tmp<fvScalarMatrix>(new fvScalarMatrix(mi, dimMass/dimTime));
+                i,
+                new volScalarField
+                (
+                    IOobject
+                    (
+                        "empty1",
+                        particleCloud_.mesh().time().timeName(),
+                        particleCloud_.mesh(),
+                        IOobject::NO_READ,
+                        IOobject::NO_WRITE
+                     ),
+                     particleCloud_.mesh(),
+                     dimensionedScalar("zero",dimless,0.0)
+                )
+            );
 }
 
-tmp<Foam::fvScalarMatrix> noChemistry::Sm() const
+tmp<volScalarField> noChemistry ::Smi(const label i) const
 {
-    tmp<volScalarField> mi
+    return tmp<volScalarField> (mi_[i]);
+}
+
+  /*  tmp<volScalarField> mi_[i]
     (
         new volScalarField
         (
             IOobject
             (
-                "mi",
+                "empty1",
                 particleCloud_.mesh().time().timeName(),
                 particleCloud_.mesh(),
                 IOobject::NO_READ,
@@ -102,14 +101,40 @@ tmp<Foam::fvScalarMatrix> noChemistry::Sm() const
              dimensionedScalar
              (
               "zero",
-              dimensionSet(0,2,-1,0,0,0,0),
+              dimMass/dimTime,//dimensionSet(0,2,-1,0,0,0,0),
               0.0
              )
         )
     );
 
-    return tmp<fvScalarMatrix>(new fvScalarMatrix(mi, dimMass/dimTime));
+    return mi_[i];
 }*/
+
+tmp<volScalarField> noChemistry::Sm() const
+{
+    tmp<volScalarField> sm_
+    (
+        new volScalarField
+        (
+            IOobject
+            (
+                "empty2",
+                particleCloud_.mesh().time().timeName(),
+                particleCloud_.mesh(),
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+             ),
+             particleCloud_.mesh(),
+             dimensionedScalar("zero",dimless,0.0)
+        )
+    );
+
+    return sm_;
+}
+
+
+/*tmp<Foam::fvScalarMatrix> noChemistry::Smi(const label i) const
+tmp<Foam::fvScalarMatrix> noChemistry::Sm() const*/
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

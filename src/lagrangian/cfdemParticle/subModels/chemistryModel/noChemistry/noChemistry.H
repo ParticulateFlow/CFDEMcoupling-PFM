@@ -42,8 +42,8 @@ class noChemistry
     public chemistryModel
 {
 private:
+    PtrList<volScalarField> mi_;
 
-       
 public:
 
     //- Runtime type information
@@ -71,6 +71,12 @@ public:
 //    tmp<fvScalarMatrix> Smi(const label i) const;
 
 //    tmp<fvScalarMatrix> Sm() const;
+
+    virtual void tryout(const label i);
+
+    tmp<volScalarField> Smi(const label i) const;
+
+    tmp<volScalarField> Sm() const;
 
 
 };

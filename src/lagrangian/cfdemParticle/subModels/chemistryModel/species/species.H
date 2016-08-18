@@ -117,6 +117,11 @@ public:
     //tmp<fvScalarMatrix> Smi(const label i, volScalarField& changeOfSpeciesMassFields_) const;
 
 //    tmp<fvScalarMatrix> Sm() const;
+
+        tmp <volScalarField> Smi(const label i) const;
+
+        tmp <volScalarField> Sm() const;
+
     
     
 
