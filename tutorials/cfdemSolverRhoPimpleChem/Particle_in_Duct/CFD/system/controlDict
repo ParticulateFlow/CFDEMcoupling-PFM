@@ -23,7 +23,7 @@ startTime       0;
 
 stopAt          endTime;
 
-endTime         1;
+endTime         5;
 
 deltaT          0.0005;
 
@@ -53,15 +53,15 @@ maxDeltaT       0.1;
 
 
 // ************************************************************************* //
-/*libs (
+libs (
     "libsampling.so"
     "libutilityFunctionObjects.so"
     "libOpenFOAM.so"
 //"libsimpleSwakFunctionObjects.so"
 //"libswakFunctionObjects.so"
 //"libgroovyBC.so"
-);*/
-/*
+);
+
 functions
 {  
   testing
@@ -113,5 +113,5 @@ functions
         ); 
     } 
 }
-*/
+
 // ************************************************************************* //

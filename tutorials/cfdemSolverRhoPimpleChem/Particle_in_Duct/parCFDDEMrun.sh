@@ -24,7 +24,7 @@ machineFileName="none"   # yourMachinefileName | none
 debugMode="off"          # on | off| strict
 testHarnessPath="$CFDEM_TEST_HARNESS_PATH"
 runOctave="false"
-postproc="false"
+postproc="true"
 #--------------------------------------------------------------------------------#
 
 #- call function to run a parallel CFD-DEM case
@@ -66,6 +66,7 @@ if [ $postproc == "true" ]
 
     #- get VTK data from CFD sim
     cd $casePath/CFD
+    reconstructPar
     foamToVTK                                                   #- serial run of foamToVTK
     #source $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/functions.sh                       #- include functions
     #pseudoParallelRun "foamToVTK" $nrPostProcProcessors          #- pseudo parallel run of foamToVTK
