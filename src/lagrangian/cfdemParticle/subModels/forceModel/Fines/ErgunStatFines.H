@@ -56,6 +56,8 @@ private:
     const volScalarField& dSauterMix_;
     
     const volScalarField& alphaP_;
+    
+    const volScalarField& alphaSt_;
 
     const scalar phi_;
 

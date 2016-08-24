@@ -76,7 +76,7 @@ private:
 
     volScalarField alphaSt_;
 
-    volScalarField alphaStRel_;
+//     volScalarField alphaStRel_;
     
     volScalarField dHydMix_;
     
@@ -142,7 +142,7 @@ private:
       
     void updateUDyn();
 
-    void updateVoidfraction();
+  //  void updateVoidfraction();
     
 public:
 

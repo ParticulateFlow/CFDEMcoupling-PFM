@@ -103,18 +103,18 @@ FinesFields::FinesFields
         ),
         sm.mesh()
     ),
-    alphaStRel_
-    (   IOobject
-        (
-            "alphaStRel",
-            sm.mesh().time().timeName(),
-            sm.mesh(),
-            IOobject::NO_READ,
-            IOobject::NO_WRITE
-        ),
-        sm.mesh(),
-        dimensionedScalar("zero", dimensionSet(0,0,0,0,0), 1.0)
-    ),
+//     alphaStRel_
+//     (   IOobject
+//         (
+//             "alphaStRel",
+//             sm.mesh().time().timeName(),
+//             sm.mesh(),
+//             IOobject::NO_READ,
+//             IOobject::NO_WRITE
+//         ),
+//         sm.mesh(),
+//         dimensionedScalar("zero", dimensionSet(0,0,0,0,0), 1.0)
+//     ),
     dHydMix_
     (   IOobject
         (
@@ -224,7 +224,7 @@ FinesFields::FinesFields
     exponent_(-1.33),
     nCrit_(readScalar(propsDict_.lookup ("nCrit"))),
     poresizeWidth_(readScalar(propsDict_.lookup ("poresizeWidth"))),
-    prefactor_(14.98),
+    prefactor_(10.5),
     ratioHydraulicPore_(1.5)
 {
     Sds_.write();
@@ -254,8 +254,8 @@ FinesFields::FinesFields
       alphaG_.write();
       alphaP_.writeOpt() = IOobject::AUTO_WRITE;
       alphaP_.write();
-      alphaStRel_.writeOpt() = IOobject::AUTO_WRITE;
-      alphaStRel_.write();
+//       alphaStRel_.writeOpt() = IOobject::AUTO_WRITE;
+//       alphaStRel_.write();
       dHydMix_.writeOpt() = IOobject::AUTO_WRITE;
       dHydMix_.write();
       DragCoeff_.writeOpt() = IOobject::AUTO_WRITE;
@@ -301,8 +301,8 @@ void FinesFields::update()
     if(verbose_)  Info << "FinesFields: Integrating alphas.\n" << endl;
     integrateFields();
     // update voidfraction, probably really bad...
-    if(verbose_)  Info << "FinesFields: Updating voidfraction.\n" << endl;
-    updateVoidfraction();
+    // if(verbose_)  Info << "FinesFields: Updating voidfraction.\n" << endl;
+    // updateVoidfraction();
     if(verbose_)  Info << "FinesFields: Update finished.\n" << endl;
 }
 
@@ -419,14 +419,14 @@ void FinesFields::integrateFields()
     
     massFluxDyn_ = rhoFine_ * alphaDyn_ * uDyn_;
 
-    forAll(alphaStRel_,cellI)
-    {
-        scalar aP = alphaP_[cellI];
-        if(aP>0.1)
-            alphaStRel_[cellI] = (alphaSt_[cellI] + aP) / aP;
-        else
-            alphaStRel_[cellI] = 1.0;
-    }
+//     forAll(alphaStRel_,cellI)
+//     {
+//         scalar aP = alphaP_[cellI];
+//         if(aP>0.1)
+//             alphaStRel_[cellI] = (alphaSt_[cellI] + aP) / aP;
+//         else
+//             alphaStRel_[cellI] = 1.0;
+//     }
 }
 
 
@@ -569,11 +569,11 @@ void FinesFields::updateUDyn()
     uDyn_.correctBoundaryConditions();
 }
 
-void FinesFields::updateVoidfraction()
-{
-    updateAlphaG();
-    voidfraction_ = alphaG_;
-}
+// void FinesFields::updateVoidfraction()
+// {
+//     updateAlphaG();
+//     voidfraction_ = alphaG_;
+// }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

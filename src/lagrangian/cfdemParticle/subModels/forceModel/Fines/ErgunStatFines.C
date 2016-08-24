@@ -56,6 +56,7 @@ ErgunStatFines::ErgunStatFines
     dSauter_(sm.mesh().lookupObject<volScalarField> ("dSauter")),
     dSauterMix_(sm.mesh().lookupObject<volScalarField> ("dSauterMix")),
     alphaP_(sm.mesh().lookupObject<volScalarField> ("alphaP")),
+    alphaSt_(sm.mesh().lookupObject<volScalarField> ("alphaSt")),
     phi_(readScalar(propsDict_.lookup("phi"))),
     UsFieldName_(propsDict_.lookup("granVelFieldName")),
     UsField_(sm.mesh().lookupObject<volVectorField> (UsFieldName_)),
@@ -127,7 +128,7 @@ void ErgunStatFines::setForce() const
     scalar rho(0);
     scalar magUr(0);
     scalar Rep(0);
-    scalar localPhiP(0);
+    scalar alphaPartEff(0);
 
     scalar CdMagUrLag(0);       //Cd of the very particle
     scalar betaP(0);             //momentum exchange of the very particle
@@ -181,16 +182,16 @@ void ErgunStatFines::setForce() const
                 nuf = nufField[cellI];
 
                 Rep=0.0;
-                localPhiP = 1.0f-voidfraction+SMALL;
+		alphaPartEff = 1.0 - voidfraction + alphaSt_[cellI] + SMALL;
 
                 // calc particle's drag coefficient (i.e., Force per unit slip velocity and per m³ PARTICLE)
-                if(voidfraction > switchingVoidfraction_) //dilute
+                if(voidfraction > switchingVoidfraction_) //dilute, no static hold-up present
                 {
                     Rep=dSauterMix*voidfraction*magUr/nuf;
                     CdMagUrLag = (24.0*nuf/(dSauterMix*voidfraction)) //1/magUr missing here, but compensated in expression for betaP!
                                  *(scalar(1.0)+0.15*Foam::pow(Rep, 0.687));
 
-                    betaP = 0.75* localPhiP * ( 
+                    betaP = 0.75* alphaPartEff * ( 
                                             rho*voidfraction*CdMagUrLag
                                           /
                                             (dSauterMix*Foam::pow(voidfraction,2.65))
@@ -198,15 +199,16 @@ void ErgunStatFines::setForce() const
                 }
                 else  //dense
                 {
-                    betaP = (150 * localPhiP * localPhiP *nuf*rho)          //this is betaP = beta / localPhiP!
-                             /  (voidfraction*dSauterMix*phi_*dSauterMix*phi_)
+                    betaP = (150 * alphaPartEff * alphaPartEff *nuf*rho)
+                             /  ((1-alphaPartEff) * dSauterMix*phi_*dSauterMix*phi_)
                             +
-                              (1.75 * magUr * rho * localPhiP)
+                              (1.75 * magUr * rho * alphaPartEff)
                              /((dSauterMix*phi_));
                 }
                 
                 // calc particle's drag
-                dragCoefficient = M_PI/6 * ds/scaleDia_ * ds/scaleDia_ * dSauter_[cellI] /alphaP_[cellI] *betaP*scaleDrag_;
+                betaP /= (1-alphaPartEff);
+                dragCoefficient = M_PI/6 * ds/scaleDia_ * ds/scaleDia_ * dSauter_[cellI] * voidfraction / (1 - voidfraction) * betaP * scaleDrag_;
                 if (modelType_=="B")
                     dragCoefficient /= voidfraction;
 
