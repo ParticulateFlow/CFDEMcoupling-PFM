@@ -199,7 +199,8 @@ FinesFields::FinesFields
             IOobject::NO_WRITE
         ),
         sm.mesh(),
-	dimensionedVector("zero", dimensionSet(1,-2,-1,0,0), vector::zero)
+	dimensionedScalar("zero", dimensionSet(1,-2,-1,0,0), 0)
+	//dimensionedVector("zero", dimensionSet(1,-2,-1,0,0), vector::zero)
     ),
     uDyn_
     (   IOobject
@@ -417,7 +418,7 @@ void FinesFields::integrateFields()
     alphaSt_.correctBoundaryConditions();
     alphaDyn_.correctBoundaryConditions();
     
-    massFluxDyn_ = rhoFine_ * alphaDyn_ * uDyn_;
+    massFluxDyn_ = rhoFine_ * fvc::interpolate(alphaDyn_) * phiDyn;//uDyn_;
 
 //     forAll(alphaStRel_,cellI)
 //     {

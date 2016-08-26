@@ -90,7 +90,8 @@ private:
     
     volScalarField Sds_;
     
-    volVectorField massFluxDyn_;
+    //volVectorField massFluxDyn_;
+    surfaceScalarField massFluxDyn_;
     
     volVectorField uDyn_;
 
