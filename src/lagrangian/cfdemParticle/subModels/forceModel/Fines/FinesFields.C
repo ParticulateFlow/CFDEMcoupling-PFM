@@ -199,7 +199,7 @@ FinesFields::FinesFields
             IOobject::NO_WRITE
         ),
         sm.mesh(),
-	dimensionedScalar("zero", dimensionSet(1,-2,-1,0,0), 0)
+	dimensionedScalar("zero", dimensionSet(1,0,-1,0,0), 0)
 	//dimensionedVector("zero", dimensionSet(1,-2,-1,0,0), vector::zero)
     ),
     uDyn_
