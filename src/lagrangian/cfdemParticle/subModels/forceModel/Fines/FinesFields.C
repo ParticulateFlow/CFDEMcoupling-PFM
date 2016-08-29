@@ -410,9 +410,12 @@ void FinesFields::integrateFields()
     
     if (verbose_)
     {
-        Info << "amount of alphaSt added because of positivity requirement: " << -alphaStErr << endl;
-	Info << "amount of alphaDyn added because of positivity requirement: " << -alphaDynErr1 << endl;
-	Info << "amount of alphaDyn removed because of max. value: " << -alphaDynErr2 << endl;
+     //   Info << "amount of alphaSt added because of positivity requirement: " << -alphaStErr << endl;
+     //   Info << "amount of alphaDyn added because of positivity requirement: " << -alphaDynErr1 << endl;
+     //   Info << "amount of alphaDyn removed because of max. value: " << -alphaDynErr2 << endl;
+        Sout << "[" << Pstream::myProcNo() << "] " << "amount of alphaSt added because of positivity requirement: " << -alphaStErr << endl;
+        Sout << "[" << Pstream::myProcNo() << "] " << "amount of alphaDyn added because of positivity requirement: " << -alphaDynErr1 << endl;
+        Sout << "[" << Pstream::myProcNo() << "] " << "amount of alphaDyn removed because of max. value: " << -alphaDynErr2 << endl;
     }
     
     alphaSt_.correctBoundaryConditions();
