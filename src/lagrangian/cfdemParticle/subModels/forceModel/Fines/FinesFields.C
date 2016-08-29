@@ -559,7 +559,7 @@ void FinesFields::updateUDyn()
 	}
     }
     
-  /*  forAll(uDyn_.boundaryField(), patchI)
+    forAll(uDyn_.boundaryField(), patchI)
         forAll(uDyn_.boundaryField()[patchI], faceI)
         {
 	    scalar mU(mag(U_.boundaryField()[patchI][faceI]));
@@ -569,8 +569,8 @@ void FinesFields::updateUDyn()
 	        uDyn_.boundaryField()[patchI][faceI] *= mU / muDyn;
 	    }
         }
-    */
-    uDyn_.correctBoundaryConditions();
+    
+  //  uDyn_.correctBoundaryConditions();
 }
 
 // void FinesFields::updateVoidfraction()
