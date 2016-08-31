@@ -568,7 +568,7 @@ void FinesFields::updateUDyn()
 	    scalar muDyn(mag(uDyn_.boundaryField()[patchI][faceI]));
             if(muDyn > mU && muDyn > SMALL)
 	    {
-	        uDyn_.boundaryField()[patchI][faceI] *= mU / muDyn;
+	        uDyn_.boundaryFieldRef()[patchI][faceI] *= mU / muDyn;
 	    }
         }
     
