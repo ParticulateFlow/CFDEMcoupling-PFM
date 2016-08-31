@@ -103,18 +103,18 @@ FinesFields::FinesFields
         ),
         sm.mesh()
     ),
-//     alphaStRel_
-//     (   IOobject
-//         (
-//             "alphaStRel",
-//             sm.mesh().time().timeName(),
-//             sm.mesh(),
-//             IOobject::NO_READ,
-//             IOobject::NO_WRITE
-//         ),
-//         sm.mesh(),
-//         dimensionedScalar("zero", dimensionSet(0,0,0,0,0), 1.0)
-//     ),
+    deltaAlpha_
+    (   IOobject
+        (
+            "deltaAlpha",
+            sm.mesh().time().timeName(),
+            sm.mesh(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        sm.mesh(),
+        dimensionedScalar("zero", dimensionSet(0,0,0,0,0), 0.0)
+    ),
     dHydMix_
     (   IOobject
         (
@@ -255,8 +255,8 @@ FinesFields::FinesFields
       alphaG_.write();
       alphaP_.writeOpt() = IOobject::AUTO_WRITE;
       alphaP_.write();
-//       alphaStRel_.writeOpt() = IOobject::AUTO_WRITE;
-//       alphaStRel_.write();
+      deltaAlpha_.writeOpt() = IOobject::AUTO_WRITE;
+      deltaAlpha_.write();
       dHydMix_.writeOpt() = IOobject::AUTO_WRITE;
       dHydMix_.write();
       DragCoeff_.writeOpt() = IOobject::AUTO_WRITE;
@@ -311,9 +311,9 @@ void FinesFields::update()
 void FinesFields::calcSource() 
 {
     Sds_.primitiveFieldRef()=0;
+    deltaAlpha_.primitiveFieldRef() = 0.0;
     scalar f(0.0);
     scalar critpore(0.0);
-    scalar deltaAlpha(0.0);
     scalar dmean(0.0);
     scalar d1(0.0);
     scalar d2(0.0);
@@ -339,18 +339,20 @@ void FinesFields::calcSource()
         }
 	
 	// at this point, voidfraction is still calculated from the true particle sizes
-	deltaAlpha = f * (alphaMax_ - alphaP_[cellI]) - alphaSt_[cellI];
-	if (deltaAlpha < 0)
+	deltaAlpha_[cellI] = f * (alphaMax_ - alphaP_[cellI]) - alphaSt_[cellI];
+	// too much volume occupied: release it (50% per time step)
+	if (deltaAlpha_[cellI] < 0.0)
 	{
-	    Sds_[cellI] = deltaAlpha;
+	    Sds_[cellI] = 0.5*deltaAlpha_[cellI];
 	}
-	else if (depRate_ * deltaAlpha > 0.8 * alphaDyn_[cellI])
+	// volume too occupy available: deposit at most 80% of dyn hold up
+	else if (depRate_ * deltaAlpha_[cellI] > 0.8 * alphaDyn_[cellI])
 	{
 	    Sds_[cellI] = 0.8 * alphaDyn_[cellI];
 	}
 	else
 	{
-	    Sds_[cellI] = depRate_ * deltaAlpha;
+	    Sds_[cellI] = depRate_ * deltaAlpha_[cellI];
 	}
     }   
 }
