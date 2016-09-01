@@ -88,6 +88,10 @@ private:
     
     mutable double **partRho_;                     // gas density at particle positions
 
+    word voidfractionFieldName_;
+
+    const volScalarField& voidfraction_;
+
     void allocateMyArrays() const;
 
 public:

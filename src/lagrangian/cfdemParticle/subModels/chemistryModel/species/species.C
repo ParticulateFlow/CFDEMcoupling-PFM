@@ -92,8 +92,9 @@ species::species
     densityFieldName_(propsDict_.lookupOrDefault<word>("densityFieldName","rho")),
     rho_(sm.mesh().lookupObject<volScalarField> (densityFieldName_)),
     partRhoName_(propsDict_.lookupOrDefault<word>("partRhoName","partRho")),
-    partRho_(NULL)
-
+    partRho_(NULL),
+    voidfractionFieldName_(propsDict_.lookupOrDefault<word>("voidfractionFieldName","voidfraction")),
+    voidfraction_(sm.mesh().lookupObject<volScalarField>(voidfractionFieldName_))
 {
 //    Info << " Read species list from: " << specDict_.name() << endl;
 //    Info << " Reading species list: " << speciesNames_ << endl;
@@ -149,7 +150,6 @@ species::species
                 dimensionedScalar("0",dimMass/(dimVol*dimTime), 0)
             )
          );
-
     }
 
     allocateMyArrays();
@@ -168,7 +168,7 @@ species::~species()
     {
         particleCloud_.dataExchangeM().destroy(concentrations_[i],nP_);
         particleCloud_.dataExchangeM().destroy(changeOfSpeciesMass_[i],nP_);
-     }
+    }
 }
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
@@ -181,10 +181,12 @@ void species::allocateMyArrays() const
         particleCloud_.dataExchangeM().allocateArray(partRho_,initVal,1,"nparticles");
         particleCloud_.dataExchangeM().allocateArray(partTemp_,initVal,1,"nparticles");
 
+
         for (int i=0; i<speciesNames_.size(); i++)
         {
             particleCloud_.dataExchangeM().allocateArray(concentrations_[i],initVal,1,"nparticles");
             particleCloud_.dataExchangeM().allocateArray(changeOfSpeciesMass_[i],initVal,1,"nparticles");
+
         }
     }
 }
@@ -210,8 +212,8 @@ void species::reAllocMyArrays() const
 
 void species::execute()
 {
-  // realloc the arrays
-     //allocateMyArrays();
+    // realloc the arrays
+    // allocateMyArrays();
      reAllocMyArrays();
 
   // get Y_i, T, rho at particle positions, fill arrays with them and push to LIGGGHTS
@@ -220,12 +222,15 @@ void species::execute()
     scalar Tfluid(0);
     scalar rhofluid(0);
     List<scalar> Yfluid_;
+    scalar voidfraction(1);
     Yfluid_.setSize(speciesNames_.size());
     scalar deltaT = particleCloud_.mesh().time().deltaT().value();
 
-    // defining interpolators for T, rho
+
+    // defining interpolators for T, rho, voidfraction
     interpolationCellPoint <scalar> TInterpolator_(tempField_);
     interpolationCellPoint <scalar> rhoInterpolator_(rho_);
+    interpolationCellPoint <scalar> voidfractionInterpolator_(voidfraction_);
 
     for (int index=0; index<particleCloud_.numberOfParticles(); index++)
     {
@@ -237,16 +242,18 @@ void species::execute()
                 vector position     =   particleCloud_.position(index);
                 Tfluid              =   TInterpolator_.interpolate(position,cellI);
                 rhofluid            =   rhoInterpolator_.interpolate(position,cellI);
+                voidfraction        =   voidfractionInterpolator_.interpolate(position,cellI);
             }
             else
             {
-                Tfluid = tempField_[cellI];
-                rhofluid=rho_[cellI];
+                Tfluid          = tempField_[cellI];
+                rhofluid        = rho_[cellI];
+                voidfraction    = voidfraction_[cellI];
             }
 
             //fill arrays
             partTemp_[index][0]=Tfluid;
-            partRho_[index][0]=rhofluid;
+            partRho_[index][0]=rhofluid*voidfraction;
             for (int i=0; i<speciesNames_.size();i++)
             {
 	        Yfluid_[i] = Y_[i][cellI];
@@ -265,6 +272,7 @@ void species::execute()
                 Info << "Yfluid = " << Yfluid_[i] << endl;
                 Info << "partTemp_[index][0] = " << partTemp_[index][0] << endl;
                 Info << "Tfluid = " << Tfluid << endl  ;
+                Info << "voidfraction =" << voidfraction << endl;
             }
         }
     }
@@ -316,30 +324,6 @@ tmp<volScalarField> species::Sm () const
 {
     return tmp<volScalarField> (changeOfGasMassField_);
 }
-
-/*tmp<Foam::fvScalarMatrix> species::Smi(const label i) const
-{
-    return tmp<fvScalarMatrix>(new fvScalarMatrix(changeOfSpeciesMassFields_[i], dimMass/dimTime));
-    //return tmp<fvScalarMatrix>(new fvScalarMatrix(Y_[i], dimMass/dimTime));
-}*/
-
-/*tmp<fvScalarMatrix> Smi(const label i, volScalarField& changeOfSpeciesMassFields_[i]) const
-{
-    tmp<fvScalarMatrix> tfvm (new fvScalarMatrix(changeOfSpeciesMassFields_[i], dimMass/dimTime));
-    fvScalarMatrix& fvm = tfvm();
-
-    forAll (i, &fvm)
-    {
-        fvm += operator[](i).Smi(i, changeOfSpeciesMassFields_[i]);
-    }
-
-    return tfvm;
-}*/
-
-/*tmp<Foam::fvScalarMatrix> species::Sm() const
-{
-    return tmp<fvScalarMatrix>(new fvScalarMatrix(changeOfGasMassField_, dimMass/dimTime));
-}*/
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
