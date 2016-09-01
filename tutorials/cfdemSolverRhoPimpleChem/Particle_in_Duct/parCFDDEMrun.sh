@@ -25,6 +25,7 @@ debugMode="off"          # on | off| strict
 testHarnessPath="$CFDEM_TEST_HARNESS_PATH"
 runOctave="false"
 postproc="true"
+
 #--------------------------------------------------------------------------------#
 
 #- call function to run a parallel CFD-DEM case
@@ -52,12 +53,12 @@ if [ $runOctave == "true" ]
         cp ../../$logfileName $testHarnessPath
         cp cfdemSolverPiso_ErgunTestMPI.eps $testHarnessPath
 fi
-
+    
 if [ $postproc == "true" ]
   then
 
     #- keep terminal open (if started in new terminal)
-    echo "simulation finisehd? ...press enter to proceed"
+    echo "simulation finished? ...press enter to proceed"
     read
 
     #- get VTK data from liggghts dump file
@@ -73,8 +74,8 @@ if [ $postproc == "true" ]
 
     #- start paraview
     paraview
-
-    #- keep terminal open (if started in new terminal)
+ 
+ #- keep terminal open (if started in new terminal)
     echo "...press enter to clean up case"
     echo "press Ctr+C to keep data"
     read

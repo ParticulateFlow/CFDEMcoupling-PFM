@@ -24,18 +24,15 @@ boundaryField
     // Walls in no slip condition
     top
     {
-        type            fixedValue;
-        value           uniform (0 0 0);
+        type            slip;
     }
     bottom
     {
-        type            fixedValue;
-        value           uniform (0 0 0);
+        type            slip;
     }
     side-walls
     {
-        type            fixedValue;
-        value           uniform (0 0 0);
+        type            slip;
     }
     inlet
     {

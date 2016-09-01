@@ -91,6 +91,10 @@ turbulenceModelType "RASProperties";//"LESProperties";//
 
 //===========================================================================//
 // sub-model properties
+reactionHeatProps
+{
+    reactionHeatName            "reactionHeat";
+}
 
 speciesProps
 {

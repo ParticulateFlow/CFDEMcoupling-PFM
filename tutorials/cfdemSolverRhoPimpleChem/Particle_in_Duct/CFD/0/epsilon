@@ -23,18 +23,15 @@ boundaryField
 {
     top
     {
-        type            compressible::epsilonWallFunction;
-        value           uniform 0.003;
+        type            slip;
     }
     bottom
     {
-        type            compressible::epsilonWallFunction;
-        value           uniform 0.003;
+        type            slip;
     }
     side-walls
     {
-        type            compressible::epsilonWallFunction;
-        value           uniform 0.003;
+        type            slip;
     }
     inlet
     {

@@ -23,7 +23,7 @@ startTime       0;
 
 stopAt          endTime;
 
-endTime         5;
+endTime         10;
 
 deltaT          0.0005;
 
@@ -64,7 +64,7 @@ libs (
 
 functions
 {  
-  testing
+  /*testing
    {
       type                 writeRegisteredObject;
       functionObjectLibs   ("libIOFunctionObjects.so");
@@ -75,7 +75,7 @@ functions
       (
          "CO2"
       );
-   }
+   }*/
  
  CO2-Average1
     {
@@ -102,6 +102,7 @@ functions
         functionObjectLibs ("libfieldValueFunctionObjects.so"); 
         enabled         true; 
         outputControl   timeStep;//outputTime; 
+        outputInterval  1,
         log             true;    
         valueOutput     false;   //true; 
         source          all;   // Type of cell source or all for the full domain
@@ -110,6 +111,43 @@ functions
         fields 
         ( 
             CO2
+        ); 
+    } 
+    
+     O2-Average1
+    {
+        type            fieldAverage;
+        functionObjectLibs ("libfieldFunctionObjects.so");
+        enabled         true;
+        outputControl   outputTime;
+
+        fields
+        (
+            O2
+            {
+                mean        on;
+                prime2Mean  on;
+                base        time;
+            }
+        );
+    }
+    
+    // add CO2 concentration
+   species_O2 // Name also used to identify output folder 
+    { 
+        type            cellSource; 
+        functionObjectLibs ("libfieldValueFunctionObjects.so"); 
+        enabled         true; 
+        outputControl   timeStep;//outputTime; 
+        outputInterval  1,
+        log             true;    
+        valueOutput     false;   //true; 
+        source          all;   // Type of cell source or all for the full domain
+        sourceName      O2; 
+        operation       sum; // volAverage; //volIntegrate; //weightedAverage; //none;
+        fields 
+        ( 
+            O2
         ); 
     } 
 }

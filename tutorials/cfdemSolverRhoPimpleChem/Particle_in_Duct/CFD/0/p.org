@@ -23,27 +23,27 @@ boundaryField
 {
     top
     {
-        type            zeroGradient;
+        type            slip;
     }
 
     bottom
     {
-        type            zeroGradient;
+        type            slip;
     }
 
     side-walls
     {
-        type            zeroGradient;
+        type            slip;
     }
 
     inlet
     {
-        type            zeroGradient;
+        type            slip;
     }
 
     outlet
     {
-        type            zeroGradient;
+        type            slip;
     }
 }
 

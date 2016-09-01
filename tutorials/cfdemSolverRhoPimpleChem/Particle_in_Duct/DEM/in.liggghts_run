@@ -6,7 +6,7 @@ atom_style      granular
 atom_modify     map array
 communicate     single vel yes
 
-boundary        m m m
+boundary        f f f
 newton          off
 
 units           si
@@ -50,9 +50,8 @@ fix     cfd2 all couple/cfd/force
 fix     cfd3 all couple/cfd/chemistry n_species 2 species_names O2 CO2
 
 # this should shrink the particle
-#fix     cfd4 all chem/shrink speciesA O2 molMassA 31.99 speciesC CO2 molMassC 44.01 molMassB 12.01 k 2.5e3 rdef hertzpct 0.2
-fix     cfd4 all chem/shrink speciesA O2 molMassA 31.99 speciesC CO2 molMassC 44.01 molMassB 12.01 k 2.5e3 rmin 0.003
-
+#fix    cfd4 all chem/shrink speciesA O2 molMassA 31.99 speciesC CO2 molMassC 44.01 molMassB 12.01 k 2.5e3 rdef hertzpct 0.2
+fix     cfd4 all chem/shrink speciesA O2 molMassA 31.99 speciesC CO2 molMassC 44.01 molMassB 12.01 k 2.5e3 rmin 0.005
 
 # apply nve integration to all particles that are inserted as single particles
 fix     integr all nve/sphere
@@ -62,8 +61,13 @@ compute radChange all property/atom radius
 compute radreduce all reduce sum c_radChange
 fix     shrink all ave/time 50 1 50 c_radreduce file shrink.dat 
 
-#compute radChange reduce sum c_radius
+compute radChange1 all property/atom radius
+compute radreduce1 all reduce max c_radChange1
+fix     shrink1 all ave/time 50 1 50 c_radreduce1 file shrink-1.dat 
 
+compute radChange2 all property/atom radius
+compute radreduce2 all reduce min c_radChange2
+fix     shrink2 all ave/time 50 1 50 c_radreduce2 file shrink-2.dat 
 
 # screen output
 compute         rke all erotate/sphere
@@ -72,6 +76,6 @@ thermo          1000
 thermo_modify   lost ignore norm no
 compute_modify  thermo_temp dynamic yes
 
-dump        dmp all custom 50 ../DEM/post/dump.liggghts_run id type x y z ix iy iz vx vy vz fx fy fz omegax omegay omegaz radius
+dump        dmp all custom 100 ../DEM/post/dump.liggghts_run id type x y z ix iy iz vx vy vz fx fy fz omegax omegay omegaz radius
 
 run         1

@@ -22,17 +22,17 @@ boundaryField
 {
     top
     {
-        type            zeroGradient;
+        type            slip;
     }
 
     bottom
     {
-        type            zeroGradient;
+        type            slip;
     }
 
     side-walls
     {
-        type            zeroGradient;
+        type            slip;
     }
 
     inlet
