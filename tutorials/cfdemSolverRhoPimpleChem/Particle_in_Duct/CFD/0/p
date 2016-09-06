@@ -40,7 +40,8 @@ boundaryField
 
     outlet
     {
-        type            zeroGradient;
+        type            fixedValue;
+        value           $internalField;
     }
 }
 
