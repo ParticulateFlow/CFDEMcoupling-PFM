@@ -41,11 +41,7 @@ boundaryField
     outlet
     {
         type            fixedValue;
-<<<<<<< HEAD
         value           uniform 101325;
-=======
-        value           $internalField;
->>>>>>> 88f858a366a36749b31c01ce4faa0a27a30bf5dc
     }
 }
 
