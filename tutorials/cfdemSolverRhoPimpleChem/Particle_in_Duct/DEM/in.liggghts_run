@@ -51,7 +51,7 @@ fix     cfd3 all couple/cfd/chemistry n_species 2 species_names O2 CO2
 
 # this should shrink the particle
 #fix    cfd4 all chem/shrink speciesA O2 molMassA 31.99 speciesC CO2 molMassC 44.01 molMassB 12.01 k 2.5e3 rdef hertzpct 0.2
-fix     cfd4 all chem/shrink speciesA O2 molMassA 31.99 speciesC CO2 molMassC 44.01 molMassB 12.01 k 25 rmin 0.005
+fix     cfd4 all chem/shrink speciesA O2 molMassA 31.99 speciesC CO2 molMassC 44.01 molMassB 12.01 k 2.5e3 rmin 0.005
 
 # apply nve integration to all particles that are inserted as single particles
 fix     integr all nve/sphere
@@ -59,15 +59,15 @@ fix     integr all nve/sphere
 # print radius change according to timestep
 compute radChange all property/atom radius
 compute radreduce all reduce sum c_radChange
-fix     shrink all ave/time 50 1 50 c_radreduce file shrink.dat 
+fix     shrink all ave/time 25 1 25 c_radreduce file shrink.dat 
 
 compute radChange1 all property/atom radius
 compute radreduce1 all reduce max c_radChange1
-fix     shrink1 all ave/time 50 1 50 c_radreduce1 file shrink-1.dat 
+fix     shrink1 all ave/time 25 1 25 c_radreduce1 file shrink-1.dat 
 
-compute radChange2 all property/atom radius
-compute radreduce2 all reduce min c_radChange2
-fix     shrink2 all ave/time 50 1 50 c_radreduce2 file shrink-2.dat 
+compute masschange all property/atom mass
+compute massreduce all reduce sum c_masschange
+fix     rmass all ave/time 25 1 25 c_massreduce file rmass.dat 
 
 # screen output
 compute         rke all erotate/sphere

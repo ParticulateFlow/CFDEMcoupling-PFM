@@ -23,15 +23,15 @@ boundaryField
 {
     top
     {
-        type            slip;
+        type            zeroGradient;
     }
     bottom
     {
-        type            slip;
+        type            zeroGradient;
     }
     side-walls
     {
-        type            slip;
+        type            zeroGradient;
     }
     inlet
     {
@@ -40,7 +40,8 @@ boundaryField
 
     outlet
     {
-        type            zeroGradient;
+        type            fixedValue;
+        value           uniform 101325;
     }
 }
 

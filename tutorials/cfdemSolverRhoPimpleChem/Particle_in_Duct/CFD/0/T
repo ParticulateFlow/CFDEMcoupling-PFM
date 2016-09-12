@@ -17,23 +17,23 @@ FoamFile
 
 dimensions      [0 0 0 1 0 0 0];
 
-internalField   uniform 1073; //Taken from paper of Smith, I.W. Nineteenth Symposium (International) on Combustion, 1982, p. 1045
+internalField   uniform 293.15; 
 
 boundaryField
 {
     top
     {
-        type            slip;
+        type            zeroGradient;
     }
 
     bottom
     {
-        type            slip;
+        type            zeroGradient;
     }
 
     side-walls
     {
-        type            slip;
+        type            zeroGradient;
     }
 
     inlet
