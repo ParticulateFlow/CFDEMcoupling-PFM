@@ -52,8 +52,7 @@ maxCo 0.1;
 //libs ("libOpenFOAM.so" "libgroovyBC.so");
 
 functions
-(
-
+{
     probes
     {
         type        probes;
@@ -93,25 +92,5 @@ functions
         outputControl   timeStep;//outputTime;
         outputInterval  1;
     }
-
-   /*pressureDrop
-   {
-     type patchAverage;
-     functionObjectLibs
-     (
-         "libsimpleFunctionObjects.so"
-     );
-     verbose true;
-     patches
-     (
-         inlet
-         outlet
-     );
-     fields
-     (
-         p
-     );
-     factor  1;
-   }*/
-);
+};
 // ************************************************************************* //

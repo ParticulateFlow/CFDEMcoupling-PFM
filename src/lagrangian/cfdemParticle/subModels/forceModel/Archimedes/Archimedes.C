@@ -64,11 +64,7 @@ Archimedes::Archimedes
     propsDict_(dict.subDict(typeName + "Props")),
     twoDimensional_(false),
     gravityFieldName_(propsDict_.lookup("gravityFieldName")),
-    #if defined(version21) || defined(version16ext)
-        g_(sm.mesh().lookupObject<uniformDimensionedVectorField> (gravityFieldName_))
-    #elif defined(version15)
-        g_(dimensionedVector(sm.mesh().lookupObject<IOdictionary>("environmentalProperties").lookup(gravityFieldName_)).value())
-    #endif
+    g_(sm.mesh().lookupObject<uniformDimensionedVectorField> (gravityFieldName_))
 {
 
     //Append the field names to be probed

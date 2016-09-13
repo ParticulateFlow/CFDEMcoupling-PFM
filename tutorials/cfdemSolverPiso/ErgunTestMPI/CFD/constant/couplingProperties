@@ -55,12 +55,12 @@ smoothingModel off;// localPSizeDiffSmoothing;// constDiffSmoothing; //
 
 forceModels
 (
-    //GidaspowDrag
+    GidaspowDrag
     //BeetstraDrag
     //DiFeliceDrag
     gradPForce
     viscForce
-    KochHillDrag
+    //KochHillDrag
     //DEMbasedDrag
     //RongDrag
     //Archimedes
@@ -75,7 +75,7 @@ momCoupleModels
     implicitCouple
 );
 
-turbulenceModelType "RASProperties";//"LESProperties";//
+turbulenceModelType "turbulenceProperties";//"LESProperties";//
 
 //===========================================================================//
 // sub-model properties
@@ -143,6 +143,7 @@ GidaspowDragProps
 {
     verbose true;
     velFieldName "U";
+    granVelFieldName "Us";
     voidfractionFieldName "voidfraction";
     interpolation true;
     phi 1;

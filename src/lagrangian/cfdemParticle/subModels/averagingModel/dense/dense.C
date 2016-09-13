@@ -78,7 +78,7 @@ void dense::setScalarAverage
 (
     volScalarField& field,
     double**& value,
-    double**& weight,
+    double**const& weight,
     volScalarField& weightField,
     double**const& mask
 ) const
@@ -127,7 +127,7 @@ void dense::setVectorAverage
 (
     volVectorField& field,
     double**& value,
-    double**& weight,
+    double**const& weight,
     volScalarField& weightField,
     double**const& mask
 ) const

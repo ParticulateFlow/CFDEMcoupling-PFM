@@ -23,7 +23,7 @@ startTime       0;
 
 stopAt          endTime;
 
-endTime         0.1;
+endTime         0.5;
 
 deltaT          0.0005;
 
@@ -49,10 +49,9 @@ adjustTimeStep  no;
 
 maxCo 0.1;
 
-//libs ( "libgroovyBC.so" "libfiniteVolumeCFDEM.so");
 
 functions
-(
+{
 
     probes
     {
@@ -94,24 +93,5 @@ functions
         outputInterval  1;
     }
 
-   /*pressureDrop
-   {
-     type patchAverage;
-     functionObjectLibs
-     (
-         "libsimpleFunctionObjects.so"
-     );
-     verbose true;
-     patches
-     (
-         inlet
-         outlet
-     );
-     fields
-     (
-         p
-     );
-     factor  1;
-   }*/
-);
+};
 // ************************************************************************* //

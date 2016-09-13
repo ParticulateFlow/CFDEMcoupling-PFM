@@ -29,68 +29,56 @@ Description
     and OpenFOAM(R). Note: this code is not part of OpenFOAM(R) (see DISCLAIMER).
 
 Class
-    noHeatTransfer
+    noThermCond
 
 SourceFiles
-    noHeatTransfer.C
+    noThermCond.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef noHeatTransfer_H
-#define noHeatTransfer_H
+#ifndef noThermCond_H
+#define noThermCond_H
 
+#include "thermCondModel.H"
+#include "cfdemCloud.H"
 #include "fvCFD.H"
-#include "cfdemCloudEnergy.H"
-#include "heatTransferModel.H"
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class noHeatTransfer Declaration
+                           Class noDrag Declaration
 \*---------------------------------------------------------------------------*/
 
-class noHeatTransfer
+class noThermCond
 :
-    public heatTransferModel
+    public thermCondModel
 {
 
-protected:
-
-    // Protected data
-        const dictionary& dict_;
-
-        cfdemCloudEnergy& particleCloud_;
-
-       
 public:
 
     //- Runtime type information
-    TypeName("noHeatTransfer");
+    TypeName("off");
+
 
     // Constructors
 
         //- Construct from components
-        noHeatTransfer
+        noThermCond
         (
             const dictionary& dict,
-            cfdemCloudEnergy& sm
+            cfdemCloud& sm
         );
-
 
     // Destructor
 
-        virtual ~noHeatTransfer();
+        ~noThermCond();
 
-
-      // Member Functions
-
-
-        void partFluidHeatTransfer(volScalarField&) const;
-	scalar partThermCond() const;
-
-
+    // Member Functions
+        tmp<volScalarField> thermCond() const;
+        tmp<volScalarField> thermDiff() const;
 };
 
 

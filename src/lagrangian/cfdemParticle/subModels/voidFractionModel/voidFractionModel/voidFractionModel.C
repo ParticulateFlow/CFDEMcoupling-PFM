@@ -169,19 +169,19 @@ tmp<volScalarField> Foam::voidFractionModel::voidFractionInterp() const
     scalar tsf = particleCloud_.dataExchangeM().timeStepFraction();
     if(1-tsf < 1e-4 && particleCloud_.dataExchangeM().couplingStep() > 1) //tsf==1
     {
-        tsource() = voidfractionPrev_;
+        tsource.ref() = voidfractionPrev_;
     }
     else
     {
-        tsource() = (1 - tsf) * voidfractionPrev_ + tsf * voidfractionNext_;
+        tsource.ref() = (1 - tsf) * voidfractionPrev_ + tsf * voidfractionNext_;
     }
     return tsource;
 }
 
 void Foam::voidFractionModel::resetVoidFractions() const
 {
-    voidfractionPrev_.internalField() = voidfractionNext_.internalField();
-    voidfractionNext_.internalField() = 1;
+    voidfractionPrev_.ref() = voidfractionNext_.ref();
+    voidfractionNext_.ref() = 1;
 }
 
 /*void Foam::voidFractionModel::undoVoidFractions(double**const& mask) const

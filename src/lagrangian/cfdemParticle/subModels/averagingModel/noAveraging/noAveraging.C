@@ -55,7 +55,7 @@ noAveraging::noAveraging
     cfdemCloud& sm
 )
 :
-    averagingModel(dict,sm,vector(0,0,0))
+    averagingModel(dict,sm)
 {}
 
 

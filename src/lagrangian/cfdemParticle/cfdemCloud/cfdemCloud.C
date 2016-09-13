@@ -125,15 +125,7 @@ cfdemCloud::cfdemCloud
     ),
     turbulence_
     (
-        #if defined(version21) || defined(version16ext)
-            #ifdef compre
-                mesh.lookupObject<compressible::turbulenceModel>
-            #else
-                mesh.lookupObject<incompressible::turbulenceModel>
-            #endif
-        #elif defined(version15)
-            mesh.lookupObject<incompressible::RASModel>
-        #endif
+        mesh.lookupObject<turbulenceModel>
         (
             turbulenceModelType_
         )
@@ -440,6 +432,11 @@ const forceModel& cfdemCloud::forceM(int i)
 int cfdemCloud::nrForceModels()
 {
     return forceModels_.size();
+}
+
+int cfdemCloud::nrMomCoupleModels()
+{
+    return momCoupleModels_.size();
 }
 
 scalar cfdemCloud::voidfraction(int index)

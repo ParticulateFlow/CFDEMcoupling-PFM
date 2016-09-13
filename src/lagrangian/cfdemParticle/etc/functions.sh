@@ -76,17 +76,17 @@ compileLib()
         i=$((${#str}-4))
         ending=${str:$i:4}
         if [[ $ending == "Comp" ]]; then
-                echo "Compiling a compressible library - so doing an rmdepall of incomp library first."
+                echo "Compiling a compressible library - so doing an wrmdep -a of incomp library first."
                 echo "Please make sure to have the compressible libraries first in the library-list.txt!"
                 cd $CFDEM_SRC_DIR/lagrangian/cfdemParticle
                 echo "changing to $PWD"
-                rmdepall 2>&1 | tee -a $logpath/$logfileName
+                wrmdep -a 2>&1 | tee -a $logpath/$logfileName
                 cd $casePath
                 echo "changing to $PWD"
             else
                 echo "Compiling a incompressible library."
         fi
-        rmdepall 2>&1 | tee -a $logpath/$logfileName
+        wrmdep -a 2>&1 | tee -a $logpath/$logfileName
         wclean 2>&1 | tee -a $logpath/$logfileName
     #fi
     wmake libso 2>&1 | tee -a $logpath/$logfileName
@@ -128,7 +128,7 @@ compileSolver()
 
     #- wclean and wmake
     #if [ $doClean != "noClean" ]; then
-        rmdepall 2>&1 | tee -a $logpath/$logfileName
+        wrmdep -a 2>&1 | tee -a $logpath/$logfileName
         wclean 2>&1 | tee -a $logpath/$logfileName
     #fi
     
@@ -284,7 +284,7 @@ cleanCFDEM()
 
             cd  $path
             echo "cleaning library $PWD"
-            rmdepall
+            wrmdep -a
             wclean    
             rm -r ./Make/linux*
             rm -r ./lnInclude
@@ -338,7 +338,7 @@ cleanCFDEM()
 
             cd  $path            
             echo "cleaning solver $PWD"
-            rmdepall
+            wrmdep -a
             wclean    
     done
 }

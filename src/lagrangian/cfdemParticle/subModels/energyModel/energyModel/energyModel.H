@@ -1,57 +1,40 @@
 /*---------------------------------------------------------------------------*\
-    CFDEMcoupling - Open Source CFD-DEM coupling
-
-    CFDEMcoupling is part of the CFDEMproject
-    www.cfdem.com
-                                Christoph Goniva, christoph.goniva@cfdem.com
-                                Copyright 2009-2012 JKU Linz
-                                Copyright 2012-     DCS Computing GmbH, Linz
--------------------------------------------------------------------------------
 License
-    This file is part of CFDEMcoupling.
 
-    CFDEMcoupling is free software; you can redistribute it and/or modify it
-    under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 3 of the License, or (at your
-    option) any later version.
+    This is free software: you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-    CFDEMcoupling is distributed in the hope that it will be useful, but WITHOUT
+    This code is distributed in the hope that it will be useful, but WITHOUT
     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
     FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
     for more details.
 
     You should have received a copy of the GNU General Public License
-    along with CFDEMcoupling; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+    along with this code.  If not, see <http://www.gnu.org/licenses/>.
 
-Description
-    This code is designed to realize coupled CFD-DEM simulations using LIGGGHTS
-    and OpenFOAM(R). Note: this code is not part of OpenFOAM(R) (see DISCLAIMER).
-
-Class
-    heatTransferModel
-
-SourceFiles
-    heatTransferModel.C
+    Copyright (C) 2015- Thomas Lichtenegger, JKU Linz, Austria
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef heatTransferModel_H
-#define heatTransferModel_H
+#ifndef energyModel_H
+#define energyModel_H
 
 #include "fvCFD.H"
 #include "cfdemCloudEnergy.H"
 #include "probeModel.H"
+#include "interpolationCellPoint.H"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class heatTransferModel Declaration
+                           Class energyModel Declaration
 \*---------------------------------------------------------------------------*/
 
-class heatTransferModel
+class energyModel
 {
 
 protected:
@@ -60,19 +43,24 @@ protected:
         const dictionary& dict_;
 
         cfdemCloudEnergy& particleCloud_;
+	
+	IOdictionary transportProperties_;
+	
+	scalar kf0_;                              // fluid thermal conductivity [W/(m*K)]
 
+        scalar Cp_;                                  // specific heat capacity [W*s/(kg*K)]
        
 public:
 
     //- Runtime type information
-    TypeName("heatTransferModel");
+    TypeName("energyModel");
 
     // Declare runtime constructor selection table
 
         declareRunTimeSelectionTable
         (
             autoPtr,
-            heatTransferModel,
+            energyModel,
             dictionary,
             (
                 const dictionary& dict,
@@ -85,32 +73,39 @@ public:
     // Constructors
 
         //- Construct from components
-        heatTransferModel
+        energyModel
         (
             const dictionary& dict,
-            cfdemCloudEnergy& sm
+            cfdemCloudEnergy& sm            
         );
 
 
     // Destructor
 
-        virtual ~heatTransferModel();
+        virtual ~energyModel();
 
 
     // Selector
 
-        static autoPtr<heatTransferModel> New
+        static autoPtr<energyModel> New
         (
             const dictionary& dict,
-            cfdemCloudEnergy& sm
+            cfdemCloudEnergy& sm,
+            word energyType
         );
 
 
     // Member Functions
 
-
-        virtual void partFluidHeatTransfer(volScalarField&) const = 0;
-	virtual scalar partThermCond() const = 0;
+        virtual void addEnergyContribution(volScalarField&) const = 0;
+	
+	virtual void addEnergyCoefficient(volScalarField&) const = 0;
+	
+	virtual void calcEnergyContribution() = 0;
+	
+	virtual void postFlow() {}
+	
+	scalar Cp() const;
 
 
 };
@@ -125,3 +120,4 @@ public:
 #endif
 
 // ************************************************************************* //
+

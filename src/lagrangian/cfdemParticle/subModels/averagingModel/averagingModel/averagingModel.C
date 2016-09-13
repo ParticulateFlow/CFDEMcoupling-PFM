@@ -59,7 +59,7 @@ void averagingModel::undoVectorAverage
 {
 // WARNING - not sure if this is valid for dilute model!!!
 
-    if(!single) fieldPrev.internalField() = fieldNext.internalField();
+    if(!single) fieldPrev.ref() = fieldNext.ref();
 
     label cellI;
     vector valueVec;
@@ -135,7 +135,7 @@ void averagingModel::setVectorSum
 (
     volVectorField& field,
     double**& value,
-    double**& weight,
+    double**const& weight,
     double**const& mask
 ) const
 {
@@ -169,7 +169,7 @@ void averagingModel::setVectorSumSimple
 (
     volVectorField& field,
     double**& value,
-    double**& weight,
+    double**const& weight,
     int nP
 ) const
 {
@@ -232,7 +232,7 @@ void averagingModel::setScalarSum
 void averagingModel::setDSauter
 (
     volScalarField& dSauter,
-    double**& weight,
+    double**const& weight,
     volScalarField& weightField,
     label myParticleType
 ) const
@@ -303,13 +303,13 @@ void averagingModel::setDSauter
 
 void averagingModel::resetVectorAverage(volVectorField& prev,volVectorField& next,bool single) const
 {
-    if(!single) prev.internalField() = next.internalField();
-    next.internalField() = vector::zero;
+    if(!single) prev.ref() = next.ref();
+    next.primitiveFieldRef() = vector::zero;
 }
 
 void averagingModel::resetWeightFields() const
 {
-    UsWeightField_.internalField() = 0;
+    UsWeightField_.ref() = 0;
 }
 
 
@@ -352,12 +352,12 @@ tmp<volVectorField> Foam::averagingModel::UsInterp() const
 
     if (particleCloud_.dataExchangeM().couplingStep() > 1)
     {
-        tsource() = (1 - particleCloud_.dataExchangeM().timeStepFraction()) * UsPrev_
+        tsource.ref() = (1 - particleCloud_.dataExchangeM().timeStepFraction()) * UsPrev_
                     + particleCloud_.dataExchangeM().timeStepFraction() * UsNext_;
     }
     else
     {
-        tsource() = UsNext_;
+        tsource.ref() = UsNext_;
     }
 
     return tsource;
@@ -412,55 +412,6 @@ averagingModel::averagingModel
         sm.mesh().lookupObject<volVectorField> ("Us")
         /*sm.mesh(),
         dimensionedVector("zero", dimensionSet(0,1,-1,0,0),vector::zero)*/
-    )
-{}
-
-// Construct from components, specify initial value for fields
-averagingModel::averagingModel
-(
-    const dictionary& dict,
-    cfdemCloud& sm,
-    const vector u0
-)
-:
-    dict_(dict),
-    particleCloud_(sm),
-    UsWeightField_
-    (
-        IOobject
-        (
-            "UsWeightField_",
-            particleCloud_.mesh().time().timeName(),
-            particleCloud_.mesh(),
-            IOobject::NO_READ,
-            IOobject::NO_WRITE
-        ),
-        particleCloud_.mesh(),
-        dimensionedScalar("zero", dimensionSet(0,0,0,0,0), 0.0)
-    ),
-    UsPrev_
-    (   IOobject
-        (
-            "UsPrev",
-            sm.mesh().time().timeName(),
-            sm.mesh(),
-            IOobject::NO_READ,
-            IOobject::NO_WRITE
-        ),
-        sm.mesh(),
-        dimensionedVector("zero", dimensionSet(0,1,-1,0,0),u0)
-    ),
-    UsNext_
-    (   IOobject
-        (
-            "UsNext",
-            sm.mesh().time().timeName(),
-            sm.mesh(),
-            IOobject::NO_READ,
-            IOobject::NO_WRITE
-        ),
-        sm.mesh(),
-        dimensionedVector("zero", dimensionSet(0,1,-1,0,0),u0)
     )
 {}
 

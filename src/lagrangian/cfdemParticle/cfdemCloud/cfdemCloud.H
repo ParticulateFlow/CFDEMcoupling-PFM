@@ -49,11 +49,7 @@ SourceFiles
 #include "fvCFD.H"
 #include "IFstream.H"
 
-#if defined(version21) || defined(version16ext)
-    #include <turbulenceModel.H>
-#elif defined(version15)
-    #include <RASModel.H>
-#endif
+#include <turbulenceModel.H>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -157,15 +153,7 @@ protected:
 
     mutable volScalarField ddtVoidfraction_;
 
-    #if defined(version21) || defined(version16ext)
-        #ifdef compre
-            const compressible::turbulenceModel& turbulence_;
-        #else
-            const incompressible::turbulenceModel& turbulence_;
-        #endif
-    #elif defined(version15)
-        const incompressible::RASModel& turbulence_;
-    #endif
+    const turbulenceModel& turbulence_;
 
     autoPtr<forceModel>* forceModel_;
 
@@ -244,6 +232,8 @@ public:
        virtual const forceModel& forceM(int);
 
        virtual int nrForceModels();
+       
+       virtual int nrMomCoupleModels();
 
        scalar voidfraction(int);
 
@@ -364,20 +354,14 @@ public:
 
        inline autoPtr<liggghtsCommandModel>* liggghtsCommand() const;
 
-       #if defined(version21) || defined(version16ext)
-            #ifdef compre
-                inline const compressible::turbulenceModel& turbulence() const;
-            #else
-                inline const incompressible::turbulenceModel& turbulence() const;
-            #endif
-       #elif defined(version15)
-           inline const incompressible::RASModel& turbulence() const;
-       #endif
-
+       inline const turbulenceModel& turbulence() const;
+       
     // Write
 
       // write cfdemCloud internal data
         virtual bool evolve(volScalarField&,volVectorField&,volVectorField&);
+        
+        virtual void postFlow() {}
 
         virtual bool reAllocArrays();
 
