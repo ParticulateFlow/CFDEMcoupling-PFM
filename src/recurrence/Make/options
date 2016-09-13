@@ -12,7 +12,6 @@ EXE_INC = \
     -I ./cfdemParticle \
     -I$(LIB_SRC)/finiteVolume/lnInclude \
     -I$(LIB_SRC)/transportModels \
-    -I$(LIB_SRC)/turbulenceModels/incompressible/turbulenceModel \
     -I$(LIB_SRC)/meshTools/lnInclude \
     -I$(LIB_SRC)/lagrangian/basic/lnInclude \
     -I$(LIB_SRC)/OpenFOAM/containers/HashTables/labelHashSet \
@@ -25,8 +24,6 @@ LIB_LIBS = \
      $(PLIBS) \
     -L$(CFDEM_LIB_DIR) \
     -lfiniteVolume \
-    -lincompressibleRASModels \
-    -lincompressibleLESModels \
     -lmeshTools \
     -llagrangian \
     -lmpi_cxx \

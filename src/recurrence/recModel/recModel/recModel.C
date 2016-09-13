@@ -70,7 +70,7 @@ recModel::recModel
     recTime("dataBase", "", "../system", "../constant", false),
     timeDirs(recTime.times()),
     numRecFields_(label(timeDirs.size())),
-    recurrenceMatrix_(numRecFields_,numRecFields_,scalar(0)),
+    recurrenceMatrix_(numRecFields_,scalar(0.0)),
     timeIndexList_(numRecFields_-1),
     timeValueList_(numRecFields_-1),
     contTimeIndex(0),

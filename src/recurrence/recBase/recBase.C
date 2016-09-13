@@ -63,6 +63,14 @@ recBase::recBase
             recProperties_,
             *this
         )
+    ),
+    recPath_
+    (
+        recPath::New
+        (
+            recProperties_,
+            *this
+        )
     )
 {
   recModel_ ->  readFieldSeries();
