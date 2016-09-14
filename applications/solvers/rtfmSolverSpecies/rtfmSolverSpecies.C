@@ -37,21 +37,27 @@ Rules
 
 #include "fvCFD.H"
 #include "singlePhaseTransportModel.H"
-#include "turbulenceModel.H"
+#include "turbulentTransportModel.H"
+#include "fvOptions.H"
+
 #include "cfdemCloudRec.H"
-#include "cfdemCloud.H"
 #include "recBase.H"
 #include "recModel.H"
-#include "clockModel.H"
 
+#include "cfdemCloud.H"
+#include "clockModel.H"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 int main(int argc, char *argv[])
 {
+#include "postProcess.H"
     #include "setRootCase.H"
     #include "createTime.H"
     #include "createMesh.H"
+    #include "createControl.H"
     #include "createFields.H"
+    #include "createFvOptions.H"
+  
     cfdemCloudRec<cfdemCloud> particleCloud(mesh);
     recBase recurrenceBase(mesh);
 
@@ -70,16 +76,16 @@ int main(int argc, char *argv[])
         particleCloud.clockM().start(1,"Global");
 
         Info<< "Time = " << runTime.timeName() << nl << endl;
-
-        particleCloud.clockM().start(2,"Coupling");
-
-        particleCloud.evolve(voidfraction,Us,URec);
-
-        particleCloud.clockM().stop("Coupling");
+	
+	particleCloud.clockM().start(2,"Flow");
+        #include "TEq.H"
+	particleCloud.clockM().stop("Flow");
 
         
         if ( runTime.timeOutputValue() - (recTimeIndex+1)*recTimeStep_ + 1.0e-5 > 0.0 )
         {
+	    Info << "Updating fields at run time " << runTime.timeOutputValue()
+	        << " corresponding to recurrence time " << (recTimeIndex+1)*recTimeStep_ << ".\n" << endl;
             recurrenceBase.updateRecFields();
 	    #include "readFields.H"
             recTimeIndex++;

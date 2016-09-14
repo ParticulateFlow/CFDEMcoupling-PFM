@@ -1,5 +1,6 @@
-cfdemSolverRecurrence/dir
-tfmSolverRecurrence/dir
+rcfdemSolverHeattransfer/dir
+rcfdemSolverBase/dir
+rtfmSolverSpecies/dir
 cfdemSolverRhoPimple/dir
 cfdemSolverPisoMS/dir
 cfdemSolverPiso/dir

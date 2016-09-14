@@ -68,6 +68,19 @@
         ),
         mesh
     );
+    
+    volScalarField T
+    (
+        IOobject
+        (
+            "T",
+            runTime.timeName(),
+            mesh,
+            IOobject::MUST_READ,
+            IOobject::AUTO_WRITE
+        ),
+        mesh
+    );
 
     // calculated fields
     Info<< "\nCreating fields subject to calculation\n" << endl;
@@ -102,9 +115,9 @@
     Us.write();
 //===============================
 
-#ifndef createPhi_H
-#define createPhi_H
-Info<< "Calculating face flux field phi\n" << endl;
+//#ifndef createPhiRec_H
+//#define createPhiRec_H
+Info<< "Calculating face flux field phiRec\n" << endl;
 surfaceScalarField phiRec
  (
      IOobject
@@ -118,7 +131,7 @@ surfaceScalarField phiRec
      linearInterpolate(URec*voidfractionRec) & mesh.Sf()
  );
 phiRec.write();
-#endif
+//#endif
  
   singlePhaseTransportModel laminarTransport(URec, phiRec);
 

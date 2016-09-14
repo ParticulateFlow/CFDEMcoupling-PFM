@@ -30,11 +30,11 @@
     
     // recurrence fields
     Info<< "\nCreating recurrence fields.\n" << endl;
-    volVectorField U1Rec
+    volVectorField URec
     (
         IOobject
         (
-            "U.1Rec",
+            "URec",
             runTime.timeName(),
             mesh,
             IOobject::MUST_READ,
@@ -43,11 +43,11 @@
         mesh
     );
     
-    volScalarField alpha1Rec
+    volScalarField voidfractionRec
     (
         IOobject
         (
-            "alpha.1Rec",
+            "voidfractionRec",
             runTime.timeName(),
             mesh,
             IOobject::MUST_READ,
@@ -56,11 +56,11 @@
         mesh
     );
     
-    volVectorField U2Rec
+    volVectorField UsRec
     (
         IOobject
         (
-            "U.2Rec",
+            "UsRec",
             runTime.timeName(),
             mesh,
             IOobject::MUST_READ,
@@ -71,69 +71,55 @@
 
     // calculated fields
     Info<< "\nCreating fields subject to calculation\n" << endl;
-    volScalarField alpha2Rec
+    volScalarField voidfraction
     (
         IOobject
         (
-            "alpha.2Rec",
+            "voidfraction",
             runTime.timeName(),
             mesh,
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
-        1-alpha1Rec
+        voidfractionRec
     );
         
-    
+    volVectorField Us
+    (
+        IOobject
+        (
+            "Us",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        UsRec
+    );
     
     // write fields for t=t_start
-    alpha2Rec.write();
+    voidfraction.write();
+    Us.write();
 //===============================
 
-#ifndef createPhi_H
-#define createPhi_H
 Info<< "Calculating face flux field phi\n" << endl;
-surfaceScalarField phi2Rec
+surfaceScalarField phiRec
  (
      IOobject
      (
-        "phi.2Rec",
+        "phiRec",
         runTime.timeName(),
         mesh,
         IOobject::READ_IF_PRESENT,
         IOobject::AUTO_WRITE
      ),
-     linearInterpolate(U2Rec*alpha2Rec) & mesh.Sf()
+     linearInterpolate(URec*voidfractionRec) & mesh.Sf()
  );
-phi2Rec.write();
-#endif
+phiRec.write();
  
-  singlePhaseTransportModel laminarTransport(U2Rec, phi2Rec);
+  singlePhaseTransportModel laminarTransport(URec, phiRec);
 
     autoPtr<incompressible::turbulenceModel> turbulence
     (
-        incompressible::turbulenceModel::New(U2Rec, phi2Rec, laminarTransport)
+        incompressible::turbulenceModel::New(URec, phiRec, laminarTransport)
     );
-    
-
-    // transport stuff
-
- // create concentration field
-    volScalarField T
-    (
-        IOobject
-        (
-            "T",
-            runTime.timeName(),
-            mesh,
-            IOobject::MUST_READ,
-            IOobject::AUTO_WRITE
-        ),
-        mesh
-    );
-    
-    fvScalarMatrix TEqn(T, dimless*dimVolume/(dimTime));
-    
-    T.write();
-
-    scalar relaxCoeff(0.0);
