@@ -62,7 +62,7 @@ SyamlalThermCond::SyamlalThermCond
             sm.mesh().time().timeName(),
             sm.mesh(),
             IOobject::READ_IF_PRESENT,
-            IOobject::NO_WRITE
+            IOobject::AUTO_WRITE
         ),
         sm.mesh(),
         dimensionedScalar("zero", dimensionSet(0,0,0,0,0,0,0), 1.0)
@@ -109,8 +109,11 @@ tmp<volScalarField> SyamlalThermCond::thermCond() const
     
     // if a wallQFactor field is present, use it to scale heat transport through a patch
     if (hasWallQFactor_)
+    {
+        wallQFactor_.correctBoundaryConditions();
         forAll(wallQFactor_.boundaryField(), patchi)
             svf.boundaryFieldRef()[patchi] *= wallQFactor_.boundaryField()[patchi];
+    }
   
     return tvf;
 }
