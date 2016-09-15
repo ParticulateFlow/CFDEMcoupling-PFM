@@ -82,15 +82,18 @@ int main(int argc, char *argv[])
         particleCloud.evolve(voidfraction,Us,URec);
 
         particleCloud.clockM().stop("Coupling");
-
-        
+	
+	particleCloud.clockM().start(3,"Flow");
+        #include "TEq.H"
+	particleCloud.clockM().stop("Flow");
+       
         if ( runTime.timeOutputValue() - (recTimeIndex+1)*recTimeStep_ + 1.0e-5 > 0.0 )
         {
             recurrenceBase.updateRecFields();
 	    #include "readFields.H"
             recTimeIndex++;
         }
-
+        
         particleCloud.clockM().start(27,"Output");
         runTime.write();
         particleCloud.clockM().stop("Output");	

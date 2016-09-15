@@ -71,6 +71,37 @@
         mesh
     );
     
+    // heat transfer fields
+    Info<< "\nCreating heat transfer fields.\n" << endl;
+    
+    volScalarField Qsource
+    (
+        IOobject
+        (
+            "Qsource",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        mesh,
+        dimensionedScalar("zero", dimensionSet(1,-1,-3,0,0,0,0), 0.0)
+    );
+    
+    volScalarField thDiff
+    (
+        IOobject
+        (
+            "thDiff",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        mesh,
+        dimensionedScalar("zero", dimensionSet(0,2,-1,0,0,0,0), 0.0)
+    );
+    
     volScalarField T
     (
         IOobject
@@ -117,27 +148,27 @@
     Us.write();
 //===============================
 
-//#ifndef createPhiRec_H
-//#define createPhiRec_H
-Info<< "Calculating face flux field phiRec\n" << endl;
-surfaceScalarField phiRec
- (
-     IOobject
-     (
-        "phiRec",
-        runTime.timeName(),
-        mesh,
-        IOobject::READ_IF_PRESENT,
-        IOobject::AUTO_WRITE
-     ),
-     linearInterpolate(URec*voidfractionRec*rhoRec) & mesh.Sf()
- );
-phiRec.write();
-//#endif
+
+    Info<< "Calculating face flux field phiRec\n" << endl;
+    surfaceScalarField phiRec
+    (
+        IOobject
+        (
+            "phiRec",
+            runTime.timeName(),
+            mesh,
+            IOobject::READ_IF_PRESENT,
+            IOobject::AUTO_WRITE
+        ),
+        linearInterpolate(URec*voidfractionRec*rhoRec) & mesh.Sf()
+    );
+    phiRec.write();
+
  
-  singlePhaseTransportModel laminarTransport(URec, phiRec);
+    singlePhaseTransportModel laminarTransport(URec, phiRec);
 
     autoPtr<incompressible::turbulenceModel> turbulence
     (
         incompressible::turbulenceModel::New(URec, phiRec, laminarTransport)
     );
+    
