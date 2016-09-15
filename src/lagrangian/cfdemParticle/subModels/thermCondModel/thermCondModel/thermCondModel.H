@@ -108,6 +108,8 @@ public:
 	virtual tmp<volScalarField> thermCond() const = 0;
 	
 	virtual tmp<volScalarField> thermDiff() const = 0;
+	
+	dimensionedScalar Cp() const;
        
 };
 
