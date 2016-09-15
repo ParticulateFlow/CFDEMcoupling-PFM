@@ -50,7 +50,7 @@ Rules
 
 int main(int argc, char *argv[])
 {
-#include "postProcess.H"
+    #include "postProcess.H"
     #include "setRootCase.H"
     #include "createTime.H"
     #include "createMesh.H"
