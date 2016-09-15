@@ -1,5 +1,5 @@
     // dummy fields
-    Info<< "\nCreating dummy pressure and density fields\n" << endl;
+    Info<< "\nCreating dummy pressure field\n" << endl;
     volScalarField p
     (
         IOobject
@@ -14,22 +14,24 @@
         dimensionedScalar("p", dimensionSet(1, 2, -2, 0, 0), 1.0)
     );
     
-    volScalarField rho
+
+    // recurrence fields
+    Info<< "\nCreating recurrence fields.\n" << endl;
+    
+    volScalarField rhoRec
     (
         IOobject
         (
-            "rho",
+            "rhoRec",
             runTime.timeName(),
             mesh,
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
         mesh,
-        dimensionedScalar("rho", dimensionSet(1, -3, 0, 0, 0), 1.0)
+        dimensionedScalar("rhoRec", dimensionSet(1, -3, 0, 0, 0), 1.0)
     );
     
-    // recurrence fields
-    Info<< "\nCreating recurrence fields.\n" << endl;
     volVectorField URec
     (
         IOobject
@@ -128,7 +130,7 @@ surfaceScalarField phiRec
         IOobject::READ_IF_PRESENT,
         IOobject::AUTO_WRITE
      ),
-     linearInterpolate(URec*voidfractionRec) & mesh.Sf()
+     linearInterpolate(URec*voidfractionRec*rhoRec) & mesh.Sf()
  );
 phiRec.write();
 //#endif
