@@ -62,11 +62,12 @@ isotropicFluctuations::isotropicFluctuations
     voidfractionRec_(sm.mesh().lookupObject<volScalarField> (voidfractionRecFieldName_)),
     critVoidfraction_(propsDict_.lookupOrDefault<scalar>("critVoidfraction", 1.0)),
     D0_(readScalar(propsDict_.lookup("D0"))),
-    ranGen_(osRandomInteger())
+    ranGen_(osRandomInteger()),
+    vfluc_(NULL)
 {
     dt_=particleCloud_.mesh().time().deltaTValue();
     
-    forceSubModels_.setSize(1, "recU");
+  /*  forceSubModels_.setSize(1, "recU");
     delete[] forceSubModel_;
     forceSubModel_ = new autoPtr<forceSubModel>[nrForceSubModels()];
     Info << "nrForceSubModels()=" << nrForceSubModels() << endl;
@@ -80,19 +81,34 @@ isotropicFluctuations::isotropicFluctuations
             forceSubModels_[i]
         );
     }
+  */
+    allocateMyArrays();
 }
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 isotropicFluctuations::~isotropicFluctuations()
-{}
+{
+    delete vfluc_;
+}
 
+
+// * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
+void isotropicFluctuations::allocateMyArrays() const
+{
+    // get memory for 2d arrays
+    double initVal=0.0;
+    particleCloud_.dataExchangeM().allocateArray(vfluc_,initVal,3); 
+}
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 void isotropicFluctuations::setForce() const
 {
+     // realloc the arrays
+    allocateMyArrays();
+    
     vector position(0,0,0);
     scalar voidfraction(0.0);
     scalar voidfractionRec(0.0);
@@ -112,7 +128,7 @@ void isotropicFluctuations::setForce() const
 	    voidfraction=0.0;
 	    voidfractionRec=0.0;
 	    deltaVoidfrac=0.0;
-            if (cellI > -1) // particle Found
+            if (cellI > -1) // particle found
             {
 	        // particles in empty regions follow trajectories subject to gravity
 		if(voidfractionRec_[cellI] < critVoidfraction_)
@@ -135,11 +151,15 @@ void isotropicFluctuations::setForce() const
 		    if(deltaVoidfrac>0)
 		    {
                         flucU=unitRndVec()*fluctuationMag(relVolfractionExcess);
-			forceSubM(0).partToArray(index,flucU,vector::zero);
+	//		forceSubM(0).partToArray(index,flucU,vector::zero);
 		    }              
+		    for(int i = 0; i < 3; i++)
+		        vfluc_[index][i]=flucU[i];
 		}
 	    }
     }
+    
+    particleCloud_.dataExchangeM().giveData("vfluc","vector-atom", vfluc_);   
 }
 
 scalar isotropicFluctuations::fluctuationMag(const scalar relVolfractionExcess) const
@@ -174,9 +194,9 @@ vector isotropicFluctuations::unitRndVec() const
 	s=v1*v1+v2*v2;
     }
     s2=Foam::sqrt(1-s);
-    rvec[1]=2*v1*s2;
-    rvec[2]=2*v2*s2;
-    rvec[3]=1-2*s;
+    rvec[0]=2*v1*s2;
+    rvec[1]=2*v2*s2;
+    rvec[2]=1-2*s;
     return rvec;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

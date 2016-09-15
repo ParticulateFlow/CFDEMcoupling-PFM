@@ -123,6 +123,7 @@ void freeStreaming::setForce() const
 		}
 		else
 		{
+		    position = particleCloud_.position(index);
 		    radius = particleCloud_.radius(index);
                     mass = 4.188790205*radius*radius*radius * particleDensity_;
 		    grav = mass*gravAcc_;
