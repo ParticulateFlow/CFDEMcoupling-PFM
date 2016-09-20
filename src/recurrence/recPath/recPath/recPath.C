@@ -56,7 +56,7 @@ recPath::recPath
     verbose_(false),
     virtualTimeIndexList_( base_.recM().virtualTimeIndexList() )
 {
-   
+    if (recProperties_.found("verbose")) verbose_=true;
 }
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
