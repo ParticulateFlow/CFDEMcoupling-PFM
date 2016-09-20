@@ -62,7 +62,7 @@ private:
     
     wordList mod_spec_names_;
 
-    PtrList<volScalarField> Y_;
+    UPtrList<volScalarField> Y_;
 
     mutable List<double**> concentrations_;
     
