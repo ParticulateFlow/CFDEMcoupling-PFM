@@ -103,6 +103,7 @@ speciesProps
 	partTempName  		"partTemp";
 	densityFieldName 	"rho";
 	partRhoName		"partRho";
+        voidfractionFieldName   "voidfraction";
 }
 
 SyamlalThermCondProps
