@@ -54,6 +54,19 @@ Info<< "Reading thermophysical properties\n" << endl;
         mesh
     );
 
+    volScalarField addSource
+    (
+        IOobject
+        (
+           "addSource",
+           runTime.timeName(),
+           mesh,
+           IOobject::MUST_READ,
+           IOobject::AUTO_WRITE
+        ),
+        mesh
+    );
+
     Info<< "\nCreating fluid-particle heat flux field\n" << endl;
     volScalarField Qsource
     (

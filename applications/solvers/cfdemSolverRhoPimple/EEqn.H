@@ -10,10 +10,7 @@
     // to enforce user-defined values, change thDiff to MUST_READ and do
     // thDiff.correctBoundaryConditions();
 
-    fvScalarMatrix EEqn
-    (
-        fvm::ddt(rhoeps, he) + fvm::div(phi, he)
-      + fvc::ddt(rhoeps, K) + fvc::div(phi, K)
+    addSource = fvc::ddt(rhoeps, K) + fvc::div(phi, K)
       + (
             he.name() == "e"
           ? fvc::div
@@ -23,7 +20,13 @@
                 "div(phiv,p)"
             )
           : -dpdt
-        )
+        );
+
+
+    fvScalarMatrix EEqn
+    (
+        fvm::ddt(rhoeps, he) + fvm::div(phi, he)
+      + addSource
      // net heat transfer from particles to fluid
       - Qsource
      // thermal conduction of the fluid with effective conductivity
@@ -51,4 +54,6 @@
     fvOptions.correct(he);
 
     thermo.correct();
+
+    Info<< "T max/min : " << max(T).value() << " " << min(T).value() << endl;
 }
