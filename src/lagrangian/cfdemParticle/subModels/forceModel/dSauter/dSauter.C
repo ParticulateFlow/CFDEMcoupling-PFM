@@ -55,6 +55,8 @@ dSauter::dSauter
     propsDict_(dict.subDict(typeName + "Props")),
     d2_(NULL),
     d3_(NULL),
+    scaleDia_(1.0),
+    scaleDiaDist_(1.0),
     d2Field_
     (   IOobject
         (
@@ -99,6 +101,11 @@ dSauter::dSauter
 
     // init force sub model
     setForceSubModels(propsDict_);
+
+    if (propsDict_.found("scaleCG"))
+        scaleDia_=scalar(readScalar(propsDict_.lookup("scaleCG")));
+    if (propsDict_.found("scaleDist"))
+        scaleDiaDist_=scalar(readScalar(propsDict_.lookup("scaleDist")));
 }
 
 
@@ -122,10 +129,19 @@ void dSauter::allocateMyArrays() const
 
 void dSauter::setForce() const
 {
+    if (scaleDia_ > 1)
+        Info << "dSauter using scaleCG = " << scaleDia_ << endl;
+    else if (particleCloud_.cg() > 1)
+    {
+        scaleDia_=particleCloud_.cg();
+        Info << "dSauter using scaleCG from liggghts cg = " << scaleDia_ << endl;
+    }
+
     allocateMyArrays();
 
     label cellI=0;
     scalar ds(0);
+    scalar scale = scaleDiaDist_/scaleDia_;
     
     for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)
     {
@@ -161,7 +177,7 @@ void dSauter::setForce() const
     {
         if(d2Field_[cellI] > ROOTVSMALL)
         {
-             dSauter_[cellI] = d3Field_[cellI] / d2Field_[cellI];
+             dSauter_[cellI] = d3Field_[cellI] / d2Field_[cellI] * scale;
         }
         else
 	{

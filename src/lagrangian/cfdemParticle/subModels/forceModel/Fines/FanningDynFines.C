@@ -91,7 +91,15 @@ void FanningDynFines::setForce() const
 {
     if(forceSubM(0).verbose())
         Info << "Entering force loop of FanningDynFines.\n" << endl;
-    
+ 
+    if (scaleDia_ > 1)
+        Info << "FanningDynFines using scale = " << scaleDia_ << endl;
+    else if (particleCloud_.cg() > 1)
+    {
+        scaleDia_=particleCloud_.cg();
+        Info << "FanningDynFines using scale from liggghts cg = " << scaleDia_ << endl;
+    }
+   
     vector UDyn(0,0,0);
     vector drag(0,0,0);
     label cellI=0;

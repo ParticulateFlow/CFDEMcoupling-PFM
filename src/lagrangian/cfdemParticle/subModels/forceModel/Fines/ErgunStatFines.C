@@ -105,10 +105,11 @@ ErgunStatFines::~ErgunStatFines()
 void ErgunStatFines::setForce() const
 {
     if (scaleDia_ > 1)
-        Info << "Gidaspow using scale = " << scaleDia_ << endl;
-    else if (particleCloud_.cg() > 1){
+        Info << "ErgunStatFines using scale = " << scaleDia_ << endl;
+    else if (particleCloud_.cg() > 1)
+    {
         scaleDia_=particleCloud_.cg();
-        Info << "Gidaspow using scale from liggghts cg = " << scaleDia_ << endl;
+        Info << "ErgunStatFines using scale from liggghts cg = " << scaleDia_ << endl;
     }
 
     const volScalarField& nufField = forceSubM(0).nuField();
@@ -135,6 +136,8 @@ void ErgunStatFines::setForce() const
 
     vector dragExplicit(0,0,0);
     scalar dragCoefficient(0);
+
+    scalar scaleDia3 = scaleDia_*scaleDia_*scaleDia_;
     
     interpolationCellPoint<scalar> voidfractionInterpolator_(voidfraction_);
     interpolationCellPoint<vector> UInterpolator_(U_);
@@ -209,6 +212,7 @@ void ErgunStatFines::setForce() const
                 // calc particle's drag
                 betaP /= (1-alphaPartEff);
                 dragCoefficient = M_PI/6 * ds/scaleDia_ * ds/scaleDia_ * dSauter_[cellI] * voidfraction / (1 - voidfraction) * betaP * scaleDrag_;
+                dragCoefficient *= scaleDia3;
                 if (modelType_=="B")
                     dragCoefficient /= voidfraction;
 
