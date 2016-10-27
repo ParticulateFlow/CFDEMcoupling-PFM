@@ -43,8 +43,10 @@ heatTransferGunn::heatTransferGunn
 :
     energyModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
+    expNusselt_(propsDict_.lookupOrDefault<bool>("expNusselt",false)),
     interpolation_(propsDict_.lookupOrDefault<bool>("interpolation",false)),
     verbose_(propsDict_.lookupOrDefault<bool>("verbose",false)),
+    NusseltFieldName_(propsDict_.lookupOrDefault<word>("NusseltFieldName","NuField")),
     QPartFluidName_(propsDict_.lookupOrDefault<word>("QPartFluidName","QPartFluid")),
     QPartFluid_
     (   IOobject
@@ -97,10 +99,10 @@ heatTransferGunn::heatTransferGunn
     NuField_
     (   IOobject
         (
-            "NuField",
+            NusseltFieldName_,
             sm.mesh().time().timeName(),
             sm.mesh(),
-            IOobject::NO_READ,
+            IOobject::READ_IF_PRESENT,
             IOobject::NO_WRITE
         ),
         sm.mesh(),
@@ -141,12 +143,24 @@ heatTransferGunn::heatTransferGunn
 	partRelTempField_.write();
 	Info <<  "Particle temperature field activated." << endl;
     }
+ 
     if (verbose_)
     {
         ReField_.writeOpt() = IOobject::AUTO_WRITE;
 	NuField_.writeOpt() = IOobject::AUTO_WRITE;
 	ReField_.write();
 	NuField_.write();
+	if (expNusselt_)
+	{
+	  FatalError <<"Cannot read and create NuField at the same time!\n" << abort(FatalError);
+	}
+    }
+    
+    if (expNusselt_)
+    {
+        NuField_.writeOpt() = IOobject::AUTO_WRITE;
+	NuField_.write();
+        Info <<  "Using predefined Nusselt number field." << endl;
     }
 }
 
@@ -187,7 +201,9 @@ void heatTransferGunn::calcEnergyContribution()
     QPartFluid_.primitiveFieldRef() = 0.0;
 
     // get DEM data
+    particleCloud_.clockM().start(29,"getDEM_Tdata");
     particleCloud_.dataExchangeM().getData(partTempName_,"scalar-atom",partTemp_);
+    particleCloud_.clockM().stop("getDEM_Tdata");
     
     if(calcPartTempField_)
     {       
@@ -255,15 +271,25 @@ void heatTransferGunn::calcEnergyContribution()
                 if (voidfraction < 0.01)
 		    voidfraction = 0.01;
 
-                // calc relative velocity
-                Us = particleCloud_.velocity(index);
-                magUr = mag(Ufluid - Us);
                 ds = 2.*particleCloud_.radius(index);
-                muf = mufField[cellI];
-                Rep = ds * magUr * voidfraction * rho_[cellI]/ muf;
-                Pr = max(SMALL, Cp_ * muf / kf0_);
+		
+		if (expNusselt_)
+		{
+		    Nup = NuField_[cellI];
+		    if (Nup < 2.0)
+		        Nup = 2.0;
+		}
+		else
+		{
+                    Us = particleCloud_.velocity(index);
+                    magUr = mag(Ufluid - Us);
+                
+                    muf = mufField[cellI];
+                    Rep = ds * magUr * voidfraction * rho_[cellI]/ muf;
+                    Pr = max(SMALL, Cp_ * muf / kf0_);
 
-                Nup = Nusselt(voidfraction, Rep, Pr);
+                    Nup = Nusselt(voidfraction, Rep, Pr);
+		}
                 
 
                 scalar h = kf0_ * Nup / ds;
@@ -327,8 +353,6 @@ void heatTransferGunn::calcEnergyContribution()
 	    particleCloud_.averagingM().UsWeightField(),
             NULL
         );
-	ReField_.primitiveFieldRef() /= ReField_.mesh().V();
-	NuField_.primitiveFieldRef() /= NuField_.mesh().V();
     }
     
     // limit source term
@@ -380,8 +404,10 @@ void heatTransferGunn::giveData(int call)
     if(call == 0)
     {
         Info << "total convective particle-fluid heat flux [W] (Eulerian) = " << gSum(QPartFluid_*1.0*QPartFluid_.mesh().V()) << endl;
-
-        particleCloud_.dataExchangeM().giveData(partHeatFluxName_,"scalar-atom", partHeatFlux_);    
+	
+        particleCloud_.clockM().start(30,"giveDEM_Tdata");
+        particleCloud_.dataExchangeM().giveData(partHeatFluxName_,"scalar-atom", partHeatFlux_);
+	particleCloud_.clockM().stop("giveDEM_Tdata");
     }
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -120,9 +120,9 @@ void heatTransferGunnImplicit::giveData(int call)
 {
     if(call == 1)
     {
-        //Info << "total convective particle-fluid heat flux [W] (Eulerian) = " << gSum(QPartFluid_*1.0*QPartFluid_.mesh().V()) << endl;
-
-        particleCloud_.dataExchangeM().giveData(partHeatFluxName_,"scalar-atom", partHeatFlux_);    
+//      particleCloud_.clockM().start(23,"giveDEMdata");
+        particleCloud_.dataExchangeM().giveData(partHeatFluxName_,"scalar-atom", partHeatFlux_);
+//	particleCloud_.clockM().stop("giveDEMdata");
     }
 }
 

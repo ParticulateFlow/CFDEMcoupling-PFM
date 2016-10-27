@@ -67,6 +67,10 @@ int main(int argc, char *argv[])
     
     label recTimeIndex(0);
     scalar recTimeStep_=recurrenceBase.recM().recTimeStep();
+
+    // control coupling behavior in case of substepping
+    label counter = 0;
+    label couplingSubStep = 5;//3;
     
     while (runTime.run())
     {
@@ -83,18 +87,20 @@ int main(int argc, char *argv[])
 
         particleCloud.clockM().stop("Coupling");
 	
-	particleCloud.clockM().start(3,"Flow");
-        #include "TEq.H"
+	particleCloud.clockM().start(26,"Flow");
+        #include "TEqImp.H"
 	particleCloud.clockM().stop("Flow");
        
+	particleCloud.clockM().start(27,"ReadFields");
         if ( runTime.timeOutputValue() - (recTimeIndex+1)*recTimeStep_ + 1.0e-5 > 0.0 )
         {
             recurrenceBase.updateRecFields();
-	    #include "readFields.H"
+	    #include "updateFields.H"
             recTimeIndex++;
         }
+        particleCloud.clockM().stop("ReadFields");
         
-        particleCloud.clockM().start(27,"Output");
+        particleCloud.clockM().start(28,"Output");
         runTime.write();
         particleCloud.clockM().stop("Output");	
 

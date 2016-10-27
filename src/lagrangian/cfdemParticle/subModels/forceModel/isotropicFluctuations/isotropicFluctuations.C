@@ -62,11 +62,12 @@ isotropicFluctuations::isotropicFluctuations
     voidfractionRec_(sm.mesh().lookupObject<volScalarField> (voidfractionRecFieldName_)),
     critVoidfraction_(propsDict_.lookupOrDefault<scalar>("critVoidfraction", 1.0)),
     D0_(readScalar(propsDict_.lookup("D0"))),
+    dt_(particleCloud_.dataExchangeM().DEMts()),
     ranGen_(osRandomInteger()),
     vfluc_(NULL)
 {
-    dt_=particleCloud_.mesh().time().deltaTValue();
-    
+   // dt_=particleCloud_.mesh().time().deltaTValue();
+  
   /*  forceSubModels_.setSize(1, "recU");
     delete[] forceSubModel_;
     forceSubModel_ = new autoPtr<forceSubModel>[nrForceSubModels()];

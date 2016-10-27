@@ -124,7 +124,7 @@ void simpleRandomPath::computeRecPath()
         if (virtualTimeIndex < numRecFields/2)
         {
         	startLoop = numRecFields/2;
-        	endLoop = numRecFields-1;
+        	endLoop = numRecFields-1 - upperSeqLim/2;  // avoid running into end of recurrence database too often
 		endLoop--; // start of next sequence one snapshot AFTER minimum position
         }
         else

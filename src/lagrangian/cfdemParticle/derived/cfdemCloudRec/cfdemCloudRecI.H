@@ -70,6 +70,10 @@ template <class baseCloud>
 void cfdemCloudRec<baseCloud>::setParticleForceField()
 {}
 
+template <class baseCloud>
+void cfdemCloudRec<baseCloud>::setVectorAverages()
+{}
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

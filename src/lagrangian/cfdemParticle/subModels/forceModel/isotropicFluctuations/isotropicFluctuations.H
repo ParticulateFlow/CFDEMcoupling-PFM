@@ -59,7 +59,7 @@ private:
     
     scalar D0_;
     
-    scalar dt_;
+    const scalar dt_;
 
     vector unitRndVec() const;
     

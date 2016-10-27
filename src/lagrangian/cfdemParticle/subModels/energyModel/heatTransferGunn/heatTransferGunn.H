@@ -45,9 +45,13 @@ protected:
 
     dictionary propsDict_;
     
+    bool expNusselt_;
+    
     bool interpolation_;
     
     bool verbose_;
+    
+    word NusseltFieldName_;
     
     word QPartFluidName_;
         

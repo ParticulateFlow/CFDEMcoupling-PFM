@@ -1,17 +1,16 @@
     // dummy fields
     Info<< "\nCreating dummy pressure field\n" << endl;
-    volScalarField p
+    volScalarField pRec
     (
         IOobject
         (
-            "p",
+            "pRec",
             runTime.timeName(),
             mesh,
-            IOobject::NO_READ,
-            IOobject::NO_WRITE
+            IOobject::MUST_READ,
+            IOobject::AUTO_WRITE
         ),
-        mesh,
-        dimensionedScalar("p", dimensionSet(1, 2, -2, 0, 0), 1.0)
+        mesh
     );
     
 
@@ -25,11 +24,11 @@
             "rhoRec",
             runTime.timeName(),
             mesh,
-            IOobject::NO_READ,
-            IOobject::NO_WRITE
+            IOobject::MUST_READ,
+            IOobject::AUTO_WRITE
         ),
-        mesh,
-        dimensionedScalar("rhoRec", dimensionSet(1, -3, 0, 0, 0), 1.0)
+        mesh//,
+        //dimensionedScalar("rhoRec", dimensionSet(1, -3, 0, 0, 0), 1.0)
     );
     
     volVectorField URec
@@ -86,6 +85,19 @@
         ),
         mesh,
         dimensionedScalar("zero", dimensionSet(1,-1,-3,0,0,0,0), 0.0)
+    );
+    
+    volScalarField QCoeff
+    (   IOobject
+        (
+            "QCoeff",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        mesh,
+        dimensionedScalar("zero", dimensionSet(1,-1,-3,-1,0,0,0), 0.0)
     );
     
     volScalarField thDiff
@@ -172,3 +184,20 @@
         incompressible::turbulenceModel::New(URec, phiRec, laminarTransport)
     );
     
+    
+    volScalarField addSource
+    (
+        IOobject
+        (
+            "addSource",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        mesh,
+        dimensionedScalar("zero", dimensionSet(1,-1,-3,0,0,0,0), 0.0)
+    );
+    
+    Info<< "Creating field kinetic energy K\n" << endl;
+    volScalarField K("K", 0.5*magSqr(URec));
