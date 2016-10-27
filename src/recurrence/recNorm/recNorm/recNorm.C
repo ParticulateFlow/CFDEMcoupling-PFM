@@ -54,7 +54,7 @@ recNorm::recNorm
     recProperties_(dict),
     verbose_(false)
 {
-   
+    if (recProperties_.found("verbose")) verbose_=true;
 }
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
