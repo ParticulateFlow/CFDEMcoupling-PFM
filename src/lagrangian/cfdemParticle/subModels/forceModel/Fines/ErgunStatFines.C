@@ -144,11 +144,11 @@ void ErgunStatFines::setForce() const
 
     #include "setupProbeModel.H"
 
-    for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
-    {
-            if(forceSubM(0).verbose())
+    if(forceSubM(0).verbose())
                 Info << "Entering force loop of ErgunStatFines.\n" << endl;
-	    
+    
+    for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
+    {	    
             cellI = particleCloud_.cellIDs()[index][0];
             drag = vector(0,0,0);
             dragExplicit = vector(0,0,0);
