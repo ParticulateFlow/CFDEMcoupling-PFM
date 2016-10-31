@@ -120,9 +120,9 @@ void heatTransferGunnImplicit::giveData(int call)
 {
     if(call == 1)
     {
-//      particleCloud_.clockM().start(23,"giveDEMdata");
+        particleCloud_.clockM().start(30,"giveDEM_Tdata");
         particleCloud_.dataExchangeM().giveData(partHeatFluxName_,"scalar-atom", partHeatFlux_);
-//	particleCloud_.clockM().stop("giveDEMdata");
+	particleCloud_.clockM().stop("giveDEM_Tdata");
     }
 }
 

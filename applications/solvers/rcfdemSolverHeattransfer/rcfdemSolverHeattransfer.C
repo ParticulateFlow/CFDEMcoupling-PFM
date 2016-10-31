@@ -91,7 +91,7 @@ int main(int argc, char *argv[])
         #include "TEqImp.H"
 	particleCloud.clockM().stop("Flow");
        
-	particleCloud.clockM().start(27,"ReadFields");
+	particleCloud.clockM().start(32,"ReadFields");
         if ( runTime.timeOutputValue() - (recTimeIndex+1)*recTimeStep_ + 1.0e-5 > 0.0 )
         {
             recurrenceBase.updateRecFields();
@@ -100,7 +100,7 @@ int main(int argc, char *argv[])
         }
         particleCloud.clockM().stop("ReadFields");
         
-        particleCloud.clockM().start(28,"Output");
+        particleCloud.clockM().start(33,"Output");
         runTime.write();
         particleCloud.clockM().stop("Output");	
 
