@@ -157,24 +157,28 @@ void ErgunStatFines::setForce() const
             voidfraction=0;
             dragCoefficient = 0;
 
-            if (cellI > -1) // particle Found
+            if (cellI > -1) // particle found
             {
 
                 if( forceSubM(0).interpolation() )
                 {
 	            position     = particleCloud_.position(index);
                     voidfraction = voidfractionInterpolator_.interpolate(position,cellI);
-                    Ufluid       = UInterpolator_.interpolate(position,cellI);
-                    //Ensure interpolated void fraction to be meaningful
-                    // Info << " --> voidfraction: " << voidfraction << endl;
-                    if(voidfraction>1.00) voidfraction = 1.0;
-                    if(voidfraction<0.10) voidfraction = 0.10;
+                    Ufluid       = UInterpolator_.interpolate(position,cellI);      
                 }
                 else
                 {
 		    voidfraction = voidfraction_[cellI];
                     Ufluid = U_[cellI];
                 }
+
+                // ensure voidfraction to be meaningful
+                // problems could arise from interpolation or empty cells
+
+                if(voidfraction>0.999) 
+                    voidfraction = 0.999;
+                else if(voidfraction<0.05)
+                    voidfraction = 0.05;
 
                 Us = particleCloud_.velocity(index);
                 Ur = Ufluid-Us;
@@ -208,7 +212,7 @@ void ErgunStatFines::setForce() const
                               (1.75 * magUr * rho * alphaPartEff)
                              /((dSauterMix*phi_));
                 }
-                
+       
                 // calc particle's drag
                 betaP /= (1-alphaPartEff);
                 dragCoefficient = M_PI/6 * ds/scaleDia_ * ds/scaleDia_ * dSauter_[cellI] * voidfraction / (1 - voidfraction) * betaP * scaleDrag_;
@@ -254,11 +258,10 @@ void ErgunStatFines::setForce() const
             // write particle based data to global array
             forceSubM(0).partToArray(index,drag,dragExplicit,Ufluid,dragCoefficient);
 
-        //}// end if mask
     }// end loop particles
     
     if(forceSubM(0).verbose())
-        Info << "Entering force loop of ErgunStatFines.\n" << endl;
+        Pout << "Leaving force loop of ErgunStatFines.\n" << endl;
 }
 
 
