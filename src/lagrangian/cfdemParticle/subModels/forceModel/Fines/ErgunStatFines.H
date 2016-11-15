@@ -67,9 +67,13 @@ private:
 
     mutable scalar scaleDia_;
 
+    mutable scalar scaleDist_;
+
     mutable scalar scaleDrag_;
 
     mutable scalar switchingVoidfraction_; //voidfraction above which dilute formulation will be used
+
+    inline const scalar dSauter(label) const;
 
 public:
 

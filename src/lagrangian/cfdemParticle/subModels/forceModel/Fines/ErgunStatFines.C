@@ -61,6 +61,7 @@ ErgunStatFines::ErgunStatFines
     UsFieldName_(propsDict_.lookup("granVelFieldName")),
     UsField_(sm.mesh().lookupObject<volVectorField> (UsFieldName_)),
     scaleDia_(1.),
+    scaleDist_(1.),
     scaleDrag_(1.),
     switchingVoidfraction_(0.8)
 {
@@ -91,6 +92,11 @@ ErgunStatFines::ErgunStatFines
 
     if (propsDict_.found("switchingVoidfraction"))
         switchingVoidfraction_ = readScalar(propsDict_.lookup("switchingVoidfraction"));
+
+    dictionary SauterDict(dict.subDict("dSauterProps"));
+    if (SauterDict.found("scaleDist"))
+        scaleDist_=scalar(readScalar(SauterDict.lookup("scaleDist")));
+    
 }
 
 
@@ -101,6 +107,12 @@ ErgunStatFines::~ErgunStatFines()
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+const scalar ErgunStatFines::dSauter(label cellI) const
+{
+    // Sauter mean diameter without influence of medium-scale fines
+    scalar dS = dSauter_[cellI] / scaleDist_;
+    return dS;
+}
 
 void ErgunStatFines::setForce() const
 {
@@ -215,7 +227,7 @@ void ErgunStatFines::setForce() const
        
                 // calc particle's drag
                 betaP /= (1-alphaPartEff);
-                dragCoefficient = M_PI/6 * ds/scaleDia_ * ds/scaleDia_ * dSauter_[cellI] * voidfraction / (1 - voidfraction) * betaP * scaleDrag_;
+                dragCoefficient = M_PI/6 * ds/scaleDia_ * ds/scaleDia_ * dSauter(cellI) * voidfraction / (1 - voidfraction) * betaP * scaleDrag_;
                 dragCoefficient *= scaleDia3;
                 if (modelType_=="B")
                     dragCoefficient /= voidfraction;
