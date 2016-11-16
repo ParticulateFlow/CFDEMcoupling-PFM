@@ -71,7 +71,7 @@ scaleForceBoundary::scaleForceBoundary
     {
         coordinateInner_=readScalar(propsDict_.lookup ("z1"));
 	coordinateOuter_=readScalar(propsDict_.lookup ("z2"));
-	dim_ = 1;
+	dim_ = 2;
         Info << "scaleForceBoundary: Limiting force in z direction."  << endl;
     }
     
@@ -116,6 +116,7 @@ void scaleForceBoundary::partToArray
     }
 
     dragTot *= scaleFac;
+    Cd *= scaleFac;
     forceSubModel::partToArray(index,dragTot,dragEx,Ufluid,Cd);
 }
 
