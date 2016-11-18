@@ -53,7 +53,7 @@ maxDeltaT       0.1;
 
 
 // ************************************************************************* //
-libs (
+/*libs (
     "libsampling.so"
     "libutilityFunctionObjects.so"
     "libOpenFOAM.so"
@@ -84,18 +84,18 @@ functions
         );
         expression "CO2*rho*Area*U";
     }
-
-    CO2_Mass_in_Volume
+        
+    OutletMassFlow-O2
     {
-        type                swakExpression;
-        valueType           internalField; //patch;
-        //aliases{alpha alpha.water;}
-        //patchName           outlet;
-        verbose             true;
-        expression          "rho*voidfraction*CO2*vol()";
-        accumulations       ( sum );
-        outputControlMode   timeStep; //outputTime;
-        outputInterval      1;
+        type patchExpression;
+        accumulations (
+            sum
+        );
+        patches (
+            outlet
+        );
+        expression "O2";
+        verbose true;
     }
     
     OutletMassFlow-CO2
@@ -111,7 +111,41 @@ functions
         verbose true;
         autoInterpolate true;
     }
+} */
+
+// ************************************************************************* //
+ 
+ /*CO2-Average1
+    {
+        type            fieldAverage;
+        functionObjectLibs ("libfieldFunctionObjects.so");
+        enabled         true;
+        outputControl   outputTime;
+
+        fields
+        (
+            CO2
+            {
+                mean        on;
+                prime2Mean  on;
+                base        time;
+            }
+        );
+    }
     
+    CO2_Mass_in_Volume
+    {
+        type                swakExpression;
+        valueType           internalField; //patch;
+        //aliases{alpha alpha.water;}
+        //patchName           outlet;
+        verbose             true;
+        expression          "rho*voidfraction*CO2*vol()";
+        accumulations       ( sum );
+        outputControlMode   timeStep; //outputTime;
+        outputInterval      1;
+    }
+        
     CO2_Concentration_in_Volume
     {
         type                swakExpression;
@@ -137,53 +171,7 @@ functions
         outputControlMode   timeStep; //outputTime;
         outputInterval      1;
     }
-   
-    O2_Concentration_in_Volume
-    {
-        type                swakExpression;
-        valueType           internalField; //patch;
-        //aliases{alpha alpha.water;}
-        //patchName           outlet;
-        verbose             true;
-        expression          "O2";
-        accumulations       ( sum );
-        outputControlMode   timeStep; //outputTime;
-        outputInterval      1;
-    }
     
-    OutletMassFlow-O2
-    {
-        type patchExpression;
-        accumulations (
-            sum
-        );
-        patches (
-            outlet
-        );
-        expression "O2";
-        verbose true;
-    }
-}
-
-// ************************************************************************* //
- 
- /*CO2-Average1
-    {
-        type            fieldAverage;
-        functionObjectLibs ("libfieldFunctionObjects.so");
-        enabled         true;
-        outputControl   outputTime;
-
-        fields
-        (
-            CO2
-            {
-                mean        on;
-                prime2Mean  on;
-                base        time;
-            }
-        );
-    }
    species_CO2 // Name also used to identify output folder 
     { 
         type            cellSource; 
@@ -201,6 +189,20 @@ functions
             CO2
         ); 
     } 
+    
+       
+    O2_Concentration_in_Volume
+    {
+        type                swakExpression;
+        valueType           internalField; //patch;
+        //aliases{alpha alpha.water;}
+        //patchName           outlet;
+        verbose             true;
+        expression          "O2";
+        accumulations       ( sum );
+        outputControlMode   timeStep; //outputTime;
+        outputInterval      1;
+    }
     
      O2-Average1
     {
