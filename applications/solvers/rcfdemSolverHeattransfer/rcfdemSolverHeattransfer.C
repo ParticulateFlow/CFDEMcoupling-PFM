@@ -69,8 +69,15 @@ int main(int argc, char *argv[])
     scalar recTimeStep_=recurrenceBase.recM().recTimeStep();
 
     // control coupling behavior in case of substepping
+    // assumes constant timestep size
     label counter = 0;
-    label couplingSubStep = 5;//3;
+    label couplingSubStep = recurrenceBase.couplingSubStep();//5;//3;
+    double dtProp =  particleCloud.dataExchangeM().couplingTime() / runTime.deltaTValue();
+    label dtDEM2dtCFD = int(dtProp + 0.5);
+    Info << "deltaT_DEM / deltaT_CFD = " << dtDEM2dtCFD << endl;
+    if (dtDEM2dtCFD > 1)
+        Info << "coupling at substep " << couplingSubStep << endl;
+    
     
     while (runTime.run())
     {

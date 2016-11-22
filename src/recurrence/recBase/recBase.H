@@ -59,6 +59,9 @@ protected:
     
     autoPtr<recPath> recPath_;
     
+    // in case of substepping: couple passive quantity at this substep
+    label couplingSubStep_;
+    
 public:
       
       // Constructors
@@ -79,6 +82,8 @@ public:
     recModel& recM();
  
     void updateRecFields();
+    
+    label couplingSubStep() const;
   
 };
 

@@ -71,7 +71,8 @@ recBase::recBase
             recProperties_,
             *this
         )
-    )
+    ),
+    couplingSubStep_(recProperties_.lookupOrDefault<label>("couplingSubStep",0))
 {
   recModel_ ->  readFieldSeries();
   recNorm_  ->  computeRecMatrix();
@@ -104,4 +105,9 @@ void recBase::updateRecFields()
     recModel_->updateRecFields(); 
 }
 
+}
+
+label recBase::couplingSubStep() const
+{
+    return couplingSubStep_;
 }

@@ -36,7 +36,7 @@
 
         particleCloud.clockM().start(31,"postFlow");
 	counter++;
-	if( (counter - couplingSubStep) % 10 == 0)
+	if( (counter - couplingSubStep) % dtDEM2dtCFD == 0)
 	    particleCloud.postFlow();
         particleCloud.clockM().stop("postFlow");
 
