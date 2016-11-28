@@ -83,11 +83,11 @@ Info<< "Reading thermophysical properties\n" << endl;
     );
     
     Info<< "\nCreating fluid-particle heat flux coefficient field\n" << endl;
-    volScalarField Qcoeff
+    volScalarField QCoeff
     (
         IOobject
         (
-            "Qcoeff",
+            "QCoeff",
             runTime.timeName(),
             mesh,
             IOobject::NO_READ,

@@ -4,6 +4,7 @@
     // dim he = J / kg
     volScalarField& he = thermo.he();
     particleCloud.energyContributions(Qsource);
+    particleCloud.energyCoefficients(QCoeff);
 
     //thDiff=particleCloud.thermCondM().thermDiff();   
     thCond=particleCloud.thermCondM().thermCond(); 
@@ -29,6 +30,7 @@
       + addSource
      // net heat transfer from particles to fluid
       - Qsource
+      - fvm::Sp(QCoeff/Cpv, he)
      // thermal conduction of the fluid with effective conductivity
      // - fvm::laplacian(rhoeps*thDiff,he)
       - fvm::laplacian(voidfraction*thCond/Cpv,he)
@@ -38,12 +40,6 @@
         fvOptions(rho, he)
     );
     
-    
-    // work in progress:
-    // if (particleCloud.implicitEnergyModel)
-    // volScalarField& tpart (lookup ...)
-    // particleCloud.energyCoefficients(Qcoeff);
-    // EEqn += ...
 
     EEqn.relax();
 
@@ -56,4 +52,8 @@
     thermo.correct();
 
     Info<< "T max/min : " << max(T).value() << " " << min(T).value() << endl;
+
+    particleCloud.clockM().start(31,"postFlow");
+    particleCloud.postFlow();
+    particleCloud.clockM().stop("postFlow");
 }
