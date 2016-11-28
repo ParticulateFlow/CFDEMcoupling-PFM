@@ -68,6 +68,7 @@ $(forceModels)/Fines/Fines.C
 $(forceModels)/Fines/FinesFields.C
 $(forceModels)/Fines/FanningDynFines.C
 $(forceModels)/Fines/ErgunStatFines.C
+$(forceModels)/granKineticEnergy/granKineticEnergy.C
 
 $(forceModelsMS)/forceModelMS/forceModelMS.C
 $(forceModelsMS)/forceModelMS/newForceModelMS.C
