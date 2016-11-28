@@ -206,6 +206,7 @@ void heatTransferGunn::calcEnergyContribution()
 	// average per cell-value, not per volume * cell-value
 	dimensionedScalar aveTemp = weigthedTp.average() / volP.average();
 	partRelTempField_ = (partTempField_ - aveTemp) / (aveTemp - partRefTemp_);
+	Info << "heatTransferGunn: average part. temp = " << aveTemp.value() << endl;
     }
 
     #ifdef compre
