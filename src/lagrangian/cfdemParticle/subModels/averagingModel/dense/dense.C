@@ -101,7 +101,7 @@ void dense::setScalarAverage
                 if (cellI >= 0)
                 {
                     valueScal = value[index][0];
-                    weightP = weight[index][0];
+                    weightP = weight[index][subCell];
 
                     // first entry in this cell
                     if(weightField[cellI] == 0)
