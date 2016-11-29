@@ -58,6 +58,8 @@ protected:
 	
 	dimensionedScalar Cp_;
 	
+	dimensionedScalar Cv_;
+	
 
 public:
 
@@ -110,6 +112,8 @@ public:
 	virtual tmp<volScalarField> thermDiff() const = 0;
 	
 	dimensionedScalar Cp() const;
+	
+	dimensionedScalar Cv() const;
        
 };
 

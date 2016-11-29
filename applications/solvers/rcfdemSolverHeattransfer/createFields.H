@@ -100,18 +100,18 @@
         dimensionedScalar("zero", dimensionSet(1,-1,-3,-1,0,0,0), 0.0)
     );
     
-    volScalarField thDiff
+    volScalarField thCond
     (
         IOobject
         (
-            "thDiff",
+            "thCond",
             runTime.timeName(),
             mesh,
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
         mesh,
-        dimensionedScalar("zero", dimensionSet(0,2,-1,0,0,0,0), 0.0)
+        dimensionedScalar("zero", dimensionSet(1,1,-3,-1,0,0,0), 0.0)
     );
     
     volScalarField T

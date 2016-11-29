@@ -59,7 +59,8 @@ thermCondModel::thermCondModel
         )
     ),
     kf0_(transportProperties_.lookup("kf")),
-    Cp_(transportProperties_.lookup("Cp"))
+    Cp_(transportProperties_.lookup("Cp")),
+    Cv_(transportProperties_.lookup("Cv"))
 {}
 
 
@@ -71,6 +72,11 @@ thermCondModel::~thermCondModel()
 dimensionedScalar thermCondModel::Cp() const
 {
     return Cp_; 
+}
+
+dimensionedScalar thermCondModel::Cv() const
+{
+    return Cv_; 
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
