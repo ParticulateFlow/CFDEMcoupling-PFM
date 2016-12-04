@@ -52,18 +52,18 @@ fix     cfd3 all couple/cfd/chemistry n_species 2 species_names O2 CO2
 #fix    cfd4 all chem/shrink speciesA O2 molMassA 31.99 speciesC CO2 molMassC 44.01 molMassB 12.01 k 7.60e5 rmin 0.005
 
 # Activate for 3-layer unreacted core shrink model
-fix     OreReductionCO Ore chem/shrink/core speciesA O2 molMassA 31.99 speciesC CO2 molMassC 44.01
+fix     OreReductionCO all chem/shrink/core speciesA O2 molMassA 31.99 speciesC CO2 molMassC 44.01
 
 # Chemical properties for unreacted shrink core (activate only when chem/shrink/core is active)
 fix     k0 all property/global k0_OreReductionCO vector 2700 25 17
 fix     Ea all property/global Ea_OreReductionCO vector 113.859 73.674 69.488
 
 # Material properties for unreacted chemical shrink core (activate only when chem/shrink/core is active)
-fix     density Ore property/global density_Ore vector 5.24 5.17 5.74 7.87
-fix     molMass Ore property/global molMass_Ore vector 156 231.533 71.844 55.845
+fix     density Ore property/global density_all vector 5.24 5.17 5.74 7.87
+fix     molMass Ore property/global molMass_all vector 156 231.533 71.844 55.845
 
 # define layer radius
-#fix     layerRelRad all property/atom layerradii vector yes no no 0. 0. 0. 0.
+fix     layerRelRad all property/atom layerradii vector yes no no 0.015 0.025 0.035
 
 # apply nve integration to all particles that are inserted as single particles
 fix     integr all nve/sphere
@@ -75,6 +75,6 @@ thermo          1000
 thermo_modify   lost ignore norm no
 compute_modify  thermo_temp dynamic yes
 
-dump        dmp all custom 1 ../DEM/post/dump.liggghts_run id type x y z ix iy iz vx vy vz fx fy fz omegax omegay omegaz radius
+dump        dmp all custom 1 ../DEM/post/dump.liggghts_run id type x y z ix iy iz vx vy vz fx fy fz radius
 
 run         1
