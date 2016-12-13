@@ -1,3 +1,6 @@
+// work-around for transient properties
+// needs to be specified for each case
+
 // case 1
 
 forAll(rhoRec,cellI)
