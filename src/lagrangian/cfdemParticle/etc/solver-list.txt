@@ -1,3 +1,4 @@
 cfdemSolverPisoMS/dir
 cfdemSolverPiso/dir
+cfdemSolverIB/dir
 cfdemSolverPisoScalar/dir
