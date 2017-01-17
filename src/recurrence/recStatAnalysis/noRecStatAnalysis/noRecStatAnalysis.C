@@ -2,7 +2,7 @@
     CFDEMcoupling academic - Open Source CFD-DEM coupling
     
     Contributing authors:
-    Thomas Lichtenegger
+    Thomas Lichtenegger, Gerhard Holzinger
     Copyright (C) 2015- Johannes Kepler University, Linz
 -------------------------------------------------------------------------------
 License
@@ -21,77 +21,66 @@ License
     You should have received a copy of the GNU General Public License
     along with CFDEMcoupling academic.  If not, see <http://www.gnu.org/licenses/>.
 \*---------------------------------------------------------------------------*/
-#ifndef recBase_H
-#define recBase_H
 
-// choose version
-#include <vector>
-
-#include "fvCFD.H"
-#include "IFstream.H"
+#include "error.H"
+#include "Random.H"
+#include "noRecStatAnalysis.H"
+#include "recModel.H"
+#include "addToRunTimeSelectionTable.H"
+#include <mpi.h>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-// forward declarations
-class recModel;
-class recNorm;
-class recPath;
-class recStatAnalysis;
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-/*---------------------------------------------------------------------------*\
-                           Class recBase Declaration
-\*---------------------------------------------------------------------------*/
+defineTypeNameAndDebug(noRecStatAnalysis, 0);
 
-class recBase
+addToRunTimeSelectionTable
+(
+    recStatAnalysis,
+    noRecStatAnalysis,
+    dictionary
+);
+
+
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+
+// Construct from components
+noRecStatAnalysis::noRecStatAnalysis
+(
+    const dictionary& dict,
+    recBase& base
+)
+:
+    recStatAnalysis(dict,base)
 {
-  
-protected:
     
-    const fvMesh& mesh_;
-
-    IOdictionary recProperties_;
     
-    autoPtr<recModel> recModel_;
-    
-    autoPtr<recNorm> recNorm_;
-    
-    autoPtr<recPath> recPath_;
-    
-    autoPtr<recStatAnalysis> recStatAnalysis_;
-    
-    // in case of substepping: couple passive quantity at this substep
-    label couplingSubStep_;
-    
-public:
-      
-      // Constructors
-
-    //- Construct from mesh and a list of particles
-    recBase
-    (
-            const fvMesh& mesh
-    );
-    
-    //- Destructor
-    virtual ~recBase();
-    
-    // public Member Functions
-    
-    const fvMesh& mesh() const;
-    
-    recModel& recM();
-    
-    recStatAnalysis& recStatA();
- 
-    void updateRecFields();
-    
-    label couplingSubStep() const;
-  
-};
 
 }
 
-#endif
+
+// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
+
+noRecStatAnalysis::~noRecStatAnalysis()
+{}
+
+
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+void noRecStatAnalysis::init()
+{
+}
+
+void noRecStatAnalysis::statistics()
+{
+}
+
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace Foam
+
+// ************************************************************************* //

@@ -2,7 +2,7 @@
     CFDEMcoupling academic - Open Source CFD-DEM coupling
     
     Contributing authors:
-    Thomas Lichtenegger
+    Thomas Lichtenegger, Gerhard Holzinger
     Copyright (C) 2015- Johannes Kepler University, Linz
 -------------------------------------------------------------------------------
 License
@@ -21,77 +21,84 @@ License
     You should have received a copy of the GNU General Public License
     along with CFDEMcoupling academic.  If not, see <http://www.gnu.org/licenses/>.
 \*---------------------------------------------------------------------------*/
-#ifndef recBase_H
-#define recBase_H
 
-// choose version
-#include <vector>
+#ifndef standardRecStatAnalysis_H
+#define standardRecStatAnalysis_H
 
-#include "fvCFD.H"
-#include "IFstream.H"
+#include "recStatAnalysis.H"
+#include "scalarList.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-// forward declarations
-class recModel;
-class recNorm;
-class recPath;
-class recStatAnalysis;
-
 /*---------------------------------------------------------------------------*\
-                           Class recBase Declaration
+                           Class standardRecStatAnalysis Declaration
 \*---------------------------------------------------------------------------*/
 
-class recBase
+class standardRecStatAnalysis
+:
+    public recStatAnalysis
 {
-  
 protected:
-    
-    const fvMesh& mesh_;
-
-    IOdictionary recProperties_;
-    
-    autoPtr<recModel> recModel_;
-    
-    autoPtr<recNorm> recNorm_;
-    
-    autoPtr<recPath> recPath_;
-    
-    autoPtr<recStatAnalysis> recStatAnalysis_;
-    
-    // in case of substepping: couple passive quantity at this substep
-    label couplingSubStep_;
-    
-public:
-      
-      // Constructors
-
-    //- Construct from mesh and a list of particles
-    recBase
-    (
-            const fvMesh& mesh
-    );
-    
-    //- Destructor
-    virtual ~recBase();
-    
-    // public Member Functions
-    
-    const fvMesh& mesh() const;
-    
-    recModel& recM();
-    
-    recStatAnalysis& recStatA();
- 
-    void updateRecFields();
-    
-    label couplingSubStep() const;
   
+    
+
+public:
+
+    //- Runtime type information
+    TypeName("standardRecStatAnalysis");
+
+
+    // Constructors
+
+        //- Construct from components
+        standardRecStatAnalysis
+        (
+            const dictionary& dict,
+            recBase& base
+        );
+
+    // Destructor
+
+        ~standardRecStatAnalysis();
+
+    void init();
+	
+    void statistics();
+    
+	
+private:
+  
+    dictionary propsDict_;
+
+    label aveSimSpecialRefLength_;
+    
+    label ignoreStepsInit_;
+    
+    label ignoreStepsDiag_;
+    
+    scalarList aveSimilarity_;
+    
+    scalarList mostDistinct_;
+    
+    void aveSimGeneral();
+
+    void aveSimSpecial();
+    
+    void mostDistinct();
+    
+    
 };
 
-}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #endif
+
+// ************************************************************************* //

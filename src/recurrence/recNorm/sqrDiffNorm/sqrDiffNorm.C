@@ -55,6 +55,7 @@ sqrDiffNorm::sqrDiffNorm
 :
     recNorm(dict, base),
     propsDict_(dict.subDict(typeName + "Props")),
+    normConstant_(propsDict_.lookupOrDefault<scalar>("normConstant",-1.0)),
     fieldType_(propsDict_.lookup("fieldType")),
     fieldName_(propsDict_.lookup("fieldName"))
 {}
@@ -75,10 +76,20 @@ void sqrDiffNorm::computeRecMatrix()
     
     scalar normIJ(0.0);
     scalar maxNormIJ(0.0);
+    
+    label size = timeIndexList.size();
+    label counter = 0;
+    label percentage = 0;
 
     // perform un-normalized calculation for lower half of the recurrence matrix
     forAll(timeIndexList, ti)
     {
+        if(counter >= 0.1 * percentage * size)
+	{
+	    Info << "\t" << 10 * percentage << " \% done" << endl;
+	    percentage++;
+	}
+	counter++;
     	forAll(timeIndexList, tj)
     	{
 	        if(verbose_)
@@ -109,6 +120,7 @@ void sqrDiffNorm::computeRecMatrix()
     }
     
     // normalize matrix and copy lower to upper half
+    if(normConstant_ > 0.0) maxNormIJ = normConstant_;
     forAll(timeIndexList, ti)
     {
     	forAll(timeIndexList, tj)

@@ -2,7 +2,7 @@
     CFDEMcoupling academic - Open Source CFD-DEM coupling
     
     Contributing authors:
-    Thomas Lichtenegger
+    Thomas Lichtenegger, Gerhard Holzinger
     Copyright (C) 2015- Johannes Kepler University, Linz
 -------------------------------------------------------------------------------
 License
@@ -22,76 +22,61 @@ License
     along with CFDEMcoupling academic.  If not, see <http://www.gnu.org/licenses/>.
 \*---------------------------------------------------------------------------*/
 
-#ifndef sqrDiffNorm_H
-#define sqrDiffNorm_H
+#include "error.H"
+#include "recStatAnalysis.H"
+#include <unistd.h>
 
-#include "recNorm.H"
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-/*---------------------------------------------------------------------------*\
-                           Class sqrDiffNorm Declaration
-\*---------------------------------------------------------------------------*/
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-class sqrDiffNorm
+defineTypeNameAndDebug(recStatAnalysis, 0);
+
+defineRunTimeSelectionTable(recStatAnalysis, dictionary);
+
+
+// * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * //
+
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+
+// Construct from components
+recStatAnalysis::recStatAnalysis
+(
+    const dictionary& dict,
+    recBase& base
+)
 :
-    public recNorm
-{
-protected:
-
-    // Protected data
-
-    dictionary propsDict_;
-    
-    const scalar normConstant_;
-
-    word fieldType_;
-    
-    word fieldName_;
-    
-    void computeRecMatrix();
-    
-    scalar normVSF(label, label);
-    
-    scalar normVVF(label, label);
-    
-    scalar normSSF(label, label);
-    
-   
-
-public:
-
-    //- Runtime type information
-    TypeName("sqrDiffNorm");
-
-    // Constructors
-
-        //- Construct from components
-        sqrDiffNorm
+    base_(base),
+    recProperties_(dict),
+    controlDict_
+    (
+        IOobject
         (
-            const dictionary& dict,
-            recBase& base
-        );
+            "controlDict",
+            base.mesh().time().system(),
+            base.mesh(),
+            IOobject::MUST_READ,
+            IOobject::NO_WRITE
+        )
+    )
+{
 
+}
 
-    // Destructor
+// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-        virtual ~sqrDiffNorm();
+recStatAnalysis::~recStatAnalysis()
+{}
 
-
-    // Member Functions
-    
-  
-};
+// * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * //
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#endif
 
 // ************************************************************************* //

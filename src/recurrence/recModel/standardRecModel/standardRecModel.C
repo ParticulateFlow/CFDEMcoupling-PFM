@@ -165,10 +165,21 @@ void standardRecModel::exportSurfaceScalarField(word fieldname, surfaceScalarFie
 
 void standardRecModel::readFieldSeries()
 {
-    Info << "Reading fields" << endl;
+    Info << "Reading fields\n" << endl;
+    
+    label size = timeDirs.size();
+    label counter = 0;
+    label percentage = 0;
     
     for (instantList::iterator it=timeDirs.begin(); it != timeDirs.end(); ++it)
     {
+        if(counter >= 0.1 * percentage * size)
+	{
+	    Info << "\t" << 10 * percentage << " \% done" << endl;
+	    percentage++;
+	}
+	counter++;
+      
         // set time
         recTime.setTime(*it, it->value());
         

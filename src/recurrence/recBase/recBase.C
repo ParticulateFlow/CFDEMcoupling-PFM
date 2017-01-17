@@ -26,6 +26,7 @@ License
 #include "recModel.H"
 #include "recNorm.H"
 #include "recPath.H"
+#include "recStatAnalysis.H"
 
 namespace Foam
 {
@@ -72,16 +73,24 @@ recBase::recBase
             *this
         )
     ),
+    recStatAnalysis_
+    (
+	recStatAnalysis::New
+	(
+	    recProperties_,
+            *this
+        )
+    ),
     couplingSubStep_(recProperties_.lookupOrDefault<label>("couplingSubStep",0))
 {
-  recModel_ ->  readFieldSeries();
-  recNorm_  ->  computeRecMatrix();
-  recPath_  ->  getRecPath();
+  recModel_        ->  readFieldSeries();
+  recNorm_         ->  computeRecMatrix();
+  recPath_         ->  getRecPath();
  
-  recModel_ ->  init();
+  recModel_        ->  init();
   
-  recModel_ ->  writeRecMatrix();    
-  recModel_ ->  writeRecPath();
+  recModel_        ->  writeRecMatrix();    
+  recModel_        ->  writeRecPath();
 }
 
 // * * * * * * * * * * * * * * * * Destructors  * * * * * * * * * * * * * * //
@@ -100,14 +109,19 @@ recModel& recBase::recM()
     return recModel_();
 }
 
+recStatAnalysis& recBase::recStatA()
+{
+   return recStatAnalysis_(); 
+}
+
 void recBase::updateRecFields()
 {
     recModel_->updateRecFields(); 
 }
 
-}
-
 label recBase::couplingSubStep() const
 {
     return couplingSubStep_;
+}
+
 }

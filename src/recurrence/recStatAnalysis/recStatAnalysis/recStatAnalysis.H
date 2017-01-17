@@ -22,8 +22,8 @@ License
     along with CFDEMcoupling academic.  If not, see <http://www.gnu.org/licenses/>.
 \*---------------------------------------------------------------------------*/
 
-#ifndef recModel_H
-#define recModel_H
+#ifndef recStatAnalysis_H
+#define recStatAnalysis_H
 
 #include "recBase.H"
 #include "fvCFD.H"
@@ -35,10 +35,10 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class recModel Declaration
+                           Class recStatAnalysis Declaration
 \*---------------------------------------------------------------------------*/
 
-class recModel
+class recStatAnalysis
 {
 protected:
 
@@ -48,68 +48,22 @@ protected:
     const dictionary& recProperties_;
     
     IOdictionary controlDict_;
-    
-    bool verbose_;
-    
-    const wordList volScalarFieldNames_;
-    const wordList volVectorFieldNames_;
-    const wordList surfaceScalarFieldNames_;
-    
-    Foam::Time recTime;
-    instantList timeDirs;
-    label numRecFields_;
-
-    // matrix that contains the recurrence ERROR
-    SymmetricSquareMatrix<scalar> recurrenceMatrix_;
-    
-    // create a data structure for the time indices
-    //	constant will not be contained
-    //	runTimeIndex -> continuousIndex
-    HashTable<label,word> timeIndexList_;
-    
-    // create a data structure for the time values
-    //	constant will not be contained
-    //	continuousIndex -> time.value()
-    HashTable<label,scalar> timeValueList_;
-    
-    label contTimeIndex;
-    
-    label sequenceStart;
-    label sequenceEnd;
-    const label lowerSeqLim_;
-    const label upperSeqLim_;
-    
-    scalar startTime_;
-    scalar endTime_;
-    scalar timeStep_;
-    scalar recTimeStep_;
-    label virtualStartIndex;
-    label virtualTimeIndex;
-    label virtualTimeIndexNext;
-    // list of pairs (start value, end value)
-    labelPairList virtualTimeIndexList_;
-    label virtualTimeIndexListPos;
-    label totRecSteps_;
-    
-    virtual void readFieldSeries() = 0;
-    virtual void init();
      
-    void readTimeSeries();
-    scalar checkTimeStep();
+
 
 public:
   
     friend class recBase;
 
     //- Runtime type information
-    TypeName("recModel");
+    TypeName("recStatAnalysis");
 
     // Declare runtime constructor selection table
 
         declareRunTimeSelectionTable
         (
             autoPtr,
-            recModel,
+            recStatAnalysis,
             dictionary,
             (
                 const dictionary& dict,
@@ -122,7 +76,7 @@ public:
     // Constructors
 
         //- Construct from components
-        recModel
+        recStatAnalysis
         (
             const dictionary& dict,
             recBase& base
@@ -131,12 +85,12 @@ public:
 
     // Destructor
 
-        virtual ~recModel();
+        virtual ~recStatAnalysis();
 
 
     // Selector
 
-        static autoPtr<recModel> New
+        static autoPtr<recStatAnalysis> New
         (
             const dictionary& dict,
             recBase& base
@@ -144,36 +98,11 @@ public:
 
 
     // Member Functions
+    virtual void init() = 0;
+	
+    virtual void statistics() = 0;
     
-    virtual void updateRecFields() = 0;
-    
-    virtual void exportVolScalarField(word, volScalarField&) const = 0;
-    virtual void exportVolVectorField(word, volVectorField&) const = 0;
-    virtual void exportSurfaceScalarField(word, surfaceScalarField&) const = 0;
-    
-    virtual const volScalarField& exportVolScalarField(word, label) const = 0;
-    virtual const volVectorField& exportVolVectorField(word, label) const = 0;
-    virtual const surfaceScalarField& exportSurfaceScalarField(word, label) const = 0;
-    
-    const HashTable<label,word>& timeIndexList() const;
-    
-    SymmetricSquareMatrix<scalar>& recurrenceMatrix();
-    
-    label lowerSeqLim() const;
-    label upperSeqLim() const;
-    
-    labelPairList& virtualTimeIndexList();
-    
-    label numRecFields() const;
-    
-    label totRecSteps() const; 
-
-    scalar recTimeStep() const
-    {
-        return recTimeStep_;
-    }
-    void writeRecMatrix() const;
-    void writeRecPath() const;
+   
 };
 
 
