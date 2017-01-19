@@ -179,7 +179,7 @@ void volWeightedAverage::setForce() const
             MPI_Allreduce(&totVol, &totVol_all, 3, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
             integralValue = gSum(scalarFields_[i]);
             volWeightedAverage = integralValue / (totVol_all+SMALL);
-            scalarFields_[i].internalField() = volWeightedAverage;
+            scalarFields_[i].ref() = volWeightedAverage;
 
             if(verbose_)
             {
@@ -224,7 +224,7 @@ void volWeightedAverage::setForce() const
 
             MPI_Allreduce(&totVol, &totVol_all, 3, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
             volWeightedAverage = gSum(vectorFields_[i]) / (totVol_all+SMALL);
-            vectorFields_[i].internalField() = volWeightedAverage;
+            vectorFields_[i].ref() = volWeightedAverage;
 
             if(verbose_)
             {

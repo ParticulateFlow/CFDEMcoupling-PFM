@@ -90,7 +90,7 @@ void bigParticleVoidFraction::setvoidFraction(double** const& mask,double**& voi
 {
     reAllocArrays();
 
-    voidfractionNext_.internalField()=1;
+    voidfractionNext_.ref()=1;
 
     scalar radius(-1);
     scalar volume(0);

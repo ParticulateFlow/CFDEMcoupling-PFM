@@ -145,18 +145,18 @@ tmp<volVectorField> explicitCouple::expMomSource() const
                 if (fNext_[cellI][i] > fLimit_[i]) fNext_[cellI][i] = fLimit_[i];
             }
         }
-        tsource() = fPrev_;
+        tsource.ref() = fPrev_;
     }else
     {
-        tsource() = (1 - tsf) * fPrev_ + tsf * fNext_;
+        tsource.ref() = (1 - tsf) * fPrev_ + tsf * fNext_;
     }
     return tsource;
 }
 
 void Foam::explicitCouple::resetMomSourceField() const
 {
-    fPrev_.internalField() = fNext_.internalField();
-    fNext_.internalField() = vector::zero;
+    fPrev_.ref() = fNext_.ref();
+    fNext_.primitiveFieldRef() = vector::zero;
 }
 
 inline vector Foam::explicitCouple::arrayToField(label cellI) const

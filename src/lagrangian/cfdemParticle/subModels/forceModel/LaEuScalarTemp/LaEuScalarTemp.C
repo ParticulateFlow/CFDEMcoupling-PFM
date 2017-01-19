@@ -130,7 +130,7 @@ void LaEuScalarTemp::manipulateScalarField(volScalarField& EuField) const
     allocateMyArrays();
 
     // reset Scalar field
-    EuField.internalField() = 0.0;
+    EuField.primitiveFieldRef() = 0.0;
 
     // get DEM data
     particleCloud_.dataExchangeM().getData(partTempName_,"scalar-atom",partTemp_);
@@ -232,7 +232,7 @@ void LaEuScalarTemp::manipulateScalarField(volScalarField& EuField) const
     );
 
     // scale with -1/(Vcell*rho*Cp)
-    EuField.internalField() /= -rhoField.internalField()*Cp_*EuField.mesh().V();
+    EuField.primitiveFieldRef() /= -rhoField.internalField()*Cp_*EuField.mesh().V();
 
     // limit source term
     forAll(EuField,cellI)

@@ -39,7 +39,8 @@ Contributions
 
 #include "fvCFD.H"
 #include "singlePhaseTransportModel.H"
-#include "turbulenceModel.H"
+#include "turbulentTransportModel.H"
+#include "pisoControl.H"
 
 #include "cfdemCloudIB.H"
 #include "implicitCouple.H"
@@ -52,11 +53,6 @@ Contributions
 
 #include "cellSet.H"
 
-#if defined(version22)
-    #include "meshToMeshNew.H"
-    #include "fvIOoptionList.H"
-#endif
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 int main(int argc, char *argv[])
@@ -67,13 +63,13 @@ int main(int argc, char *argv[])
 
     #include "createDynamicFvMesh.H"
 
+    #include "createControl.H"
+
+    #include "createTimeControls.H"
+
     #include "createFields.H"
 
     #include "initContinuityErrs.H"
-
-    #if defined(version22)
-    #include "createFvOptions.H"
-    #endif
 
     // create cfdemCloud
     #include "readGravitationalAcceleration.H"
@@ -91,8 +87,9 @@ int main(int argc, char *argv[])
         interFace = mag(mesh.lookupObject<volScalarField>("voidfractionNext"));
         mesh.update(); //dyM
 
-        #include "readPISOControls.H"
+        #include "readTimeControls.H"
         #include "CourantNo.H"
+        #include "setDeltaT.H"
 
         // do particle stuff
         Info << "- evolve()" << endl;
@@ -107,45 +104,29 @@ int main(int argc, char *argv[])
                 fvm::ddt(voidfraction,U)
               + fvm::div(phi, U)
               + turbulence->divDevReff(U)
-                #if defined(version22)
-                ==
-                fvOptions(U)
-                #endif
             );
 
             UEqn.relax();
 
-            #if defined(version22)
-            fvOptions.constrain(UEqn);
-            #endif
-
-            if (momentumPredictor)
+            if (piso.momentumPredictor())
             {
                 solve(UEqn == -fvc::grad(p));
             }
 
             // --- PISO loop
-            for (int corr=0; corr<nCorr; corr++)
+            while (piso.correct())
             {
                 volScalarField rUA = 1.0/UEqn.A();
                 surfaceScalarField rUAf(fvc::interpolate(rUA));
 
                 U = rUA*UEqn.H();
-                #ifdef version23
+
                 phi = (fvc::interpolate(U) & mesh.Sf())
                     + rUAf*fvc::ddtCorr(U, phi);
-                #else
-                phi = (fvc::interpolate(U) & mesh.Sf())
-                    + fvc::ddtPhiCorr(rUA, U, phi);
-                #endif
+
                 adjustPhi(phi, U, p);
 
-                #if defined(version22)
-                fvOptions.relativeFlux(phi);
-                #endif
-
-                // Non-orthogonal pressure corrector loop
-                for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
+                while (piso.correctNonOrthogonal())
                 {
                     // Pressure corrector
 
@@ -156,20 +137,9 @@ int main(int argc, char *argv[])
 
                     pEqn.setReference(pRefCell, pRefValue);
 
-                    if
-                    (
-                        corr == nCorr-1
-                     && nonOrth == nNonOrthCorr
-                    )
-                    {
-                        pEqn.solve(mesh.solver("pFinal"));
-                    }
-                    else
-                    {
-                        pEqn.solve();
-                    }
+                    pEqn.solve(mesh.solver(p.select(piso.finalInnerIter())));
 
-                    if (nonOrth == nNonOrthCorr)
+                    if (piso.finalNonOrthogonalIter())
                     {
                         phi -= pEqn.flux();
                     }
@@ -187,10 +157,6 @@ int main(int argc, char *argv[])
         Info << "particleCloud.calcVelocityCorrection() " << endl;
         volScalarField voidfractionNext=mesh.lookupObject<volScalarField>("voidfractionNext");
         particleCloud.calcVelocityCorrection(p,U,phiIB,voidfractionNext);
-
-        #if defined(version22)
-        fvOptions.correct(U);
-        #endif
 
         runTime.write();
 

@@ -56,7 +56,7 @@ maxDeltaT       1;
 
 
 functions
-(
+{
     probes
     {
         type        probes;
@@ -76,6 +76,6 @@ functions
         outputControl   timeStep;//outputTime;
         outputInterval  1;
     }
-);
+};
 
 // ************************************************************************* //
