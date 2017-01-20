@@ -301,9 +301,6 @@ void FinesFields::update()
     updateUDyn();
     if(verbose_)  Info << "FinesFields: Integrating alphas.\n" << endl;
     integrateFields();
-    // update voidfraction, probably really bad...
-    // if(verbose_)  Info << "FinesFields: Updating voidfraction.\n" << endl;
-    // updateVoidfraction();
     if(verbose_)  Info << "FinesFields: Update finished.\n" << endl;
 }
 
@@ -412,9 +409,6 @@ void FinesFields::integrateFields()
     
     if (verbose_)
     {
-     //   Info << "amount of alphaSt added because of positivity requirement: " << -alphaStErr << endl;
-     //   Info << "amount of alphaDyn added because of positivity requirement: " << -alphaDynErr1 << endl;
-     //   Info << "amount of alphaDyn removed because of max. value: " << -alphaDynErr2 << endl;
         Sout << "[" << Pstream::myProcNo() << "] " << "amount of alphaSt added because of positivity requirement: " << -alphaStErr << endl;
         Sout << "[" << Pstream::myProcNo() << "] " << "amount of alphaDyn added because of positivity requirement: " << -alphaDynErr1 << endl;
         Sout << "[" << Pstream::myProcNo() << "] " << "amount of alphaDyn removed because of max. value: " << -alphaDynErr2 << endl;
@@ -423,16 +417,7 @@ void FinesFields::integrateFields()
     alphaSt_.correctBoundaryConditions();
     alphaDyn_.correctBoundaryConditions();
     
-    massFluxDyn_ = rhoFine_ * fvc::interpolate(alphaDyn_) * phiDyn;//uDyn_;
-
-//     forAll(alphaStRel_,cellI)
-//     {
-//         scalar aP = alphaP_[cellI];
-//         if(aP>0.1)
-//             alphaStRel_[cellI] = (alphaSt_[cellI] + aP) / aP;
-//         else
-//             alphaStRel_[cellI] = 1.0;
-//     }
+    massFluxDyn_ = rhoFine_ * fvc::interpolate(alphaDyn_) * phiDyn;
 }
 
 
@@ -571,15 +556,7 @@ void FinesFields::updateUDyn()
 	        uDyn_.boundaryFieldRef()[patchI][faceI] *= mU / muDyn;
 	    }
         }
-    
-  //  uDyn_.correctBoundaryConditions();
 }
-
-// void FinesFields::updateVoidfraction()
-// {
-//     updateAlphaG();
-//     voidfraction_ = alphaG_;
-// }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
