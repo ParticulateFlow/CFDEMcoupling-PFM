@@ -107,7 +107,7 @@ ErgunStatFines::~ErgunStatFines()
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-const scalar ErgunStatFines::dSauter(label cellI) const
+scalar ErgunStatFines::dSauter(label cellI) const
 {
     // Sauter mean diameter without influence of medium-scale fines
     scalar dS = dSauter_[cellI] / scaleDist_;
