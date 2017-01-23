@@ -97,8 +97,8 @@ void reactionHeat::calcEnergyContribution()
 
     particleCloud_.dataExchangeM().getData(reactionHeatName_,"scalar-atom",reactionHeat_);
 
-    reactionHeatField_.internalField() = 0.0;
-    reactionHeatField_.boundaryField() = 0.0;
+    reactionHeatField_.primitiveFieldRef() = 0.0;
+    reactionHeatField_.boundaryFieldRef() = 0.0;
 
     particleCloud_.averagingM().setScalarSum
     (
@@ -108,7 +108,7 @@ void reactionHeat::calcEnergyContribution()
         NULL
     );
 
-    reactionHeatField_.internalField() /= (reactionHeatField_.mesh().V());
+    reactionHeatField_.primitiveFieldRef() /= (reactionHeatField_.mesh().V());
 
     forAll(reactionHeatField_,cellI)
     {
