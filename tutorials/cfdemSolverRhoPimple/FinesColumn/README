@@ -1,7 +1,8 @@
 Test case for fines transport through packed particle column
 
 1) fill a cylinder with sperical particles (parDEMrun.sh)
-2) introduce gas flow with fines (parCFDDEMrun.sh)
+2) create CFD mesh (mesh.sh)
+3) introduce gas flow with fines (parCFDDEMrun.sh)
 
 
 Comments:
