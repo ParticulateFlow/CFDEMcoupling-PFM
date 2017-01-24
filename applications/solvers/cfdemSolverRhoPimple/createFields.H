@@ -25,7 +25,7 @@ Info<< "Reading thermophysical properties\n" << endl;
     );
 
 
-    
+
     Info<< "Reading field U\n" << endl;
     volVectorField U
     (
@@ -39,7 +39,7 @@ Info<< "Reading thermophysical properties\n" << endl;
         ),
         mesh
     );
-    
+
     Info<< "\nReading voidfraction field voidfraction = (Vgas/Vparticle)\n" << endl;
     volScalarField voidfraction
     (
@@ -81,7 +81,7 @@ Info<< "Reading thermophysical properties\n" << endl;
         mesh,
         dimensionedScalar("zero", dimensionSet(1,-1,-3,0,0,0,0), 0.0)
     );
-    
+
     Info<< "\nCreating fluid-particle heat flux coefficient field\n" << endl;
     volScalarField QCoeff
     (
@@ -96,7 +96,7 @@ Info<< "Reading thermophysical properties\n" << endl;
         mesh,
         dimensionedScalar("zero", dimensionSet(1,-1,-3,-1,0,0,0), 0.0)
     );
-    
+
   /*  Info<< "\nCreating thermal diffusivity field\n" << endl;
     volScalarField thDiff
     (
@@ -141,7 +141,7 @@ Info<< "Reading thermophysical properties\n" << endl;
         mesh,
         dimensionedScalar("zero", dimensionSet(0,2,-2,-1,0,0,0), 0.0)
     );
-    
+
     Info<< "\nCreating body force field\n" << endl;
     volVectorField fOther
     (
@@ -204,7 +204,7 @@ Info<< "Reading thermophysical properties\n" << endl;
             thermo
         )
     );
-    
+
     mesh.setFluxRequired(p.name());
 
     Info<< "Creating field dpdt\n" << endl;
@@ -222,7 +222,7 @@ Info<< "Reading thermophysical properties\n" << endl;
 
     Info<< "Creating field kinetic energy K\n" << endl;
     volScalarField K("K", 0.5*magSqr(U));
-    
+
     Info<< "\nReading momentum exchange field Ksl\n" << endl;
     volScalarField Ksl
     (
