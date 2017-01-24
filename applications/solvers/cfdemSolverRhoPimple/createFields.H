@@ -7,8 +7,6 @@ Info<< "Reading thermophysical properties\n" << endl;
     psiThermo& thermo = pThermo();
     thermo.validate(args.executable(), "h", "e");
     volScalarField& p = thermo.p();
-    volScalarField& T = thermo.T();
-    const volScalarField& psi = thermo.psi();
 
     Info<< "Reading field rho\n" << endl;
     volScalarField rho
@@ -23,7 +21,6 @@ Info<< "Reading thermophysical properties\n" << endl;
         ),
         thermo.rho()
     );
-
 
 
     Info<< "Reading field U\n" << endl;
