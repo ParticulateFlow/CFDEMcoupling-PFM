@@ -9,7 +9,6 @@ include $(CFDEM_ADD_LIBS_DIR)/additionalLibs
 EXE_INC = \
      $(PFLAGS) \
      $(PINC) \
-    -I ./cfdemParticle \
     -I$(LIB_SRC)/finiteVolume/lnInclude \
     -I$(LIB_SRC)/transportModels \
     -I$(LIB_SRC)/TurbulenceModels/turbulenceModels/lnInclude \
@@ -19,6 +18,9 @@ EXE_INC = \
     -I$(CFDEM_LIGGGHTS_SRC_DIR) \
     -I$(CFDEM_M2MLIB_PATH) \
     -I$(CFDEM_SRC_DIR)/cfdTools \
+    -Wno-old-style-cast \
+    -Wno-unused-result \
+    -Wno-literal-suffix
 
 LIB_LIBS = \
      $(PLIBS) \
