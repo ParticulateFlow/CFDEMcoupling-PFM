@@ -5,16 +5,18 @@ PFLAGS+= -Dcompre
 EXE_INC = \
      $(PFLAGS) \
     -I../. \
-    -I$(LIB_SRC)/thermophysicalModels/basic/lnInclude \
-    -I$(LIB_SRC)/turbulenceModels/compressible/turbulenceModel \
     -I$(LIB_SRC)/finiteVolume/cfdTools \
     -I$(LIB_SRC)/finiteVolume/lnInclude \
+    -I$(LIB_SRC)/TurbulenceModels/turbulenceModels/lnInclude \
+    -I$(LIB_SRC)/TurbulenceModels/compressible/lnInclude \
+    -I$(LIB_SRC)/thermophysicalModels/basic/lnInclude \
     -I$(LIB_SRC)/meshTools/lnInclude \
     -I$(LIB_SRC)/sampling/lnInclude \
     -I$(LIB_SRC)/fvOptions/lnInclude \
     -I$(CFDEM_SRC_DIR)/lagrangian/cfdemParticle/lnInclude \
     -I$(CFDEM_SRC_DIR)/lagrangian/cfdemParticle/cfdTools \
     -I$(LIB_SRC)/thermophysicalModels/specie/lnInclude \
+    -I$(LIB_SRC)/transportModels/compressible/lnInclude \
     -I$(LIB_SRC)/thermophysicalModels/basic/lnInclude \
     -I$(LIB_SRC)/thermophysicalModels/properties/liquidProperties/lnInclude \
     -I$(LIB_SRC)/thermophysicalModels/properties/liquidMixtureProperties/lnInclude \
@@ -27,21 +29,19 @@ EXE_INC = \
     -I$(LIB_SRC)/ODE/lnInclude \
     -I$(LIB_SRC)/combustionModels/lnInclude \
     -I$(FOAM_SOLVERS)/combustion/reactingFoam \
-    -I$(LIB_SRC)/TurbulenceModels/turbulenceModels/lnInclude \
-    -I$(LIB_SRC)/TurbulenceModels/compressible/lnInclude \
 
 
 
 
 EXE_LIBS = \
     -L$(CFDEM_LIB_DIR)  \
-    -lfluidThermophysicalModels \
-    -lspecie \
-    -lcompressibleTurbulenceModel \
-    -lcompressibleRASModels \
-    -lcompressibleLESModels \
     -lfiniteVolume \
     -lmeshTools \
+    -lturbulenceModels \
+    -lcompressibleTurbulenceModels \
+    -lcompressibleTransportModels \
+    -lfluidThermophysicalModels \
+    -lspecie \
     -lsampling \
     -lfvOptions \
     -l$(CFDEM_LIB_COMP_NAME) \

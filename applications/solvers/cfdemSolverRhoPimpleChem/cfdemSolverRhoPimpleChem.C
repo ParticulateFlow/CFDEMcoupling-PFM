@@ -31,11 +31,11 @@ Description
 #include "fvCFD.H"
 #include "psiThermo.H"
 #include "turbulentFluidThermoModel.H"
-#include "localEulerDdtScheme.H"
 #include "psiCombustionModel.H"
 #include "bound.H"
 #include "pimpleControl.H"
 #include "fvOptions.H"
+#include "localEulerDdtScheme.H"
 #include "fvcSmooth.H"
 
 
@@ -53,13 +53,13 @@ Description
 
 int main(int argc, char *argv[])
 {
+    #include "postProcess.H"
     #include "setRootCase.H"
     #include "createTime.H"
     #include "createMesh.H"
+    #include "createControl.H"
     #include "createTimeControls.H"
     #include "createRDeltaT.H"
-
-    pimpleControl pimple(mesh);
 
     #include "createFields.H"
     #include "createFieldRefs.H"
@@ -70,6 +70,8 @@ int main(int argc, char *argv[])
     #include "readGravitationalAcceleration.H"
     cfdemCloudEnergy particleCloud(mesh);
     #include "checkModelType.H"
+
+    turbulence->validate();
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

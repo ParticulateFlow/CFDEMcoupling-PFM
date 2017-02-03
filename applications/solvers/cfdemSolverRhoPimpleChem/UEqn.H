@@ -1,13 +1,10 @@
 // Solve the Momentum equation
-particleCloud.otherForces(fOther);
-
 tmp<fvVectorMatrix> tUEqn
+
 (
-    fvm::ddt(rhoeps, U)
-  + fvm::div(phi, U)
-  + particleCloud.divVoidfractionTau(U, voidfraction)
-  + fvm::Sp(Ksl,U)
-  - fOther
+    fvm::ddt(rhoeps,U) + fvm::div(phi, U)
+   + particleCloud.divVoidfractionTau(U, voidfraction)
+   + fvm::Sp(Ksl,U)
  ==
     fvOptions(rho, U)
 );
@@ -31,3 +28,4 @@ else if (pimple.momentumPredictor())
     fvOptions.correct(U);
     K = 0.5*magSqr(U);
 }
+
