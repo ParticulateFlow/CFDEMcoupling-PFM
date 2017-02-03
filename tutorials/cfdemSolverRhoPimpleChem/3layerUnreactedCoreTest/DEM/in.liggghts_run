@@ -63,7 +63,7 @@ fix     density Ore property/global density_all vector 5.24 5.17 5.74 7.87
 fix     molMass Ore property/global molMass_all vector 156 231.533 71.844 55.845
 
 # define layer radius
-fix     layerRelRad all property/atom layerradii vector yes no no 0.015 0.025 0.035
+fix     layerRelRad all property/atom relRadii vector yes no no 0.3 0.5 0.6
 
 # apply nve integration to all particles that are inserted as single particles
 fix     integr all nve/sphere
