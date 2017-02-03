@@ -44,6 +44,7 @@ heatTransferGunn::heatTransferGunn
     energyModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
     interpolation_(propsDict_.lookupOrDefault<bool>("interpolation",false)),
+    verbose_(propsDict_.lookupOrDefault<bool>("verbose",false)),
     QPartFluidName_(propsDict_.lookupOrDefault<word>("QPartFluidName","QPartFluid")),
     QPartFluid_
     (   IOobject
@@ -81,6 +82,30 @@ heatTransferGunn::heatTransferGunn
         sm.mesh(),
         dimensionedScalar("zero", dimensionSet(0,0,0,0,0,0,0), 0.0)
     ),
+    ReField_
+    (   IOobject
+        (
+            "ReField",
+            sm.mesh().time().timeName(),
+            sm.mesh(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        sm.mesh(),
+        dimensionedScalar("zero", dimensionSet(0,0,0,0,0,0,0), 0.0)
+    ),
+    NuField_
+    (   IOobject
+        (
+            "NuField",
+            sm.mesh().time().timeName(),
+            sm.mesh(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        sm.mesh(),
+        dimensionedScalar("zero", dimensionSet(0,0,0,0,0,0,0), 0.0)
+    ),
     partRefTemp_("partRefTemp", dimensionSet(0,0,0,1,0,0,0), 0.0),
     calcPartTempField_(propsDict_.lookupOrDefault<bool>("calcPartTempField",false)),
     tempFieldName_(propsDict_.lookupOrDefault<word>("tempFieldName","T")),
@@ -95,7 +120,9 @@ heatTransferGunn::heatTransferGunn
     partTempName_(propsDict_.lookup("partTempName")),
     partTemp_(NULL),
     partHeatFluxName_(propsDict_.lookup("partHeatFluxName")),
-    partHeatFlux_(NULL)
+    partHeatFlux_(NULL),
+    partRe_(NULL),
+    partNu_(NULL)
 {
      allocateMyArrays();
 
@@ -114,6 +141,13 @@ heatTransferGunn::heatTransferGunn
 	partRelTempField_.write();
 	Info <<  "Particle temperature field activated." << endl;
     }
+    if (verbose_)
+    {
+        ReField_.writeOpt() = IOobject::AUTO_WRITE;
+	NuField_.writeOpt() = IOobject::AUTO_WRITE;
+	ReField_.write();
+	NuField_.write();
+    }
 }
 
 
@@ -123,6 +157,8 @@ heatTransferGunn::~heatTransferGunn()
 {
     delete partTemp_;
     delete partHeatFlux_;
+    delete partRe_;
+    delete partNu_;
 }
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
@@ -132,6 +168,12 @@ void heatTransferGunn::allocateMyArrays() const
     double initVal=0.0;
     particleCloud_.dataExchangeM().allocateArray(partTemp_,initVal,1);  // field/initVal/with/lenghtFromLigghts
     particleCloud_.dataExchangeM().allocateArray(partHeatFlux_,initVal,1);
+    
+    if(verbose_)
+    {
+        particleCloud_.dataExchangeM().allocateArray(partRe_,initVal,1);
+        particleCloud_.dataExchangeM().allocateArray(partNu_,initVal,1);
+    }
 }
 
 // * * * * * * * * * * * * * * * * Member Fct  * * * * * * * * * * * * * * * //
@@ -142,14 +184,14 @@ void heatTransferGunn::calcEnergyContribution()
     allocateMyArrays();
 
     // reset Scalar field
-    QPartFluid_.internalField() = 0.0;
+    QPartFluid_.primitiveFieldRef() = 0.0;
 
     // get DEM data
     particleCloud_.dataExchangeM().getData(partTempName_,"scalar-atom",partTemp_);
     
     if(calcPartTempField_)
     {       
-	partTempField_.internalField() = 0.0;
+	partTempField_.primitiveFieldRef() = 0.0;
         particleCloud_.averagingM().resetWeightFields();
         particleCloud_.averagingM().setScalarAverage
         (
@@ -159,11 +201,11 @@ void heatTransferGunn::calcEnergyContribution()
             particleCloud_.averagingM().UsWeightField(),
             NULL
         );
-	volScalarField volP (1 - voidfraction_);
-	volScalarField weigthedTp (volP * partTempField_);
-	// average per cell-value, not per volume * cell-value
-	dimensionedScalar aveTemp = weigthedTp.average() / volP.average();
+
+	volScalarField sumTp (particleCloud_.averagingM().UsWeightField() * partTempField_);
+	dimensionedScalar aveTemp("aveTemp",dimensionSet(0,0,0,1,0,0,0), gSum(sumTp) / particleCloud_.numberOfParticles());
 	partRelTempField_ = (partTempField_ - aveTemp) / (aveTemp - partRefTemp_);
+	Info << "heatTransferGunn: average part. temp = " << aveTemp.value() << endl;
     }
 
     #ifdef compre
@@ -209,6 +251,9 @@ void heatTransferGunn::calcEnergyContribution()
                     Ufluid = U_[cellI];
                     Tfluid = tempField_[cellI];
                 }
+                
+                if (voidfraction < 0.01)
+		    voidfraction = 0.01;
 
                 // calc relative velocity
                 Us = particleCloud_.velocity(index);
@@ -227,6 +272,12 @@ void heatTransferGunn::calcEnergyContribution()
                 // calc convective heat flux [W]
                 heatFlux(index, h, As, Tfluid);
                 heatFluxCoeff(index, h, As);
+		
+		if(verbose_)
+		{
+		    partRe_[index][0] = Rep;
+		    partNu_[index][0] = Nup;
+		}
 		
 		if(particleCloud_.verbose() && index >=0 && index <2)
                 {
@@ -252,8 +303,32 @@ void heatTransferGunn::calcEnergyContribution()
         NULL
     );
 
-    QPartFluid_.internalField() /= -QPartFluid_.mesh().V();
+    QPartFluid_.primitiveFieldRef() /= -QPartFluid_.mesh().V();
 
+    if(verbose_)
+    {
+        ReField_.primitiveFieldRef() = 0.0;
+	NuField_.primitiveFieldRef() = 0.0;
+	particleCloud_.averagingM().resetWeightFields();
+        particleCloud_.averagingM().setScalarAverage
+        (
+            ReField_,
+            partRe_,
+            particleCloud_.particleWeights(),
+	    particleCloud_.averagingM().UsWeightField(),
+            NULL
+        );
+	particleCloud_.averagingM().resetWeightFields();
+        particleCloud_.averagingM().setScalarAverage
+        (
+            NuField_,
+            partNu_,
+            particleCloud_.particleWeights(),
+	    particleCloud_.averagingM().UsWeightField(),
+            NULL
+        );
+    }
+    
     // limit source term
     forAll(QPartFluid_,cellI)
     {
@@ -261,6 +336,7 @@ void heatTransferGunn::calcEnergyContribution()
 
         if(mag(EuFieldInCell) > maxSource_ )
         {
+	     Pout << "limiting source term\n"  << endl  ;
              QPartFluid_[cellI] = sign(EuFieldInCell) * maxSource_;
         }
     }
@@ -311,3 +387,4 @@ void heatTransferGunn::giveData(int call)
 } // End namespace Foam
 
 // ************************************************************************* //
+

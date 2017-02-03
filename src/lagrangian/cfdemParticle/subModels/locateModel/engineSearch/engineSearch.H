@@ -61,8 +61,6 @@ private:
 
     dictionary propsDict_;
 
-    //Switch faceDecomp_;
-
     Switch treeSearch_;
 
 protected:

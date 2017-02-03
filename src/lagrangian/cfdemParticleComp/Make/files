@@ -19,6 +19,7 @@ clockModels = $(path)/subModels/clockModel
 liggghtsCommandModels = $(path)/subModels/liggghtsCommandModel
 smoothingModels = $(path)/subModels/smoothingModel
 probeModels = $(path)/subModels/probeModel
+otherForceModels = $(path)/subModels/otherForceModel
 
 $(cfdemCloud)/cfdemCloud.C
 $(derived)/cfdemCloudIB/cfdemCloudIB.C
@@ -58,10 +59,24 @@ $(forceModels)/viscForce/viscForce.C
 $(forceModels)/MeiLift/MeiLift.C
 $(forceModels)/particleCellVolume/particleCellVolume.C
 $(forceModels)/BeetstraDrag/BeetstraDrag.C
+$(forceModels)/dSauter/dSauter.C
+$(forceModels)/Fines/Fines.C
+$(forceModels)/Fines/FinesFields.C
+$(forceModels)/Fines/FanningDynFines.C
+$(forceModels)/Fines/ErgunStatFines.C
+$(forceModels)/granKineticEnergy/granKineticEnergy.C
 
 $(forceSubModels)/forceSubModel/newForceSubModel.C
 $(forceSubModels)/forceSubModel/forceSubModel.C
 $(forceSubModels)/ImEx/ImEx.C
+$(forceSubModels)/ScaleForce/ScaleForce.C
+$(forceSubModels)/scaleForceBoundary/scaleForceBoundary.C
+
+$(otherForceModels)/otherForceModel/otherForceModel.C
+$(otherForceModels)/otherForceModel/newOtherForceModel.C
+$(otherForceModels)/gravity/gravity.C
+$(otherForceModels)/weightSecondaryPhase/weightSecondaryPhase.C
+$(otherForceModels)/expParticleForces/expParticleForces.C
 
 $(chemistryModels)/chemistryModel/chemistryModel.C
 $(chemistryModels)/chemistryModel/newChemistryModel.C

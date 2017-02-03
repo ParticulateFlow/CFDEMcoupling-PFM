@@ -100,7 +100,7 @@ void Foam::constDiffSmoothing::smoothen(volScalarField& fieldSrc) const
     volScalarField sSmoothField = sSmoothField_;
 
     sSmoothField.dimensions().reset(fieldSrc.dimensions());
-    sSmoothField.internalField()=fieldSrc.internalField();
+    sSmoothField.ref()=fieldSrc.internalField();
     sSmoothField.correctBoundaryConditions();
     sSmoothField.oldTime().dimensions().reset(fieldSrc.dimensions());
     sSmoothField.oldTime()=fieldSrc;
@@ -141,7 +141,7 @@ void Foam::constDiffSmoothing::smoothen(volVectorField& fieldSrc) const
     volVectorField vSmoothField = vSmoothField_;
 
     vSmoothField.dimensions().reset(fieldSrc.dimensions());
-    vSmoothField.internalField()=fieldSrc.internalField();
+    vSmoothField.ref()=fieldSrc.internalField();
     vSmoothField.correctBoundaryConditions();
     vSmoothField.oldTime().dimensions().reset(fieldSrc.dimensions());
     vSmoothField.oldTime()=fieldSrc;
@@ -176,7 +176,7 @@ void Foam::constDiffSmoothing::smoothenReferenceField(volVectorField& fieldSrc) 
     volVectorField vSmoothField = vSmoothField_;
 
     vSmoothField.dimensions().reset(fieldSrc.dimensions());
-    vSmoothField.internalField()=fieldSrc.internalField();
+    vSmoothField.ref()=fieldSrc.internalField();
     vSmoothField.correctBoundaryConditions();
     vSmoothField.oldTime().dimensions().reset(fieldSrc.dimensions());
     vSmoothField.oldTime()=fieldSrc;
@@ -210,7 +210,7 @@ void Foam::constDiffSmoothing::smoothenReferenceField(volVectorField& fieldSrc) 
     forAll(vSmoothField,cellI)
     {
         if ( mag(vSmoothField.oldTime().internalField()[cellI]) > 0.0f)  // have a vector in the OLD vSmoothField, so keep it!
-            NLarge()[cellI] = sourceStrength;
+            NLarge.ref()[cellI] = sourceStrength;
     }
 
     // do the smoothing

@@ -67,7 +67,6 @@ species::species
     ),
     // create a list from the Species table in the specified species dictionary
     speciesNames_(specDict_.lookup("species")),
-    //speciesNames_(propsDict_.lookup("speciesNames")),
     mod_spec_names_(speciesNames_.size()),
     Y_(speciesNames_.size()),                           //volumeScalarFields created in the ts folders
     concentrations_(speciesNames_.size(),NULL),         //the value of species concentration for every species
@@ -154,14 +153,6 @@ species::~species()
         particleCloud_.dataExchangeM().destroy(concentrations_[i],nP_);
         particleCloud_.dataExchangeM().destroy(changeOfSpeciesMass_[i],nP_);
     }
-    /*delete partTemp_;
-    delete partRho_;
-
-    for (int i = 0; i < speciesNames_.size();i++)
-    {
-        delete concentrations_[i];
-        delete changeOfSpeciesMass_[i];
-    }*/
 }
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
@@ -289,13 +280,13 @@ void species::execute()
 
 
         // pull changeOfSpeciesMass_, transform onto fields changeOfSpeciesMassFields_, add them up on changeOfGasMassField_
-        changeOfGasMassField_.internalField() = 0.0;
-        changeOfGasMassField_.boundaryField() = 0.0;
+        changeOfGasMassField_.primitiveFieldRef() = 0.0;
+        changeOfGasMassField_.boundaryFieldRef() = 0.0;
         for (int i=0; i<speciesNames_.size();i++)
         {
             particleCloud_.dataExchangeM().getData(mod_spec_names_[i],"scalar-atom",changeOfSpeciesMass_[i]);
-            changeOfSpeciesMassFields_[i].internalField() = 0.0;
-            changeOfSpeciesMassFields_[i].boundaryField() = 0.0;
+            changeOfSpeciesMassFields_[i].primitiveFieldRef() = 0.0;
+            changeOfSpeciesMassFields_[i].boundaryFieldRef() = 0.0;
             particleCloud_.averagingM().setScalarSum
             (
                 changeOfSpeciesMassFields_[i],
@@ -305,7 +296,7 @@ void species::execute()
             );
 
             // take care for implementation in LIGGGHTS: species produced from particles defined positive
-            changeOfSpeciesMassFields_[i].internalField() /= (changeOfSpeciesMassFields_[i].mesh().V()*deltaT);
+            changeOfSpeciesMassFields_[i].primitiveFieldRef() /= changeOfSpeciesMassFields_[i].mesh().V();
             changeOfSpeciesMassFields_[i].correctBoundaryConditions();
             changeOfGasMassField_ += changeOfSpeciesMassFields_[i];
             Info << "total conversion of species" << speciesNames_[i] << " = " << gSum(changeOfSpeciesMassFields_[i]*1.0*changeOfSpeciesMassFields_[i].mesh().V()) << endl;

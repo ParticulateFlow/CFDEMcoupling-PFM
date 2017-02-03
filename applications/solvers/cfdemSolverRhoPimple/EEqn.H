@@ -4,16 +4,12 @@
     // dim he = J / kg
     volScalarField& he = thermo.he();
     particleCloud.energyContributions(Qsource);
+    particleCloud.energyCoefficients(QCoeff);
 
-    thDiff=particleCloud.thermCondM().thermDiff();   
-    // BC for thDiff are calculated from its mathematical expression
-    // to enforce user-defined values, change thDiff to MUST_READ and do
-    // thDiff.correctBoundaryConditions();
+    //thDiff=particleCloud.thermCondM().thermDiff();   
+    thCond=particleCloud.thermCondM().thermCond(); 
 
-    fvScalarMatrix EEqn
-    (
-        fvm::ddt(rhoeps, he) + fvm::div(phi, he)
-      + fvc::ddt(rhoeps, K) + fvc::div(phi, K)
+    addSource = fvc::ddt(rhoeps, K) + fvc::div(phi, K)
       + (
             he.name() == "e"
           ? fvc::div
@@ -23,24 +19,27 @@
                 "div(phiv,p)"
             )
           : -dpdt
-        )
+        );
+
+    Cpv = he.name() == "e" ? thermo.Cv() : thermo.Cp();
+
+
+    fvScalarMatrix EEqn
+    (
+        fvm::ddt(rhoeps, he) + fvm::div(phi, he)
+      + addSource
      // net heat transfer from particles to fluid
       - Qsource
+      - fvm::Sp(QCoeff/Cpv, he)
      // thermal conduction of the fluid with effective conductivity
-      - fvm::laplacian(rhoeps*thDiff,he)
-          
+     // - fvm::laplacian(rhoeps*thDiff,he)
+      - fvm::laplacian(voidfraction*thCond/Cpv,he)
       // + particle-fluid energy transfer due to work
       // + fluid energy dissipation due to shearing
      ==
         fvOptions(rho, he)
     );
     
-    
-    // work in progress:
-    // if (particleCloud.implicitEnergyModel)
-    // volScalarField& tpart (lookup ...)
-    // particleCloud.energyCoefficients(Qcoeff);
-    // EEqn += ...
 
     EEqn.relax();
 
@@ -51,4 +50,10 @@
     fvOptions.correct(he);
 
     thermo.correct();
+
+    Info<< "T max/min : " << max(T).value() << " " << min(T).value() << endl;
+
+    particleCloud.clockM().start(31,"postFlow");
+    particleCloud.postFlow();
+    particleCloud.clockM().stop("postFlow");
 }

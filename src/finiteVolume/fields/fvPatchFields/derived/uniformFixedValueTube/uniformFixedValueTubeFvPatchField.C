@@ -88,7 +88,7 @@ uniformFixedValueTubeFvPatchField<Type>::uniformFixedValueTubeFvPatchField
 )
 :
     fixedValueFvPatchField<Type>(p, iF),
-    uniformValue_(DataEntry<Type>::New("uniformValue", dict)),
+    uniformValue_(Function1<Type>::New("uniformValue", dict)),
 	pName_("p"), //JOKER
 	phiName_("phi"), //JOKER
     velocityFieldName_("U"),

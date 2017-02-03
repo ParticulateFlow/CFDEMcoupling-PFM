@@ -96,7 +96,7 @@ void IBVoidFraction::setvoidFraction(double** const& mask,double**& voidfraction
 
     reAllocArrays();
 
-    voidfractionNext_.internalField()=1;
+    voidfractionNext_.ref()=1;
 
     for(int index=0; index< particleCloud_.numberOfParticles(); index++)
     {

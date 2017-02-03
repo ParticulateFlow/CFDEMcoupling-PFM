@@ -59,7 +59,7 @@ void averagingModel::undoVectorAverage
 {
 // WARNING - not sure if this is valid for dilute model!!!
 
-    if(!single) fieldPrev.internalField() = fieldNext.internalField();
+    if(!single) fieldPrev.ref() = fieldNext.ref();
 
     label cellI;
     vector valueVec;
@@ -303,13 +303,13 @@ void averagingModel::setDSauter
 
 void averagingModel::resetVectorAverage(volVectorField& prev,volVectorField& next,bool single) const
 {
-    if(!single) prev.internalField() = next.internalField();
-    next.internalField() = vector::zero;
+    if(!single) prev.ref() = next.ref();
+    next.primitiveFieldRef() = vector::zero;
 }
 
 void averagingModel::resetWeightFields() const
 {
-    UsWeightField_.internalField() = 0;
+    UsWeightField_.ref() = 0;
 }
 
 
@@ -352,12 +352,12 @@ tmp<volVectorField> Foam::averagingModel::UsInterp() const
 
     if (particleCloud_.dataExchangeM().couplingStep() > 1)
     {
-        tsource() = (1 - particleCloud_.dataExchangeM().timeStepFraction()) * UsPrev_
+        tsource.ref() = (1 - particleCloud_.dataExchangeM().timeStepFraction()) * UsPrev_
                     + particleCloud_.dataExchangeM().timeStepFraction() * UsNext_;
     }
     else
     {
-        tsource() = UsNext_;
+        tsource.ref() = UsNext_;
     }
 
     return tsource;

@@ -23,17 +23,19 @@ Description
     Transient solver for compressible flow using the flexible PIMPLE (PISO-SIMPLE)
     algorithm.
     Turbulence modelling is generic, i.e. laminar, RAS or LES may be selected.
-    The code is an evolution of the solver rhoPimpleFoam in OpenFOAM(R) 2.3,
+    The code is an evolution of the solver rhoPimpleFoam in OpenFOAM(R) 4.x,
     where additional functionality for CFD-DEM coupling is added.
 \*---------------------------------------------------------------------------*/
 
-
 #include "fvCFD.H"
 #include "psiThermo.H"
-#include "turbulenceModel.H"
+#include "turbulentFluidThermoModel.H"
 #include "bound.H"
 #include "pimpleControl.H"
-#include "fvIOoptionList.H"
+#include "fvOptions.H"
+#include "localEulerDdtScheme.H"
+#include "fvcSmooth.H"
+
 
 #include "cfdemCloudEnergy.H"
 #include "implicitCouple.H"
@@ -48,20 +50,27 @@ Description
 
 int main(int argc, char *argv[])
 {
+    #include "postProcess.H"
+
     #include "setRootCase.H"
     #include "createTime.H"
     #include "createMesh.H"
-
-    pimpleControl pimple(mesh);
-
-    #include "createFields.H"
-    #include "createFvOptions.H"
+    #include "createControl.H"
+    #include "createTimeControls.H"
+    #include "createRDeltaT.H"
     #include "initContinuityErrs.H"
-    
+    #include "createFields.H"
+    #include "createFieldRefs.H"
+    #include "createFvOptions.H"
+
     // create cfdemCloud
     #include "readGravitationalAcceleration.H"
     cfdemCloudEnergy particleCloud(mesh);
     #include "checkModelType.H"
+
+    turbulence->validate();
+  //        #include "compressibleCourantNo.H"
+  //  #include "setInitialDeltaT.H"
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -74,12 +83,12 @@ int main(int argc, char *argv[])
         #include "setDeltaT.H"
 
         runTime++;
-	
-	particleCloud.clockM().start(1,"Global");
+
+        particleCloud.clockM().start(1,"Global");
 
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
-	// do particle stuff
+        // do particle stuff
         particleCloud.clockM().start(2,"Coupling");
         bool hasEvolved = particleCloud.evolve(voidfraction,Us,U);
 
@@ -87,27 +96,28 @@ int main(int argc, char *argv[])
         {
             particleCloud.smoothingM().smoothen(particleCloud.forceM(0).impParticleForces());
         }
-    
+
         Info << "update Ksl.internalField()" << endl;
         Ksl = particleCloud.momCoupleM(0).impMomSource();
         Ksl.correctBoundaryConditions();
 
-       //Force Checks
-       vector fTotal(0,0,0);
-       vector fImpTotal = sum(mesh.V()*Ksl.internalField()*(Us.internalField()-U.internalField()));
-       reduce(fImpTotal, sumOp<vector>());
-       Info << "TotalForceExp: " << fTotal << endl;
-       Info << "TotalForceImp: " << fImpTotal << endl;
+        //Force Checks
+        vector fTotal(0,0,0);
+        vector fImpTotal = sum(mesh.V()*Ksl.primitiveFieldRef()*(Us.primitiveFieldRef()-U.primitiveFieldRef()));
+        reduce(fImpTotal, sumOp<vector>());
+        Info << "TotalForceExp: " << fTotal << endl;
+        Info << "TotalForceImp: " << fImpTotal << endl;
 
         #include "solverDebugInfo.H"
         particleCloud.clockM().stop("Coupling");
 
         particleCloud.clockM().start(26,"Flow");
-	
+
         if (pimple.nCorrPIMPLE() <= 1)
         {
             #include "rhoEqn.H"
         }
+
         volScalarField rhoeps("rhoeps",rho*voidfraction);
         // --- Pressure-velocity PIMPLE corrector loop
         while (pimple.loop())
@@ -118,8 +128,9 @@ int main(int argc, char *argv[])
             // --- Pressure corrector loop
             while (pimple.correct())
             {
+                // besides this pEqn, OF offers a "pimple consistent"-option
                 #include "pEqn.H"
-	      	rhoeps=rho*voidfraction;
+                rhoeps=rho*voidfraction;
             }
 
             if (pimple.turbCorr())
@@ -130,7 +141,7 @@ int main(int argc, char *argv[])
 
         runTime.write();
 
-       
+
         Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
             << "  ClockTime = " << runTime.elapsedClockTime() << " s"
             << nl << endl;

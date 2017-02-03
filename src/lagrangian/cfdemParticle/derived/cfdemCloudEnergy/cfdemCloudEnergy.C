@@ -119,16 +119,16 @@ const thermCondModel& cfdemCloudEnergy::thermCondM()
 
 void cfdemCloudEnergy::energyContributions(volScalarField& Qsource)
 {
-    Qsource.internalField()=0.0;
-    Qsource.boundaryField()=0.0;
+    Qsource.primitiveFieldRef()=0.0;
+    Qsource.boundaryFieldRef()=0.0;
     for (int i=0;i<nrEnergyModels();i++)
         energyM(i).addEnergyContribution(Qsource);
 }
 
 void cfdemCloudEnergy::energyCoefficients(volScalarField& Qcoeff)
 {
-    Qcoeff.internalField()=0.0;
-    Qcoeff.boundaryField()=0.0;
+    Qcoeff.primitiveFieldRef()=0.0;
+    Qcoeff.boundaryFieldRef()=0.0;
     for (int i=0;i<nrEnergyModels();i++)
         energyM(i).addEnergyCoefficient(Qcoeff);
 }

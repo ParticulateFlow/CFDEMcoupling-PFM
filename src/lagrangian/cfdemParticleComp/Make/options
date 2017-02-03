@@ -12,10 +12,10 @@ PFLAGS+= -Dcompre
 EXE_INC = \
      $(PFLAGS) \
      $(PINC) \
-    -I ../cfdemParticle/lnInclude \
+    -I../cfdemParticle/lnInclude \
     -I$(LIB_SRC)/finiteVolume/lnInclude \
     -I$(LIB_SRC)/transportModels \
-    -I$(LIB_SRC)/turbulenceModels/compressible/turbulenceModel \
+    -I$(LIB_SRC)/TurbulenceModels/turbulenceModels/lnInclude \
     -I$(LIB_SRC)/thermophysicalModels/basic/lnInclude \
     -I$(LIB_SRC)/meshTools/lnInclude \
     -I$(LIB_SRC)/lagrangian/basic/lnInclude \
@@ -28,8 +28,7 @@ LIB_LIBS = \
      $(PLIBS) \
     -L$(CFDEM_LIB_DIR) \
     -lfiniteVolume \
-    -lcompressibleRASModels \
-    -lcompressibleLESModels \
+    -lcompressibleTurbulenceModels \
     -lfluidThermophysicalModels \
     -lmeshTools \
     -llagrangian \

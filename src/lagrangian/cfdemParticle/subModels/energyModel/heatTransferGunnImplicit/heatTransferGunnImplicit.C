@@ -74,7 +74,7 @@ heatTransferGunnImplicit::~heatTransferGunnImplicit()
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
 void heatTransferGunnImplicit::allocateMyArrays() const
 {
-    heatTransferGunn::allocateMyArrays();
+//    heatTransferGunn::allocateMyArrays();
     double initVal=0.0;
     particleCloud_.dataExchangeM().allocateArray(partHeatFluxCoeff_,initVal,1);
 }
@@ -82,7 +82,11 @@ void heatTransferGunnImplicit::allocateMyArrays() const
 
 void heatTransferGunnImplicit::calcEnergyContribution()
 {
+    allocateMyArrays();
+
     heatTransferGunn::calcEnergyContribution();
+
+    QPartFluidCoeff_.primitiveFieldRef() = 0.0;
     
     particleCloud_.averagingM().setScalarSum
     (
@@ -92,9 +96,9 @@ void heatTransferGunnImplicit::calcEnergyContribution()
         NULL
     );
 
-    QPartFluidCoeff_.internalField() /= -QPartFluidCoeff_.mesh().V();
+    QPartFluidCoeff_.primitiveFieldRef() /= -QPartFluidCoeff_.mesh().V();
     
-    QPartFluidCoeff_.correctBoundaryConditions();
+//    QPartFluidCoeff_.correctBoundaryConditions();
 
 }
 

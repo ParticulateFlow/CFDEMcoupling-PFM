@@ -49,11 +49,7 @@ SourceFiles
 #include "fvCFD.H"
 #include "IFstream.H"
 
-#if defined(version21) || defined(version16ext)
-    #include <turbulenceModel.H>
-#elif defined(version15)
-    #include <RASModel.H>
-#endif
+#include <turbulenceModel.H>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -73,6 +69,7 @@ class smoothingModel;
 class momCoupleModel;
 class meshMotionModel;
 class liggghtsCommandModel;
+class otherForceModel;
 
 /*---------------------------------------------------------------------------*\
                            Class cfdemCloud Declaration
@@ -138,6 +135,8 @@ protected:
     const wordList momCoupleModels_;
 
     const wordList liggghtsCommandModelList_;
+    
+    const wordList otherForceModels_;
 
     const word turbulenceModelType_;
 
@@ -157,15 +156,7 @@ protected:
 
     mutable volScalarField ddtVoidfraction_;
 
-    #if defined(version21) || defined(version16ext)
-        #ifdef compre
-            const compressible::turbulenceModel& turbulence_;
-        #else
-            const incompressible::turbulenceModel& turbulence_;
-        #endif
-    #elif defined(version15)
-        const incompressible::RASModel& turbulence_;
-    #endif
+    const turbulenceModel& turbulence_;
 
     autoPtr<forceModel>* forceModel_;
 
@@ -190,6 +181,8 @@ protected:
     autoPtr<meshMotionModel> meshMotionModel_;
 
     autoPtr<liggghtsCommandModel>* liggghtsCommand_;
+    
+    autoPtr<otherForceModel>* otherForceModel_;
 
 // Protected member functions
     virtual void getDEMdata();
@@ -244,6 +237,8 @@ public:
        virtual const forceModel& forceM(int);
 
        virtual int nrForceModels();
+       
+       virtual int nrMomCoupleModels();
 
        scalar voidfraction(int);
 
@@ -364,16 +359,8 @@ public:
 
        inline autoPtr<liggghtsCommandModel>* liggghtsCommand() const;
 
-       #if defined(version21) || defined(version16ext)
-            #ifdef compre
-                inline const compressible::turbulenceModel& turbulence() const;
-            #else
-                inline const incompressible::turbulenceModel& turbulence() const;
-            #endif
-       #elif defined(version15)
-           inline const incompressible::RASModel& turbulence() const;
-       #endif
-
+       inline const turbulenceModel& turbulence() const;
+       
     // Write
 
       // write cfdemCloud internal data
@@ -407,6 +394,8 @@ public:
         std::vector< std::vector<double*> >* getVprobe();
 
         std::vector< std::vector<double> >* getSprobe();
+	
+	void otherForces(volVectorField&);
 };
 
 

@@ -47,6 +47,8 @@ protected:
     
     bool interpolation_;
     
+    bool verbose_;
+    
     word QPartFluidName_;
         
     volScalarField QPartFluid_;
@@ -54,6 +56,10 @@ protected:
     volScalarField partTempField_;
     
     volScalarField partRelTempField_;
+    
+    volScalarField ReField_;
+    
+    volScalarField NuField_;
     
     dimensionedScalar partRefTemp_;
     
@@ -84,6 +90,10 @@ protected:
     word partHeatFluxName_;
 
     mutable double **partHeatFlux_;              // Lagrangian array
+    
+    mutable double **partRe_;
+    
+    mutable double **partNu_;
 
     void allocateMyArrays() const;
     
@@ -134,3 +144,4 @@ public:
 #endif
 
 // ************************************************************************* //
+

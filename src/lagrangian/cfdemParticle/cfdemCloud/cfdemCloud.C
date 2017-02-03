@@ -44,6 +44,7 @@ Description
 #include "clockModel.H"
 #include "smoothingModel.H"
 #include "liggghtsCommandModel.H"
+#include "otherForceModel.H"
 
 namespace Foam
 {
@@ -102,6 +103,7 @@ cfdemCloud::cfdemCloud
     forceModels_(couplingProperties_.lookup("forceModels")),
     momCoupleModels_(couplingProperties_.lookup("momCoupleModels")),
     liggghtsCommandModelList_(liggghtsCommandDict_.lookup("liggghtsCommandModels")),
+    otherForceModels_(couplingProperties_.lookupOrDefault<wordList>("otherForceModels",wordList(0))),
     turbulenceModelType_(couplingProperties_.lookup("turbulenceModelType")),
     cg_(1.),
     cgOK_(true),
@@ -125,15 +127,7 @@ cfdemCloud::cfdemCloud
     ),
     turbulence_
     (
-        #if defined(version21) || defined(version16ext)
-            #ifdef compre
-                mesh.lookupObject<compressible::turbulenceModel>
-            #else
-                mesh.lookupObject<incompressible::turbulenceModel>
-            #endif
-        #elif defined(version15)
-            mesh.lookupObject<incompressible::RASModel>
-        #endif
+        mesh.lookupObject<turbulenceModel>
         (
             turbulenceModelType_
         )
@@ -274,6 +268,17 @@ cfdemCloud::cfdemCloud
             *this,
             liggghtsCommandModelList_[i],
             i
+        );
+    }
+    
+    otherForceModel_ = new autoPtr<otherForceModel>[otherForceModels_.size()];
+    for (int i=0;i<otherForceModels_.size();i++)
+    {
+        otherForceModel_[i] = otherForceModel::New
+        (
+            couplingProperties_,
+            *this,
+            otherForceModels_[i]
         );
     }
 
@@ -440,6 +445,11 @@ const forceModel& cfdemCloud::forceM(int i)
 int cfdemCloud::nrForceModels()
 {
     return forceModels_.size();
+}
+
+int cfdemCloud::nrMomCoupleModels()
+{
+    return momCoupleModels_.size();
 }
 
 scalar cfdemCloud::voidfraction(int index)
@@ -731,6 +741,14 @@ void cfdemCloud::resetArray(double**& array,int length,int width,double resetVal
             array[index][i] = resetVal;
         }
     }
+}
+
+void cfdemCloud::otherForces(volVectorField& forcefield)
+{
+  forcefield.primitiveFieldRef() = vector::zero;
+  forcefield.boundaryFieldRef() = vector::zero;
+  for (int i=0;i<otherForceModels_.size();i++)
+      forcefield += otherForceModel_[i]().exportForceField();
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
