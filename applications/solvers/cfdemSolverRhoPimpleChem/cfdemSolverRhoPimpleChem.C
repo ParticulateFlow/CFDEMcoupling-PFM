@@ -30,11 +30,14 @@ Description
 
 #include "fvCFD.H"
 #include "psiThermo.H"
-#include "turbulenceModel.H"
+#include "turbulentFluidThermoModel.H"
+#include "localEulerDdtScheme.H"
 #include "psiCombustionModel.H"
 #include "bound.H"
 #include "pimpleControl.H"
-#include "fvIOoptionList.H"
+#include "fvOptions.H"
+#include "fvcSmooth.H"
+
 
 #include "cfdemCloudEnergy.H"
 #include "implicitCouple.H"
