@@ -53,10 +53,13 @@ int main(int argc, char *argv[])
     #include "setRootCase.H"
     #include "createTime.H"
     #include "createMesh.H"
+    #include "createTimeControls.H"
+    #include "createRDeltaT.H"
 
     pimpleControl pimple(mesh);
 
     #include "createFields.H"
+    #include "createFieldRefs.H"
     #include "createFvOptions.H"
     #include "initContinuityErrs.H"
     
@@ -97,19 +100,15 @@ int main(int argc, char *argv[])
 
        //Force Checks
        vector fTotal(0,0,0);
-       vector fImpTotal = sum(mesh.V()*Ksl.internalField()*(Us.internalField()-U.internalField()));
+       vector fImpTotal = sum(mesh.V()*Ksl.primitiveFieldRef()*(Us.primitiveFieldRef()-U.primitiveFieldRef()));
        reduce(fImpTotal, sumOp<vector>());
        Info << "TotalForceExp: " << fTotal << endl;
        Info << "TotalForceImp: " << fImpTotal << endl;
 
-       Info << "number of particles = " << particleCloud.numberOfParticles() << nl << endl;
+       #include "solverDebugInfo.H"
+       particleCloud.clockM().stop("Coupling");
 
-        #include "solverDebugInfo.H"
-        particleCloud.clockM().stop("Coupling");
-
-
-
-        particleCloud.clockM().start(26,"Flow");
+       particleCloud.clockM().start(26,"Flow");
 	
         if (pimple.nCorrPIMPLE() <= 1)
         {
