@@ -18,7 +18,9 @@ read_restart    ../DEM/post/restart/liggghts.restart
 neighbor        0.0005 bin
 neigh_modify    delay 0 binsize 0.01 ##0.01
 
+
 # Material properties required for granular pair styles
+
 fix         m1 all property/global youngsModulus peratomtype 5.e6
 fix         m2 all property/global poissonsRatio peratomtype 0.45
 fix         m3 all property/global coefficientRestitution peratomtypepair 1 0.3
@@ -41,32 +43,46 @@ fix     zwalls1 all wall/gran model hertz tangential history primitive type 1 zp
 fix     zwalls2 all wall/gran model hertz tangential history primitive type 1 zplane 0.5
 
 # cfd coupling
-fix     cfd all couple/cfd couple_every 100000000 mpi
+fix     cfd all couple/cfd couple_every 100 mpi
 fix     cfd2 all couple/cfd/force
 
 # this should invoke chemistry
-fix     cfd3 all couple/cfd/chemistry n_species 2 species_names O2 CO2   
+fix     cfd3 all couple/cfd/chemistry n_species 2 species_names O2 CO2
 
-# Activate for shrinking particle model
-#fix    cfd4 all chem/shrink speciesA O2 molMassA 31.99 speciesC CO2 molMassC 44.01 molMassB 12.01 k 2.5e3 rdef hertzpct 0.2
-#fix    cfd4 all chem/shrink speciesA O2 molMassA 31.99 speciesC CO2 molMassC 44.01 molMassB 12.01 k 7.60e5 rmin 0.005
+# this should shrink the particle
+#fix    cfd4 all chem/shrink speciesA O2 molMassA 31.99 speciesC CO2 molMassC 44.01 molMassB 12.01 k 2.5e3 rdef 0.2
+#fix     cfd4 all chem/shrink speciesA O2 molMassA 31.99 speciesC CO2 molMassC 44.01 molMassB 12.01 k 2.5e3 rmin 0.005
 
 # Activate for 3-layer unreacted core shrink model
-fix     OreReductionCO all chem/shrink/core speciesA O2 molMassA 31.99 speciesC CO2 molMassC 44.01
+#fix     OreReductionCO all chem/shrink/core speciesA O2 molMassA 31.99 speciesC CO2 molMassC 44.01
+fix     cfd5 all chem/shrink/core speciesA O2 molMassA 31.99 speciesC CO2 molMassC 44.01
 
 # Chemical properties for unreacted shrink core (activate only when chem/shrink/core is active)
-fix     k0 all property/global k0_OreReductionCO vector 2700 25 17
-fix     Ea all property/global Ea_OreReductionCO vector 113.859 73.674 69.488
+#fix     k0 all property/global k0_OreReductionCO vector 2700 25 17
+#fix     Ea all property/global Ea_OreReductionCO vector 113.859 73.674 69.488
+fix     k0 all property/global k0_cfd5 vector 2700 25 17
+fix     Ea all property/global Ea_cfd5 vector 113.859 73.674 69.488
 
 # Material properties for unreacted chemical shrink core (activate only when chem/shrink/core is active)
-fix     density Ore property/global density_all vector 5.24 5.17 5.74 7.87
-fix     molMass Ore property/global molMass_all vector 156 231.533 71.844 55.845
+#fix     density Ore property/global density_all vector 5.24 5.17 5.74 7.87
+#fix     molMass Ore property/global molMass_all vector 156 231.533 71.844 55.845
+fix     density all property/global density_all vector 5.24 5.17 5.74 7.87
+fix     molMass all property/global molMass_all vector 156 231.533 71.844 55.845
 
 # define layer radius
 fix     layerRelRad all property/atom relRadii vector yes no no 0.3 0.5 0.6
 
 # apply nve integration to all particles that are inserted as single particles
 fix     integr all nve/sphere
+
+# print radius change according to timestep
+compute radChange all property/atom radius
+compute radreduce all reduce sum c_radChange
+fix     shrink all ave/time 25 1 25 c_radreduce file shrink.dat 
+
+compute masschange all property/atom mass
+compute massreduce all reduce sum c_masschange
+fix     rmass all ave/time 25 1 25 c_massreduce file rmass.dat 
 
 # screen output
 compute         rke all erotate/sphere
@@ -75,6 +91,6 @@ thermo          1000
 thermo_modify   lost ignore norm no
 compute_modify  thermo_temp dynamic yes
 
-dump        dmp all custom 1 ../DEM/post/dump.liggghts_run id type x y z ix iy iz vx vy vz fx fy fz radius
+dump        dmp all custom 100 ../DEM/post/dump.liggghts_run id type x y z ix iy iz vx vy vz fx fy fz omegax omegay omegaz radius
 
 run         1

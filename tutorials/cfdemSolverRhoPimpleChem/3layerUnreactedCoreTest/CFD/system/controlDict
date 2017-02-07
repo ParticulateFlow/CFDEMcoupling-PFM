@@ -23,13 +23,13 @@ startTime       0;
 
 stopAt          endTime;
 
-endTime         0.009;
+endTime         1;
 
-deltaT          1e-4;
+deltaT          0.0001;
 
 writeControl    adjustableRunTime;
 
-writeInterval   1e-4;
+writeInterval   0.50;
 
 purgeWrite      0;
 
@@ -53,17 +53,100 @@ maxDeltaT       0.1;
 
 
 // ************************************************************************* //
-/*libs (
-    "libsampling.so"
-    "libutilityFunctionObjects.so"
-    "libOpenFOAM.so"
-    "libsimpleSwakFunctionObjects.so"
-    "libswakFunctionObjects.so"
-    "libgroovyBC.so"
-);
+/* libs (  
+        "libsimpleFunctionObjects.so"
+        "libfieldFunctionObjects.so"
+     );
 
 functions
 {  
+    Average-O2
+    {
+        type            fieldAverage;
+        functionObjectLibs ( "libfieldFunctionObjects.so" );
+        enabled         true;
+        outputControl   outputTime; //timeStep; //
+        //outputInterval  0.50;
+        log             true;
+        restartOnRestart    false;
+        restartOnOutput     false;
+        
+        
+        fields
+        (
+            O2
+            {
+                mean        on;
+                prime2Mean  on;
+                base        time;
+            }
+        );
+    }
+    
+   species_O2 // Name also used to identify output folder 
+    { 
+        type            cellSource; 
+        functionObjectLibs ("libfieldValueFunctionObjects.so"); 
+        enabled         true; 
+        outputControl   timeStep;//outputTime; 
+        outputInterval  1,
+        log             true;    
+        valueOutput     false;   //true; 
+        source          all;   // Type of cell source or all for the full domain
+        sourceName      O2; 
+        operation       weightedAverage; // volAverage; //volIntegrate; //weightedAverage; //none //sum;
+        fields 
+        ( 
+            O2
+        ); 
+    } 
+    Average-CO2
+    {
+        type            fieldAverage;
+        functionObjectLibs ( "libfieldFunctionObjects.so" );
+        enabled         true;
+        outputControl   outputTime; //timeStep; //
+        //outputInterval  0.50;
+        log             true;
+        restartOnRestart    false;
+        restartOnOutput     false;
+        
+        
+        fields
+        (
+           CO2
+            {
+                mean        on;
+                prime2Mean  on;
+                base        time;
+            }
+        );
+    }
+    
+   species_CO2 // Name also used to identify output folder 
+    { 
+        type            cellSource; 
+        functionObjectLibs ("libfieldValueFunctionObjects.so"); 
+        enabled         true; 
+        outputControl   timeStep;//outputTime; 
+        outputInterval  1,
+        log             true;    
+        valueOutput     false;   //true; 
+        source          all;   // Type of cell source or all for the full domain
+        sourceName      CO2; 
+        operation       weightedAverage; // volAverage; //volIntegrate; //weightedAverage; //none //sum;
+        fields 
+        ( 
+            CO2
+        ); 
+    } 
+              
+
+} */
+
+// ************************************************************************* //
+ 
+ /* // IF swak4Foam is installed following can be used;
    volumetricFlowSurfaceField
    {
         type patchExpression;
@@ -84,18 +167,18 @@ functions
         );
         expression "CO2*rho*Area*U";
     }
-        
-    OutletMassFlow-O2
+
+    CO2_Mass_in_Volume
     {
-        type patchExpression;
-        accumulations (
-            sum
-        );
-        patches (
-            outlet
-        );
-        expression "O2";
-        verbose true;
+        type                swakExpression;
+        valueType           internalField; //patch;
+        //aliases{alpha alpha.water;}
+        //patchName           outlet;
+        verbose             true;
+        expression          "rho*voidfraction*CO2*vol()";
+        accumulations       ( sum );
+        outputControlMode   timeStep; //outputTime;
+        outputInterval      1;
     }
     
     OutletMassFlow-CO2
@@ -111,41 +194,7 @@ functions
         verbose true;
         autoInterpolate true;
     }
-} */
-
-// ************************************************************************* //
- 
- /*CO2-Average1
-    {
-        type            fieldAverage;
-        functionObjectLibs ("libfieldFunctionObjects.so");
-        enabled         true;
-        outputControl   outputTime;
-
-        fields
-        (
-            CO2
-            {
-                mean        on;
-                prime2Mean  on;
-                base        time;
-            }
-        );
-    }
     
-    CO2_Mass_in_Volume
-    {
-        type                swakExpression;
-        valueType           internalField; //patch;
-        //aliases{alpha alpha.water;}
-        //patchName           outlet;
-        verbose             true;
-        expression          "rho*voidfraction*CO2*vol()";
-        accumulations       ( sum );
-        outputControlMode   timeStep; //outputTime;
-        outputInterval      1;
-    }
-        
     CO2_Concentration_in_Volume
     {
         type                swakExpression;
@@ -171,26 +220,7 @@ functions
         outputControlMode   timeStep; //outputTime;
         outputInterval      1;
     }
-    
-   species_CO2 // Name also used to identify output folder 
-    { 
-        type            cellSource; 
-        functionObjectLibs ("libfieldValueFunctionObjects.so"); 
-        enabled         true; 
-        outputControl   timeStep;//outputTime; 
-        outputInterval  1,
-        log             true;    
-        valueOutput     false;   //true; 
-        source          all;   // Type of cell source or all for the full domain
-        sourceName      CO2; 
-        operation       sum; // volAverage; //volIntegrate; //weightedAverage; //none;
-        fields 
-        ( 
-            CO2
-        ); 
-    } 
-    
-       
+   
     O2_Concentration_in_Volume
     {
         type                swakExpression;
@@ -204,38 +234,15 @@ functions
         outputInterval      1;
     }
     
-     O2-Average1
+    OutletMassFlow-O2
     {
-        type            fieldAverage;
-        functionObjectLibs ("libfieldFunctionObjects.so");
-        enabled         true;
-        outputControl   outputTime;
-
-        fields
-        (
-            O2
-            {
-                mean        on;
-                prime2Mean  on;
-                base        time;
-            }
+        type patchExpression;
+        accumulations (
+            sum
         );
-    }
-    
-   species_O2 // Name also used to identify output folder 
-    { 
-        type            cellSource; 
-        functionObjectLibs ("libfieldValueFunctionObjects.so"); 
-        enabled         true; 
-        outputControl   timeStep;//outputTime; 
-        outputInterval  1,
-        log             true;    
-        valueOutput     false;   //true; 
-        source          all;   // Type of cell source or all for the full domain
-        sourceName      O2; 
-        operation       sum; // volAverage; //volIntegrate; //weightedAverage; //none;
-        fields 
-        ( 
-            O2
-        ); 
-    } 
+        patches (
+            outlet
+        );
+        expression "O2";
+        verbose true;
+    } */

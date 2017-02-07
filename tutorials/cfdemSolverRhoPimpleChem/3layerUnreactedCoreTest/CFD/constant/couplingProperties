@@ -87,7 +87,7 @@ momCoupleModels
     implicitCouple
 );
 
-turbulenceModelType "RASProperties";//"LESProperties";//
+turbulenceModelType "turbulenceProperties";//"LESProperties";//
 
 //===========================================================================//
 // sub-model properties

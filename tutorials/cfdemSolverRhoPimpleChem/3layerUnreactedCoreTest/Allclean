@@ -9,8 +9,8 @@ source $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/functions.sh
 casePath="$(dirname "$(readlink -f ${BASH_SOURCE[0]})")"
 cd $casePath/CFD
 cleanCase
-#rm $casePath/CFD/shrink*.dat
-#rm $casePath/CFD/rmass*.dat
+rm $casePath/CFD/shrink*.dat
+rm $casePath/CFD/rmass*.dat
 rm $casePath/log*
 #rm $casePath/run_error.log
 #cp -R 0/Org/p 0/p
@@ -25,13 +25,10 @@ mkdir $casePath/DEM/post/restart
 #cd $casePath/DEM/post/restart 
 #touch liggghts.restart
 
-#cd $casePath
-#rm changeOfCO2-3
-#rm O2_output_2
-#rm rhogas_output-2
-#rm pmass_file_4
-#rm O2mass_file_4
-#rm CO2mass-output-4
-
+## if postproc is activated (in fix_chem_shrink) 
+#rm $casePath/changeOfCO2
+#rm $casePath/changeOfO2
+#rm $casePath/rhogas_
+#rm $casePath/pmass_
 
 # ----------------------------------------------------------------- end-of-file

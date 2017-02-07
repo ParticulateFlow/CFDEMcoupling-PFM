@@ -40,19 +40,18 @@ fix     zwalls1 all wall/gran model hertz tangential history primitive type 1 zp
 fix     zwalls2 all wall/gran model hertz tangential history primitive type 1 zplane 0.5
 
 # create single particle in a specific spot
-create_atoms 1 single 0.75 .31 0.31  units box
-set atom 1 diameter 0.7 density 2267 vx 0 vy 0 vz 0 
-group Ore id 1
+#create_atoms 1 single 0.25 .25 0.25  units box
+#set atom 1 diameter 0.07 density 2267 vx 0 vy 0 vz 0
 
 # particle distributions and insertion
-# region  bc block 0.5 0.75 0.15 0.25 0.15 0.25 units box
-# fix     pts1 all particletemplate/sphere 1 atom_type 1 density constant 2267 radius constant 0.035 
-# fix     pdd1 all particledistribution/discrete 1 1 pts1 1.0
+region  bc block 0.25 1.25 0. 0.5 0. 0.5 units box
+fix     pts1 all particletemplate/sphere 1 atom_type 1 density constant 2267 radius constant 0.07 
+fix     pdd1 all particledistribution/discrete 1 1 pts1 1.0
 
-# fix     ins all insert/pack seed 100001 distributiontemplate pdd1 vel constant 0. 0. 0. insert_every once overlapcheck yes all_in yes particles_in_region 1 region bc
+fix     ins all insert/pack seed 100001 distributiontemplate pdd1 vel constant 0. 0. 0. insert_every once overlapcheck yes all_in yes particles_in_region 1 region bc
 
 # apply nve integration to all particles that are inserted as single particles
-# fix     integr all nve/sphere
+#fix     integr all nve/sphere
 
 # screen output
 compute         rke all erotate/sphere
@@ -63,7 +62,7 @@ compute_modify  thermo_temp dynamic yes
 
 # insert the first particles so that dump is not empty
 run     1
-dump    dmp all custom 25 post/dump.liggghts_init id type x y z ix iy iz vx vy vz fx fy fz omegax omegay omegaz radius 
+dump    dmp all custom 100 post/dump.liggghts_init id type x y z ix iy iz vx vy vz fx fy fz omegax omegay omegaz radius 
 
-run         1 upto
+run         10000 upto
 write_restart   post/restart/liggghts.restart
