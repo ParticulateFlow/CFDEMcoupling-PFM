@@ -51,7 +51,7 @@ Description
 int main(int argc, char *argv[])
 {
     #include "postProcess.H"
-  
+
     #include "setRootCase.H"
     #include "createTime.H"
     #include "createMesh.H"
@@ -60,13 +60,14 @@ int main(int argc, char *argv[])
     #include "createRDeltaT.H"
     #include "initContinuityErrs.H"
     #include "createFields.H"
+    #include "createFieldRefs.H"
     #include "createFvOptions.H"
 
     // create cfdemCloud
     #include "readGravitationalAcceleration.H"
     cfdemCloudEnergy particleCloud(mesh);
     #include "checkModelType.H"
-    
+
     turbulence->validate();
   //        #include "compressibleCourantNo.H"
   //  #include "setInitialDeltaT.H"
@@ -82,12 +83,12 @@ int main(int argc, char *argv[])
         #include "setDeltaT.H"
 
         runTime++;
-	
-	particleCloud.clockM().start(1,"Global");
+
+        particleCloud.clockM().start(1,"Global");
 
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
-	// do particle stuff
+        // do particle stuff
         particleCloud.clockM().start(2,"Coupling");
         bool hasEvolved = particleCloud.evolve(voidfraction,Us,U);
 
@@ -95,7 +96,7 @@ int main(int argc, char *argv[])
         {
             particleCloud.smoothingM().smoothen(particleCloud.forceM(0).impParticleForces());
         }
-    
+
         Info << "update Ksl.internalField()" << endl;
         Ksl = particleCloud.momCoupleM(0).impMomSource();
         Ksl.correctBoundaryConditions();
@@ -111,12 +112,12 @@ int main(int argc, char *argv[])
         particleCloud.clockM().stop("Coupling");
 
         particleCloud.clockM().start(26,"Flow");
-	
+
         if (pimple.nCorrPIMPLE() <= 1)
         {
             #include "rhoEqn.H"
         }
-        
+
         volScalarField rhoeps("rhoeps",rho*voidfraction);
         // --- Pressure-velocity PIMPLE corrector loop
         while (pimple.loop())
@@ -127,9 +128,9 @@ int main(int argc, char *argv[])
             // --- Pressure corrector loop
             while (pimple.correct())
             {
-	        // besides this pEqn, OF offers a "pimple consistent"-option
+                // besides this pEqn, OF offers a "pimple consistent"-option
                 #include "pEqn.H"
-	      	rhoeps=rho*voidfraction;	
+                rhoeps=rho*voidfraction;
             }
 
             if (pimple.turbCorr())
@@ -140,7 +141,7 @@ int main(int argc, char *argv[])
 
         runTime.write();
 
-       
+
         Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
             << "  ClockTime = " << runTime.elapsedClockTime() << " s"
             << nl << endl;

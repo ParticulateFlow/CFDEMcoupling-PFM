@@ -73,7 +73,7 @@ private:
 
     mutable scalar switchingVoidfraction_; //voidfraction above which dilute formulation will be used
 
-    inline const scalar dSauter(label) const;
+    inline scalar dSauter(label) const;
 
 public:
 

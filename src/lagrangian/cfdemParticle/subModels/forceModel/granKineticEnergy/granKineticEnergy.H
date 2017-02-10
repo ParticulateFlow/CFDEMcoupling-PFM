@@ -44,12 +44,12 @@ private:
     dictionary propsDict_;
 
     mutable double **vfluc_;
-    
-    mutable volScalarField granKineticEnergy_;
-    
-    word UsFieldName_;   
 
-    const volVectorField& UsField_; 
+    word UsFieldName_;
+
+    const volVectorField& UsField_;
+
+    mutable volScalarField granKineticEnergy_;
 
     void allocateMyArrays() const;
 
