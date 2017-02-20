@@ -81,6 +81,7 @@ cfdemCloud::cfdemCloud
     solveFlow_(true),
     verbose_(false),
     ignore_(false),
+    limitDEMForces_(false),
     modelType_(couplingProperties_.lookup("modelType")),
     positions_(NULL),
     velocities_(NULL),
@@ -228,6 +229,11 @@ cfdemCloud::cfdemCloud
         treatVoidCellsAsExplicitForce_ = readBool(couplingProperties_.lookup("treatVoidCellsAsExplicitForce"));
     if (couplingProperties_.found("verbose")) verbose_=true;
     if (couplingProperties_.found("ignore")) ignore_=true;
+    if (couplingProperties_.found("limitDEMForces"))
+    {
+        limitDEMForces_=true;
+	maxDEMForce_ = readScalar(couplingProperties_.lookup("limitDEMForces"));
+    }
     if (turbulenceModelType_=="LESProperties")
         Info << "WARNING - LES functionality not yet tested!" << endl;
 
@@ -360,6 +366,18 @@ void cfdemCloud::setForces()
     resetArray(DEMForces_,numberOfParticles(),3);
     resetArray(Cds_,numberOfParticles(),1);
     for (int i=0;i<cfdemCloud::nrForceModels();i++) cfdemCloud::forceM(i).setForce();
+    if (limitDEMForces_)
+    {
+        scalar maxF = 0.0;
+	for (int index = 0;index <  numberOfParticles(); ++index)
+	{
+	    scalar F = mag(expForce(index));
+	    if (F > maxF) maxF = F;
+	    if (F > maxDEMForce_)
+	      for(int i=0;i<3;i++) DEMForces_[index][i] *= maxDEMForce_/F;
+	}
+	Info << "largest particle-fluid interaction on particle: " << maxF << endl;
+    }
 }
 
 void cfdemCloud::setParticleForceField()
@@ -428,6 +446,13 @@ vector cfdemCloud::velocity(int index)
     vector vel;
     for(int i=0;i<3;i++) vel[i] = velocities()[index][i];
     return vel;
+}
+
+vector cfdemCloud::expForce(int index)
+{
+    vector force;
+    for(int i=0;i<3;i++) force[i] = DEMForces()[index][i];
+    return force;
 }
 
 vector cfdemCloud::fluidVel(int index)

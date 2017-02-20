@@ -91,6 +91,10 @@ protected:
     bool verbose_;
 
     bool ignore_;
+    
+    bool limitDEMForces_;
+    
+    scalar maxDEMForce_;
 
     const word modelType_;
 
@@ -231,6 +235,8 @@ public:
        vector position(int);
 
        vector velocity(int);
+       
+       vector expForce(int);
 
        vector fluidVel(int);
 
