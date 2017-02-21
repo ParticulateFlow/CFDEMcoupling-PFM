@@ -1,0 +1,8 @@
+hsqrt2 0.7071068;
+r1 0.05;
+r2 0.025;
+mr1 -0.05;
+mr2 -0.025;
+zmin 0.0;
+zmax 0.53;
+#inputMode merge

@@ -44,6 +44,7 @@ Description
 #include "clockModel.H"
 #include "smoothingModel.H"
 #include "liggghtsCommandModel.H"
+#include "otherForceModel.H"
 
 namespace Foam
 {
@@ -80,6 +81,7 @@ cfdemCloud::cfdemCloud
     solveFlow_(true),
     verbose_(false),
     ignore_(false),
+    limitDEMForces_(false),
     modelType_(couplingProperties_.lookup("modelType")),
     positions_(NULL),
     velocities_(NULL),
@@ -102,6 +104,7 @@ cfdemCloud::cfdemCloud
     forceModels_(couplingProperties_.lookup("forceModels")),
     momCoupleModels_(couplingProperties_.lookup("momCoupleModels")),
     liggghtsCommandModelList_(liggghtsCommandDict_.lookup("liggghtsCommandModels")),
+    otherForceModels_(couplingProperties_.lookupOrDefault<wordList>("otherForceModels",wordList(0))),
     turbulenceModelType_(couplingProperties_.lookup("turbulenceModelType")),
     cg_(1.),
     cgOK_(true),
@@ -111,7 +114,7 @@ cfdemCloud::cfdemCloud
     treatVoidCellsAsExplicitForce_(false),
     useDDTvoidfraction_(false),
     ddtVoidfraction_
-    (   
+    (
         IOobject
         (
             "ddtVoidfraction",
@@ -226,12 +229,17 @@ cfdemCloud::cfdemCloud
         treatVoidCellsAsExplicitForce_ = readBool(couplingProperties_.lookup("treatVoidCellsAsExplicitForce"));
     if (couplingProperties_.found("verbose")) verbose_=true;
     if (couplingProperties_.found("ignore")) ignore_=true;
+    if (couplingProperties_.found("limitDEMForces"))
+    {
+        limitDEMForces_=true;
+        maxDEMForce_ = readScalar(couplingProperties_.lookup("limitDEMForces"));
+    }
     if (turbulenceModelType_=="LESProperties")
         Info << "WARNING - LES functionality not yet tested!" << endl;
 
     if (couplingProperties_.found("useDDTvoidfraction"))
         useDDTvoidfraction_=true;
-    else        
+    else
         Info << "ignoring ddt(voidfraction)" << endl;
 
     forceModel_ = new autoPtr<forceModel>[nrForceModels()];
@@ -269,8 +277,19 @@ cfdemCloud::cfdemCloud
         );
     }
 
+    otherForceModel_ = new autoPtr<otherForceModel>[otherForceModels_.size()];
+    for (int i=0;i<otherForceModels_.size();i++)
+    {
+        otherForceModel_[i] = otherForceModel::New
+        (
+            couplingProperties_,
+            *this,
+            otherForceModels_[i]
+        );
+    }
+
     dataExchangeM().setCG();
-    if (!cgOK_ && cg_ > 1) FatalError<< "at least one of your models is not fit for cg !!!"<< abort(FatalError); 
+    if (!cgOK_ && cg_ > 1) FatalError<< "at least one of your models is not fit for cg !!!"<< abort(FatalError);
 }
 
 // * * * * * * * * * * * * * * * * Destructors  * * * * * * * * * * * * * * //
@@ -347,6 +366,19 @@ void cfdemCloud::setForces()
     resetArray(DEMForces_,numberOfParticles(),3);
     resetArray(Cds_,numberOfParticles(),1);
     for (int i=0;i<cfdemCloud::nrForceModels();i++) cfdemCloud::forceM(i).setForce();
+
+    if (limitDEMForces_)
+    {
+        scalar maxF = 0.0;
+        for (int index = 0;index <  numberOfParticles(); ++index)
+        {
+            scalar F = mag(expForce(index));
+            if (F > maxF) maxF = F;
+            if (F > maxDEMForce_)
+              for(int i=0;i<3;i++) DEMForces_[index][i] *= maxDEMForce_/F;
+        }
+        Info << "largest particle-fluid interaction on particle: " << maxF << endl;
+    }
 }
 
 void cfdemCloud::setParticleForceField()
@@ -417,6 +449,13 @@ vector cfdemCloud::velocity(int index)
     return vel;
 }
 
+vector cfdemCloud::expForce(int index)
+{
+    vector force;
+    for(int i=0;i<3;i++) force[i] = DEMForces()[index][i];
+    return force;
+}
+
 vector cfdemCloud::fluidVel(int index)
 {
     vector vel;
@@ -432,6 +471,11 @@ const forceModel& cfdemCloud::forceM(int i)
 int cfdemCloud::nrForceModels()
 {
     return forceModels_.size();
+}
+
+int cfdemCloud::nrMomCoupleModels()
+{
+    return momCoupleModels_.size();
 }
 
 scalar cfdemCloud::voidfraction(int index)
@@ -490,7 +534,7 @@ bool cfdemCloud::evolve
             clockM().start(16,"resetVolFields");
             if(verbose_)
             {
-                Info << "couplingStep:" << dataExchangeM().couplingStep() 
+                Info << "couplingStep:" << dataExchangeM().couplingStep()
                      << "\n- resetVolFields()" << endl;
             }
             averagingM().resetVectorAverage(averagingM().UsPrev(),averagingM().UsNext(),false);
@@ -528,21 +572,21 @@ bool cfdemCloud::evolve
             setVectorAverages();
 
 
-            //Smoothen "next" fields            
+            //Smoothen "next" fields
             smoothingM().dSmoothing();
             smoothingM().smoothen(voidFractionM().voidFractionNext());
 
             //only smoothen if we use implicit force coupling in cells void of particles
-            //because we need unsmoothened Us field to detect cells for explicit 
+            //because we need unsmoothened Us field to detect cells for explicit
             //force coupling
             if(!treatVoidCellsAsExplicitForce())
                 smoothingM().smoothenReferenceField(averagingM().UsNext());
-            
+
             clockM().stop("setVectorAverage");
         }
-        
+
         //============================================
-        //CHECK JUST TIME-INTERPOATE ALREADY SMOOTHENED VOIDFRACTIONNEXT AND UsNEXT FIELD 
+        //CHECK JUST TIME-INTERPOATE ALREADY SMOOTHENED VOIDFRACTIONNEXT AND UsNEXT FIELD
         //      IMPLICIT FORCE CONTRIBUTION AND SOLVER USE EXACTLY THE SAME AVERAGED
         //      QUANTITIES AT THE GRID!
         Info << "\n timeStepFraction() = " << dataExchangeM().timeStepFraction() << endl;
@@ -686,7 +730,7 @@ void cfdemCloud::calcDdtVoidfraction(volScalarField& voidfraction) const
 /*tmp<fvVectorMatrix> cfdemCloud::ddtVoidfractionU(volVectorField& U,volScalarField& voidfraction) const
 {
     if (dataExchangeM().couplingStep() <= 2) return fvm::ddt(U);
-    
+
     return fvm::ddt(voidfraction,U);
 }*/
 
@@ -723,6 +767,14 @@ void cfdemCloud::resetArray(double**& array,int length,int width,double resetVal
             array[index][i] = resetVal;
         }
     }
+}
+
+void cfdemCloud::otherForces(volVectorField& forcefield)
+{
+  forcefield.primitiveFieldRef() = vector::zero;
+  forcefield.boundaryFieldRef() = vector::zero;
+  for (int i=0;i<otherForceModels_.size();i++)
+      forcefield += otherForceModel_[i]().exportForceField();
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
