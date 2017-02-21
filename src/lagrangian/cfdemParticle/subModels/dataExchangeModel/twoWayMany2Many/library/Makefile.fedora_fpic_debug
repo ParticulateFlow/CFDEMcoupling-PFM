@@ -6,7 +6,7 @@ SHELL = /bin/sh
 
 CC =		mpic++
 CCFLAGS =	-g -O2 -fPIC \
-		 -funroll-loops -fstrict-aliasing -Wall -W -Wno-uninitialized
+		 -funroll-loops -fstrict-aliasing -Wall -Wextra -Wno-unused-result -Wno-literal-suffix
 DEPFLAGS =	-M
 LINK =		mpic++
 LINKFLAGS =	-O -fPIC
