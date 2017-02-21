@@ -91,9 +91,9 @@ protected:
     bool verbose_;
 
     bool ignore_;
-    
+
     bool limitDEMForces_;
-    
+
     scalar maxDEMForce_;
 
     const word modelType_;
@@ -139,7 +139,7 @@ protected:
     const wordList momCoupleModels_;
 
     const wordList liggghtsCommandModelList_;
-    
+
     const wordList otherForceModels_;
 
     const word turbulenceModelType_;
@@ -185,7 +185,7 @@ protected:
     autoPtr<meshMotionModel> meshMotionModel_;
 
     autoPtr<liggghtsCommandModel>* liggghtsCommand_;
-    
+
     autoPtr<otherForceModel>* otherForceModel_;
 
 // Protected member functions
@@ -235,7 +235,7 @@ public:
        vector position(int);
 
        vector velocity(int);
-       
+
        vector expForce(int);
 
        vector fluidVel(int);
@@ -243,7 +243,7 @@ public:
        virtual const forceModel& forceM(int);
 
        virtual int nrForceModels();
-       
+
        virtual int nrMomCoupleModels();
 
        scalar voidfraction(int);
@@ -366,12 +366,12 @@ public:
        inline autoPtr<liggghtsCommandModel>* liggghtsCommand() const;
 
        inline const turbulenceModel& turbulence() const;
-       
+
     // Write
 
       // write cfdemCloud internal data
         virtual bool evolve(volScalarField&,volVectorField&,volVectorField&);
-        
+
         virtual void postFlow() {}
 
         virtual bool reAllocArrays();
@@ -400,8 +400,8 @@ public:
         std::vector< std::vector<double*> >* getVprobe();
 
         std::vector< std::vector<double> >* getSprobe();
-	
-	void otherForces(volVectorField&);
+
+        void otherForces(volVectorField&);
 };
 
 

@@ -114,7 +114,7 @@ cfdemCloud::cfdemCloud
     treatVoidCellsAsExplicitForce_(false),
     useDDTvoidfraction_(false),
     ddtVoidfraction_
-    (   
+    (
         IOobject
         (
             "ddtVoidfraction",
@@ -232,14 +232,14 @@ cfdemCloud::cfdemCloud
     if (couplingProperties_.found("limitDEMForces"))
     {
         limitDEMForces_=true;
-	maxDEMForce_ = readScalar(couplingProperties_.lookup("limitDEMForces"));
+        maxDEMForce_ = readScalar(couplingProperties_.lookup("limitDEMForces"));
     }
     if (turbulenceModelType_=="LESProperties")
         Info << "WARNING - LES functionality not yet tested!" << endl;
 
     if (couplingProperties_.found("useDDTvoidfraction"))
         useDDTvoidfraction_=true;
-    else        
+    else
         Info << "ignoring ddt(voidfraction)" << endl;
 
     forceModel_ = new autoPtr<forceModel>[nrForceModels()];
@@ -276,7 +276,7 @@ cfdemCloud::cfdemCloud
             i
         );
     }
-    
+
     otherForceModel_ = new autoPtr<otherForceModel>[otherForceModels_.size()];
     for (int i=0;i<otherForceModels_.size();i++)
     {
@@ -289,7 +289,7 @@ cfdemCloud::cfdemCloud
     }
 
     dataExchangeM().setCG();
-    if (!cgOK_ && cg_ > 1) FatalError<< "at least one of your models is not fit for cg !!!"<< abort(FatalError); 
+    if (!cgOK_ && cg_ > 1) FatalError<< "at least one of your models is not fit for cg !!!"<< abort(FatalError);
 }
 
 // * * * * * * * * * * * * * * * * Destructors  * * * * * * * * * * * * * * //
@@ -366,17 +366,18 @@ void cfdemCloud::setForces()
     resetArray(DEMForces_,numberOfParticles(),3);
     resetArray(Cds_,numberOfParticles(),1);
     for (int i=0;i<cfdemCloud::nrForceModels();i++) cfdemCloud::forceM(i).setForce();
+
     if (limitDEMForces_)
     {
         scalar maxF = 0.0;
-	for (int index = 0;index <  numberOfParticles(); ++index)
-	{
-	    scalar F = mag(expForce(index));
-	    if (F > maxF) maxF = F;
-	    if (F > maxDEMForce_)
-	      for(int i=0;i<3;i++) DEMForces_[index][i] *= maxDEMForce_/F;
-	}
-	Info << "largest particle-fluid interaction on particle: " << maxF << endl;
+        for (int index = 0;index <  numberOfParticles(); ++index)
+        {
+            scalar F = mag(expForce(index));
+            if (F > maxF) maxF = F;
+            if (F > maxDEMForce_)
+              for(int i=0;i<3;i++) DEMForces_[index][i] *= maxDEMForce_/F;
+        }
+        Info << "largest particle-fluid interaction on particle: " << maxF << endl;
     }
 }
 
@@ -533,7 +534,7 @@ bool cfdemCloud::evolve
             clockM().start(16,"resetVolFields");
             if(verbose_)
             {
-                Info << "couplingStep:" << dataExchangeM().couplingStep() 
+                Info << "couplingStep:" << dataExchangeM().couplingStep()
                      << "\n- resetVolFields()" << endl;
             }
             averagingM().resetVectorAverage(averagingM().UsPrev(),averagingM().UsNext(),false);
@@ -571,21 +572,21 @@ bool cfdemCloud::evolve
             setVectorAverages();
 
 
-            //Smoothen "next" fields            
+            //Smoothen "next" fields
             smoothingM().dSmoothing();
             smoothingM().smoothen(voidFractionM().voidFractionNext());
 
             //only smoothen if we use implicit force coupling in cells void of particles
-            //because we need unsmoothened Us field to detect cells for explicit 
+            //because we need unsmoothened Us field to detect cells for explicit
             //force coupling
             if(!treatVoidCellsAsExplicitForce())
                 smoothingM().smoothenReferenceField(averagingM().UsNext());
-            
+
             clockM().stop("setVectorAverage");
         }
-        
+
         //============================================
-        //CHECK JUST TIME-INTERPOATE ALREADY SMOOTHENED VOIDFRACTIONNEXT AND UsNEXT FIELD 
+        //CHECK JUST TIME-INTERPOATE ALREADY SMOOTHENED VOIDFRACTIONNEXT AND UsNEXT FIELD
         //      IMPLICIT FORCE CONTRIBUTION AND SOLVER USE EXACTLY THE SAME AVERAGED
         //      QUANTITIES AT THE GRID!
         Info << "\n timeStepFraction() = " << dataExchangeM().timeStepFraction() << endl;
@@ -729,7 +730,7 @@ void cfdemCloud::calcDdtVoidfraction(volScalarField& voidfraction) const
 /*tmp<fvVectorMatrix> cfdemCloud::ddtVoidfractionU(volVectorField& U,volScalarField& voidfraction) const
 {
     if (dataExchangeM().couplingStep() <= 2) return fvm::ddt(U);
-    
+
     return fvm::ddt(voidfraction,U);
 }*/
 
