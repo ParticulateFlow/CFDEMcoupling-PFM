@@ -94,7 +94,12 @@ species::species
     partRhoName_(propsDict_.lookup("partRhoName")),
     partRho_(NULL),
     voidfractionFieldName_(propsDict_.lookup("voidfractionFieldName")),
-    voidfraction_(sm.mesh().lookupObject<volScalarField>(voidfractionFieldName_))
+    voidfraction_(sm.mesh().lookupObject<volScalarField>(voidfractionFieldName_)),
+    // add total mole numebr in volume
+    totalMoleFieldName_(propsDict_.lookup("totalMoleFieldName")),
+    N_(sm.mesh().lookupObject<volScalarField>(totalMoleFieldName_)),
+    partMoleName_(propsDict_.lookup("partMoleName")),
+    partN_(NULL)
 {
     Info << " Read species list from: " << specDict_.name() << endl;
     Info << " Reading species list: " << speciesNames_ << endl;
@@ -147,6 +152,8 @@ species::~species()
 
     particleCloud_.dataExchangeM().destroy(partTemp_,nP_);
     particleCloud_.dataExchangeM().destroy(partRho_,nP_);
+    // Total Mole number in volume
+    particleCloud_.dataExchangeM().destroy(partN_,nP_);
 
     for (int i=0; i<speciesNames_.size(); i++)
     {
@@ -164,6 +171,8 @@ void species::allocateMyArrays() const
         // get memory for 2d arrays
         particleCloud_.dataExchangeM().allocateArray(partRho_,initVal,1,"nparticles");
         particleCloud_.dataExchangeM().allocateArray(partTemp_,initVal,1,"nparticles");
+        // total volume mole
+        particleCloud_.dataExchangeM().allocateArray(partN_,initVal,1,"nparticles");
 
 
         for (int i=0; i<speciesNames_.size(); i++)
@@ -183,6 +192,8 @@ void species::reAllocMyArrays() const
         double initVal=0.0;
         particleCloud_.dataExchangeM().allocateArray(partRho_,initVal,1);
         particleCloud_.dataExchangeM().allocateArray(partTemp_,initVal,1);
+        // total volume mole
+        particleCloud_.dataExchangeM().allocateArray(partN_,initVal,1);
 
         for (int i=0; i<speciesNames_.size(); i++)
         {
@@ -208,13 +219,15 @@ void species::execute()
     List<scalar> Yfluid_;
     scalar voidfraction(1);
     Yfluid_.setSize(speciesNames_.size());
-    scalar deltaT = particleCloud_.mesh().time().deltaT().value();
+    // scalar deltaT = particleCloud_.mesh().time().deltaT().value();
+    scalar Nfluid(0);
 
 
     // defining interpolators for T, rho, voidfraction
     interpolationCellPoint <scalar> TInterpolator_(tempField_);
     interpolationCellPoint <scalar> rhoInterpolator_(rho_);
     interpolationCellPoint <scalar> voidfractionInterpolator_(voidfraction_);
+    interpolationCellPoint <scalar> NInterpolator_(N_);
 
     for (int index=0; index<particleCloud_.numberOfParticles(); index++)
     {
@@ -227,12 +240,14 @@ void species::execute()
                 Tfluid              =   TInterpolator_.interpolate(position,cellI);
                 rhofluid            =   rhoInterpolator_.interpolate(position,cellI);
                 voidfraction        =   voidfractionInterpolator_.interpolate(position,cellI);
+                Nfluid              =   NInterpolator_.interpolate(position,cellI);
             }
             else
             {
                 Tfluid          = tempField_[cellI];
                 rhofluid        = rho_[cellI];
                 voidfraction    = voidfraction_[cellI];
+                Nfluid          = N_[cellI];
                 for (int i = 0; i<speciesNames_.size();i++)
                 {
                     Yfluid_[i] = Y_[i][cellI];
@@ -240,18 +255,17 @@ void species::execute()
             }
 
             //fill arrays
-            partTemp_[index][0]=Tfluid;
-            partRho_[index][0]=rhofluid*voidfraction;
-            //partRho_[index][0]= 0.5;
+            partTemp_[index][0] =   Tfluid;
+            partRho_[index][0]  =   rhofluid*voidfraction;
+            partN_[index][0]    =   Nfluid*voidfraction; //number of moles except solid particles?
             for (int i=0; i<speciesNames_.size();i++)
             {
                 concentrations_[i][index][0]=Yfluid_[i];
-                //concentrations_[i][index][0]=1*particleCloud_.mesh().time().value();
             }
         }
 
-       // if(particleCloud_.verbose() && index >=0 && index < 2)
-       // {
+        if(particleCloud_.verbose() && index >=0 && index < 2)
+        {
             for(int i =0; i<speciesNames_.size();i++)
             {
                 Info << "Y_i = " << Y_[i].name() << endl;
@@ -262,13 +276,16 @@ void species::execute()
                 Info << "partTemp_[index][0] = " << partTemp_[index][0] << endl;
                 Info << "Tfluid = " << Tfluid << endl  ;
                 Info << "voidfraction =" << voidfraction << endl;
+                Info << "Nfluid" << Nfluid << endl;
+                Info << "partN_[index][0]" << partN_[index][0] << endl;
             }
-       // }
+        }
     }
 
         // give DEM data
         particleCloud_.dataExchangeM().giveData(partTempName_, "scalar-atom", partTemp_);
         particleCloud_.dataExchangeM().giveData(partRhoName_, "scalar-atom", partRho_);
+        particleCloud_.dataExchangeM().giveData(partMoleName_,"scalar-atom",partN_);
         for (int i=0; i<speciesNames_.size();i++)
         {
             //particleCloud_.dataExchangeM().giveData(Y_[i].name(),"scalar-atom",concentrations_[i]);
