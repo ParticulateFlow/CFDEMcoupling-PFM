@@ -50,6 +50,8 @@ tmp<fv::convectionScheme<scalar> > mvConvection
         }
     }
 
+    N = Yt*rhoeps/W;
+
     Y[inertIndex] = scalar(1) - Yt;
     Y[inertIndex].max(0.0);
 }
