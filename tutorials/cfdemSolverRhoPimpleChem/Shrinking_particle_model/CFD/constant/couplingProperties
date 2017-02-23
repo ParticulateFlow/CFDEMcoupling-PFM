@@ -104,6 +104,9 @@ speciesProps
 	densityFieldName 	"rho";
 	partRhoName		"partRho";
         voidfractionFieldName   "voidfraction";
+        totalMoleFieldName      "N";
+        partMoleName            "partN";
+        verbose                 true;
 }
 
 SyamlalThermCondProps
