@@ -13,8 +13,14 @@
   //  probably for particles in OF, not needed when using LIGGGHTS  
   //  SLGThermo slgThermo(mesh, thermo);
 
-    basicMultiComponentMixture& composition = thermo.composition();
+    // new class exists in OF4.x containing all material therm props called basicSpecieMixture
+    //basicMultiComponentMixture& composition = thermo.composition();
+    basicSpecieMixture& composition = thermo.composition();
     PtrList<volScalarField>& Y = composition.Y();
+
+    // The molecular weight [kj/mol]  ====== EKI
+    //const volScalarField W(composition.W());
+    const volScalarField& W = composition.W();
 
     const word inertSpecie(thermo.lookup("inertSpecie"));
 
@@ -35,6 +41,21 @@
         fields.add(Y[i]);
     }
     fields.add(thermo.he());
+
+    // define total number of moles in volume ====== EKI
+    volScalarField N
+    (
+        IOobject
+        (
+            "N",
+            runTime.timeName(),
+            mesh,
+            IOobject::MUST_READ,
+            IOobject::AUTO_WRITE
+        ),
+        mesh
+    );
+    // =============================================
 
     volScalarField rho
     (
