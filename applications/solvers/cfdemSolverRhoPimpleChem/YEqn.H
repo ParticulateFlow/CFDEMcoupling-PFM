@@ -50,7 +50,10 @@ tmp<fv::convectionScheme<scalar> > mvConvection
         }
     }
 
+    // calculate total molar number in volume
     N = Yt*rhoeps/W;
+
+    Info << "molecular weight of mixture" << W << endl;
 
     Y[inertIndex] = scalar(1) - Yt;
     Y[inertIndex].max(0.0);

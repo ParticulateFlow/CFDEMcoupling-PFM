@@ -18,9 +18,8 @@
     basicSpecieMixture& composition = thermo.composition();
     PtrList<volScalarField>& Y = composition.Y();
 
-    // The molecular weight [kj/mol]  ====== EKI
-    //const volScalarField W(composition.W());
-    const volScalarField& W = composition.W();
+    // The molecular weight [kj/mol]
+    const volScalarField W(composition.W());
 
     const word inertSpecie(thermo.lookup("inertSpecie"));
 
@@ -42,7 +41,7 @@
     }
     fields.add(thermo.he());
 
-    // define total number of moles in volume ====== EKI
+    // Total Mole in Volume
     volScalarField N
     (
         IOobject
@@ -55,7 +54,6 @@
         ),
         mesh
     );
-    // =============================================
 
     volScalarField rho
     (
