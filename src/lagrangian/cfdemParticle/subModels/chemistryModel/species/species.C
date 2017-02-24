@@ -95,7 +95,7 @@ species::species
     partRho_(NULL),
     voidfractionFieldName_(propsDict_.lookup("voidfractionFieldName")),
     voidfraction_(sm.mesh().lookupObject<volScalarField>(voidfractionFieldName_)),
-    // add total mole numebr in volume
+    // add total mole number in volume
     totalMoleFieldName_(propsDict_.lookup("totalMoleFieldName")),
     N_(sm.mesh().lookupObject<volScalarField>(totalMoleFieldName_)),
     partMoleName_(propsDict_.lookup("partMoleName")),
@@ -152,7 +152,6 @@ species::~species()
 
     particleCloud_.dataExchangeM().destroy(partTemp_,nP_);
     particleCloud_.dataExchangeM().destroy(partRho_,nP_);
-    // Total Mole number in volume
     particleCloud_.dataExchangeM().destroy(partN_,nP_);
 
     for (int i=0; i<speciesNames_.size(); i++)
@@ -171,7 +170,6 @@ void species::allocateMyArrays() const
         // get memory for 2d arrays
         particleCloud_.dataExchangeM().allocateArray(partRho_,initVal,1,"nparticles");
         particleCloud_.dataExchangeM().allocateArray(partTemp_,initVal,1,"nparticles");
-        // total volume mole
         particleCloud_.dataExchangeM().allocateArray(partN_,initVal,1,"nparticles");
 
 
@@ -192,7 +190,6 @@ void species::reAllocMyArrays() const
         double initVal=0.0;
         particleCloud_.dataExchangeM().allocateArray(partRho_,initVal,1);
         particleCloud_.dataExchangeM().allocateArray(partTemp_,initVal,1);
-        // total volume mole
         particleCloud_.dataExchangeM().allocateArray(partN_,initVal,1);
 
         for (int i=0; i<speciesNames_.size(); i++)
@@ -208,8 +205,7 @@ void species::reAllocMyArrays() const
 void species::execute()
 {
     // realloc the arrays
-    // allocateMyArrays();
-     reAllocMyArrays();
+    reAllocMyArrays();
 
   // get Y_i, T, rho at particle positions, fill arrays with them and push to LIGGGHTS
 
@@ -219,7 +215,6 @@ void species::execute()
     List<scalar> Yfluid_;
     scalar voidfraction(1);
     Yfluid_.setSize(speciesNames_.size());
-    // scalar deltaT = particleCloud_.mesh().time().deltaT().value();
     scalar Nfluid(0);
 
 
