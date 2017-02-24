@@ -51,7 +51,7 @@ fix     cfd3 all couple/cfd/chemistry n_species 2 species_names O2 CO2
 
 # this should shrink the particle
 #fix    cfd4 all chem/shrink speciesA O2 molMassA 31.99 speciesC CO2 molMassC 44.01 molMassB 12.01 k 2.5e3 rdef 0.2
-fix     cfd4 all chem/shrink speciesA O2 molMassA 31.99 speciesC CO2 molMassC 44.01 molMassB 12.01 k 2.5e3 rmin 0.005
+#fix     cfd4 all chem/shrink speciesA O2 molMassA 31.99 speciesC CO2 molMassC 44.01 molMassB 12.01 k 2.5e3 rmin 0.005
 
 # apply nve integration to all particles that are inserted as single particles
 fix     integr all nve/sphere

@@ -283,7 +283,6 @@ void species::execute()
         particleCloud_.dataExchangeM().giveData(partMoleName_,"scalar-atom",partN_);
         for (int i=0; i<speciesNames_.size();i++)
         {
-            //particleCloud_.dataExchangeM().giveData(Y_[i].name(),"scalar-atom",concentrations_[i]);
             particleCloud_.dataExchangeM().giveData(speciesNames_[i],"scalar-atom",concentrations_[i]);
         };
 
