@@ -52,7 +52,7 @@ maxCo 0.1;
 libs ("libOpenFOAM.so" "libgroovyBC.so");
 
 functions
-(
+{
 
     probes
     {
@@ -113,5 +113,5 @@ functions
      );
      factor  1;
    }*/
-);
+}
 // ************************************************************************* //
