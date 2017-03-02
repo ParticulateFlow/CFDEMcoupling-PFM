@@ -106,7 +106,6 @@ speciesProps
         voidfractionFieldName   "voidfraction";
         totalMoleFieldName      "N";
         partMoleName            "partN";
-        verbose                 true;
 }
 
 SyamlalThermCondProps

@@ -47,7 +47,7 @@ fix     cfd all couple/cfd couple_every 100 mpi
 fix     cfd2 all couple/cfd/force
 
 # this should invoke chemistry
-fix     cfd3 all couple/cfd/chemistry n_species 2 species_names O2 CO2
+fix     cfd3 all couple/cfd/chemistry n_species 3 species_names O2 CO2 N2
 
 # this should shrink the particle
 #fix    cfd4 all chem/shrink speciesA O2 molMassA 31.99 speciesC CO2 molMassC 44.01 molMassB 12.01 k 2.5e3 rdef 0.2
