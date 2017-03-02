@@ -15,7 +15,6 @@ tmp<fv::convectionScheme<scalar> > mvConvection
     dQ = combustion->dQ();
     label inertIndex = -1;
     volScalarField Yt(0.0*Y[0]);
-    // volScalarField Wt(0.0*W);
 
     forAll(Y, i)
     {
@@ -44,8 +43,6 @@ tmp<fv::convectionScheme<scalar> > mvConvection
 
             Yi.max(0.0);
             Yt += Yi;
-
-            // Wt += thermo.composition().W(i);
         }
         else
         {
@@ -53,10 +50,13 @@ tmp<fv::convectionScheme<scalar> > mvConvection
         }
     }
 
-    // calculate total molar number in volume
-    N = Yt*rhoeps/W;
+    // calculate total mole in Volume
+    N = rho/W;
 
-    Info << "molecular weight of mixture" << W << endl;
+    Info << "total molar weight in volume (solver)" << W << endl;
+    Info << "rho (solver)" << rho << endl;
+    Info << "total mass fractions" << Yt << endl;
+    Info << "total moles in volume (solver)" << N << endl;
 
     Y[inertIndex] = scalar(1) - Yt;
     Y[inertIndex].max(0.0);
