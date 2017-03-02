@@ -62,8 +62,7 @@ private:
     
     wordList mod_spec_names_;
 
-    // mass fractions
-    PtrList<volScalarField> Y_;
+    UPtrList<volScalarField> Y_;
 
     mutable List<double**> concentrations_;
     
@@ -95,8 +94,7 @@ private:
 
     void allocateMyArrays() const;
 
-    // reference the total mole number in volume
-
+    // total mole field
     word totalMoleFieldName_;
 
     const volScalarField& N_;
@@ -104,6 +102,7 @@ private:
     word partMoleName_;
 
     mutable double **partN_;
+
 
 public:
 
