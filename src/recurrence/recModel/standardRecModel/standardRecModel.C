@@ -106,44 +106,23 @@ void standardRecModel::updateRecFields()
 
 const volScalarField& standardRecModel::exportVolScalarField(word fieldname, label index) const
 {
-    if (index < 0 || index > numRecFields_ - 1)
-       FatalError<<"standardRecModel: Index out of bounds for volScalarField with name " << fieldname << abort(FatalError);	
-      
-    for(int i=0; i<volScalarFieldNames_.size(); i++)
-        if(volScalarFieldNames_[i].match(fieldname))
-	{
-	    return volScalarFieldList_[i][index];
-	}
-	
-    FatalError<<"standardRecModel: Could not find volScalarField with name " << fieldname << abort(FatalError);	
+    const label fieldI = getVolScalarFieldIndex(fieldname, index);
+    
+    return volScalarFieldList_[fieldI][index];
 }
 
 const volVectorField& standardRecModel::exportVolVectorField(word fieldname, label index) const
 {
-     if (index < 0 || index > numRecFields_ - 1)
-       FatalError<<"standardRecModel: Index out of bounds for volVectorField with name " << fieldname << abort(FatalError);
-  
-     for(int i=0; i<volVectorFieldNames_.size(); i++)
-        if(volVectorFieldNames_[i].match(fieldname))
-	{
-	    return volVectorFieldList_[i][index];
-	}
-	
-    FatalError<<"standardRecModel: Could not find volVectorField with name " << fieldname << abort(FatalError); 
+    const label fieldI = getVolVectorFieldIndex(fieldname, index);
+    
+    return volVectorFieldList_[fieldI][index];
 }
 
 const surfaceScalarField& standardRecModel::exportSurfaceScalarField(word fieldname, label index) const
 {
-    if (index < 0 || index > numRecFields_ - 1)
-       FatalError<<"standardRecModel: Index out of bounds for surfaceScalarField with name " << fieldname << abort(FatalError);
-  
-    for(int i=0; i<surfaceScalarFieldNames_.size(); i++)
-        if(surfaceScalarFieldNames_[i].match(fieldname))
-	{
-	    return surfaceScalarFieldList_[i][index]; 
-	}
-	
-    FatalError<<"standardRecModel: Could not find surfaceScalarField with name " << fieldname << abort(FatalError);	
+    const label fieldI = getSurfaceScalarFieldIndex(fieldname, index);
+    
+    return surfaceScalarFieldList_[fieldI][index];
 }
 
 void standardRecModel::exportVolScalarField(word fieldname, volScalarField& field) const
