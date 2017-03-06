@@ -48,7 +48,7 @@ inline Foam::label Foam::standardRecModel::getVolScalarFieldIndex(word fieldname
 	        << fieldname << abort(FatalError);
 	}
 	
-	return label(fieldI);
+	return fieldI;
 }
 
 inline Foam::label Foam::standardRecModel::getVolVectorFieldIndex(word fieldname, label index) const
