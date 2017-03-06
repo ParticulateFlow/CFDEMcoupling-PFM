@@ -73,6 +73,10 @@ public:
     const volScalarField& exportVolScalarField(word, label) const;
     const volVectorField& exportVolVectorField(word, label) const;
     const surfaceScalarField& exportSurfaceScalarField(word, label) const;
+    
+    inline label getVolScalarFieldIndex(word, label) const;
+    inline label getVolVectorFieldIndex(word, label) const;
+    inline label getSurfaceScalarFieldIndex(word, label) const;
 	
 private:
   
@@ -87,6 +91,10 @@ private:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#include "standardRecModelI.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
