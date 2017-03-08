@@ -64,11 +64,7 @@ Archimedes::Archimedes
     propsDict_(dict.subDict(typeName + "Props")),
     twoDimensional_(false),
     gravityFieldName_(propsDict_.lookup("gravityFieldName")),
-    #if defined(version21) || defined(version16ext)
-        g_(sm.mesh().lookupObject<uniformDimensionedVectorField> (gravityFieldName_))
-    #elif defined(version15)
-        g_(dimensionedVector(sm.mesh().lookupObject<IOdictionary>("environmentalProperties").lookup(gravityFieldName_)).value())
-    #endif
+    g_(sm.mesh().lookupObject<uniformDimensionedVectorField> (gravityFieldName_))
 {
 
     //Append the field names to be probed
@@ -132,11 +128,10 @@ void Archimedes::setForce() const
 
             if (cellI > -1) // particle Found
             {
-                scalar dp = 2*particleCloud_.radius(index);
-
                 if(twoDimensional_)
                 {
-                    force = -g_.value()*forceSubM(0).rhoField()[cellI]*pow(dp,2)/4*M_PI;
+                    scalar r = particleCloud_.radius(index);
+                    force = -g_.value()*forceSubM(0).rhoField()[cellI]*r*r*M_PI; // circle area
                     Warning << "Archimedes::setForce() : this functionality is not tested!" << endl;
                 }else{
                     force = -g_.value()*forceSubM(0).rhoField()[cellI]*particleCloud_.particleVolume(index);

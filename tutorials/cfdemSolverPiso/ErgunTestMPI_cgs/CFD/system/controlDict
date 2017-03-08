@@ -149,8 +149,7 @@ DimensionedConstants
 }
 
 functions
-(
-
+{
     probes
     {
         type        probes;
@@ -190,25 +189,5 @@ functions
         outputControl   timeStep;//outputTime;
         outputInterval  1;
     }
-
-   /*pressureDrop
-   {
-     type patchAverage;
-     functionObjectLibs
-     (
-         "libsimpleFunctionObjects.so"
-     );
-     verbose true;
-     patches
-     (
-         inlet
-         outlet
-     );
-     fields
-     (
-         p
-     );
-     factor  1;
-   }*/
-);
+}
 // ************************************************************************* //

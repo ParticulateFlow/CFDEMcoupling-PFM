@@ -53,8 +53,7 @@ maxCo 0.1;
 libs ( "libfiniteVolumeCFDEM.so" );
 
 functions
-(
-
+{
     probes
     {
         type        probes;
@@ -94,76 +93,5 @@ functions
         outputControl   timeStep;//outputTime;
         outputInterval  1;
     }
-
-/*
-    probes_inletFlux
-    {
-        type            faceSource;
-        functionObjectLibs ("libfieldFunctionObjects.so");
-        enabled         true;
-        outputControl   timeStep;   //outputTime;
-        log             true;       // log to screen?
-        valueOutput     true;       // Write values at run-time output times?
-        source          patch;   // Type of face source:
-        sourceName      inlet;         // faceZone name, see below
-        operation       sum;
-        fields
-        (
-            phi
-        );
-    }
-
-    probes_outletFlux
-    {
-        type            faceSource;
-        functionObjectLibs ("libfieldFunctionObjects.so");
-        enabled         true;
-        outputControl   timeStep;   //outputTime;
-        log             true;       // log to screen?
-        valueOutput     true;       // Write values at run-time output times?
-        source          patch;   // Type of face source:
-        sourceName      outlet;         // faceZone name, see below
-        operation       sum;
-        fields
-        (
-            phi
-        );
-    }
-
-    probes_wallFlux
-    {
-        type            faceSource;
-        functionObjectLibs ("libfieldFunctionObjects.so");
-        enabled         true;
-        outputControl   timeStep;   //outputTime;
-        log             true;       // log to screen?
-        valueOutput     true;       // Write values at run-time output times?
-        source          patch;   // Type of face source:
-        sourceName      wall;         // faceZone name, see below
-        operation       sum;
-        fields
-        (
-            phi
-        );
-    }*/
-   /*pressureDrop
-   {
-     type patchAverage;
-     functionObjectLibs
-     (
-         "libsimpleFunctionObjects.so"
-     );
-     verbose true;
-     patches
-     (
-         inlet
-         outlet
-     );
-     fields
-     (
-         p
-     );
-     factor  1;
-   }*/
-);
+}
 // ************************************************************************* //

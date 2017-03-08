@@ -90,7 +90,7 @@ public:
         (
             double** const& mask,
             double**& positions,
-            double**& cellIDs,
+            int**& cellIDs,
             int size
         ) const;
 

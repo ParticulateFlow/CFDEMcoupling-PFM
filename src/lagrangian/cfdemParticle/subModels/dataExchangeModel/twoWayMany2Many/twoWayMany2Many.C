@@ -103,7 +103,8 @@ twoWayMany2Many::twoWayMany2Many
     if (liggghts == 1) lmp = new LAMMPS_NS::LAMMPS(0,NULL,comm_liggghts);
 
     MPI_Bcast(&n,1,MPI_INT,0,MPI_COMM_WORLD);
-    if (n > 0) {
+    if (n > 0)
+    {
         MPI_Bcast(liggghtsPathChar,n,MPI_CHAR,0,MPI_COMM_WORLD);
         if (liggghts == 1) lmp->input->file(liggghtsPathChar);
     }
@@ -115,9 +116,9 @@ twoWayMany2Many::twoWayMany2Many
     checkTSsize();
 
     // m2m stuff
-    firstRun_=true;
-    particleLost_=false;
-    Npart_=-1;
+    firstRun_ = true;
+    particleLost_ = false;
+    Npart_ = -1;
     lmp2foam_ = NULL;
     lmp2foam_vec_ = NULL;
     foam2lmp_vec_ = NULL;
@@ -130,7 +131,7 @@ twoWayMany2Many::twoWayMany2Many
     id_foamVec_ = NULL;
     tmp_ = NULL;
     tmpI_ = NULL;
-    pos_lammps_=NULL;
+    pos_lammps_ = NULL;
     nlocal_foam_lost_ = -1;
     id_foamLost_ = NULL;
     id_foamLostAll = NULL;
@@ -167,12 +168,6 @@ twoWayMany2Many::~twoWayMany2Many()
 
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
-char* twoWayMany2Many::wordToChar(word& inWord) const
-{
-    string HH = string(inWord);
-    return const_cast<char*>(HH.c_str());
-}
-
 
 // * * * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * * //
 void twoWayMany2Many::getData
@@ -180,47 +175,48 @@ void twoWayMany2Many::getData
     word name,
     word type,
     double ** const& field,
-    label step
+    label /*step*/
 ) const
 {
-    char* charName = wordToChar(name);
-    if(name != "x")
+    if (name != "x")
     {
-        if ( type == "vector-atom")
+        if (type == "vector-atom")
         {
-            double **tmp_ = (double **) lammps_extract_atom(lmp,charName);
-            if(!tmp_)
+            double **tmp_ = static_cast<double **>(lammps_extract_atom(lmp,name.c_str()));
+            if (!tmp_)
             {
                 LAMMPS_NS::Fix *fix = NULL;
-                fix = lmp->modify->find_fix_property(charName,"property/atom","vector",0,0,"cfd coupling",false);
-                if(fix)
-                    tmp_ = (double **) static_cast<LAMMPS_NS::FixPropertyAtom*>(fix)->array_atom;
+                fix = lmp->modify->find_fix_property(name.c_str(),"property/atom","vector",0,0,"cfd coupling",false);
+                if (fix)
+                    tmp_ = static_cast<LAMMPS_NS::FixPropertyAtom*>(fix)->array_atom;
                 else
-                    Warning << "coupling fix not found!"<<endl;
+                    Warning << "coupling fix not found!" << endl;
 
-                if(!tmp_)
-                    FatalError << "find_fix_property " << charName << " array_atom not found." << abort(FatalError);
+                if (!tmp_)
+                    FatalError << "find_fix_property " << name << " array_atom not found." << abort(FatalError);
             }
 
             lmp2foam_vec_->exchange(tmp_ ? tmp_[0] : NULL, field[0]);
-        }else if ( type == "scalar-atom")
+        }
+        else if (type == "scalar-atom")
         {
-            double *tmp_ = (double *) lammps_extract_atom(lmp,charName);
-            if(!tmp_)
+            double *tmp_ = static_cast<double *>(lammps_extract_atom(lmp,name.c_str()));
+            if (!tmp_)
             {
                 LAMMPS_NS::Fix *fix = NULL;
-                fix = lmp->modify->find_fix_property(charName,"property/atom","scalar",0,0,"cfd coupling",true);
-                if(fix)
-                    tmp_ = (double *) static_cast<LAMMPS_NS::FixPropertyAtom*>(fix)->vector_atom;
+                fix = lmp->modify->find_fix_property(name.c_str(),"property/atom","scalar",0,0,"cfd coupling",true);
+                if (fix)
+                    tmp_ = static_cast<LAMMPS_NS::FixPropertyAtom*>(fix)->vector_atom;
                 else
-                    FatalError << "coupling fix not found!"<< abort(FatalError);
+                    FatalError << "coupling fix not found!" << abort(FatalError);
 
-                if(!tmp_)
-                    FatalError << "find_fix_property " << charName << " array_atom not found." << abort(FatalError);
+                if (!tmp_)
+                    FatalError << "find_fix_property " << name << " vector_atom not found." << abort(FatalError);
             }
 
             lmp2foam_->exchange(tmp_, field[0]);
-        }else
+        }
+        else
         {
             FatalError << "requesting type " << type << " and name " << name << abort(FatalError);
         }
@@ -232,12 +228,10 @@ void twoWayMany2Many::getData
     word name,
     word type,
     int ** const& field,
-    label step
+    label /*step*/
 ) const
 {
-    char* charName = wordToChar(name);
-    char* charType = wordToChar(type);
-    data_liggghts_to_of(charName,charType, lmp, (void*&) field,"int");
+    data_liggghts_to_of(name.c_str(), type.c_str(), lmp, (void*&)field, "int");
 }
 
 void twoWayMany2Many::giveData
@@ -245,40 +239,42 @@ void twoWayMany2Many::giveData
     word name,
     word type,
     double ** const& field,
-    const char* datatype
+    const char* /*datatype*/
 ) const
 {
-    char* charName = wordToChar(name);
-    if ( type == "vector-atom")
+    if (type == "vector-atom")
     {
-        double **tmp_=NULL;
+        double **tmp_ = NULL;
         LAMMPS_NS::Fix *fix = NULL;
-        fix = lmp->modify->find_fix_property(charName,"property/atom","vector",0,0,"cfd coupling",false);
-        if(fix)
-            tmp_ = (double **) static_cast<LAMMPS_NS::FixPropertyAtom*>(fix)->array_atom;
+        fix = lmp->modify->find_fix_property(name.c_str(),"property/atom","vector",0,0,"cfd coupling",false);
+        if (fix)
+            tmp_ = static_cast<LAMMPS_NS::FixPropertyAtom*>(fix)->array_atom;
         else
             Warning << "coupling fix not found!"<<endl;
 
-        if(!tmp_)
-            FatalError << "find_fix_property " << charName << " array_atom not found." << abort(FatalError);
+        if (!tmp_)
+            FatalError << "find_fix_property " << name << " array_atom not found." << abort(FatalError);
 
         foam2lmp_vec_->exchange(field[0],tmp_ ? tmp_[0] : NULL);
-    }else if( type == "scalar-atom" )
+    }
+    else if (type == "scalar-atom")
     {
-        double *tmp_=NULL;
+        double *tmp_ = NULL;
         LAMMPS_NS::Fix *fix = NULL;
-        fix = lmp->modify->find_fix_property(charName,"property/atom","scalar",0,0,"cfd coupling",true);
-        if(fix)
-            tmp_ = (double *) static_cast<LAMMPS_NS::FixPropertyAtom*>(fix)->vector_atom;
+        fix = lmp->modify->find_fix_property(name.c_str(),"property/atom","scalar",0,0,"cfd coupling",false);
+        if (fix)
+            tmp_ = static_cast<LAMMPS_NS::FixPropertyAtom*>(fix)->vector_atom;
         else
-            FatalError << "coupling fix not found!"<< abort(FatalError);
+            FatalError << "coupling fix not found!" << abort(FatalError);
 
-        if(!tmp_)
-            FatalError << "find_fix_property " << charName << " array_atom not found." << abort(FatalError);
+        if (!tmp_)
+            FatalError << "find_fix_property " << name << " vector_atom not found." << abort(FatalError);
 
-        foam2lmp_->exchange(field[0],tmp_ ? tmp_ : NULL); // for double *
-    }else{
-        FatalError << "twoWayMany2Many::giveData requested type "<< type <<" not implemented! \n"<< abort(FatalError);
+        foam2lmp_->exchange(field[0],tmp_); // for double *
+    }
+    else
+    {
+        FatalError << "twoWayMany2Many::giveData requested type " << type << " not implemented! \n" << abort(FatalError);
     }
 }
 
@@ -313,10 +309,12 @@ void Foam::twoWayMany2Many::allocateArray
         for (int j = 0; j < width; j++)
             array[i][j] = initVal;
 }
+
 void inline Foam::twoWayMany2Many::destroy(double** array,int len) const
 {
     lmp->memory->destroy(array);
 }
+
 //============
 // int **
 void Foam::twoWayMany2Many::allocateArray
@@ -348,10 +346,12 @@ void Foam::twoWayMany2Many::allocateArray
         for (int j = 0; j < width; j++)
             array[i][j] = initVal;
 }
+
 void inline Foam::twoWayMany2Many::destroy(int** array,int len) const
 {
     lmp->memory->destroy(array);
 }
+
 //============
 // double *
 void Foam::twoWayMany2Many::allocateArray(double*& array, double initVal, int length) const
@@ -361,10 +361,12 @@ void Foam::twoWayMany2Many::allocateArray(double*& array, double initVal, int le
     for (int i = 0; i < len; i++)
         array[i] = initVal;
 }
+
 void inline Foam::twoWayMany2Many::destroy(double* array) const
 {
     lmp->memory->destroy(array);
 }
+
 //==============
 // int *
 void Foam::twoWayMany2Many::allocateArray(int*& array, int initVal, int length) const
@@ -374,6 +376,7 @@ void Foam::twoWayMany2Many::allocateArray(int*& array, int initVal, int length) 
     for (int i = 0; i < len; i++)
         array[i] = initVal;
 }
+
 void inline Foam::twoWayMany2Many::destroy(int* array) const
 {
     lmp->memory->destroy(array);
@@ -381,11 +384,10 @@ void inline Foam::twoWayMany2Many::destroy(int* array) const
 //==============
 
 
-bool Foam::twoWayMany2Many::couple() const
+bool Foam::twoWayMany2Many::couple(int i) const
 {
     bool coupleNow = false;
-    label commandLines(0);
-    if (doCoupleNow())
+    if (i==0)
     {
         couplingStep_++;
         coupleNow = true;
@@ -399,19 +401,19 @@ bool Foam::twoWayMany2Many::couple() const
             forAll(particleCloud_.liggghtsCommandModelList(),i)
             {
 
-                if(particleCloud_.liggghtsCommand()[i]().runCommand(couplingStep()))
+                if (particleCloud_.liggghtsCommand()[i]().runCommand(couplingStep()))
                 {
-                    commandLines=particleCloud_.liggghtsCommand()[i]().commandLines();
-                    for(int j=0;j<commandLines;j++)
+                    label commandLines = particleCloud_.liggghtsCommand()[i]().commandLines();
+                    for (int j=0; j<commandLines; j++)
                     {
                         const char* command = particleCloud_.liggghtsCommand()[i]().command(j);
-                        Info << "Executing command: '"<< command <<"'"<< endl;
+                        Info << "Executing command: '" << command << "'" << endl;
                         lmp->input->one(command);
                     }
                 }
             }
             particleCloud_.clockM().stop("LIGGGHTS");
-            Info<<"LIGGGHTS finished"<<endl;
+            Info << "LIGGGHTS finished" << endl;
         }
 
         double newNpart = liggghts_get_maxtag(lmp);
@@ -430,13 +432,13 @@ bool Foam::twoWayMany2Many::couple() const
 
         setNumberOfParticles(nlocal_foam_);
 
-        // re-allocate arrays of cloud      
+        // re-allocate arrays of cloud
         particleCloud_.reAllocArrays();
 
         setPositions(nlocal_foam_,pos_foam_);
         setCellIDs(nlocal_foam_,cellID_foam_);
 
-        Info <<"Foam::twoWayMany2Many::couple() done." << endl;
+        Info <<"Foam::twoWayMany2Many::couple(i) done." << endl;
     }
     return coupleNow;
 }
@@ -466,17 +468,17 @@ void Foam::twoWayMany2Many::syncIDs() const
     foam2lmp_vec_ = new Many2Many(MPI_COMM_WORLD);
     foam2lmp_ = new Many2Many(MPI_COMM_WORLD);
 
-    nlocal_lammps_ = *((int *) lammps_extract_global(lmp,"nlocal"));
+    nlocal_lammps_ = *(static_cast<int *>(lammps_extract_global(lmp,"nlocal")));
 
-    int*  id_lammpsSync=NULL;
-    double** pos_lammpsSync=NULL;
-	bool pos_lammps_alloc_flag=false;
-	bool id_lammps_alloc_flag=false;
+    int*  id_lammpsSync = NULL;
+    double** pos_lammpsSync = NULL;
+    bool pos_lammps_alloc_flag = false;
+    bool id_lammps_alloc_flag = false;
 
-    if(firstRun_ || particleLost_)
+    if (firstRun_ || particleLost_)
     {
         id_lammps_ = NULL;
-        id_lammps_ = (int *) lammps_extract_atom(lmp,"id");
+        id_lammps_ = static_cast<int *>(lammps_extract_atom(lmp,"id"));
 
         allocateArray(id_lammpsVec_,0,nlocal_lammps_*3);
         allocateArray(id_lammpsSync,0,nlocal_lammps_);
@@ -487,15 +489,15 @@ void Foam::twoWayMany2Many::syncIDs() const
             for (int j=0;j<3;j++)
                 id_lammpsVec_[i*3+j] = id_lammps_[i]*3+j;
         }
-		destroy(pos_lammps_,0);
-		pos_lammps_=NULL;
-        pos_lammps_ = (double **) lammps_extract_atom(lmp,"x");
-		pos_lammps_alloc_flag=false;
-		id_lammps_alloc_flag=false;
+        destroy(pos_lammps_,0);
+        pos_lammps_ = NULL;
+        pos_lammps_ = static_cast<double **>(lammps_extract_atom(lmp,"x"));
+        pos_lammps_alloc_flag = false;
+        id_lammps_alloc_flag = false;
     }
     else
     {
-        id_lammps_ = (int *) lammps_extract_atom(lmp,"id");
+        id_lammps_ = static_cast<int *>(lammps_extract_atom(lmp,"id"));
         allocateArray(id_lammpsSync,0,nlocal_lammps_);
         for (int i = 0; i < nlocal_lammps_; i++)
             id_lammpsSync[i] = id_lammps_[i];
@@ -510,32 +512,32 @@ void Foam::twoWayMany2Many::syncIDs() const
         foam2lmp_vec_->setup(nlocal_foam_*3,id_foamVec_,nlocal_lammps_*3,id_lammpsVec_);
         foam2lmp_->setup(nlocal_foam_,id_foam_,nlocal_lammps_,id_lammpsSync);
 
-        id_lammps_=NULL;
+        id_lammps_ = NULL;
         allocateArray(id_lammps_,-1.,nlocal_foam_);
-		id_lammps_alloc_flag=true;
+        id_lammps_alloc_flag = true;
 
         allocateArray(tmpI_,-1.,nlocal_foam_);
         lmp2foam_->exchange(id_lammpsSync, tmpI_);
-        for(int i=0;i<nlocal_foam_;i++)
-            id_lammps_[i]=tmpI_[i];
+        for (int i=0;i<nlocal_foam_;i++)
+            id_lammps_[i] = tmpI_[i];
 
-        pos_lammpsSync = (double **) lammps_extract_atom(lmp,"x");
+        pos_lammpsSync = static_cast<double **>(lammps_extract_atom(lmp,"x"));
 
         allocateArray(tmp_,-1.,nlocal_foam_*3);
         lmp2foam_vec_->exchange(pos_lammpsSync ? pos_lammpsSync[0] : NULL, tmp_);
 
         allocateArray(pos_lammps_,0,3,nlocal_foam_);
-		pos_lammps_alloc_flag=true;
-        for(int i=0;i<nlocal_foam_;i++)
-            for(int j=0;j<3;j++)
-                pos_lammps_[i][j]=tmp_[i*3+j];
+        pos_lammps_alloc_flag = true;
+        for (int i=0;i<nlocal_foam_;i++)
+            for (int j=0;j<3;j++)
+                pos_lammps_[i][j] = tmp_[i*3+j];
 
     }
     particleCloud_.clockM().stop("recv_DEM_ids");
 
     particleCloud_.clockM().start(6,"locateParticle()");
     locateParticle(id_lammpsSync, id_lammps_alloc_flag);
-	id_lammps_alloc_flag=true;
+    id_lammps_alloc_flag = true;
     particleCloud_.clockM().stop("locateParticle()");
 
     particleCloud_.clockM().start(11,"setup_Comm");
@@ -549,13 +551,14 @@ void Foam::twoWayMany2Many::syncIDs() const
     foam2lmp_vec_ = new Many2Many(MPI_COMM_WORLD);
     foam2lmp_ = new Many2Many(MPI_COMM_WORLD);
 
-    if(firstRun_ || particleLost_)
+    if (firstRun_ || particleLost_)
     {
         lmp2foam_->setup(nlocal_lammps_,id_lammps_,nlocal_foam_,id_foam_);
         lmp2foam_vec_->setup(nlocal_lammps_*3,id_lammpsVec_,nlocal_foam_*3,id_foamVec_);
         foam2lmp_vec_->setup(nlocal_foam_*3,id_foamVec_,nlocal_lammps_*3,id_lammpsVec_);
         foam2lmp_->setup(nlocal_foam_,id_foam_,nlocal_lammps_,id_lammps_);
-    }else
+    }
+    else
     {
         lmp2foam_->setup(nlocal_lammps_,id_lammpsSync,nlocal_foam_,id_foam_);
         lmp2foam_vec_->setup(nlocal_lammps_*3,id_lammpsVec_,nlocal_foam_*3,id_foamVec_);
@@ -563,14 +566,13 @@ void Foam::twoWayMany2Many::syncIDs() const
         foam2lmp_->setup(nlocal_foam_,id_foam_,nlocal_lammps_,id_lammpsSync);
     }
     if (id_lammps_alloc_flag) destroy(id_lammps_);
-    id_lammps_=NULL;    // free pointer from LIG
+    id_lammps_ = NULL;    // free pointer from LIG
     destroy(id_lammpsSync);
-    id_lammpsSync=NULL; // free pointer from LIG
+    id_lammpsSync = NULL; // free pointer from LIG
     if (pos_lammps_alloc_flag) destroy(pos_lammps_,0);
     pos_lammps_ = NULL; // free pointer from LIG
 
     particleCloud_.clockM().stop("setup_Comm");
-
 }
 
 void Foam::twoWayMany2Many::locateParticle(int* id_lammpsSync, bool id_lammps_alloc_flag) const
@@ -585,18 +587,18 @@ void Foam::twoWayMany2Many::locateParticle(int* id_lammpsSync, bool id_lammps_al
     allocateArray(id_foamVec_,0,nop*3);
     allocateArray(cellID_foam_,0,nop);
     if(firstRun_)
-		allocateArray(pos_foam_,0,nop*3);
+        allocateArray(pos_foam_,0,nop*3);
 
     particleCloud_.clockM().start(7,"locate_Stage1");
     int iterate;
-    if(firstRun_ || particleLost_) iterate=nlocal_lammps_;
-    else iterate=nlocal_foam_;
+    if (firstRun_ || particleLost_) iterate=nlocal_lammps_;
+    else iterate = nlocal_foam_;
 
     nlocal_foam_ = 0;
     nlocal_foam_lost_ = 0;
     vector pos;
     label cellID = 0;
-    label searchCellID=-1;
+    label searchCellID = -1;
     List< DynamicList<int> > particleTransferID(neighbourProcs_.size());
     List< DynamicList<vector> > particleTransferPos(neighbourProcs_.size());
 
@@ -612,7 +614,7 @@ void Foam::twoWayMany2Many::locateParticle(int* id_lammpsSync, bool id_lammps_al
 
             for (int j=0;j<3;j++)
             {
-                id_foamVec_[nlocal_foam_*3+j] = id_lammps_[i]*3+j;                
+                id_foamVec_[nlocal_foam_*3+j] = id_lammps_[i]*3+j;
                 pos_foam_[nlocal_foam_*3+j] = pos[j];
             }
             cellID_foam_[nlocal_foam_] = cellID;
@@ -640,9 +642,9 @@ void Foam::twoWayMany2Many::locateParticle(int* id_lammpsSync, bool id_lammps_al
                         ).neighbProcNo()
                     ];
 
-                    if(n==Pstream::myProcNo())
+                    if (n==Pstream::myProcNo())
                     {
-                        //Pout << couplingStep_ << "st communicating particle " << id_lammps_[i] 
+                        //Pout << couplingStep_ << "st communicating particle " << id_lammps_[i]
                         //     << "communication fails as particle travels diagonal or jumps over proc" << endl;
                     }
                     else
@@ -650,14 +652,14 @@ void Foam::twoWayMany2Many::locateParticle(int* id_lammpsSync, bool id_lammps_al
                         particleTransferID[n].append(id_lammps_[i]);
                         particleTransferPos[n].append(pos);
                         commPart=true;
-					    //Pout << couplingStep_ << "st communicating particle " << id_lammps_[i] << ", to proc# " << n << endl;
+                       //Pout << couplingStep_ << "st communicating particle " << id_lammps_[i] << ", to proc# " << n << endl;
                     }
                 }
             }
             if (!commPart)
             {
                 id_foamLost_[nlocal_foam_lost_] = id_lammps_[i];
-          
+
                 for (int j=0; j<3; j++)
                     lost_pos_[nlocal_foam_lost_*3+j] = pos[j];
 
@@ -716,7 +718,7 @@ void Foam::twoWayMany2Many::locateParticle(int* id_lammpsSync, bool id_lammps_al
             {
                 pos = recvParticleTransferPos[i];
                 cellID = particleCloud_.locateM().findSingleCell(pos,searchCellID);
-        
+
                 if (cellID >= 0)
                 {
                     id_foam_[nlocal_foam_] = recvParticleTransferID[i];
@@ -733,7 +735,7 @@ void Foam::twoWayMany2Many::locateParticle(int* id_lammpsSync, bool id_lammps_al
                 else
                 {
                     id_foamLost_[nlocal_foam_lost_] = recvParticleTransferID[i];
-          
+
                     for (int j=0; j<3; j++)
                         lost_pos_[nlocal_foam_lost_*3+j] = pos[j];
 
@@ -748,23 +750,23 @@ void Foam::twoWayMany2Many::locateParticle(int* id_lammpsSync, bool id_lammps_al
     particleCloud_.clockM().start(9,"locate_Stage3");
 
     int nlocal_foam_lostAll(-1);
-	if (firstRun_ || allowDiagComm_)
+    if (firstRun_ || allowDiagComm_)
     {
         particleCloud_.clockM().start(10,"locate_Stage3_1");
-	    MPI_Allreduce(&nlocal_foam_lost_, &nlocal_foam_lostAll, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+        MPI_Allreduce(&nlocal_foam_lost_, &nlocal_foam_lostAll, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
         particleCloud_.clockM().stop("locate_Stage3_1");
     }
 
     if (nlocal_foam_lostAll > 0)
     {
         Info << "all-to-all necessary: nlocal_foam_lostAll=" << nlocal_foam_lostAll << endl;
-        if(lost_posAll) 
-        { 
+        if (lost_posAll)
+        {
            delete[] lost_posAll;
            lost_posAll = NULL;
         }
-        if(id_foamLostAll) 
-        { 
+        if (id_foamLostAll)
+        {
            delete[] id_foamLostAll;
            id_foamLostAll = NULL;
         }
@@ -776,7 +778,7 @@ void Foam::twoWayMany2Many::locateParticle(int* id_lammpsSync, bool id_lammps_al
         {
             pos = vector(lost_posAll[i*3+0],lost_posAll[i*3+1],lost_posAll[i*3+2]);
             cellID = particleCloud_.locateM().findSingleCell(pos,searchCellID);
-        
+
             if (cellID >= 0)
             {
                 id_foam_[nlocal_foam_] = id_foamLostAll[i];
@@ -796,14 +798,14 @@ void Foam::twoWayMany2Many::locateParticle(int* id_lammpsSync, bool id_lammps_al
     }
     particleCloud_.clockM().stop("locate_Stage3");
 
-    particleLost_=false;
+    particleLost_ = false;
     if (firstRun_)
     {
         int* id_foam_nowhere_all;
         Foam::dataExchangeModel::allocateArray(id_foam_nowhere_all,1,nlocal_foam_lostAll);
         MPI_Allreduce(id_foamLostAll, id_foam_nowhere_all, nlocal_foam_lostAll, MPI_INT, MPI_MIN, MPI_COMM_WORLD);
 
-        int i=0;
+        int i = 0;
         while (i < nlocal_foam_lostAll)
         {
             if (id_foam_nowhere_all[i] > 0)
@@ -826,10 +828,10 @@ void Foam::twoWayMany2Many::locateParticle(int* id_lammpsSync, bool id_lammps_al
             }
             i++;
         }
-		Foam::dataExchangeModel::destroy(id_foam_nowhere_all);
-		id_foam_nowhere_all=NULL;
-		if (id_lammps_alloc_flag) destroy(id_lammps_);
-        id_lammps_=NULL;
+        Foam::dataExchangeModel::destroy(id_foam_nowhere_all);
+        id_foam_nowhere_all = NULL;
+        if (id_lammps_alloc_flag) destroy(id_lammps_);
+        id_lammps_ = NULL;
         allocateArray(id_lammps_,-1.,nlocal_lammps_);
         for (int i = 0; i < nlocal_lammps_; i++)
             id_lammps_[i]=id_lammpsSync[i];

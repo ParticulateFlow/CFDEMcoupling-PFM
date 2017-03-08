@@ -35,7 +35,7 @@ Description
 #include "locateModel.H"
 #include "dataExchangeModel.H"
 
-//#include "mpi.h" // only for debug reason
+//#include <mpi.h> // only for debug reason
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -105,13 +105,6 @@ cfdemCloudMS::~cfdemCloudMS()
     dataExchangeM().destroy(clumpVol_,1);
     dataExchangeM().destroy(clumpDH_,1);
     dataExchangeM().destroy(clumpWeights_,1);
-    //delete exCM_;
-    //delete eyCM_;
-    //delete ezCM_;
-    //delete SclumpCM_;
-    //delete scalingCM_;
-    //delete Cclump_ex_;
-    //delete Cclump_ey_;
     dataExchangeM().destroy(impForcesCM_,3);
     dataExchangeM().destroy(expForcesCM_,3);
     dataExchangeM().destroy(DEMForcesCM_,3);
@@ -169,7 +162,7 @@ void cfdemCloudMS::getDEMdata()
     //dataExchangeM().getScalarData("Cclump_ey",Cclump_ey_);   // cross section of the clump in ey normal direction
 }
 
-void Foam::cfdemCloudMS::giveDEMdata()
+void cfdemCloudMS::giveDEMdata()
 {
     /*for(int index = 0;index < numberOfClumps(); ++index)
     {
@@ -194,7 +187,7 @@ bool cfdemCloudMS::evolve
     return false;
 }
 
-bool cfdemCloudMS::reAllocArrays() const
+bool cfdemCloudMS::reAllocArrays()
 {
     if(cfdemCloud::reAllocArrays())
     {
@@ -203,18 +196,11 @@ bool cfdemCloudMS::reAllocArrays() const
         dataExchangeM().allocateArray(velocitiesCM_,0,3,"nbodies");
         dataExchangeM().allocateArray(cellIDsCM_,-1,1,"nbodies");
         dataExchangeM().allocateArray(bodies_,0,1);
-        dataExchangeM().allocateArray(nrigids_,0,1,"nbodies");      
+        dataExchangeM().allocateArray(nrigids_,0,1,"nbodies");
         dataExchangeM().allocateArray(clumpType_,0,1,"nbodies");
         dataExchangeM().allocateArray(clumpVol_,0,1,"nbodies");
         dataExchangeM().allocateArray(clumpDH_,1.,1,"nbodies");
         dataExchangeM().allocateArray(clumpWeights_,1,1,"nbodies");
-        //dataExchangeM().allocateArray(exCM_,0,3,"nbodies");
-        //dataExchangeM().allocateArray(eyCM_,0,3,"nbodies");
-        //dataExchangeM().allocateArray(ezCM_,0,3,"nbodies");
-        //dataExchangeM().allocateArray(SclumpCM_,0,3,nClumpTypes);
-        //dataExchangeM().allocateArray(scalingCM_,0,3,"nbodies");
-        //dataExchangeM().allocateArray(Cclump_ex_,0,3,nClumpTypes);
-        //dataExchangeM().allocateArray(Cclump_ey_,0,3,nClumpTypes);
         dataExchangeM().allocateArray(impForcesCM_,0,3,"nbodies");
         dataExchangeM().allocateArray(expForcesCM_,0,3,"nbodies");
         dataExchangeM().allocateArray(DEMForcesCM_,0,3,"nbodies");
@@ -223,7 +209,7 @@ bool cfdemCloudMS::reAllocArrays() const
     return false;
 }
 
-void Foam::cfdemCloudMS::setNumberOfParticles(int nP)
+void cfdemCloudMS::setNumberOfParticles(int nP)
 {
     cfdemCloud::setNumberOfParticles(nP);
     int nC = dataExchangeM().getNumberOfClumps();
@@ -238,13 +224,13 @@ void Foam::cfdemCloudMS::setNumberOfParticles(int nP)
     numberOfClumps_ = min(numberOfParticles(),numberOfClumps_);
 }
 
-void Foam::cfdemCloudMS::findCells()
+void cfdemCloudMS::findCells()
 {
     cfdemCloud::findCells();
     locateM().findCell(NULL,positionsCM_,cellIDsCM_,numberOfClumps());
 }
 
-void Foam::cfdemCloudMS::setForces()
+void cfdemCloudMS::setForces()
 {
     resetArray(impForces_,numberOfParticles(),3);
     resetArray(expForces_,numberOfParticles(),3);
@@ -258,7 +244,7 @@ void Foam::cfdemCloudMS::setForces()
     for (int i=0;i<cfdemCloudMS::nrForceModels();i++) cfdemCloudMS::forceM(i).setForce();
 }
 
-void Foam::cfdemCloudMS::setParticleForceField()
+void cfdemCloudMS::setParticleForceField()
 {
     // set forces per particle
     cfdemCloud::setParticleForceField();
@@ -287,7 +273,7 @@ void Foam::cfdemCloudMS::setParticleForceField()
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 //             PUBLIC MEMBER FUNCTIONS
 
-const forceModel& Foam::cfdemCloudMS::forceM(int i)
+const forceModel& cfdemCloudMS::forceM(int i)
 {
     return forceModel_[i];
 }

@@ -95,8 +95,6 @@ private:
 
     mutable Random RanGen_;
 
-    void allocateMyArrays() const;
-
 public:
 
     //- Runtime type information

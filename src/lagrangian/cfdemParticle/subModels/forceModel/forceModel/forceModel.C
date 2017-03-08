@@ -87,7 +87,7 @@ forceModel::forceModel
     modelType_(sm.modelType()),
     probeIt_(sm.probeM().active()),
     requiresEx_(false),
-    forceSubModels_(wordList(0)),
+    forceSubModels_(0),
     forceSubModel_(new autoPtr<forceSubModel>[nrForceSubModels()])
 {}
 
@@ -170,10 +170,12 @@ void forceModel::treatVoidCells() const
 void forceModel::setForceSubModels(dictionary& dict)
 {
     if (dict.found("forceSubModels"))
+    {
         forceSubModels_ = wordList(dict.lookup("forceSubModels"));
-    else{
-        forceSubModels_ = wordList(1);
-        forceSubModels_[0] = "ImEx";
+    }
+    else
+    {
+        forceSubModels_.setSize(1, "ImEx");
     }
 
     delete[] forceSubModel_;

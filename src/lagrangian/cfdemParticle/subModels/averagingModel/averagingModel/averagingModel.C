@@ -59,7 +59,7 @@ void averagingModel::undoVectorAverage
 {
 // WARNING - not sure if this is valid for dilute model!!!
 
-    if(!single) fieldPrev.internalField() = fieldNext.internalField();
+    if(!single) fieldPrev.ref() = fieldNext.ref();
 
     label cellI;
     vector valueVec;
@@ -135,7 +135,7 @@ void averagingModel::setVectorSum
 (
     volVectorField& field,
     double**& value,
-    double**& weight,
+    double**const& weight,
     double**const& mask
 ) const
 {
@@ -169,7 +169,7 @@ void averagingModel::setVectorSumSimple
 (
     volVectorField& field,
     double**& value,
-    double**& weight,
+    double**const& weight,
     int nP
 ) const
 {
@@ -232,18 +232,16 @@ void averagingModel::setScalarSum
 void averagingModel::setDSauter
 (
     volScalarField& dSauter,
-    double**& weight,
+    double**const& weight,
     volScalarField& weightField,
     label myParticleType
 ) const
 {
     label cellI;
-    scalar valueScal;
     scalar weightP;
     scalar radius(-1);
     scalar radiusPow2(-1);
     scalar radiusPow3(-1);
-    scalar volume(-1);
 
     scalar scale_ = particleCloud_.cg(); //scaling of parcel vs. primary particle diameter
     dSauter = 0.0 * dSauter; //set to zero, because we will use it to calc sum(wi*ri^3)
@@ -305,13 +303,13 @@ void averagingModel::setDSauter
 
 void averagingModel::resetVectorAverage(volVectorField& prev,volVectorField& next,bool single) const
 {
-    if(!single) prev.internalField() = next.internalField();
-    next.internalField() = vector::zero;
+    if(!single) prev.ref() = next.ref();
+    next.primitiveFieldRef() = vector::zero;
 }
 
 void averagingModel::resetWeightFields() const
 {
-    UsWeightField_.internalField() = 0;
+    UsWeightField_.ref() = 0;
 }
 
 
@@ -354,12 +352,12 @@ tmp<volVectorField> Foam::averagingModel::UsInterp() const
 
     if (particleCloud_.dataExchangeM().couplingStep() > 1)
     {
-        tsource() = (1 - particleCloud_.dataExchangeM().timeStepFraction()) * UsPrev_
+        tsource.ref() = (1 - particleCloud_.dataExchangeM().timeStepFraction()) * UsPrev_
                     + particleCloud_.dataExchangeM().timeStepFraction() * UsNext_;
     }
     else
     {
-        tsource() = UsNext_;
+        tsource.ref() = UsNext_;
     }
 
     return tsource;

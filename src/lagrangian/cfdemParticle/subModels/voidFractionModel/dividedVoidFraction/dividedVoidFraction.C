@@ -35,8 +35,9 @@ Description
 #include "addToRunTimeSelectionTable.H"
 #include "locateModel.H"
 #include "dataExchangeModel.H"
+#include <math.h>
 
-//#include "mpi.h"
+//#include <mpi.h>
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -74,7 +75,7 @@ dividedVoidFraction::dividedVoidFraction
 {
     maxCellsPerParticle_ = 29;
 
-    if(alphaMin_ > 1 || alphaMin_ < 0.01){ FatalError<< "alphaMin should be < 1 and > 0.01 !!!" << abort(FatalError); }
+    if(alphaMin_ > 1 || alphaMin_ < 0.01){ Warning << "alphaMin should be < 1 and > 0.01 !!!" << endl; }
     if (propsDict_.found("interpolation")){
         interpolation_=true;
         Warning << "interpolation for dividedVoidFraction does not yet work correctly!" << endl;
@@ -102,24 +103,22 @@ dividedVoidFraction::~dividedVoidFraction()
 
 void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfractions,double**& particleWeights,double**& particleVolumes, double**& particleV) const
 {
-
     if(cfdemUseOnly_)
         reAllocArrays(particleCloud_.numberOfParticles());
     else
         reAllocArrays();
 
-    scalar pi = M_PI;
-    vector position(0,0,0);
-    label cellID=-1;
-    scalar radius(-1);
-    scalar volume(0);
-    scalar cellVol(0);
-    scalar scaleVol= weight();
-    scalar scaleRadius = pow(porosity(),1/3);
+    vector position(0.,0.,0.);
+    label cellID = -1;
+    scalar radius(-1.);
+    scalar volume(0.);
+    scalar cellVol(0.);
+    scalar scaleVol = weight();
+    scalar scaleRadius = pow(porosity(),1./3.);
 
     for(int index=0; index< particleCloud_.numberOfParticles(); index++)
     {
-           if(!checkParticleType(index)) continue; //skip this particle if not correct type
+        if(!checkParticleType(index)) continue; //skip this particle if not correct type
 
         //if(mask[index][0])
         //{
@@ -130,9 +129,9 @@ void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfra
                 particleWeights[index][subcell]=0;
                 particleVolumes[index][subcell]=0;
             }
-            particleV[index][0]=0;
+            particleV[index][0] = 0.;
 
-            cellsPerParticle_[index][0]=1;
+            cellsPerParticle_[index][0] = 1;
             position = particleCloud_.position(index);
             cellID = particleCloud_.cellIDs()[index][0];
             radius = particleCloud_.radius(index);
@@ -143,7 +142,7 @@ void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfra
             //--variables for sub-search
             int nPoints = 29;
             int nNotFound=0,nUnEqual=0,nTotal=0;
-            vector offset(0,0,0);
+            vector offset(0.,0.,0.);
             int cellsSet = 0;
 
             if (cellID >= 0)  // particel centre is in domain
@@ -151,39 +150,44 @@ void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfra
                 cellVol = particleCloud_.mesh().V()[cellID];
 
                 // for 2 different radii
-                for(scalar r = 0.623926*radius;r < radius;r+=0.293976*radius)
+                const scalar delta_r = 0.293976*radius;
+                for (scalar r = 0.623926*radius; r < radius; r+=delta_r)
                 {
                     // try 8 subpoint derived from spherical coordinates
-	                for (scalar zeta=pi/4.;zeta<(2.*pi);zeta+=(pi/2.))
-	                {
-                        for (scalar theta=(pi/4.);theta<pi;theta+=(pi/2.))
-	                    {
-	                        offset[0]=double(r)*Foam::sin(theta)*Foam::cos(zeta);
-	                        offset[1]=double(r)*Foam::sin(theta)*Foam::sin(zeta);
-	                        offset[2]=double(r)*Foam::cos(theta);
+                    for (scalar zeta=M_PI_4; zeta<2.*M_PI; zeta+=M_PI_2)
+                    {
+                        for (scalar theta=M_PI_4; theta<M_PI; theta+=M_PI_2)
+                        {
+                            offset[0] = r * Foam::sin(theta) * Foam::cos(zeta);
+                            offset[1] = r * Foam::sin(theta) * Foam::sin(zeta);
+                            offset[2] = r * Foam::cos(theta);
                             #include "setWeightedSource.H"   // set source terms at position+offset
-	                    }
+                        }
                     }
-	                // try 2 more subpoints for each coordinate direction (6 total)
-	                for (int j=-1;j<=1;j+=2)
-	                {
-	    	            offset[0]=double(r)*(double(j));
-	                    offset[1]=double(0.);offset[2]=double(0.);
-                        #include "setWeightedSource.H"   //NP set source terms at position+offset
-	                    offset[1]=double(r)*(double(j));
-	                    offset[0]=double(0.);offset[2]=double(0.);
+                    // try 2 more subpoints for each coordinate direction (6 total)
+                    for (int j=-1; j<=1; j+=2)
+                    {
+                        offset[0] = r * static_cast<double>(j);
+                        offset[1] = 0.;
+                        offset[2] = 0.;
                         #include "setWeightedSource.H"   //NP set source terms at position+offset
 
-	                    offset[2]=double(r)*(double(j));
-	                    offset[0]=double(0.);offset[1]=double(0.);
+                        offset[0] = 0.;
+                        offset[1] = r * static_cast<double>(j);
+                        offset[2] = 0.;
                         #include "setWeightedSource.H"   //NP set source terms at position+offset
-	                }
+
+                        offset[0] = 0.;
+                        offset[1] = 0.;
+                        offset[2] = r * static_cast<double>(j);
+                        #include "setWeightedSource.H"   //NP set source terms at position+offset
+                    }
                 }// end loop radiivoidfractions
 
-	            if(cellsSet>29 || cellsSet<0)
+                if(cellsSet>29 || cellsSet<0)
                 {
-	                Info << "ERROR  cellsSet =" << cellsSet << endl;
-        	    }
+                    Info << "ERROR  cellsSet =" << cellsSet << endl;
+                }
 
                 // set source for particle center; source 1/nPts+weight of all subpoints that have not been found
                 scalar centreWeight = 1./nPoints*(nPoints-cellsSet);
@@ -224,7 +228,7 @@ void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfra
     }// end loop all particles
 
     // reset counter of lost volume
-    if (verbose_) Pout << "Total particle volume neglected: " << tooMuch_<< endl;
+    if (verbose_) Pout << "Total particle volume neglected: " << tooMuch_ << endl;
     tooMuch_ = 0.;
 
     // bring voidfraction from Eulerian Field to particle array

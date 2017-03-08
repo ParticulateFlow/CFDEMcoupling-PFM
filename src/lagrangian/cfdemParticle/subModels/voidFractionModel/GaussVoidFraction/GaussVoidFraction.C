@@ -91,12 +91,12 @@ void GaussVoidFraction::setvoidFraction(double** const& mask,double**& voidfract
 {
     reAllocArrays();
 
-    voidfractionNext_.internalField()=1;
+    voidfractionNext_.ref()=1;
 
     scalar radius(-1);
     scalar volume(0);
     scalar scaleVol= weight();
-    scalar scaleRadius = pow(porosity(),1/3);
+    scalar scaleRadius = pow(porosity(),1./3.);
 
     for(int index=0; index< particleCloud_.numberOfParticles(); index++)
     {
@@ -108,7 +108,7 @@ void GaussVoidFraction::setvoidFraction(double** const& mask,double**& voidfract
                 particleWeights[index][subcell]=0;
                 particleVolumes[index][subcell]=0;
             }
-            cellsPerParticle_[index][0]=1.0;
+            cellsPerParticle_[index][0]=1;
             particleV[index][0]=0;
 
             //collecting data
@@ -133,7 +133,7 @@ void GaussVoidFraction::setvoidFraction(double** const& mask,double**& voidfract
 
 
                 //generating list with cell and subcells
-                scalar hashSetLength = hashSett.size();
+                label hashSetLength = hashSett.size();
                 if (hashSetLength > maxCellsPerParticle_)
                 {
                     FatalError<< "big particle algo found more cells ("<< hashSetLength
@@ -232,7 +232,8 @@ void GaussVoidFraction::buildLabelHashSet
     hashSett.insert(cellID);
     //Info<<"cell inserted"<<cellID<<endl;
     const labelList& nc = particleCloud_.mesh().cellCells()[cellID];
-    forAll(nc,i){
+    forAll(nc,i)
+    {
         label neighbor=nc[i];
         if(!hashSett.found(neighbor) && mag(position-particleCloud_.mesh().C()[neighbor])<radius){
             buildLabelHashSet(radius,position,neighbor,hashSett);

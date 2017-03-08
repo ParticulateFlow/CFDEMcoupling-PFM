@@ -1,5 +1,5 @@
-#include "mpi.h"
-#include "stdio.h"
+#include <mpi.h>
+#include <stdio.h>
 #include "stdlib.h"
 #include "many2one.h"
 #include "memory.h"

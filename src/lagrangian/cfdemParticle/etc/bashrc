@@ -26,7 +26,8 @@
 #export CFDEM_PROJECT_USER_DIR=$HOME/CFDEM/$LOGNAME-$CFDEM_VERSION-$WM_PROJECT_VERSION
 #export CFDEM_bashrc=$CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/bashrc
 #export CFDEM_LIGGGHTS_SRC_DIR=$HOME/LIGGGHTS/LIGGGHTS-PUBLIC/src
-#export CFDEM_LIGGGHTS_MAKEFILE_NAME=fedora_fpic
+#export CFDEM_LIGGGHTS_BIN_DIR=$HOME/LIGGGHTS/LIGGGHTS-PUBLIC/src-build
+#export CFDEM_LIGGGHTS_MAKEFILE_NAME=fedora_fpic # obsolete with CMake
 #export CFDEM_LPP_DIR=$HOME/LIGGGHTS/mylpp/src
 #export CFDEM_PIZZA_DIR=$HOME/LIGGGHTS/PIZZA/gran_pizza_17Aug10/src
 #. $CFDEM_bashrc
@@ -41,7 +42,7 @@
 if [[ $CFDEM_LAMMPS_LIB_DIR == "" ]]; then
     export CFDEM_LAMMPS_LIB_DIR=$CFDEM_LIGGGHTS_SRC_DIR/../lib/
 else
-    echo "using already defined CFDEM_LAMMPS_LIB_DIR=$CFDEM_LAMMPS_LIB_DIR ."
+    echo "using CFDEM_LAMMPS_LIB_DIR=$CFDEM_LAMMPS_LIB_DIR defined by user."
 fi
 
 #- LIGGGHTS lib name
@@ -52,6 +53,13 @@ export CFDEM_LIB_NAME=lagrangianCFDEM-$CFDEM_VERSION-$WM_PROJECT_VERSION
 
 #- CFDEM compressible lib name
 export CFDEM_LIB_COMP_NAME=lagrangianCFDEMcomp-$CFDEM_VERSION-$WM_PROJECT_VERSION
+
+#check if additional libraries should be compiled together with solvers
+if [[ $CFDEM_ADD_LIBS_DIR == "" ]]; then
+    export CFDEM_ADD_LIBS_DIR=$CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc
+else
+    echo "using CFDEM_ADD_LIBS_DIR=$CFDEM_ADD_LIBS_DIR defined by user."
+fi
 
 #-----------------------------------------------------
 # additional libraries

@@ -23,8 +23,8 @@
           meanUs_array[i] += velocities_[index][i];
       }
       meanR_array += radii_[index][0];
-      particleVolume_radius += radii_[index][0]*radii_[index][0]*radii_[index][0]*4./3.*3.1415;
-      
+      particleVolume_radius += radii_[index][0]*radii_[index][0]*radii_[index][0]*(4./3.)*M_PI;
+
       // loop subCells
       for(int subCell=0;subCell<voidFractionM().cellsPerParticle()[index][0];subCell++)
       {
@@ -63,17 +63,17 @@
   if(countCell>0)
   {
       meanAlpha_field /= countCell;
-      meanU_field /= countCell; 
+      meanU_field /= countCell;
       meanUs_field /= countCell;
   }
   else
   {
       meanAlpha_field = 0;
-      meanU_field = vector(0,0,0); 
+      meanU_field = vector(0,0,0);
       meanUs_field = vector(0,0,0);
   }
-  meanUs_array /= numberOfParticles()+SMALL;   
-  meanR_array /= numberOfParticles()+SMALL;   
+  meanUs_array /= numberOfParticles()+SMALL;
+  meanR_array /= numberOfParticles()+SMALL;
 
   Info <<"=============================================================================" << endl;
   Info << "Debug Info, only serial and not tested!" << endl;

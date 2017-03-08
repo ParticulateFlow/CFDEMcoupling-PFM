@@ -35,7 +35,7 @@ Description
 #include "addToRunTimeSelectionTable.H"
 #include "voidFractionModel.H"
 
-//#include "mpi.h"
+//#include <mpi.h>
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -78,7 +78,7 @@ void dense::setScalarAverage
 (
     volScalarField& field,
     double**& value,
-    double**& weight,
+    double**const& weight,
     volScalarField& weightField,
     double**const& mask
 ) const
@@ -101,7 +101,7 @@ void dense::setScalarAverage
                 if (cellI >= 0)
                 {
                     valueScal = value[index][0];
-                    weightP = weight[index][0];
+                    weightP = weight[index][subCell];
 
                     // first entry in this cell
                     if(weightField[cellI] == 0)
@@ -127,7 +127,7 @@ void dense::setVectorAverage
 (
     volVectorField& field,
     double**& value,
-    double**& weight,
+    double**const& weight,
     volScalarField& weightField,
     double**const& mask
 ) const

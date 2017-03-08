@@ -67,7 +67,7 @@ protected:
 
         mutable volScalarField voidfractionNext_;
 
-        mutable double ** cellsPerParticle_;
+        mutable int ** cellsPerParticle_;
 
         int maxCellsPerParticle_;
 
@@ -138,13 +138,13 @@ public:
         {
             if (propsDict.found("weight")) weight_ = readScalar(propsDict.lookup("weight"));
             if (propsDict.found("porosity")) porosity_ = readScalar(propsDict.lookup("porosity"));
-        };
+        }
 
         void resetVoidFractions() const;
 
         //void undoVoidFractions(double**const&) const;
 
-        double** const& cellsPerParticle() const;
+        int** const& cellsPerParticle() const;
 
         int maxCellsPerParticle() const;
 
@@ -152,9 +152,9 @@ public:
 
         void reAllocArrays(int nP) const;  //force number of particles during reallocation, for CFD offline-use
 
-        virtual void setParticleType(label type) const {};
+        virtual void setParticleType(label type) const {}
 
-        virtual bool checkParticleType(label) const {return true;}; //consider all particles by default
+        virtual bool checkParticleType(label) const { return true; } //consider all particles by default
 };
 
 

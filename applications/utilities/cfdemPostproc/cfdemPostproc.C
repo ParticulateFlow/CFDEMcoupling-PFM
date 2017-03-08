@@ -33,7 +33,7 @@ Description
 
 #include "fvCFD.H"
 #include "singlePhaseTransportModel.H"
-#include "turbulenceModel.H"
+#include "turbulentTransportModel.H"
 
 #include "cfdemCloud.H"
 #include "dataExchangeModel.H"
@@ -72,8 +72,8 @@ int main(int argc, char *argv[])
     double **particleWeights_;
     double **particleVolumes_;
     double **particleV_;
-    double **cellIDs_;
-    
+    int **cellIDs_;
+
     particleCloud.dataExchangeM().allocateArray(positions_,0.,3);
     particleCloud.dataExchangeM().allocateArray(velocities_,0.,3);
     particleCloud.get_radii(radii_);  // get ref to radii
@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
         particleCloud.averagingM().resetWeightFields();
         particleCloud.momCoupleM(0).resetMomSourceField();
 
-        particleCloud.dataExchangeM().couple();
+        particleCloud.dataExchangeM().couple(0);
 
         particleCloud.dataExchangeM().getData("x","vector-atom",positions_,count);
         particleCloud.dataExchangeM().getData("v","vector-atom",velocities_,count);
@@ -109,7 +109,7 @@ int main(int argc, char *argv[])
 
         particleCloud.voidFractionM().setvoidFraction(NULL,voidfractions_,particleWeights_,particleVolumes_,particleV_);
 
-        voidfraction.internalField() = particleCloud.voidFractionM().voidFractionInterp();
+        voidfraction.ref() = particleCloud.voidFractionM().voidFractionInterp();
         voidfraction.correctBoundaryConditions();
 
         particleCloud.averagingM().setVectorAverage

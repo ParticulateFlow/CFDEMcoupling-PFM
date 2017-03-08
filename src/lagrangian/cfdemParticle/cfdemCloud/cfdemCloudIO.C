@@ -32,6 +32,9 @@ Description
 
 #include "cfdemCloud.H"
 
+namespace Foam
+{
+
 // * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
 
 
@@ -45,7 +48,7 @@ Description
 
 // * * * * * * * * * * * * * * * IO * * * * * * * * * * * * * //
 
-void Foam::cfdemCloud::writeScalarFieldToTerminal(double**& array)
+void cfdemCloud::writeScalarFieldToTerminal(double**& array)
 {
     // init double array
     for (int i=0; i<numberOfParticles(); i++)
@@ -54,7 +57,7 @@ void Foam::cfdemCloud::writeScalarFieldToTerminal(double**& array)
     }
 }
 
-void Foam::cfdemCloud::writeVectorFieldToTerminal(double**& array)
+void cfdemCloud::writeVectorFieldToTerminal(double**& array)
 {
     // init double array
     for (int i=0; i<numberOfParticles(); i++)
@@ -64,5 +67,9 @@ void Foam::cfdemCloud::writeVectorFieldToTerminal(double**& array)
     }
 }
 
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace Foam
 
 // ************************************************************************* //

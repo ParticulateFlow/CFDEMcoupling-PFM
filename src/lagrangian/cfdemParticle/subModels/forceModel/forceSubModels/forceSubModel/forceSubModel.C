@@ -60,9 +60,9 @@ forceSubModel::forceSubModel
     particleCloud_(sm),
     forceModel_(fm),
     nrDefaultSwitches_(9),                                          // !!!
-    switchesNameList_(wordList(nrDefaultSwitches_)),
-    switchesList_(List<Switch>(nrDefaultSwitches_)),
-    switches_(List<Switch>(nrDefaultSwitches_)),
+    switchesNameList_(nrDefaultSwitches_),
+    switchesList_(nrDefaultSwitches_),
+    switches_(nrDefaultSwitches_),
     nu_
     (
         IOobject
@@ -114,14 +114,8 @@ forceSubModel::forceSubModel
     switchesNameList_[iCounter]="interpolation";iCounter++;         //4
     switchesNameList_[iCounter]="useFilteredDragModel";iCounter++;  //5
     switchesNameList_[iCounter]="useParcelSizeDependentFilteredDrag";iCounter++;  //6
-	switchesNameList_[iCounter]="implForceDEMaccumulated";iCounter++;             //7
-	switchesNameList_[iCounter]="scalarViscosity";iCounter++;                     //8
-
-    for(int i=0;i<switchesList_.size();i++)
-    {
-        switchesList_[i]=false;
-        switches_[i]=false;
-    }
+    switchesNameList_[iCounter]="implForceDEMaccumulated";iCounter++;             //7
+    switchesNameList_[iCounter]="scalarViscosity";iCounter++;                     //8
 
     // sanity check of what is defined above
     if(switchesNameList_.size() != nrDefaultSwitches_)
@@ -179,8 +173,9 @@ void forceSubModel::partToArray
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-void forceSubModel::explicitInterpCorr
+void forceSubModel::explicitCorr
 (
+    vector& dragImplicit,
     vector& dragExplicit,
     scalar& dragCoefficient,
     vector& Ufluid,
@@ -201,7 +196,7 @@ void forceSubModel::readSwitches() const
     Info << "\nreading switches for forceSubModel:" << myType() << endl;
     forAll(switchesNameList_,i)
     {
-        if(switchesList_[i] > 0+SMALL) //check if switch is required
+        if(switchesList_[i]) //check if switch is required
         {
             Info << "  looking for " << switchesNameList_[i] << " ..." << endl;
             if (dict_.found(switchesNameList_[i]))
@@ -218,11 +213,15 @@ void forceSubModel::readSwitches() const
         particleCloud_.impDEMdrag_=true;
 
         // do sanity check
+        // This can work if the accumulator is used, but is explicitely applied on the CFD side
+        // Sanity check is therefore not necessary here
+        /*
         if(switches_[0]) // treatExplicit=true
         {
-            FatalError << "Please check your settings, treatExplicit together with implForceDEM does not work!." 
+            FatalError << "Please check your settings, treatExplicit together with implForceDEM does not work!."
                        << abort(FatalError);
         }
+        */
     }
 
     if(switches_[7]) // implForceDEMaccumulated=true
@@ -320,7 +319,7 @@ const volVectorField& forceSubModel::divTauField(const volVectorField& U) const
 const volVectorField& forceSubModel::IBDragPerV(const volVectorField& U,const volScalarField& p) const
 {
     #ifdef compre
-        IBDragPerV_ = muField()*fvc::laplacian(U)-fvc::grad(p)
+        IBDragPerV_ = muField()*fvc::laplacian(U)-fvc::grad(p);
     #else
         IBDragPerV_ = rhoField()*(nuField()*fvc::laplacian(U)-fvc::grad(p));
     #endif

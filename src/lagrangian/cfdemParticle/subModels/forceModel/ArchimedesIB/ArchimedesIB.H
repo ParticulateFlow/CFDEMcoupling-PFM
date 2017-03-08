@@ -71,12 +71,8 @@ private:
 
     word gravityFieldName_;
 
-    #ifdef version21
-        const uniformDimensionedVectorField& g_;    // ref to gravity
-    #elif defined(version16ext) || defined(version15)
-        const dimensionedVector& g_;    // ref to gravity
-    #endif
-
+    const uniformDimensionedVectorField& g_;    // ref to gravity
+    
 
 public:
 

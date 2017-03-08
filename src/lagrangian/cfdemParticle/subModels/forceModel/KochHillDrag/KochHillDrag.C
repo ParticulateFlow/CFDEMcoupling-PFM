@@ -35,7 +35,7 @@ Description
 #include "addToRunTimeSelectionTable.H"
 #include "dataExchangeModel.H"
 
-//#include "mpi.h"
+//#include <mpi.h>
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -75,11 +75,11 @@ KochHillDrag::KochHillDrag
 {
     //Append the field names to be probed
     particleCloud_.probeM().initialize(typeName, "kochHillDrag.logDat");
-    particleCloud_.probeM().vectorFields_.append("dragForce"); //first entry must the be the force
-    particleCloud_.probeM().vectorFields_.append("Urel");        //other are debug
-    particleCloud_.probeM().scalarFields_.append("Rep");          //other are debug
-    particleCloud_.probeM().scalarFields_.append("beta");                 //other are debug
-    particleCloud_.probeM().scalarFields_.append("voidfraction");       //other are debug
+    particleCloud_.probeM().vectorFields_.append("dragForce");      //first entry must the be the force
+    particleCloud_.probeM().vectorFields_.append("Urel");           //other are debug
+    particleCloud_.probeM().scalarFields_.append("Rep");            //other are debug
+    particleCloud_.probeM().scalarFields_.append("beta");           //other are debug
+    particleCloud_.probeM().scalarFields_.append("voidfraction");   //other are debug
     particleCloud_.probeM().writeHeader();
 
     // init force sub model
@@ -115,10 +115,13 @@ KochHillDrag::~KochHillDrag()
 
 void KochHillDrag::setForce() const
 {
-    if (scaleDia_ > 1)
+    if (scaleDia_ > 1.0)
+    {
         Info << "KochHill using scale = " << scaleDia_ << endl;
-    else if (particleCloud_.cg() > 1){
-        scaleDia_=particleCloud_.cg();
+    }
+    else if (particleCloud_.cg() > 1.0)
+    {
+        scaleDia_ = particleCloud_.cg();
         Info << "KochHill using scale from liggghts cg = " << scaleDia_ << endl;
     }
 
@@ -140,8 +143,8 @@ void KochHillDrag::setForce() const
     scalar rho(0);
     scalar magUr(0);
     scalar Rep(0);
-	scalar Vs(0);
-	scalar volumefraction(0);
+    scalar Vs(0);
+    scalar volumefraction(0);
     scalar betaP(0);
 
     int couplingInterval(particleCloud_.dataExchangeM().couplingInterval());
@@ -151,7 +154,7 @@ void KochHillDrag::setForce() const
 
     #include "setupProbeModel.H"
 
-    for(int index = 0;index <  particleCloud_.numberOfParticles(); index++)
+    for (int index=0; index<particleCloud_.numberOfParticles(); index++)
     {
             cellI = particleCloud_.cellIDs()[index][0];
             drag = vector(0,0,0);
@@ -164,86 +167,91 @@ void KochHillDrag::setForce() const
 
             if (cellI > -1) // particle Found
             {
-                if(forceSubM(0).interpolation())
+                if (forceSubM(0).interpolation())
                 {
-	                position = particleCloud_.position(index);
+                    position = particleCloud_.position(index);
                     voidfraction = voidfractionInterpolator_.interpolate(position,cellI);
                     Ufluid = UInterpolator_.interpolate(position,cellI);
                     //Ensure interpolated void fraction to be meaningful
                     // Info << " --> voidfraction: " << voidfraction << endl;
-                    if(voidfraction>1.00) voidfraction = 1.00;
-                    if(voidfraction<0.40) voidfraction = 0.40;
-                }else
+                    if (voidfraction > 1.00) voidfraction = 1.00;
+                    if (voidfraction < 0.40) voidfraction = 0.40;
+                }
+                else
                 {
-					voidfraction = voidfraction_[cellI];
+                    voidfraction = voidfraction_[cellI];
                     Ufluid = U_[cellI];
                 }
 
                 Us = particleCloud_.velocity(index);
                 Ur = Ufluid-Us;
                 ds = particleCloud_.d(index);
+                scalar ds_scaled = ds/scaleDia_;
                 nuf = nufField[cellI];
                 rho = rhoField[cellI];
                 magUr = mag(Ur);
-				Rep = 0;
-                Vs = ds*ds*ds*M_PI/6;
-                volumefraction = max(SMALL,min(1-SMALL,1-voidfraction));
+                Rep = 0.;
+                Vs = ds*ds*ds*M_PI/6.; // sphere volume
+                volumefraction = max(SMALL,min(1.-SMALL,1.-voidfraction));
 
-                if (magUr > 0)
+                if (magUr > 0.)
                 {
                     // calc particle Re Nr
-                    Rep = ds/scaleDia_*voidfraction*magUr/(nuf+SMALL);
+                    Rep = ds_scaled*voidfraction*magUr/(nuf+SMALL);
 
                     // calc model coefficient F0
-                    scalar F0=0.;
-                    if(volumefraction < 0.4)
+                    scalar F0 = 0.;
+                    if (volumefraction < 0.4)
                     {
-                        F0 = (1+3*sqrt((volumefraction)/2)+135/64*volumefraction*log(volumefraction)
-                              +16.14*volumefraction
+                        F0 = (1. + 3.*sqrt(volumefraction/2.) + (135./64.)*volumefraction*log(volumefraction)
+                              + 16.14*volumefraction
                              )/
-                             (1+0.681*volumefraction-8.48*sqr(volumefraction)
-                              +8.16*volumefraction*volumefraction*volumefraction
+                             (1. + 0.681*volumefraction - 8.48*sqr(volumefraction)
+                              + 8.16*volumefraction*volumefraction*volumefraction
                              );
-                    } else {
-                        F0 = 10*volumefraction/(voidfraction*voidfraction*voidfraction);
+                    }
+                    else
+                    {
+                        F0 = 10.*volumefraction/(voidfraction*voidfraction*voidfraction);
                     }
 
                     // calc model coefficient F3
-                    scalar F3 = 0.0673+0.212*volumefraction+0.0232/pow(voidfraction,5);
+                    scalar F3 = 0.0673 + 0.212*volumefraction + 0.0232/pow(voidfraction,5);
 
                     //Calculate F (the factor 0.5 is introduced, since Koch and Hill, ARFM 33:619–47, use the radius
                     //to define Rep, and we use the particle diameter, see vanBuijtenen et al., CES 66:2368–2376.
                     scalar F = voidfraction * (F0 + 0.5*F3*Rep);
 
                     // calc drag model coefficient betaP
-                    betaP = 18.*nuf*rho/(ds/scaleDia_*ds/scaleDia_)*voidfraction*F;
+                    betaP = (18.*nuf*rho/(ds_scaled*ds_scaled))*voidfraction*F;
 
                     // calc particle's drag
                     dragCoefficient = Vs*betaP*scaleDrag_;
                     if (modelType_=="B")
                         dragCoefficient /= voidfraction;
 
-                    if(forceSubM(0).switches()[7]) // implForceDEMaccumulated=true
+                    if (forceSubM(0).switches()[7]) // implForceDEMaccumulated=true
                     {
-		                //get drag from the particle itself
-		                for (int j=0 ; j<3 ; j++) drag[j] = particleCloud_.fAccs()[index][j]/couplingInterval;
-                    }else
+                        //get drag from the particle itself
+                        for (int j=0; j<3; j++) drag[j] = particleCloud_.fAccs()[index][j]/couplingInterval;
+                    }
+                    else
                     {
                         drag = dragCoefficient * Ur;
 
-                        // explicitInterpCorr
-                        forceSubM(0).explicitInterpCorr(dragExplicit,dragCoefficient,Ufluid,U_[cellI],Us,UsField_[cellI],forceSubM(0).verbose());
+                        // explicitCorr
+                        forceSubM(0).explicitCorr(drag,dragExplicit,dragCoefficient,Ufluid,U_[cellI],Us,UsField_[cellI],forceSubM(0).verbose());
                     }
                 }
 
-                if(forceSubM(0).verbose() && index >=0 && index <2)
+                if (forceSubM(0).verbose() && index >= 0 && index < 2)
                 {
                     Pout << "cellI = " << cellI << endl;
                     Pout << "index = " << index << endl;
                     Pout << "Us = " << Us << endl;
                     Pout << "Ur = " << Ur << endl;
                     Pout << "ds = " << ds << endl;
-                    Pout << "ds/scale = " << ds/scaleDia_ << endl;
+                    Pout << "ds/scale = " << ds_scaled << endl;
                     Pout << "rho = " << rho << endl;
                     Pout << "nuf = " << nuf << endl;
                     Pout << "voidfraction = " << voidfraction << endl;
@@ -253,7 +261,7 @@ void KochHillDrag::setForce() const
                 }
 
                 //Set value fields and write the probe
-                if(probeIt_)
+                if (probeIt_)
                 {
                     #include "setupProbeModelfields.H"
                     vValues.append(drag);           //first entry must the be the force

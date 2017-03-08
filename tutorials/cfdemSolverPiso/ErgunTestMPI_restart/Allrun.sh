@@ -49,7 +49,8 @@ cp $casePath/CFD/constant/couplingProperties_restart $casePath/CFD/constant/coup
 cp $casePath/CFD/system/controlDict_restart $casePath/CFD/system/controlDict
 
 #- run parallel CFD-DEM in new terminal
-gnome-terminal --title='cfdemSolverPiso ErgunTestMPI_restart CFD'  -e "bash $casePath/parCFDDEMrun.sh" 
+#gnome-terminal --title='cfdemSolverPiso ErgunTestMPI_restart CFD'  -e "bash $casePath/parCFDDEMrun.sh" 
+bash $casePath/parCFDDEMrun.sh
 
 
 #- wait until sim has finished then run octave

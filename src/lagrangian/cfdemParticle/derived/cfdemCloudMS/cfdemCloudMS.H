@@ -61,7 +61,7 @@ class cfdemCloudMS
 private:
     mutable double **positionsCM_;
     mutable double **velocitiesCM_;
-    mutable double **cellIDsCM_;
+    mutable int **cellIDsCM_;
     mutable int **bodies_;
     mutable int **nrigids_;
 
@@ -95,7 +95,6 @@ private:
 // Private member functions
     void getDEMdata();
     void giveDEMdata();
-    bool reAllocArrays() const;
     void setNumberOfParticles(int);
     void findCells();
     void setForces();
@@ -163,6 +162,8 @@ public:
        inline bool useforcePerClump() const;
 
        const forceModel& forceM(int);
+
+       bool reAllocArrays();
 
        bool evolve(volScalarField&,volVectorField&,volVectorField&);
 };

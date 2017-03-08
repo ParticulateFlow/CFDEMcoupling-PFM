@@ -64,8 +64,6 @@ private:
 
     fileName relativePath_;
 
-    const char* charFilename_;
-
 public:
 
     //- Runtime type information
@@ -102,7 +100,7 @@ public:
             int ** const& field,
             label step
         ) const
-        {};
+        {}
 
         void giveData
         (
@@ -112,7 +110,7 @@ public:
             const char* datatype = ""
         ) const;
 
-        word myType() const{return typeName; };
+        word myType() const{ return typeName; }
 };
 
 

@@ -44,7 +44,7 @@ SourceFiles
 #include "dataExchangeModel.H"
 #include "liggghtsCommandModel.H"
 #include "OFstream.H"
-#include "sys/stat.h"
+#include <sys/stat.h>
 #include "pair.h"
 #include "force.h"
 #include "forceModel.H"
@@ -52,7 +52,7 @@ SourceFiles
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "mpi.h"
+#include <mpi.h>
 #include <lammps.h>
 #include <input.h>
 #include <atom.h>
@@ -134,8 +134,6 @@ private:
 
   // private member functions
 
-    char* wordToChar(word&) const;
-
 public:
 
     //- Runtime type information
@@ -184,12 +182,12 @@ public:
         //============
         // double **
         void allocateArray(double**&, double, int, int) const;
-        void allocateArray(double**&, double, int,const char* ="nparticles") const;
+        void allocateArray(double**&, double, int,const char* = "nparticles") const;
         void inline destroy(double**,int) const;
         //============
         // int **
         void allocateArray(int**&, int, int, int) const;
-        void allocateArray(int**&, int, int,const char* ="nparticles") const;
+        void allocateArray(int**&, int, int,const char* = "nparticles") const;
         void inline destroy(int**,int) const;
         //==============
 
@@ -203,15 +201,15 @@ public:
         void inline destroy(int*) const;
         //==============
 
-        bool couple() const;
+        bool couple(int) const;
 
         int getNumberOfParticles() const;
         int getNumberOfClumps() const;
 
         void syncIDs() const;
         void locateParticle(int*, bool) const;
-        word myType() const{return typeName; };
-        void setCG() const { particleCloud_.setCG(lmp->force->cg()); };
+        word myType() const { return typeName; }
+        void setCG() const { particleCloud_.setCG(lmp->force->cg()); }
 };
 
 

@@ -63,45 +63,20 @@ twoWayMPI::twoWayMPI
 )
 :
     dataExchangeModel(dict,sm),
-    propsDict_(dict.subDict(typeName + "Props"))
+    propsDict_(dict.subDict(typeName + "Props")),
+    lmp(NULL)
 {
-    // set max nr of particles from dict
-    //Info << "twoWayMPI.C- this should no longer be needed" << endl;
-    //maxNumberOfParticles_ = readScalar(propsDict_.lookup("maxNumberOfParticles"));
-
-
     Info<<"Starting up LIGGGHTS for first time execution"<<endl;
 
-    MPI_Comm_rank(MPI_COMM_WORLD,&me);
-    MPI_Comm_size(MPI_COMM_WORLD,&nprocs);
+    MPI_Comm_dup(MPI_COMM_WORLD, &comm_liggghts);
 
-    if (me < nprocs) liggghts = 1;
-    else liggghts = MPI_UNDEFINED;
-
-    MPI_Comm_split(MPI_COMM_WORLD,liggghts,0,&comm_liggghts);
+    // read path from dictionary
+    const fileName liggghtsPath(propsDict_.lookup("liggghtsPath"));
 
     // open LIGGGHTS input script
-    char *liggghtsPathChar = new char[256];
-    int n = 0;
-    if (me == 0)
-    {
-      // read path from dictionary
-      const fileName liggghtsPath(propsDict_.lookup("liggghtsPath"));
-      strcpy(liggghtsPathChar, liggghtsPath.c_str());
-      n = strlen(liggghtsPathChar) + 1;
-
-      Info<<"Executing input script '"<< liggghtsPath.c_str() <<"'"<<endl;
-    }
-
-    if (liggghts == 1) lmp = new LAMMPS_NS::LAMMPS(0,NULL,comm_liggghts);
-
-    MPI_Bcast(&n,1,MPI_INT,0,MPI_COMM_WORLD);
-    if (n > 0) {
-        MPI_Bcast(liggghtsPathChar,n,MPI_CHAR,0,MPI_COMM_WORLD);
-        if (liggghts == 1) lmp->input->file(liggghtsPathChar);
-    }
-
-    delete [] liggghtsPathChar;
+    Info<<"Executing input script '"<< liggghtsPath.c_str() <<"'"<<endl;
+    lmp = new LAMMPS_NS::LAMMPS(0,NULL,comm_liggghts);
+    lmp->input->file(liggghtsPath.c_str());
 
     // get DEM time step size
     DEMts_ = lmp->update->dt;
@@ -112,15 +87,9 @@ twoWayMPI::twoWayMPI
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 twoWayMPI::~twoWayMPI()
-{}
-
-// * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
-char* twoWayMPI::wordToChar(word& inWord) const
 {
-    string HH = string(inWord);
-    return const_cast<char*>(HH.c_str());
+    delete lmp;
 }
-
 
 // * * * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * * //
 void twoWayMPI::getData
@@ -128,12 +97,10 @@ void twoWayMPI::getData
     word name,
     word type,
     double ** const& field,
-    label step
+    label /*step*/
 ) const
 {
-    char* charName = wordToChar(name);
-    char* charType = wordToChar(type);
-    data_liggghts_to_of(charName,charType, lmp, (void*&) field,"double");
+    data_liggghts_to_of(name.c_str(), type.c_str(), lmp, (void*&) field, "double");
 }
 
 void twoWayMPI::getData
@@ -141,12 +108,10 @@ void twoWayMPI::getData
     word name,
     word type,
     int ** const& field,
-    label step
+    label /*step*/
 ) const
 {
-    char* charName = wordToChar(name);
-    char* charType = wordToChar(type);
-    data_liggghts_to_of(charName,charType, lmp, (void*&) field,"int");
+    data_liggghts_to_of(name.c_str(), type.c_str(), lmp, (void*&) field, "int");
 }
 
 void twoWayMPI::giveData
@@ -157,11 +122,9 @@ void twoWayMPI::giveData
     const char* datatype
 ) const
 {
-    char* charName = wordToChar(name);
-    char* charType = wordToChar(type);
-    char* charDatatype= const_cast<char*> (datatype);
-    data_of_to_liggghts(charName,charType, lmp, (void*) field,charDatatype);
+    data_of_to_liggghts(name.c_str(), type.c_str(), lmp, (void*)field, datatype);
 }
+
 //============
 // double **
 void Foam::twoWayMPI::allocateArray
@@ -172,8 +135,7 @@ void Foam::twoWayMPI::allocateArray
     int length
 ) const
 {
-    //if(length==-1) then LIGGGHTS uses own length data
-    allocate_external_double(array, width,length,initVal,lmp);
+    allocate_external_double(array, width, length, initVal, lmp);
 }
 
 void Foam::twoWayMPI::allocateArray
@@ -184,20 +146,18 @@ void Foam::twoWayMPI::allocateArray
     const char* length
 ) const
 {
-    //if(length==-1) then LIGGGHTS uses own length data
-    char* charLength= const_cast<char*> (length);
-    allocate_external_double(array, width,charLength,initVal,lmp);
+    allocate_external_double(array, width, length, initVal, lmp);
 }
-void Foam::twoWayMPI::destroy(double** array,int len) const
+
+void Foam::twoWayMPI::destroy(double** array,int /*len*/) const
 {
     if (array == NULL) return;
 
-    //for ( int i = 0; i < len; i++ ) // does not work
-    for ( int i = 0; i < 1; i++ )
-        free(array[i]); 
+    if (array[0]) free(array[0]);
 
     free(array);
 }
+
 //============
 // int **
 void Foam::twoWayMPI::allocateArray
@@ -208,8 +168,7 @@ void Foam::twoWayMPI::allocateArray
     int length
 ) const
 {
-    //if(length==-1) then LIGGGHTS uses own length data
-    allocate_external_int(array, width,length,initVal,lmp);
+    allocate_external_int(array, width, length, initVal, lmp);
 }
 
 void Foam::twoWayMPI::allocateArray
@@ -220,17 +179,14 @@ void Foam::twoWayMPI::allocateArray
     const char* length
 ) const
 {
-    //if(length==-1) then LIGGGHTS uses own length data
-    char* charLength= const_cast<char*> (length);
-    allocate_external_int(array, width,charLength,initVal,lmp);
+    allocate_external_int(array, width, length, initVal, lmp);
 }
-void Foam::twoWayMPI::destroy(int** array,int len) const
+
+void Foam::twoWayMPI::destroy(int** array,int /*len*/) const
 {
     if (array == NULL) return;
 
-    //for ( int i = 0; i < len; i++ ) // does not work
-    for ( int i = 0; i < 1; i++ )
-        free(array[i]); 
+    if (array[0]) free(array[0]);
 
     free(array);
 }
@@ -250,17 +206,15 @@ void Foam::twoWayMPI::destroy(double* array) const
 }
 //============
 
-bool Foam::twoWayMPI::couple() const
+bool Foam::twoWayMPI::couple(int i) const
 {
     bool coupleNow = false;
-    if (doCoupleNow())
+    if (i==0)
     {
         couplingStep_++;
         coupleNow = true;
 
         // start liggghts
-        if (liggghts == 1)
-        {
             // run commands from liggghtsCommands dict
             Info<<"Starting up LIGGGHTS" << endl;
             particleCloud_.clockM().start(3,"LIGGGHTS");
@@ -271,7 +225,6 @@ bool Foam::twoWayMPI::couple() const
             DynamicList<scalar> interruptTimes(0);
             DynamicList<int> DEMstepsToInterrupt(0);
             DynamicList<int> lcModel(0);
-            scalar interruptTime = -1;
 
             forAll(particleCloud_.liggghtsCommandModelList(),i)
             {
@@ -303,11 +256,11 @@ bool Foam::twoWayMPI::couple() const
                         ind = len-i-1;
                         if(ind>0)
                             DEMstepsToInterrupt[ind] -= DEMstepsToInterrupt[ind-1];
-                    }                    
+                    }
 
-                    Info << "Foam::twoWayMPI::couple(): interruptTimes=" << interruptTimes << endl;
-                    Info << "Foam::twoWayMPI::couple(): DEMstepsToInterrupt=" << DEMstepsToInterrupt << endl;
-                    Info << "Foam::twoWayMPI::couple(): lcModel=" << lcModel << endl;
+                    Info << "Foam::twoWayMPI::couple(i): interruptTimes=" << interruptTimes << endl;
+                    Info << "Foam::twoWayMPI::couple(i): DEMstepsToInterrupt=" << DEMstepsToInterrupt << endl;
+                    Info << "Foam::twoWayMPI::couple(i): lcModel=" << lcModel << endl;
                 }
 
                 if(particleCloud_.liggghtsCommand()[i]().type()=="runLiggghts")
@@ -322,16 +275,16 @@ bool Foam::twoWayMPI::couple() const
                 //    sort interrupt list within this run period
                 //    keep track of corresponding liggghtsCommand
                 int DEMstepsRun(0);
-                
+
                 forAll(interruptTimes,j)
-                {                  
+                {
                     // set run command till interrupt
-                    DEMstepsRun += DEMstepsToInterrupt[j];          
+                    DEMstepsRun += DEMstepsToInterrupt[j];
                     particleCloud_.liggghtsCommand()[runComNr]().set(DEMstepsToInterrupt[j]);
                     const char* command = particleCloud_.liggghtsCommand()[runComNr]().command(0);
                     Info << "Executing run command: '"<< command <<"'"<< endl;
                     lmp->input->one(command);
-    
+
                     // run liggghts command with exact timing
                     command = particleCloud_.liggghtsCommand()[lcModel[j]]().command(0);
                     Info << "Executing command: '"<< command <<"'"<< endl;
@@ -386,7 +339,6 @@ bool Foam::twoWayMPI::couple() const
 
             particleCloud_.clockM().stop("LIGGGHTS");
             Info<<"LIGGGHTS finished"<<endl;
-        }
 
         // give nr of particles to cloud
         double newNpart = liggghts_get_maxtag(lmp);
@@ -414,7 +366,7 @@ int Foam::twoWayMPI::getNumberOfClumps() const
     #endif
 
     Warning << "liggghts_get_maxtag_ms(lmp) is not available here!" << endl;
-    return -1;       
+    return -1;
 }
 
 int Foam::twoWayMPI::getNumberOfTypes() const
@@ -433,7 +385,7 @@ double* Foam::twoWayMPI::getTypeVol() const
     #endif
 
     Warning << "liggghts_get_vclump_ms(lmp) is not available here!" << endl;
-    return NULL;       
+    return NULL;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

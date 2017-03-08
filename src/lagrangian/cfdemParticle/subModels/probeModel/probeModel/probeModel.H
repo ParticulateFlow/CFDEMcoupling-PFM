@@ -97,8 +97,8 @@ public:
             (
                 const dictionary& dict,
                 cfdemCloud& sm,
-                word   typeName,
-                char*  logFileName
+                const word& typeName,
+                const char* logFileName
             ),
             (dict,sm,typeName,logFileName)
         );
@@ -111,8 +111,8 @@ public:
         (
             const dictionary& dict,
             cfdemCloud& sm,
-            word   typeName,
-            char*  logFileName
+            const word& typeName,
+            const char* logFileName
         );
 
 
@@ -127,23 +127,22 @@ public:
         (
             const dictionary& dict,
             cfdemCloud& sm,
-            word   typeName,
-            char*  logFileName
+            const word& typeName,
+            const char* logFileName
         );
 
     // Member Functions
 
-    virtual void initialize(word typeName, word  logFileName) const {};
-    virtual void setOutputFile() const {};
-    virtual void writeHeader() const {};
-    virtual void writeProbe(int index, Field<scalar> sValues, Field<vector> vValues) const {};
-    virtual bool checkIDForPrint(int) const {return false;};
-    virtual void setCounter() const {};
-    virtual bool active() const {return true;}; 
-    virtual std::vector<double*>* getVprobe() {return NULL;};
-    virtual std::vector<double>* getSprobe() {return NULL;};
-    virtual void clearProbes() const {};
-    const char* wordToChar(word&) const;
+    virtual void initialize(word typeName, word  logFileName) const {}
+    virtual void setOutputFile() const {}
+    virtual void writeHeader() const {}
+    virtual void writeProbe(int index, Field<scalar> sValues, Field<vector> vValues) const {}
+    virtual bool checkIDForPrint(int) const { return false; }
+    virtual void setCounter() const {}
+    virtual bool active() const { return true; }
+    virtual std::vector< std::vector<double*> >* getVprobe() { return NULL; }
+    virtual std::vector< std::vector<double> >* getSprobe() { return NULL; }
+    virtual void clearProbes() const {}
 
     // Access
 

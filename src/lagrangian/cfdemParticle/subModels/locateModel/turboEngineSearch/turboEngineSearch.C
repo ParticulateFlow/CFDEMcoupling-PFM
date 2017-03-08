@@ -64,11 +64,7 @@ turboEngineSearch::turboEngineSearch
     propsDict_(dict.subDict(typeName + "Props")),
     treeSearch_(propsDict_.lookup("treeSearch")),
     bb_(particleCloud_.mesh().points(),false),
-    #ifdef version16ext
-        searchEngine_(particleCloud_.mesh(),false) //(particleCloud_.mesh(),faceDecomp_)
-    #elif defined(version21)
-        searchEngine_(particleCloud_.mesh(),polyMesh::FACEPLANES) // FACEPLANES or FACECENTRETETS; FACEDIAGTETS not stable
-    #endif
+    searchEngine_(particleCloud_.mesh(), polyMesh::FACE_PLANES)
 {}
 
 
@@ -84,7 +80,7 @@ label turboEngineSearch::findCell
 (
     double** const& mask,
     double**& positions,
-    double**& cellIDs,
+    int**& cellIDs,
     int size
 ) const
 {
@@ -101,18 +97,18 @@ label turboEngineSearch::findCell
             // find cell
             if(first)
             {
-                cellIDs[index][0] =searchEngine_.findCell(position,cellIDs[index][0],treeSearch_);
+                cellIDs[index][0] = searchEngine_.findCell(position,cellIDs[index][0],treeSearch_);
                 first=false;
             }
             else
             {
                 if(bb_.contains(position))
-                    cellIDs[index][0] =searchEngine_.findCell(position,cellIDs[index][0],treeSearch_);
+                    cellIDs[index][0] = searchEngine_.findCell(position,cellIDs[index][0],treeSearch_);
                 else
-                    cellIDs[index][0] =-1;
+                    cellIDs[index][0] = -1;
             }
         }
-        else cellIDs[index][0]=-1;
+        else cellIDs[index][0] = -1;
     }
 
     return 1;
@@ -120,8 +116,8 @@ label turboEngineSearch::findCell
 
 label turboEngineSearch::findSingleCell
 (
-    vector& position,
-    label& oldCellID
+    const vector& position,
+    label oldCellID
 ) const
 {
     // find cell

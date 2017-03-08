@@ -43,7 +43,7 @@ SourceFiles
 
 #include "dataExchangeModel.H"
 #include "OFstream.H"
-#include "sys/stat.h"
+#include <sys/stat.h>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -64,10 +64,6 @@ private:
     dictionary propsDict_;
 
   // private member functions
-
-    const char* wordToChar(word&) const;
-
-    const char* fileNameToChar(fileName&) const;
 
     fileName getFilePath(word&, bool) const;
 
@@ -108,7 +104,7 @@ public:
             word type,
             int ** const& field,
             label step
-        ) const {FatalError<<"function not implemented !!! twoWayFiles::getData!!!\n" << abort(FatalError);};
+        ) const { FatalError<<"function not implemented !!! twoWayFiles::getData!!!\n" << abort(FatalError); }
 
         void giveData
         (
@@ -118,7 +114,7 @@ public:
             const char* datatype = ""
         ) const;
 
-        word myType() const{return typeName; };
+        word myType() const{ return typeName; }
 };
 
 

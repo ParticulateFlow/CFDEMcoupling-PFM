@@ -60,7 +60,7 @@ momCoupleModels
     off
 );
 
-turbulenceModelType RASProperties;
+turbulenceModelType "turbulenceProperties";
 
 //===========================================================================//
 // sub-model properties

@@ -80,14 +80,14 @@ public:
         (
             double** const& mask,
             double**& positions,
-            double**& cellIDs,
+            int**& cellIDs,
             int size
         ) const;
 
         label findSingleCell
         (
-            vector& position,
-            label& oldCellID
+            const vector& position,
+            label oldCellID
         ) const;
 };
 

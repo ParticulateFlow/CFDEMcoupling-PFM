@@ -156,23 +156,25 @@ public:
 
         string addTimeStamp(word);
 
-        virtual void set(int){};
+        virtual void set(int) {}
 
         DynamicList<scalar> executionsWithinPeriod(scalar,scalar);
 
+        bool checkPath(fileName);
+
     // Access
 
-        int nextRun(){return nextRun_;};
+        int nextRun(){return nextRun_;}
 
-        int lastRun(){return lastRun_;};
+        int lastRun(){return lastRun_;}
 
         virtual word name()=0;
 
-        bool exactTiming(){return exactTiming_;};
+        bool exactTiming(){return exactTiming_;}
 
-        label commandLines(){return commandLines_;};
+        label commandLines(){return commandLines_;}
 
-        void parseCommandList(wordList&, labelList&, scalarList&, word&, dictionary&, bool=false);
+        void parseCommandList(wordList&, labelList&, scalarList&, word&, dictionary&, bool&);
 };
 
 

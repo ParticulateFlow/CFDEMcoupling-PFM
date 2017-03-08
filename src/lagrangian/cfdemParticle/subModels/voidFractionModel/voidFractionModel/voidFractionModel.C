@@ -88,7 +88,7 @@ voidFractionModel::voidFractionModel
     weight_(1.),
     porosity_(1.)
 {
-    particleCloud_.dataExchangeM().allocateArray(cellsPerParticle_,1,maxCellsPerParticle_);
+    particleCloud_.dataExchangeM().allocateArray(cellsPerParticle_,1,1);
 }
 
 
@@ -127,19 +127,19 @@ tmp<volScalarField> Foam::voidFractionModel::voidFractionInterp() const
     scalar tsf = particleCloud_.dataExchangeM().timeStepFraction();
     if(1-tsf < 1e-4 && particleCloud_.dataExchangeM().couplingStep() > 1) //tsf==1
     {
-        tsource() = voidfractionPrev_;
+        tsource.ref() = voidfractionPrev_;
     }
     else
     {
-        tsource() = (1 - tsf) * voidfractionPrev_ + tsf * voidfractionNext_;
+        tsource.ref() = (1 - tsf) * voidfractionPrev_ + tsf * voidfractionNext_;
     }
     return tsource;
 }
 
 void Foam::voidFractionModel::resetVoidFractions() const
 {
-    voidfractionPrev_.internalField() = voidfractionNext_.internalField();
-    voidfractionNext_.internalField() = 1;
+    voidfractionPrev_.ref() = voidfractionNext_.ref();
+    voidfractionNext_.ref() = 1;
 }
 
 /*void Foam::voidFractionModel::undoVoidFractions(double**const& mask) const
@@ -158,7 +158,7 @@ void Foam::voidFractionModel::resetVoidFractions() const
     }
 }*/
 
-double** const& Foam::voidFractionModel::cellsPerParticle() const
+int** const& voidFractionModel::cellsPerParticle() const
 {
     return cellsPerParticle_;
 }
@@ -168,7 +168,7 @@ int Foam::voidFractionModel::maxCellsPerParticle() const
     return maxCellsPerParticle_;
 }
 
-void Foam::voidFractionModel::reAllocArrays() const
+void voidFractionModel::reAllocArrays() const
 {
     if(particleCloud_.numberOfParticlesChanged())
     {
@@ -177,7 +177,7 @@ void Foam::voidFractionModel::reAllocArrays() const
     }
 }
 
-void Foam::voidFractionModel::reAllocArrays(int nP) const
+void voidFractionModel::reAllocArrays(int nP) const
 {
     if(particleCloud_.numberOfParticlesChanged())
     {

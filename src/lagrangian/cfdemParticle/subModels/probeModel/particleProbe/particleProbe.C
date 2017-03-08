@@ -33,7 +33,7 @@ Description
 
 #include "particleProbe.H"
 #include "addToRunTimeSelectionTable.H"
-#include "mpi.h"
+#include <mpi.h>
 #include "IOmanip.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -60,8 +60,8 @@ particleProbe::particleProbe
 (
     const dictionary& dict,
     cfdemCloud& sm,
-    word   typeName,
-    char*  logFileName
+    const word& typeName,
+    const char* logFileName
 )
 :
     probeModel(dict,sm,typeName,logFileName),
@@ -79,8 +79,6 @@ particleProbe::particleProbe
     probeDebug_(false),
     includePosition_(false),
     particleIDsToSample_(propsDict_.lookup("particleIDsToSample")),
-    itemsToSample_(NULL),
-    sPtrList_(NULL),
     itemCounter_(0),
     currItemId_(0),
     printCounter_(0),
@@ -101,7 +99,9 @@ particleProbe::particleProbe
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 particleProbe::~particleProbe()
-{}
+{
+    clearProbes();
+}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
@@ -114,74 +114,67 @@ void particleProbe::setOutputFile() const
     else
         currItemId_+=1;
     sPtr = sPtrList_[currItemId_-1]; //set the pointer to the output file from list
+    probeIndex_=currItemId_-1;
 }
 
 
-void particleProbe::initialize(word typeName, word  logFileName) const
+void particleProbe::initialize(word typeName, word logFileName) const
 {
-  //update the list of items to be sampled
-  itemCounter_ += 1; 
-  itemsToSample_.append(logFileName);
+    //update the list of items to be sampled
+    ++itemCounter_;
+    itemsToSample_.append(logFileName);
 
-  // init environment
-  //propsDict_ = particleCloud_.couplingProperties().subDict(typeName + "Props");
-  name_ = typeName;
-  const char* fileNameOut_ = wordToChar(logFileName);
+    // init environment
+    //propsDict_ = particleCloud_.couplingProperties().subDict(typeName + "Props");
+    name_ = typeName;
 
-  if(verboseToFile_)
-  {
+    if (verboseToFile_)
+    {
+        Info << "Will sample these particle IDs: " << particleIDsToSample_ << " every " << printEvery_ << endl;
 
-    Info << "Will sample these particle IDs: " << particleIDsToSample_ << " every " <<  printEvery_ <<  endl;
+        //initialize the output files
+        MPI_Comm_rank(MPI_COMM_WORLD, &rank_);
 
-    //initialize the output files
-    int myrank_(-1);
-    int numprocs_(-1);
-    MPI_Comm_rank(MPI_COMM_WORLD,&myrank_);
-    MPI_Comm_size(MPI_COMM_WORLD, &numprocs_);
-    rank_=myrank_;
+        //open a separate file for each processor
+        char* filecurrent_ = new char[strlen(logFileName.c_str()) + 4]; //reserve 4 chars for processor name
+        sprintf(filecurrent_,"%s%s%d", logFileName.c_str(), ".", rank_);
 
-    //open a separate file for each processor
-    char* filecurrent_;
-    filecurrent_= new char[strlen(fileNameOut_) + 4]; //reserve 4 chars for processor name
-    if (myrank_ < numprocs_)  
-             sprintf(filecurrent_,"%s%s%d", fileNameOut_, ".", myrank_);
-    else  //open one file for proc 0
-            sprintf(filecurrent_,"%s", fileNameOut_); 
-     word file_(filecurrent_);
-     Info << "particleProbe for model " <<  name_ << " will write to file " << file_ << endl;
+        Info << "particleProbe for model " << name_ << " will write to file " << filecurrent_ << endl;
 
-      //generate the file streams
-      fileName probeSubDir = dirName_;
-      if (particleCloud_.mesh().name() != polyMesh::defaultRegion)
-      {
-                probeSubDir = probeSubDir/particleCloud_.mesh().name();
-       }
-      probeSubDir = probeSubDir/particleCloud_.mesh().time().timeName();
+        //generate the file streams
+        fileName probeSubDir = dirName_;
+        if (particleCloud_.mesh().name() != polyMesh::defaultRegion)
+        {
+            probeSubDir = probeSubDir/particleCloud_.mesh().name();
+        }
+        probeSubDir = probeSubDir/particleCloud_.mesh().time().timeName();
 
-       fileName probeDir_;
-       if (Pstream::parRun())
-       {
-                // Put in undecomposed case
-                // (Note: gives problems for distributed data running)
-               probeDir_ = particleCloud_.mesh().time().path()/".."/probeSubDir;
+        fileName probeDir_;
+        if (Pstream::parRun())
+        {
+            // Put in undecomposed case
+            // (Note: gives problems for distributed data running)
+            probeDir_ = particleCloud_.mesh().time().path()/".."/probeSubDir;
         }
         else
         {
-              probeDir_ = particleCloud_.mesh().time().path()/probeSubDir;
+            probeDir_ = particleCloud_.mesh().time().path()/probeSubDir;
         }
 
-    //manage files and OFstreams
-    mkDir(probeDir_);
-    sPtr = new OFstream(probeDir_/file_);
-    sPtrList_.append(sPtr);
+        //manage files and OFstreams
+        mkDir(probeDir_);
+        sPtr = new OFstream(probeDir_/filecurrent_);
+        sPtrList_.append(sPtr);
 
-    //Clear the containers for the fields to be probed
-    scalarFields_.clear();
-    vectorFields_.clear();
-  }
-  return;
+        delete [] filecurrent_;
+        //Clear the containers for the fields to be probed
+        scalarFields_.clear();
+        vectorFields_.clear();
+    }
 
+    return;
 }
+
 void particleProbe::writeHeader() const
 {
 
@@ -196,97 +189,140 @@ void particleProbe::writeHeader() const
          forAll(vectorFields_, iter)
          {
              if(!probeDebug_ && iter>0) break;
-             *sPtr << vectorFields_(iter) << "   "; 
-          }
+             *sPtr << vectorFields_(iter) << "   ";
+         }
 
          if(probeDebug_)
          {
-            *sPtr<<"||   scalarData:  "  << "   ";  
+            *sPtr<<"||   scalarData:  "  << "   ";
             forAll(scalarFields_, iter)
             {
                  *sPtr << scalarFields_(iter)  << "   ";
             }
          }
 
-         if(includePosition_) *sPtr<<" ||  position" << endl; 
-         else *sPtr << endl; 
+         if(includePosition_) *sPtr<<" ||  position" << endl;
+         else *sPtr << endl;
      }
 
 }
 
 void particleProbe::clearProbes() const
 {
-  for (unsigned int i=0; i<vProbes_.size(); i++)
-   delete vProbes_[i];
-   
-  sProbes_.clear();
-  vProbes_.clear();
- 
+    for (unsigned int i=0; i<vProbes_.size(); i++)
+        vProbes_[i].clear();
+  
+    for (unsigned int j=0; j<sProbes_.size(); j++)
+        sProbes_[j].clear();
+
+    sProbes_.clear();
+    vProbes_.clear();
+}
+
+void particleProbe::updateProbes(int index, Field<scalar> sValues, Field<vector> vValues) const
+{
+    int vSize_=vProbes_.size();
+    int sSize_=sProbes_.size();
+
+    //check if the particle already has an allocated vector. If not, create it. It should be only called at the beginning.
+    while(index >= vSize_)
+    {
+        std::vector<double*> particleVector_;
+        vProbes_.push_back(particleVector_);
+        vSize_=vProbes_.size();
+    }
+
+    while(index >= sSize_)
+    {
+        std::vector<double> particleScalar_;
+        sProbes_.push_back(particleScalar_);
+        sSize_=sProbes_.size();
+    }
+
+    //register vector probes on the corresponding vector
+    forAll(vValues, iter)
+    {
+        int ProbeSize_=vProbes_[index].size();
+
+        if(probeIndex_<ProbeSize_) //The corresponding probe for this particle already exists, values are overwritten.
+        {
+            vProbes_[index][probeIndex_][0]=vValues[iter][0];
+            vProbes_[index][probeIndex_][1]=vValues[iter][1];
+            vProbes_[index][probeIndex_][2]=vValues[iter][2];
+        }
+        else //The corresponding probe for this particle has to be created
+        {
+            double * probe_= new double[3];
+
+            probe_[0]=vValues[iter][0];
+            probe_[1]=vValues[iter][1];
+            probe_[2]=vValues[iter][2];
+
+            vProbes_[index].push_back(probe_);
+        }
+    }
+
+    //register scalar probes on the corresponding vector
+    forAll(sValues, iter)
+    {
+        int ProbeSize_=sProbes_[index].size();
+
+        if(probeIndex_<ProbeSize_) //The corresponding probe for this particle already exists, values are overwritten.
+        {
+            sProbes_[index][probeIndex_]=sValues[iter];
+        }
+        else //The corresponding probe for this particle has to be created
+        {
+            sProbes_[index].push_back(sValues[iter]);
+        }
+    }
 }
 
 void particleProbe::writeProbe(int index, Field<scalar> sValues, Field<vector> vValues) const
 {
-   
-    
-    if(printNow_ && checkIDForPrint(index) &&  verboseToFile_) 
-    {
+    updateProbes(index,sValues,vValues); //update probe vectors
 
+
+    if(printNow_ && checkIDForPrint(index) &&  verboseToFile_)
+    {
         //index and time
-       *sPtr <<    setprecision(IOstream::defaultPrecision()+7) ;
-       *sPtr << index  << tab 
-                << particleCloud_.mesh().time().value()  << "   " ;
+        *sPtr << setprecision(IOstream::defaultPrecision()+7);
+        *sPtr << index  << tab << particleCloud_.mesh().time().value()  << "   ";
         *sPtr << "||   ";
-        
-        int vsize_=vProbes_.size();
+
         //vectorFields
-        *sPtr <<    setprecision(writePrecision_) ;
-         forAll(vValues, iter)
-         {
-             // if(!probeDebug_ && iter>0) break;
-             *sPtr << vValues[iter][0] << "   ";
-             *sPtr << vValues[iter][1] << "   "; 
-             *sPtr << vValues[iter][2] << "   ";  
-             
-             
-             if(index<vsize_)
-             {
-              vProbes_[index][0]+=vValues[iter][0];
-              vProbes_[index][1]+=vValues[iter][1];
-              vProbes_[index][2]+=vValues[iter][2];
-             }
-             else
-             {
-              double * vprobe_= new double[3];
-              vprobe_[0]=vValues[iter][0];
-              vprobe_[1]=vValues[iter][1];
-              vprobe_[2]=vValues[iter][2];
-              
-              vProbes_.push_back(vprobe_);
-             }       
-          
-          }
+        *sPtr << setprecision(writePrecision_);
+        forAll(vValues, iter)
+        {
+            // if(!probeDebug_ && iter>0) break;
+            *sPtr << vValues[iter][0] << "   ";
+            *sPtr << vValues[iter][1] << "   ";
+            *sPtr << vValues[iter][2] << "   ";
+
+        }
 
         //scalarFields
         if(probeDebug_)
         {
-          *sPtr << "||   ";
-           forAll(sValues, iter)
-           {
-               *sPtr << sValues[iter] << "   "; 
-               sProbes_.push_back(sValues[iter]);
+            *sPtr << "||   ";
+            forAll(sValues, iter)
+            {
+                *sPtr << sValues[iter] << "   ";
             }
         }
 
         if(includePosition_)
         {
             *sPtr << "||   ";
-             *sPtr <<     particleCloud_.position(index)[0] << "   " 
-                      <<     particleCloud_.position(index)[1] << "   "
-                      <<     particleCloud_.position(index)[2]
-                      << endl;
+            *sPtr << particleCloud_.position(index)[0] << "   "
+                  << particleCloud_.position(index)[1] << "   "
+                  << particleCloud_.position(index)[2]
+                  << endl;
         }
-        else *sPtr << endl;
-
+        else
+        {
+            *sPtr << endl;
+        }
     }
 
     return;
@@ -294,7 +330,6 @@ void particleProbe::writeProbe(int index, Field<scalar> sValues, Field<vector> v
 
 bool particleProbe::checkIDForPrint(int index) const
 {
-  
       bool sampleThisId_ = false;
       if(sampleAll_) sampleThisId_ = true;
       else

@@ -34,7 +34,7 @@ Description
 #include "volWeightedAverage.H"
 #include "addToRunTimeSelectionTable.H"
 #include "dataExchangeModel.H"
-#include "mpi.h"
+#include <mpi.h>
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -67,8 +67,6 @@ volWeightedAverage::volWeightedAverage
     startTime_(0.),
     scalarFieldNames_(propsDict_.lookup("scalarFieldNames")),
     vectorFieldNames_(propsDict_.lookup("vectorFieldNames")),
-    scalarFields_(NULL),
-    vectorFields_(NULL),
     upperThreshold_(readScalar(propsDict_.lookup("upperThreshold"))),
     lowerThreshold_(readScalar(propsDict_.lookup("lowerThreshold"))),
     verbose_(false)
@@ -154,7 +152,7 @@ void volWeightedAverage::setForce() const
         for (int i=0;i < scalarFieldNames_.size(); i++)
         {
             // get reference to actual field
-            volScalarField& field = (volScalarField&) mesh_.lookupObject<volScalarField>(scalarFieldNames_[i]);
+            const volScalarField& field = mesh_.lookupObject<volScalarField>(scalarFieldNames_[i]);
 
             scalar fieldValue=-1;
             scalar volWeightedAverage=-1;
@@ -181,7 +179,7 @@ void volWeightedAverage::setForce() const
             MPI_Allreduce(&totVol, &totVol_all, 3, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
             integralValue = gSum(scalarFields_[i]);
             volWeightedAverage = integralValue / (totVol_all+SMALL);
-            scalarFields_[i].internalField() = volWeightedAverage;
+            scalarFields_[i].ref() = volWeightedAverage;
 
             if(verbose_)
             {
@@ -199,7 +197,7 @@ void volWeightedAverage::setForce() const
         for (int i=0;i < vectorFieldNames_.size(); i++)
         {
             // get reference to actual field
-            volVectorField& field = (volVectorField&) mesh_.lookupObject<volVectorField>(vectorFieldNames_[i]);
+            const volVectorField& field = mesh_.lookupObject<volVectorField>(vectorFieldNames_[i]);
 
             vector fieldValue(-1,-1,-1);
             vector volWeightedAverage(-1,-1,-1);
@@ -226,7 +224,7 @@ void volWeightedAverage::setForce() const
 
             MPI_Allreduce(&totVol, &totVol_all, 3, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
             volWeightedAverage = gSum(vectorFields_[i]) / (totVol_all+SMALL);
-            vectorFields_[i].internalField() = volWeightedAverage;
+            vectorFields_[i].ref() = volWeightedAverage;
 
             if(verbose_)
             {

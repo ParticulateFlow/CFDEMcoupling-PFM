@@ -69,7 +69,6 @@ protected:
         int couplingInterval_;
 
     // Protected member functions
-        void setNumberOfParticles(int) const;
 
 public:
 
@@ -116,7 +115,9 @@ public:
 
 
     // Member Function
-        inline const int& maxNumberOfParticles() const {return maxNumberOfParticles_;};
+        void setNumberOfParticles(int) const;
+
+        inline const int& maxNumberOfParticles() const { return maxNumberOfParticles_; }
 
         template <typename T>
         void getData
@@ -140,7 +141,7 @@ public:
             word type,
             int ** const& field,
             label step
-        ) const=0;
+        ) const = 0;
 
         virtual void giveData
         (
@@ -175,25 +176,25 @@ public:
         virtual void destroy(double*) const;
         //====
 
-        virtual bool couple() const;
+        virtual bool couple(int) const;
 
         virtual scalar timeStepFraction() const;
 
-        inline int couplingStep() const {return couplingStep_;};
+        inline int couplingStep() const { return couplingStep_; }
 
-        inline const scalar& DEMts() const {return DEMts_;};
+        inline const scalar& DEMts() const { return DEMts_; }
 
-        inline int couplingInterval() const {return couplingInterval_;};
+        inline int couplingInterval() const { return couplingInterval_; }
 
-        inline scalar couplingTime() const {return couplingInterval_*DEMts_;};
+        inline scalar couplingTime() const { return couplingInterval_*DEMts_; }
 
         inline scalar TSstart() const { return particleCloud_.mesh().time().startTime().value()
-                                        + (couplingStep_-1) * couplingTime();};
+                                        + (couplingStep_-1) * couplingTime(); }
 
-        inline scalar TSend() const {return particleCloud_.mesh().time().startTime().value()
-                                        + (couplingStep_) * couplingTime();};
+        inline scalar TSend() const { return particleCloud_.mesh().time().startTime().value()
+                                        + (couplingStep_) * couplingTime(); }
 
-        inline int DEMstepsTillT(scalar t) const {return (t - (particleCloud_.mesh().time().value() - couplingTime())  + SMALL) / DEMts_;};
+        inline int DEMstepsTillT(scalar t) const { return (t - (particleCloud_.mesh().time().value() - couplingTime())  + SMALL) / DEMts_; }
 
         inline void checkTSsize() const
         {
@@ -253,7 +254,7 @@ public:
 
         virtual word myType() const=0;
 
-        virtual void setCG() const { Warning << "setCG() not executed correctly!" << endl; };
+        virtual void setCG() const { Warning << "setCG() not executed correctly!" << endl; }
 };
 
 

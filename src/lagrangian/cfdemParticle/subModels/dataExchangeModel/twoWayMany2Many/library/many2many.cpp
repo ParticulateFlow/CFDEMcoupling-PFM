@@ -1,5 +1,5 @@
-#include "mpi.h"
-#include "stdio.h"
+#include <mpi.h>
+#include <stdio.h>
 #include "many2many.h"
 #include "irregular.h"
 #include "memory.h"
@@ -268,7 +268,6 @@ void Many2Many::exchange(int *src, int *dest)
   // user src_off and dest_off to pack/unpack data
 
   if (irregular) {
-    int nrecv = irregular->size(sizeof(int)) / sizeof(int);
     for (i = 0; i < nsrc_off; i++) src_iwork[i] = src[src_off[i]];
     irregular->exchange((char *) src_iwork, (char *) dest_iwork);
     for (i = 0; i < ndest_off; i++) dest[dest_off[i]] = dest_iwork[i];
@@ -293,7 +292,6 @@ void Many2Many::exchange(double *src, double *dest)
   // user src_off and dest_off to pack/unpack data
 
   if (irregular) {
-    int nrecv = irregular->size(sizeof(double)) / sizeof(double);
     for (i = 0; i < nsrc_off; i++) src_dwork[i] = src[src_off[i]];
     irregular->exchange((char *) src_dwork, (char *) dest_dwork);
     for (i = 0; i < ndest_off; i++) dest[dest_off[i]] = dest_dwork[i];

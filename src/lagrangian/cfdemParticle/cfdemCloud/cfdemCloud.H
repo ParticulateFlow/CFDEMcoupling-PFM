@@ -49,11 +49,7 @@ SourceFiles
 #include "fvCFD.H"
 #include "IFstream.H"
 
-#if defined(version21) || defined(version16ext)
-    #include "turbulenceModel.H"
-#elif defined(version15)
-    #include "RASModel.H"
-#endif
+#include <turbulenceModel.H>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -73,6 +69,7 @@ class smoothingModel;
 class momCoupleModel;
 class meshMotionModel;
 class liggghtsCommandModel;
+class otherForceModel;
 
 /*---------------------------------------------------------------------------*\
                            Class cfdemCloud Declaration
@@ -94,6 +91,10 @@ protected:
     bool verbose_;
 
     bool ignore_;
+
+    bool limitDEMForces_;
+
+    scalar maxDEMForce_;
 
     const word modelType_;
 
@@ -117,7 +118,7 @@ protected:
 
     mutable double **voidfractions_;
 
-    mutable double **cellIDs_;
+    mutable int **cellIDs_;
 
     mutable double **particleWeights_;
 
@@ -126,6 +127,8 @@ protected:
     mutable double **particleV_;
 
     int numberOfParticles_;
+
+    scalar d32_;
 
     bool numberOfParticlesChanged_;
 
@@ -136,6 +139,8 @@ protected:
     const wordList momCoupleModels_;
 
     const wordList liggghtsCommandModelList_;
+
+    const wordList otherForceModels_;
 
     const word turbulenceModelType_;
 
@@ -155,15 +160,7 @@ protected:
 
     mutable volScalarField ddtVoidfraction_;
 
-    #if defined(version21) || defined(version16ext)
-        #ifdef compre
-            const compressible::turbulenceModel& turbulence_;
-        #else
-            const incompressible::turbulenceModel& turbulence_;
-        #endif
-    #elif defined(version15)
-        const incompressible::RASModel& turbulence_;
-    #endif
+    const turbulenceModel& turbulence_;
 
     autoPtr<forceModel>* forceModel_;
 
@@ -188,6 +185,8 @@ protected:
     autoPtr<meshMotionModel> meshMotionModel_;
 
     autoPtr<liggghtsCommandModel>* liggghtsCommand_;
+
+    autoPtr<otherForceModel>* otherForceModel_;
 
 // Protected member functions
     virtual void getDEMdata();
@@ -229,7 +228,7 @@ public:
 
        void setPos(double **&);
 
-       word modelType(){ return modelType_; };
+       word modelType(){ return modelType_; }
 
        label particleCell(int);
 
@@ -237,11 +236,15 @@ public:
 
        vector velocity(int);
 
+       vector expForce(int);
+
        vector fluidVel(int);
 
        virtual const forceModel& forceM(int);
 
        virtual int nrForceModels();
+
+       virtual int nrMomCoupleModels();
 
        scalar voidfraction(int);
 
@@ -291,9 +294,9 @@ public:
 
        inline void get_radii(double**&) const;
 
-       inline double ** cellIDs() const;
+       inline int ** cellIDs() const;
 
-       inline void get_cellIDs(double**&) const;
+       inline void get_cellIDs(int**&) const;
 
        inline double ** particleWeights() const;
 
@@ -305,24 +308,25 @@ public:
 
        virtual inline double d(int);
 
+       inline scalar d32(bool recalc=true);
        virtual inline double dMin() {return -1;}
        virtual inline double dMax() {return -1;}
        virtual inline int minType() {return -1;}
        virtual inline int maxType() {return -1;}
        virtual inline bool multipleTypesDMax() {return false;}
        virtual inline bool multipleTypesDMin() {return false;}
-       virtual inline double ** particleDensity() const {return NULL;};
-       virtual inline int ** particleTypes() const {return NULL;};
-       virtual label particleType(label index) const {return -1;};
+       virtual inline double ** particleDensity() const {return NULL;}
+       virtual inline int ** particleTypes() const {return NULL;}
+       virtual label particleType(label index) const {return -1;}
 
        //access to the particle's rotation and torque data
-       virtual inline double ** DEMTorques() const {return NULL;};
-       virtual inline double ** omegaArray() const {return NULL;};
-       virtual vector omega(int) const {return Foam::vector(0,0,0);};
+       virtual inline double ** DEMTorques() const {return NULL;}
+       virtual inline double ** omegaArray() const {return NULL;}
+       virtual vector omega(int) const {return Foam::vector(0,0,0);}
 
        //access to the particles' orientation information
-       virtual inline double ** exArray() const {return NULL;};
-       virtual vector ex(int) const {return Foam::vector(0,0,0);};
+       virtual inline double ** exArray() const {return NULL;}
+       virtual vector ex(int) const {return Foam::vector(0,0,0);}
 
        //Detector if SRF module is enable or not
        virtual inline bool SRFOn(){return false;}
@@ -361,24 +365,18 @@ public:
 
        inline autoPtr<liggghtsCommandModel>* liggghtsCommand() const;
 
-       #if defined(version21) || defined(version16ext)
-            #ifdef compre
-                inline const compressible::turbulenceModel& turbulence() const;
-            #else
-                inline const incompressible::turbulenceModel& turbulence() const;
-            #endif
-       #elif defined(version15)
-           inline const incompressible::RASModel& turbulence() const;
-       #endif
+       inline const turbulenceModel& turbulence() const;
 
     // Write
 
       // write cfdemCloud internal data
         virtual bool evolve(volScalarField&,volVectorField&,volVectorField&);
 
-        virtual bool reAllocArrays() const;
+        virtual void postFlow() {}
 
-        virtual bool reAllocArrays(int nP, bool forceRealloc) const;  //force number of particles during reallocation
+        virtual bool reAllocArrays();
+
+        virtual bool reAllocArrays(int nP, bool forceRealloc);  //force number of particles during reallocation
 
 
     // IO
@@ -399,9 +397,11 @@ public:
 
         void resetArray(double**&,int,int,double resetVal=0.);
 
-        std::vector<double*>* getVprobe();
-         
-        std::vector<double>* getSprobe();
+        std::vector< std::vector<double*> >* getVprobe();
+
+        std::vector< std::vector<double> >* getSprobe();
+
+        void otherForces(volVectorField&);
 };
 
 

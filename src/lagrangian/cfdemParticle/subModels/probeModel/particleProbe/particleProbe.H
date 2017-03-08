@@ -101,10 +101,14 @@ private:
 
     mutable bool printNow_;
 
-    mutable std::vector<double> sProbes_;
-    
-    mutable std::vector<double*> vProbes_;
-    
+    mutable std::vector< std::vector<double> > sProbes_;
+
+    mutable std::vector< std::vector<double*> > vProbes_;
+
+    mutable  std::vector<std::string> probeName_;
+
+    mutable int probeIndex_;
+
 public:
 
     //- Runtime type information
@@ -118,8 +122,8 @@ public:
         (
             const dictionary& dict,
             cfdemCloud& sm,
-            word   typeName,
-            char*  logFileName
+            const word& typeName,
+            const char* logFileName
         );
 
     // Destructor
@@ -127,6 +131,7 @@ public:
         ~particleProbe();
 
     // Member Functions
+    void updateProbes(int index, Field<scalar> sValues, Field<vector> vValues) const;
     void initialize(word typeName, word logFileName) const;
     void setOutputFile() const;
     void writeHeader() const;
@@ -134,8 +139,9 @@ public:
     bool checkIDForPrint(int) const;
     void setCounter() const;
     void clearProbes() const;
-    std::vector<double*>* getVprobe() {return &vProbes_; };
-    std::vector<double>* getSprobe() {return &sProbes_; };
+    std::vector< std::vector<double*> >* getVprobe() { return &vProbes_; }
+    std::vector< std::vector<double> >* getSprobe() { return &sProbes_; }
+
 };
 
 

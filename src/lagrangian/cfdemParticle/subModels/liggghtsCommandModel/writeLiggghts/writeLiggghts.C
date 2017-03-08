@@ -81,6 +81,15 @@ writeLiggghts::writeLiggghts
             writeLast_=Switch(propsDict_.lookup("writeLast"));
         }
 
+        if (propsDict_.found("path"))
+        {
+            path_=fileName(propsDict_.lookup("path"));
+            if (!checkPath(path_))
+                FatalError<<"The path you provided in writeLiggghtsProps is incorrect: " << path_ << "\n" << abort(FatalError);
+            else
+                Info << "Using user defined path to write LIGGGHTS restart file: " << path_ << endl;
+        }
+
         if(propsDict_.found("writeName"))
         {
             propsDict_.lookup("writeName") >> writeName_;

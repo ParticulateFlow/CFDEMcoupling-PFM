@@ -34,7 +34,7 @@ Description
 #include "particleCellVolume.H"
 #include "addToRunTimeSelectionTable.H"
 #include "dataExchangeModel.H"
-#include "mpi.h"
+#include <mpi.h>
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -120,10 +120,10 @@ void particleCellVolume::setForce() const
     {
         if(verbose_) Info << "particleCellVolume.C - setForce()" << endl;
 
-        scalarField_.internalField()=0.;
+        scalarField_.ref()=0.;
 
         // get reference to actual field
-        volScalarField& field = (volScalarField&) mesh_.lookupObject<volScalarField>(scalarFieldName_);
+        const volScalarField& field = mesh_.lookupObject<volScalarField>(scalarFieldName_);
 
         scalar fieldValue=-1;
         scalar cellVol=-1;
@@ -143,8 +143,8 @@ void particleCellVolume::setForce() const
                 scalarField2_[cellI] = 0.;
             }
         }
-        scalarField_.internalField() = gSum(scalarField_);
-        scalarField2_.internalField() = gSum(scalarField2_);
+        scalarField_.ref() = gSum(scalarField_);
+        scalarField2_.ref() = gSum(scalarField2_);
 
         if(verbose_)
         {

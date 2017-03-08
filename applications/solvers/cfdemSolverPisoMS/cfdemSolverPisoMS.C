@@ -25,23 +25,26 @@ License
     along with CFDEMcoupling.  If not, see <http://www.gnu.org/licenses/>.
 
 Application
-    cfdemSolverPisoMS
+    cfdemSolverPiso
 
 Description
     Transient solver for incompressible flow.
     Turbulence modelling is generic, i.e. laminar, RAS or LES may be selected.
-    The code is an evolution of the solver pisoFoam in OpenFOAM(R) 1.6, 
+    The code is an evolution of the solver pisoFoam in OpenFOAM(R) 1.6,
     where additional functionality for CFD-DEM coupling is added.
 \*---------------------------------------------------------------------------*/
 
 #include "fvCFD.H"
 #include "singlePhaseTransportModel.H"
-#include "turbulenceModel.H"
+#include "turbulentTransportModel.H"
+#include "pisoControl.H"
+#include "fvOptions.H"
 
 #include "cfdemCloudMS.H"
 #include "implicitCouple.H"
 #include "clockModel.H"
 #include "smoothingModel.H"
+#include "forceModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -50,7 +53,9 @@ int main(int argc, char *argv[])
     #include "setRootCase.H"
     #include "createTime.H"
     #include "createMesh.H"
+    #include "createControl.H"
     #include "createFields.H"
+    #include "createFvOptions.H"
     #include "initContinuityErrs.H"
 
     // create cfdemCloud
@@ -59,118 +64,62 @@ int main(int argc, char *argv[])
     #include "checkModelType.H"
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
+    Info<< "\nStarting time loop\n" << endl;
     while (runTime.loop())
     {
-        Info<< "\nStarting time loop\n" << endl;
-            particleCloud.clockM().start(1,"Global");
+        particleCloud.clockM().start(1,"Global");
 
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
-        #include "readPISOControls.H"
         #include "CourantNo.H"
 
         // do particle stuff
         particleCloud.clockM().start(2,"Coupling");
-        particleCloud.evolve(voidfraction,Us,U);
-      
+        bool hasEvolved = particleCloud.evolve(voidfraction,Us,U);
+
+        if(hasEvolved)
+        {
+            particleCloud.smoothingM().smoothen(particleCloud.forceM(0).impParticleForces());
+        }
+    
         Info << "update Ksl.internalField()" << endl;
         Ksl = particleCloud.momCoupleM(0).impMomSource();
-        particleCloud.smoothingM().smoothen(Ksl);
         Ksl.correctBoundaryConditions();
+
+       //Force Checks
+       vector fTotal(0,0,0);
+       vector fImpTotal = sum(mesh.V()*Ksl.internalField()*(Us.internalField()-U.internalField())).value();
+       reduce(fImpTotal, sumOp<vector>());
+       Info << "TotalForceExp: " << fTotal << endl;
+       Info << "TotalForceImp: " << fImpTotal << endl;
 
         #include "solverDebugInfo.H"
         particleCloud.clockM().stop("Coupling");
 
         particleCloud.clockM().start(26,"Flow");
-        // Pressure-velocity PISO corrector
+
+        if(particleCloud.solveFlow())
         {
-            // Momentum predictor
-            fvVectorMatrix UEqn
-            (
-                fvm::ddt(voidfraction,U) //particleCloud.ddtVoidfractionU(U,voidfraction) //
-              + fvm::div(phi, U)
-//              + turbulence->divDevReff(U)
-              + particleCloud.divVoidfractionTau(U, voidfraction)
-             ==
-              - fvm::Sp(Ksl/rho,U)
-            );
-
-            if (modelType=="B")
-                UEqn == - fvc::grad(p) + Ksl/rho*Us;
-            else
-                UEqn == - voidfraction*fvc::grad(p) + Ksl/rho*Us;
-
-            UEqn.relax();
-
-            if (momentumPredictor)
-                solve(UEqn);
-
-            // --- PISO loop
-
-            //for (int corr=0; corr<nCorr; corr++)
-            int nCorrSoph = nCorr + 5 * pow((1-particleCloud.dataExchangeM().timeStepFraction()),1);
-
-            for (int corr=0; corr<nCorrSoph; corr++)
+            // Pressure-velocity PISO corrector
             {
-                volScalarField rUA = 1.0/UEqn.A();
+                // Momentum predictor
+                 #include "UEqn.H"
 
-                surfaceScalarField rUAf("(1|A(U))", fvc::interpolate(rUA));
-                volScalarField rUAvoidfraction("(voidfraction2|A(U))",rUA*voidfraction);
+                // --- PISO loop
 
-                U = rUA*UEqn.H();
-
-                phi = (fvc::interpolate(U*voidfraction) & mesh.Sf() );
-                     //+ fvc::ddtPhiCorr(rUAvoidfraction, U, phi);
-                surfaceScalarField phiS(fvc::interpolate(Us*voidfraction) & mesh.Sf());
-                surfaceScalarField phiGes = phi + rUAf*(fvc::interpolate(Ksl/rho) * phiS);
-
-                if (modelType=="A")
-                    rUAvoidfraction = volScalarField("(voidfraction2|A(U))",rUA*voidfraction*voidfraction);
-
-                // Non-orthogonal pressure corrector loop
-                for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
+                while (piso.correct())
                 {
-                    // Pressure corrector
-                    fvScalarMatrix pEqn
-                    (
-                        fvm::laplacian(rUAvoidfraction, p) == fvc::div(phiGes) + particleCloud.ddtVoidfraction()
-                    );
-                    pEqn.setReference(pRefCell, pRefValue);
+                    #include "pEqn.H"
+                }
+            }
 
-                    if
-                    (
-                        corr == nCorr-1
-                     && nonOrth == nNonOrthCorr
-                    )
-                    {
-                        pEqn.solve(mesh.solver("pFinal"));
-                    }
-                    else
-                    {
-                        pEqn.solve();
-                    }
-
-                    if (nonOrth == nNonOrthCorr)
-                    {
-                        phiGes -= pEqn.flux();
-                    }
-
-                } // end non-orthogonal corrector loop
-
-                #include "continuityErrorPhiPU.H"
-
-                if (modelType=="B")
-                    U -= rUA*fvc::grad(p) - Ksl/rho*Us*rUA;
-                else
-                    U -= voidfraction*rUA*fvc::grad(p) - Ksl/rho*Us*rUA;
-
-                U.correctBoundaryConditions();
-
-            } // end piso loop
+            laminarTransport.correct();
+            turbulence->correct();
         }
-
-        turbulence->correct();
+        else
+        {
+            Info << "skipping flow solution." << endl;
+        }
 
         runTime.write();
 
@@ -183,7 +132,7 @@ int main(int argc, char *argv[])
     }
 
     Info<< "End\n" << endl;
-    
+
     return 0;
 }
 

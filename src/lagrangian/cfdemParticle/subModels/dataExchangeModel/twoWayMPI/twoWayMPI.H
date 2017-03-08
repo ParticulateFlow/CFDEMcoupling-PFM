@@ -44,7 +44,7 @@ SourceFiles
 #include "dataExchangeModel.H"
 #include "liggghtsCommandModel.H"
 #include "OFstream.H"
-#include "sys/stat.h"
+#include <sys/stat.h>
 #include "pair.h"
 #include "force.h"
 #include "forceModel.H"
@@ -54,7 +54,7 @@ SourceFiles
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "mpi.h"
+#include <mpi.h>
 #include <lammps.h>         // these are LAMMPS include files
 #include <input.h>
 #include <atom.h>
@@ -81,21 +81,12 @@ private:
 
   // private data
     dictionary propsDict_;
-
-    // variables
-    int me;
-
-    int nprocs;
-
-    int liggghts;
-
     MPI_Comm comm_liggghts;
-
-    LAMMPS_NS::LAMMPS *lmp;
 
   // private member functions
 
-    char* wordToChar(word&) const;
+protected:
+    LAMMPS_NS::LAMMPS *lmp;
 
 public:
 
@@ -145,12 +136,12 @@ public:
         //============
         // double **
         void allocateArray(double**&, double, int, int) const;
-        void allocateArray(double**&, double, int,const char* ="nparticles") const;
+        void allocateArray(double**&, double, int, const char* = "nparticles") const;
         void destroy(double**,int) const;
         //============
         // int **
         void allocateArray(int**&, int, int, int) const;
-        void allocateArray(int**&, int, int,const char* ="nparticles") const;
+        void allocateArray(int**&, int, int, const char* = "nparticles") const;
         void destroy(int**,int) const;
         //==============
         // double *
@@ -160,16 +151,16 @@ public:
         void destroy(int*) const;
         //==============
 
-        bool couple() const;
+        bool couple(int) const;
 
         int getNumberOfParticles() const;
         int getNumberOfClumps() const;
         int getNumberOfTypes() const;
         double* getTypeVol() const;
 
-        word myType() const{return typeName; };
+        word myType() const { return typeName; }
 
-        void setCG() const { particleCloud_.setCG(lmp->force->cg()); };
+        void setCG() const { particleCloud_.setCG(lmp->force->cg()); }
 };
 
 

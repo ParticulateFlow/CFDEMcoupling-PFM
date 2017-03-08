@@ -1,4 +1,4 @@
-#include "stdio.h"
+#include <stdio.h>
 #include "string.h"
 #include "files.h"
 
@@ -45,4 +45,5 @@ char **extract(char *file, char *header, int n, char **lines)
   }
 
   fclose(fp);
+  return lines;
 }

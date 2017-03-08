@@ -67,8 +67,6 @@ fieldTimeAverage::fieldTimeAverage
     startTime_(0.),
     scalarFieldNames_(propsDict_.lookup("scalarFieldNames")),
     vectorFieldNames_(propsDict_.lookup("vectorFieldNames")),
-    scalarFields_(NULL),
-    vectorFields_(NULL),
     nrAverages_(0.0)
 {
     // create time average scalar fields
@@ -147,7 +145,7 @@ void fieldTimeAverage::setForce() const
         for (int i=0;i < scalarFieldNames_.size(); i++)
         {
             // get reference to actual field
-            volScalarField& field = (volScalarField&) mesh_.lookupObject<volScalarField>(scalarFieldNames_[i]);
+            const volScalarField& field = mesh_.lookupObject<volScalarField>(scalarFieldNames_[i]);
 
             // first entry in this field
             if(nrAverages_ == 0)
@@ -156,14 +154,14 @@ void fieldTimeAverage::setForce() const
             }
             else
             {
-                scalarFields_[i] = (scalarFields_[i]*nrAverages_+field*1)/(nrAverages_+1);
+                scalarFields_[i] = (scalarFields_[i]*nrAverages_+field*1)/(nrAverages_+1.0);
             }
         }
 
         for (int i=0;i < vectorFieldNames_.size(); i++)
         {
             // get reference to actual field
-            volVectorField& field = (volVectorField&) mesh_.lookupObject<volVectorField>(vectorFieldNames_[i]);
+            const volVectorField& field = mesh_.lookupObject<volVectorField>(vectorFieldNames_[i]);
 
             // first entry in this field
             if(nrAverages_ == 0)

@@ -61,14 +61,8 @@ engineSearch::engineSearch
 :
     locateModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
-    //faceDecomp_(propsDict_.lookup("faceDecomp")),
     treeSearch_(propsDict_.lookup("treeSearch")),
-    #ifdef version16ext
-        searchEngine_(particleCloud_.mesh(),false) //(particleCloud_.mesh(),faceDecomp_)
-    #elif defined(version21)
-        searchEngine_(particleCloud_.mesh(),polyMesh::FACEPLANES) // FACEPLANES or FACECENTRETETS; FACEDIAGTETS not stable
-    #endif
-    //searchEngine_(particleCloud_.mesh(),faceDecomp_) // only 2.0.x
+    searchEngine_(particleCloud_.mesh(), polyMesh::FACE_PLANES)
 {}
 
 
@@ -84,7 +78,7 @@ label engineSearch::findCell
 (
     double** const& mask,
     double**& positions,
-    double**& cellIDs,
+    int**& cellIDs,
     int size
 ) const
 {
@@ -106,8 +100,8 @@ label engineSearch::findCell
 
 label engineSearch::findSingleCell
 (
-    vector& position,
-    label& oldCellID
+    const vector& position,
+    label oldCellID
 ) const
 {
     return searchEngine_.findCell(position,oldCellID,treeSearch_);

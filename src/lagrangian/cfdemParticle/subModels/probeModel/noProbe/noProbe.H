@@ -71,8 +71,8 @@ public:
         (
             const dictionary& dict,
             cfdemCloud& sm,
-            word   typeName,
-            char*  logFileName
+            const word& typeName,
+            const char* logFileName
         );
 
     // Destructor
@@ -80,7 +80,7 @@ public:
         ~noProbe();
 
     // Member Functions
-        bool active() const {return false;}; 
+        bool active() const {return false;}
 };
 
 

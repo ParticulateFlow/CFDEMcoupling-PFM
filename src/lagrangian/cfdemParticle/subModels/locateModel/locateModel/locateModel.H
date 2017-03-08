@@ -109,21 +109,21 @@ public:
         (
             double** const& mask,
             double**& positions,
-            double**& cellIDs,
+            int**& cellIDs,
             int size
         ) const = 0;
 
         virtual label findSingleCell
         (
-            vector& position,
-            label& oldCellID
+            const vector& position,
+            label oldCellID
         ) const = 0;
 
         virtual label intersection
         (
                 const point& pStart,
                 const point& pEnd
-        ) const {return -1;};
+        ) const {return -1;}
 };
 
 

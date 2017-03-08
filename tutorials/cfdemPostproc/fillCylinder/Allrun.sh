@@ -97,4 +97,4 @@ rm -r $casePath/DEM/log.*
 echo "done"
 
 #- preserve post directory
-echo "dummyfile" >> $casePath/DEM/post/dummy
+touch $casePath/DEM/post/.gitignore
