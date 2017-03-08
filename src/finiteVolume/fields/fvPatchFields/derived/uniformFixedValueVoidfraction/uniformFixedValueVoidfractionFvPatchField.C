@@ -41,7 +41,6 @@ uniformFixedValueVoidfractionFvPatchField<Type>::uniformFixedValueVoidfractionFv
 :
     fixedValueFvPatchField<Type>(p, iF),
     uniformValue_(),
-    //voidfractionFieldName_(dict.lookupOrDefault<word>("voidfraction", "voidfraction"))
     voidfractionFieldName_("voidfraction")
 {}
 
@@ -56,7 +55,7 @@ uniformFixedValueVoidfractionFvPatchField<Type>::uniformFixedValueVoidfractionFv
 )
 :
     fixedValueFvPatchField<Type>(p, iF),
-    uniformValue_(ptf.uniformValue_().clone().ptr()),
+    uniformValue_(ptf.uniformValue_, false),
     voidfractionFieldName_("voidfraction")
 {
     const scalar t = this->db().time().timeOutputValue();
@@ -88,7 +87,7 @@ uniformFixedValueVoidfractionFvPatchField<Type>::uniformFixedValueVoidfractionFv
 )
 :
     fixedValueFvPatchField<Type>(ptf),
-    uniformValue_(ptf.uniformValue_().clone().ptr()),
+    uniformValue_(ptf.uniformValue_, false),
     voidfractionFieldName_("voidfraction")
 {
     const scalar t = this->db().time().timeOutputValue();
@@ -104,7 +103,7 @@ uniformFixedValueVoidfractionFvPatchField<Type>::uniformFixedValueVoidfractionFv
 )
 :
     fixedValueFvPatchField<Type>(ptf, iF),
-    uniformValue_(ptf.uniformValue_().clone().ptr()),
+    uniformValue_(ptf.uniformValue_, false),
     voidfractionFieldName_("voidfraction")
 {
     const scalar t = this->db().time().timeOutputValue();
