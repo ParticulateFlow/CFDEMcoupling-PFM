@@ -31,7 +31,7 @@ pair_style  gran model hertz tangential history # Hertzian without cohesion
 pair_coeff  * *
 
 # timestep, gravity
-timestep    1e-8
+timestep    0.000001
 fix         gravi all gravity 0.0 vector 0.0 -1.0 0.0
 
 # walls
@@ -55,17 +55,13 @@ fix     cfd3 all couple/cfd/chemistry n_species 4 species_names CO CO2 O2 N2
 
 # Activate for 3-layer unreacted core shrink model
 #fix     OreReductionCO all chem/shrink/core speciesA O2 molMassA 31.99 speciesC CO2 molMassC 44.01
-fix     cfd5 all chem/shrink/core speciesA CO molMassA 28.01 speciesC CO2 molMassC 44.01
+fix     cfd5 all chem/shrink/core speciesA CO molMassA 28.01 speciesC CO2 molMassC 44.01 
 
 # Chemical properties for unreacted shrink core (activate only when chem/shrink/core is active)
-#fix     k0 all property/global k0_OreReductionCO vector 2700 25 17
-#fix     Ea all property/global Ea_OreReductionCO vector 113.859 73.674 69.488
 fix     k0 all property/global k0_cfd5 vector 2700 25 17
-fix     Ea all property/global Ea_cfd5 vector 113.859 73.674 69.488
+fix     Ea all property/global Ea_cfd5 vector 113859 73674 69488
 
 # Material properties for unreacted chemical shrink core (activate only when chem/shrink/core is active)
-#fix     density Ore property/global density_all vector 5.24 5.17 5.74 7.87
-#fix     molMass Ore property/global molMass_all vector 156 231.533 71.844 55.845
 fix     density all property/global density_all vector 5240 5170 5740 7870
 fix     molMass all property/global molMass_all vector 156 231.533 71.844 55.845
 
@@ -74,11 +70,6 @@ fix     layerRelRad all property/atom relRadii vector yes no no 0.3 0.5 0.6
 
 # apply nve integration to all particles that are inserted as single particles
 fix     integr all nve/sphere
-
-# print radius change according to timestep
-compute radChange all property/atom radius
-compute radreduce all reduce sum c_radChange
-fix     shrink all ave/time 25 1 25 c_radreduce file shrink.dat 
 
 compute masschange all property/atom mass
 compute massreduce all reduce sum c_masschange
