@@ -53,10 +53,10 @@ tmp<fv::convectionScheme<scalar> > mvConvection
     // calculate total mole in Volume
     N = rho/W;
 
-    Info << "total molar weight in volume (solver)" << W << endl;
-    Info << "rho (solver)" << rho << endl;
-    Info << "total mass fractions" << Yt << endl;
-    Info << "total moles in volume (solver)" << N << endl;
+    //Info << "total molar weight in volume (solver)" << W << endl;
+    //Info << "rho (solver)" << rho << endl;
+    //Info << "total mass fractions" << Yt << endl;
+    //Info << "total moles in volume (solver)" << N << endl;
 
     Y[inertIndex] = scalar(1) - Yt;
     Y[inertIndex].max(0.0);
