@@ -99,7 +99,11 @@ species::species
     totalMoleFieldName_(propsDict_.lookup("totalMoleFieldName")),
     N_(sm.mesh().lookupObject<volScalarField>(totalMoleFieldName_)),
     partMoleName_(propsDict_.lookup("partMoleName")),
-    partN_(NULL)
+    partN_(NULL),
+    pressureFieldName_(propsDict_.lookup("pressureFieldName")),
+    P_(sm.mesh().lookupObject<volScalarField>(pressureFieldName_)),
+    partPName_(propsDict_.lookup("partPName")),
+    partP_(NULL)
 {
     Info << " Read species list from: " << specDict_.name() << endl;
     Info << " Reading species list: " << speciesNames_ << endl;
@@ -153,6 +157,7 @@ species::~species()
     particleCloud_.dataExchangeM().destroy(partTemp_,nP_);
     particleCloud_.dataExchangeM().destroy(partRho_,nP_);
     particleCloud_.dataExchangeM().destroy(partN_,nP_);
+    particleCloud_.dataExchangeM().destroy(partP_,nP_);
 
     for (int i=0; i<speciesNames_.size(); i++)
     {
@@ -171,6 +176,7 @@ void species::allocateMyArrays() const
         particleCloud_.dataExchangeM().allocateArray(partRho_,initVal,1,"nparticles");
         particleCloud_.dataExchangeM().allocateArray(partTemp_,initVal,1,"nparticles");
         particleCloud_.dataExchangeM().allocateArray(partN_,initVal,1,"nparticles");
+        particleCloud_.dataExchangeM().allocateArray(partP_,initVal,1,"nparticles");
 
         for (int i=0; i<speciesNames_.size(); i++)
         {
@@ -190,6 +196,7 @@ void species::reAllocMyArrays() const
         particleCloud_.dataExchangeM().allocateArray(partRho_,initVal,1);
         particleCloud_.dataExchangeM().allocateArray(partTemp_,initVal,1);
         particleCloud_.dataExchangeM().allocateArray(partN_,initVal,1);
+        particleCloud_.dataExchangeM().allocateArray(partP_,initVal,1);
 
         for (int i=0; i<speciesNames_.size(); i++)
         {
@@ -215,13 +222,16 @@ void species::execute()
     scalar voidfraction(1);
     Yfluid_.setSize(speciesNames_.size());
     scalar Nfluid(0);
+    scalar Pfluid(0);
 
 
-    // defining interpolators for T, rho, voidfraction
+    // defining interpolators for T, rho, voidfraction, N
     interpolationCellPoint <scalar> TInterpolator_(tempField_);
     interpolationCellPoint <scalar> rhoInterpolator_(rho_);
     interpolationCellPoint <scalar> voidfractionInterpolator_(voidfraction_);
     interpolationCellPoint <scalar> NInterpolator_(N_);
+    interpolationCellPoint <scalar> PInterpolator_(P_);
+
 
     for (int index=0; index<particleCloud_.numberOfParticles(); index++)
     {
@@ -235,13 +245,15 @@ void species::execute()
                 rhofluid            =   rhoInterpolator_.interpolate(position,cellI);
                 voidfraction        =   voidfractionInterpolator_.interpolate(position,cellI);
                 Nfluid              =   NInterpolator_.interpolate(position,cellI);
+                Pfluid              =   PInterpolator_.interpolate(position,cellI);
             }
             else
             {
-                Tfluid          = tempField_[cellI];
-                rhofluid        = rho_[cellI];
-                voidfraction    = voidfraction_[cellI];
-                Nfluid          = N_[cellI];
+                Tfluid          =   tempField_[cellI];
+                rhofluid        =   rho_[cellI];
+                voidfraction    =   voidfraction_[cellI];
+                Nfluid          =   N_[cellI];
+                Pfluid          =   P_[cellI];
 
                 for (int i = 0; i<speciesNames_.size();i++)
                 {
@@ -253,6 +265,7 @@ void species::execute()
             partTemp_[index][0] =   Tfluid;
             partRho_[index][0]  =   rhofluid*voidfraction;
             partN_[index][0]    =   Nfluid;
+            partP_[index][0]    =   Pfluid;
 
             for (int i=0; i<speciesNames_.size();i++)
             {
@@ -282,6 +295,8 @@ void species::execute()
         particleCloud_.dataExchangeM().giveData(partTempName_, "scalar-atom", partTemp_);
         particleCloud_.dataExchangeM().giveData(partRhoName_, "scalar-atom", partRho_);
         particleCloud_.dataExchangeM().giveData(partMoleName_, "scalar-atom", partN_);
+        particleCloud_.dataExchangeM().giveData(partPName_, "scalar-atom", partP_);
+
         for (int i=0; i<speciesNames_.size();i++)
         {
             particleCloud_.dataExchangeM().giveData(speciesNames_[i],"scalar-atom",concentrations_[i]);
