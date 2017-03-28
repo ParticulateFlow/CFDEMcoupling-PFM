@@ -58,15 +58,20 @@ fix     cfd3 all couple/cfd/chemistry n_species 4 species_names CO CO2 O2 N2
 fix     cfd5 all chem/shrink/core speciesA CO molMassA 28.01 speciesC CO2 molMassC 44.01 
 
 # Chemical properties for unreacted shrink core (activate only when chem/shrink/core is active)
-fix     k0 all property/global k0_cfd5 vector 2700 25 17
-fix     Ea all property/global Ea_cfd5 vector 113859 73674 69488
+#fix     k0 all property/global k0_cfd5 vector 2700 25 17
+#fix     Ea all property/global Ea_cfd5 vector 113859 73674 69488
+fix     k0 all property/global k0_cfd5 vector 17 25 2700
+fix     Ea all property/global Ea_cfd5 vector 69488 73674 113859
 
 # Material properties for unreacted chemical shrink core (activate only when chem/shrink/core is active)
-fix     density all property/global density_all vector 5240 5170 5740 7870
-fix     molMass all property/global molMass_all vector 156 231.533 71.844 55.845
+#fix     density all property/global density_all vector 5240 5170 5740 7870
+#fix     molMass all property/global molMass_all vector 156 231.533 71.844 55.845
+fix     density all property/global density_all vector 7870 5740 5170 5240 
+fix     molMass all property/global molMass_all vector 55.845 71.844 231.533 156
 
 # define layer radius
-fix     layerRelRad all property/atom relRadii vector yes no no 0.3 0.5 0.6
+#fix     layerRelRad all property/atom relRadii vector yes no no 0.3 0.5 0.6 1.0
+fix     layerRelRad all property/atom relRadii vector yes no no 1.0 0.6 0.5 0.3
 
 # apply nve integration to all particles that are inserted as single particles
 fix     integr all nve/sphere
@@ -75,14 +80,14 @@ compute masschange all property/atom mass
 compute massreduce all reduce sum c_masschange
 fix     rmass all ave/time 25 1 25 c_massreduce file rmass.dat 
 
-compute layerRed1 all reduce sum f_layerRelRad[1]
-fix     redRad1 all ave/time 25 1 25 c_layerRed1 file relRad1.dat
+compute layerRed1 all reduce sum f_layerRelRad[2]
+fix     redRad1 all ave/time 25 1 25 c_layerRed1 file relRad2.dat
 
-compute layerRed2 all reduce sum f_layerRelRad[2]
-fix     redRad2 all ave/time 25 1 25 c_layerRed2 file relRad2.dat
+compute layerRed2 all reduce sum f_layerRelRad[3]
+fix     redRad2 all ave/time 25 1 25 c_layerRed2 file relRad3.dat
 
-compute layerRed3 all reduce sum f_layerRelRad[3]
-fix     redRad3 all ave/time 25 1 25 c_layerRed3 file relRad3.dat
+compute layerRed3 all reduce sum f_layerRelRad[4]
+fix     redRad3 all ave/time 25 1 25 c_layerRed3 file relRad4.dat
 
 
 # screen output
