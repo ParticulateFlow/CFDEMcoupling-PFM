@@ -89,6 +89,8 @@ fix     redRad2 all ave/time 25 1 25 c_layerRed2 file relRad3.dat
 compute layerRed3 all reduce sum f_layerRelRad[4]
 fix     redRad3 all ave/time 25 1 25 c_layerRed3 file relRad4.dat
 
+variable d01 equal f_density[1]
+#fix 1 all ave/time 100 1 100 v_d01 file d01.dat
 
 # screen output
 compute         rke all erotate/sphere
@@ -97,6 +99,6 @@ thermo          1000
 thermo_modify   lost ignore norm no
 compute_modify  thermo_temp dynamic yes
 
-dump        dmp all custom 100 ../DEM/post/dump.liggghts_run id type x y z ix iy iz vx vy vz fx fy fz omegax omegay omegaz radius
+dump        dmp all custom 100 ../DEM/post/dump.liggghts_run id type x y z ix iy iz vx vy vz fx fy fz omegax omegay omegaz radius 
 
 run         1
