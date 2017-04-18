@@ -274,8 +274,8 @@ void species::execute()
             }
         }
 
-       // if(particleCloud_.verbose() && index >=0 && index < 2)
-       // {
+        if(particleCloud_.verbose() && index >=0 && index < 2)
+        {
             for(int i =0; i<speciesNames_.size();i++)
             {
                 Info << "Y_i = " << Y_[i].name() << endl;
@@ -288,7 +288,7 @@ void species::execute()
                 Info << "voidfraction =" << voidfraction << endl;
                 Info << "N_" << N_ << endl;
             }
-       // }
+        }
     }
 
         // give DEM data
