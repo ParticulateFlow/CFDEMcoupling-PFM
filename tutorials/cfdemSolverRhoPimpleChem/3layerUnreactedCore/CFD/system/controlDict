@@ -1,0 +1,248 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.3.0                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+application     cfdemSolverRhoPimpleChem;
+
+startFrom       latestTime;
+
+startTime       0;
+
+stopAt          endTime;
+
+endTime         120.0;
+
+deltaT          0.0001;
+
+writeControl    adjustableRunTime;
+
+writeInterval   10;
+
+purgeWrite      0;
+
+writeFormat     ascii;
+
+writePrecision  10;
+
+writeCompression off;
+
+timeFormat      general;
+
+timePrecision   6;
+
+runTimeModifiable true;
+
+adjustTimeStep  yes;
+
+maxCo           0.5;
+
+maxDeltaT       0.1;
+
+
+// ************************************************************************* //
+/* libs (  
+        "libsimpleFunctionObjects.so"
+        "libfieldFunctionObjects.so"
+     );
+
+functions
+{  
+    Average-O2
+    {
+        type            fieldAverage;
+        functionObjectLibs ( "libfieldFunctionObjects.so" );
+        enabled         true;
+        outputControl   outputTime; //timeStep; //
+        //outputInterval  0.50;
+        log             true;
+        restartOnRestart    false;
+        restartOnOutput     false;
+        
+        
+        fields
+        (
+            O2
+            {
+                mean        on;
+                prime2Mean  on;
+                base        time;
+            }
+        );
+    }
+    
+   species_O2 // Name also used to identify output folder 
+    { 
+        type            cellSource; 
+        functionObjectLibs ("libfieldValueFunctionObjects.so"); 
+        enabled         true; 
+        outputControl   timeStep;//outputTime; 
+        outputInterval  1,
+        log             true;    
+        valueOutput     false;   //true; 
+        source          all;   // Type of cell source or all for the full domain
+        sourceName      O2; 
+        operation       weightedAverage; // volAverage; //volIntegrate; //weightedAverage; //none //sum;
+        fields 
+        ( 
+            O2
+        ); 
+    } 
+    Average-CO2
+    {
+        type            fieldAverage;
+        functionObjectLibs ( "libfieldFunctionObjects.so" );
+        enabled         true;
+        outputControl   outputTime; //timeStep; //
+        //outputInterval  0.50;
+        log             true;
+        restartOnRestart    false;
+        restartOnOutput     false;
+        
+        
+        fields
+        (
+           CO2
+            {
+                mean        on;
+                prime2Mean  on;
+                base        time;
+            }
+        );
+    }
+    
+   species_CO2 // Name also used to identify output folder 
+    { 
+        type            cellSource; 
+        functionObjectLibs ("libfieldValueFunctionObjects.so"); 
+        enabled         true; 
+        outputControl   timeStep;//outputTime; 
+        outputInterval  1,
+        log             true;    
+        valueOutput     false;   //true; 
+        source          all;   // Type of cell source or all for the full domain
+        sourceName      CO2; 
+        operation       weightedAverage; // volAverage; //volIntegrate; //weightedAverage; //none //sum;
+        fields 
+        ( 
+            CO2
+        ); 
+    } 
+              
+
+} */
+
+// ************************************************************************* //
+ 
+ /* // IF swak4Foam is installed following can be used;
+   volumetricFlowSurfaceField
+   {
+        type patchExpression;
+        outputControlMode timeStep;
+        outputInterval    1;
+        verbose true;
+        accumulations ( sum  );
+        patches ( outlet );
+        expression "CO2";
+    }
+    
+    massFlowSurfaceField
+    {
+        $volumetricFlowSurfaceField;
+        patches ( outlet );
+        variables ("Area=0.25;"
+                    
+        );
+        expression "CO2*rho*Area*U";
+    }
+
+    CO2_Mass_in_Volume
+    {
+        type                swakExpression;
+        valueType           internalField; //patch;
+        //aliases{alpha alpha.water;}
+        //patchName           outlet;
+        verbose             true;
+        expression          "rho*voidfraction*CO2*vol()";
+        accumulations       ( sum );
+        outputControlMode   timeStep; //outputTime;
+        outputInterval      1;
+    }
+    
+    OutletMassFlow-CO2
+    {
+        type patchExpression;
+        accumulations (
+            sum
+        );
+        patches (
+            outlet
+        );
+        expression "CO2";
+        verbose true;
+        autoInterpolate true;
+    }
+    
+    CO2_Concentration_in_Volume
+    {
+        type                swakExpression;
+        valueType           internalField; //patch;
+        //aliases{alpha alpha.water;}
+        //patchName           outlet;
+        verbose             true;
+        expression          "CO2";
+        accumulations       ( sum );
+        outputControlMode   timeStep; //outputTime;
+        outputInterval      1;
+    }
+    
+    O2_Mass_in_Volume
+    {
+        type                swakExpression;
+        valueType           internalField; //patch;
+        //aliases{alpha alpha.water;}
+        //patchName           outlet;
+        verbose             true;
+        expression          "rho*voidfraction*O2*vol()";
+        accumulations       ( sum );
+        outputControlMode   timeStep; //outputTime;
+        outputInterval      1;
+    }
+   
+    O2_Concentration_in_Volume
+    {
+        type                swakExpression;
+        valueType           internalField; //patch;
+        //aliases{alpha alpha.water;}
+        //patchName           outlet;
+        verbose             true;
+        expression          "O2";
+        accumulations       ( sum );
+        outputControlMode   timeStep; //outputTime;
+        outputInterval      1;
+    }
+    
+    OutletMassFlow-O2
+    {
+        type patchExpression;
+        accumulations (
+            sum
+        );
+        patches (
+            outlet
+        );
+        expression "O2";
+        verbose true;
+    } */
