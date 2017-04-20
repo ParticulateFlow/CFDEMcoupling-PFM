@@ -189,12 +189,12 @@ void diffusionCoefficient::execute()
 		for (int j=0; j < speciesNames_.size();j++)
 		{
 		    speciesPair = diffusionCoefficientNames_[i] + speciesNames_[j];
-		    if(coeffs.find(speciesPair))
+		    if(coeffs.found(speciesPair))
 		    {
-		        dCoeff += Y[j] * 
+		        dCoeff += Y[j] / coeffs.find(speciesPair)();
 		    }
 		}
-                diffusionCoefficients_[i][index][0]=
+                diffusionCoefficients_[i][index][0]= *1.0/dCoeff
             }
         }
 
