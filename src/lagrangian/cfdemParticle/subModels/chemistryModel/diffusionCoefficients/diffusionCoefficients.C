@@ -100,6 +100,7 @@ diffusionCoefficient::diffusionCoefficient
 
 diffusionCoefficient::~diffusionCoefficient()
 {
+    coeffs.clearStorage();
     int nP_ = particleCloud_.numberOfParticles();
     for (int i=0; i<diffusionCoefficientNames_.size(); i++)
     {
@@ -188,7 +189,7 @@ void diffusionCoefficient::execute()
 	        dCoeff = 0.0;
 		for (int j=0; j < speciesNames_.size();j++)
 		{
-		    speciesPair = diffusionCoefficientNames_[i] + speciesNames_[j];
+		    speciesPair = diffusionCoefficientNames_[i] + "_" + speciesNames_[j];
 		    if(coeffs.found(speciesPair))
 		    {
 		        dCoeff += Y[j] / coeffs.find(speciesPair)();
