@@ -1,0 +1,137 @@
+/*---------------------------------------------------------------------------*\
+License
+
+    This is free software: you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This code is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this code.  If not, see <http://www.gnu.org/licenses/>.
+
+    Copyright (C) 2015- Thomas Lichtenegger, JKU Linz, Austria
+    
+    Description
+    Model to communicate species concentration and changes due to reactions
+
+\*---------------------------------------------------------------------------*/
+
+#ifndef diffusionCoefficient_H
+#define diffusionCoefficient_H
+
+#include "fvCFD.H"
+#include "cfdemCloudEnergy.H"
+#include "chemistryModel.H"
+
+#include "HashPtrTable.H"
+#include "HashTable.H"
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+namespace Foam
+{
+
+/*---------------------------------------------------------------------------*\
+                           Class diffusionCoefficient Declaration
+\*---------------------------------------------------------------------------*/
+
+// for future use:
+// + communicate every N steps
+
+class diffusionCoefficient
+:
+    public chemistryModel
+{
+private:
+
+    dictionary propsDict_;
+
+    bool interpolation_;
+
+    const fvMesh& mesh_;
+
+    // Species dictionary - To be read where the species are from
+    dictionary specDict_;
+
+    wordList speciesNames_;
+    
+    wordList diffusionCoefficientNames_;
+    
+    UPtrList<volScalarField> Y_;
+
+    mutable List<double**> diffusionCoefficients_;
+    
+    word tempFieldName_;
+
+    const volScalarField& tempField_;              // ref to gas temperature field
+
+    // gas pressure at particle location
+    word pressureFieldName_;
+
+    const volScalarField& P_;  
+
+    HashTable<scalar, word> coeffs;
+    
+    void createCoeffs();
+
+    void allocateMyArrays() const;
+
+  
+
+
+
+
+
+public:
+
+    //- Runtime type information
+    TypeName("diffusionCoefficient");
+
+    // Constructors
+
+        //- Construct from components
+        diffusionCoefficient
+        (
+            const dictionary& dict,
+            cfdemCloudEnergy& sm
+        );
+
+    // Destructor
+
+        virtual ~diffusionCoefficient();
+
+    // Member Functions
+        void execute();
+
+        void reAllocMyArrays() const;
+
+//    tmp<fvScalarMatrix> Smi(const label i) const;
+    //tmp<fvScalarMatrix> Smi(const label i, volScalarField& changeOfSpeciesMassFields_) const;
+
+//    tmp<fvScalarMatrix> Sm() const;
+
+        tmp <volScalarField> Smi(const label i) const;
+
+        tmp <volScalarField> Sm() const;
+
+    
+    
+
+
+};
+
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#endif
+
+// ************************************************************************* //
