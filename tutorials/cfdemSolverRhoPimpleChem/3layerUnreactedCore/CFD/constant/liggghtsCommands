@@ -26,7 +26,7 @@ FoamFile
 liggghtsCommandModels
 (
     runLiggghts
-    writeLiggghts
+    // writeLiggghts
 );
 // ************************************************************************* //
 
