@@ -12,6 +12,7 @@ PFLAGS+= -Dcompre
 EXE_INC = \
      $(PFLAGS) \
      $(PINC) \
+    -I$(CFDEM_OFVERSION_DIR) \
     -I../cfdemParticle/lnInclude \
     -I$(LIB_SRC)/finiteVolume/lnInclude \
     -I$(LIB_SRC)/transportModels \
