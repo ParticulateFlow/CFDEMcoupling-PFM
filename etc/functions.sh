@@ -249,7 +249,7 @@ cleanCFDEM()
 
     #**********************************************
     #cleaning libraries
-    whitelist="$CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/library-list.txt"
+    whitelist="$CFDEM_PROJECT_DIR/etc/library-list.txt"
     echo ""
     echo "Please provide the libraries to be cleaned in the $CWD/$whitelist file."
 
@@ -303,7 +303,7 @@ cleanCFDEM()
 
     #**********************************************
     #cleaning solvers
-    whitelist="$CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/solver-list.txt"
+    whitelist="$CFDEM_PROJECT_DIR/etc/solver-list.txt"
     echo ""
     echo "Please provide the solvers to be cleaned in the $CWD/$whitelist file."
 

@@ -8,9 +8,9 @@
 whitelist="utilities-list.txt"
 
 #- include functions
-source $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/functions.sh
+source $CFDEM_PROJECT_DIR/etc/functions.sh
 logDir="log"
-cd $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc
+cd $CFDEM_PROJECT_DIR/etc
 mkdir -p $logDir
 
 CWD="$(dirname "$(readlink -f ${BASH_SOURCE[0]})")"

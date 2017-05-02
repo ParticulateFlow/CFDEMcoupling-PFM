@@ -24,7 +24,7 @@
 #setenv CFDEM_UT_DIR $CFDEM_PROJECT_DIR/applications/utilities
 #setenv CFDEM_TUT_DIR $CFDEM_PROJECT_DIR/tutorials
 #setenv CFDEM_PROJECT_USER_DIR $HOME/CFDEM/$LOGNAME-$CFDEM_VERSION-$WM_PROJECT_VERSION
-#setenv CFDEM_bashrc $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/cshrc
+#setenv CFDEM_bashrc $CFDEM_PROJECT_DIR/etc/cshrc
 #setenv CFDEM_LIGGGHTS_SRC_DIR $HOME/LIGGGHTS/LIGGGHTS-PUBLIC/src
 #setenv CFDEM_LIGGGHTS_MAKEFILE_NAME fedora_fpic
 #setenv CFDEM_LPP_DIR $HOME/LIGGGHTS/mylpp/src
@@ -55,7 +55,7 @@ setenv CFDEM_LIB_COMP_NAME lagrangianCFDEMcomp-$CFDEM_VERSION-$WM_PROJECT_VERSIO
 
 #check if additional libraries should be compiled together with solvers
 if ( ! ($?CFDEM_ADD_LIBS_DIR) ) then
-    setenv CFDEM_ADD_LIBS_DIR $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc
+    setenv CFDEM_ADD_LIBS_DIR $CFDEM_PROJECT_DIR/etc
 else
     echo "using CFDEM_ADD_LIBS_DIR=$CFDEM_ADD_LIBS_DIR defined by user."
 endif
@@ -131,37 +131,37 @@ alias cfdemDox 'firefox $CFDEM_DOC_DIR/doxygen/html/index.html'
 alias cfdemLIG 'cd $CFDEM_LIGGGHTS_SRC_DIR'
 
 #- shortcut to system test
-alias cfdemSysTest 'bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/cfdemSystemTest.sh'
+alias cfdemSysTest 'bash $CFDEM_PROJECT_DIR/etc/cfdemSystemTest.sh'
 
 #- shortcut to pull LIGGGHTS
-alias cfdemPullLIG 'bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/pullLIGGGHTS.sh'
+alias cfdemPullLIG 'bash $CFDEM_PROJECT_DIR/etc/pullLIGGGHTS.sh'
 
 #- shortcut to pull CFDEMcoupling
-alias cfdemPullCFDEMcoupling 'bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/pullCFDEMcoupling.sh'
+alias cfdemPullCFDEMcoupling 'bash $CFDEM_PROJECT_DIR/etc/pullCFDEMcoupling.sh'
 
 #- shortcut to clean CFDEM
-alias cfdemCleanCFDEM 'bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/cleanCFDEMcoupling.sh'
+alias cfdemCleanCFDEM 'bash $CFDEM_PROJECT_DIR/etc/cleanCFDEMcoupling.sh'
 
 #- shortcut to compile LIGGGHTS + sublibraries
-alias cfdemCompLIG 'bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/compileLIGGGHTS.sh'
+alias cfdemCompLIG 'bash $CFDEM_PROJECT_DIR/etc/compileLIGGGHTS.sh'
 
 #- shortcut to compile CFDEMcoupling +LIGGGHTS
-alias cfdemCompCFDEMall 'bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/compileCFDEMcoupling_all.sh'
+alias cfdemCompCFDEMall 'bash $CFDEM_PROJECT_DIR/etc/compileCFDEMcoupling_all.sh'
 
 #- shortcut to compile CFDEMcoupling (src+solvers)
-alias cfdemCompCFDEM 'bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/compileCFDEMcoupling.sh'
+alias cfdemCompCFDEM 'bash $CFDEM_PROJECT_DIR/etc/compileCFDEMcoupling.sh'
 
 #- shortcut to compile CFDEMcoupling src
-alias cfdemCompCFDEMsrc 'bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/compileCFDEMcoupling_src.sh'
+alias cfdemCompCFDEMsrc 'bash $CFDEM_PROJECT_DIR/etc/compileCFDEMcoupling_src.sh'
 
 #- shortcut to compile CFDEMcoupling solvers
-alias cfdemCompCFDEMsol 'bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/compileCFDEMcoupling_sol.sh'
+alias cfdemCompCFDEMsol 'bash $CFDEM_PROJECT_DIR/etc/compileCFDEMcoupling_sol.sh'
 
 #- shortcut to compile CFDEMcoupling utilities
-alias cfdemCompCFDEMuti 'bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/compileCFDEMcoupling_uti.sh'
+alias cfdemCompCFDEMuti 'bash $CFDEM_PROJECT_DIR/etc/compileCFDEMcoupling_uti.sh'
 
 #- shortcut to test basic tutorials
-alias cfdemTestTUT 'bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/testTutorials.sh'
+alias cfdemTestTUT 'bash $CFDEM_PROJECT_DIR/etc/testTutorials.sh'
 
 #- shortcut to visualize the clock model data
 alias vizClock 'python $CFDEM_UT_DIR/vizClock/matPlot.py'

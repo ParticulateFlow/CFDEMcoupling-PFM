@@ -6,12 +6,12 @@
 #===================================================================
 
 #- include functions
-source $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/functions.sh
+source $CFDEM_PROJECT_DIR/etc/functions.sh
 
 NOW="$(date +"%Y-%m-%d-%H:%M")"
 logDir="log"
 
-cd $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc
+cd $CFDEM_PROJECT_DIR/etc
 mkdir -p $logDir
 
 #================================================================================#
@@ -38,4 +38,4 @@ compileLIGGGHTS $logpath $logfileName $headerText
 #================================================================================#
 # compile LIGGGHTS libraries
 #================================================================================#
-bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/compileLIGGGHTS_lib.sh
+bash $CFDEM_PROJECT_DIR/etc/compileLIGGGHTS_lib.sh
