@@ -11,7 +11,7 @@ newton          off
 units           si
 processors      2 2 1
 
-region          reg block 0. 15 0. 5 0. 5 units box
+region          reg block 0. 15. 0. 5. 0. 5. units box
 create_box      1 reg
 
 neighbor        0.0005 bin
@@ -33,11 +33,11 @@ fix         gravi all gravity 0.0 vector 0.0 -1.0 0.0
 
 # walls
 fix     xwalls1 all wall/gran model hertz tangential history primitive type 1 xplane 0.0
-fix     xwalls2 all wall/gran model hertz tangential history primitive type 1 xplane 15
+fix     xwalls2 all wall/gran model hertz tangential history primitive type 1 xplane 15.0
 fix     ywalls1 all wall/gran model hertz tangential history primitive type 1 yplane 0.0
-fix     ywalls2 all wall/gran model hertz tangential history primitive type 1 yplane 5
+fix     ywalls2 all wall/gran model hertz tangential history primitive type 1 yplane 5.0
 fix     zwalls1 all wall/gran model hertz tangential history primitive type 1 zplane 0.0
-fix     zwalls2 all wall/gran model hertz tangential history primitive type 1 zplane 5
+fix     zwalls2 all wall/gran model hertz tangential history primitive type 1 zplane 5.0
 
 # create single particle in a specific spot
 create_atoms 1 single 7.5 2 2  units box

@@ -36,11 +36,11 @@ fix         gravi all gravity 0.0 vector 0.0 -1.0 0.0
 
 # walls
 fix     xwalls1 all wall/gran model hertz tangential history primitive type 1 xplane 0.0
-fix     xwalls2 all wall/gran model hertz tangential history primitive type 1 xplane 1.5
+fix     xwalls2 all wall/gran model hertz tangential history primitive type 1 xplane 15.0
 fix     ywalls1 all wall/gran model hertz tangential history primitive type 1 yplane 0.0
-fix     ywalls2 all wall/gran model hertz tangential history primitive type 1 yplane 0.5
+fix     ywalls2 all wall/gran model hertz tangential history primitive type 1 yplane 5.0
 fix     zwalls1 all wall/gran model hertz tangential history primitive type 1 zplane 0.0
-fix     zwalls2 all wall/gran model hertz tangential history primitive type 1 zplane 0.5
+fix     zwalls2 all wall/gran model hertz tangential history primitive type 1 zplane 5.0
 
 ###############################################
 
@@ -85,33 +85,33 @@ compute massreduce all reduce sum c_masschange
 fix     rmass all ave/time 1 1 25 c_massreduce file rmass.dat 
 
 compute layerRad1 all reduce sum f_layerRelRad[1]
-fix     redRad1 all ave/time 25 1 25 c_layerRad1 file relRad1.dat
+fix     redRad1 all ave/time 100 1 100 c_layerRad1 file relRad1.dat
 
 compute layerRad2 all reduce sum f_layerRelRad[2]
-fix     redRad2 all ave/time 25 1 25 c_layerRad2 file relRad2.dat
+fix     redRad2 all ave/time 100 1 100 c_layerRad2 file relRad2.dat 
 
 compute layerRad3 all reduce sum f_layerRelRad[3]
-fix     redRad3 all ave/time 25 1 25 c_layerRad3 file relRad3.dat
+fix     redRad3 all ave/time 100 1 100 c_layerRad3 file relRad3.dat 
 
 compute layerRad4 all reduce sum f_layerRelRad[4]
-fix     redRad4 all ave/time 25 1 25 c_layerRad4 file relRad4.dat
+fix     redRad4 all ave/time 100 1 100 c_layerRad4 file relRad4.dat 
 
 
 variable    rad_fe  atom   "f_layerRelRad[1]*radius"
 compute r_fe    all reduce  sum v_rad_fe
-fix         r_fe1   all     ave/time    25  1   25  c_r_fe  file    rfe.dat
+fix         r_fe1   all     ave/time    25  1   25  c_r_fe  file    rfe.dat 
 
 variable    rad_w   atom   "f_layerRelRad[2]*radius"
 compute     r_w    all     reduce      sum v_rad_w
-fix         r_w1   all     ave/time    25  1   25  c_r_w  file    rw.dat
+fix         r_w1   all     ave/time    25  1   25  c_r_w  file    rw.dat 
 
 variable    rad_m  atom   "f_layerRelRad[3]*radius"
 compute     r_m    all     reduce      sum v_rad_m
-fix         r_m1   all     ave/time    25  1   25  c_r_m  file    rm.dat
+fix         r_m1   all     ave/time    25  1   25  c_r_m  file    rm.dat 
 
 variable    rad_h  atom   "f_layerRelRad[4]*radius"
 compute     r_h    all     reduce      sum v_rad_h
-fix         r_h1   all     ave/time    25  1   25  c_r_h  file    rh.dat
+fix         r_h1   all     ave/time    25  1   25  c_r_h  file    rh.dat 
 
 ###############################################
 # screen output
