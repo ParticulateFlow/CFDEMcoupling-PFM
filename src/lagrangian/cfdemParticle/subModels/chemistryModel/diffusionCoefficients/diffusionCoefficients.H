@@ -21,12 +21,13 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef diffusionCoefficient_H
-#define diffusionCoefficient_H
+#ifndef diffusionCoefficients_H
+#define diffusionCoefficients_H
 
 #include "fvCFD.H"
 #include "cfdemCloudEnergy.H"
 #include "chemistryModel.H"
+#include "species.H"
 
 #include "HashPtrTable.H"
 #include "HashTable.H"
@@ -59,13 +60,7 @@ private:
     dictionary specDict_;
 
     wordList speciesNames_;
-    
-    wordList diffusionCoefficientNames_;
-    
-    UPtrList<volScalarField> Y_;
 
-    mutable List<double**> diffusionCoefficients_;
-    
     word tempFieldName_;
 
     const volScalarField& tempField_;              // ref to gas temperature field
@@ -73,7 +68,18 @@ private:
     // gas pressure at particle location
     word pressureFieldName_;
 
-    const volScalarField& P_;  
+    const volScalarField& P_;
+
+    // total mole field
+    word totalMoleFieldName_;
+
+    const volScalarField& N_;
+
+    UPtrList<volScalarField> Y_;
+
+    wordList diffusantGasNames_;
+    
+    mutable List<double**> diffusionCoefficients_;
 
     HashTable<scalar, word> coeffs;
     
@@ -81,16 +87,10 @@ private:
 
     void allocateMyArrays() const;
 
-  
-
-
-
-
-
-public:
+ public:
 
     //- Runtime type information
-    TypeName("diffusionCoefficient");
+    TypeName("diffusionCoefficients");
 
     // Constructors
 

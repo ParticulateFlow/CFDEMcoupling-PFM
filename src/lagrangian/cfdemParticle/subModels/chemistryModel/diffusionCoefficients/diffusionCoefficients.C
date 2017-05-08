@@ -20,13 +20,11 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "error.H"
-#include "diffusionCoefficient.H"
+#include "diffusionCoefficients.H"
 #include "addToRunTimeSelectionTable.H"
 
 #include "dataExchangeModel.H"
 #include "IFstream.H"
-
-
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -57,7 +55,7 @@ diffusionCoefficient::diffusionCoefficient
     propsDict_(dict.subDict(typeName + "Props")),
     interpolation_(propsDict_.lookupOrDefault<bool>("interpolation",false)),
     mesh_(sm.mesh()),
-    // define a file name in the coupling properties that contains the diffusionCoefficient
+    // define a file name in the coupling properties that contains the species
     specDict_
     (
         IFstream
@@ -67,28 +65,27 @@ diffusionCoefficient::diffusionCoefficient
     ),
     // create a list from the Species table in the specified diffusionCoefficient dictionary
     speciesNames_(specDict_.lookup("species")),
-    diffusionCoefficientNames_(propsDict_.lookup("diffusionCoefficientNames")),
-    Y_(speciesNames_.size()),                           //volumeScalarFields created in the ts folders
-    diffusionCoefficients_(diffusionCoefficientNames_.size(),NULL),         //the value of diffusionCoefficient concentration for every diffusionCoefficient 
     tempFieldName_(propsDict_.lookup("tempFieldName")),
     tempField_(sm.mesh().lookupObject<volScalarField> (tempFieldName_)),
     pressureFieldName_(propsDict_.lookup("pressureFieldName")),
-    P_(sm.mesh().lookupObject<volScalarField>(pressureFieldName_))
+    P_(sm.mesh().lookupObject<volScalarField>(pressureFieldName_)),
+    totalMoleFieldName_(propsDict_.lookup("totalMoleFieldName")),
+    N_(sm.mesh().lookupObject<volScalarField>(totalMoleFieldName_)),
+    Y_(speciesNames_.size()),
+    diffusantGasNames_(propsDict_.lookup("diffusantGasNames")),
+    diffusionCoefficients_(diffusantGasNames_.size(),NULL)
+ /*   diffusionCoefficientNames_(propsDict_.lookup("diffusionCoefficientNames")),
+                               //volumeScalarFields created in the ts folders
+    diffusionCoefficients_(diffusionCoefficientNames_.size(),NULL),         //the value of diffusionCoefficient concentration for every diffusionCoefficient 
+    */
 {
-    Info << " Read species list from: " << specDict_.name() << endl;
-    Info << " Reading diffusionCoefficient list: " << diffusionCoefficientNames_ << endl;
+    Info << " Reading diffusionCoefficient list: " << diffusantGasNames_ << endl;
 
     for (int i=0; i<speciesNames_.size(); i++)
     {
-        // Defining the Species volume scalar fields
-        Info << " Looking up diffusionCoefficient fields \n " << speciesNames_[i] << endl;
         volScalarField& Y = const_cast<volScalarField&>
                 (sm.mesh().lookupObject<volScalarField>(speciesNames_[i]));
         Y_.set(i, &Y);
-
-         Info << "The concentration fields (Y_i): \n" << Y_[i].name() << endl;
-        // define the modified diffusionCoefficient names
-
         particleCloud_.checkCG(false);
     }
 
@@ -100,18 +97,18 @@ diffusionCoefficient::diffusionCoefficient
 
 diffusionCoefficient::~diffusionCoefficient()
 {
-    coeffs.clearStorage();
+/*    coeffs.clearStorage();
     int nP_ = particleCloud_.numberOfParticles();
     for (int i=0; i<diffusionCoefficientNames_.size(); i++)
     {
         particleCloud_.dataExchangeM().destroy(diffusionCoefficients_[i],nP_);
-    }
+    }*/
 }
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
-void diffusionCoefficient::allocateMyArrays() const
+ void diffusionCoefficient::allocateMyArrays() const
 {
-    double initVal=0.0;
+    /*double initVal=0.0;
     if (particleCloud_.dataExchangeM().maxNumberOfParticles() > 0)
     {
         for (int i=0; i<diffusionCoefficientNames_.size(); i++)
@@ -119,13 +116,12 @@ void diffusionCoefficient::allocateMyArrays() const
             particleCloud_.dataExchangeM().allocateArray(diffusionCoefficients_[i],initVal,1,"nparticles");
 
         }
-    }
+    } */
 }
-
 
 void diffusionCoefficient::reAllocMyArrays() const
 {
-    if (particleCloud_.numberOfParticlesChanged())
+ /*   if (particleCloud_.numberOfParticlesChanged())
     {
         double initVal=0.0;
 
@@ -133,14 +129,14 @@ void diffusionCoefficient::reAllocMyArrays() const
         {
             particleCloud_.dataExchangeM().allocateArray(diffusionCoefficients_[i],initVal,1);
         }
-    }
+    }*/
 }
 
 // * * * * * * * * * * * * * * * * Member Fct  * * * * * * * * * * * * * * * //
 
 void diffusionCoefficient::execute()
 {
-    // realloc the arrays
+/*    // realloc the arrays
     reAllocMyArrays();
 
 
@@ -216,7 +212,7 @@ void diffusionCoefficient::execute()
 
     Info << "give data done" << endl;
 
-       
+*/
 }
 
 void diffusionCoefficient::createCoeffs()
