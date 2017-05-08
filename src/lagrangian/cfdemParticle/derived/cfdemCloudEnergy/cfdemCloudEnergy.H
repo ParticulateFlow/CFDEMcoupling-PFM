@@ -62,7 +62,7 @@ protected:
     
     autoPtr<thermCondModel> thermCondModel_;
     
-    autoPtr<chemistryModel> chemistryModel_;
+    autoPtr<chemistryModel>* chemistryModel_;
     
     void calcEnergyContributions();
 
@@ -71,6 +71,8 @@ protected:
 public:
 
     friend class energyModel;
+
+    friend class chemistryModel;
 
     // Constructors
 
@@ -92,11 +94,15 @@ public:
        
        const thermCondModel& thermCondM();
        
-       const chemistryModel& chemistryM();
+       const chemistryModel& chemistryM(int);
 
        int nrEnergyModels();
 
+       int nrChemistryModels();
+
        inline const wordList& energyModels();
+
+       inline const wordList& chemistryModels();
        
        bool& implicitEnergyModel();
        

@@ -86,7 +86,8 @@ public:
         static autoPtr<chemistryModel> New
         (
             const dictionary& dict,
-            cfdemCloudEnergy& sm
+            cfdemCloudEnergy& sm,
+            word chemistryModelType
         );
 
 
@@ -94,10 +95,6 @@ public:
 
        virtual void execute() = 0;
        
-//       virtual tmp<fvScalarMatrix> Smi (const label i) const = 0;
-
-//       virtual tmp<fvScalarMatrix> Sm () const = 0;
-
         virtual tmp<volScalarField> Smi (const label i) const = 0;
 
         virtual tmp<volScalarField> Sm () const = 0;
