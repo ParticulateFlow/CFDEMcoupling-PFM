@@ -70,6 +70,8 @@ diffusionCoefficient::diffusionCoefficient
     pressureFieldName_(propsDict_.lookup("pressureFieldName")),
     P_(sm.mesh().lookupObject<volScalarField>(pressureFieldName_)),
     totalMoleFieldName_(propsDict_.lookup("totalMoleFieldName")),
+    // needed to calculate the mixture diffusion coefficient
+    // dcoeff is dependent on molar fraction not mass fraction
     N_(sm.mesh().lookupObject<volScalarField>(totalMoleFieldName_)),
     Y_(speciesNames_.size()),
     diffusantGasNames_(propsDict_.lookup("diffusantGasNames")),
@@ -80,6 +82,8 @@ diffusionCoefficient::diffusionCoefficient
     */
 {
     Info << " Reading diffusionCoefficient list: " << diffusantGasNames_ << endl;
+    for (int i = 0; i < diffusantGasNames_.size(); i++)
+        Info << " Diffusant names: " << diffusantGasNames_[i] << endl;
 
     for (int i=0; i<speciesNames_.size(); i++)
     {
@@ -97,64 +101,65 @@ diffusionCoefficient::diffusionCoefficient
 
 diffusionCoefficient::~diffusionCoefficient()
 {
-/*    coeffs.clearStorage();
+    coeffs.clearStorage();
+    molWeight.clearStorage();
+
     int nP_ = particleCloud_.numberOfParticles();
-    for (int i=0; i<diffusionCoefficientNames_.size(); i++)
+    for (int i=0; i<diffusantGasNames_.size(); i++)
     {
         particleCloud_.dataExchangeM().destroy(diffusionCoefficients_[i],nP_);
-    }*/
+    }
 }
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
  void diffusionCoefficient::allocateMyArrays() const
 {
-    /*double initVal=0.0;
+    double initVal=0.0;
     if (particleCloud_.dataExchangeM().maxNumberOfParticles() > 0)
     {
-        for (int i=0; i<diffusionCoefficientNames_.size(); i++)
+        for (int i=0; i<diffusantGasNames_.size(); i++)
         {
             particleCloud_.dataExchangeM().allocateArray(diffusionCoefficients_[i],initVal,1,"nparticles");
 
         }
-    } */
+    }
 }
 
 void diffusionCoefficient::reAllocMyArrays() const
 {
- /*   if (particleCloud_.numberOfParticlesChanged())
+    if (particleCloud_.numberOfParticlesChanged())
     {
         double initVal=0.0;
 
-        for (int i=0; i<diffusionCoefficientNames_.size(); i++)
+        for (int i=0; i<diffusantGasNames_.size(); i++)
         {
             particleCloud_.dataExchangeM().allocateArray(diffusionCoefficients_[i],initVal,1);
         }
-    }*/
+    }
 }
 
 // * * * * * * * * * * * * * * * * Member Fct  * * * * * * * * * * * * * * * //
 
 void diffusionCoefficient::execute()
 {
-/*    // realloc the arrays
+    // realloc the arrays
     reAllocMyArrays();
-
 
     label  cellI=0;
     scalar Tfluid(0);
     List<scalar> Yfluid_;
     Yfluid_.setSize(speciesNames_.size());
     scalar Pfluid(0);
+    scalar Nfluid(0);
     
     scalar dCoeff(0.0);
     
-    word speciesPair("none");
-
+    // word speciesPair("none");
 
     // defining interpolators for T, rho, voidfraction, N
     interpolationCellPoint <scalar> TInterpolator_(tempField_);
     interpolationCellPoint <scalar> PInterpolator_(P_);
-
+    interpolationCellPoint <scalar> NInterpolator_(N_);
 
     for (int index=0; index<particleCloud_.numberOfParticles(); index++)
     {
@@ -166,11 +171,13 @@ void diffusionCoefficient::execute()
                 vector position     =   particleCloud_.position(index);
                 Tfluid              =   TInterpolator_.interpolate(position,cellI);
                 Pfluid              =   PInterpolator_.interpolate(position,cellI);
+                Nfluid              =   NInterpolator_.interpolate(position,cellI);
             }
             else
             {
                 Tfluid          =   tempField_[cellI];
                 Pfluid          =   P_[cellI];
+                Nfluid          =   N_[cellI];
 
                 for (int i = 0; i<speciesNames_.size();i++)
                 {
@@ -178,44 +185,90 @@ void diffusionCoefficient::execute()
                 }
             }
 
-
-            for (int i=0; i<diffusionCoefficientNames_.size();i++)
+            /*for (int i=0; i<diffusantGasNames_.size();i++)
             {
-	      // do the calculation
-	        dCoeff = 0.0;
-		for (int j=0; j < speciesNames_.size();j++)
-		{
-		    speciesPair = diffusionCoefficientNames_[i] + "_" + speciesNames_[j];
-		    if(coeffs.found(speciesPair))
-		    {
-		        dCoeff += Y[j] / coeffs.find(speciesPair)();
-		    }
-		}
-                diffusionCoefficients_[i][index][0]= *1.0/dCoeff
-            }
+                // do the calculation
+                dCoeff = 0.0;
+                for (int j=0; j < speciesNames_.size();j++)
+                {
+                    // speciesPair = diffusantGasNames_[i] + "_" + speciesNames_[j];
+                    // According to literature i.e Valipour 2006, Elnashaie et al. 1993, Taylor and Krishna (1993), Natsui et al.
+                    // dCoeff = (1-X[j])*sum(X[i]/D_[i,j])
+                    // X is molar fraction / Dij binary diff coeff.
+
+                     if(coeffs.found(speciesPair))
+                    {
+                        dCoeff += Y[j] / coeffs.find(speciesPair)();
+                    }
+                }
+                // diffusionCoefficients_[i][index][0]= *1.0/dCoeff;
+            } */
         }
 
         if(particleCloud_.verbose() && index >=0 && index < 2)
         {
-            for(int i =0; i<diffusionCoefficientNames_.size();i++)
+            for(int i =0; i<diffusantGasNames_.size();i++)
             {
-                Info << "effective diffusionCoefficient of species " << diffusionCoefficientNames_[i] << " = " << diffusionCoefficients_[i][index][0] << endl;
+                Info << "effective diffusionCoefficient of species " << diffusantGasNames_[i] << " = " << diffusionCoefficients_[i][index][0] << endl;
             }
         }
     }
 
-    for (int i=0; i<diffusionCoefficientNames_.size();i++)
+    /*for (int i=0; i<diffusionCoefficientNames_.size();i++)
     {
-        word pushName = diffusionCoefficientNames_[i] + "_diffCoeff";
+        word pushName = diffusantGasNames_[i] + "_diffCoeff";
         particleCloud_.dataExchangeM().giveData(pushName,"scalar-atom",diffusionCoefficients_[i]);
-    };
+    };*/
 
     Info << "give data done" << endl;
-
-*/
 }
 
-// add dummy volScalarFields, used in YEqn
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+void diffusionCoefficient::createCoeffs()
+{
+    // add all relevant combinations
+    coeffs.insert("CO", 18.9);
+    coeffs.insert("CO2", 26.9);
+    coeffs.insert("O2", 16.6);
+    coeffs.insert("N2", 17.9);
+    coeffs.insert("H2", 7.07);
+    coeffs.insert("H2O", 12.7);
+
+    // coeffs for pairs (Va^(1/3)+Vb^(1/3))
+    coeffs.insert("CO_CO2", 5.66);
+    coeffs.insert("H2_H2O", 4.25239);
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+void diffusionCoefficient::molWeightTable()
+{
+    // table for molecular weights
+    molWeight.insert("CO", 28.01);
+    molWeight.insert("CO2", 44.01);
+    molWeight.insert("O2", 32.00);
+    molWeight.insert("N2", 28.01);
+    molWeight.insert("H2", 2.02);
+    molWeight.insert("H2O", 2.02);
+
+    //Molecular Weight eq. solution in D_ij for species pairs (reactant-product)
+    molWeight.insert("CO_CO2",0.2417);
+    molWeight.insert("H2_H2O",0.74198);
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+// either calculate Molecular Weight addition (eq. D_ij) or consturct hashtable with diffusant and fifuser species
+/*void diffusionCoefficient::calcMolNum(int i, int j, double *molNum_)
+{
+    molNum_ = (1/molWeight.find(diffusantGasNames_[i])+1/molWeight.find(speciesNames_[j]));
+    molNum_ = pow(molNum_,0.5);
+} */
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+// add dummy volScalarFields, used in YEqn as Smi
 tmp <volScalarField> diffusionCoefficient::Smi(const label i) const
 {
     PtrList<volScalarField> dummy_;
@@ -238,7 +291,7 @@ tmp <volScalarField> diffusionCoefficient::Smi(const label i) const
         );
     return tmp<volScalarField> (dummy_[i]);
 }
-
+// add dummy volScalarFields, used in YEqn as Sm
 tmp <volScalarField> diffusionCoefficient::Sm() const
 {
     tmp<volScalarField> dummy
@@ -259,13 +312,6 @@ tmp <volScalarField> diffusionCoefficient::Sm() const
         );
     return dummy;
 }
-
-void diffusionCoefficient::createCoeffs()
-{
-  // add all relevant combinations
-//   coeffs.insert("CO_CO2", );
-}
-
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

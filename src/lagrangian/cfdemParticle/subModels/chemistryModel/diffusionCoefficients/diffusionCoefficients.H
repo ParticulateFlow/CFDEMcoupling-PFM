@@ -82,8 +82,14 @@ private:
     mutable List<double**> diffusionCoefficients_;
 
     HashTable<scalar, word> coeffs;
+
+    HashTable<scalar, word> molWeight;
     
     void createCoeffs();
+
+    void molWeightTable();
+
+    // void calcMolNum(int, int, double *);
 
     void allocateMyArrays() const;
 
