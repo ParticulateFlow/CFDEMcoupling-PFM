@@ -87,7 +87,7 @@ diffusionCoefficient::diffusionCoefficient
                 (sm.mesh().lookupObject<volScalarField>(speciesNames_[i]));
         Y_.set(i, &Y);
         particleCloud_.checkCG(false);
-    }
+}
 
     allocateMyArrays();
     createCoeffs();
@@ -213,6 +213,51 @@ void diffusionCoefficient::execute()
     Info << "give data done" << endl;
 
 */
+}
+
+// add dummy volScalarFields, used in YEqn
+tmp <volScalarField> diffusionCoefficient::Smi(const label i) const
+{
+    PtrList<volScalarField> dummy_;
+    dummy_.set
+            (
+            i,
+            new volScalarField
+            (
+                IOobject
+                (
+                    "empty1",
+                    particleCloud_.mesh().time().timeName(),
+                    particleCloud_.mesh(),
+                    IOobject::NO_READ,
+                    IOobject::NO_WRITE
+                ),
+                particleCloud_.mesh(),
+                dimensionedScalar("zero",dimless,0.0)
+            )
+        );
+    return tmp<volScalarField> (dummy_[i]);
+}
+
+tmp <volScalarField> diffusionCoefficient::Sm() const
+{
+    tmp<volScalarField> dummy
+    (
+            new volScalarField
+            (
+                IOobject
+                (
+                    "empty2",
+                    particleCloud_.mesh().time().timeName(),
+                    particleCloud_.mesh(),
+                    IOobject::NO_READ,
+                    IOobject::NO_WRITE
+                ),
+                    particleCloud_.mesh(),
+                    dimensionedScalar("zero",dimless,0.0)
+            )
+        );
+    return dummy;
 }
 
 void diffusionCoefficient::createCoeffs()
