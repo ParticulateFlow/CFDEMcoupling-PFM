@@ -1,0 +1,14 @@
+species
+(
+        CO
+        CO2
+	O2
+	N2
+);
+
+reactions
+{
+
+}
+
+
