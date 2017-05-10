@@ -70,12 +70,18 @@ private:
 
     const volScalarField& P_;
 
+    word densityFieldName_;
+
+    const volScalarField& rho_;
+
     // total mole field
     word totalMoleFieldName_;
 
     const volScalarField& N_;
 
     UPtrList<volScalarField> Y_;
+
+    // PtrList<volScalarField> X_;
 
     wordList diffusantGasNames_;
     

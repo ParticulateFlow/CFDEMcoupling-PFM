@@ -69,11 +69,14 @@ diffusionCoefficient::diffusionCoefficient
     tempField_(sm.mesh().lookupObject<volScalarField> (tempFieldName_)),
     pressureFieldName_(propsDict_.lookup("pressureFieldName")),
     P_(sm.mesh().lookupObject<volScalarField>(pressureFieldName_)),
+    densityFieldName_(propsDict_.lookup("densityFieldName")),
+    rho_(sm.mesh().lookupObject<volScalarField> (densityFieldName_)),
     totalMoleFieldName_(propsDict_.lookup("totalMoleFieldName")),
     // needed to calculate the mixture diffusion coefficient
     // dcoeff is dependent on molar fraction not mass fraction
     N_(sm.mesh().lookupObject<volScalarField>(totalMoleFieldName_)),
     Y_(speciesNames_.size()),
+    // X_(speciesNames_.size()),
     diffusantGasNames_(propsDict_.lookup("diffusantGasNames")),
     diffusionCoefficients_(diffusantGasNames_.size(),NULL)
  /*   diffusionCoefficientNames_(propsDict_.lookup("diffusionCoefficientNames")),
@@ -91,10 +94,33 @@ diffusionCoefficient::diffusionCoefficient
                 (sm.mesh().lookupObject<volScalarField>(speciesNames_[i]));
         Y_.set(i, &Y);
         particleCloud_.checkCG(false);
-}
+    }
+
+    // if mole fractions field should be generated ??
+    /*forAll(Y, i)
+    {
+        X_.set
+        (
+            i,
+            new volScalarField
+            (
+                IOobject
+                (
+                    "X_" + Y_[i].name(),
+                    mesh_.time().timeName(),
+                    mesh_,
+                    IOobject::NO_READ,
+                    IOobject::AUTO_WRITE
+                ),
+                mesh_,
+                dimensionedScalar("X", dimless, 0)
+            )
+        );
+    } */
 
     allocateMyArrays();
     createCoeffs();
+    molWeightTable();
 }
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
@@ -147,17 +173,23 @@ void diffusionCoefficient::execute()
 
     label  cellI=0;
     scalar Tfluid(0);
+    scalar rhofluid(0);
     List<scalar> Yfluid_;
     Yfluid_.setSize(speciesNames_.size());
     scalar Pfluid(0);
     scalar Nfluid(0);
-    
+    scalar Texp(0);
+    List<scalar> Xfluid_;
+    Xfluid_.setSize(speciesNames_.size());
+
+    scalar dBinary(0.0);
     scalar dCoeff(0.0);
     
-    // word speciesPair("none");
+    word speciesPair("none");
 
     // defining interpolators for T, rho, voidfraction, N
     interpolationCellPoint <scalar> TInterpolator_(tempField_);
+    interpolationCellPoint <scalar> rhoInterpolator_(rho_);
     interpolationCellPoint <scalar> PInterpolator_(P_);
     interpolationCellPoint <scalar> NInterpolator_(N_);
 
@@ -170,12 +202,17 @@ void diffusionCoefficient::execute()
             {
                 vector position     =   particleCloud_.position(index);
                 Tfluid              =   TInterpolator_.interpolate(position,cellI);
+                rhofluid            =   rhoInterpolator_.interpolate(position,cellI);
                 Pfluid              =   PInterpolator_.interpolate(position,cellI);
                 Nfluid              =   NInterpolator_.interpolate(position,cellI);
             }
             else
             {
                 Tfluid          =   tempField_[cellI];
+                // does it save num time?
+                Texp            =   pow(Tfluid,1.75);
+
+                rhofluid        =   rho_[cellI];
                 Pfluid          =   P_[cellI];
                 Nfluid          =   N_[cellI];
 
@@ -185,33 +222,52 @@ void diffusionCoefficient::execute()
                 }
             }
 
-            /*for (int i=0; i<diffusantGasNames_.size();i++)
+            for (int i=0; i<diffusantGasNames_.size();i++)
             {
                 // do the calculation
                 dCoeff = 0.0;
                 for (int j=0; j < speciesNames_.size();j++)
                 {
-                    // speciesPair = diffusantGasNames_[i] + "_" + speciesNames_[j];
-                    // According to literature i.e Valipour 2006, Elnashaie et al. 1993, Taylor and Krishna (1993), Natsui et al.
-                    // dCoeff = (1-X[j])*sum(X[i]/D_[i,j])
-                    // X is molar fraction / Dij binary diff coeff.
+                    Info << "molar weights: " << molWeight(speciesNames_[j]) << nl << endl;
+                    Info << "N fluid" << Nfluid << nl << endl;
+                    Info << "rho fluid" << rhofluid << nl << endl;
+                    Info << "Y fluid" << Yfluid_[j] << nl << endl;
 
-                     if(coeffs.found(speciesPair))
+                    // Nfluid is 0 for first ts, division by zero is no good...
+                    if (Nfluid == 0)
                     {
-                        dCoeff += Y[j] / coeffs.find(speciesPair)();
+                        Xfluid_[j] = 0.0;
+                    } else
+                    {
+                        // convert mass to molar fractions
+                        Xfluid_[j] =   Yfluid_[j]*rhofluid/(Nfluid*molWeight(speciesNames_[j]));
+                        Info << "molar fraction:" << Xfluid_[j] << nl << endl;
+
+                        speciesPair = diffusantGasNames_[i] + "_" + speciesNames_[j];
+                        // convert mass to mole fraction
+                        // if ( i != j) but checks speciesPairs anyways so not needed.
+                        /*if(coeffs.found(speciesPair))
+                        {
+                            dBinary = 0.001*Texp*molWeight.find(speciesPair)/(Pfluid*coeffs.find(speciesPair));
+
+                            // According to literature i.e Valipour 2006, Elnashaie et al. 1993, Taylor and Krishna (1993), Natsui et al.
+                            // dCoeff = (1-X[j])*sum(X[i]/D_[i,j])
+                            // X is molar fraction / Dij binary diff coeff.
+                            // dCoeff += Y[j] / coeffs.find(speciesPair)();
+                        }*/
                     }
                 }
                 // diffusionCoefficients_[i][index][0]= *1.0/dCoeff;
-            } */
+            }
         }
 
-        if(particleCloud_.verbose() && index >=0 && index < 2)
+        /*if(particleCloud_.verbose() && index >=0 && index < 2)
         {
             for(int i =0; i<diffusantGasNames_.size();i++)
             {
                 Info << "effective diffusionCoefficient of species " << diffusantGasNames_[i] << " = " << diffusionCoefficients_[i][index][0] << endl;
             }
-        }
+        } */
     }
 
     /*for (int i=0; i<diffusionCoefficientNames_.size();i++)
