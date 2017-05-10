@@ -95,11 +95,9 @@ public:
 
        virtual void execute() = 0;
        
-        virtual tmp<volScalarField> Smi (const label i) const = 0;
+       virtual tmp<volScalarField> Smi (const label i) const {}
 
-        virtual tmp<volScalarField> Sm () const = 0;
-
-
+       virtual tmp<volScalarField> Sm () const {}
 };
 
 
