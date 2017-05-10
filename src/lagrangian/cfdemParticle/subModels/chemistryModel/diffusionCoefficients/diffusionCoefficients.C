@@ -324,53 +324,6 @@ void diffusionCoefficient::molWeightTable()
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-// add dummy volScalarFields, used in YEqn as Smi
-tmp <volScalarField> diffusionCoefficient::Smi(const label i) const
-{
-    PtrList<volScalarField> dummy_;
-    dummy_.set
-            (
-            i,
-            new volScalarField
-            (
-                IOobject
-                (
-                    "empty1",
-                    particleCloud_.mesh().time().timeName(),
-                    particleCloud_.mesh(),
-                    IOobject::NO_READ,
-                    IOobject::NO_WRITE
-                ),
-                particleCloud_.mesh(),
-                dimensionedScalar("zero",dimless,0.0)
-            )
-        );
-    return tmp<volScalarField> (dummy_[i]);
-}
-// add dummy volScalarFields, used in YEqn as Sm
-tmp <volScalarField> diffusionCoefficient::Sm() const
-{
-    tmp<volScalarField> dummy
-    (
-            new volScalarField
-            (
-                IOobject
-                (
-                    "empty2",
-                    particleCloud_.mesh().time().timeName(),
-                    particleCloud_.mesh(),
-                    IOobject::NO_READ,
-                    IOobject::NO_WRITE
-                ),
-                    particleCloud_.mesh(),
-                    dimensionedScalar("zero",dimless,0.0)
-            )
-        );
-    return dummy;
-}
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
 } // End namespace Foam
 
 // ************************************************************************* //

@@ -121,10 +121,6 @@ private:
         void execute();
 
         void reAllocMyArrays() const;
-
-        tmp <volScalarField> Smi(const label i) const;
-
-        tmp <volScalarField> Sm() const;
 };
 
 
