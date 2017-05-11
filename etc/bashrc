@@ -181,11 +181,11 @@ alias vizClock='python $CFDEM_UT_DIR/vizClock/matPlot.py'
 alias touchRec='find ./* -exec touch {} \;'
 
 #- shortcut to run liggghts in serial
-cfdemLiggghts() { $CFDEM_LIGGGHTS_SRC_DIR/lmp_$CFDEM_LIGGGHTS_MAKEFILE_NAME < $1; }
+cfdemLiggghts() { $CFDEM_LIGGGHTS_BIN_DIR/liggghts < $1; }
 export -f cfdemLiggghts
 
 #- shortcut to run liggghts in parallel
-cfdemLiggghtsPar() { mpirun -np $2 $CFDEM_LIGGGHTS_SRC_DIR/lmp_$CFDEM_LIGGGHTS_MAKEFILE_NAME < $1; }
+cfdemLiggghtsPar() { mpirun -np $2 $CFDEM_LIGGGHTS_BIN_DIR/liggghts < $1; }
 export -f cfdemLiggghtsPar
 
 #- shortcut to open files including a pattern

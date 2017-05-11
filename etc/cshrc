@@ -167,10 +167,10 @@ alias cfdemTestTUT 'bash $CFDEM_PROJECT_DIR/etc/testTutorials.sh'
 alias vizClock 'python $CFDEM_UT_DIR/vizClock/matPlot.py'
 
 #- shortcut to run liggghts in serial
-alias cfdemLiggghts '$CFDEM_LIGGGHTS_SRC_DIR/lmp_$CFDEM_LIGGGHTS_MAKEFILE_NAME'
+alias cfdemLiggghts '$CFDEM_LIGGGHTS_BIN_DIR/liggghts'
 
 #- shortcut to run liggghts in parallel (no fcts in csh...)
-alias cfdemLiggghtsPar 'echo "mpirun -np xx -machinefile mynodes $CFDEM_LIGGGHTS_SRC_DIR/lmp_$CFDEM_LIGGGHTS_MAKEFILE_NAME < in.liggghts_init"'
+alias cfdemLiggghtsPar 'echo "mpirun -np xx -machinefile mynodes $CFDEM_LIGGGHTS_BIN_DIR/liggghts < in.liggghts_init"'
 
 #- shortcut to run liggghts in parallel
 # unfortunately no functions available in csh
