@@ -82,7 +82,7 @@ granKineticEnergy::granKineticEnergy
 
 granKineticEnergy::~granKineticEnergy()
 {
-    delete vfluc_;
+    particleCloud_.dataExchangeM().destroy(vfluc_,1);
 }
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //

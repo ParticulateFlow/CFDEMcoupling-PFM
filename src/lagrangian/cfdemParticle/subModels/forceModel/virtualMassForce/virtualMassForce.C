@@ -119,7 +119,7 @@ virtualMassForce::virtualMassForce
 
 virtualMassForce::~virtualMassForce()
 {
-    delete UrelOld_;
+    particleCloud_.dataExchangeM().destroy(UrelOld_,3);
 }
 
 

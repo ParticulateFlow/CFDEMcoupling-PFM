@@ -155,10 +155,10 @@ heatTransferGunn::heatTransferGunn
 
 heatTransferGunn::~heatTransferGunn()
 {
-    delete partTemp_;
-    delete partHeatFlux_;
-    delete partRe_;
-    delete partNu_;
+    particleCloud_.dataExchangeM().destroy(partTemp_,1);
+    particleCloud_.dataExchangeM().destroy(partHeatFlux_,1);
+    particleCloud_.dataExchangeM().destroy(partRe_,1);
+    particleCloud_.dataExchangeM().destroy(partNu_,1);
 }
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //

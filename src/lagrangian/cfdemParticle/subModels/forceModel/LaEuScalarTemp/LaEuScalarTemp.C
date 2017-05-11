@@ -105,8 +105,8 @@ LaEuScalarTemp::LaEuScalarTemp
 
 LaEuScalarTemp::~LaEuScalarTemp()
 {
-    delete partTemp_;
-    delete partHeatFlux_;
+    particleCloud_.dataExchangeM().destroy(partTemp_,1);
+    particleCloud_.dataExchangeM().destroy(partHeatFlux_,1);
 }
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //

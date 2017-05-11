@@ -113,8 +113,8 @@ dSauter::dSauter
 
 dSauter::~dSauter()
 {
-    delete d2_;
-    delete d3_;
+    particleCloud_.dataExchangeM().destroy(d2_,1);
+    particleCloud_.dataExchangeM().destroy(d3_,1);
 }
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //

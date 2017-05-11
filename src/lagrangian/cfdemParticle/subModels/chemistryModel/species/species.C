@@ -147,11 +147,11 @@ species::species
 
 species::~species()
 {
-    delete partTemp_;
-    delete partRho_;
+    particleCloud_.dataExchangeM().destroy(partTemp_,1);
+    particleCloud_.dataExchangeM().destroy(partRho_,1);
 
-    for (int i=0; i<speciesNames_.size();i++) delete [] concentrations_[i];
-    for (int i=0; i<speciesNames_.size();i++) delete [] changeOfSpeciesMass_[i];
+    for (int i=0; i<speciesNames_.size();i++) particleCloud_.dataExchangeM().destroy(concentrations_[i],1);
+    for (int i=0; i<speciesNames_.size();i++) particleCloud_.dataExchangeM().destroy(changeOfSpeciesMass_[i],1);
 
 }
 

@@ -120,8 +120,8 @@ KochHillRWDrag::KochHillRWDrag
 
 KochHillRWDrag::~KochHillRWDrag()
 {
-    delete partTime_;
-    delete partUfluct_;
+    particleCloud_.dataExchangeM().destroy(partTime_, 1);
+    particleCloud_.dataExchangeM().destroy(partUfluct_, 3);
 }
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //

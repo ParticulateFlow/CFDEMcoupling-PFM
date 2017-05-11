@@ -68,7 +68,7 @@ heatTransferGunnImplicit::heatTransferGunnImplicit
 
 heatTransferGunnImplicit::~heatTransferGunnImplicit()
 {
-    delete partHeatFluxCoeff_;
+    particleCloud_.dataExchangeM().destroy(partHeatFluxCoeff_,1);
 }
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //

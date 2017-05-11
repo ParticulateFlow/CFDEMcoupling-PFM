@@ -83,8 +83,8 @@ regionModel::regionModel
 
 regionModel::~regionModel()
 {
-    free(inRegion_);
-    free(outRegion_);
+    particleCloud_.dataExchangeM().destroy(inRegion_,1);
+    particleCloud_.dataExchangeM().destroy(outRegion_,1);
 }
 
 
