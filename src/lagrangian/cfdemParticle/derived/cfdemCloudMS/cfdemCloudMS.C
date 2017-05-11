@@ -128,7 +128,7 @@ void cfdemCloudMS::getDEMdata()
 
     //- save clump volume and mass
     double **typeDH(NULL);
-    dataExchangeM().allocateArray(typeDH,-1,1,nClumpTypes()+1);
+    dataExchangeM().allocateArray(typeDH,-1.,1,nClumpTypes()+1);
     if(manDHdev_) // use manually defined dH
     {
         for(int k = 1;k <= nClumpTypes(); k++)
@@ -192,18 +192,18 @@ bool cfdemCloudMS::reAllocArrays()
     if(cfdemCloud::reAllocArrays())
     {
         // get arrays of new length
-        dataExchangeM().allocateArray(positionsCM_,0,3,"nbodies");
-        dataExchangeM().allocateArray(velocitiesCM_,0,3,"nbodies");
+        dataExchangeM().allocateArray(positionsCM_,0.,3,"nbodies");
+        dataExchangeM().allocateArray(velocitiesCM_,0.,3,"nbodies");
         dataExchangeM().allocateArray(cellIDsCM_,-1,1,"nbodies");
         dataExchangeM().allocateArray(bodies_,0,1);
         dataExchangeM().allocateArray(nrigids_,0,1,"nbodies");
         dataExchangeM().allocateArray(clumpType_,0,1,"nbodies");
-        dataExchangeM().allocateArray(clumpVol_,0,1,"nbodies");
+        dataExchangeM().allocateArray(clumpVol_,0.,1,"nbodies");
         dataExchangeM().allocateArray(clumpDH_,1.,1,"nbodies");
-        dataExchangeM().allocateArray(clumpWeights_,1,1,"nbodies");
-        dataExchangeM().allocateArray(impForcesCM_,0,3,"nbodies");
-        dataExchangeM().allocateArray(expForcesCM_,0,3,"nbodies");
-        dataExchangeM().allocateArray(DEMForcesCM_,0,3,"nbodies");
+        dataExchangeM().allocateArray(clumpWeights_,1.,1,"nbodies");
+        dataExchangeM().allocateArray(impForcesCM_,0.,3,"nbodies");
+        dataExchangeM().allocateArray(expForcesCM_,0.,3,"nbodies");
+        dataExchangeM().allocateArray(DEMForcesCM_,0.,3,"nbodies");
         return true;
     }
     return false;

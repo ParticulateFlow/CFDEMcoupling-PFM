@@ -51,8 +51,8 @@ void Foam::regionModel::reAllocArrays() const
     if(particleCloud_.numberOfParticlesChanged())
     {
         // get arrays of new length
-        particleCloud_.dataExchangeM().allocateArray(inRegion_,1,1);
-        particleCloud_.dataExchangeM().allocateArray(outRegion_,1,1);
+        particleCloud_.dataExchangeM().allocateArray(inRegion_,1.,1);
+        particleCloud_.dataExchangeM().allocateArray(outRegion_,1.,1);
     }
 }
 

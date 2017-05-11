@@ -91,7 +91,7 @@ bool cfdemCloudIB::reAllocArrays()
     if(cfdemCloud::reAllocArrays())
     {
         // get arrays of new length
-        dataExchangeM().allocateArray(angularVelocities_,0,3);
+        dataExchangeM().allocateArray(angularVelocities_,0.,3);
         return true;
     }
     return false;
