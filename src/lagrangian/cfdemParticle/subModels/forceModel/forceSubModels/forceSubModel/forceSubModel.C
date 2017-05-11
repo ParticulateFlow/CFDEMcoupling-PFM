@@ -145,11 +145,11 @@ void forceSubModel::partToArray
         {
             for(int j=0;j<3;j++)
                 myForceM().expForces()[index][j] += dragTot[j];
-        }    
+        }
         else   //implicit treatment, taking explicit force contribution into account
         {
-            for(int j=0;j<3;j++) 
-            { 
+            for(int j=0;j<3;j++)
+            {
                 myForceM().impForces()[index][j] += dragTot[j] - dragEx[j]; //only consider implicit part!
                 myForceM().expForces()[index][j] += dragEx[j];
             }
@@ -166,7 +166,7 @@ void forceSubModel::partToArray
     }
     else
     {
-        for(int j=0;j<3;j++) 
+        for(int j=0;j<3;j++)
             myForceM().DEMForces()[index][j] += dragTot[j];
     }
 }
@@ -183,7 +183,7 @@ void forceSubModel::explicitCorr
     vector& Us,
     const vector& UsCell,
     bool verbose,
-    label index    
+    label index
 ) const
 {
     dragExplicit=vector::zero;
@@ -201,9 +201,9 @@ void forceSubModel::readSwitches() const
             Info << "  looking for " << switchesNameList_[i] << " ..." << endl;
             if (dict_.found(switchesNameList_[i]))
                 switches_[i]=Switch(dict_.lookup(switchesNameList_[i]));
-                
+
             Info << "\t" << switchesNameList_[i] << " = " << switches_[i] << endl;
-        }        
+        }
     }
     Info << endl;
 
@@ -259,7 +259,7 @@ void forceSubModel::readSwitches() const
     // look for old nomenclature
     if (dict_.found("treatExplicit") || dict_.found("treatDEM") || dict_.found("implDEM"))
         FatalError<< "You are using an old nomenclature for force model settings, please have a look at the forceSubModel doc." << abort(FatalError);
-        
+
     // look for old nomenclature
     if (dict_.found("verbose"))
         Warning<< "Please make sure you use the new nomenclature for verbose force model settings, please have a look at the forceSubModel doc." << endl;

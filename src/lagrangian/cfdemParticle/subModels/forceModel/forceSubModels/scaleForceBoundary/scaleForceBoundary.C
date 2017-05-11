@@ -56,35 +56,35 @@ scaleForceBoundary::scaleForceBoundary
     if (propsDict_.found("x1") && propsDict_.found("x2"))
     {
         coordinateInner_=readScalar(propsDict_.lookup ("x1"));
-	coordinateOuter_=readScalar(propsDict_.lookup ("x2"));
-	dim_ = 0;
+        coordinateOuter_=readScalar(propsDict_.lookup ("x2"));
+        dim_ = 0;
         Info << "scaleForceBoundary: Limiting force in x direction."  << endl;
     }
     else if (propsDict_.found("y1") && propsDict_.found("y2"))
     {
         coordinateInner_=readScalar(propsDict_.lookup ("y1"));
-	coordinateOuter_=readScalar(propsDict_.lookup ("y2"));
-	dim_ = 1;
+        coordinateOuter_=readScalar(propsDict_.lookup ("y2"));
+        dim_ = 1;
         Info << "scaleForceBoundary: Limiting force in y direction."  << endl;
     }
     else if (propsDict_.found("z1") && propsDict_.found("z2"))
     {
         coordinateInner_=readScalar(propsDict_.lookup ("z1"));
-	coordinateOuter_=readScalar(propsDict_.lookup ("z2"));
-	dim_ = 2;
+        coordinateOuter_=readScalar(propsDict_.lookup ("z2"));
+        dim_ = 2;
         Info << "scaleForceBoundary: Limiting force in z direction."  << endl;
     }
-    
+
     if (propsDict_.found("outerValue"))
         outerVal_=readScalar(propsDict_.lookup ("outerValue"));
-    
+
     if(coordinateOuter_ > coordinateInner_)
         orientation_ = 1;
     else
         orientation_ = -1;
-  
+
     dist_ = fabs(coordinateOuter_ - coordinateInner_);
-  
+
 }
 
 

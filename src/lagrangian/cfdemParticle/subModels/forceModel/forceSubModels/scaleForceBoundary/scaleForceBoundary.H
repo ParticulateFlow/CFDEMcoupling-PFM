@@ -45,19 +45,19 @@ class scaleForceBoundary
     public forceSubModel
 {
 private:
-  
+
     dictionary propsDict_;
-  
+
     scalar coordinateInner_;
-    
+
     scalar coordinateOuter_;
-    
+
     scalar dist_;
-    
+
     scalar outerVal_;
-    
+
     int dim_;
-    
+
     int orientation_;
 
 public:

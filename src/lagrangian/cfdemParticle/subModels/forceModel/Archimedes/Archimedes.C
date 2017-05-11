@@ -71,7 +71,7 @@ Archimedes::Archimedes
     particleCloud_.probeM().initialize(typeName, "archimedesF.logDat");
     particleCloud_.probeM().vectorFields_.append("archimedesForce");  //first entry must the be the force
     particleCloud_.probeM().scalarFields_.append("Vp");
-    particleCloud_.probeM().writeHeader();  
+    particleCloud_.probeM().writeHeader();
 
 
     if (propsDict_.found("twoDimensional"))

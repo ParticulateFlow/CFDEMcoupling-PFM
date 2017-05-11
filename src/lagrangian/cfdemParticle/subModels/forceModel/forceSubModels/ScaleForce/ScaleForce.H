@@ -41,9 +41,9 @@ class ScaleForce
     public forceSubModel
 {
 private:
-  
+
     dictionary propsDict_;
-  
+
     word scaleFieldName_;
 
     const volScalarField& scaleField_;
