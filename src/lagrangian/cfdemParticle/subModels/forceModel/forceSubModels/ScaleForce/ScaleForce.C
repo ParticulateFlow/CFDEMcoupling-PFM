@@ -62,7 +62,7 @@ ScaleForce::~ScaleForce()
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 void ScaleForce::partToArray
 (
-    label& index,
+    label index,
     vector& dragTot,
     const vector& dragEx,
     const vector& Ufluid,

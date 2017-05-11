@@ -131,7 +131,7 @@ forceSubModel::~forceSubModel()
 // * * * * * * * * * * * * * * * * Member Fct  * * * * * * * * * * * * * * * //
 void forceSubModel::partToArray
 (
-    label& index,
+    label index,
     vector& dragTot,
     const vector& dragEx,
     const vector& Ufluid,

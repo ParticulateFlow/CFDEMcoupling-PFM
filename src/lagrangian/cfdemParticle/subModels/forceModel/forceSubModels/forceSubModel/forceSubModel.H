@@ -130,7 +130,7 @@ public:
 
 
     // Member Functions
-        virtual void partToArray(label&, vector&, const vector&, const vector& Ufluid=vector::zero, scalar Cd=scalar(0)) const;
+        virtual void partToArray(label, vector&, const vector&, const vector& Ufluid=vector::zero, scalar Cd=scalar(0)) const;
 
         virtual void explicitCorr(vector&, vector&, scalar&, vector&, const vector&, vector&, const vector&, bool,label index=100) const;
 

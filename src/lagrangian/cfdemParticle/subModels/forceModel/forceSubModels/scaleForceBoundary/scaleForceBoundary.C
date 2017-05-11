@@ -97,7 +97,7 @@ scaleForceBoundary::~scaleForceBoundary()
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 void scaleForceBoundary::partToArray
 (
-    label& index,
+    label index,
     vector& dragTot,
     const vector& dragEx,
     const vector& Ufluid,

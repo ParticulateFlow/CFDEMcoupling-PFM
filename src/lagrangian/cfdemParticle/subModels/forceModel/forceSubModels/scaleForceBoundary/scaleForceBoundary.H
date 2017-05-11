@@ -82,10 +82,10 @@ public:
 
 
     // Member Functions
-	
-	void partToArray(label&, vector&, const vector&, const vector& Ufluid=vector::zero, scalar Cd=scalar(0)) const;
 
-        word myType() const{return typeName; };
+        void partToArray(label, vector&, const vector&, const vector& Ufluid=vector::zero, scalar Cd=scalar(0)) const;
+
+        word myType() const {return typeName; }
 };
 
 
