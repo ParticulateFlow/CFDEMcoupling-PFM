@@ -675,29 +675,6 @@ bool cfdemCloud::reAllocArrays()
     return false;
 }
 
-bool cfdemCloud::reAllocArrays(int nP, bool forceRealloc)
-{
-    if( (numberOfParticlesChanged_ && !arraysReallocated_) || forceRealloc)
-    {
-        // get arrays of new length
-        dataExchangeM().allocateArray(positions_,0.,3,nP);
-        dataExchangeM().allocateArray(velocities_,0.,3,nP);
-        dataExchangeM().allocateArray(fluidVel_,0.,3,nP);
-        dataExchangeM().allocateArray(impForces_,0.,3,nP);
-        dataExchangeM().allocateArray(expForces_,0.,3,nP);
-        dataExchangeM().allocateArray(DEMForces_,0.,3,nP);
-        dataExchangeM().allocateArray(Cds_,0.,1,nP);
-        dataExchangeM().allocateArray(radii_,0.,1,nP);
-        dataExchangeM().allocateArray(voidfractions_,1.,voidFractionM().maxCellsPerParticle(),nP);
-        dataExchangeM().allocateArray(cellIDs_,-1,voidFractionM().maxCellsPerParticle(),nP);
-        dataExchangeM().allocateArray(particleWeights_,0.,voidFractionM().maxCellsPerParticle(),nP);
-        dataExchangeM().allocateArray(particleVolumes_,0.,voidFractionM().maxCellsPerParticle(),nP);
-        arraysReallocated_ = true;
-        return true;
-    }
-    return false;
-}
-
 tmp<fvVectorMatrix> cfdemCloud::divVoidfractionTau(volVectorField& U,volScalarField& voidfraction) const
 {
     return

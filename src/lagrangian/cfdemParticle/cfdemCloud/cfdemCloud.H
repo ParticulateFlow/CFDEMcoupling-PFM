@@ -376,9 +376,6 @@ public:
 
         virtual bool reAllocArrays();
 
-        virtual bool reAllocArrays(int nP, bool forceRealloc);  //force number of particles during reallocation
-
-
     // IO
         void writeScalarFieldToTerminal(double**&);
 
