@@ -262,7 +262,7 @@ void averagingModel::setDSauter
     for(int index=0; index< particleCloud_.numberOfParticles(); index++)
     {
         if(myParticleType!=0) //in case a particle type is specified, only consider particles of the right type
-            if(myParticleType != particleCloud_.particleType(index)) continue; 
+            if(myParticleType != particleCloud_.particleType(index)) continue;
 
         radius         = particleCloud_.radii()[index][0] / scale_; //the primary particle diameter
         radiusPow2 = radius*radius;
@@ -313,7 +313,7 @@ void averagingModel::resetWeightFields() const
 }
 
 
-void Foam::averagingModel::undoWeightFields(double**const& mask) const
+void averagingModel::undoWeightFields(double**const& mask) const
 {
     for(int index=0; index< particleCloud_.numberOfParticles(); index++)
     {
@@ -326,7 +326,7 @@ void Foam::averagingModel::undoWeightFields(double**const& mask) const
     }
 }
 
-tmp<volVectorField> Foam::averagingModel::UsInterp() const
+tmp<volVectorField> averagingModel::UsInterp() const
 {
     tmp<volVectorField> tsource
     (

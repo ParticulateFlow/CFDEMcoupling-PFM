@@ -62,7 +62,7 @@ twoWayMany2Many::twoWayMany2Many
 :
     dataExchangeModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
-    pbm_(sm.mesh().boundaryMesh()), 
+    pbm_(sm.mesh().boundaryMesh()),
     pData_(sm.mesh().globalData()),
     procPatches_(pData_.processorPatches()),
     procPatchIndices_(pData_.processorPatchIndices()),
@@ -280,7 +280,7 @@ void twoWayMany2Many::giveData
 
 //============
 // double **
-void Foam::twoWayMany2Many::allocateArray
+void twoWayMany2Many::allocateArray
 (
     double**& array,
     double initVal,
@@ -295,7 +295,7 @@ void Foam::twoWayMany2Many::allocateArray
             array[i][j] = initVal;
 }
 
-void Foam::twoWayMany2Many::allocateArray
+void twoWayMany2Many::allocateArray
 (
     double**& array,
     double initVal,
@@ -310,14 +310,14 @@ void Foam::twoWayMany2Many::allocateArray
             array[i][j] = initVal;
 }
 
-void inline Foam::twoWayMany2Many::destroy(double** array,int len) const
+void inline twoWayMany2Many::destroy(double** array,int len) const
 {
     lmp->memory->destroy(array);
 }
 
 //============
 // int **
-void Foam::twoWayMany2Many::allocateArray
+void twoWayMany2Many::allocateArray
 (
     int**& array,
     int initVal,
@@ -332,7 +332,7 @@ void Foam::twoWayMany2Many::allocateArray
             array[i][j] = initVal;
 }
 
-void Foam::twoWayMany2Many::allocateArray
+void twoWayMany2Many::allocateArray
 (
     int**& array,
     int initVal,
@@ -347,14 +347,14 @@ void Foam::twoWayMany2Many::allocateArray
             array[i][j] = initVal;
 }
 
-void inline Foam::twoWayMany2Many::destroy(int** array,int len) const
+void inline twoWayMany2Many::destroy(int** array,int len) const
 {
     lmp->memory->destroy(array);
 }
 
 //============
 // double *
-void Foam::twoWayMany2Many::allocateArray(double*& array, double initVal, int length) const
+void twoWayMany2Many::allocateArray(double*& array, double initVal, int length) const
 {
     int len = max(length,1);
     lmp->memory->grow(array, len, "m2m:dbl*");
@@ -362,14 +362,14 @@ void Foam::twoWayMany2Many::allocateArray(double*& array, double initVal, int le
         array[i] = initVal;
 }
 
-void inline Foam::twoWayMany2Many::destroy(double* array) const
+void inline twoWayMany2Many::destroy(double* array) const
 {
     lmp->memory->destroy(array);
 }
 
 //==============
 // int *
-void Foam::twoWayMany2Many::allocateArray(int*& array, int initVal, int length) const
+void twoWayMany2Many::allocateArray(int*& array, int initVal, int length) const
 {
     int len = max(length,1);
     lmp->memory->grow(array, len, "m2m:int*");
@@ -377,14 +377,14 @@ void Foam::twoWayMany2Many::allocateArray(int*& array, int initVal, int length) 
         array[i] = initVal;
 }
 
-void inline Foam::twoWayMany2Many::destroy(int* array) const
+void inline twoWayMany2Many::destroy(int* array) const
 {
     lmp->memory->destroy(array);
 }
 //==============
 
 
-bool Foam::twoWayMany2Many::couple(int i) const
+bool twoWayMany2Many::couple(int i) const
 {
     bool coupleNow = false;
     if (i==0)
@@ -443,19 +443,19 @@ bool Foam::twoWayMany2Many::couple(int i) const
     return coupleNow;
 }
 
-int Foam::twoWayMany2Many::getNumberOfParticles() const
+int twoWayMany2Many::getNumberOfParticles() const
 {
     return liggghts_get_maxtag(lmp);
 }
 
-int Foam::twoWayMany2Many::getNumberOfClumps() const
+int twoWayMany2Many::getNumberOfClumps() const
 {
     Warning << "Foam::twoWayMany2Many::getNumberOfClumps() - changes necessary here" << endl;
     //return liggghts_get_maxtag_ms(lmp);
     return 1;
 }
 
-void Foam::twoWayMany2Many::syncIDs() const
+void twoWayMany2Many::syncIDs() const
 {
     particleCloud_.clockM().start(5,"recv_DEM_ids");
 
@@ -575,7 +575,7 @@ void Foam::twoWayMany2Many::syncIDs() const
     particleCloud_.clockM().stop("setup_Comm");
 }
 
-void Foam::twoWayMany2Many::locateParticle(int* id_lammpsSync, bool id_lammps_alloc_flag) const
+void twoWayMany2Many::locateParticle(int* id_lammpsSync, bool id_lammps_alloc_flag) const
 {
 #if defined(version21)
 
@@ -669,7 +669,7 @@ void Foam::twoWayMany2Many::locateParticle(int* id_lammpsSync, bool id_lammps_al
     }
     particleCloud_.clockM().stop("locate_Stage1");
     particleCloud_.clockM().start(8,"locate_Stage2");
- 
+
     PstreamBuffers pBufs(Pstream::nonBlocking);
 
     forAll(particleTransferID, i)
@@ -802,7 +802,7 @@ void Foam::twoWayMany2Many::locateParticle(int* id_lammpsSync, bool id_lammps_al
     if (firstRun_)
     {
         int* id_foam_nowhere_all;
-        Foam::dataExchangeModel::allocateArray(id_foam_nowhere_all,1,nlocal_foam_lostAll);
+        dataExchangeModel::allocateArray(id_foam_nowhere_all,1,nlocal_foam_lostAll);
         MPI_Allreduce(id_foamLostAll, id_foam_nowhere_all, nlocal_foam_lostAll, MPI_INT, MPI_MIN, MPI_COMM_WORLD);
 
         int i = 0;
@@ -820,7 +820,7 @@ void Foam::twoWayMany2Many::locateParticle(int* id_lammpsSync, bool id_lammps_al
 
                         for (int k=0;k<3;k++)
                             id_lammpsVec_[j*3+k] = id_lammpsVec_[(nlocal_lammps_-1)*3+k];
-              
+
                         nlocal_lammps_ -= 1;
                         break;
                     }
@@ -828,7 +828,7 @@ void Foam::twoWayMany2Many::locateParticle(int* id_lammpsSync, bool id_lammps_al
             }
             i++;
         }
-        Foam::dataExchangeModel::destroy(id_foam_nowhere_all);
+        dataExchangeModel::destroy(id_foam_nowhere_all);
         id_foam_nowhere_all = NULL;
         if (id_lammps_alloc_flag) destroy(id_lammps_);
         id_lammps_ = NULL;

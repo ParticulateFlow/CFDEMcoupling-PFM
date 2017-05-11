@@ -322,11 +322,11 @@ public:
        //access to the particle's rotation and torque data
        virtual inline double ** DEMTorques() const {return NULL;}
        virtual inline double ** omegaArray() const {return NULL;}
-       virtual vector omega(int) const {return Foam::vector(0,0,0);}
+       virtual vector omega(int) const {return vector(0,0,0);}
 
        //access to the particles' orientation information
        virtual inline double ** exArray() const {return NULL;}
-       virtual vector ex(int) const {return Foam::vector(0,0,0);}
+       virtual vector ex(int) const {return vector(0,0,0);}
 
        //Detector if SRF module is enable or not
        virtual inline bool SRFOn(){return false;}

@@ -100,7 +100,7 @@ voidFractionModel::~voidFractionModel()
 }
 
 // * * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * * //
-tmp<volScalarField> Foam::voidFractionModel::voidFractionInterp() const
+tmp<volScalarField> voidFractionModel::voidFractionInterp() const
 {
     tmp<volScalarField> tsource
     (
@@ -136,13 +136,13 @@ tmp<volScalarField> Foam::voidFractionModel::voidFractionInterp() const
     return tsource;
 }
 
-void Foam::voidFractionModel::resetVoidFractions() const
+void voidFractionModel::resetVoidFractions() const
 {
     voidfractionPrev_.ref() = voidfractionNext_.ref();
     voidfractionNext_.ref() = 1;
 }
 
-/*void Foam::voidFractionModel::undoVoidFractions(double**const& mask) const
+/*void voidFractionModel::undoVoidFractions(double**const& mask) const
 {
     voidfractionPrev_.internalField() = voidfractionNext_.internalField();
 
@@ -163,7 +163,7 @@ int** const& voidFractionModel::cellsPerParticle() const
     return cellsPerParticle_;
 }
 
-int Foam::voidFractionModel::maxCellsPerParticle() const
+int voidFractionModel::maxCellsPerParticle() const
 {
     return maxCellsPerParticle_;
 }

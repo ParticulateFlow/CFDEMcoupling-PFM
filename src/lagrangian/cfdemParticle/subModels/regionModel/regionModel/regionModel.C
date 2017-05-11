@@ -46,7 +46,7 @@ defineRunTimeSelectionTable(regionModel, dictionary);
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void Foam::regionModel::reAllocArrays() const
+void regionModel::reAllocArrays() const
 {
     if(particleCloud_.numberOfParticlesChanged())
     {

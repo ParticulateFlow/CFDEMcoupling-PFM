@@ -139,7 +139,7 @@ tmp<volVectorField> explicitCouple::expMomSource() const
         forAll(fNext_,cellI)
         {
             fNext_[cellI] = arrayToField(cellI);
-    
+
             // limiter
             for (int i=0;i<3;i++)
             {
@@ -155,13 +155,13 @@ tmp<volVectorField> explicitCouple::expMomSource() const
     return tsource;
 }
 
-void Foam::explicitCouple::resetMomSourceField() const
+void explicitCouple::resetMomSourceField() const
 {
     fPrev_.ref() = fNext_.ref();
     fNext_.primitiveFieldRef() = vector::zero;
 }
 
-inline vector Foam::explicitCouple::arrayToField(label cellI) const
+inline vector explicitCouple::arrayToField(label cellI) const
 {
     return particleCloud_.forceM(0).expParticleForces()[cellI] / particleCloud_.mesh().V()[cellI];
 }

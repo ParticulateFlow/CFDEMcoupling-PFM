@@ -175,7 +175,7 @@ tmp<volScalarField> implicitCouple::impMomSource() const
     return tsource;
 }
 
-void Foam::implicitCouple::resetMomSourceField() const
+void implicitCouple::resetMomSourceField() const
 {
     KslPrev_.ref() = KslNext_.ref();
     KslNext_.primitiveFieldRef() = 0;

@@ -48,13 +48,13 @@ defineRunTimeSelectionTable(clockModel, dictionary);
 
 // * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * //
 
-void Foam::clockModel::start(int pos) const
+void clockModel::start(int pos) const
 {
     start(pos,"");
     return;
 }
 
-void Foam::clockModel::start(int pos, const std::string& ident) const
+void clockModel::start(int pos, const std::string& ident) const
 {
     if (particleCloud_.mesh().time().value() > startTime_)
     {
@@ -78,7 +78,7 @@ void Foam::clockModel::start(int pos, const std::string& ident) const
     return;
 }
 
-void Foam::clockModel::stop() const
+void clockModel::stop() const
 {
     if (particleCloud_.mesh().time().value() > startTime_)
     {
@@ -96,7 +96,7 @@ void Foam::clockModel::stop() const
     return;
 }
 
-void Foam::clockModel::stop(const std::string& ident) const
+void clockModel::stop(const std::string& ident) const
 {
     if (particleCloud_.mesh().time().value() > startTime_)
     {
@@ -118,7 +118,7 @@ void Foam::clockModel::stop(const std::string& ident) const
     return;
 }
 
-std::string Foam::clockModel::eval() const
+std::string clockModel::eval() const
 {
     std::ostringstream strs("Measurements in CPU-seconds:\n");
     strs << "Name\tdeltaT\tnOfRuns\tlevel\tparentNr\tparentName\n";
@@ -149,7 +149,7 @@ std::string Foam::clockModel::eval() const
     return strs.str();
 }
 
-void Foam::clockModel::evalFile() const
+void clockModel::evalFile() const
 {
     std::ofstream outFile;
     std::string fileName(path_/"timeEval.txt");
@@ -159,7 +159,7 @@ void Foam::clockModel::evalFile() const
     outFile.close();
 }
 
-void Foam::clockModel::evalPar() const
+void clockModel::evalPar() const
 {
     int myrank, numprocs;
     MPI_Comm_rank(MPI_COMM_WORLD,&myrank);
@@ -232,7 +232,7 @@ void Foam::clockModel::evalPar() const
 }
 
 
-void Foam::clockModel::initElems()
+void clockModel::initElems()
 {
     //init elems
     for (int i = 0;i < n_; i++)
@@ -245,7 +245,7 @@ void Foam::clockModel::initElems()
     }
 }
 
-std::vector<int> Foam::clockModel::calcShift() const
+std::vector<int> clockModel::calcShift() const
 {
     std::vector<int> shifts(n_, 0);
 
@@ -263,7 +263,7 @@ std::vector<int> Foam::clockModel::calcShift() const
     return shifts;
 }
 
-void Foam::clockModel::normHist() const
+void clockModel::normHist() const
 {
     int myrank, numprocs;
     MPI_Comm_rank(MPI_COMM_WORLD,&myrank);
@@ -303,7 +303,7 @@ void Foam::clockModel::normHist() const
     return;
 }
 
-void Foam::clockModel::plotHist(double buffIn,const std::string& identifier,int numprocs,int myrank) const
+void clockModel::plotHist(double buffIn,const std::string& identifier,int numprocs,int myrank) const
 {
     double* globalTime_all = NULL;
     if (myrank == 0) globalTime_all = new double[numprocs];
@@ -318,7 +318,7 @@ void Foam::clockModel::plotHist(double buffIn,const std::string& identifier,int 
     delete [] globalTime_all;
 }
 
-void Foam::clockModel::Hist() const
+void clockModel::Hist() const
 {
     int myrank=-10;
     MPI_Comm_rank(MPI_COMM_WORLD,&myrank);
@@ -337,7 +337,7 @@ void Foam::clockModel::Hist() const
     return;
 }
 
-void Foam::clockModel::getRAMUsage() const
+void clockModel::getRAMUsage() const
 {
     int myrank, numprocs;
     MPI_Comm_rank(MPI_COMM_WORLD,&myrank);
@@ -390,7 +390,7 @@ void Foam::clockModel::getRAMUsage() const
     // set up communication between Procs and plot Stuff
     Info << " RAM USAGE HISTOGRAM in MB" << endl;
     plotHist(RssMB,"RSS memory used",numprocs,myrank);
-    if (SwapMem > 0) 
+    if (SwapMem > 0)
     {
         plotHist(SwapMB,"WARNING: Swap",numprocs,myrank);
     }
@@ -406,7 +406,7 @@ void Foam::clockModel::getRAMUsage() const
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 // Construct from components
-Foam::clockModel::clockModel
+clockModel::clockModel
 (
     const dictionary& dict,
     cfdemCloud& sm
@@ -432,7 +432,7 @@ Foam::clockModel::clockModel
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-Foam::clockModel::~clockModel()
+clockModel::~clockModel()
 {}
 
 
