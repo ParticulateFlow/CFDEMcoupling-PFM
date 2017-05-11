@@ -135,7 +135,7 @@ void cfdemCloudMS::getDEMdata()
             typeDH[k][0]=dHbyV_[k-1]*typeVol_[k];
     }
     else // calc dH from volAeqivalent shpere
-    {  
+    {
         for(int k = 1;k <= nClumpTypes(); k++)
             typeDH[k][0]=pow(typeVol_[k]*1.9099,1./3.); // 6/pi=1.9099 // calc a hydraulic diameter as d of vol equal sphere
     }
@@ -144,7 +144,7 @@ void cfdemCloudMS::getDEMdata()
     for(int ind = 0;ind < numberOfClumps(); ind++)
     {
         ct=clumpType()[0][ind];
-        clumpVol_[ind][0] = typeVol_[ct];      
+        clumpVol_[ind][0] = typeVol_[ct];
         clumpDH_[ind][0]=typeDH[ct][0];
         //Info << "ct=" << ct << endl;
         //Info << "clumpVol()[ind][0]=" << clumpVol()[ind][0] << endl;

@@ -92,12 +92,12 @@ dSauter::dSauter
         ),
         sm.mesh(),
         dimensionedScalar("zero", dimensionSet(0,1,0,0,0), 0),
-	"zeroGradient"
+        "zeroGradient"
     )
 {
     allocateMyArrays();
     dSauter_.write();
-    
+
 
     // init force sub model
     setForceSubModels(propsDict_);
@@ -142,21 +142,21 @@ void dSauter::setForce() const
     label cellI=0;
     scalar ds(0);
     scalar scale = scaleDiaDist_/scaleDia_;
-    
+
     for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)
     {
         cellI = particleCloud_.cellIDs()[index][0];
         if(cellI >= 0)
         {
-	    ds = particleCloud_.d(index);
-	    d2_[index][0] = ds*ds;
-	    d3_[index][0] = ds*ds*ds;
-	}
+            ds = particleCloud_.d(index);
+            d2_[index][0] = ds*ds;
+            d3_[index][0] = ds*ds*ds;
+        }
     }
-    
+
     d2Field_.primitiveFieldRef() = 0.0;
     d3Field_.primitiveFieldRef() = 0.0;
-    
+
     particleCloud_.averagingM().setScalarSum
     (
         d2Field_,
@@ -164,7 +164,7 @@ void dSauter::setForce() const
         particleCloud_.particleWeights(),
         NULL
     );
-    
+
     particleCloud_.averagingM().setScalarSum
     (
         d3Field_,
@@ -172,7 +172,7 @@ void dSauter::setForce() const
         particleCloud_.particleWeights(),
         NULL
     );
-    
+
     forAll(dSauter_,cellI)
     {
         if(d2Field_[cellI] > ROOTVSMALL)
@@ -180,11 +180,11 @@ void dSauter::setForce() const
              dSauter_[cellI] = d3Field_[cellI] / d2Field_[cellI] * scale;
         }
         else
-	{
-	  dSauter_[cellI] = SMALL;
-	}
+        {
+          dSauter_[cellI] = SMALL;
+        }
     }
-    
+
     dSauter_.correctBoundaryConditions();
 }
 

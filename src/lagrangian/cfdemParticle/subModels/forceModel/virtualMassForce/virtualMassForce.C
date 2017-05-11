@@ -90,14 +90,14 @@ virtualMassForce::virtualMassForce
     //Extra switches/settings
     if(propsDict_.found("splitUrelCalculation"))
     {
-        splitUrelCalculation_ = readBool(propsDict_.lookup("splitUrelCalculation")); 
+        splitUrelCalculation_ = readBool(propsDict_.lookup("splitUrelCalculation"));
         if(splitUrelCalculation_)
             Info << "Virtual mass model: will split the Urel calculation\n";
             Info << "WARNING: be sure that LIGGGHTS integration takes ddtv_p implicitly into account! \n";
     }
     if(propsDict_.found("Cadd"))
     {
-        Cadd_ = readScalar(propsDict_.lookup("Cadd")); 
+        Cadd_ = readScalar(propsDict_.lookup("Cadd"));
         Info << "Virtual mass model: using non-standard Cadd = " << Cadd_ << endl;
     }
 
@@ -146,7 +146,7 @@ void virtualMassForce::setForce() const
 
     #include "setupProbeModel.H"
 
-    bool haveUrelOld_(false); 
+    bool haveUrelOld_(false);
 
     for(int index = 0;index <  particleCloud_.numberOfParticles(); index++)
     {
@@ -156,19 +156,19 @@ void virtualMassForce::setForce() const
             if (cellI > -1) // particle Found
             {
 
-                if(forceSubM(0).interpolation()) 
+                if(forceSubM(0).interpolation())
                 {
-	                position     = particleCloud_.position(index);
-                    Ufluid       = UInterpolator_.interpolate(position,cellI);
+                    position    = particleCloud_.position(index);
+                    Ufluid      = UInterpolator_.interpolate(position,cellI);
                 }
                 else
                 {
                     Ufluid = U_[cellI];
                 }
-           
+
 
                 if(splitUrelCalculation_)  //if split, just use total derivative of fluid velocity
-                if(forceSubM(0).interpolation()) 
+                if(forceSubM(0).interpolation())
                 {
                     DDtU = DDtUInterpolator_.interpolate(position,cellI);
                 }
@@ -182,7 +182,7 @@ void virtualMassForce::setForce() const
                     Ur = Ufluid - Us;
                 }
 
-                
+
                 //Check of particle was on this CPU the last step
                 if(UrelOld_[index][0]==NOTONCPU) //use 1. element to indicate that particle was on this CPU the last time step
                     haveUrelOld_ = false;
@@ -229,7 +229,7 @@ void virtualMassForce::setForce() const
             }
             else    //particle not on this CPU
                 UrelOld_[index][0]=NOTONCPU;
-    
+
             // write particle based data to global array
             forceSubM(0).partToArray(index,virtualMassForce,vector::zero);
     }

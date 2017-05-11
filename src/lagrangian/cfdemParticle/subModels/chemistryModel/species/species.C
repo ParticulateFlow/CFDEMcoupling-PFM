@@ -176,10 +176,10 @@ void species::allocateMyArrays() const
 
 void species::execute()
 {
-  // realloc the arrays
+    // realloc the arrays
     allocateMyArrays();
 
-  // get Y_i, T, rho at particle positions, fill arrays with them and push to LIGGGHTS
+    // get Y_i, T, rho at particle positions, fill arrays with them and push to LIGGGHTS
 
     label  cellI=0;
     scalar Tfluid(0);
@@ -194,7 +194,7 @@ void species::execute()
     for (int index=0; index<particleCloud_.numberOfParticles(); index++)
     {
         cellI=particleCloud_.cellIDs()[index][0];
-        if (cellI >=0)
+        if (cellI >= 0)
         {
             if(interpolation_)
             {
@@ -213,12 +213,12 @@ void species::execute()
             partRho_[index][0]=rhofluid;
             for (int i=0; i<speciesNames_.size();i++)
             {
-	        Yfluid_[i] = Y_[i][cellI];
-            concentrations_[i][index][0]=Yfluid_[i];
+                Yfluid_[i] = Y_[i][cellI];
+                concentrations_[i][index][0] = Yfluid_[i];
             }
         }
 
-        if(particleCloud_.verbose() && index >=0 && index < 2)
+        if(particleCloud_.verbose() && index >= 0 && index < 2)
         {
             /*for(int i =0; i<speciesNames_.size();i++)
             {
