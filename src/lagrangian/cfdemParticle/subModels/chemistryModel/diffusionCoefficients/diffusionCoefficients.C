@@ -182,14 +182,19 @@ void diffusionCoefficient::execute()
     scalar Texp(0);
     List<scalar> Xfluid_;
     Xfluid_.setSize(speciesNames_.size());
+    List<scalar> dBinary_;
+    dBinary_.setSize(diffusantGasNames_.size());
+    List<scalar> dCoeff_;
+    dCoeff_.setSize(diffusantGasNames_.size());
+
     double **molNum_ = new double*[diffusantGasNames_.size()];
     double **volDiff_ = new double*[diffusantGasNames_.size()];
 
-    scalar dBinary(0.0);
-    scalar dCoeff(0.0);
+    // scalar dBinary(0.0);
+    // scalar dCoeff(0.0);
     
-    word speciesPair("none");
-    word diffusingSpecies("none");
+    // word speciesPair("none");
+    // word diffusingSpecies("none");
 
     // defining interpolators for T, rho, voidfraction, N
     interpolationCellPoint <scalar> TInterpolator_(tempField_);
@@ -262,15 +267,14 @@ void diffusionCoefficient::execute()
                             // if ( i != j) but checks speciesPairs anyways so not needed.
                             if(coeffs.found(diffusantGasNames_[i]) && coeffs.found(speciesNames_[j]))
                             {
-                                dBinary = 0.001*Texp*molNum_[i][j]/(Pfluid*volDiff_[i][j]);
-                                Info << "dBinary: "  << dBinary << nl << endl;
+                                dBinary_[i] = 0.001*Texp*molNum_[i][j]/(Pfluid*volDiff_[i][j]);
+                                Info << "dBinary: "  << dBinary_[i] << nl << endl;
                                 // According to literature i.e Valipour 2006, Elnashaie et al. 1993, Taylor and Krishna (1993), Natsui et al.
                                 // dCoeff = 1/(1-X[j])*sum(X[i]/D_[i,j])^-1
-                                dCoeff  +=  (Xfluid_[j]/dBinary);
-                                dCoeff  =   (1-Xfluid_[i])*(1/dCoeff);
-                                Info << "dCoeff: " << dCoeff << nl << endl;
                                 // X is molar fraction / Dij binary diff coeff.
-                                // dCoeff += Y[j] / coeffs.find(speciesPair)();
+                                dCoeff_[i]  +=  (Xfluid_[j]/dBinary_[i]);
+                                dCoeff_[i]  =   (1-Xfluid_[i])*(1/dCoeff_[i]);
+                                Info << "dCoeff: " << dCoeff_[i] << nl << endl;
                             }else
                             {
                                 FatalError
@@ -281,23 +285,25 @@ void diffusionCoefficient::execute()
                         }
                     }
                 }
+                diffusionCoefficients_[i][index][0]= dCoeff_[i];
             }
-            diffusionCoefficients_[i][index][0]= dCoeff;
         }
-    }
-    if(particleCloud_.verbose() && index >=0 && index < 2)
-    {
-        for(int i =0; i<diffusantGasNames_.size();i++)
+
+        if(particleCloud_.verbose() && index >=0 && index < 2)
         {
-            Info << "effective diffusionCoefficient of species " << diffusantGasNames_[i] << " = " << diffusionCoefficients_[i][index][0] << endl;
+            for(int i =0; i<diffusantGasNames_.size();i++)
+            {
+                Info << "effective diffusionCoefficient of species " << diffusantGasNames_[i] << " = " << diffusionCoefficients_[i][index][0] << endl;
+            }
         }
+
     }
 
-    /*for (int i=0; i<diffusionCoefficientNames_.size();i++)
+    for (int i=0; i<diffusantGasNames_.size();i++)
     {
         word pushName = diffusantGasNames_[i] + "_diffCoeff";
         particleCloud_.dataExchangeM().giveData(pushName,"scalar-atom",diffusionCoefficients_[i]);
-    };*/
+    };
 
     Info << "give data done" << endl;
 }
@@ -320,10 +326,6 @@ void diffusionCoefficient::createCoeffs()
     coeffs.insert("H", 1.255707);
     coeffs.insert("O", 1.76303);
     coeffs.insert("C", 2.54582);
-
-    // coeffs for pairs (Va^(1/3)+Vb^(1/3))
-    coeffs.insert("CO_CO2", 5.66);
-    coeffs.insert("H2_H2O", 4.25239);
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
