@@ -95,7 +95,11 @@ private:
 
     void molWeightTable();
 
-    // void calcMolNum(int, int, double *);
+    // calculate numerator part molar mass addition
+    void calcMolNum(int, int, double **);
+
+    // calculate denominator part diffusion volume equation
+    void calcDiffVol(int, int, double **);
 
     void allocateMyArrays() const;
 

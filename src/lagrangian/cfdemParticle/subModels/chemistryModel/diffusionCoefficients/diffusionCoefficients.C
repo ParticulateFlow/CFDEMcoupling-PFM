@@ -26,6 +26,7 @@ License
 #include "dataExchangeModel.H"
 #include "IFstream.H"
 
+#define SMALL 1e-7
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -181,11 +182,14 @@ void diffusionCoefficient::execute()
     scalar Texp(0);
     List<scalar> Xfluid_;
     Xfluid_.setSize(speciesNames_.size());
+    double **molNum_ = new double*[diffusantGasNames_.size()];
+    double **volDiff_ = new double*[diffusantGasNames_.size()];
 
     scalar dBinary(0.0);
     scalar dCoeff(0.0);
     
     word speciesPair("none");
+    word diffusingSpecies("none");
 
     // defining interpolators for T, rho, voidfraction, N
     interpolationCellPoint <scalar> TInterpolator_(tempField_);
@@ -209,7 +213,6 @@ void diffusionCoefficient::execute()
             else
             {
                 Tfluid          =   tempField_[cellI];
-                // does it save num time?
                 Texp            =   pow(Tfluid,1.75);
 
                 rhofluid        =   rho_[cellI];
@@ -224,50 +227,70 @@ void diffusionCoefficient::execute()
 
             for (int i=0; i<diffusantGasNames_.size();i++)
             {
-                // do the calculation
-                dCoeff = 0.0;
+                molNum_[i]  =   new double [speciesNames_.size()];
+                volDiff_[i]  =   new double [speciesNames_.size()];
                 for (int j=0; j < speciesNames_.size();j++)
                 {
-                    Info << "molar weights: " << molWeight(speciesNames_[j]) << nl << endl;
-                    Info << "N fluid" << Nfluid << nl << endl;
-                    Info << "rho fluid" << rhofluid << nl << endl;
-                    Info << "Y fluid" << Yfluid_[j] << nl << endl;
-
-                    // Nfluid is 0 for first ts, division by zero is no good...
-                    if (Nfluid == 0)
+                    if (diffusantGasNames_[i] != speciesNames_[j])
                     {
-                        Xfluid_[j] = 0.0;
-                    } else
-                    {
-                        // convert mass to molar fractions
-                        Xfluid_[j] =   Yfluid_[j]*rhofluid/(Nfluid*molWeight(speciesNames_[j]));
-                        Info << "molar fraction:" << Xfluid_[j] << nl << endl;
+                        Info << "molar weights diffuser gases: " << molWeight(speciesNames_[j]) << nl << endl;
+                        Info << "N fluid" << Nfluid << nl << endl;
+                        Info << "rho fluid" << rhofluid << nl << endl;
+                        Info << "Y fluid" << Yfluid_[j] << nl << endl;
+                        Info << "molar weights diffusant gases: " << molWeight(diffusantGasNames_[i]) << nl << endl;
 
-                        speciesPair = diffusantGasNames_[i] + "_" + speciesNames_[j];
-                        // convert mass to mole fraction
-                        // if ( i != j) but checks speciesPairs anyways so not needed.
-                        /*if(coeffs.found(speciesPair))
+                        // Nfluid is 0 for first ts, division by zero is no good...
+                        if (Nfluid == 0)
                         {
-                            dBinary = 0.001*Texp*molWeight.find(speciesPair)/(Pfluid*coeffs.find(speciesPair));
+                            Xfluid_[j]  =   0.0;
+                            Xfluid_[i]  =   0.0;
+                        } else
+                        {
+                            // convert mass to molar fractions
+                            Xfluid_[j]  =   Yfluid_[j]*rhofluid/(Nfluid*molWeight(speciesNames_[j]));
+                            Xfluid_[i]  =   Yfluid_[i]*rhofluid/(Nfluid*molWeight(diffusantGasNames_[i]));
+                            Info << "molar fraction diffuser gases:" << Xfluid_[j] << nl << endl;
+                            Info << "molar fraction diffusant gases:" << Xfluid_[i] << nl << endl;
+                        }
 
-                            // According to literature i.e Valipour 2006, Elnashaie et al. 1993, Taylor and Krishna (1993), Natsui et al.
-                            // dCoeff = (1-X[j])*sum(X[i]/D_[i,j])
-                            // X is molar fraction / Dij binary diff coeff.
-                            // dCoeff += Y[j] / coeffs.find(speciesPair)();
-                        }*/
+                        if (Xfluid_[j] > 0.0)
+                        {
+                            calcMolNum(i,j,molNum_);
+                            calcDiffVol(i,j,volDiff_);
+
+                            // convert mass to mole fraction
+                            // if ( i != j) but checks speciesPairs anyways so not needed.
+                            if(coeffs.found(diffusantGasNames_[i]) && coeffs.found(speciesNames_[j]))
+                            {
+                                dBinary = 0.001*Texp*molNum_[i][j]/(Pfluid*volDiff_[i][j]);
+                                Info << "dBinary: "  << dBinary << nl << endl;
+                                // According to literature i.e Valipour 2006, Elnashaie et al. 1993, Taylor and Krishna (1993), Natsui et al.
+                                // dCoeff = 1/(1-X[j])*sum(X[i]/D_[i,j])^-1
+                                dCoeff  +=  (Xfluid_[j]/dBinary);
+                                dCoeff  =   (1-Xfluid_[i])*(1/dCoeff);
+                                Info << "dCoeff: " << dCoeff << nl << endl;
+                                // X is molar fraction / Dij binary diff coeff.
+                                // dCoeff += Y[j] / coeffs.find(speciesPair)();
+                            }else
+                            {
+                                FatalError
+                                        << "check tables for species diffusion volume"
+                                        << endl
+                                        << abort(FatalError);
+                            }
+                        }
                     }
                 }
-                // diffusionCoefficients_[i][index][0]= *1.0/dCoeff;
             }
+            diffusionCoefficients_[i][index][0]= dCoeff;
         }
-
-        /*if(particleCloud_.verbose() && index >=0 && index < 2)
+    }
+    if(particleCloud_.verbose() && index >=0 && index < 2)
+    {
+        for(int i =0; i<diffusantGasNames_.size();i++)
         {
-            for(int i =0; i<diffusantGasNames_.size();i++)
-            {
-                Info << "effective diffusionCoefficient of species " << diffusantGasNames_[i] << " = " << diffusionCoefficients_[i][index][0] << endl;
-            }
-        } */
+            Info << "effective diffusionCoefficient of species " << diffusantGasNames_[i] << " = " << diffusionCoefficients_[i][index][0] << endl;
+        }
     }
 
     /*for (int i=0; i<diffusionCoefficientNames_.size();i++)
@@ -283,13 +306,20 @@ void diffusionCoefficient::execute()
 
 void diffusionCoefficient::createCoeffs()
 {
-    // add all relevant combinations
-    coeffs.insert("CO", 18.9);
-    coeffs.insert("CO2", 26.9);
-    coeffs.insert("O2", 16.6);
-    coeffs.insert("N2", 17.9);
-    coeffs.insert("H2", 7.07);
-    coeffs.insert("H2O", 12.7);
+    // diffusion volume of species i^(0.33333)
+    coeffs.insert("CO", 2.6636);
+    coeffs.insert("CO2", 2.9962);
+    coeffs.insert("O2", 2.5509);
+    coeffs.insert("N2", 2.6158);
+    coeffs.insert("H2", 1.919);
+    coeffs.insert("H2O", 2.3331);
+    coeffs.insert("Air", 2.71893);
+    coeffs.insert("Ne", 1.774750);
+    coeffs.insert("N2O", 3.29886);
+    coeffs.insert("NH3", 2.4607);
+    coeffs.insert("H", 1.255707);
+    coeffs.insert("O", 1.76303);
+    coeffs.insert("C", 2.54582);
 
     // coeffs for pairs (Va^(1/3)+Vb^(1/3))
     coeffs.insert("CO_CO2", 5.66);
@@ -298,29 +328,33 @@ void diffusionCoefficient::createCoeffs()
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+void diffusionCoefficient::calcDiffVol(int i, int j, double **volDiff_)
+{
+    volDiff_[i][j]  =   coeffs(diffusantGasNames_[i])+coeffs(speciesNames_[j]);
+    volDiff_[i][j]  *=   volDiff_[i][j];
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
 void diffusionCoefficient::molWeightTable()
 {
     // table for molecular weights
-    molWeight.insert("CO", 28.01);
+    molWeight.insert("CO", 28.0101);
     molWeight.insert("CO2", 44.01);
     molWeight.insert("O2", 32.00);
     molWeight.insert("N2", 28.01);
     molWeight.insert("H2", 2.02);
     molWeight.insert("H2O", 2.02);
-
-    //Molecular Weight eq. solution in D_ij for species pairs (reactant-product)
-    molWeight.insert("CO_CO2",0.2417);
-    molWeight.insert("H2_H2O",0.74198);
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 // either calculate Molecular Weight addition (eq. D_ij) or consturct hashtable with diffusant and fifuser species
-/*void diffusionCoefficient::calcMolNum(int i, int j, double *molNum_)
+void diffusionCoefficient::calcMolNum(int i, int j, double **molNum_)
 {
-    molNum_ = (1/molWeight.find(diffusantGasNames_[i])+1/molWeight.find(speciesNames_[j]));
-    molNum_ = pow(molNum_,0.5);
-} */
+    molNum_[i][j] = (1/molWeight(diffusantGasNames_[i])+1/molWeight(speciesNames_[j]));
+    molNum_[i][j] = pow(molNum_[i][j],0.5);
+}
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
