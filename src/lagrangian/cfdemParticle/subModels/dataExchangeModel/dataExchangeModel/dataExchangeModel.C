@@ -168,7 +168,6 @@ void dataExchangeModel::allocateArray
 
 void dataExchangeModel::destroy(int* array) const
 {
-    if (array == NULL) return;
     delete [] array;
 }
 //====
@@ -191,8 +190,6 @@ void dataExchangeModel::allocateArray
 
 void dataExchangeModel::destroy(double* array) const
 {
-    if (array == NULL) return;
-
     delete [] array;
 }
 //====
