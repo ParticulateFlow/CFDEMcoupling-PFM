@@ -104,7 +104,7 @@ virtualMassForce::virtualMassForce
     particleCloud_.checkCG(true);
 
     //Append the field names to be probed
-    particleCloud_.probeM().initialize(typeName, "virtualMass.logDat");
+    particleCloud_.probeM().initialize(typeName, typeName+".logDat");
     particleCloud_.probeM().vectorFields_.append("virtualMassForce"); //first entry must the be the force
     particleCloud_.probeM().vectorFields_.append("Urel");
     particleCloud_.probeM().vectorFields_.append("UrelOld");

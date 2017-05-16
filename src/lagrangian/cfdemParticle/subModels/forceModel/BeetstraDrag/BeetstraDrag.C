@@ -59,7 +59,7 @@ BeetstraDrag::BeetstraDrag
     scaleDrag_(1.)
 {
     //Append the field names to be probed
-    particleCloud_.probeM().initialize(typeName, "BeetstraDrag.logDat");
+    particleCloud_.probeM().initialize(typeName, typeName+".logDat");
     particleCloud_.probeM().vectorFields_.append("dragForce"); //first entry must  be the force
     particleCloud_.probeM().vectorFields_.append("Urel");
     particleCloud_.probeM().scalarFields_.append("Rep");

@@ -75,7 +75,7 @@ DiFeliceDragMS::DiFeliceDragMS
     //dH_(readScalar(propsDict_.lookup("hydraulicDiameter")))
 {
     //Append the field names to be probed
-    particleCloud_.probeM().initialize(typeName, "diFeliceDrag.logDat");
+    particleCloud_.probeM().initialize(typeName, typeName+".logDat");
     particleCloud_.probeM().vectorFields_.append("dragForce"); //first entry must the be the force
     particleCloud_.probeM().vectorFields_.append("Urel");        //other are debug
     particleCloud_.probeM().scalarFields_.append("Rep");          //other are debug

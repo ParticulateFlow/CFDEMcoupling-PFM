@@ -69,7 +69,7 @@ SchillerNaumannDrag::SchillerNaumannDrag
     U_(sm.mesh().lookupObject<volVectorField> (velFieldName_))
 {
     //Append the field names to be probed
-    particleCloud_.probeM().initialize(typeName, "schillerNaumannDrag.logDat");
+    particleCloud_.probeM().initialize(typeName, typeName+".logDat");
     particleCloud_.probeM().vectorFields_.append("dragForce"); //first entry must the be the force
     particleCloud_.probeM().vectorFields_.append("Urel");        //other are debug
     particleCloud_.probeM().scalarFields_.append("Rep");          //other are debug

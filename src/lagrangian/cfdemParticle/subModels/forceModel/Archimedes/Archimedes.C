@@ -68,7 +68,7 @@ Archimedes::Archimedes
 {
 
     //Append the field names to be probed
-    particleCloud_.probeM().initialize(typeName, "archimedesF.logDat");
+    particleCloud_.probeM().initialize(typeName, typeName+".logDat");
     particleCloud_.probeM().vectorFields_.append("archimedesForce");  //first entry must the be the force
     particleCloud_.probeM().scalarFields_.append("Vp");
     particleCloud_.probeM().writeHeader();
