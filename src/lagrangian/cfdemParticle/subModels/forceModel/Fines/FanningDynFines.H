@@ -41,7 +41,7 @@ class FanningDynFines
     public forceModel
 {
 private:
-  
+
     dictionary propsDict_;
 
     word velFieldName_;
@@ -52,22 +52,22 @@ private:
 
     const volScalarField& voidfraction_;
 
-    word UsFieldName_;   
+    word UsFieldName_;
 
     const volVectorField& UsField_;
-    
+
     const volVectorField& UDyn_;
-    
+
     const volScalarField& FanningCoeff_;
-    
+
     const volScalarField& alphaP_;
-    
+
     const volScalarField& dSauter_;
 
     mutable scalar scaleDia_;
 
     mutable scalar scaleDrag_;
-    
+
 
 public:
 

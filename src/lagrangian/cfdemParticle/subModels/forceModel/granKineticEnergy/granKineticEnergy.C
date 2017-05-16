@@ -89,7 +89,7 @@ granKineticEnergy::~granKineticEnergy()
 void granKineticEnergy::allocateMyArrays() const
 {
     // get memory for 2d arrays
-    double initVal=0.0;
+    double initVal = 0.0;
     particleCloud_.dataExchangeM().allocateArray(vfluc_,initVal,1);
 }
 // * * * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * * //
@@ -98,11 +98,11 @@ void granKineticEnergy::setForce() const
 {
     allocateMyArrays();
 
-    label cellI=0;
+    label cellI = 0;
     vector velfluc(0,0,0);
 
 
-    for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)
+    for(int index = 0; index < particleCloud_.numberOfParticles(); ++index)
     {
         cellI = particleCloud_.cellIDs()[index][0];
         if(cellI >= 0)

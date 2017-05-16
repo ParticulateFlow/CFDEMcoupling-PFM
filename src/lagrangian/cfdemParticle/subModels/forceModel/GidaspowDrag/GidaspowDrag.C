@@ -76,7 +76,7 @@ GidaspowDrag::GidaspowDrag
 {
     //Append the field names to be probed
     particleCloud_.probeM().initialize(typeName, typeName+".logDat");
-    particleCloud_.probeM().vectorFields_.append("dragForce"); //first entry must  be the force
+    particleCloud_.probeM().vectorFields_.append("dragForce"); // first entry must  be the force
     particleCloud_.probeM().vectorFields_.append("Urel");
     particleCloud_.probeM().scalarFields_.append("Rep");
     particleCloud_.probeM().scalarFields_.append("betaP");
@@ -95,9 +95,9 @@ GidaspowDrag::GidaspowDrag
 
     particleCloud_.checkCG(true);
     if (propsDict_.found("scale"))
-        scaleDia_=scalar(readScalar(propsDict_.lookup("scale")));
+        scaleDia_ = scalar(readScalar(propsDict_.lookup("scale")));
     if (propsDict_.found("scaleDrag"))
-        scaleDrag_=scalar(readScalar(propsDict_.lookup("scaleDrag")));
+        scaleDrag_ = scalar(readScalar(propsDict_.lookup("scaleDrag")));
 
     if (propsDict_.found("switchingVoidfraction"))
         switchingVoidfraction_ = readScalar(propsDict_.lookup("switchingVoidfraction"));
@@ -115,8 +115,11 @@ GidaspowDrag::~GidaspowDrag()
 void GidaspowDrag::setForce() const
 {
     if (scaleDia_ > 1)
+    {
         Info << "Gidaspow using scale = " << scaleDia_ << endl;
-    else if (particleCloud_.cg() > 1){
+    }
+    else if (particleCloud_.cg() > 1)
+    {
         scaleDia_=particleCloud_.cg();
         Info << "Gidaspow using scale from liggghts cg = " << scaleDia_ << endl;
     }
@@ -128,7 +131,7 @@ void GidaspowDrag::setForce() const
     scalar voidfraction(1);
     vector Ufluid(0,0,0);
     vector drag(0,0,0);
-    label cellI=0;
+    label cellI = 0;
 
     vector Us(0,0,0);
     vector Ur(0,0,0);
@@ -145,13 +148,13 @@ void GidaspowDrag::setForce() const
 
     vector dragExplicit(0,0,0);
     scalar dragCoefficient(0);
-    
+
     interpolationCellPoint<scalar> voidfractionInterpolator_(voidfraction_);
     interpolationCellPoint<vector> UInterpolator_(U_);
 
     #include "setupProbeModel.H"
 
-    for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
+    for(int index = 0; index < particleCloud_.numberOfParticles(); ++index)
     {
         //if(mask[index][0])
         //{
@@ -160,26 +163,26 @@ void GidaspowDrag::setForce() const
             dragExplicit = vector(0,0,0);
             betaP = 0;
             Vs = 0;
-            Ufluid =vector(0,0,0);
-            voidfraction=0;
+            Ufluid = vector(0,0,0);
+            voidfraction = 0;
             dragCoefficient = 0;
 
             if (cellI > -1) // particle Found
             {
 
-                if( forceSubM(0).interpolation() )
+                if ( forceSubM(0).interpolation() )
                 {
-	                position     = particleCloud_.position(index);
+                    position     = particleCloud_.position(index);
                     voidfraction = voidfractionInterpolator_.interpolate(position,cellI);
                     Ufluid       = UInterpolator_.interpolate(position,cellI);
                     //Ensure interpolated void fraction to be meaningful
                     // Info << " --> voidfraction: " << voidfraction << endl;
-                    if(voidfraction>1.00) voidfraction = 1.0;
-                    if(voidfraction<0.10) voidfraction = 0.10;
+                    if (voidfraction > 1.0) voidfraction = 1.0;
+                    else if (voidfraction < 0.1) voidfraction = 0.10;
                 }
                 else
                 {
-					voidfraction = voidfraction_[cellI];
+                    voidfraction = voidfraction_[cellI];
                     Ufluid = U_[cellI];
                 }
 
@@ -190,14 +193,14 @@ void GidaspowDrag::setForce() const
                 rho = rhoField[cellI];
                 nuf = nufField[cellI];
 
-                Rep=0.0;
+                Rep = 0.0;
                 localPhiP = 1.0f-voidfraction+SMALL;
                 Vs = ds*ds*ds*M_PI/6;
 
                 // calc particle's drag coefficient (i.e., Force per unit slip velocity and per m³ PARTICLE)
-                if(voidfraction > switchingVoidfraction_) //dilute
+                if (voidfraction > switchingVoidfraction_) //dilute
                 {
-                    Rep=ds/scaleDia_*voidfraction*magUr/nuf;
+                    Rep = ds/scaleDia_*voidfraction*magUr/nuf;
                     CdMagUrLag = (24.0*nuf/(ds/scaleDia_*voidfraction)) //1/magUr missing here, but compensated in expression for betaP!
                                  *(scalar(1.0)+0.15*Foam::pow(Rep, 0.687));
 
@@ -218,7 +221,7 @@ void GidaspowDrag::setForce() const
 
                 // calc particle's drag
                 dragCoefficient = Vs*betaP*scaleDrag_;
-                if (modelType_=="B")
+                if (modelType_ == "B")
                     dragCoefficient /= voidfraction;
 
                 drag = dragCoefficient * Ur;
@@ -226,7 +229,7 @@ void GidaspowDrag::setForce() const
                 // explicitCorr
                 forceSubM(0).explicitCorr(drag,dragExplicit,dragCoefficient,Ufluid,U_[cellI],Us,UsField_[cellI],forceSubM(0).verbose());
 
-                if(forceSubM(0).verbose() && index >=0 && index <2)
+                if (forceSubM(0).verbose() && index >= 0 && index < 2)
                 {
                     Pout << "cellI = " << cellI << endl;
                     Pout << "index = " << index << endl;
@@ -244,7 +247,7 @@ void GidaspowDrag::setForce() const
                 }
 
                 //Set value fields and write the probe
-                if(probeIt_)
+                if (probeIt_)
                 {
                     #include "setupProbeModelfields.H"
                     vValues.append(drag);   //first entry must the be the force

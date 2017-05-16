@@ -79,9 +79,9 @@ KochHillRWDrag::KochHillRWDrag
     RanGen_(label(0))
 {
 
-    if (propsDict_.found("verbose")) verbose_=true;
-    if (propsDict_.found("interpolation")) interpolation_=true;
-    if (propsDict_.found("randomTauE")) randomTauE_=true;
+    if (propsDict_.found("verbose")) verbose_ = true;
+    if (propsDict_.found("interpolation")) interpolation_ = true;
+    if (propsDict_.found("randomTauE")) randomTauE_ = true;
 
     // init force sub model
     setForceSubModels(propsDict_);
@@ -152,7 +152,7 @@ void KochHillRWDrag::setForce() const
     vector drag(0,0,0);
     vector dragExplicit(0,0,0);
     scalar dragCoefficient(0);
-    label cellI=0;
+    label cellI = 0;
 
     vector Us(0,0,0);
     vector Ur(0,0,0);
@@ -195,17 +195,17 @@ void KochHillRWDrag::setForce() const
 
     //Info << "RW-TEST: We are in setForce() at t = " << t << endl; // TEST-Output
 
-    for (int index=0; index<particleCloud_.numberOfParticles(); index++)
+    for (int index = 0; index<particleCloud_.numberOfParticles(); ++index)
     {
         //if (mask[index][0])
         //{
             cellI = particleCloud_.cellIDs()[index][0];
             drag = vector(0,0,0);
             dragExplicit = vector(0,0,0);
-            dragCoefficient=0;
+            dragCoefficient = 0;
             betaP = 0;
             Vs = 0;
-            Ufluid =vector(0,0,0);
+            Ufluid = vector(0,0,0);
 
             // Pout << "RW-TEST: cellI = " << cellI << endl; // TEST-Output
             if (cellI > -1) // particle Found
@@ -217,8 +217,8 @@ void KochHillRWDrag::setForce() const
                     Ufluid = UInterpolator_.interpolate(position,cellI);
                     //Ensure interpolated void fraction to be meaningful
                     // Info << " --> voidfraction: " << voidfraction << endl;
-                    if (voidfraction > 1.00) voidfraction = 1.00;
-                    if (voidfraction < 0.40) voidfraction = 0.40;
+                    if (voidfraction > 1.0) voidfraction = 1.0;
+                    else if (voidfraction < 0.4) voidfraction = 0.4;
                 }
                 else
                 {

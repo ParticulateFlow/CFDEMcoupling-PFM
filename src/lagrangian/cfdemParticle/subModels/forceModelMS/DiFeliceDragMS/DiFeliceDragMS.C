@@ -76,11 +76,11 @@ DiFeliceDragMS::DiFeliceDragMS
 {
     //Append the field names to be probed
     particleCloud_.probeM().initialize(typeName, typeName+".logDat");
-    particleCloud_.probeM().vectorFields_.append("dragForce"); //first entry must the be the force
-    particleCloud_.probeM().vectorFields_.append("Urel");        //other are debug
-    particleCloud_.probeM().scalarFields_.append("Rep");          //other are debug
-    particleCloud_.probeM().scalarFields_.append("Cd");                 //other are debug
-    particleCloud_.probeM().scalarFields_.append("voidfraction");       //other are debug
+    particleCloud_.probeM().vectorFields_.append("dragForce");    // first entry must the be the force
+    particleCloud_.probeM().vectorFields_.append("Urel");         // other are debug
+    particleCloud_.probeM().scalarFields_.append("Rep");          // other are debug
+    particleCloud_.probeM().scalarFields_.append("Cd");           // other are debug
+    particleCloud_.probeM().scalarFields_.append("voidfraction"); // other are debug
     particleCloud_.probeM().writeHeader();
 
     // init force sub model
@@ -98,11 +98,12 @@ DiFeliceDragMS::DiFeliceDragMS
     {
         Warning << " interpolation is commented for this force model - it seems to be unstable with AMI!" << endl;
     }
+
     if (propsDict_.found("splitImplicitExplicit"))
     {
         Info << "will split implicit / explicit force contributions." << endl;
         splitImplicitExplicit_ = true;
-        if(!forceSubM(0).interpolation()) 
+        if(!forceSubM(0).interpolation())
             Info << "WARNING: will only consider fluctuating particle velocity in implicit / explicit force split!" << endl;
     }
     particleCloud_.checkCG(false);
@@ -124,11 +125,11 @@ void DiFeliceDragMS::setForce() const
     const volScalarField& nufField = forceSubM(0).nuField();
     const volScalarField& rhoField = forceSubM(0).rhoField();
 
-    vector position(0,0,0);
+    //vector position(0,0,0);
     scalar voidfraction(1);
     vector Ufluid(0,0,0);
     vector drag(0,0,0);
-    label cellI=0;
+    label cellI = 0;
     vector Us(0,0,0);
     vector Ur(0,0,0);
     scalar ds(0);
@@ -138,17 +139,17 @@ void DiFeliceDragMS::setForce() const
     scalar Rep(0);
     scalar Cd(0);
 
-	vector UfluidFluct(0,0,0);
+    vector UfluidFluct(0,0,0);
     vector UsFluct(0,0,0);
     vector dragExplicit(0,0,0);
-  	scalar dragCoefficient(0);
+    scalar dragCoefficient(0);
 
     //interpolationCellPoint<scalar> voidfractionInterpolator_(voidfraction_);
     //interpolationCellPoint<vector> UInterpolator_(U_);
 
     #include "setupProbeModel.H"
 
-    for(int index = 0;index <  cloudRefMS().numberOfClumps(); index++)
+    for(int index = 0; index < cloudRefMS().numberOfClumps(); ++index)
     {
 
         //if(mask[index][0])  // would have to be transformed from body ID to particle ID
@@ -214,7 +215,7 @@ void DiFeliceDragMS::setForce() const
                     }
                 }
 
-                if(forceSubM(0).verbose() && index >=0 && index <10)
+                if(forceSubM(0).verbose() && index >= 0 && index < 10)
                 {
                     Pout << "index = " << index << endl;
                     Pout << "Us = " << Us << endl;
@@ -246,8 +247,13 @@ void DiFeliceDragMS::setForce() const
                     particleCloud_.probeM().writeProbe(index, sValues, vValues);
                 }
             }
+
             // set force on bodies
-            if(forceSubM(0).switches()[0]) for(int j=0;j<3;j++) cloudRefMS().expForcesCM()[index][j] += drag[j];
+            if (forceSubM(0).switches()[0])
+            {
+                for(int j=0;j<3;j++)
+                    cloudRefMS().expForcesCM()[index][j] += drag[j];
+            }
             else   //implicit treatment, taking explicit force contribution into account
             {
                 for(int j=0;j<3;j++)
@@ -256,7 +262,9 @@ void DiFeliceDragMS::setForce() const
                     cloudRefMS().expForcesCM()[index][j] += dragExplicit[j];
                 }
             }
-            for(int j=0;j<3;j++) cloudRefMS().DEMForcesCM()[index][j] += drag[j];
+
+            for(int j=0;j<3;j++)
+                cloudRefMS().DEMForcesCM()[index][j] += drag[j];
         //}
     }
 

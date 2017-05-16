@@ -97,8 +97,11 @@ BeetstraDrag::~BeetstraDrag()
 void BeetstraDrag::setForce() const
 {
     if (scaleDia_ > 1)
+    {
         Info << "Beetstra using scale = " << scaleDia_ << endl;
-    else if (particleCloud_.cg() > 1){
+    }
+    else if (particleCloud_.cg() > 1)
+    {
         scaleDia_=particleCloud_.cg();
         Info << "Beetstra using scale from liggghts cg = " << scaleDia_ << endl;
     }
@@ -125,13 +128,13 @@ void BeetstraDrag::setForce() const
 
     vector dragExplicit(0,0,0);
     scalar dragCoefficient(0);
-    
+
     interpolationCellPoint<scalar> voidfractionInterpolator_(voidfraction_);
     interpolationCellPoint<vector> UInterpolator_(U_);
 
     #include "setupProbeModel.H"
 
-    for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
+    for(int index = 0; index < particleCloud_.numberOfParticles(); ++index)
     {
             cellI = particleCloud_.cellIDs()[index][0];
             drag = vector(0,0,0);
@@ -163,7 +166,7 @@ void BeetstraDrag::setForce() const
                 Ur = Ufluid-Us;
                 magUr = mag(Ur);
                 ds = 2*particleCloud_.radius(index);
-		ds_scaled = ds/scaleDia_;
+                ds_scaled = ds/scaleDia_;
                 rho = rhoField[cellI];
                 nuf = nufField[cellI];
 
@@ -171,7 +174,7 @@ void BeetstraDrag::setForce() const
                 localPhiP = 1.0f-voidfraction+SMALL;
 
                 // calc particle's drag coefficient (i.e., Force per unit slip velocity and Stokes drag)
-               
+
                 Rep=ds_scaled*voidfraction*magUr/nuf+SMALL;
                 dragCoefficient = 10.0*localPhiP/(voidfraction*voidfraction) +
                                   voidfraction*voidfraction*(1.0+1.5*Foam::sqrt(localPhiP)) +

@@ -103,9 +103,9 @@ dSauter::dSauter
     setForceSubModels(propsDict_);
 
     if (propsDict_.found("scaleCG"))
-        scaleDia_=scalar(readScalar(propsDict_.lookup("scaleCG")));
+        scaleDia_ = scalar(readScalar(propsDict_.lookup("scaleCG")));
     if (propsDict_.found("scaleDist"))
-        scaleDiaDist_=scalar(readScalar(propsDict_.lookup("scaleDist")));
+        scaleDiaDist_ = scalar(readScalar(propsDict_.lookup("scaleDist")));
 }
 
 
@@ -118,22 +118,26 @@ dSauter::~dSauter()
 }
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
+
 void dSauter::allocateMyArrays() const
 {
     // get memory for 2d arrays
-    double initVal=0.0;
+    double initVal = 0.0;
     particleCloud_.dataExchangeM().allocateArray(d2_,initVal,1);  // field/initVal/with/lenghtFromLigghts
     particleCloud_.dataExchangeM().allocateArray(d3_,initVal,1);
 }
+
 // * * * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * * //
 
 void dSauter::setForce() const
 {
     if (scaleDia_ > 1)
+    {
         Info << "dSauter using scaleCG = " << scaleDia_ << endl;
+    }
     else if (particleCloud_.cg() > 1)
     {
-        scaleDia_=particleCloud_.cg();
+        scaleDia_ = particleCloud_.cg();
         Info << "dSauter using scaleCG from liggghts cg = " << scaleDia_ << endl;
     }
 
@@ -143,10 +147,10 @@ void dSauter::setForce() const
     scalar ds(0);
     scalar scale = scaleDiaDist_/scaleDia_;
 
-    for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)
+    for(int index = 0; index < particleCloud_.numberOfParticles(); ++index)
     {
         cellI = particleCloud_.cellIDs()[index][0];
-        if(cellI >= 0)
+        if (cellI >= 0)
         {
             ds = particleCloud_.d(index);
             d2_[index][0] = ds*ds;
@@ -175,13 +179,13 @@ void dSauter::setForce() const
 
     forAll(dSauter_,cellI)
     {
-        if(d2Field_[cellI] > ROOTVSMALL)
+        if (d2Field_[cellI] > ROOTVSMALL)
         {
-             dSauter_[cellI] = d3Field_[cellI] / d2Field_[cellI] * scale;
+            dSauter_[cellI] = d3Field_[cellI] / d2Field_[cellI] * scale;
         }
         else
         {
-          dSauter_[cellI] = SMALL;
+            dSauter_[cellI] = SMALL;
         }
     }
 

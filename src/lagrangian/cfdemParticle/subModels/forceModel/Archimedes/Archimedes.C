@@ -88,13 +88,15 @@ Archimedes::Archimedes
     forceSubM(0).setSwitchesList(1,true); // activate treatForceDEM switch
     forceSubM(0).readSwitches();
 
-    if (modelType_=="A" || modelType_=="Bfull"){
+    if (modelType_=="A" || modelType_=="Bfull")
+    {
         if(!forceSubM(0).switches()[1]) // treatDEM != true
         {
             Warning << "Usually model type A and Bfull need Archimedes only on DEM side only (treatForceDEM=true)! are you sure about your settings?" << endl;
         }
     }
-    if (modelType_=="B"){
+    else if (modelType_=="B")
+    {
         if(forceSubM(0).switches()[1]) // treatDEM = true
         {
             Warning << "Usually model type B needs Archimedes on CFD and DEM side (treatForceDEM=false)! are you sure about your settings?" << endl;
@@ -119,7 +121,7 @@ void Archimedes::setForce() const
 
     #include "setupProbeModel.H"
 
-    for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
+    for(int index = 0; index < particleCloud_.numberOfParticles(); ++index)
     {
         //if(mask[index][0])
         //{
@@ -133,7 +135,9 @@ void Archimedes::setForce() const
                     scalar r = particleCloud_.radius(index);
                     force = -g_.value()*forceSubM(0).rhoField()[cellI]*r*r*M_PI; // circle area
                     Warning << "Archimedes::setForce() : this functionality is not tested!" << endl;
-                }else{
+                }
+                else
+                {
                     force = -g_.value()*forceSubM(0).rhoField()[cellI]*particleCloud_.particleVolume(index);
                 }
 

@@ -109,7 +109,7 @@ void ArchimedesIB::setForce() const
 
     #include "setupProbeModel.H"
 
-    for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
+    for(int index = 0; index < particleCloud_.numberOfParticles(); ++index)
     {
         //if(mask[index][0])
         //{

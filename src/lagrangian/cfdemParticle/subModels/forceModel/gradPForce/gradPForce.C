@@ -84,14 +84,16 @@ gradPForce::gradPForce
     if (modelType_ == "B")
     {
         FatalError <<"using  model gradPForce with model type B is not valid\n" << abort(FatalError);
-    }else if (modelType_ == "Bfull")
+    }
+    else if (modelType_ == "Bfull")
     {
         if(forceSubM(0).switches()[1])
         {
             Info << "Using treatForceDEM false!" << endl;
             forceSubM(0).setSwitches(1,false); // treatForceDEM = false
         }
-    }else // modelType_=="A"
+    }
+    else // modelType_=="A"
     {
         if(!forceSubM(0).switches()[1])
         {
@@ -100,10 +102,12 @@ gradPForce::gradPForce
         }
     }
 
-    if (propsDict_.found("useU")) useU_=true;
-    if (propsDict_.found("useAddedMass")) 
+    if (propsDict_.found("useU"))
+        useU_ = true;
+
+    if (propsDict_.found("useAddedMass"))
     {
-        addedMassCoeff_ =  readScalar(propsDict_.lookup("useAddedMass"));
+        addedMassCoeff_ = readScalar(propsDict_.lookup("useAddedMass"));
         Info << "gradP will also include added mass with coefficient: " << addedMassCoeff_ << endl;
         Info << "WARNING: use fix nve/sphere/addedMass in LIGGGHTS input script to correctly account for added mass effects!" << endl;
     }
@@ -152,21 +156,22 @@ void gradPForce::setForce() const
 
     #include "setupProbeModel.H"
 
-    for(int index = 0;index <  particleCloud_.numberOfParticles(); index++)
+    for(int index = 0; index < particleCloud_.numberOfParticles(); ++index)
     {
         //if(mask[index][0])
         //{
-            force=vector(0,0,0);
+            force = vector(0,0,0);
             cellI = particleCloud_.cellIDs()[index][0];
 
             if (cellI > -1) // particle Found
             {
                 position = particleCloud_.position(index);
 
-                if(forceSubM(0).interpolation()) // use intepolated values for alpha (normally off!!!)
+                if (forceSubM(0).interpolation()) // use intepolated values for alpha (normally off!!!)
                 {
                     gradP = gradPInterpolator_.interpolate(position,cellI);
-                }else
+                }
+                else
                 {
                     gradP = gradPField[cellI];
                 }
@@ -180,7 +185,7 @@ void gradPForce::setForce() const
                 else
                     force = -Vs*gradP*(1.0+addedMassCoeff_);
 
-                if(forceSubM(0).verbose() && index >=0 && index <2)
+                if (forceSubM(0).verbose() && index >= 0 && index < 2)
                 {
                     Info << "index = " << index << endl;
                     Info << "gradP = " << gradP << endl;
@@ -188,7 +193,7 @@ void gradPForce::setForce() const
                 }
 
                 //Set value fields and write the probe
-                if(probeIt_)
+                if (probeIt_)
                 {
                     #include "setupProbeModelfields.H"
                     vValues.append(force);           //first entry must the be the force

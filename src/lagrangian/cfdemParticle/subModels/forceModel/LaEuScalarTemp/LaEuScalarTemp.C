@@ -113,7 +113,7 @@ LaEuScalarTemp::~LaEuScalarTemp()
 void LaEuScalarTemp::allocateMyArrays() const
 {
     // get memory for 2d arrays
-    double initVal=0.0;
+    double initVal = 0.0;
     particleCloud_.dataExchangeM().allocateArray(partTemp_,initVal,1);  // field/initVal/with/lenghtFromLigghts
     particleCloud_.dataExchangeM().allocateArray(partHeatFlux_,initVal,1);
 }
@@ -156,14 +156,14 @@ void LaEuScalarTemp::manipulateScalarField(volScalarField& EuField) const
     interpolationCellPoint<vector> UInterpolator_(U_);
     interpolationCellPoint<scalar> TInterpolator_(tempField_);
 
-    for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)
+    for(int index = 0; index < particleCloud_.numberOfParticles(); ++index)
     {
         //if(particleCloud_.regionM().inRegion()[index][0])
         //{
             cellI = particleCloud_.cellIDs()[index][0];
-            if(cellI >= 0)
+            if (cellI >= 0)
             {
-                if(forceSubM(0).interpolation())
+                if (forceSubM(0).interpolation())
                 {
                     vector position = particleCloud_.position(index);
                     voidfraction = voidfractionInterpolator_.interpolate(position,cellI);
@@ -206,7 +206,7 @@ void LaEuScalarTemp::manipulateScalarField(volScalarField& EuField) const
                 partHeatFlux_[index][0] = partHeatFlux;
 
 
-                if(forceSubM(0).verbose() && index >=0 && index <2)
+                if(forceSubM(0).verbose() && index >= 0 && index < 2)
                 {
                     Info << "partHeatFlux = " << partHeatFlux << endl;
                     Info << "magUr = " << magUr << endl;

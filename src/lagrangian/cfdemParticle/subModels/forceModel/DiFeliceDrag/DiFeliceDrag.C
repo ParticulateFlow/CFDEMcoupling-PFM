@@ -34,8 +34,6 @@ Description
 #include "DiFeliceDrag.H"
 #include "addToRunTimeSelectionTable.H"
 
-//#include <mpi.h>
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -75,11 +73,11 @@ DiFeliceDrag::DiFeliceDrag
 {
     //Append the field names to be probed
     particleCloud_.probeM().initialize(typeName, typeName+".logDat");
-    particleCloud_.probeM().vectorFields_.append("dragForce"); //first entry must the be the force
-    particleCloud_.probeM().vectorFields_.append("Urel");        //other are debug
-    particleCloud_.probeM().scalarFields_.append("Rep");          //other are debug
-    particleCloud_.probeM().scalarFields_.append("Cd");                 //other are debug
-    particleCloud_.probeM().scalarFields_.append("voidfraction");       //other are debug
+    particleCloud_.probeM().vectorFields_.append("dragForce");    // first entry must the be the force
+    particleCloud_.probeM().vectorFields_.append("Urel");         // other are debug
+    particleCloud_.probeM().scalarFields_.append("Rep");          // other are debug
+    particleCloud_.probeM().scalarFields_.append("Cd");           // other are debug
+    particleCloud_.probeM().scalarFields_.append("voidfraction"); // other are debug
     particleCloud_.probeM().writeHeader();
 
     particleCloud_.checkCG(true);
@@ -114,15 +112,18 @@ DiFeliceDrag::~DiFeliceDrag()
 void DiFeliceDrag::setForce() const
 {
     if (scaleDia_ > 1)
+    {
         Info << "DiFeliceDrag using scale = " << scaleDia_ << endl;
-    else if (particleCloud_.cg() > 1){
+    }
+    else if (particleCloud_.cg() > 1)
+    {
         scaleDia_=particleCloud_.cg();
         Info << "DiFeliceDrag using scale from liggghts cg = " << scaleDia_ << endl;
     }
 
     const volScalarField& nufField = forceSubM(0).nuField();
     const volScalarField& rhoField = forceSubM(0).rhoField();
-    
+
     vector position(0,0,0);
     scalar voidfraction(1);
     vector Ufluid(0,0,0);
@@ -144,7 +145,7 @@ void DiFeliceDrag::setForce() const
 
     #include "setupProbeModel.H"
 
-    for(int index = 0;index <  particleCloud_.numberOfParticles(); index++)
+    for(int index = 0; index < particleCloud_.numberOfParticles(); ++index)
     {
             cellI = particleCloud_.cellIDs()[index][0];
             drag = vector(0,0,0);
@@ -159,7 +160,8 @@ void DiFeliceDrag::setForce() const
                     position = particleCloud_.position(index);
                     voidfraction = voidfractionInterpolator_.interpolate(position,cellI);
                     Ufluid = UInterpolator_.interpolate(position,cellI);
-                }else
+                }
+                else
                 {
                     voidfraction = voidfraction_[cellI];
                     Ufluid = U_[cellI];
@@ -189,8 +191,8 @@ void DiFeliceDrag::setForce() const
                     // calc particle's drag
                     dragCoefficient = 0.125*Cd*rho
                                      *M_PI
-                                     *ds*ds     
-                                     *scaleDia_ 
+                                     *ds*ds
+                                     *scaleDia_
                                      *pow(voidfraction,(2-Xi))*magUr
                                      *scaleDrag_;
                     if (modelType_=="B")

@@ -134,7 +134,7 @@ void KochHillDrag::setForce() const
     vector drag(0,0,0);
     vector dragExplicit(0,0,0);
     scalar dragCoefficient(0);
-    label cellI=0;
+    label cellI = 0;
 
     vector Us(0,0,0);
     vector Ur(0,0,0);
@@ -154,16 +154,16 @@ void KochHillDrag::setForce() const
 
     #include "setupProbeModel.H"
 
-    for (int index=0; index<particleCloud_.numberOfParticles(); index++)
+    for (int index = 0; index<particleCloud_.numberOfParticles(); ++index)
     {
             cellI = particleCloud_.cellIDs()[index][0];
             drag = vector(0,0,0);
             dragExplicit = vector(0,0,0);
-            dragCoefficient=0;
+            dragCoefficient = 0;
             betaP = 0;
             Vs = 0;
-            Ufluid =vector(0,0,0);
-            voidfraction=0;
+            Ufluid = vector(0,0,0);
+            voidfraction = 0;
 
             if (cellI > -1) // particle Found
             {
@@ -174,8 +174,8 @@ void KochHillDrag::setForce() const
                     Ufluid = UInterpolator_.interpolate(position,cellI);
                     //Ensure interpolated void fraction to be meaningful
                     // Info << " --> voidfraction: " << voidfraction << endl;
-                    if (voidfraction > 1.00) voidfraction = 1.00;
-                    if (voidfraction < 0.40) voidfraction = 0.40;
+                    if (voidfraction > 1.0) voidfraction = 1.0;
+                    else if (voidfraction < 0.4) voidfraction = 0.4;
                 }
                 else
                 {
@@ -227,7 +227,7 @@ void KochHillDrag::setForce() const
 
                     // calc particle's drag
                     dragCoefficient = Vs*betaP*scaleDrag_;
-                    if (modelType_=="B")
+                    if (modelType_ == "B")
                         dragCoefficient /= voidfraction;
 
                     if (forceSubM(0).switches()[7]) // implForceDEMaccumulated=true
@@ -270,7 +270,7 @@ void KochHillDrag::setForce() const
                     sValues.append(betaP);
                     sValues.append(voidfraction);
                     particleCloud_.probeM().writeProbe(index, sValues, vValues);
-                }    
+                }
             }
 
             // write particle based data to global array
