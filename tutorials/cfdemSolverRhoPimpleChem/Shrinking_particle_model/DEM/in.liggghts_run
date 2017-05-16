@@ -16,7 +16,7 @@ processors      2 2 1
 read_restart    ../DEM/post/restart/liggghts.restart
 
 neighbor        0.0005 bin
-neigh_modify    delay 0 binsize 0.01 ##0.01
+neigh_modify    delay 0 binsize 0.01 
 
 
 # Material properties required for granular pair styles
@@ -31,17 +31,18 @@ pair_style  gran model hertz tangential history # Hertzian without cohesion
 pair_coeff  * *
 
 # timestep, gravity
-timestep    1e-6
+timestep    0.000001
 fix         gravi all gravity 0.0 vector 0.0 -1.0 0.0
 
 # walls
 fix     xwalls1 all wall/gran model hertz tangential history primitive type 1 xplane 0.0
-fix     xwalls2 all wall/gran model hertz tangential history primitive type 1 xplane 1.5
+fix     xwalls2 all wall/gran model hertz tangential history primitive type 1 xplane 15.0
 fix     ywalls1 all wall/gran model hertz tangential history primitive type 1 yplane 0.0
-fix     ywalls2 all wall/gran model hertz tangential history primitive type 1 yplane 0.5
+fix     ywalls2 all wall/gran model hertz tangential history primitive type 1 yplane 5.0
 fix     zwalls1 all wall/gran model hertz tangential history primitive type 1 zplane 0.0
-fix     zwalls2 all wall/gran model hertz tangential history primitive type 1 zplane 0.5
+fix     zwalls2 all wall/gran model hertz tangential history primitive type 1 zplane 5.0
 
+###############################################
 # cfd coupling
 fix     cfd all couple/cfd couple_every 100 mpi
 fix     cfd2 all couple/cfd/force
@@ -56,6 +57,7 @@ fix     cfd4 all chem/shrink speciesA O2 molMassA 31.99 speciesC CO2 molMassC 44
 # apply nve integration to all particles that are inserted as single particles
 fix     integr all nve/sphere
 
+###############################################
 # print radius change according to timestep
 compute radChange all property/atom radius
 compute radreduce all reduce sum c_radChange
@@ -65,6 +67,7 @@ compute masschange all property/atom mass
 compute massreduce all reduce sum c_masschange
 fix     rmass all ave/time 25 1 25 c_massreduce file rmass.dat 
 
+###############################################
 # screen output
 compute         rke all erotate/sphere
 thermo_style    custom step atoms ke c_rke vol

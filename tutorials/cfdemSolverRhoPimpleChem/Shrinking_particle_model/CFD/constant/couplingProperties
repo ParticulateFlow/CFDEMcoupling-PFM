@@ -80,7 +80,10 @@ energyModels
 
 thermCondModel off;//SyamlalThermCond;//thermCondModel;
 
-chemistryModel	species;
+chemistryModels	
+(
+    species
+);
 
 momCoupleModels
 (
