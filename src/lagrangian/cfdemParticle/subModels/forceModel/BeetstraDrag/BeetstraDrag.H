@@ -59,6 +59,35 @@ private:
 
     mutable scalar scaleDrag_;
 
+    mutable scalar rhoP_;
+
+    mutable scalar rho_;
+
+    mutable scalar Lc2_;
+
+    mutable scalar dPrim_;
+
+    mutable scalar nuf_;
+
+    mutable scalar g_;
+
+    mutable scalar k_;
+
+    bool useGC_;
+
+    bool usePC_;
+
+protected:
+    double F(double, double) const;
+
+    double terminalVelocity(double, double, double, double, double, double) const; 
+
+    double a(double) const;
+
+    double h(double) const;
+
+
+
 public:
 
     //- Runtime type information

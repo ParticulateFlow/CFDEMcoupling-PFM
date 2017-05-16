@@ -162,12 +162,15 @@ KochHillDragProps
 BeetstraDragProps
 {
     velFieldName "U";
-    gravityFieldName "g";
-    rhoParticle     2000.;
     voidfractionFieldName "voidfraction";
+    granVelFieldName "Us";
     interpolation true;
-    useFilteredDragModel ;
-    useParcelSizeDependentFilteredDrag ;
+//    useFilteredDragModel;
+//    useParcelSizeDependentFilteredDrag;
+    g       9.81;
+    rhoP    7000.;
+    rho     10.;
+    nuf     1.5e-4;
     k       0.05;
     aLimit  0.0;
 //    verbose true;
