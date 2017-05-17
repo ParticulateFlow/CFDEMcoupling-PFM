@@ -48,6 +48,8 @@ protected:
 
     void computeRecPath();
     
+    void computeJumpVector();
+    
     label seqEnd(label, label&);
     
    

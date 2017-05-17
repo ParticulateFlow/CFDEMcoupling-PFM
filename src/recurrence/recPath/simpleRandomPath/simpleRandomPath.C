@@ -151,6 +151,7 @@ void simpleRandomPath::computeRecPath()
         recSteps+=seqLength;
     }
     Info<< "\nComputing recurrence path done\n" << endl;
+    computeJumpVector();
 }
 
 label simpleRandomPath::seqEnd(label seqStart, label & seqLength)
@@ -160,6 +161,48 @@ label simpleRandomPath::seqEnd(label seqStart, label & seqLength)
       seqLength=numRecFields-1-seqStart;
   return seqStart+seqLength;
 }
+
+void simpleRandomPath::computeJumpVector()
+{
+    Info << "\nComputing recurrence jump vector\n" << endl;
+    
+    OFstream jumpvec("rec_jump.dat");
+    label numRecFields( base_.recM().numRecFields() );
+    label startLoop = 0;
+    label endLoop = 0;
+    SymmetricSquareMatrix<scalar>& recurrenceMatrix( base_.recM().recurrenceMatrix() );
+    
+    for (label i = 0; i < numRecFields; i++)
+    {
+       if (i < numRecFields/2)
+        {
+        	startLoop = numRecFields/2;
+        	endLoop = numRecFields-1;
+        }
+        else
+        {
+        	startLoop = 0;
+        	endLoop = numRecFields/2-1;
+        }
+        
+        scalar nextMinimum(GREAT);
+	label jumpdest = 0;
+        for (label j = startLoop; j < endLoop; j++)
+        {
+        	if (recurrenceMatrix[j][i] < nextMinimum)
+        	{
+        		nextMinimum = recurrenceMatrix[j][i];
+        		jumpdest = j+1;
+        		continue;
+        	}
+        }
+
+        jumpvec << jumpdest << endl;
+    }
+    
+    Info<< "\nComputing recurrence jump vector done\n" << endl;
+}
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
