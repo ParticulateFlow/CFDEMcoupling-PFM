@@ -36,12 +36,12 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-inline label cfdemCloudMS::body(int index)
+inline label cfdemCloudMS::body(int index) const
 {
     return bodies_[0][index]-1;
 }
 
-inline double cfdemCloudMS::particleVolume(int index)
+inline double cfdemCloudMS::particleVolume(int index) const
 {
     int ind = body(index); // particle to clump ID
 
@@ -50,7 +50,7 @@ inline double cfdemCloudMS::particleVolume(int index)
         Vp=clumpVol_[ind][0];
     else
         Warning << "ind=" << ind << endl;
-    
+
     int nR(nrigid(ind));
     if(nR>0) Vp/=nR;
     return Vp;
@@ -75,7 +75,7 @@ inline label cfdemCloudMS::cellIDCM(int index)
     return cellIDsCM_[index][0];
 }
 
-inline label cfdemCloudMS::nrigid(int index)
+inline label cfdemCloudMS::nrigid(int index) const
 {
     return nrigids_[0][index];
 }

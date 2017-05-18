@@ -245,16 +245,16 @@ public:
             for (int i=0;i<n;i++)
                 for (int j=0;j<3;j++)
                     particleCloud_.positions_[i][j]=pos[i*3+j];
-        };
+        }
         inline void setCellIDs(label n,int* ID) const
         {
             for (int i=0;i<n;i++)
                 particleCloud_.cellIDs_[i][0]=ID[i];
-        };
+        }
 
         virtual word myType() const=0;
 
-        virtual void setCG() const { Warning << "setCG() not executed correctly!" << endl; }
+        virtual void setCG() { Warning << "setCG() not executed correctly!" << endl; }
 };
 
 

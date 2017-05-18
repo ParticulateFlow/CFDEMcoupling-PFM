@@ -250,7 +250,7 @@ public:
 
        label liggghtsCommandModelIndex(word);
 
-       inline void setCG(double) const;
+       inline void setCG(double);
 
        inline const scalar& cg() const;
 
@@ -300,13 +300,13 @@ public:
 
        inline double ** particleWeights() const;
 
-       virtual inline label body(int);
+       virtual inline label body(int) const;
 
-       virtual inline double particleVolume(int);
+       virtual inline double particleVolume(int) const;
 
-       inline scalar radius(int);
+       inline scalar radius(int) const;
 
-       virtual inline double d(int);
+       virtual inline double d(int) const;
 
        inline scalar d32(bool recalc=true);
        virtual inline double dMin() {return -1;}
@@ -347,7 +347,7 @@ public:
 
        inline const momCoupleModel& momCoupleM(int) const;
 
-       inline const dataExchangeModel& dataExchangeM() const;
+       inline dataExchangeModel& dataExchangeM();
 
        inline const IOModel& IOM() const;
 

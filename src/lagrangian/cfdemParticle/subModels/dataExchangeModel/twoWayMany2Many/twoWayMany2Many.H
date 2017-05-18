@@ -114,7 +114,7 @@ private:
     mutable int *cellID_foam_;
     mutable double *pos_foam_;
 
-    const polyBoundaryMesh& pbm_; 
+    const polyBoundaryMesh& pbm_;
     const globalMeshData& pData_;
     const labelList& procPatches_;
     const labelList& procPatchIndices_;
@@ -209,7 +209,7 @@ public:
         void syncIDs() const;
         void locateParticle(int*, bool) const;
         word myType() const { return typeName; }
-        void setCG() const { particleCloud_.setCG(lmp->force->cg()); }
+        void setCG() { particleCloud_.setCG(lmp->force->cg()); }
 };
 
 

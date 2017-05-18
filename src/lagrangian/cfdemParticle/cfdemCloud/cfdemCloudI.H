@@ -44,7 +44,7 @@ namespace Foam
 {
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-inline void cfdemCloud::setCG(double cg) const
+inline void cfdemCloud::setCG(double cg)
 {
     cg_ = cg;
     Info << "cg is set to: " << cg_ << endl;
@@ -177,24 +177,24 @@ inline double ** cfdemCloud::particleWeights() const
     return particleWeights_;
 }
 
-inline label cfdemCloud::body(int index)
+inline label cfdemCloud::body(int index) const
 {
     return index;
 }
 
-inline double cfdemCloud::particleVolume(int index)
+inline double cfdemCloud::particleVolume(int index) const
 {
     return particleV_[index][0];
 }
 
-inline scalar cfdemCloud::radius(int index)
+inline scalar cfdemCloud::radius(int index) const
 {
     return radii_[index][0];
 }
 
-inline double cfdemCloud::d(int index)
+inline double cfdemCloud::d(int index) const
 {
-    return 2*radii_[index][0];
+    return 2.*radii_[index][0];
 }
 
 inline double cfdemCloud::d32(bool recalc)
@@ -252,9 +252,9 @@ inline const momCoupleModel& cfdemCloud::momCoupleM(int i) const
     return momCoupleModel_[i];
 }
 
-inline const dataExchangeModel& cfdemCloud::dataExchangeM() const
+inline dataExchangeModel& cfdemCloud::dataExchangeM()
 {
-    return dataExchangeModel_;
+    return dataExchangeModel_();
 }
 
 inline const IOModel& cfdemCloud::IOM() const
