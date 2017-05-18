@@ -4,7 +4,7 @@
 sinclude $(GENERAL_RULES)/mplib$(WM_MPLIB)
 sinclude $(RULES)/mplib$(WM_MPLIB)
 
-GIT_VERSION := $(shell git describe --abbrev=4 --dirty --always --tags)
+GIT_VERSION := $(shell git describe --dirty --always --tags)
 PFLAGS+= -DGITVERSION=\"$(GIT_VERSION)\"
 PFLAGS+= -Dcompre
 
@@ -24,6 +24,9 @@ EXE_INC = \
     -I$(CFDEM_LIGGGHTS_SRC_DIR) \
     -I$(CFDEM_M2MLIB_PATH) \
     -I$(CFDEM_SRC_DIR)/cfdTools \
+    -Wno-old-style-cast \
+    -Wno-unused-result \
+    -Wno-literal-suffix
 
 LIB_LIBS = \
      $(PLIBS) \
