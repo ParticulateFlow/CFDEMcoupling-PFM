@@ -194,7 +194,7 @@ void constDiffSmoothing::smoothenReferenceField(volVectorField& fieldSrc) const
         (
             IOobject
             (
-                "xxx",
+                "NLarge",
                 particleCloud_.mesh().time().timeName(),
                 particleCloud_.mesh(),
                 IOobject::NO_READ,
