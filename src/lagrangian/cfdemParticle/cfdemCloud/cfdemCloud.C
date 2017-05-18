@@ -497,16 +497,6 @@ label cfdemCloud::liggghtsCommandModelIndex(word name)
     return index;
 }
 
-std::vector< std::vector<double*> >* cfdemCloud::getVprobe()
-{
- return probeModel_->getVprobe();
-}
-
-std::vector< std::vector<double> >* cfdemCloud::getSprobe()
-{
- return probeModel_->getSprobe();
-}
-
 // * * * * * * * * * * * * * * * WRITE  * * * * * * * * * * * * * //
 
 // * * *   write cfdemCloud internal data   * * * //

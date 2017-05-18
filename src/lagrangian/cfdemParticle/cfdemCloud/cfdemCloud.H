@@ -49,7 +49,7 @@ SourceFiles
 #include "fvCFD.H"
 #include "IFstream.H"
 
-#include <turbulenceModel.H>
+#include "turbulenceModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -351,7 +351,7 @@ public:
 
        inline const IOModel& IOM() const;
 
-       inline const probeModel& probeM() const;
+       inline probeModel& probeM();
 
        inline const averagingModel& averagingM() const;
 
@@ -393,10 +393,6 @@ public:
         tmp<volScalarField> voidfractionNuEff(volScalarField&) const;
 
         void resetArray(double**&,int,int,double resetVal=0.);
-
-        std::vector< std::vector<double*> >* getVprobe();
-
-        std::vector< std::vector<double> >* getSprobe();
 
         void otherForces(volVectorField&);
 };
