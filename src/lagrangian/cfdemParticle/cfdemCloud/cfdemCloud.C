@@ -431,8 +431,7 @@ void cfdemCloud::setPos(double**& pos)
 
 label cfdemCloud::particleCell(int index)
 {
-    label cellI = cellIDs()[index][0];
-    return cellI;
+    return cellIDs()[index][0];
 }
 
 vector cfdemCloud::position(int index)
@@ -485,16 +484,14 @@ scalar cfdemCloud::voidfraction(int index)
 
 label cfdemCloud::liggghtsCommandModelIndex(word name)
 {
-    int index=-1;
     forAll(liggghtsCommandModelList_,i)
     {
         if(liggghtsCommand()[i]().name() == name)
         {
-            index = i;
-            break;
+            return i;
         }
     }
-    return index;
+    return -1;
 }
 
 // * * * * * * * * * * * * * * * WRITE  * * * * * * * * * * * * * //
