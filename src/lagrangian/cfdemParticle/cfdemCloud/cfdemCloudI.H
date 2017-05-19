@@ -50,32 +50,32 @@ inline void cfdemCloud::setCG(double cg)
     Info << "cg is set to: " << cg_ << endl;
 }
 
-inline const bool& cfdemCloud::impDEMdrag() const
+inline bool cfdemCloud::impDEMdrag() const
 {
     return impDEMdrag_;
 }
 
-inline const bool& cfdemCloud::impDEMdragAcc() const
+inline bool cfdemCloud::impDEMdragAcc() const
 {
     return impDEMdragAcc_;
 }
 
-inline const scalar& cfdemCloud::imExSplitFactor() const
+inline scalar cfdemCloud::imExSplitFactor() const
 {
     return imExSplitFactor_;
 }
 
-inline const bool& cfdemCloud::treatVoidCellsAsExplicitForce() const
+inline bool cfdemCloud::treatVoidCellsAsExplicitForce() const
 {
     return treatVoidCellsAsExplicitForce_;
 }
 
-inline const scalar& cfdemCloud::cg() const
+inline scalar cfdemCloud::cg() const
 {
     return cg_;
 }
 
-inline const bool& cfdemCloud::ignore() const
+inline bool cfdemCloud::ignore() const
 {
     return ignore_;
 }

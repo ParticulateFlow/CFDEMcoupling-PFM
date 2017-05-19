@@ -252,17 +252,17 @@ public:
 
        inline void setCG(double);
 
-       inline const scalar& cg() const;
+       inline scalar cg() const;
 
-       inline const bool& impDEMdrag() const;
+       inline bool impDEMdrag() const;
 
-       inline const bool& impDEMdragAcc() const;
+       inline bool impDEMdragAcc() const;
 
-       inline const scalar& imExSplitFactor() const;
+       inline scalar imExSplitFactor() const;
 
-       inline const bool& treatVoidCellsAsExplicitForce() const;
+       inline bool treatVoidCellsAsExplicitForce() const;
 
-       inline const bool& ignore() const;
+       inline bool ignore() const;
 
        inline const fvMesh& mesh() const;
 
