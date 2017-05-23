@@ -274,6 +274,10 @@ void diffusionCoefficient::execute()
                                 // X is molar fraction / Dij binary diff coeff.
                                 dCoeff_[i]  +=  (Xfluid_[j]/dBinary_[i]);
                                 dCoeff_[i]  =   (1-Xfluid_[i])*(1/dCoeff_[i]);
+                                // According to Maier (who referred to wilke but in Wilke's paper its written as the previous eq.)
+                                // and Nietros
+                                // dCoeff_[i]   +=   Xfluid_[i]/dCoeff_[i];
+                                // dCoeff_[i]   =   1/dCoeff_[i];
                                 Info << "dCoeff: " << dCoeff_[i] << nl << endl;
                             }else
                             {
