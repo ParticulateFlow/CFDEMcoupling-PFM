@@ -47,7 +47,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class noDrag Declaration
+                           Class standardClock Declaration
 \*---------------------------------------------------------------------------*/
 
 class standardClock
@@ -67,7 +67,7 @@ public:
         standardClock
         (
             const dictionary& dict,
-            cfdemCloud& sm
+            const Time& time
         );
 
     // Destructor

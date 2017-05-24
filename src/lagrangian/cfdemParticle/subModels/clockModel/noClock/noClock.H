@@ -47,7 +47,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class noDrag Declaration
+                           Class noClock Declaration
 \*---------------------------------------------------------------------------*/
 
 class noClock
@@ -67,7 +67,7 @@ public:
         noClock
         (
             const dictionary& dict,
-            cfdemCloud& sm
+            const Time& time
         );
 
     // Destructor
@@ -79,8 +79,8 @@ public:
 
         void start(int pos) const {}
         void start(int pos,const std::string& identifier) const {}
-        void stop() const {}
-        void stop(const std::string& identifier) const {}
+        void stop() {}
+        void stop(const std::string& identifier) {}
         std::string eval() const { return ""; }
         void evalFile() const {}
         void evalPar() const {}

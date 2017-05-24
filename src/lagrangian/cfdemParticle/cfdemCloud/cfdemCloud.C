@@ -196,7 +196,7 @@ cfdemCloud::cfdemCloud
         clockModel::New
         (
             couplingProperties_,
-            *this
+            mesh.time()
         )
     ),
     smoothingModel_
