@@ -31,7 +31,7 @@ FoamFile
 
 modelType "A"; // A or B
 
-couplingInterval 100;//1000;
+couplingInterval 100;
 
 voidFractionModel divided;//centre;//
 
@@ -84,6 +84,7 @@ chemistryModels
 (
     species
     diffusionCoefficients
+    massTransferCoeff
     // off
 );
 
@@ -126,6 +127,15 @@ diffusionCoefficientsProps
                                      // H2
                                 ); 
 }
+
+massTransferCoeffProps
+{
+    velFieldName    "U";
+    voidfractionFieldName   "voidfraction";
+    partNuName      "nu";
+    partReynolds    "Rep";
+}
+
 
 SyamlalThermCondProps
 {
