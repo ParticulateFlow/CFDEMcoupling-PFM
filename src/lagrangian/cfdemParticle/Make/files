@@ -34,6 +34,7 @@ $(chemistryModels)/chemistryModel/newChemistryModel.C
 $(chemistryModels)/species/species.C
 $(chemistryModels)/noChemistry/noChemistry.C
 $(chemistryModels)/diffusionCoefficients/diffusionCoefficients.C
+$(chemistryModels)/massTransferCoeff/massTransferCoeff.C
 
 $(energyModels)/energyModel/energyModel.C
 $(energyModels)/energyModel/newEnergyModel.C
