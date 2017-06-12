@@ -189,9 +189,6 @@ void diffusionCoefficient::execute()
 
     double **molNum_ = new double*[diffusantGasNames_.size()];
     double **volDiff_ = new double*[diffusantGasNames_.size()];
-
-    // scalar dBinary(0.0);
-    // scalar dCoeff(0.0);
     
     // word speciesPair("none");
     // word diffusingSpecies("none");
@@ -358,8 +355,11 @@ void diffusionCoefficient::molWeightTable()
 // either calculate Molecular Weight addition (eq. D_ij) or consturct hashtable with diffusant and fifuser species
 void diffusionCoefficient::calcMolNum(int i, int j, double **molNum_)
 {
-    molNum_[i][j] = (1/molWeight(diffusantGasNames_[i])+1/molWeight(speciesNames_[j]));
-    molNum_[i][j] = pow(molNum_[i][j],0.5);
+    double& W1 = molWeight(diffusantGasNames_[i]);
+    double& W2 = molWeight(speciesNames_[j]);
+
+    molNum_[i][j]   =   (W1 * W2) / (W1 + W2);
+    molNum_[i][j]   =   sqrt(molNum_[i][j]);
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
