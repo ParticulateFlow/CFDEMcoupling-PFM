@@ -135,18 +135,18 @@ heatTransferGunn::heatTransferGunn
     {
         if (propsDict_.found("partRefTemp"))
 	    partRefTemp_.value()=readScalar(propsDict_.lookup ("partRefTemp"));
-	partTempField_.writeOpt() = IOobject::AUTO_WRITE;
-	partRelTempField_.writeOpt() = IOobject::AUTO_WRITE;
-	partTempField_.write();
-	partRelTempField_.write();
-	Info <<  "Particle temperature field activated." << endl;
+        partTempField_.writeOpt() = IOobject::AUTO_WRITE;
+        partRelTempField_.writeOpt() = IOobject::AUTO_WRITE;
+        partTempField_.write();
+        partRelTempField_.write();
+        Info <<  "Particle temperature field activated." << endl;
     }
     if (verbose_)
     {
         ReField_.writeOpt() = IOobject::AUTO_WRITE;
-	NuField_.writeOpt() = IOobject::AUTO_WRITE;
-	ReField_.write();
-	NuField_.write();
+        NuField_.writeOpt() = IOobject::AUTO_WRITE;
+        ReField_.write();
+        NuField_.write();
     }
 }
 
@@ -155,10 +155,12 @@ heatTransferGunn::heatTransferGunn
 
 heatTransferGunn::~heatTransferGunn()
 {
-    delete partTemp_;
-    delete partHeatFlux_;
-    delete partRe_;
-    delete partNu_;
+    int nP_ = particleCloud_.numberOfParticles();
+
+    particleCloud_.dataExchangeM().destroy(partTemp_,nP_);
+    particleCloud_.dataExchangeM().destroy(partHeatFlux_,nP_);
+    particleCloud_.dataExchangeM().destroy(partRe_,nP_);
+    particleCloud_.dataExchangeM().destroy(partNu_,nP_);
 }
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
@@ -191,7 +193,7 @@ void heatTransferGunn::calcEnergyContribution()
     
     if(calcPartTempField_)
     {       
-	partTempField_.primitiveFieldRef() = 0.0;
+        partTempField_.primitiveFieldRef() = 0.0;
         particleCloud_.averagingM().resetWeightFields();
         particleCloud_.averagingM().setScalarAverage
         (
@@ -253,7 +255,7 @@ void heatTransferGunn::calcEnergyContribution()
                 }
                 
                 if (voidfraction < 0.01)
-		    voidfraction = 0.01;
+                    voidfraction = 0.01;
 
                 // calc relative velocity
                 Us = particleCloud_.velocity(index);
@@ -308,23 +310,23 @@ void heatTransferGunn::calcEnergyContribution()
     if(verbose_)
     {
         ReField_.primitiveFieldRef() = 0.0;
-	NuField_.primitiveFieldRef() = 0.0;
-	particleCloud_.averagingM().resetWeightFields();
+        NuField_.primitiveFieldRef() = 0.0;
+        particleCloud_.averagingM().resetWeightFields();
         particleCloud_.averagingM().setScalarAverage
         (
             ReField_,
             partRe_,
             particleCloud_.particleWeights(),
-	    particleCloud_.averagingM().UsWeightField(),
+            particleCloud_.averagingM().UsWeightField(),
             NULL
         );
-	particleCloud_.averagingM().resetWeightFields();
+        particleCloud_.averagingM().resetWeightFields();
         particleCloud_.averagingM().setScalarAverage
         (
             NuField_,
             partNu_,
             particleCloud_.particleWeights(),
-	    particleCloud_.averagingM().UsWeightField(),
+            particleCloud_.averagingM().UsWeightField(),
             NULL
         );
     }
