@@ -65,10 +65,10 @@ FanningDynFines::FanningDynFines
     // init force sub model
     setForceSubModels(propsDict_);
     // define switches which can be read from dict
-    forceSubM(0).setSwitchesList(0,true); // activate treatExplicit switch
-    forceSubM(0).setSwitchesList(3,true); // activate search for verbose switch
+    forceSubM(0).setSwitchesList(SW_TREAT_FORCE_EXPLICIT,true); // activate treatExplicit switch
+    forceSubM(0).setSwitchesList(SW_VERBOSE,true); // activate search for verbose switch
     forceSubM(0).readSwitches();
-    forceSubM(0).setSwitches(0,true);
+    forceSubM(0).setSwitches(SW_TREAT_FORCE_EXPLICIT,true);
 
     particleCloud_.checkCG(true);
     if (propsDict_.found("scale"))

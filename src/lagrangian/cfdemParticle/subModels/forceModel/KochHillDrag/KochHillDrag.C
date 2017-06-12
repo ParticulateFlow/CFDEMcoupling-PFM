@@ -86,12 +86,12 @@ KochHillDrag::KochHillDrag
     setForceSubModels(propsDict_);
 
     // define switches which can be read from dict
-    forceSubM(0).setSwitchesList(0,true); // activate treatExplicit switch
-    forceSubM(0).setSwitchesList(2,true); // activate implDEM switch
-    forceSubM(0).setSwitchesList(3,true); // activate search for verbose switch
-    forceSubM(0).setSwitchesList(4,true); // activate search for interpolate switch
-    forceSubM(0).setSwitchesList(7,true); // activate implForceDEMacc switch
-    forceSubM(0).setSwitchesList(8,true); // activate scalarViscosity switch
+    forceSubM(0).setSwitchesList(SW_TREAT_FORCE_EXPLICIT,true); // activate treatExplicit switch
+    forceSubM(0).setSwitchesList(SW_IMPL_FORCE_DEM,true); // activate implDEM switch
+    forceSubM(0).setSwitchesList(SW_VERBOSE,true); // activate search for verbose switch
+    forceSubM(0).setSwitchesList(SW_INTERPOLATION,true); // activate search for interpolate switch
+    forceSubM(0).setSwitchesList(SW_IMPL_FORCE_DEM_ACCUMULATED,true); // activate implForceDEMacc switch
+    forceSubM(0).setSwitchesList(SW_SCALAR_VISCOSITY,true); // activate scalarViscosity switch
 
     // read those switches defined above, if provided in dict
     forceSubM(0).readSwitches();
@@ -99,9 +99,9 @@ KochHillDrag::KochHillDrag
     particleCloud_.checkCG(true);
 
     if (propsDict_.found("scale"))
-        scaleDia_=scalar(readScalar(propsDict_.lookup("scale")));
+        scaleDia_ = scalar(readScalar(propsDict_.lookup("scale")));
     if (propsDict_.found("scaleDrag"))
-        scaleDrag_=scalar(readScalar(propsDict_.lookup("scaleDrag")));
+        scaleDrag_ = scalar(readScalar(propsDict_.lookup("scaleDrag")));
 }
 
 
@@ -230,7 +230,7 @@ void KochHillDrag::setForce() const
                     if (modelType_ == "B")
                         dragCoefficient /= voidfraction;
 
-                    if (forceSubM(0).switches()[7]) // implForceDEMaccumulated=true
+                    if (forceSubM(0).switches()[SW_IMPL_FORCE_DEM_ACCUMULATED]) // implForceDEMaccumulated=true
                     {
                         //get drag from the particle itself
                         for (int j=0; j<3; j++) drag[j] = particleCloud_.fAccs()[index][j]/couplingInterval;

@@ -87,9 +87,9 @@ DiFeliceDragMS::DiFeliceDragMS
     setForceSubModels(propsDict_);
 
     // define switches which can be read from dict
-    forceSubM(0).setSwitchesList(0,true); // activate treatExplicit switch
-    forceSubM(0).setSwitchesList(3,true); // activate search for verbose switch
-    forceSubM(0).setSwitchesList(4,true); // activate search for interpolate switch
+    forceSubM(0).setSwitchesList(SW_TREAT_FORCE_EXPLICIT,true); // activate treatExplicit switch
+    forceSubM(0).setSwitchesList(SW_VERBOSE,true); // activate search for verbose switch
+    forceSubM(0).setSwitchesList(SW_INTERPOLATION,true); // activate search for interpolate switch
 
     // read those switches defined above, if provided in dict
     forceSubM(0).readSwitches();
@@ -249,7 +249,7 @@ void DiFeliceDragMS::setForce() const
             }
 
             // set force on bodies
-            if (forceSubM(0).switches()[0])
+            if (forceSubM(0).switches()[SW_TREAT_FORCE_EXPLICIT])
             {
                 for(int j=0;j<3;j++)
                     cloudRefMS().expForcesCM()[index][j] += drag[j];

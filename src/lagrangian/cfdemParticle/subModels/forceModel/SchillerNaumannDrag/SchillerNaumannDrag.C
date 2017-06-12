@@ -82,7 +82,7 @@ SchillerNaumannDrag::SchillerNaumannDrag
     setForceSubModels(propsDict_);
 
     // define switches which can be read from dict
-    forceSubM(0).setSwitchesList(0,true); // activate treatExplicit switch
+    forceSubM(0).setSwitchesList(SW_TREAT_FORCE_EXPLICIT,true); // activate treatExplicit switch
 
     // read those switches defined above, if provided in dict
     forceSubM(0).readSwitches();

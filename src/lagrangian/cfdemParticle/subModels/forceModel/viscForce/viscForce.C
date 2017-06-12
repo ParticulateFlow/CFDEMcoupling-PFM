@@ -71,10 +71,10 @@ viscForce::viscForce
     setForceSubModels(propsDict_);
 
     // define switches which can be read from dict
-    forceSubM(0).setSwitchesList(0,true); // activate treatExplicit switch
-    forceSubM(0).setSwitchesList(1,true); // activate treatForceDEM switch
-    forceSubM(0).setSwitchesList(4,true); // activate search for interpolate switch
-    forceSubM(0).setSwitchesList(8,true); // activate scalarViscosity switch
+    forceSubM(0).setSwitchesList(SW_TREAT_FORCE_EXPLICIT,true); // activate treatExplicit switch
+    forceSubM(0).setSwitchesList(SW_TREAT_FORCE_DEM,true); // activate treatForceDEM switch
+    forceSubM(0).setSwitchesList(SW_INTERPOLATION,true); // activate search for interpolate switch
+    forceSubM(0).setSwitchesList(SW_SCALAR_VISCOSITY,true); // activate scalarViscosity switch
 
     // read those switches defined above, if provided in dict
     forceSubM(0).readSwitches();
@@ -84,22 +84,22 @@ viscForce::viscForce
         FatalError <<"using  model viscForce with model type B is not valid\n" << abort(FatalError);
     }else if (modelType_ == "Bfull")
     {
-        if(forceSubM(0).switches()[1])
+        if(forceSubM(0).switches()[SW_TREAT_FORCE_DEM])
         {
             Info << "Using treatForceDEM false!" << endl;
-            forceSubM(0).setSwitches(1,false); // treatForceDEM = false
+            forceSubM(0).setSwitches(SW_TREAT_FORCE_DEM,false); // treatForceDEM = false
         }
 
     }else // modelType_=="A"
     {
-        if(!forceSubM(0).switches()[1])
+        if(!forceSubM(0).switches()[SW_TREAT_FORCE_DEM])
         {
             Info << "Using treatForceDEM true!" << endl;
-            forceSubM(0).setSwitches(1,true); // treatForceDEM = true
+            forceSubM(0).setSwitches(SW_TREAT_FORCE_DEM,true); // treatForceDEM = true
         }
     }
 
-    if (propsDict_.found("useAddedMass")) 
+    if (propsDict_.found("useAddedMass"))
     {
         addedMassCoeff_ =  readScalar(propsDict_.lookup("useAddedMass"));
         Info << "viscForce will also include added mass with coefficient: " << addedMassCoeff_ << endl;
@@ -160,7 +160,7 @@ void viscForce::setForce() const
 
                 Vs = particleCloud_.particleVolume(index);
 
-                // calc the contribution of the deviatoric stress 
+                // calc the contribution of the deviatoric stress
                 // to the generalized buoyancy force
                 force = -Vs*divTau*(1.0+addedMassCoeff_);
 

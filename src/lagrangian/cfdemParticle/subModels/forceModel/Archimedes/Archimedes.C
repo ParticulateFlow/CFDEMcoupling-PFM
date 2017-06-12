@@ -84,20 +84,20 @@ Archimedes::Archimedes
     setForceSubModels(propsDict_);
 
     // define switches which can be read from dict
-    forceSubM(0).setSwitchesList(0,true); // activate treatExplicit switch
-    forceSubM(0).setSwitchesList(1,true); // activate treatForceDEM switch
+    forceSubM(0).setSwitchesList(SW_TREAT_FORCE_EXPLICIT,true); // activate treatExplicit switch
+    forceSubM(0).setSwitchesList(SW_TREAT_FORCE_DEM,true); // activate treatForceDEM switch
     forceSubM(0).readSwitches();
 
     if (modelType_=="A" || modelType_=="Bfull")
     {
-        if(!forceSubM(0).switches()[1]) // treatDEM != true
+        if(!forceSubM(0).switches()[SW_TREAT_FORCE_DEM]) // treatDEM != true
         {
             Warning << "Usually model type A and Bfull need Archimedes only on DEM side only (treatForceDEM=true)! are you sure about your settings?" << endl;
         }
     }
     else if (modelType_=="B")
     {
-        if(forceSubM(0).switches()[1]) // treatDEM = true
+        if(forceSubM(0).switches()[SW_TREAT_FORCE_DEM]) // treatDEM = true
         {
             Warning << "Usually model type B needs Archimedes on CFD and DEM side (treatForceDEM=false)! are you sure about your settings?" << endl;
         }
@@ -126,7 +126,7 @@ void Archimedes::setForce() const
         //if(mask[index][0])
         //{
             label cellI = particleCloud_.cellIDs()[index][0];
-            force=vector::zero;
+            force = vector::zero;
 
             if (cellI > -1) // particle Found
             {

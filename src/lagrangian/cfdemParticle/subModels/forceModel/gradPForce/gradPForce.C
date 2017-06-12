@@ -74,9 +74,9 @@ gradPForce::gradPForce
     setForceSubModels(propsDict_);
 
     // define switches which can be read from dict
-    forceSubM(0).setSwitchesList(0,true); // activate treatExplicit switch
-    forceSubM(0).setSwitchesList(1,true); // activate treatForceDEM switch
-    forceSubM(0).setSwitchesList(4,true); // activate search for interpolate switch
+    forceSubM(0).setSwitchesList(SW_TREAT_FORCE_EXPLICIT,true); // activate treatExplicit switch
+    forceSubM(0).setSwitchesList(SW_TREAT_FORCE_DEM,true); // activate treatForceDEM switch
+    forceSubM(0).setSwitchesList(SW_INTERPOLATION,true); // activate search for interpolate switch
 
     // read those switches defined above, if provided in dict
     forceSubM(0).readSwitches();
@@ -87,18 +87,18 @@ gradPForce::gradPForce
     }
     else if (modelType_ == "Bfull")
     {
-        if(forceSubM(0).switches()[1])
+        if(forceSubM(0).switches()[SW_TREAT_FORCE_DEM])
         {
             Info << "Using treatForceDEM false!" << endl;
-            forceSubM(0).setSwitches(1,false); // treatForceDEM = false
+            forceSubM(0).setSwitches(SW_TREAT_FORCE_DEM,false); // treatForceDEM = false
         }
     }
     else // modelType_=="A"
     {
-        if(!forceSubM(0).switches()[1])
+        if(!forceSubM(0).switches()[SW_TREAT_FORCE_DEM])
         {
             Info << "Using treatForceDEM true!" << endl;
-            forceSubM(0).setSwitches(1,true); // treatForceDEM = true
+            forceSubM(0).setSwitches(SW_TREAT_FORCE_DEM,true); // treatForceDEM = true
         }
     }
 

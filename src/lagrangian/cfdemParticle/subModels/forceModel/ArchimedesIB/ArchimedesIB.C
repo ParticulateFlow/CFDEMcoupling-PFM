@@ -83,12 +83,12 @@ ArchimedesIB::ArchimedesIB
     setForceSubModels(propsDict_);
 
     // define switches which can be read from dict
-    forceSubM(0).setSwitchesList(0,true); // activate treatExplicit switch
+    forceSubM(0).setSwitchesList(SW_TREAT_FORCE_EXPLICIT,true); // activate treatExplicit switch
 
     // read those switches defined above, if provided in dict
     forceSubM(0).readSwitches();
 
-    forceSubM(0).setSwitches(1,true); // treatDEM = true
+    forceSubM(0).setSwitches(SW_TREAT_FORCE_DEM,true); // treatDEM = true
     Info << "accounting for Archimedes only on DEM side!" << endl;
 
     particleCloud_.checkCG(true);
