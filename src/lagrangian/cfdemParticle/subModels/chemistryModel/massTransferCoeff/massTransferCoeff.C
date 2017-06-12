@@ -53,16 +53,19 @@ massTransferCoeff::massTransferCoeff
 :
     chemistryModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
+    verbose_(propsDict_.lookupOrDefault<bool>("verbose",false)),
     interpolation_(propsDict_.lookupOrDefault<bool>("interpolation",false)),
     mesh_(sm.mesh()),
     velFieldName_(propsDict_.lookup("velFieldName")),
     U_(mesh_.lookupObject<volVectorField>(velFieldName_)),
     voidfractionFieldName_(propsDict_.lookup("voidfractionFieldName")),
     voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
-    partNuName_(propsDict_.lookup("partNuName")),
+    densityFieldName_(propsDict_.lookupOrDefault<word>("densityFieldName","rho")),
+    rho_(sm.mesh().lookupObject<volScalarField> (densityFieldName_)),
+    partNuName_(propsDict_.lookup("partNu")),
     partNu_(NULL),
     partReynolds_(propsDict_.lookup("partReynolds")),
-    Rep_(NULL)
+    partRe_(NULL)
 {}
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
@@ -72,7 +75,7 @@ massTransferCoeff::~massTransferCoeff()
     int nP_ = particleCloud_.numberOfParticles();
 
     particleCloud_.dataExchangeM().destroy(partNu_,nP_);
-    particleCloud_.dataExchangeM().destroy(Rep_,nP_);
+    particleCloud_.dataExchangeM().destroy(partRe_,nP_);
 }
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
@@ -83,7 +86,7 @@ void massTransferCoeff::allocateMyArrays() const
     {
         // get memory for 2d arrays
         particleCloud_.dataExchangeM().allocateArray(partNu_,initVal,1,"nparticles");
-        particleCloud_.dataExchangeM().allocateArray(Rep_,initVal,1,"nparticles");
+        particleCloud_.dataExchangeM().allocateArray(partRe_,initVal,1,"nparticles");
     }
 }
 
@@ -93,7 +96,7 @@ void massTransferCoeff::reAllocMyArrays() const
     {
         double initVal=0.0;
         particleCloud_.dataExchangeM().allocateArray(partNu_,initVal,1);
-        particleCloud_.dataExchangeM().allocateArray(Rep_,initVal,1);
+        particleCloud_.dataExchangeM().allocateArray(partRe_,initVal,1);
     }
 }
 
@@ -104,7 +107,12 @@ void massTransferCoeff::execute()
     // realloc the arrays
     reAllocMyArrays();
 
-    const volScalarField& nufField_   =   particleCloud_.turbulence().nu();
+    #ifdef compre
+        const volScalarField nufField = particleCloud_.turbulence().mu()/rho_;
+    #else
+        const volScalarField nufField = particleCloud_.turbulence().nu();
+    #endif
+
 
     label  cellI=0;
 
@@ -121,7 +129,7 @@ void massTransferCoeff::execute()
     scalar nuf(0);
 
     // defining interpolators for U, voidfraction
-    interpolationCellPoint <vector> UfluidInterpolator_(U_);
+    interpolationCellPoint <vector> UluidInterpolator_(U_);
     interpolationCellPoint <scalar> voidfractionInterpolator_(voidfraction_);
 
     for (int index=0; index<particleCloud_.numberOfParticles(); index++)
@@ -132,7 +140,7 @@ void massTransferCoeff::execute()
             if(interpolation_)
             {
                  vector position    =   particleCloud_.position(index);
-                 Ufluid             =   UfluidInterpolator_.interpolate(position,cellI);
+                 Ufluid             =   UluidInterpolator_.interpolate(position,cellI);
                  voidfraction       =   voidfractionInterpolator_.interpolate(position,cellI);
             }
             else
@@ -141,25 +149,38 @@ void massTransferCoeff::execute()
                 voidfraction    =   voidfraction_[cellI];
             }
 
-            nuf =   nufField_[cellI];
+            if (voidfraction < 0.01)
+                voidfraction = 0.01;
+
+            // calculate relative velocity
             Us  =   particleCloud_.velocity(index);
             Ur  =   Ufluid  -   Us;
-            ds  =   2*particleCloud_.radius(index);
             magUr   =   mag(Ur);
+
+            // nu_fluid Field
+            nuf =   nufField[cellI];
+            // particle diameter
+            ds  =   2*particleCloud_.radius(index);
+
+            if (particleCloud_.modelType()=="A")
+                nuf *=  voidfraction;
 
             // calculate particle Reynolds number
             Rep =   ds*voidfraction*magUr/(nuf+SMALL);
 
+            if (particleCloud_.modelType()=="B")
+                Rep /= voidfraction;
+
             // fill arrays
             partNu_[index][0]   =   nuf;
-            Rep_[index][0]      =   Rep;
+            partRe_[index][0]   =   Rep;
         }
 
-        //if (particleCloud_.verbose() && index >=0 && index < 2)
-        //{
+        if (verbose_ && index >=0 && index < 2)
+        {
             Info << "Nufield = " << nuf << endl;
-            Info << "Rep = " << Rep << endl;
-        //}
+            Info << "Rep = "     << Rep << endl;
+        }
     }
 
     Info << "give data done" << endl;

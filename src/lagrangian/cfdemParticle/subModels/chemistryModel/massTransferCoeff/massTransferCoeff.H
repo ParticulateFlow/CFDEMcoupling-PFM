@@ -50,6 +50,8 @@ private:
 
     dictionary propsDict_;
 
+    bool verbose_;
+
     bool interpolation_;
 
     const fvMesh& mesh_;
@@ -62,13 +64,17 @@ private:
 
     const volScalarField& voidfraction_;
 
+    word densityFieldName_;
+
+    const volScalarField& rho_;
+
     word partNuName_;
 
     mutable double **partNu_;
 
     word partReynolds_;
 
-    mutable double **Rep_;
+    mutable double **partRe_;
 
     void allocateMyArrays() const;
 
