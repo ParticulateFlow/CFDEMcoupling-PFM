@@ -27,6 +27,7 @@ License
 #include "fvCFD.H"
 #include "cfdemCloudEnergy.H"
 #include "chemistryModel.H"
+#include "diffusionCoefficients.H"
 
 #include "HashPtrTable.H"
 
@@ -112,8 +113,11 @@ private:
 
     mutable double **partP_;
 
+    bool verbose_;
 
 public:
+
+    friend class diffusionCoefficient;
 
     //- Runtime type information
     TypeName("species");

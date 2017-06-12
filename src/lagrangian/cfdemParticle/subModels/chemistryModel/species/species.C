@@ -57,6 +57,7 @@ species::species
     propsDict_(dict.subDict(typeName + "Props")),
     interpolation_(propsDict_.lookupOrDefault<bool>("interpolation",false)),
     mesh_(sm.mesh()),
+    verbose_(propsDict_.lookupOrDefault<bool>("verbose",false)),
     // define a file name in the coupling properties that contains the species
     specDict_
     (
@@ -274,7 +275,7 @@ void species::execute()
             }
         }
 
-        if(particleCloud_.verbose() && index >=0 && index < 2)
+        if(verbose_ && index >=0 && index < 2)
         {
             for(int i =0; i<speciesNames_.size();i++)
             {
