@@ -237,7 +237,7 @@ inline bool cfdemCloud::arraysReallocated() const
     return arraysReallocated_;
 }
 
-inline const wordList& cfdemCloud::forceModels()
+inline const wordList& cfdemCloud::forceModels() const
 {
     return forceModels_;
 }

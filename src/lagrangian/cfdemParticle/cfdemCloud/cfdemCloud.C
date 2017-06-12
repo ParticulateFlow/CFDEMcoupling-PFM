@@ -412,12 +412,15 @@ void cfdemCloud::setVectorAverages()
     );
     if(verbose_) Info << "setVectorAverage done." << endl;
 }
+
 // * * * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * * //
+
 void cfdemCloud::checkCG(bool ok)
 {
     if(!cgOK_) return;
     if(!ok) cgOK_ = ok;
 }
+
 void cfdemCloud::setPos(double**& pos)
 {
     for(int index = 0;index <  numberOfParticles(); ++index)
@@ -427,35 +430,36 @@ void cfdemCloud::setPos(double**& pos)
         }
     }
 }
+
 // * * * * * * * * * * * * * * * ACCESS  * * * * * * * * * * * * * //
 
-label cfdemCloud::particleCell(int index)
+label cfdemCloud::particleCell(int index) const
 {
     return cellIDs()[index][0];
 }
 
-vector cfdemCloud::position(int index)
+vector cfdemCloud::position(int index) const
 {
     vector pos;
     for(int i=0;i<3;i++) pos[i] = positions()[index][i];
     return pos;
 }
 
-vector cfdemCloud::velocity(int index)
+vector cfdemCloud::velocity(int index) const
 {
     vector vel;
     for(int i=0;i<3;i++) vel[i] = velocities()[index][i];
     return vel;
 }
 
-vector cfdemCloud::expForce(int index)
+vector cfdemCloud::expForce(int index) const
 {
     vector force;
     for(int i=0;i<3;i++) force[i] = DEMForces()[index][i];
     return force;
 }
 
-vector cfdemCloud::fluidVel(int index)
+vector cfdemCloud::fluidVel(int index) const
 {
     vector vel;
     for(int i=0;i<3;i++) vel[i] = fluidVels()[index][i];
@@ -477,7 +481,7 @@ int cfdemCloud::nrMomCoupleModels()
     return momCoupleModels_.size();
 }
 
-scalar cfdemCloud::voidfraction(int index)
+scalar cfdemCloud::voidfraction(int index) const
 {
     return voidfractions()[index][0];
 }

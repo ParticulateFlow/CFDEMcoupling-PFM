@@ -228,17 +228,17 @@ public:
 
        void setPos(double **&);
 
-       word modelType(){ return modelType_; }
+       const word& modelType() const { return modelType_; }
 
-       label particleCell(int);
+       label particleCell(int) const;
 
-       vector position(int);
+       vector position(int) const;
 
-       vector velocity(int);
+       vector velocity(int) const;
 
-       vector expForce(int);
+       vector expForce(int) const;
 
-       vector fluidVel(int);
+       vector fluidVel(int) const;
 
        virtual const forceModel& forceM(int);
 
@@ -246,7 +246,7 @@ public:
 
        virtual int nrMomCoupleModels();
 
-       scalar voidfraction(int);
+       scalar voidfraction(int) const;
 
        label liggghtsCommandModelIndex(word);
 
@@ -339,7 +339,7 @@ public:
 
        inline bool arraysReallocated() const;
 
-       inline const wordList& forceModels();
+       inline const wordList& forceModels() const;
 
        inline const voidFractionModel& voidFractionM() const;
 
