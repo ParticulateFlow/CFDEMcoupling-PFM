@@ -224,7 +224,7 @@ void cfdemCloudIB::calcVelocityCorrection
 
 }
 
-vector cfdemCloudIB::angularVelocity(int index)
+vector cfdemCloudIB::angularVelocity(int index) const
 {
     vector vel;
     for(int i=0;i<3;i++) vel[i] = angularVelocities_[index][i];

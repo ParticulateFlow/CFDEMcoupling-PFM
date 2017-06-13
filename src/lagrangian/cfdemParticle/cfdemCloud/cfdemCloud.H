@@ -242,13 +242,13 @@ public:
 
        virtual const forceModel& forceM(int);
 
-       virtual int nrForceModels();
+       virtual label nrForceModels() const;
 
-       virtual int nrMomCoupleModels();
+       virtual label nrMomCoupleModels() const;
 
        scalar voidfraction(int) const;
 
-       label liggghtsCommandModelIndex(word);
+       label liggghtsCommandModelIndex(word) const;
 
        inline void setCG(double);
 
@@ -377,9 +377,9 @@ public:
         virtual bool reAllocArrays();
 
     // IO
-        void writeScalarFieldToTerminal(double**&);
+        void writeScalarFieldToTerminal(double**&) const;
 
-        void writeVectorFieldToTerminal(double**&);
+        void writeVectorFieldToTerminal(double**&) const;
 
     // functions
         tmp<fvVectorMatrix> divVoidfractionTau(volVectorField& ,volScalarField&) const;

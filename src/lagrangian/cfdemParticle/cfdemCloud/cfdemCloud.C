@@ -471,12 +471,12 @@ const forceModel& cfdemCloud::forceM(int i)
     return forceModel_[i];
 }
 
-int cfdemCloud::nrForceModels()
+label cfdemCloud::nrForceModels() const
 {
     return forceModels_.size();
 }
 
-int cfdemCloud::nrMomCoupleModels()
+label cfdemCloud::nrMomCoupleModels() const
 {
     return momCoupleModels_.size();
 }
@@ -486,7 +486,7 @@ scalar cfdemCloud::voidfraction(int index) const
     return voidfractions()[index][0];
 }
 
-label cfdemCloud::liggghtsCommandModelIndex(word name)
+label cfdemCloud::liggghtsCommandModelIndex(word name) const
 {
     forAll(liggghtsCommandModelList_,i)
     {

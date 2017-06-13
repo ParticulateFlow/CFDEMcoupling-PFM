@@ -25,7 +25,7 @@ namespace Foam
 {
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-inline const wordList& cfdemCloudEnergy::energyModels()
+inline const wordList& cfdemCloudEnergy::energyModels() const
 {
     return energyModels_;
 }

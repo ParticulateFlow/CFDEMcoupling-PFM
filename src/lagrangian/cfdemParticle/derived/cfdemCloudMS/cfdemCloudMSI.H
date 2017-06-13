@@ -80,7 +80,7 @@ inline label cfdemCloudMS::nrigid(int index) const
     return nrigids_[0][index];
 }
 
-inline int cfdemCloudMS::nrForceModels()
+inline label cfdemCloudMS::nrForceModels() const
 {
     return forceModels_.size();
 }

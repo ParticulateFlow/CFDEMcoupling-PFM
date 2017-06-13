@@ -129,7 +129,7 @@ public:
 
        inline label nrigid(int) const;
 
-       inline int nrForceModels();
+       inline label nrForceModels() const;
 
        inline double **& positionsCM() const;
 
