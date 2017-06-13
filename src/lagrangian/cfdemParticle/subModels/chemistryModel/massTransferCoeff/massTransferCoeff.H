@@ -15,7 +15,7 @@ License
     along with this code.  If not, see <http://www.gnu.org/licenses/>.
 
     Copyright (C) 2015- Thomas Lichtenegger, JKU Linz, Austria
-                  2017- M. Efe Kinaci, JKU Linz, Austria
+                        M. Efe Kinaci, JKU Linz, Austria
     
     Description
     Model to communicate species concentration and changes due to reactions

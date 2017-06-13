@@ -183,6 +183,10 @@ void massTransferCoeff::execute()
         }
     }
 
+    // give DEM data
+    particleCloud_.dataExchangeM().giveData(partNuName_, "scalar-atom", partNu_);
+    particleCloud_.dataExchangeM().giveData(partReynolds_, "scalar-atom", partRe_);
+
     Info << "give data done" << endl;
 }
 
