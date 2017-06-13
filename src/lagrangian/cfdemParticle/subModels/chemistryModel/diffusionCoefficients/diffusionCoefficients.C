@@ -54,6 +54,7 @@ diffusionCoefficient::diffusionCoefficient
 :
     chemistryModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
+    verbose_(propsDict_.lookupOrDefault<bool>("verbose",false)),
     interpolation_(propsDict_.lookupOrDefault<bool>("interpolation",false)),
     mesh_(sm.mesh()),
     // define a file name in the coupling properties that contains the species
@@ -184,14 +185,10 @@ void diffusionCoefficient::execute()
     Xfluid_.setSize(speciesNames_.size());
     List<scalar> dBinary_;
     dBinary_.setSize(diffusantGasNames_.size());
-    List<scalar> dCoeff_;
     dCoeff_.setSize(diffusantGasNames_.size());
 
     double **molNum_ = new double*[diffusantGasNames_.size()];
     double **volDiff_ = new double*[diffusantGasNames_.size()];
-    
-    // word speciesPair("none");
-    // word diffusingSpecies("none");
 
     // defining interpolators for T, rho, voidfraction, N
     interpolationCellPoint <scalar> TInterpolator_(tempField_);
@@ -290,7 +287,7 @@ void diffusionCoefficient::execute()
             }
         }
 
-        if(particleCloud_.verbose() && index >=0 && index < 2)
+        if(verbose_ && index >=0 && index < 2)
         {
             for(int i =0; i<diffusantGasNames_.size();i++)
             {

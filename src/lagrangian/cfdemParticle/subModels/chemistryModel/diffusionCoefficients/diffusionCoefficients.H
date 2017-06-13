@@ -52,6 +52,8 @@ private:
 
     dictionary propsDict_;
 
+    bool verbose_;
+
     bool interpolation_;
 
     const fvMesh& mesh_;
@@ -102,6 +104,8 @@ private:
     void calcDiffVol(int, int, double **);
 
     void allocateMyArrays() const;
+
+    List<scalar> dCoeff_;
 
  public:
 
