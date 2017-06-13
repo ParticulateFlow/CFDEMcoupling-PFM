@@ -440,30 +440,22 @@ label cfdemCloud::particleCell(int index) const
 
 vector cfdemCloud::position(int index) const
 {
-    vector pos;
-    for(int i=0;i<3;i++) pos[i] = positions()[index][i];
-    return pos;
+    return vector(positions()[index][0],positions()[index][1],positions()[index][2]);
 }
 
 vector cfdemCloud::velocity(int index) const
 {
-    vector vel;
-    for(int i=0;i<3;i++) vel[i] = velocities()[index][i];
-    return vel;
+    return vector(velocities()[index][0],velocities()[index][1],velocities()[index][2]);
 }
 
 vector cfdemCloud::expForce(int index) const
 {
-    vector force;
-    for(int i=0;i<3;i++) force[i] = DEMForces()[index][i];
-    return force;
+    return vector(DEMForces()[index][0],DEMForces()[index][1],DEMForces()[index][2]);
 }
 
 vector cfdemCloud::fluidVel(int index) const
 {
-    vector vel;
-    for(int i=0;i<3;i++) vel[i] = fluidVels()[index][i];
-    return vel;
+    return vector(fluidVels()[index][0],fluidVels()[index][1],fluidVels()[index][2]);
 }
 
 const forceModel& cfdemCloud::forceM(int i)
