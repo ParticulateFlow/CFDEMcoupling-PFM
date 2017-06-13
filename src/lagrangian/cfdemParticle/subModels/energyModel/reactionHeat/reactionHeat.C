@@ -77,7 +77,9 @@ reactionHeat::reactionHeat
 
 reactionHeat::~reactionHeat()
 {
-    delete reactionHeat_;
+    int nP_ = particleCloud_.numberOfParticles();
+
+    particleCloud_.dataExchangeM().destroy(reactionHeat_,nP_);
 }
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
