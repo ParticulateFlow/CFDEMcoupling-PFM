@@ -104,15 +104,6 @@ private:
 
     mutable double **partN_;
 
-    // gas pressure at particle location
-    word pressureFieldName_;
-
-    const volScalarField& P_;
-
-    word partPName_;
-
-    mutable double **partP_;
-
     bool verbose_;
 
 public:
