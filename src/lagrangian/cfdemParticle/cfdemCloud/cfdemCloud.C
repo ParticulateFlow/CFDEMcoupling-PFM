@@ -225,6 +225,14 @@ cfdemCloud::cfdemCloud
         solveFlow_=Switch(couplingProperties_.lookup("solveFlow"));
     if (couplingProperties_.found("imExSplitFactor"))
         imExSplitFactor_ = readScalar(couplingProperties_.lookup("imExSplitFactor"));
+
+    if(imExSplitFactor_ > 1.0)
+        FatalError << "You have set imExSplitFactor > 1 in your couplingProperties. Must be <= 1."
+                   << abort(FatalError);
+    if(imExSplitFactor_ < 0.0)
+        FatalError << "You have set imExSplitFactor < 0 in your couplingProperties. Must be >= 0."
+                   << abort(FatalError);
+
     if (couplingProperties_.found("treatVoidCellsAsExplicitForce"))
         treatVoidCellsAsExplicitForce_ = readBool(couplingProperties_.lookup("treatVoidCellsAsExplicitForce"));
     if (couplingProperties_.found("verbose")) verbose_=true;
