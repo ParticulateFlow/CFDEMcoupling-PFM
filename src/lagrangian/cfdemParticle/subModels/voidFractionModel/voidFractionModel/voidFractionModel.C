@@ -102,44 +102,28 @@ voidFractionModel::~voidFractionModel()
 // * * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * * //
 tmp<volScalarField> voidFractionModel::voidFractionInterp() const
 {
-    tmp<volScalarField> tsource
-    (
-        new volScalarField
-        (
-            IOobject
-            (
-                "alpha_voidFractionModel",
-                particleCloud_.mesh().time().timeName(),
-                particleCloud_.mesh(),
-                IOobject::NO_READ,
-                IOobject::NO_WRITE
-            ),
-            particleCloud_.mesh(),
-            dimensionedScalar
-            (
-                "zero",
-                dimensionSet(0, 0, 0, 0, 0),
-                0
-            )
-        )
-    );
-
     scalar tsf = particleCloud_.dataExchangeM().timeStepFraction();
-    if(1-tsf < 1e-4 && particleCloud_.dataExchangeM().couplingStep() > 1) //tsf==1
+
+    if (1. - tsf < 1e-4 && particleCloud_.dataExchangeM().couplingStep() > 1) //tsf==1
     {
-        tsource.ref() = voidfractionPrev_;
+        return tmp<volScalarField>
+        (
+            new volScalarField("alpha_voidFractionModel", voidfractionPrev_)
+        );
     }
     else
     {
-        tsource.ref() = (1 - tsf) * voidfractionPrev_ + tsf * voidfractionNext_;
+        return tmp<volScalarField>
+        (
+            new volScalarField("alpha_voidFractionModel", (1. - tsf) * voidfractionPrev_ + tsf * voidfractionNext_)
+        );
     }
-    return tsource;
 }
 
 void voidFractionModel::resetVoidFractions() const
 {
     voidfractionPrev_.ref() = voidfractionNext_.ref();
-    voidfractionNext_.ref() = 1;
+    voidfractionNext_.ref() = 1.;
 }
 
 /*void voidFractionModel::undoVoidFractions(double**const& mask) const
