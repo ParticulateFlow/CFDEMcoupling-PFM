@@ -168,6 +168,9 @@ void massTransferCoeff::execute()
             // calculate particle Reynolds number
             Rep =   ds*voidfraction*magUr/(nuf+SMALL);
 
+            if (Rep == 0.0)
+                Rep = SMALL;
+
             if (particleCloud_.modelType()=="B")
                 Rep /= voidfraction;
 
