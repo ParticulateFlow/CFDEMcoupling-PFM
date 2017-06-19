@@ -328,39 +328,20 @@ void averagingModel::undoWeightFields(double**const& mask) const
 
 tmp<volVectorField> averagingModel::UsInterp() const
 {
-    tmp<volVectorField> tsource
-    (
-        new volVectorField
-        (
-            IOobject
-            (
-                "Us_averagingModel",
-                particleCloud_.mesh().time().timeName(),
-                particleCloud_.mesh(),
-                IOobject::NO_READ,
-                IOobject::NO_WRITE
-            ),
-            particleCloud_.mesh(),
-            dimensionedVector
-            (
-                "zero",
-                dimensionSet(0, 1, -1, 0, 0),
-                vector::zero
-            )
-        )
-    );
-
     if (particleCloud_.dataExchangeM().couplingStep() > 1)
     {
-        tsource.ref() = (1 - particleCloud_.dataExchangeM().timeStepFraction()) * UsPrev_
-                    + particleCloud_.dataExchangeM().timeStepFraction() * UsNext_;
+        return tmp<volVectorField>
+        (
+            new volVectorField("Us_averagingModel", (1. - particleCloud_.dataExchangeM().timeStepFraction()) * UsPrev_ + particleCloud_.dataExchangeM().timeStepFraction() * UsNext_)
+        );
     }
     else
     {
-        tsource.ref() = UsNext_;
+        return tmp<volVectorField>
+        (
+            new volVectorField("Us_averagingModel", UsNext_)
+        );
     }
-
-    return tsource;
 }
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
