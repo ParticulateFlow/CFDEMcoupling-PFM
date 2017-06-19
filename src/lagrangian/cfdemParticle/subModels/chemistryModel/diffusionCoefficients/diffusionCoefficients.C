@@ -185,6 +185,7 @@ void diffusionCoefficient::execute()
     Xfluid_.setSize(speciesNames_.size());
     List<scalar> dBinary_;
     dBinary_.setSize(diffusantGasNames_.size());
+    List<scalar> dCoeff_;
     dCoeff_.setSize(diffusantGasNames_.size());
 
     double **molNum_ = new double*[diffusantGasNames_.size()];
@@ -261,16 +262,18 @@ void diffusionCoefficient::execute()
                             // if ( i != j) but checks speciesPairs anyways so not needed.
                             if(coeffs.found(diffusantGasNames_[i]) && coeffs.found(speciesNames_[j]))
                             {
-                                dBinary_[i] = 0.001*Texp*molNum_[i][j]/(Pfluid*volDiff_[i][j]);
+                                // binary coefficient units in this case is [m^2/s]
+                                dBinary_[i] = pow(10,-7)*Texp*molNum_[i][j]/(Pfluid*volDiff_[i][j]);
+
                                 Info << "dBinary: "  << dBinary_[i] << nl << endl;
                                 // According to literature i.e Valipour 2006, Elnashaie et al. 1993, Taylor and Krishna (1993), Natsui et al.
                                 // dCoeff = 1/(1-X[j])*sum(X[i]/D_[i,j])^-1
                                 // X is molar fraction / Dij binary diff coeff.
                                 dCoeff_[i]  +=  (Xfluid_[j]/dBinary_[i]);
                                 dCoeff_[i]  =   (1-Xfluid_[i])*(1/dCoeff_[i]);
-                                // According to Maier (who referred to wilke but in Wilke's paper its written as the previous eq.)
+                                // According to Maier/Nietrost (who referred to wilke but in Wilke's paper its written as the previous eq.)
                                 // and Nietros
-                                // dCoeff_[i]   +=   Xfluid_[i]/dCoeff_[i];
+                                // dCoeff_[i]   +=  Xfluid_[i]/dCoeff_[i];
                                 // dCoeff_[i]   =   1/dCoeff_[i];
                                 Info << "dCoeff: " << dCoeff_[i] << nl << endl;
                             }else

@@ -105,8 +105,6 @@ private:
 
     void allocateMyArrays() const;
 
-    List<scalar> dCoeff_;
-
  public:
 
     //- Runtime type information
