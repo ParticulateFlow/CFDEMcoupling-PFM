@@ -30,8 +30,8 @@ boundaryField
 
     inlet
     {
-        type            uniformFixedValue;
-        uniformValue     table
+        type            uniformFixedValueVoidfraction;
+        uniformValue    table
         (
             (0.000 (0 0 0.002))
             (0.100 (0 0 0.030))

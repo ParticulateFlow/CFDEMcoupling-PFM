@@ -1,0 +1,118 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.3.0                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      blockMeshDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+#include "../../geometry"
+convertToMeters 1;
+
+vertices #codeStream
+{
+    codeInclude
+    #{
+        #include "pointField.H"
+    #};
+
+    code
+    #{
+        pointField points(8);
+        points[0]  = point($mr2, $mr2, $zmin);
+        points[1]  = point($r2, $mr2, $zmin);
+        points[2]  = point($r2,$r2,$zmin);
+	points[3] = point($mr2,$r2,$zmin);
+	points[4]  = point($hsqrt2*$mr1, $hsqrt2*$mr1, $zmin);
+	points[5]  = point($hsqrt2*$r1, $hsqrt2*$mr1, $zmin);
+	points[6]  = point($hsqrt2*$r1, $hsqrt2*$r1, $zmin);
+	points[7]  = point($hsqrt2*$mr1, $hsqrt2*$r1, $zmin);
+	
+
+        // Duplicate z points
+        label sz = points.size();
+        points.setSize(2*sz);
+        for (label i = 0; i < sz; i++)
+        {
+            const point& pt = points[i];
+            points[i+sz] = point(pt.x(), pt.y(), $zmax);
+        }
+
+        os  << points;
+    #};
+};
+
+
+blocks
+(
+    hex (0 1 2 3 8 9 10 11) (8 8 53) simpleGrading (1 1 1)
+    hex (4 5 1 0 12 13 9 8) (8 4 53) simpleGrading (1 1 1)
+    hex (1 5 6 2 9 13 14 10) (4 8 53) simpleGrading (1 1 1)
+    hex (2 6 7 3 10 14 15 11) (4 8 53) simpleGrading (1 1 1)
+    hex (3 7 4 0 11 15 12 8) (4 8 53) simpleGrading (1 1 1)
+);
+
+edges
+(
+    arc 5 6 ($r1 0 $zmin)
+    arc 6 7 (0 $r1 $zmin)
+    arc 7 4 ($mr1 0 $zmin)
+    arc 4 5 (0 $mr1 $zmin)
+    arc 13 14 ($r1 0 $zmax)
+    arc 14 15 (0 $r1 $zmax)
+    arc 15 12 ($mr1 0 $zmax)
+    arc 12 13 (0 $mr1 $zmax)
+);
+
+boundary
+(
+    inlet
+    {
+        type wall;
+        faces
+        (
+            (0 1 2 3)
+            (0 4 5 1)
+            (1 5 6 2)
+            (6 7 3 2)
+            (7 4 0 3)
+
+        );
+    }
+    outlet
+    {
+        type wall;
+        faces
+        (
+            (8 9 10 11)
+            (8 12 13 9)
+            (9 13 14 10)
+            (14 15 11 10)
+            (15 12 8 11)
+        );
+    }
+    walls
+    { 
+        type wall;
+        faces
+        (
+            (5 6 14 13)
+            (6 7 15 14)
+            (7 4 12 15)
+            (4 5 13 12)
+        );
+    }
+);
+
+mergePatchPairs
+(
+);
+
+// ************************************************************************* //

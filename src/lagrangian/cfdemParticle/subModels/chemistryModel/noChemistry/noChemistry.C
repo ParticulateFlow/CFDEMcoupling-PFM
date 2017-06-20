@@ -1,0 +1,75 @@
+/*---------------------------------------------------------------------------*\
+License
+
+    This is free software: you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This code is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this code.  If not, see <http://www.gnu.org/licenses/>.
+
+    Copyright (C) 2015- Thomas Lichtenegger, JKU Linz, Austria
+
+\*---------------------------------------------------------------------------*/
+
+#include "error.H"
+#include "noChemistry.H"
+#include "addToRunTimeSelectionTable.H"
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+namespace Foam
+{
+
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+
+defineTypeNameAndDebug(noChemistry, 0);
+
+addToRunTimeSelectionTable(chemistryModel, noChemistry, dictionary);
+
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+
+// Construct from components
+noChemistry::noChemistry
+(
+    const dictionary& dict,
+    cfdemCloudEnergy& sm
+)
+:
+    chemistryModel(dict,sm)
+{}
+
+
+// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
+
+noChemistry::~noChemistry()
+{}
+
+// * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
+
+// * * * * * * * * * * * * * * * * Member Fct  * * * * * * * * * * * * * * * //
+
+void noChemistry::execute()
+{}
+
+//tmp<Foam::fvScalarMatrix> noChemistry::Smi(const label i) const
+//{
+//    return tmp<fvScalarMatrix>(new fvScalarMatrix(0, dimMass/dimTime)); 
+//}
+
+//tmp<Foam::fvScalarMatrix> noChemistry::Sm() const
+//{
+//    return tmp<fvScalarMatrix>(new fvScalarMatrix(0, dimMass/dimTime)); 
+//}
+
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace Foam
+
+// ************************************************************************* //

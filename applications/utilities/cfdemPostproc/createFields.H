@@ -10,7 +10,7 @@
             IOobject::NO_WRITE
         ),
         mesh,
-        dimensionedScalar("0", dimensionSet(0, 2, -2, 0, 0), 1.0)
+        dimensionedScalar("1", dimensionSet(0, 2, -2, 0, 0), 1.0)
     );
 
     Info<< "Reading physical velocity field U" << endl;
@@ -33,8 +33,22 @@
 // drag law modelling
 //========================
 
+    Info<< "Creating dummy density field rho\n" << endl;
+    volScalarField rho
+    (
+        IOobject
+        (
+            "rho",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        mesh,
+        dimensionedScalar("1", dimensionSet(1, -3, 0, 0, 0), 1.0)
+    );
 
-    Info<< "\nReading voidfraction field voidfraction = (Vgas/Vparticle)\n" << endl;
+    Info<< "Reading voidfraction field voidfraction = (Vgas/Vparticle)\n" << endl;
     volScalarField voidfraction
     (
         IOobject
@@ -46,7 +60,7 @@
             IOobject::AUTO_WRITE
         ),
         mesh,
-        dimensionedScalar("0", dimensionSet(0, 0, 0, 0, 0), 1.)
+        dimensionedScalar("1", dimensionSet(0, 0, 0, 0, 0), 1.0)
     );
 
 

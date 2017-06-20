@@ -53,10 +53,6 @@ Contributions
 
 #include "cellSet.H"
 
-#include "meshToMeshNew.H"
-#include "fvIOoptionList.H"
-
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 int main(int argc, char *argv[])
@@ -66,14 +62,14 @@ int main(int argc, char *argv[])
     #include "createTime.H"
 
     #include "createDynamicFvMesh.H"
-  
+
     #include "createControl.H"
+
+    #include "createTimeControls.H"
 
     #include "createFields.H"
 
     #include "initContinuityErrs.H"
-
-    #include "createFvOptions.H"
 
     // create cfdemCloud
     #include "readGravitationalAcceleration.H"
@@ -91,7 +87,9 @@ int main(int argc, char *argv[])
         interFace = mag(mesh.lookupObject<volScalarField>("voidfractionNext"));
         mesh.update(); //dyM
 
+        #include "readTimeControls.H"
         #include "CourantNo.H"
+        #include "setDeltaT.H"
 
         // do particle stuff
         Info << "- evolve()" << endl;
@@ -106,13 +104,9 @@ int main(int argc, char *argv[])
                 fvm::ddt(voidfraction,U)
               + fvm::div(phi, U)
               + turbulence->divDevReff(U)
-                ==
-                fvOptions(U)
             );
 
             UEqn.relax();
-
-            fvOptions.constrain(UEqn);
 
             if (piso.momentumPredictor())
             {
@@ -120,7 +114,7 @@ int main(int argc, char *argv[])
             }
 
             // --- PISO loop
-           while (piso.correct())
+            while (piso.correct())
             {
                 volScalarField rUA = 1.0/UEqn.A();
                 surfaceScalarField rUAf(fvc::interpolate(rUA));
@@ -132,7 +126,7 @@ int main(int argc, char *argv[])
 
                 adjustPhi(phi, U, p);
 
-                while (piso.correct())
+                while (piso.correctNonOrthogonal())
                 {
                     // Pressure corrector
 
@@ -163,10 +157,6 @@ int main(int argc, char *argv[])
         Info << "particleCloud.calcVelocityCorrection() " << endl;
         volScalarField voidfractionNext=mesh.lookupObject<volScalarField>("voidfractionNext");
         particleCloud.calcVelocityCorrection(p,U,phiIB,voidfractionNext);
-
-        #if defined(version22)
-        fvOptions.correct(U);
-        #endif
 
         runTime.write();
 
