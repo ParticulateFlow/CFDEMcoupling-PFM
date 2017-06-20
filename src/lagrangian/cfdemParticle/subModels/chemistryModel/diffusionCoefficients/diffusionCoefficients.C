@@ -181,15 +181,21 @@ void diffusionCoefficient::execute()
     scalar Pfluid(0);
     scalar Nfluid(0);
     scalar Texp(0);
+    // for total stagnant gas molar fractions
+    scalar Xstag_tot;
+    // for adding gases one by one.
     List<scalar> Xfluid_;
     Xfluid_.setSize(speciesNames_.size());
-    List<scalar> dBinary_;
-    dBinary_.setSize(diffusantGasNames_.size());
+    List<scalar> dBinarytot_;
+    dBinarytot_.setSize(diffusantGasNames_.size());
     List<scalar> dCoeff_;
     dCoeff_.setSize(diffusantGasNames_.size());
+    /*    List<scalar> dBinary_;
+    dBinary_.setSize(diffusantGasNames_.size()); */
 
-    double **molNum_ = new double*[diffusantGasNames_.size()];
-    double **volDiff_ = new double*[diffusantGasNames_.size()];
+    double  **dBinary_   = new double*[diffusantGasNames_.size()];
+    double  **molNum_    = new double*[diffusantGasNames_.size()];
+    double  **volDiff_   = new double*[diffusantGasNames_.size()];
 
     // defining interpolators for T, rho, voidfraction, N
     interpolationCellPoint <scalar> TInterpolator_(tempField_);
@@ -225,12 +231,16 @@ void diffusionCoefficient::execute()
                 }
             }
 
+            // for every diffusant gases
             for (int i=0; i<diffusantGasNames_.size();i++)
             {
-                molNum_[i]  =   new double [speciesNames_.size()];
-                volDiff_[i]  =   new double [speciesNames_.size()];
+                dBinary_[i]     =   new double [speciesNames_.size()];
+                molNum_[i]      =   new double [speciesNames_.size()];
+                volDiff_[i]     =   new double [speciesNames_.size()];
+                // and for every reactant gas
                 for (int j=0; j < speciesNames_.size();j++)
                 {
+                    // if diffusant gas ans reactant gas are not equal get diffusion coefficients
                     if (diffusantGasNames_[i] != speciesNames_[j])
                     {
                         Info << "molar weights diffuser gases: " << molWeight(speciesNames_[j]) << nl << endl;
@@ -239,21 +249,30 @@ void diffusionCoefficient::execute()
                         Info << "Y fluid" << Yfluid_[j] << nl << endl;
                         Info << "molar weights diffusant gases: " << molWeight(diffusantGasNames_[i]) << nl << endl;
 
-                        // Nfluid is 0 for first ts, division by zero is no good...
+                        // if Nfluid ever becomes zero, no division with 0 should occur
                         if (Nfluid == 0)
                         {
                             Xfluid_[j]  =   0.0;
                             Xfluid_[i]  =   0.0;
                         } else
                         {
-                            // convert mass to molar fractions
-                            Xfluid_[j]  =   Yfluid_[j]*rhofluid/(Nfluid*molWeight(speciesNames_[j]));
+                            // get molar fraction for diffusing gas gas
                             Xfluid_[i]  =   Yfluid_[i]*rhofluid/(Nfluid*molWeight(diffusantGasNames_[i]));
-                            Info << "molar fraction diffuser gases:" << Xfluid_[j] << nl << endl;
-                            Info << "molar fraction diffusant gases:" << Xfluid_[i] << nl << endl;
+                            Info << "molar fraction diffusing gases:" << Xfluid_[i] << nl << endl;
+
+                            // convert mass to molar fractions
+                            // get molar fraction for other stagnant gases
+
+                            Xfluid_[j]  =   Yfluid_[j]*rhofluid/(Nfluid*molWeight(speciesNames_[j])); //TODO:: change rhofluid to specific denisities of the species by creating hastable
+                            Info << "molar fraction stagnant gases:" << Xfluid_[j] << nl << endl;
+
+                            // for now considering only one species is diffusing, the rest of the molar fractions are from
+                            // stagnangt gases we can get the total stagnant gas molar fractions by
+                            Xstag_tot   =   1-Xfluid_[i];
                         }
 
-                        if (Xfluid_[j] > 0.0)
+                        // when reactant gas mole fraction is greater than zero do calculation
+                        if (Xstag_tot > 0.0)
                         {
                             calcMolNum(i,j,molNum_);
                             calcDiffVol(i,j,volDiff_);
@@ -263,19 +282,33 @@ void diffusionCoefficient::execute()
                             if(coeffs.found(diffusantGasNames_[i]) && coeffs.found(speciesNames_[j]))
                             {
                                 // binary coefficient units in this case is [m^2/s]
-                                dBinary_[i] = pow(10,-7)*Texp*molNum_[i][j]/(Pfluid*volDiff_[i][j]);
+                                dBinary_[i][j] = pow(10,-7)*Texp*molNum_[i][j]/(Pfluid*volDiff_[i][j]);
 
-                                Info << "dBinary: "  << dBinary_[i] << nl << endl;
+                                Info << "dBinary: "  << dBinary_[i][j] << nl << endl;
+
                                 // According to literature i.e Valipour 2006, Elnashaie et al. 1993, Taylor and Krishna (1993), Natsui et al.
                                 // dCoeff = 1/(1-X[j])*sum(X[i]/D_[i,j])^-1
                                 // X is molar fraction / Dij binary diff coeff.
-                                dCoeff_[i]  +=  (Xfluid_[j]/dBinary_[i]);
-                                dCoeff_[i]  =   (1-Xfluid_[i])*(1/dCoeff_[i]);
+                                // doing the sum for binary diff coeff.
+                                // TODO:: DONT FORGET TO CLEAN THE LIST VALUES!
+                                dBinarytot_[i]  +=  dBinary_[i][j];
+
+                                // for only one reactant gas, and one product gas
+                                // calculate diffusion coefficient for mixture
+                                dCoeff_[i]  =   dBinarytot_[i];
+
+                                // TODO:: it should add for every reactant gas mole fraction
+                                //     :: however, in every ts maybe it should reset afterwards?
+                                // dCoeff_[i]  +=  (Xfluid_[j]/dBinary_[i]);
+                                // Info << "dCoeff: before :" << dCoeff_[i] << nl << endl;
+                                // Info << "Xfluid_[i]: " << Xfluid_[i] << nl << endl;
+                                // dCoeff_[i]  =   (1-Xfluid_[i])/dCoeff_[i];
                                 // According to Maier/Nietrost (who referred to wilke but in Wilke's paper its written as the previous eq.)
                                 // and Nietros
                                 // dCoeff_[i]   +=  Xfluid_[i]/dCoeff_[i];
                                 // dCoeff_[i]   =   1/dCoeff_[i];
-                                Info << "dCoeff: " << dCoeff_[i] << nl << endl;
+
+                                Info << "dCoeff: after " << dCoeff_[i] << nl << endl;
                             }else
                             {
                                 FatalError
@@ -287,6 +320,10 @@ void diffusionCoefficient::execute()
                     }
                 }
                 diffusionCoefficients_[i][index][0]= dCoeff_[i];
+
+                // reset dCoeff & dBinarytot array for next ts after current value is given to DEM
+                // dCoeff_[i]      =   0.0;
+                dBinarytot_[i]  =   0.0;
             }
         }
 
@@ -297,7 +334,6 @@ void diffusionCoefficient::execute()
                 Info << "effective diffusionCoefficient of species " << diffusantGasNames_[i] << " = " << diffusionCoefficients_[i][index][0] << endl;
             }
         }
-
     }
 
     for (int i=0; i<diffusantGasNames_.size();i++)
