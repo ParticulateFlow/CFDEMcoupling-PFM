@@ -95,7 +95,9 @@ forceModel::forceModel
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 forceModel::~forceModel()
-{}
+{
+  delete [] forceSubModel_;
+}
 
 // * * * * * * * * * * * * * * * * Member Fct  * * * * * * * * * * * * * * * //
 /*tmp<volScalarField> forceModel::provideScalarField()
