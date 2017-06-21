@@ -17,7 +17,7 @@ FoamFile
 
 transportModel  Newtonian;
 
-nu              nu [ 0 2 -1 0 0 0 0 ] 1.328e-05;    // dnyamic viscosity of CO : 1.66*10^-5 [kg/ms] -- density: 1.25 kg/m3 
+nu              nu [ 0 2 -1 0 0 0 0 ] 1.328e-05;     // dnyamic viscosity of CO : 1.66*10^-5 [kg/ms] -- density: 1.25 kg/m3 
                                                      // dynamic viscosity of O2 = 2,04-10^-5[kg/ms]; 
                                                      // density of O2 = 1.4290 [kg/m^3]
                                                      // kinematic viscosity of air (o2+n2) = 1.48e-05;

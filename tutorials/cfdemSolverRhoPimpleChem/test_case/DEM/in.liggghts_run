@@ -18,7 +18,6 @@ read_restart    ../DEM/post/restart/liggghts.restart
 neighbor        0.0005 bin
 neigh_modify    delay 0 binsize 0.01 
 
-
 # Material properties required for granular pair styles
 
 fix         m1 all property/global youngsModulus peratomtype 5.e6
@@ -31,7 +30,7 @@ pair_style  gran model hertz tangential history # Hertzian without cohesion
 pair_coeff  * *
 
 # timestep, gravity
-timestep    0.000001
+timestep    0.001 #0.00001 #0.000001
 fix         gravi all gravity 0.0 vector 0.0 -1.0 0.0
 
 # walls
@@ -53,10 +52,9 @@ fix     cfd3 all couple/cfd/chemistry n_species 4 species_names CO CO2 O2 N2
 
 # this should shrink the particle
 #fix    cfd4 all chem/shrink speciesA O2 molMassA 31.99 speciesC CO2 molMassC 44.01 molMassB 12.01 k 2.5e3 rdef 0.2
-#fix     cfd4 all chem/shrink speciesA O2 molMassA 31.99 speciesC CO2 molMassC 44.01 molMassB 12.01 k 2.5e3 rmin 0.005
+#fix     cfd4 all chem/shrink speciesA CO molMassA 28.01 speciesC CO2 molMassC 44.01 molMassB 12.01 k 2.5e3 rmin 0.005
 
 # Activate for 3-layer unreacted core shrink model
-#fix     OreReductionCO all chem/shrink/core speciesA O2 molMassA 31.99 speciesC CO2 molMassC 44.01
 fix     cfd5 all chem/shrink/core speciesA CO molMassA 28.01 speciesC CO2 molMassC 44.01 
 
 # Chemical properties for unreacted shrink core (activate only when chem/shrink/core is active)
@@ -66,7 +64,7 @@ fix     Ea all property/global Ea_cfd5 vector 69488 73674 113859
 # particle porosities adn tortuosity
 fix     porosity        all property/global porosity_       scalar 0.15
 fix     tortuosity      all property/global tortuosity_     scalar 3
-fix     pore_diameter   all property/global pore_diameter_  scalar 3.91e-6
+fix     pore_diameter   all property/global pore_diameter_  scalar 0.00001 #3.91e-9
 
 # Material properties for unreacted chemical shrink core (activate only when chem/shrink/core is active)
 fix     density all property/global density_all vector 7870 5740 5170 5240 
@@ -80,38 +78,38 @@ fix     integr all nve/sphere
 
 ###############################################
 ## DEBUG ##
-compute masschange all property/atom mass
-compute massreduce all reduce sum c_masschange
-fix     rmass all ave/time 100 1 100 c_massreduce file rmass.dat 
+#compute masschange all property/atom mass
+#compute massreduce all reduce sum c_masschange
+#fix     rmass all ave/time 100 1 100 c_massreduce file rmass.dat 
 
-compute layerRad1 all reduce sum f_layerRelRad[1]
-fix     redRad1 all ave/time 100 1 100 c_layerRad1 file relRad1.dat
+#compute layerRad1 all reduce sum f_layerRelRad[1]
+#fix     redRad1 all ave/time 100 1 100 c_layerRad1 file relRad1.dat
 
-compute layerRad2 all reduce sum f_layerRelRad[2]
-fix     redRad2 all ave/time 100 1 100 c_layerRad2 file relRad2.dat 
+#compute layerRad2 all reduce sum f_layerRelRad[2]
+#fix     redRad2 all ave/time 100 1 100 c_layerRad2 file relRad2.dat 
 
-compute layerRad3 all reduce sum f_layerRelRad[3]
-fix     redRad3 all ave/time 100 1 100 c_layerRad3 file relRad3.dat 
+#compute layerRad3 all reduce sum f_layerRelRad[3]
+#fix     redRad3 all ave/time 100 1 100 c_layerRad3 file relRad3.dat 
 
-compute layerRad4 all reduce sum f_layerRelRad[4]
-fix     redRad4 all ave/time 100 1 100 c_layerRad4 file relRad4.dat 
+#compute layerRad4 all reduce sum f_layerRelRad[4]
+#fix     redRad4 all ave/time 100 1 100 c_layerRad4 file relRad4.dat 
 
 
-variable    rad_fe  atom   "f_layerRelRad[1]*radius"
-compute r_fe    all reduce  sum v_rad_fe
-fix         r_fe1   all     ave/time    100  1   100  c_r_fe  file    rfe.dat 
+#variable    rad_fe  atom   "f_layerRelRad[1]*radius"
+#compute r_fe    all reduce  sum v_rad_fe
+#fix         r_fe1   all     ave/time    100  1   100  c_r_fe  file    rfe.dat 
 
-variable    rad_w   atom   "f_layerRelRad[2]*radius"
-compute     r_w    all     reduce      sum v_rad_w
-fix         r_w1   all     ave/time    100  1   100  c_r_w  file    rw.dat 
+#variable    rad_w   atom   "f_layerRelRad[2]*radius"
+#compute     r_w    all     reduce      sum v_rad_w
+#fix         r_w1   all     ave/time    100  1   100  c_r_w  file    rw.dat 
 
-variable    rad_m  atom   "f_layerRelRad[3]*radius"
-compute     r_m    all     reduce      sum v_rad_m
-fix         r_m1   all     ave/time    100  1   100  c_r_m  file    rm.dat 
+#variable    rad_m  atom   "f_layerRelRad[3]*radius"
+#compute     r_m    all     reduce      sum v_rad_m
+#fix         r_m1   all     ave/time    100  1   100  c_r_m  file    rm.dat 
 
-variable    rad_h  atom   "f_layerRelRad[4]*radius"
-compute     r_h    all     reduce      sum v_rad_h
-fix         r_h1   all     ave/time    100  1   100  c_r_h  file    rh.dat 
+#variable    rad_h  atom   "f_layerRelRad[4]*radius"
+#compute     r_h    all     reduce      sum v_rad_h
+#fix         r_h1   all     ave/time    100  1   100  c_r_h  file    rh.dat 
 
 ###############################################
 # screen output

@@ -15,7 +15,7 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-combustionModel  noCombustion<psiThermoCombustion>;//laminar<psiChemistryCombustion>;////noCombustion<psiThermoCombustion>;//PaSR<psiChemistryCombustion>;
+combustionModel  noCombustion<psiThermoCombustion>; //laminar<psiChemistryCombustion>;////noCombustion<psiThermoCombustion>;//PaSR<psiChemistryCombustion>;
 
 active  false; //true;
 

@@ -165,7 +165,7 @@ DiFeliceDragProps
 
 KochHillDragProps
 {
-    //verbose true;
+    verbose true;
     velFieldName "U";
     voidfractionFieldName "voidfraction";
     interpolation true;

@@ -15,7 +15,80 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 // Sutherland coefficients not valid must be checked before real cases
-
+// for hConst 
+/*CO2
+{
+    specie
+    {
+        nMoles          1;
+        molWeight       44.01;
+    }
+    thermodynamics
+    {
+        Cp  1290;
+        Hf  0;
+       
+    }
+    transport
+    {
+        mu              1.37e-05; 
+        Pr              0.72; 
+    }
+}
+O2
+{
+    specie
+    {
+        nMoles          1;
+        molWeight       31.9988;
+    }
+    thermodynamics
+    {
+        Cp  1120;
+        Hf  0;
+    }
+    transport
+    {
+        mu              1.95e-05; 
+        Pr              0.7; 
+    }
+}
+N2
+{
+    specie
+    {
+        nMoles          1;
+        molWeight       28.0134;
+    }
+    thermodynamics
+    {
+        Cp  1212;
+        Hf  0;
+    }
+    transport
+    {
+        mu              1.66e-05; 
+        Pr              0.7; 
+    }
+}
+CO
+{
+    specie
+    {
+        nMoles          1;
+        molWeight       28.01;
+    }
+    thermodynamics
+    {
+        Cp  1227;
+        Hf  0;
+    }
+    transport
+    {
+        mu              1.66e-05; 
+        Pr              0.7;       
+    }
+}*/
 CO2
 {
     specie
@@ -103,7 +176,7 @@ CO
         As              1.67212e-06;
         Ts              170.672;
     }
-}
+} 
 
 
 

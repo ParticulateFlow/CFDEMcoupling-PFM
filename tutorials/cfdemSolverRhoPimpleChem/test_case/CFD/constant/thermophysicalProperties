@@ -17,18 +17,20 @@ FoamFile
 
 thermoType
 {
-    type            hePsiThermo;        //covers compressible and lagrangian solvers
-    mixture         reactingMixture;    //species and reactions are listed in chemistry file
-    transport       sutherland;         //calcualtes viscosity as a function of temperature from Stuherland coefficient As and Ts
-    thermo          janaf;
-    energy          sensibleEnthalpy;   //uses enthaly in the solution
-    equationOfState perfectGas;         
-    specie          specie;
+    type                hePsiThermo;        //covers compressible and lagrangian solvers
+    mixture             reactingMixture;    //species and reactions are listed in chemistry file
+    //transport           const;              // assumes constant viscosity and Prandtl number
+    transport         sutherland;         //calcualtes viscosity as a function of temperature from Stuherland coefficient As and Ts
+    thermo              janaf; //hConst;             //janaf;
+    energy              sensibleEnthalpy;   //uses enthaly in the solution
+    //equationOfState     rhoConst;         // rho = const.
+    equationOfState   perfectGas;           // rho = 1/RT*p  
+    specie              specie;
 }
 
 chemistryReader foamChemistryReader;
 
-foamChemistryThermoFile     "$casePath/CFD/constant/foam.dat";
+foamChemistryThermoFile     "$casePath/CFD/constant/foam.dat" ;// "$casePath/CFD/constant/foam.dat";
 
 foamChemistryFile           "$casePath/CFD/constant/foam.inp";
 

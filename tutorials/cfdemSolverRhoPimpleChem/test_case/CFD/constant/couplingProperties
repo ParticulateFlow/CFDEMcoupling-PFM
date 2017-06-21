@@ -60,7 +60,7 @@ forceModels
     //DiFeliceDrag
     gradPForce
     viscForce
-    //KochHillDrag
+    // KochHillDrag
     //DEMbasedDrag
     //RongDrag
     //Archimedes
@@ -114,11 +114,13 @@ speciesProps
         partMoleName            "partN";
         pressureFieldName       "p";
         partPName               "partP";
+        // verbose true;
 }
 
 diffusionCoefficientsProps
 {
-        ChemistryFile 		"$casePath/CFD/constant/foam.inp";
+	verbose			true;        
+	ChemistryFile 		"$casePath/CFD/constant/foam.inp";
 	tempFieldName 		"T";
 	totalMoleFieldName      "N";
         pressureFieldName       "p";
@@ -130,12 +132,12 @@ diffusionCoefficientsProps
 
 massTransferCoeffProps
 {
-    velFieldName    "U";
-    voidfractionFieldName   "voidfraction";
-    partNuName      "nu";
-    partReynolds    "Rep";
+    velFieldName    		"U";
+    voidfractionFieldName   	"voidfraction";
+    partNu          		"partNu";
+    partReynolds   		"partRe";
+    verbose 			true;
 }
-
 
 SyamlalThermCondProps
 {
@@ -243,7 +245,7 @@ DiFeliceDragProps
 
 KochHillDragProps
 {
-    //verbose true;
+    verbose true;
     velFieldName "U";
     voidfractionFieldName "voidfraction";
     interpolation true;
