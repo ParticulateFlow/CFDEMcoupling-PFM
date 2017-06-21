@@ -182,7 +182,8 @@ void diffusionCoefficient::execute()
     scalar Nfluid(0);
     scalar Texp(0);
     // for total stagnant gas molar fractions
-    scalar Xstag_tot;
+    List<scalar> Xstag_tot;
+    Xstag_tot.setSize(diffusantGasNames_.size());
     // for adding gases one by one.
     List<scalar> Xfluid_;
     Xfluid_.setSize(speciesNames_.size());
@@ -268,11 +269,11 @@ void diffusionCoefficient::execute()
 
                             // for now considering only one species is diffusing, the rest of the molar fractions are from
                             // stagnangt gases we can get the total stagnant gas molar fractions by
-                            Xstag_tot   =   1-Xfluid_[i];
+                            Xstag_tot[i]   =   1-Xfluid_[i];
                         }
 
                         // when reactant gas mole fraction is greater than zero do calculation
-                        if (Xstag_tot > 0.0)
+                        if (Xstag_tot[i] > 0.0)
                         {
                             calcMolNum(i,j,molNum_);
                             calcDiffVol(i,j,volDiff_);
@@ -304,7 +305,7 @@ void diffusionCoefficient::execute()
                                 // Info << "Xfluid_[i]: " << Xfluid_[i] << nl << endl;
                                 // dCoeff_[i]  =   (1-Xfluid_[i])/dCoeff_[i];
                                 // According to Maier/Nietrost (who referred to wilke but in Wilke's paper its written as the previous eq.)
-                                // and Nietros
+                                // and Nietrost
                                 // dCoeff_[i]   +=  Xfluid_[i]/dCoeff_[i];
                                 // dCoeff_[i]   =   1/dCoeff_[i];
 
