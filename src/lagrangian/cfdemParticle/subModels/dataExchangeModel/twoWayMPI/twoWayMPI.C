@@ -194,14 +194,12 @@ void twoWayMPI::destroy(int** array,int /*len*/) const
 // int *
 void twoWayMPI::destroy(int* array) const
 {
-    if (array == NULL) return;
     free(array);
 }
 //============
 // double *
 void twoWayMPI::destroy(double* array) const
 {
-    if (array == NULL) return;
     free(array);
 }
 //============
