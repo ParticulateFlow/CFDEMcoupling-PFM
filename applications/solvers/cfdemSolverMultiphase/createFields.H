@@ -98,7 +98,8 @@ volScalarField rho
         "rho",
         runTime.timeName(),
         mesh,
-        IOobject::READ_IF_PRESENT
+        IOobject::READ_IF_PRESENT,
+        IOobject::AUTO_WRITE
     ),
     mixture.rho()
 );
