@@ -78,6 +78,7 @@ void standardRecStatAnalysis::init()
 {
     label size = base_.recM().numRecFields() - ignoreStepsInit_;
     aveSimilarity_.resize(size,0.0);
+    correlationSum_.resize(size,0.0);
     mostDistinct_.resize(size,0.0);
 }
 

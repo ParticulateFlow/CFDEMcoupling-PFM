@@ -81,6 +81,8 @@ private:
     
     scalarList aveSimilarity_;
     
+    scalarList correlationSum_;
+    
     scalarList mostDistinct_;
     
     void aveSimGeneral();
@@ -88,7 +90,7 @@ private:
     void aveSimSpecial();
     
     void mostDistinct();
-    
+
     
 };
 

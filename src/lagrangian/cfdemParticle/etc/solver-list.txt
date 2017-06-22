@@ -1,4 +1,5 @@
 rcfdemSolverHeattransfer/dir
+rStatAnalysis/dir
 rcfdemSolverBase/dir
 rtfmSolverSpecies/dir
 cfdemSolverRhoPimple/dir
