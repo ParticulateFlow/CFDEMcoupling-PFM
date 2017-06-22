@@ -54,6 +54,23 @@ void Foam::multiphaseMixture::calcAlphas()
     }
 }
 
+
+Foam::tmp<Foam::volScalarField>
+Foam::multiphaseMixture::calcNu() const
+{
+    PtrDictionary<phase>::const_iterator iter = phases_.begin();
+
+    tmp<volScalarField> tnu = iter()*iter().nu();
+    volScalarField& nu = tnu.ref();
+    
+    for (++iter; iter != phases_.end(); ++iter)
+    {
+        nu += iter()*iter().nu();
+    }
+    
+    return tnu;
+}
+
 Foam::tmp<Foam::surfaceScalarField>
 Foam::multiphaseMixture::calcStf() const
 {
@@ -186,9 +203,11 @@ Foam::multiphaseMixture::multiphaseMixture
         (
             "nu",
             mesh_.time().timeName(),
-            mesh_
+            mesh_,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
         ),
-        mu()/rho()
+        calcNu()
     ),
 
     sigmas_(lookup("sigmas")),
@@ -245,17 +264,19 @@ Foam::multiphaseMixture::rho(const label patchi) const
 Foam::tmp<Foam::volScalarField>
 Foam::multiphaseMixture::mu() const
 {
-    PtrDictionary<phase>::const_iterator iter = phases_.begin();
+    
+    return nu()*rho();
+//    PtrDictionary<phase>::const_iterator iter = phases_.begin();
 
-    tmp<volScalarField> tmu = iter()*iter().rho()*iter().nu();
-    volScalarField& mu = tmu.ref();
+//    tmp<volScalarField> tmu = iter()*iter().rho()*iter().nu();
+//    volScalarField& mu = tmu.ref();
 
-    for (++iter; iter != phases_.end(); ++iter)
-    {
-        mu += iter()*iter().rho()*iter().nu();
-    }
+//    for (++iter; iter != phases_.end(); ++iter)
+//    {
+//        mu += iter()*iter().rho()*iter().nu();
+//    }
 
-    return tmu;
+//    return tmu;
 }
 
 
@@ -285,19 +306,21 @@ Foam::multiphaseMixture::mu(const label patchi) const
 Foam::tmp<Foam::surfaceScalarField>
 Foam::multiphaseMixture::muf() const
 {
-    PtrDictionary<phase>::const_iterator iter = phases_.begin();
-
-    tmp<surfaceScalarField> tmuf =
-        fvc::interpolate(iter())*iter().rho()*fvc::interpolate(iter().nu());
-    surfaceScalarField& muf = tmuf.ref();
-
-    for (++iter; iter != phases_.end(); ++iter)
-    {
-        muf +=
-            fvc::interpolate(iter())*iter().rho()*fvc::interpolate(iter().nu());
-    }
-
-    return tmuf;
+    
+    return nuf()*fvc::interpolate(rho());
+//    PtrDictionary<phase>::const_iterator iter = phases_.begin();
+    
+//    tmp<surfaceScalarField> tmuf =
+//            fvc::interpolate(iter())*iter().rho()*fvc::interpolate(iter().nu());
+//    surfaceScalarField& muf = tmuf.ref();
+    
+//    for (++iter; iter != phases_.end(); ++iter)
+//    {
+//        muf +=
+//                fvc::interpolate(iter())*iter().rho()*fvc::interpolate(iter().nu());
+//    }
+    
+//    return tmuf;
 }
 
 
@@ -311,14 +334,42 @@ Foam::multiphaseMixture::nu() const
 Foam::tmp<Foam::scalarField>
 Foam::multiphaseMixture::nu(const label patchi) const
 {
-    return nu_.boundaryField()[patchi];
+    //return nu_.boundaryField()[patchi];
+    PtrDictionary<phase>::const_iterator iter = phases_.begin();
+
+    tmp<scalarField> tnu =
+        iter().boundaryField()[patchi]
+       *iter().nu(patchi);
+    scalarField& nu = tnu.ref();
+
+    for (++iter; iter != phases_.end(); ++iter)
+    {
+        nu +=
+            iter().boundaryField()[patchi]
+           *iter().nu(patchi);
+    }
+
+    return tnu;
 }
 
 
 Foam::tmp<Foam::surfaceScalarField>
 Foam::multiphaseMixture::nuf() const
 {
-    return muf()/fvc::interpolate(rho());
+    //return muf()/fvc::interpolate(rho());
+    PtrDictionary<phase>::const_iterator iter = phases_.begin();
+
+    tmp<surfaceScalarField> tnuf =
+        fvc::interpolate(iter())*fvc::interpolate(iter().nu());
+    surfaceScalarField& nuf = tnuf.ref();
+
+    for (++iter; iter != phases_.end(); ++iter)
+    {
+        nuf +=
+            fvc::interpolate(iter())*fvc::interpolate(iter().nu());
+    }
+
+    return tnuf;
 }
 
 void Foam::multiphaseMixture::solve()
@@ -368,7 +419,7 @@ void Foam::multiphaseMixture::solve()
     }
 
     // Update the mixture kinematic viscosity
-    nu_ = mu()/rho();
+    nu_ = calcNu();
     surfaceTensionForce_ = calcStf();
 }
 

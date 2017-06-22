@@ -162,6 +162,8 @@ private:
     // Private member functions
 
         void calcAlphas();
+        
+        tmp<volScalarField> calcNu() const;        
 
         void solveAlphas(const scalar cAlpha);
 
