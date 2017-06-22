@@ -247,7 +247,8 @@ void diffusionCoefficient::execute()
                         Info << "molar weights diffuser gases: " << molWeight(speciesNames_[j]) << nl << endl;
                         Info << "N fluid" << Nfluid << nl << endl;
                         Info << "rho fluid" << rhofluid << nl << endl;
-                        Info << "Y fluid" << Yfluid_[j] << nl << endl;
+                        Info << "Y fluid_reactant" << Yfluid_[i] << nl << endl;
+                        Info << "Y fluid_stagnant" << Yfluid_[j] << nl << endl;
                         Info << "molar weights diffusant gases: " << molWeight(diffusantGasNames_[i]) << nl << endl;
 
                         // if Nfluid ever becomes zero, no division with 0 should occur
@@ -266,6 +267,13 @@ void diffusionCoefficient::execute()
 
                             Xfluid_[j]  =   Yfluid_[j]*rhofluid/(Nfluid*molWeight(speciesNames_[j])); //TODO:: change rhofluid to specific denisities of the species by creating hastable
                             Info << "molar fraction stagnant gases:" << Xfluid_[j] << nl << endl;
+
+                            // limit Xfluid molar fractions so that it does not diverge
+                            // TODO:: check the error!!!
+                            Xfluid_[i]  = std::min(Xfluid_[i],1.0);
+                            Xfluid_[j]  = std::min(Xfluid_[j],1.0);
+                            Info << "molar fraction diffusing gases - 2:" << Xfluid_[i] << nl << endl;
+                            Info << "molar fraction stagnant gases - 2:" << Xfluid_[j] << nl << endl;
 
                             // for now considering only one species is diffusing, the rest of the molar fractions are from
                             // stagnangt gases we can get the total stagnant gas molar fractions by
@@ -297,6 +305,10 @@ void diffusionCoefficient::execute()
                                 // for only one reactant gas, and one product gas
                                 // calculate diffusion coefficient for mixture
                                 dCoeff_[i]  =   dBinarytot_[i];
+                                Info << "dCoeff: after " << dCoeff_[i] << nl << endl;
+
+                                // pass on dCoeff values to array
+                                diffusionCoefficients_[i][index][0]= dCoeff_[i];
 
                                 // TODO:: it should add for every reactant gas mole fraction
                                 //     :: however, in every ts maybe it should reset afterwards?
@@ -308,8 +320,6 @@ void diffusionCoefficient::execute()
                                 // and Nietrost
                                 // dCoeff_[i]   +=  Xfluid_[i]/dCoeff_[i];
                                 // dCoeff_[i]   =   1/dCoeff_[i];
-
-                                Info << "dCoeff: after " << dCoeff_[i] << nl << endl;
                             }else
                             {
                                 FatalError
@@ -320,10 +330,9 @@ void diffusionCoefficient::execute()
                         }
                     }
                 }
-                diffusionCoefficients_[i][index][0]= dCoeff_[i];
 
                 // reset dCoeff & dBinarytot array for next ts after current value is given to DEM
-                // dCoeff_[i]      =   0.0;
+                dCoeff_[i]      =   0.0;
                 dBinarytot_[i]  =   0.0;
             }
         }
