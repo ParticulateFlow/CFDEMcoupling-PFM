@@ -5,7 +5,8 @@
     www.cfdem.com
                                 Christoph Goniva, christoph.goniva@cfdem.com
                                 Copyright 2009-2012 JKU Linz
-                                Copyright 2012-     DCS Computing GmbH, Linz
+                                Copyright 2012-2015 DCS Computing GmbH, Linz
+                                Copyright 2015-     JKU Linz
 -------------------------------------------------------------------------------
 License
     This file is part of CFDEMcoupling.
@@ -33,12 +34,12 @@ Description
 #ifndef versionInfo_H
 #define versionInfo_H
 
-word CFDEMversion="cfdem-2.9.0PFM";
-word compatibleLIGGGHTSversion="3.0.6PFM";
-word OFversion="2.3.x-commit-4d6f4a3115ff76ec4154c580eb041bc95ba4ec09";
+word CFDEMversion="PFM 17.02";
+word compatibleLIGGGHTSversion="PFM 17.02";
+word OFversion="4.x";
 
 Info << "\nCFDEMcoupling version: " << CFDEMversion <<  endl;
 Info << ", compatible to LIGGGHTS version: " << compatibleLIGGGHTSversion <<  endl;
-Info << ", compatible to OF version and build: " << OFversion <<  endl;
+Info << ", compatible to OpenFOAM version: " << OFversion <<  endl;
 
 #endif

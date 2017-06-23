@@ -35,8 +35,8 @@ if [ $runOctave == "true" ]
     
     cd $casePath/CFD/octave
     octave postproc.m
-    evince pos_y_two_part_rec_glow.eps 
-    evince vel_y_two_part_rec_glow.eps 
+    evince pos_z_two_part_rec_glow.eps 
+    evince vel_z_two_part_rec_glow.eps 
     #display pos_y_two_part_rec_glow.png &
     #display vel_y_two_part_rec_glow.png &
 fi

@@ -47,8 +47,8 @@ defineRunTimeSelectionTable(global, dictionary);
 void global::info()
 {
     Info << "\nYou are currently using:" << endl;
-    Info << "OF version: " << FOAMversion << endl;
-    Info << "OF build: " << FOAMbuild << endl;
+    Info << "OpenFOAM version: " << FOAMversion << endl;
+    Info << "OpenFOAM build: " << FOAMbuild << endl;
     Info << "CFDEM build: " << CFDEMversion << "\n" << endl;
 }
 
