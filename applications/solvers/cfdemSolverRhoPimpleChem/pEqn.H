@@ -48,6 +48,7 @@ else
           + fvc::div(phi)
           - fvm::laplacian(rhorAUf, p)
           ==
+        //    particleCloud.chemistryM(0).Sm()
             fvOptions(psi, p, rho.name())
         );
 
