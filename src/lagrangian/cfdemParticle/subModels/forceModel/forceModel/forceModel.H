@@ -131,7 +131,7 @@ public:
         virtual void manipulateScalarField(volScalarField&) const;
 
     // Access
-        word modelType() { return modelType_; }
+        const word& modelType() const { return modelType_; }
 
         inline volVectorField& impParticleForces() const { return impParticleForces_; }
 
@@ -147,7 +147,7 @@ public:
 
         inline double ** fluidVel() const { return particleCloud_.fluidVel_; }
 
-        inline const bool& coupleForce() const { return coupleForce_; }
+        inline bool coupleForce() const { return coupleForce_; }
 
         virtual inline bool& requiresEx() { return requiresEx_; }
 
@@ -157,9 +157,9 @@ public:
 
         inline const wordList& forceSubModels(){ return forceSubModels_; }
 
-        inline const forceSubModel& forceSubM(int i) const { return forceSubModel_[i]; }
+        inline forceSubModel& forceSubM(int i) const { return forceSubModel_[i](); }
 
-        inline int nrForceSubModels(){ return forceSubModels_.size(); }
+        inline int nrForceSubModels() const { return forceSubModels_.size(); }
 
         void setForceSubModels(dictionary& dict);
 };
