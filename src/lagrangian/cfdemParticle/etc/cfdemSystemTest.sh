@@ -12,7 +12,7 @@ source $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/functions.sh
 checkGPP="true"
 
 #- sys check for add on
-checkAddOn="true"
+checkAddOn="false"
 
 #- system settings
 printHeader
@@ -37,7 +37,7 @@ checkDirComment "$CFDEM_LPP_DIR" '$CFDEM_LPP_DIR' "yes"
 checkDirComment "$CFDEM_ADD_LIBS_DIR" '$CFDEM_ADD_LIBS_DIR' "yes"
 checkDirComment "$CFDEM_PIZZA_DIR" '$CFDEM_PIZZA_DIR' "no"
 checkDirComment "$CFDEM_TEST_HARNESS_PATH" '$CFDEM_TEST_HARNESS_PATH' "no"
-checkDirComment "$C3PO_SRC_DIR" '$C3PO_SRC_DIR' "no"
+#checkDirComment "$C3PO_SRC_DIR" '$C3PO_SRC_DIR' "no"
 echo ""
 
 echo "library names"
@@ -68,11 +68,11 @@ if [ $checkGPP == "true" ]
     mpirun --version
 fi
 
-echo "**********************"
-echo "additional packages..."
-
 if [ $checkAddOn == "true" ]
   then
+    echo "**********************"
+    echo "additional packages..."
+
     packageName=c3po
     filePath=$CFDEM_SRC_DIR/$packageName
     if [ $(checkDir $filePath) == "true" ]; then

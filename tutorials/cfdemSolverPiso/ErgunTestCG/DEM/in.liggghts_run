@@ -2,7 +2,8 @@
 # tutorial case showing coarse graining functionality #
 # Christoph Goniva  08.02.2013                        #
 #######################################################
-echo both
+log             ../DEM/log.liggghts
+thermo_log      ../DEM/post/thermo.txt
 
 #######################################################
 # variables                                           #

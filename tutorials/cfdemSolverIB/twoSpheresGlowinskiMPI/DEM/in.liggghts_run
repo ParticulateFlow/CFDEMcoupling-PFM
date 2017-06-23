@@ -68,10 +68,10 @@ variable        y2 equal y[2]
 variable        z2 equal z[2]
 variable        time equal step*dt
 
-fix             extra1 all print 100 "${time} ${vx1} ${vy1} ${vz1}" file ../DEM/post/velocity_particle_1.txt title "%" screen no
-fix             extra2 all print 100 "${time} ${vx2} ${vy2} ${vz2}" file ../DEM/post/velocity_particle_2.txt title "%" screen no
-fix             extra3 all print 100 "${time} ${x1}  ${y1}  ${z1}"  file ../DEM/post/position_particle_1.txt title "%" screen no
-fix             extra4 all print 100 "${time} ${x2}  ${y2}  ${z2}"  file ../DEM/post/position_particle_2.txt title "%" screen no
+fix             extra1 all print 100 "${time} ${vx1} ${vy1} ${vz1}" file ../DEM/post/velocity_particle_1.txt title "#" screen no
+fix             extra2 all print 100 "${time} ${vx2} ${vy2} ${vz2}" file ../DEM/post/velocity_particle_2.txt title "#" screen no
+fix             extra3 all print 100 "${time} ${x1}  ${y1}  ${z1}"  file ../DEM/post/position_particle_1.txt title "#" screen no
+fix             extra4 all print 100 "${time} ${x2}  ${y2}  ${z2}"  file ../DEM/post/position_particle_2.txt title "#" screen no
 
 
 # apply nve integration to all particles that are inserted as single particles
