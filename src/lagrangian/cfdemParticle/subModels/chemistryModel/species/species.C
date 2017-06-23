@@ -207,7 +207,7 @@ void species::reAllocMyArrays() const
 void species::execute()
 {
     loopCounter_++;
-    if (loopCounter_ % Nevery_ == 0)
+    if (loopCounter_ % Nevery_ != 0)
     {
         return;
     }
