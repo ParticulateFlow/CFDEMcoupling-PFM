@@ -260,6 +260,8 @@ void diffusionCoefficient::execute()
                         {
                             // get molar fraction for diffusing gas gas
                             Xfluid_[i]  =   Yfluid_[i]*rhofluid/(Nfluid*molWeight(diffusantGasNames_[i]));
+                            // add decimal point limit
+                            Xfluid_[i]  =   (int)(Xfluid_[i]/1e-6)*1e-6;
                             Info << "molar fraction diffusing gases:" << Xfluid_[i] << nl << endl;
 
                             // convert mass to molar fractions
@@ -292,6 +294,8 @@ void diffusionCoefficient::execute()
                             {
                                 // binary coefficient units in this case is [m^2/s]
                                 dBinary_[i][j] = pow(10,-7)*Texp*molNum_[i][j]/(Pfluid*volDiff_[i][j]);
+                                // add decimal point limit
+                                dBinary_[i][j]  =   (int)(dBinary_[i][j]/1e-6)*1e-6;
 
                                 Info << "dBinary: "  << dBinary_[i][j] << nl << endl;
 
