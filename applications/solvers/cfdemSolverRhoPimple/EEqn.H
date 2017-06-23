@@ -52,8 +52,4 @@
     thermo.correct();
 
     Info<< "T max/min : " << max(T).value() << " " << min(T).value() << endl;
-
-    particleCloud.clockM().start(31,"postFlow");
-    particleCloud.postFlow();
-    particleCloud.clockM().stop("postFlow");
 }
