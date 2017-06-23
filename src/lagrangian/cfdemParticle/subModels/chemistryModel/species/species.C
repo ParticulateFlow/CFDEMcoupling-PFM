@@ -100,7 +100,9 @@ species::species
     totalMoleFieldName_(propsDict_.lookup("totalMoleFieldName")),
     N_(sm.mesh().lookupObject<volScalarField>(totalMoleFieldName_)),
     partMoleName_(propsDict_.lookup("partMoleName")),
-    partN_(NULL)
+    partN_(NULL),
+    loopCounter_(0),
+    Nevery_(propsDict_.lookupOrDefault<label>("Nevery",1))
 {
     Info << " Read species list from: " << specDict_.name() << endl;
     Info << " Reading species list: " << speciesNames_ << endl;
@@ -204,6 +206,12 @@ void species::reAllocMyArrays() const
 
 void species::execute()
 {
+    loopCounter_++;
+    if (loopCounter_ % Nevery_ == 0)
+    {
+        return;
+    }
+  
     // realloc the arrays
     reAllocMyArrays();
 
@@ -253,7 +261,9 @@ void species::execute()
 
             //fill arrays
             partTemp_[index][0] =   Tfluid;
-            partRho_[index][0]  =   rhofluid*voidfraction;
+	    // partRho was filled with rhofluid*voidfraction before
+	    // probably wrong: need actual gas density, not averaged one
+            partRho_[index][0]  =   rhofluid;
             partN_[index][0]    =   Nfluid;
 
             for (int i=0; i<speciesNames_.size();i++)
@@ -293,6 +303,7 @@ void species::execute()
         Info << "give data done" << endl;
 
         // pull changeOfSpeciesMass_, transform onto fields changeOfSpeciesMassFields_, add them up on changeOfGasMassField_
+	scalar timestep = mesh_.time().deltaTValue();
         changeOfGasMassField_.primitiveFieldRef() = 0.0;
         changeOfGasMassField_.boundaryFieldRef() = 0.0;
         for (int i=0; i<speciesNames_.size();i++)
@@ -309,7 +320,8 @@ void species::execute()
             );
 
             // take care for implementation in LIGGGHTS: species produced from particles defined positive
-            changeOfSpeciesMassFields_[i].primitiveFieldRef() /= changeOfSpeciesMassFields_[i].mesh().V();
+	    // changeOf...Fields need to be mass per volume per timestep
+            changeOfSpeciesMassFields_[i].primitiveFieldRef() /= (changeOfSpeciesMassFields_[i].mesh().V() * Nevery_ * timestep);
             changeOfSpeciesMassFields_[i].correctBoundaryConditions();
             changeOfGasMassField_ += changeOfSpeciesMassFields_[i];
             Info << "total conversion of species" << speciesNames_[i] << " = " << gSum(changeOfSpeciesMassFields_[i]*1.0*changeOfSpeciesMassFields_[i].mesh().V()) << endl;

@@ -105,6 +105,10 @@ private:
     mutable double **partN_;
 
     bool verbose_;
+    
+    label loopCounter_;
+    
+    label Nevery_;
 
 public:
 
