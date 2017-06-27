@@ -17,10 +17,10 @@ tmp<fv::convectionScheme<scalar> > mvConvection
 
     forAll(Y, i)
     {
-        if (Y[i].name() != inertSpecie)
+        if (Y[i].name() != inertSpecie || ignoreInertSpecie)
         {
             volScalarField& Yi = Y[i];
-
+	    
             fvScalarMatrix YiEqn
             (
                 fvm::ddt(rhoeps, Yi)
@@ -52,6 +52,17 @@ tmp<fv::convectionScheme<scalar> > mvConvection
     // calculate total mole in Volume
     N = rho/W;
 
-    Y[inertIndex] = scalar(1) - Yt;
-    Y[inertIndex].max(0.0);
+    if (ignoreInertSpecie)
+    {
+        forAll(Y,i)
+        {
+            volScalarField& Yi = Y[i];
+            Yi = Yi/Yt;
+        }
+    }
+    else
+    {
+        Y[inertIndex] = scalar(1) - Yt;
+        Y[inertIndex].max(0.0);
+    }
 }
