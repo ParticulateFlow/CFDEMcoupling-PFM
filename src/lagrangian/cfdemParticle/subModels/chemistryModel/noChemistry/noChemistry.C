@@ -59,84 +59,50 @@ noChemistry::~noChemistry()
 void noChemistry::execute()
 {}
 
-void noChemistry::tryout(const label i)
-{
-    mi_.set
-            (
-                i,
-                new volScalarField
-                (
-                    IOobject
-                    (
-                        "empty1",
-                        particleCloud_.mesh().time().timeName(),
-                        particleCloud_.mesh(),
-                        IOobject::NO_READ,
-                        IOobject::NO_WRITE
-                     ),
-                     particleCloud_.mesh(),
-                     dimensionedScalar("zero",dimless,0.0)
-                )
-            );
-}
 
 tmp<volScalarField> noChemistry ::Smi(const label i) const
 {
-    return tmp<volScalarField> (mi_[i]);
-}
-
-  /*  tmp<volScalarField> mi_[i]
+  tmp<volScalarField> smi
     (
         new volScalarField
         (
             IOobject
             (
-                "empty1",
+                "dummy",
                 particleCloud_.mesh().time().timeName(),
                 particleCloud_.mesh(),
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
-             ),
-             particleCloud_.mesh(),
-             dimensionedScalar
-             (
-              "zero",
-              dimMass/dimTime,//dimensionSet(0,2,-1,0,0,0,0),
-              0.0
-             )
-        )
+            ),
+            particleCloud_.mesh(),
+            dimensionedScalar("zero",dimMass/(dimVol*dimTime),0.0)
+         )
     );
 
-    return mi_[i];
-}*/
+    return smi;
+}
 
 tmp<volScalarField> noChemistry::Sm() const
 {
-    tmp<volScalarField> sm_
+    tmp<volScalarField> sm
     (
         new volScalarField
         (
             IOobject
             (
-                "empty2",
+                "dummy",
                 particleCloud_.mesh().time().timeName(),
                 particleCloud_.mesh(),
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
-             ),
-             particleCloud_.mesh(),
-             dimensionedScalar("zero",dimless,0.0)
+            ),
+            particleCloud_.mesh(),
+            dimensionedScalar("zero",dimMass/(dimVol*dimTime), 0.0)
         )
     );
 
-    return sm_;
+    return sm;
 }
-
-
-/*tmp<Foam::fvScalarMatrix> noChemistry::Smi(const label i) const
-tmp<Foam::fvScalarMatrix> noChemistry::Sm() const*/
-
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
