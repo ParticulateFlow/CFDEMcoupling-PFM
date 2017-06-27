@@ -20,6 +20,8 @@
     // read molecular weight
     volScalarField W(composition.W());
 
+    bool ignoreInertSpecie = true;
+
     const word inertSpecie(thermo.lookup("inertSpecie"));
 
     if (!composition.contains(inertSpecie))
@@ -97,6 +99,19 @@
             IOobject::AUTO_WRITE
         ),
         mesh
+    );
+    
+    volScalarField rhoeps
+    (
+        IOobject
+        (
+            "rhoeps",
+            runTime.timeName(),
+            mesh,
+            IOobject::MUST_READ,
+            IOobject::AUTO_WRITE
+        ),
+        rho*voidfraction
     );
 
     Info<< "\nCreating fluid-particle heat flux field\n" << endl;
