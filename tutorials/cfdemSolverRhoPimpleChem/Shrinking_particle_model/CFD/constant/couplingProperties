@@ -111,6 +111,7 @@ speciesProps
         partMoleName            "partN";
         pressureFieldName       "p";
         partPName               "partP";
+	Nevery			10;
 }
 
 SyamlalThermCondProps

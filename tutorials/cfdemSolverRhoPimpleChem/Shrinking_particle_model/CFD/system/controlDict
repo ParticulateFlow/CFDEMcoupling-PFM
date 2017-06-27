@@ -17,19 +17,19 @@ FoamFile
 
 application     cfdemSolverRhoPimpleChem;
 
-startFrom       latestTime;
+startFrom       startTime;
 
 startTime       0;
 
 stopAt          endTime;
 
-endTime         0.5;
+endTime         20.0;
 
 deltaT          0.0001;
 
-writeControl    adjustableRunTime;
+writeControl    timeStep;
 
-writeInterval   0.005;
+writeInterval   10000;
 
 purgeWrite      0;
 
@@ -53,14 +53,60 @@ maxDeltaT       0.1;
 
 
 // ************************************************************************* //
-/* libs (  
-        "libsimpleFunctionObjects.so"
+ libs (  
+   //     "libsimpleFunctionObjects.so"
         "libfieldFunctionObjects.so"
      );
 
 functions
-{  
-    Average-O2
+{
+    probes1
+    {
+	type probes;
+
+        functionObjectLibs ("libsampling.so");
+
+	#include "probesDict";
+    }
+  
+    globalMassFrac
+    {          
+        type            volRegion;
+        libs ("libfieldFunctionObjects.so");
+        writeControl   timeStep;//outputTime; 
+        writeInterval  1;
+        log             true;
+        writeFields     false;
+        regionType      all;
+        name            c0;
+        operation       weightedVolAverage;
+        weightField     rhoeps;
+        fields
+        (
+            O2
+            CO2
+            N2
+        );
+    }
+
+    globalMass
+    {          
+        type            volRegion;
+        libs ("libfieldFunctionObjects.so");
+        writeControl   timeStep;//outputTime; 
+        writeInterval  1;
+        log             true;
+        writeFields     false;
+        regionType      all;
+        name            c1;
+        operation       volIntegrate;
+        fields
+        (
+            rhoeps
+        );
+    }
+
+/*    Average-O2
     {
         type            fieldAverage;
         functionObjectLibs ( "libfieldFunctionObjects.so" );
@@ -139,10 +185,9 @@ functions
         ( 
             CO2
         ); 
-    } 
-              
-
-} */
+    }
+*/ 
+} 
 
 // ************************************************************************* //
  

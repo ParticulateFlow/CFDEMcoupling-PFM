@@ -9,7 +9,7 @@ boundary        f f f
 newton          off
 
 units           si
-processors      2 2 1
+processors      2 1 1
 
 region          reg block 0. 15. 0. 5. 0. 5. units box
 create_box      1 reg
@@ -40,7 +40,7 @@ fix     zwalls1 all wall/gran model hertz tangential history primitive type 1 zp
 fix     zwalls2 all wall/gran model hertz tangential history primitive type 1 zplane 5.0
 
 # create single particle in a specific spot
-create_atoms 1 single 7.5 2 2 units box
+create_atoms 1 single 7.5 2.5 2.5 units box
 set atom 1 diameter 0.2 density 2267 vx 0 vy 0 vz 0
 
 # particle distributions and insertion
