@@ -101,7 +101,7 @@ species::species
     N_(sm.mesh().lookupObject<volScalarField>(totalMoleFieldName_)),
     partMoleName_(propsDict_.lookup("partMoleName")),
     partN_(NULL),
-    loopCounter_(0),
+    loopCounter_(-1),
     Nevery_(propsDict_.lookupOrDefault<label>("Nevery",1))
 {
     Info << " Read species list from: " << specDict_.name() << endl;
@@ -137,7 +137,7 @@ species::species
                 IOobject::AUTO_WRITE
                 ),
                 mesh_,
-                dimensionedScalar("0",dimMass/(dimVol*dimTime), 0)
+                dimensionedScalar("zero",dimMass/(dimVol*dimTime), 0.0)
             )
          );
 
@@ -211,7 +211,6 @@ void species::execute()
     {
         return;
     }
-  
     // realloc the arrays
     reAllocMyArrays();
 
@@ -252,13 +251,11 @@ void species::execute()
                 rhofluid        =   rho_[cellI];
                 voidfraction    =   voidfraction_[cellI];
                 Nfluid          =   N_[cellI];
-
                 for (int i = 0; i<speciesNames_.size();i++)
                 {
                     Yfluid_[i] = Y_[i][cellI];
                 }
             }
-
             //fill arrays
             partTemp_[index][0] =   Tfluid;
 	    // partRho was filled with rhofluid*voidfraction before
@@ -324,7 +321,7 @@ void species::execute()
             changeOfSpeciesMassFields_[i].primitiveFieldRef() /= (changeOfSpeciesMassFields_[i].mesh().V() * Nevery_ * timestep);
             changeOfSpeciesMassFields_[i].correctBoundaryConditions();
             changeOfGasMassField_ += changeOfSpeciesMassFields_[i];
-            Info << "total conversion of species" << speciesNames_[i] << " = " << gSum(changeOfSpeciesMassFields_[i]*1.0*changeOfSpeciesMassFields_[i].mesh().V()) << endl;
+            Info << "total conversion of species" << speciesNames_[i] << " = " << gSum(changeOfSpeciesMassFields_[i]*1.0*changeOfSpeciesMassFields_[i].mesh().V() * Nevery_ * timestep) << endl;
         }
         Info << "get data done" << endl;
 }

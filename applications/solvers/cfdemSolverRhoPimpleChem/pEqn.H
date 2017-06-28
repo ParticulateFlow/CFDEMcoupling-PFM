@@ -48,8 +48,8 @@ else
           + fvc::div(phi)
           - fvm::laplacian(rhorAUf, p)
           ==
-        //    particleCloud.chemistryM(0).Sm()
-            fvOptions(psi, p, rho.name())
+            particleCloud.chemistryM(0).Sm()
+          + fvOptions(psi, p, rho.name())
         );
 
         pEqn.solve(mesh.solver(p.select(pimple.finalInnerIter())));

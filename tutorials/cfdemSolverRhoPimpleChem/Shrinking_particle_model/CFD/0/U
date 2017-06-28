@@ -17,32 +17,37 @@ FoamFile
 
 dimensions      [0 1 -1 0 0 0 0];
 
-internalField   uniform (0.0 0 0);
+internalField   uniform (1.0 0 0);
 
 boundaryField
 {
     // Walls in no slip condition
     top
     {
-        type            zeroGradient;
+        type            fixedValue;
+        value           uniform (0.0 0 0);
     }
     bottom
     {
-        type            zeroGradient;
+        type            fixedValue;
+        value           uniform (0.0 0 0);
     }
     side-walls
     {
-        type            zeroGradient;
+        type            fixedValue;
+        value           uniform (0.0 0 0);
     }
     inlet
     {
         type            fixedValue;
-        value           uniform (0.0 0 0);
+        value           uniform (1.0 0 0);
     }
 
     outlet
     {
         type            zeroGradient;
+  //      type            fixedValue;
+  //      value           uniform (0.0 0 0);
     }
 }
 
