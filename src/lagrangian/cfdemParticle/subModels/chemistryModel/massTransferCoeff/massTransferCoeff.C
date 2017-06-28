@@ -56,15 +56,15 @@ massTransferCoeff::massTransferCoeff
     verbose_(propsDict_.lookupOrDefault<bool>("verbose",false)),
     interpolation_(propsDict_.lookupOrDefault<bool>("interpolation",false)),
     mesh_(sm.mesh()),
-    velFieldName_(propsDict_.lookup("velFieldName")),
+    velFieldName_(propsDict_.lookupOrDefault<word>("velFieldName","U")),
     U_(mesh_.lookupObject<volVectorField>(velFieldName_)),
-    voidfractionFieldName_(propsDict_.lookup("voidfractionFieldName")),
+    voidfractionFieldName_(propsDict_.lookupOrDefault<word>("voidfractionFieldName","voidfraction")),
     voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
     densityFieldName_(propsDict_.lookupOrDefault<word>("densityFieldName","rho")),
     rho_(sm.mesh().lookupObject<volScalarField> (densityFieldName_)),
-    partNuName_(propsDict_.lookup("partNu")),
+    partNuName_(propsDict_.lookupOrDefault<word>("partViscos","partNu")),
     partNu_(NULL),
-    partReynolds_(propsDict_.lookup("partReynolds")),
+    partReynolds_(propsDict_.lookupOrDefault<word>("partReynolds","partRe")),
     partRe_(NULL)
 {}
 

@@ -67,13 +67,13 @@ diffusionCoefficient::diffusionCoefficient
     ),
     // create a list from the Species table in the specified diffusionCoefficient dictionary
     speciesNames_(specDict_.lookup("species")),
-    tempFieldName_(propsDict_.lookup("tempFieldName")),
+    tempFieldName_(propsDict_.lookupOrDefault<word>("tempFieldName","T")),
     tempField_(sm.mesh().lookupObject<volScalarField> (tempFieldName_)),
-    pressureFieldName_(propsDict_.lookup("pressureFieldName")),
+    pressureFieldName_(propsDict_.lookupOrDefault<word>("pressureFieldName","p")),
     P_(sm.mesh().lookupObject<volScalarField>(pressureFieldName_)),
-    densityFieldName_(propsDict_.lookup("densityFieldName")),
+    densityFieldName_(propsDict_.lookupOrDefault<word>("densityFieldName","rho")),
     rho_(sm.mesh().lookupObject<volScalarField> (densityFieldName_)),
-    totalMoleFieldName_(propsDict_.lookup("totalMoleFieldName")),
+    totalMoleFieldName_(propsDict_.lookupOrDefault<word>("totalMoleFieldName","N")),
     // needed to calculate the mixture diffusion coefficient
     // dcoeff is dependent on molar fraction not mass fraction
     N_(sm.mesh().lookupObject<volScalarField>(totalMoleFieldName_)),
@@ -81,10 +81,6 @@ diffusionCoefficient::diffusionCoefficient
     // X_(speciesNames_.size()),
     diffusantGasNames_(propsDict_.lookup("diffusantGasNames")),
     diffusionCoefficients_(diffusantGasNames_.size(),NULL)
- /*   diffusionCoefficientNames_(propsDict_.lookup("diffusionCoefficientNames")),
-                               //volumeScalarFields created in the ts folders
-    diffusionCoefficients_(diffusionCoefficientNames_.size(),NULL),         //the value of diffusionCoefficient concentration for every diffusionCoefficient 
-    */
 {
     Info << " Reading diffusionCoefficient list: " << diffusantGasNames_ << endl;
     for (int i = 0; i < diffusantGasNames_.size(); i++)

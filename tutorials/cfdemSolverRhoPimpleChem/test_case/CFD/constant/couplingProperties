@@ -105,26 +105,14 @@ reactionHeatProps
 speciesProps
 {
 	ChemistryFile 		"$casePath/CFD/constant/foam.inp";
-	tempFieldName 		"T";
-	partTempName  		"partTemp";
-	densityFieldName 	"rho";
-	partRhoName		"partRho";
-        voidfractionFieldName   "voidfraction";
-        totalMoleFieldName      "N";
-        partMoleName            "partN";
-        pressureFieldName       "p";
-        partPName               "partP";
-        // verbose true;
+        // verbose	true;
+	// Nevery	1;
 }
 
 diffusionCoefficientsProps
 {
 	verbose			true;        
 	ChemistryFile 		"$casePath/CFD/constant/foam.inp";
-	tempFieldName 		"T";
-	totalMoleFieldName      "N";
-        pressureFieldName       "p";
-        densityFieldName 	"rho";
         diffusantGasNames       (    CO
                                      // H2
                                 ); 
@@ -132,10 +120,6 @@ diffusionCoefficientsProps
 
 massTransferCoeffProps
 {
-    velFieldName    		"U";
-    voidfractionFieldName   	"voidfraction";
-    partNu          		"partNu";
-    partReynolds   		"partRe";
     verbose 			true;
 }
 
