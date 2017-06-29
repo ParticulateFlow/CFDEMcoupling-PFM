@@ -242,9 +242,6 @@ void diffusionCoefficient::execute()
                             Xfluid_[i]  =   (int)(Xfluid_[i]/1e-6)*1e-6;
                             Info << "molar fraction diffusing gases:" << Xfluid_[i] << nl << endl;
 
-                            // fill X array with diffusant gas molar fraction to be transferred to DEM
-                            X_[i][index][0] = Xfluid_[i];
-
                             // convert mass to molar fractions
                             // get molar fraction for other stagnant gases
 
@@ -257,6 +254,9 @@ void diffusionCoefficient::execute()
                             Xfluid_[j]  = std::min(Xfluid_[j],1.0);
                             Info << "molar fraction diffusing gases - 2:" << Xfluid_[i] << nl << endl;
                             Info << "molar fraction stagnant gases - 2:" << Xfluid_[j] << nl << endl;
+
+                            // fill X array with diffusant gas molar fraction to be transferred to DEM
+                            X_[i][index][0] = Xfluid_[i];
 
                             // for now considering only one species is diffusing, the rest of the molar fractions are from
                             // stagnangt gases we can get the total stagnant gas molar fractions by
