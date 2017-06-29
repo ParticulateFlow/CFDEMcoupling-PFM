@@ -78,13 +78,15 @@ diffusionCoefficient::diffusionCoefficient
     // dcoeff is dependent on molar fraction not mass fraction
     N_(sm.mesh().lookupObject<volScalarField>(totalMoleFieldName_)),
     Y_(speciesNames_.size()),
-    // X_(speciesNames_.size()),
     diffusantGasNames_(propsDict_.lookup("diffusantGasNames")),
-    diffusionCoefficients_(diffusantGasNames_.size(),NULL)
+    diffusionCoefficients_(diffusantGasNames_.size(),NULL),
+    X_(diffusantGasNames_.size(), NULL)
 {
     Info << " Reading diffusionCoefficient list: " << diffusantGasNames_ << endl;
     for (int i = 0; i < diffusantGasNames_.size(); i++)
-        Info << " Diffusant names: " << diffusantGasNames_[i] << endl;
+    {
+        Info << "Diffusant names: " << diffusantGasNames_[i] << endl;
+    }
 
     for (int i=0; i<speciesNames_.size(); i++)
     {
@@ -93,28 +95,6 @@ diffusionCoefficient::diffusionCoefficient
         Y_.set(i, &Y);
         particleCloud_.checkCG(false);
     }
-
-    // if mole fractions field should be generated ??
-    /*forAll(Y, i)
-    {
-        X_.set
-        (
-            i,
-            new volScalarField
-            (
-                IOobject
-                (
-                    "X_" + Y_[i].name(),
-                    mesh_.time().timeName(),
-                    mesh_,
-                    IOobject::NO_READ,
-                    IOobject::AUTO_WRITE
-                ),
-                mesh_,
-                dimensionedScalar("X", dimless, 0)
-            )
-        );
-    } */
 
     allocateMyArrays();
     createCoeffs();
@@ -132,6 +112,7 @@ diffusionCoefficient::~diffusionCoefficient()
     for (int i=0; i<diffusantGasNames_.size(); i++)
     {
         particleCloud_.dataExchangeM().destroy(diffusionCoefficients_[i],nP_);
+        particleCloud_.dataExchangeM().destroy(X_[i], nP_);
     }
 }
 
@@ -144,7 +125,7 @@ diffusionCoefficient::~diffusionCoefficient()
         for (int i=0; i<diffusantGasNames_.size(); i++)
         {
             particleCloud_.dataExchangeM().allocateArray(diffusionCoefficients_[i],initVal,1,"nparticles");
-
+            particleCloud_.dataExchangeM().allocateArray(X_[i],initVal,1,"nparticles");
         }
     }
 }
@@ -158,6 +139,7 @@ void diffusionCoefficient::reAllocMyArrays() const
         for (int i=0; i<diffusantGasNames_.size(); i++)
         {
             particleCloud_.dataExchangeM().allocateArray(diffusionCoefficients_[i],initVal,1);
+            particleCloud_.dataExchangeM().allocateArray(X_[i],initVal,1);
         }
     }
 }
@@ -237,7 +219,7 @@ void diffusionCoefficient::execute()
                 // and for every reactant gas
                 for (int j=0; j < speciesNames_.size();j++)
                 {
-                    // if diffusant gas ans reactant gas are not equal get diffusion coefficients
+                    // if diffusant gas and reactant gas are not equal get diffusion coefficients
                     if (diffusantGasNames_[i] != speciesNames_[j])
                     {
                         Info << "molar weights diffuser gases: " << molWeight(speciesNames_[j]) << nl << endl;
@@ -259,6 +241,9 @@ void diffusionCoefficient::execute()
                             // add decimal point limit
                             Xfluid_[i]  =   (int)(Xfluid_[i]/1e-6)*1e-6;
                             Info << "molar fraction diffusing gases:" << Xfluid_[i] << nl << endl;
+
+                            // fill X array with diffusant gas molar fraction to be transferred to DEM
+                            X_[i][index][0] = Xfluid_[i];
 
                             // convert mass to molar fractions
                             // get molar fraction for other stagnant gases
@@ -342,6 +327,7 @@ void diffusionCoefficient::execute()
             for(int i =0; i<diffusantGasNames_.size();i++)
             {
                 Info << "effective diffusionCoefficient of species " << diffusantGasNames_[i] << " = " << diffusionCoefficients_[i][index][0] << endl;
+                Info << "molar fraction of species" << diffusantGasNames_[i] << " = " << X_[i][index][0] << endl;
             }
         }
     }
@@ -350,6 +336,8 @@ void diffusionCoefficient::execute()
     {
         word pushName = diffusantGasNames_[i] + "_diffCoeff";
         particleCloud_.dataExchangeM().giveData(pushName,"scalar-atom",diffusionCoefficients_[i]);
+        word moleFractionName = "X_" + diffusantGasNames_[i];
+        particleCloud_.dataExchangeM().giveData(moleFractionName, "scalar-atom", X_[i]);
     };
 
     Info << "give data done" << endl;
