@@ -29,9 +29,10 @@ Description
 
 
 #include "fvCFD.H"
-#include "psiThermo.H"
+//#include "psiThermo.H"
 #include "turbulentFluidThermoModel.H"
-#include "psiCombustionModel.H"
+//#include "psiCombustionModel.H"
+#include "rhoCombustionModel.H"
 #include "bound.H"
 #include "pimpleControl.H"
 #include "fvOptions.H"
@@ -53,7 +54,7 @@ Description
 
 int main(int argc, char *argv[])
 {
-    #include "postProcess.H"
+//    #include "postProcess.H"
     #include "setRootCase.H"
     #include "createTime.H"
     #include "createMesh.H"
@@ -77,6 +78,10 @@ int main(int argc, char *argv[])
 
     Info<< "\nStarting time loop\n" << endl;
 
+    scalar m(0.0);
+    scalar m0(0.0);
+    label counter(0);
+    
     while (runTime.run())
     {
         #include "readTimeControls.H"
@@ -131,10 +136,14 @@ int main(int argc, char *argv[])
             // --- Pressure corrector loop
             while (pimple.correct())
             {
+	        #include "molConc.H"
                 #include "pEqn.H"
-	      	rhoeps=rho*voidfraction;
             }
-      
+            m=gSum(rhoeps*1.0*rhoeps.mesh().V());
+            if(counter==0) m0=m;
+	    counter++;
+            Info << "\ncurrent gas mass = " << m << "\n" << endl;
+	    Info << "\ncurrent added gas mass = " << m-m0 << "\n" << endl;
             if (pimple.turbCorr())
             {
                 turbulence->correct();

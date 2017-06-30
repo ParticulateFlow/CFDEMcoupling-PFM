@@ -3,6 +3,12 @@ rho = max(rho, rhoMin);
 rho = min(rho, rhoMax);
 rho.relax();
 
+rhoeps = rho * voidfraction;
+
+// Thermodynamic density needs to be updated by psi*d(p) after the
+// pressure solution - done in 2 parts. Part 1:
+thermo.rho() -= psi*p;
+
 volScalarField rAU(1.0/UEqn.A());
 surfaceScalarField rhorAUf("rhorAUf", fvc::interpolate(rhoeps*rAU));
 if (modelType=="A")
@@ -44,12 +50,14 @@ else
         // Pressure corrector
         fvScalarMatrix pEqn
         (
-            fvm::ddt(psi*voidfraction, p)
+         //   fvm::ddt(psi*voidfraction, p)
+          fvc::ddt(rhoeps) + psi*correction(fvm::ddt(voidfraction,p))
           + fvc::div(phi)
           - fvm::laplacian(rhorAUf, p)
           ==
-            particleCloud.chemistryM(0).Sm()
+           particleCloud.chemistryM(0).Sm()
           + fvOptions(psi, p, rho.name())
+
         );
 
         pEqn.solve(mesh.solver(p.select(pimple.finalInnerIter())));
@@ -66,12 +74,18 @@ else
 
 // Explicitly relax pressure for momentum corrector
 p.relax();
+// Second part of thermodynamic density update
+thermo.rho() += psi*p;
 
 // Recalculate density from the relaxed pressure
 rho = thermo.rho();
+
 rho = max(rho, rhoMin);
 rho = min(rho, rhoMax);
 rho.relax();
+
+rhoeps = rho * voidfraction;
+
 Info<< "rho max/min : " << max(rho).value()
     << " " << min(rho).value() << endl;
 

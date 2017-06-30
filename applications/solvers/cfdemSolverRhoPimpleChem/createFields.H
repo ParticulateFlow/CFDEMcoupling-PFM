@@ -2,18 +2,15 @@
     
     Info<< "Creating combustion model\n" << endl;
 
-    autoPtr<combustionModels::psiCombustionModel> combustion
+    autoPtr<combustionModels::rhoCombustionModel> combustion
     (
-        combustionModels::psiCombustionModel::New(mesh)
+        combustionModels::rhoCombustionModel::New(mesh)
     );
 
-    psiReactionThermo& thermo = combustion->thermo();
+    rhoReactionThermo& thermo = combustion->thermo();
+
     thermo.validate(args.executable(), "h", "e");
 
-  //  probably for particles in OF, not needed when using LIGGGHTS  
-  //  SLGThermo slgThermo(mesh, thermo);
-
-    // basicMultiComponentMixture& composition = thermo.composition();
     basicSpecieMixture& composition = thermo.composition();
     PtrList<volScalarField>& Y = composition.Y();
 
@@ -67,8 +64,7 @@
         ),
         thermo.rho()
     );
-    
-   
+
     //  kinematic fields
 
 
@@ -130,11 +126,11 @@
     );
     
     Info<< "\nCreating fluid-particle heat flux coefficient field\n" << endl;
-    volScalarField Qcoeff
+    volScalarField QCoeff
     (
         IOobject
         (
-            "Qcoeff",
+            "QCoeff",
             runTime.timeName(),
             mesh,
             IOobject::NO_READ,
@@ -144,19 +140,34 @@
         dimensionedScalar("zero", dimensionSet(1,-1,-3,-1,0,0,0), 0.0)
     );
     
-    Info<< "\nCreating thermal diffusivity field\n" << endl;
-    volScalarField thDiff
+    Info<< "\nCreating thermal conductivity field\n" << endl;
+    volScalarField thCond
     (
         IOobject
         (
-            "thDiff",
+            "thCond",
             runTime.timeName(),
             mesh,
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
         mesh,
-        dimensionedScalar("zero", dimensionSet(0,2,-1,0,0,0,0), 0.0)
+        dimensionedScalar("zero", dimensionSet(1,1,-3,-1,0,0,0), 0.0)
+    );
+    
+    Info<< "\nCreating heat capacity field\n" << endl;
+    volScalarField Cpv
+    (
+        IOobject
+        (
+            "Cpv",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        mesh,
+        dimensionedScalar("zero", dimensionSet(0,2,-2,-1,0,0,0), 0.0)
     );
 
     Info<< "Reading/calculating face flux field phi\n" << endl;
@@ -267,6 +278,19 @@
         mesh
     );
 
+    volScalarField molC
+    (
+        IOobject
+        (
+            "molC",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        mesh,
+        dimensionedScalar("zero",dimensionSet(0, -3, 0, 0, 1),0)
+    );
 //===============================
 
 
