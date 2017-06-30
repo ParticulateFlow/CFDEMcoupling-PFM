@@ -20,7 +20,7 @@ chemistry       off; //on;
 chemistryType
 {
     chemistrySolver   ode;
-    chemistryThermo   psi;
+    chemistryThermo   rho;
 }
 
 initialChemicalTimeStep 1e-07;

@@ -17,7 +17,7 @@ FoamFile
 
 thermoType
 {
-    type            hePsiThermo;        //covers compressible and lagrangian solvers
+    type            heRhoThermo;
     mixture         reactingMixture;    //species and reactions are listed in chemistry file
     transport       sutherland;         //calcualtes viscosity as a function of temperature from Stuherland coefficient As and Ts
     thermo          janaf;
