@@ -83,11 +83,11 @@ private:
 
     UPtrList<volScalarField> Y_;
 
-    // PtrList<volScalarField> X_;
-
     wordList diffusantGasNames_;
     
     mutable List<double**> diffusionCoefficients_;
+
+    mutable List<double**> X_;
 
     HashTable<scalar, word> coeffs;
 

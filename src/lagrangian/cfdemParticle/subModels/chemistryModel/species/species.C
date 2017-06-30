@@ -86,20 +86,20 @@ species::species
         mesh_,
         dimensionedScalar("zero",dimMass/(dimVol*dimTime),0.0)
     ),
-    tempFieldName_(propsDict_.lookup("tempFieldName")),
+    tempFieldName_(propsDict_.lookupOrDefault<word>("tempFieldName","T")),
     tempField_(sm.mesh().lookupObject<volScalarField> (tempFieldName_)),
-    partTempName_(propsDict_.lookup("partTempName")),
+    partTempName_(propsDict_.lookupOrDefault<word>("partTempName","partTemp")),
     partTemp_(NULL),
-    densityFieldName_(propsDict_.lookup("densityFieldName")),
+    densityFieldName_(propsDict_.lookupOrDefault<word>("densityFieldName","rho")),
     rho_(sm.mesh().lookupObject<volScalarField> (densityFieldName_)),
-    partRhoName_(propsDict_.lookup("partRhoName")),
+    partRhoName_(propsDict_.lookupOrDefault<word>("partRhoName","partRho")),
     partRho_(NULL),
-    voidfractionFieldName_(propsDict_.lookup("voidfractionFieldName")),
+    voidfractionFieldName_(propsDict_.lookupOrDefault<word>("voidfractionFieldName","voidfraction")),
     voidfraction_(sm.mesh().lookupObject<volScalarField>(voidfractionFieldName_)),
     // total mole field
-    totalMoleFieldName_(propsDict_.lookup("totalMoleFieldName")),
+    totalMoleFieldName_(propsDict_.lookupOrDefault<word>("totalMoleFieldName","N")),
     N_(sm.mesh().lookupObject<volScalarField>(totalMoleFieldName_)),
-    partMoleName_(propsDict_.lookup("partMoleName")),
+    partMoleName_(propsDict_.lookupOrDefault<word>("partMoleName","partN")),
     partN_(NULL),
     loopCounter_(-1),
     Nevery_(propsDict_.lookupOrDefault<label>("Nevery",1)),
@@ -216,7 +216,7 @@ void species::execute()
     // realloc the arrays
     reAllocMyArrays();
 
-  // get Y_i, T, rho at particle positions, fill arrays with them and push to LIGGGHTS
+    // get Y_i, T, rho at particle positions, fill arrays with them and push to LIGGGHTS
 
     label  cellI=0;
     scalar Tfluid(0);
@@ -225,7 +225,6 @@ void species::execute()
     scalar voidfraction(1);
     Yfluid_.setSize(speciesNames_.size());
     scalar Nfluid(0);
-
 
     // defining interpolators for T, rho, voidfraction, N
     interpolationCellPoint <scalar> TInterpolator_(tempField_);
@@ -260,8 +259,8 @@ void species::execute()
             }
             //fill arrays
             partTemp_[index][0] =   Tfluid;
-	    // partRho was filled with rhofluid*voidfraction before
-	    // probably wrong: need actual gas density, not averaged one
+            // partRho was filled with rhofluid*voidfraction before
+            // probably wrong: need actual gas density, not averaged one
             partRho_[index][0]  =   rhofluid;
             partN_[index][0]    =   Nfluid;
 
@@ -294,7 +293,7 @@ void species::execute()
 
         // give DEM data
         particleCloud_.dataExchangeM().giveData(partTempName_, "scalar-atom", partTemp_);
-        particleCloud_.dataExchangeM().giveData(partRhoName_, "scalar-atom", partRho_);
+        particleCloud_.dataExchangeM().giveData(partRhoName_,  "scalar-atom", partRho_);
         particleCloud_.dataExchangeM().giveData(partMoleName_, "scalar-atom", partN_);
 
         for (int i=0; i<speciesNames_.size();i++)
@@ -305,7 +304,7 @@ void species::execute()
         Info << "give data done" << endl;
 
         // pull changeOfSpeciesMass_, transform onto fields changeOfSpeciesMassFields_, add them up on changeOfGasMassField_
-	scalar timestep = mesh_.time().deltaTValue();
+        scalar timestep = mesh_.time().deltaTValue();
         changeOfGasMassField_.primitiveFieldRef() = 0.0;
         changeOfGasMassField_.boundaryFieldRef() = 0.0;
         for (int i=0; i<speciesNames_.size();i++)
@@ -322,7 +321,7 @@ void species::execute()
             );
 
             // take care for implementation in LIGGGHTS: species produced from particles defined positive
-	    // changeOf...Fields need to be mass per volume per timestep
+            // changeOf...Fields need to be mass per volume per timestep
             changeOfSpeciesMassFields_[i].primitiveFieldRef() /= (changeOfSpeciesMassFields_[i].mesh().V() * Nevery_ * timestep);
             changeOfSpeciesMassFields_[i].correctBoundaryConditions();
             changeOfGasMassField_ += changeOfSpeciesMassFields_[i];
