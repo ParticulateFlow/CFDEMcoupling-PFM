@@ -109,6 +109,10 @@ private:
     label loopCounter_;
     
     label Nevery_;
+    
+    scalar massSourceCurr_;
+    
+    scalar massSourceTot_;
 
 public:
 

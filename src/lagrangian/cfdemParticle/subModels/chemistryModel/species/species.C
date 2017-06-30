@@ -102,7 +102,9 @@ species::species
     partMoleName_(propsDict_.lookup("partMoleName")),
     partN_(NULL),
     loopCounter_(-1),
-    Nevery_(propsDict_.lookupOrDefault<label>("Nevery",1))
+    Nevery_(propsDict_.lookupOrDefault<label>("Nevery",1)),
+    massSourceCurr_(0.0),
+    massSourceTot_(0.0)
 {
     Info << " Read species list from: " << specDict_.name() << endl;
     Info << " Reading species list: " << speciesNames_ << endl;
@@ -265,8 +267,11 @@ void species::execute()
 
             for (int i=0; i<speciesNames_.size();i++)
             {
+	      // FOR COMMUNICATION OF MOLAR CONCENTRATIONS:
+	      // c_i = N_i / V = rho * Yfluid_[i] / m_{mol,i}
+	      // m_{mol,i} = composition().W(i)
+	      // attention for indices when not communicating all species
                 concentrations_[i][index][0]=Yfluid_[i];
-                //concentrations_[i][index][0]=1*particleCloud_.mesh().time().value();
             }
         }
 
@@ -323,6 +328,9 @@ void species::execute()
             changeOfGasMassField_ += changeOfSpeciesMassFields_[i];
             Info << "total conversion of species" << speciesNames_[i] << " = " << gSum(changeOfSpeciesMassFields_[i]*1.0*changeOfSpeciesMassFields_[i].mesh().V() * Nevery_ * timestep) << endl;
         }
+        massSourceCurr_ = gSum(changeOfGasMassField_*1.0*changeOfGasMassField_.mesh().V() * Nevery_ * timestep);
+	massSourceTot_ += massSourceCurr_;
+	Info << "total conversion of mass:\tcurrent source = " << massSourceCurr_ << ", total source = " << massSourceTot_ << "\n" << endl;
         Info << "get data done" << endl;
 }
 
