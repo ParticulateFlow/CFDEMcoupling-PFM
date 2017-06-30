@@ -1,0 +1,32 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  4.x                                   |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      combustionProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+//combustionModel  laminar<psiChemistryCombustion>;
+combustionModel  PaSR<rhoChemistryCombustion>;
+active  true;
+
+laminarCoeffs
+{
+}
+
+PaSRCoeffs
+{
+    Cmix                1.0;
+    turbulentReaction   off;
+}
+
+// ************************************************************************* //

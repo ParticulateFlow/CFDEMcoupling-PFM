@@ -1,0 +1,73 @@
+species
+5
+(
+O
+O2
+CO
+CO2
+N2
+)
+;
+
+reactions
+{
+    un-named-reaction-0
+    {
+        type            reversiblethirdBodyArrheniusReaction;
+        reaction        "2O = O2";
+        A               1.2e+11;
+        beta            -1;
+        Ta              0;
+        coeffs          
+5
+(
+(O 1)
+(O2 1)
+(CO 1.75)
+(CO2 3.6)
+(N2 1)
+)
+;
+    }
+    un-named-reaction-1
+    {
+        type            reversibleArrheniusLindemannFallOffReaction;
+        reaction        "O + CO = CO2";
+        k0
+        {
+            A               6.02e+08;
+            beta            0;
+            Ta              1509.57;
+        }
+        kInf
+        {
+            A               1.8e+07;
+            beta            0;
+            Ta              1200.11;
+        }
+        F
+        {
+        }
+        thirdBodyEfficiencies
+        {
+            coeffs          
+5
+(
+(O 1)
+(O2 6)
+(CO 1.5)
+(CO2 3.5)
+(N2 1)
+)
+;
+        }
+    }
+    un-named-reaction-2
+    {
+        type            reversibleArrheniusReaction;
+        reaction        "O2 + CO = O + CO2";
+        A               2.5e+09;
+        beta            0;
+        Ta              24052.5;
+    }
+}
