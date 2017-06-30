@@ -71,7 +71,7 @@ tmp<volScalarField> noThermCond::thermCond() const
              dimensionedScalar
              (
               "zero",
-              dimensionSet(0,2,-1,0,0,0,0),
+              dimensionSet(1,1,-3,-1,0,0,0),
               0.0
              )
         )
