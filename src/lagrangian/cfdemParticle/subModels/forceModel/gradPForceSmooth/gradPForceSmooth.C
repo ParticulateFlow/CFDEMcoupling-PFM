@@ -68,7 +68,6 @@ gradPForceSmooth::gradPForceSmooth
     propsDict_(dict.subDict(typeName + "Props")),
     pFieldName_(propsDict_.lookup("pFieldName")),
     p_(sm.mesh().lookupObject<volScalarField> (pFieldName_)),
-    //p_rgh_(sm.mesh().lookupObject<volScalarField> ("p_rgh")),
     velocityFieldName_(propsDict_.lookup("velocityFieldName")),
     U_(sm.mesh().lookupObject<volVectorField> (velocityFieldName_)),
     useRho_(false),
@@ -82,23 +81,11 @@ gradPForceSmooth::gradPForceSmooth
             sm
         )
     ),
-    gradPField  //for debug
+    pSmooth_    //must read a new field from file to get appropriate b.c's, doesn't work with fixedFlux pressure b.c. for any reason
     (
         IOobject
         (
-            "gradPSmooth",
-            sm.mesh().time().timeName(), //runTime.timeName(),
-            sm.mesh(),
-            IOobject::NO_READ,
-            IOobject::AUTO_WRITE
-        ),
-        fvc::grad(p_)
-    ),
-    pSmooth_    //must read a new field from file to get appropriate b.c's, doesn't work with fixedFlux pressure b.c.
-    (
-        IOobject
-        (
-            "pSmoothField",
+            "pSmooth",
             sm.mesh().time().timeName(),
             sm.mesh(),
             IOobject::MUST_READ,
@@ -170,14 +157,11 @@ gradPForceSmooth::~gradPForceSmooth()
 
 void gradPForceSmooth::setForce() const
 {
+    volVectorField gradPField = fvc::grad(p_);
     if(pFieldName_ == "p_rgh")
     {
         const volScalarField& rho_ = particleCloud_.mesh().lookupObject<volScalarField>("rho");
         const volScalarField& gh_ = particleCloud_.mesh().lookupObject<volScalarField>("gh");
-        
-        Info << "Debug, current timestep: " << pSmooth_.timeIndex() << " " << min(pSmooth_) << " "  << max(pSmooth_) << endl;
-        Info << "Debug, old timestep: " << pSmooth_.oldTime().timeIndex() << " "  << min(pSmooth_.oldTime()) << " "  << max(pSmooth_.oldTime()) << endl;
-        Info << "Debug, old old timestep: " << pSmooth_.oldTime().oldTime().timeIndex() << " "  << min(pSmooth_.oldTime().oldTime()) << " "  << max(pSmooth_.oldTime().oldTime()) << endl;
         
         //Smooth p_rgh, easier to handle boundaries
         smoothingM().smoothen(pSmooth_);
