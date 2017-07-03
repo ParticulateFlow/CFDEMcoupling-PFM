@@ -65,22 +65,8 @@ temporalSmoothing::temporalSmoothing
     propsDict_(dict.subDict(typeName + "Props")),
     lowerLimit_(readScalar(propsDict_.lookup("lowerLimit"))),
     upperLimit_(readScalar(propsDict_.lookup("upperLimit"))),
-    DT_
-    (
-        IOobject
-        (
-            "DT" ,
-            sm.mesh().time().timeName(),
-            sm.mesh(),
-            IOobject::NO_READ,
-            IOobject::NO_WRITE
-        ),
-        sm.mesh(),
-        dimensionedScalar("DT",dimensionSet(0,2,-1,0,0), 0.0)
-    ),
     verbose_(false),
     refFieldName_(propsDict_.lookup("referenceField")),
-    refField_(sm.mesh().lookupObject<volScalarField>(refFieldName_)),
     alpha_(readScalar(propsDict_.lookup("alpha")))
 {
 
@@ -116,13 +102,14 @@ void Foam::temporalSmoothing::smoothen(volScalarField& fieldSrc) const
     sSmoothField.oldTime()=fieldSrc;
     sSmoothField.oldTime().correctBoundaryConditions();
     
+    volScalarField refField = particleCloud_.mesh().lookupObject<volScalarField>(refFieldName_);
     // do smoothing
     dimensionedScalar deltaT = sSmoothField.mesh().time().deltaT();
     solve
     (
         fvm::ddt(sSmoothField)
         -
-        alpha_/deltaT * (refField_ - fvm::Sp(1.0,sSmoothField))
+        alpha_/deltaT * (refField - fvm::Sp(1.0,sSmoothField))
     );
     // bound sSmoothField_
     forAll(sSmoothField,cellI)
@@ -155,12 +142,14 @@ void Foam::temporalSmoothing::smoothen(volVectorField& fieldSrc) const
     vSmoothField.oldTime()=fieldSrc;
     vSmoothField.oldTime().correctBoundaryConditions();
     
+    volVectorField refField = particleCloud_.mesh().lookupObject<volVectorField>(refFieldName_);
+    
     dimensionedScalar deltaT = vSmoothField.mesh().time().deltaT();
     solve
     (
         fvm::ddt(vSmoothField)
-//        -
-//        alpha_/deltaT * (refField_ - fvm::Sp(1.0,vSmoothField))
+        -
+        alpha_/deltaT * (refField - fvm::Sp(1.0,vSmoothField))
     );
 
     // get data from working vSmoothField
@@ -179,6 +168,7 @@ void Foam::temporalSmoothing::smoothen(volVectorField& fieldSrc) const
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 void Foam::temporalSmoothing::smoothenReferenceField(volVectorField& fieldSrc) const
 {
+    FatalError << "Smoothen reference field is not implemented for this smoothing model!" << abort(FatalError);
 //    // Create scalar smooth field from virgin scalar smooth field template
 //    volVectorField vSmoothField = vSmoothField_;
 

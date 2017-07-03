@@ -62,10 +62,8 @@ private:
     dictionary propsDict_;
     scalar lowerLimit_;
     scalar upperLimit_;
-    mutable volScalarField DT_;
     bool verbose_;
     word refFieldName_;
-    const volScalarField& refField_;
     scalar alpha_;
 
 public:
