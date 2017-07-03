@@ -65,6 +65,7 @@ private:
     word pFieldName_;
 
     const volScalarField& p_;
+    //const volScalarField& p_rgh_;
 
     word velocityFieldName_;
 
@@ -78,7 +79,7 @@ private:
     
     autoPtr<smoothingModel> smoothingModel_;
     mutable volVectorField gradPField;
-    
+    mutable volScalarField pSmooth_;    
 
 public:
 

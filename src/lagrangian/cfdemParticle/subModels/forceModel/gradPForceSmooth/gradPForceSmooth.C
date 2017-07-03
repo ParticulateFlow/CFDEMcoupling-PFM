@@ -68,6 +68,7 @@ gradPForceSmooth::gradPForceSmooth
     propsDict_(dict.subDict(typeName + "Props")),
     pFieldName_(propsDict_.lookup("pFieldName")),
     p_(sm.mesh().lookupObject<volScalarField> (pFieldName_)),
+    //p_rgh_(sm.mesh().lookupObject<volScalarField> ("p_rgh")),
     velocityFieldName_(propsDict_.lookup("velocityFieldName")),
     U_(sm.mesh().lookupObject<volVectorField> (velocityFieldName_)),
     useRho_(false),
@@ -81,17 +82,29 @@ gradPForceSmooth::gradPForceSmooth
             sm
         )
     ),
-    gradPField
+    gradPField  //for debug
     (
         IOobject
         (
-            "gradPField",
+            "gradPSmooth",
             sm.mesh().time().timeName(), //runTime.timeName(),
             sm.mesh(),
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
         fvc::grad(p_)
+    ),
+    pSmooth_    //must read a new field from file to get appropriate b.c's, doesn't work with fixedFlux pressure b.c.
+    (
+        IOobject
+        (
+            "pSmoothField",
+            sm.mesh().time().timeName(),
+            sm.mesh(),
+            IOobject::MUST_READ,
+            IOobject::AUTO_WRITE
+        ),
+        sm.mesh()
     )
 {
     // init force sub model
@@ -143,10 +156,8 @@ gradPForceSmooth::gradPForceSmooth
     particleCloud_.probeM().scalarFields_.append("rho");
     particleCloud_.probeM().writeHeader();
     
-
-    
-
-}
+    pSmooth_ = p_;
+   }
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
@@ -159,10 +170,30 @@ gradPForceSmooth::~gradPForceSmooth()
 
 void gradPForceSmooth::setForce() const
 {
-    gradPField = fvc::grad(p_);
-    smoothingM().dSmoothing();
-    smoothingM().smoothen(gradPField);    
-
+    if(pFieldName_ == "p_rgh")
+    {
+        const volScalarField& rho_ = particleCloud_.mesh().lookupObject<volScalarField>("rho");
+        const volScalarField& gh_ = particleCloud_.mesh().lookupObject<volScalarField>("gh");
+        
+        Info << "Debug, current timestep: " << pSmooth_.timeIndex() << " " << min(pSmooth_) << " "  << max(pSmooth_) << endl;
+        Info << "Debug, old timestep: " << pSmooth_.oldTime().timeIndex() << " "  << min(pSmooth_.oldTime()) << " "  << max(pSmooth_.oldTime()) << endl;
+        Info << "Debug, old old timestep: " << pSmooth_.oldTime().oldTime().timeIndex() << " "  << min(pSmooth_.oldTime().oldTime()) << " "  << max(pSmooth_.oldTime().oldTime()) << endl;
+        
+        //Smooth p_rgh, easier to handle boundaries
+        smoothingM().smoothen(pSmooth_);
+        
+        //Superpose hydrostatic pressure
+        volScalarField pFull = pSmooth_ + rho_*gh_;
+        
+        gradPField = fvc::grad(pFull);
+        
+    }else{
+        
+        smoothingM().smoothen(pSmooth_);
+        gradPField = fvc::grad(pSmooth_);
+        
+    }
+    
     /*if (useU_)
     {
         // const volScalarField& voidfraction_ = particleCloud_.mesh().lookupObject<volScalarField> ("voidfraction");
@@ -192,7 +223,7 @@ void gradPForceSmooth::setForce() const
             if (cellI > -1) // particle Found
             {
                 position = particleCloud_.position(index);
-
+                
                 if(forceSubM(0).interpolation()) // use intepolated values for alpha (normally off!!!)
                 {
                     gradP = gradPInterpolator_.interpolate(position,cellI);
