@@ -55,6 +55,8 @@ private:
     bool interpolation_;
 
     const fvMesh& mesh_;
+    
+    bool verbose_;
 
     // Species dictionary - To be read where the species are from
     dictionary specDict_;
@@ -63,9 +65,9 @@ private:
     
     wordList mod_spec_names_;
 
-    UPtrList<volScalarField> Y_;
+    UPtrList<volScalarField> X_;
 
-    mutable List<double**> concentrations_;
+    mutable List<double**> molarFractions_;
     
     mutable List<double**> changeOfSpeciesMass_;
 
@@ -96,15 +98,13 @@ private:
     void allocateMyArrays() const;
 
     // total mole field
-    word totalMoleFieldName_;
+    word molarConcFieldName_;
 
-    const volScalarField& N_;
+    const volScalarField& molarConc_;
 
-    word partMoleName_;
+    word partMolarConcName_;
 
-    mutable double **partN_;
-
-    bool verbose_;
+    mutable double **partMolarConc_;
     
     label loopCounter_;
     

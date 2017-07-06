@@ -69,8 +69,8 @@ species::species
     // create a list from the Species table in the specified species dictionary
     speciesNames_(specDict_.lookup("species")),
     mod_spec_names_(speciesNames_.size()),
-    Y_(speciesNames_.size()),                           //volumeScalarFields created in the ts folders
-    concentrations_(speciesNames_.size(),NULL),         //the value of species concentration for every species
+    X_(speciesNames_.size()),                           //volumeScalarFields created in the ts folders
+    molarFractions_(speciesNames_.size(),NULL),         //the value of molar fractions for every species
     changeOfSpeciesMass_(speciesNames_.size(),NULL),    //the values that are received from DEM with the name of Modified_+species name
     changeOfSpeciesMassFields_(speciesNames_.size()),   //the scalar fields generated with the values from Modified_+species names
     changeOfGasMassField_                               //the total change of Gas Mass field (when the Modified species
@@ -97,10 +97,10 @@ species::species
     voidfractionFieldName_(propsDict_.lookupOrDefault<word>("voidfractionFieldName","voidfraction")),
     voidfraction_(sm.mesh().lookupObject<volScalarField>(voidfractionFieldName_)),
     // total mole field
-    totalMoleFieldName_(propsDict_.lookupOrDefault<word>("totalMoleFieldName","N")),
-    N_(sm.mesh().lookupObject<volScalarField>(totalMoleFieldName_)),
-    partMoleName_(propsDict_.lookupOrDefault<word>("partMoleName","partN")),
-    partN_(NULL),
+    molarConcFieldName_(propsDict_.lookupOrDefault<word>("totalMoleFieldName","molarConc")),
+    molarConc_(sm.mesh().lookupObject<volScalarField>(molarConcFieldName_)),
+    partMolarConcName_(propsDict_.lookupOrDefault<word>("partMoleName","partMolarConc")),
+    partMolarConc_(NULL),
     loopCounter_(-1),
     Nevery_(propsDict_.lookupOrDefault<label>("Nevery",1)),
     massSourceCurr_(0.0),
@@ -112,12 +112,12 @@ species::species
     for (int i=0; i<speciesNames_.size(); i++)
     {
         // Defining the Species volume scalar fields
-        Info << " Looking up species fields \n " << speciesNames_[i] << endl;
-        volScalarField& Y = const_cast<volScalarField&>
+        Info << " Looking up species fields \n " << "X_"+speciesNames_[i] << endl;
+        volScalarField& X = const_cast<volScalarField&>
                 (sm.mesh().lookupObject<volScalarField>(speciesNames_[i]));
-        Y_.set(i, &Y);
+        X_.set(i, &X);
 
-         Info << "The concentration fields (Y_i): \n" << Y_[i].name() << endl;
+         Info << "The molar fraction fields (X_i): \n" << X_[i].name() << endl;
         // define the modified species names
         mod_spec_names_[i] = "Modified_" + speciesNames_[i];
 
@@ -132,7 +132,7 @@ species::species
             (
                 IOobject
                 (
-                "ModSpeciesMassField_"+Y_[i].name(),
+                "ModSpeciesMassField_"+X_[i].name(),
                 mesh_.time().timeName(),
                 mesh_,
                 IOobject::NO_READ,
@@ -157,11 +157,11 @@ species::~species()
 
     particleCloud_.dataExchangeM().destroy(partTemp_,nP_);
     particleCloud_.dataExchangeM().destroy(partRho_,nP_);
-    particleCloud_.dataExchangeM().destroy(partN_,nP_);
+    particleCloud_.dataExchangeM().destroy(partMolarConc_,nP_);
 
     for (int i=0; i<speciesNames_.size(); i++)
     {
-        particleCloud_.dataExchangeM().destroy(concentrations_[i],nP_);
+        particleCloud_.dataExchangeM().destroy(molarFractions_[i],nP_);
         particleCloud_.dataExchangeM().destroy(changeOfSpeciesMass_[i],nP_);
     }
 }
@@ -175,11 +175,11 @@ void species::allocateMyArrays() const
         // get memory for 2d arrays
         particleCloud_.dataExchangeM().allocateArray(partRho_,initVal,1,"nparticles");
         particleCloud_.dataExchangeM().allocateArray(partTemp_,initVal,1,"nparticles");
-        particleCloud_.dataExchangeM().allocateArray(partN_,initVal,1,"nparticles");
+        particleCloud_.dataExchangeM().allocateArray(partMolarConc_,initVal,1,"nparticles");
 
         for (int i=0; i<speciesNames_.size(); i++)
         {
-            particleCloud_.dataExchangeM().allocateArray(concentrations_[i],initVal,1,"nparticles");
+            particleCloud_.dataExchangeM().allocateArray(molarFractions_[i],initVal,1,"nparticles");
             particleCloud_.dataExchangeM().allocateArray(changeOfSpeciesMass_[i],initVal,1,"nparticles");
 
         }
@@ -194,11 +194,11 @@ void species::reAllocMyArrays() const
         double initVal=0.0;
         particleCloud_.dataExchangeM().allocateArray(partRho_,initVal,1);
         particleCloud_.dataExchangeM().allocateArray(partTemp_,initVal,1);
-        particleCloud_.dataExchangeM().allocateArray(partN_,initVal,1);
+        particleCloud_.dataExchangeM().allocateArray(partMolarConc_,initVal,1);
 
         for (int i=0; i<speciesNames_.size(); i++)
         {
-            particleCloud_.dataExchangeM().allocateArray(concentrations_[i],initVal,1);
+            particleCloud_.dataExchangeM().allocateArray(molarFractions_[i],initVal,1);
             particleCloud_.dataExchangeM().allocateArray(changeOfSpeciesMass_[i],initVal,1);
         }
     }
@@ -216,21 +216,21 @@ void species::execute()
     // realloc the arrays
     reAllocMyArrays();
 
-    // get Y_i, T, rho at particle positions, fill arrays with them and push to LIGGGHTS
+    // get X_i, T, rho at particle positions, fill arrays with them and push to LIGGGHTS
 
     label  cellI=0;
     scalar Tfluid(0);
     scalar rhofluid(0);
-    List<scalar> Yfluid_;
+    List<scalar> Xfluid_;
     scalar voidfraction(1);
-    Yfluid_.setSize(speciesNames_.size());
-    scalar Nfluid(0);
+    Xfluid_.setSize(speciesNames_.size());
+    scalar molarConcfluid(0);
 
-    // defining interpolators for T, rho, voidfraction, N
+    // defining interpolators for T, rho, voidfraction, molarConc
     interpolationCellPoint <scalar> TInterpolator_(tempField_);
     interpolationCellPoint <scalar> rhoInterpolator_(rho_);
     interpolationCellPoint <scalar> voidfractionInterpolator_(voidfraction_);
-    interpolationCellPoint <scalar> NInterpolator_(N_);
+    interpolationCellPoint <scalar> molarConcInterpolator_(molarConc_);
 
 
     for (int index=0; index<particleCloud_.numberOfParticles(); index++)
@@ -244,17 +244,17 @@ void species::execute()
                 Tfluid              =   TInterpolator_.interpolate(position,cellI);
                 rhofluid            =   rhoInterpolator_.interpolate(position,cellI);
                 voidfraction        =   voidfractionInterpolator_.interpolate(position,cellI);
-                Nfluid              =   NInterpolator_.interpolate(position,cellI);
+                molarConcfluid              =   molarConcInterpolator_.interpolate(position,cellI);
             }
             else
             {
                 Tfluid          =   tempField_[cellI];
                 rhofluid        =   rho_[cellI];
                 voidfraction    =   voidfraction_[cellI];
-                Nfluid          =   N_[cellI];
+                molarConcfluid	=   molarConc_[cellI];
                 for (int i = 0; i<speciesNames_.size();i++)
                 {
-                    Yfluid_[i] = Y_[i][cellI];
+                    Xfluid_[i] = X_[i][cellI];
                 }
             }
             //fill arrays
@@ -262,15 +262,12 @@ void species::execute()
             // partRho was filled with rhofluid*voidfraction before
             // probably wrong: need actual gas density, not averaged one
             partRho_[index][0]  =   rhofluid;
-            partN_[index][0]    =   Nfluid;
+            partMolarConc_[index][0]    =   molarConcfluid;
 
             for (int i=0; i<speciesNames_.size();i++)
             {
-	      // FOR COMMUNICATION OF MOLAR CONCENTRATIONS:
-	      // c_i = N_i / V = rho * Yfluid_[i] / m_{mol,i}
-	      // m_{mol,i} = composition().W(i)
 	      // attention for indices when not communicating all species
-                concentrations_[i][index][0]=Yfluid_[i];
+                molarFractions_[i][index][0]=Xfluid_[i];
             }
         }
 
@@ -278,15 +275,15 @@ void species::execute()
         {
             for(int i =0; i<speciesNames_.size();i++)
             {
-                Info << "Y_i = " << Y_[i].name() << endl;
-                Info << "concentrations = " << concentrations_[i][index][0] << endl;
+                Info << "X_i = " << X_[i].name() << endl;
+                Info << "molarFractions_= " << molarFractions_[i][index][0] << endl;
                 Info << "partRho_[index][0] = " << partRho_[index][0] << endl;
                 Info << "rhofluid =" << rhofluid << endl;
-                Info << "Yfluid = " << Yfluid_[i] << endl;
+                Info << "Xfluid = " << Xfluid_[i] << endl;
                 Info << "partTemp_[index][0] = " << partTemp_[index][0] << endl;
                 Info << "Tfluid = " << Tfluid << endl  ;
                 Info << "voidfraction =" << voidfraction << endl;
-                Info << "N_" << N_ << endl;
+                Info << "molarConc_" << molarConc_ << endl;
             }
         }
     }
@@ -294,11 +291,11 @@ void species::execute()
         // give DEM data
         particleCloud_.dataExchangeM().giveData(partTempName_, "scalar-atom", partTemp_);
         particleCloud_.dataExchangeM().giveData(partRhoName_,  "scalar-atom", partRho_);
-        particleCloud_.dataExchangeM().giveData(partMoleName_, "scalar-atom", partN_);
+        particleCloud_.dataExchangeM().giveData(partMolarConcName_, "scalar-atom", partMolarConc_);
 
         for (int i=0; i<speciesNames_.size();i++)
         {
-            particleCloud_.dataExchangeM().giveData(speciesNames_[i],"scalar-atom",concentrations_[i]);
+            particleCloud_.dataExchangeM().giveData(speciesNames_[i],"scalar-atom",molarFractions_[i]);
         };
 
         Info << "give data done" << endl;
