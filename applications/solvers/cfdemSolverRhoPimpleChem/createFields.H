@@ -39,19 +39,6 @@
     }
     fields.add(thermo.he());
 
-    volScalarField N
-    (
-        IOobject
-        (
-            "N",
-            runTime.timeName(),
-            mesh,
-            IOobject::MUST_READ,
-            IOobject::AUTO_WRITE
-        ),
-        mesh
-    );
-
     volScalarField rho
     (
         IOobject
@@ -278,11 +265,11 @@
         mesh
     );
 
-    volScalarField molC
+    volScalarField molarConc
     (
         IOobject
         (
-            "molC",
+            "molarConc",
             runTime.timeName(),
             mesh,
             IOobject::NO_READ,

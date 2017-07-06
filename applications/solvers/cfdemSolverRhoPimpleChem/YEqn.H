@@ -48,9 +48,6 @@ tmp<fv::convectionScheme<scalar> > mvConvection
             inertIndex = i;
         }
     }
-    
-        // calculate total mole in Volume
-    N = rho/W;
 
     if (ignoreInertSpecie)
     {

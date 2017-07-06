@@ -29,9 +29,7 @@ Description
 
 
 #include "fvCFD.H"
-//#include "psiThermo.H"
 #include "turbulentFluidThermoModel.H"
-//#include "psiCombustionModel.H"
 #include "rhoCombustionModel.H"
 #include "bound.H"
 #include "pimpleControl.H"
