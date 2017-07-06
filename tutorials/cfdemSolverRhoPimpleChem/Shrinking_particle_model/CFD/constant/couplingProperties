@@ -107,8 +107,8 @@ speciesProps
 	densityFieldName 	"rho";
 	partRhoName		"partRho";
         voidfractionFieldName   "voidfraction";
-        totalMoleFieldName      "N";
-        partMoleName            "partN";
+        totalMoleFieldName      "molarConc";
+        partMoleName            "partMolarConc";
         pressureFieldName       "p";
         partPName               "partP";
 	Nevery			10;
