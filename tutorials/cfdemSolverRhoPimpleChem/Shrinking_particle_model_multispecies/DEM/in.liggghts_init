@@ -42,8 +42,8 @@ fix     zwalls2 all wall/gran model hertz tangential history primitive type 1 zp
 # create single particle in a specific spot
 create_atoms 1 single 7.0 2.5 2.5 units box
 create_atoms 1 single 8.0 2.5 2.5 units box
-set atom 1 diameter 0.2 density 2267 vx 0 vy 0 vz 0
-set atom 2 diameter 0.2 density 2267 vx 0 vy 0 vz 0
+set atom 1 diameter 0.2 density 800 vx 0 vy 0 vz 0
+set atom 2 diameter 0.2 density 800 vx 0 vy 0 vz 0
 
 
 # screen output
