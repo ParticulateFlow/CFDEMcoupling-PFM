@@ -52,8 +52,15 @@ fix     cfd2 all couple/cfd/force
 fix     cfd3 all couple/cfd/chemistry n_species 5 species_names O2 CO2 N2 CO O
 
 # this should shrink the particle
-fix     cfd4 all chem/shrink speciesA O2 molMassA 31.99 speciesC CO2 molMassC 44.01 molMassB 12.01 k 2.5e1 rmin 0.005 nevery 100
-fix     cfd5 all chem/shrink speciesA CO2 molMassA 44.01 speciesC CO molMassC 28.01 nuC 2 molMassB 12.01 k 2.5e1 rmin 0.005 nevery 100
+#fix     cfd4 all chem/shrink speciesA O2 molMassA 31.99 speciesC CO2 molMassC 44.01 molMassB 12.01 k 2.5e1 rmin 0.005 nevery 100 screen yes
+#fix     cfd5 all chem/shrink speciesA CO2 molMassA 44.01 speciesC CO molMassC 28.01 nuC 2 molMassB 12.01 k 2.5e1 rmin 0.005 nevery 100
+
+# values for k0 and T0 according to Shen et al., Fuel (2011) with a coke density of 800 kg / m^3
+# C + O2 -> CO2		k0 = 4e3 m/s		T0 = 10855 K 
+# C + CO2 -> 2CO	k0 = 6e6 m/s		T0 = 29018 K 
+fix     cfd4 all chem/shrink/Arrhenius speciesA O2 molMassA 31.99 speciesC CO2 molMassC 44.01 molMassB 12.01 rmin 0.005 nevery 100 screen yes k 4.0e3 T 10855
+fix	cfd5 all chem/shrink/Arrhenius speciesA CO2 molMassA 44.01 speciesC CO molMassC 28.01 nuC 2 molMassB 12.01 rmin 0.005 nevery 100 screen yes k 6e6 T 29018
+
 
 # apply nve integration to all particles that are inserted as single particles
 fix     integr all nve/sphere
