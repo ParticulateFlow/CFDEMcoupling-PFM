@@ -104,48 +104,10 @@ species::species
     loopCounter_(-1),
     Nevery_(propsDict_.lookupOrDefault<label>("Nevery",1)),
     massSourceCurr_(0.0),
-    massSourceTot_(0.0)
+    massSourceTot_(0.0),
+    initialized_(false)
 {
-    Info << " Read species list from: " << specDict_.name() << endl;
-    Info << " Reading species list: " << speciesNames_ << endl;
-
-    for (int i=0; i<speciesNames_.size(); i++)
-    {
-        // Defining the Species volume scalar fields
-        Info << " Looking up species fields \n " << "X_"+speciesNames_[i] << endl;
-        volScalarField& X = const_cast<volScalarField&>
-                (sm.mesh().lookupObject<volScalarField>(speciesNames_[i]));
-        X_.set(i, &X);
-
-         Info << "The molar fraction fields (X_i): \n" << X_[i].name() << endl;
-        // define the modified species names
-        mod_spec_names_[i] = "Modified_" + speciesNames_[i];
-
-        // Check if mod species are correct
-        Info << "Modified species names are: \n" << mod_spec_names_[i] << endl;
-
-        // Create new volScalarFields for the changed values of the species mass fields
-        changeOfSpeciesMassFields_.set
-        (
-            i,
-            new volScalarField
-            (
-                IOobject
-                (
-                "ModSpeciesMassField_"+X_[i].name(),
-                mesh_.time().timeName(),
-                mesh_,
-                IOobject::NO_READ,
-                IOobject::AUTO_WRITE
-                ),
-                mesh_,
-                dimensionedScalar("zero",dimMass/(dimVol*dimTime), 0.0)
-            )
-         );
-
-        particleCloud_.checkCG(false);
-    }
-
+    particleCloud_.checkCG(false);
     allocateMyArrays();
 }
 
@@ -204,10 +166,60 @@ void species::reAllocMyArrays() const
     }
 }
 
+void species::init()
+{
+    // look-up of molar fraction fields can't happen in constructor because functionObject
+    // has not been created at that time
+  
+    Info << " Read species list from: " << specDict_.name() << endl;
+    Info << " Reading species list: " << speciesNames_ << endl;
+
+    for (int i=0; i<speciesNames_.size(); i++)
+    {
+        // Defining the Species volume scalar fields
+        Info << " Looking up species fields \n " << "X_"+speciesNames_[i] << endl;
+        volScalarField& X = const_cast<volScalarField&>
+                (mesh_.lookupObject<volScalarField>("X_"+speciesNames_[i]));
+        X_.set(i, &X);
+
+         Info << "The molar fraction fields (X_i): \n" << X_[i].name() << endl;
+        // define the modified species names
+        mod_spec_names_[i] = "Modified_" + speciesNames_[i];
+
+        // Check if mod species are correct
+        Info << "Modified species names are: \n" << mod_spec_names_[i] << endl;
+
+        // Create new volScalarFields for the changed values of the species mass fields
+        changeOfSpeciesMassFields_.set
+        (
+            i,
+            new volScalarField
+            (
+                IOobject
+                (
+                "ModSpeciesMassField_"+X_[i].name(),
+                mesh_.time().timeName(),
+                mesh_,
+                IOobject::NO_READ,
+                IOobject::AUTO_WRITE
+                ),
+                mesh_,
+                dimensionedScalar("zero",dimMass/(dimVol*dimTime), 0.0)
+            )
+         );       
+    }
+    initialized_ = true;
+}
+
 // * * * * * * * * * * * * * * * * Member Fct  * * * * * * * * * * * * * * * //
 
 void species::execute()
 {
+    if(!initialized_)
+    {
+        init();  
+    }
+    
     loopCounter_++;
     if (loopCounter_ % Nevery_ != 0)
     {
@@ -244,7 +256,7 @@ void species::execute()
                 Tfluid              =   TInterpolator_.interpolate(position,cellI);
                 rhofluid            =   rhoInterpolator_.interpolate(position,cellI);
                 voidfraction        =   voidfractionInterpolator_.interpolate(position,cellI);
-                molarConcfluid              =   molarConcInterpolator_.interpolate(position,cellI);
+                molarConcfluid      =   molarConcInterpolator_.interpolate(position,cellI);
             }
             else
             {
@@ -295,7 +307,7 @@ void species::execute()
 
         for (int i=0; i<speciesNames_.size();i++)
         {
-            particleCloud_.dataExchangeM().giveData(speciesNames_[i],"scalar-atom",molarFractions_[i]);
+            particleCloud_.dataExchangeM().giveData("X_"+speciesNames_[i],"scalar-atom",molarFractions_[i]);
         };
 
         Info << "give data done" << endl;

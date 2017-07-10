@@ -113,6 +113,10 @@ private:
     scalar massSourceCurr_;
     
     scalar massSourceTot_;
+    
+    bool initialized_;
+    
+    void init();
 
 public:
 
