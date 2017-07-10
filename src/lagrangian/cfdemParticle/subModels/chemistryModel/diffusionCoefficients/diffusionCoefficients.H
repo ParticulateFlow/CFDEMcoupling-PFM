@@ -15,7 +15,7 @@ License
     along with this code.  If not, see <http://www.gnu.org/licenses/>.
 
     Copyright (C) 2015- Thomas Lichtenegger, JKU Linz, Austria
-    
+
     Description
     Model to communicate species concentration and changes due to reactions
 
@@ -77,22 +77,20 @@ private:
     const volScalarField& rho_;
 
     // total mole field
-    word totalMoleFieldName_;
+    word molarConcFieldName_;
 
-    const volScalarField& N_;
+    const volScalarField& molarConc_;
 
-    UPtrList<volScalarField> Y_;
+    UPtrList<volScalarField> X_;
 
     wordList diffusantGasNames_;
-    
-    mutable List<double**> diffusionCoefficients_;
 
-    mutable List<double**> X_;
+    mutable List<double**> diffusionCoefficients_;
 
     HashTable<scalar, word> coeffs;
 
     HashTable<scalar, word> molWeight;
-    
+
     void createCoeffs();
 
     void molWeightTable();
@@ -104,6 +102,10 @@ private:
     void calcDiffVol(int, int, double **);
 
     void allocateMyArrays() const;
+
+    bool initialized_;
+
+    void init();
 
  public:
 

@@ -148,7 +148,6 @@ void species::allocateMyArrays() const
     }
 }
 
-
 void species::reAllocMyArrays() const
 {
     if (particleCloud_.numberOfParticlesChanged())

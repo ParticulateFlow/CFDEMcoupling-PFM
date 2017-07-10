@@ -147,10 +147,6 @@ public:
 
         tmp <volScalarField> Sm() const;
 
-    
-    
-
-
 };
 
 
