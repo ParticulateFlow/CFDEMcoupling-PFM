@@ -1,3 +1,5 @@
+particleCloud.clockM().start(29,"Y");
+
 tmp<fv::convectionScheme<scalar> > mvConvection
 (
     fv::convectionScheme<scalar>::New
@@ -63,3 +65,4 @@ tmp<fv::convectionScheme<scalar> > mvConvection
         Y[inertIndex].max(0.0);
     }
 }
+particleCloud.clockM().stop("Y");
