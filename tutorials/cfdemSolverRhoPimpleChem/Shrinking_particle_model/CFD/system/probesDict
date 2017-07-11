@@ -19,6 +19,8 @@ FoamFile
 fields
 (
     rho
+    T
+    p
     O2
     CO2
     ModSpeciesMassField_O2
