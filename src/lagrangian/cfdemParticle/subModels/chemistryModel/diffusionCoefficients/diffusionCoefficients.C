@@ -215,6 +215,7 @@ void diffusionCoefficient::execute()
                 for (int i = 0; i<speciesNames_.size();i++)
                 {
                     Xfluid_[i] = X_[i][cellI];
+                    if (Xfluid_[i] <= 0.) Xfluid_[i] = 0;
                     Info << "X fluid for species " << speciesNames_[i] << " : " << Xfluid_[i] << nl << endl;
                 }
             }
@@ -237,6 +238,8 @@ void diffusionCoefficient::execute()
                         Info << "molarConc fluid: " << molarConcfluid << nl << endl;
                         Info << "rho fluid:  " << rhofluid << nl << endl;
                         Info << "molar weights diffusant gases: " << molWeight(diffusantGasNames_[i]) << nl << endl;
+                        Info << "Pressure: " << Pfluid << nl << endl;
+                        Info << "Temperature: " << Tfluid << nl << endl;
 
                         calcMolNum(i,j,molNum_);
                         calcDiffVol(i,j,volDiff_);
@@ -330,6 +333,7 @@ void diffusionCoefficient::calcDiffVol(int i, int j, double **volDiff_)
 {
     volDiff_[i][j]  =   coeffs(diffusantGasNames_[i])+coeffs(speciesNames_[j]);
     volDiff_[i][j]  *=   volDiff_[i][j];
+    Info << "Is the error in volDiff calculation? : " << volDiff_[i][j] << nl << endl;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -355,6 +359,7 @@ void diffusionCoefficient::calcMolNum(int i, int j, double **molNum_)
 
     molNum_[i][j]   =   (W1 + W2) / (W1 * W2);
     molNum_[i][j]   =   sqrt(molNum_[i][j]);
+    Info << "Is the error in molNum calculation? : " << molNum_[i][j] << nl << endl;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
