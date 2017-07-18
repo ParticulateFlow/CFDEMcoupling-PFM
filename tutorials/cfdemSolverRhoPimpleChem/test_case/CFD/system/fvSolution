@@ -85,13 +85,12 @@ solvers
 PIMPLE
 {
     momentumPredictor yes;
-    nOuterCorrectors 1;
-    nCorrectors     2;
+    nOuterCorrectors 2;
+    nCorrectors     1;
     nNonOrthogonalCorrectors 0;
-    rhoMin          rhoMin [ 1 -3 0 0 0 ] 0.5;
-    rhoMax          rhoMax [ 1 -3 0 0 0 ] 2.0;
+    rhoMin          rhoMin [ 1 -3 0 0 0 ] 0.2;
+    rhoMax          rhoMax [ 1 -3 0 0 0 ] 2.5;
 }
-
 
 /*
 relaxationFactors

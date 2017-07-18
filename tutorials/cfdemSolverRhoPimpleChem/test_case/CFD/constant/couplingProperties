@@ -105,8 +105,7 @@ reactionHeatProps
 speciesProps
 {
 	ChemistryFile 		"$casePath/CFD/constant/foam.inp";
-        // verbose	true;
-	// Nevery	1;
+	Nevery			1;
 }
 
 diffusionCoefficientsProps

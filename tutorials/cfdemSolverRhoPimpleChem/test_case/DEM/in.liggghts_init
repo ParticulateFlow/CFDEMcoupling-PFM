@@ -9,7 +9,7 @@ boundary        f f f
 newton          off
 
 units           si
-processors      2 2 1
+processors      2 1 1
 
 region          reg block 0. 15. 0. 5. 0. 5. units box
 create_box      1 reg
@@ -28,7 +28,7 @@ pair_style  gran model hertz tangential history # Hertzian without cohesion
 pair_coeff  * *
 
 # timestep, gravity
-timestep    0.001 #0.00001 #0.000001
+timestep    1e-6
 fix         gravi all gravity 0.0 vector 0.0 -1.0 0.0
 
 # walls
@@ -40,18 +40,8 @@ fix     zwalls1 all wall/gran model hertz tangential history primitive type 1 zp
 fix     zwalls2 all wall/gran model hertz tangential history primitive type 1 zplane 5.0
 
 # create single particle in a specific spot
-create_atoms 1 single 7.5 2 2  units box
+create_atoms 1 single 7.5 2.5 2.5  units box
 set atom 1 diameter 0.2 density 2267 vx 0 vy 0 vz 0
-
-# particle distributions and insertion
-#region  bc block 0.25 1.25 0. 0.5 0. 0.5 units box
-#fix     pts1 all particletemplate/sphere 1 atom_type 1 density constant 2267 radius constant 0.02 
-#fix     pdd1 all particledistribution/discrete 1 1 pts1 1.0
-
-#fix     ins all insert/pack seed 100001 distributiontemplate pdd1 vel constant 0. 0. 0. insert_every once overlapcheck yes all_in yes particles_in_region 1 region bc
-
-# apply nve integration to all particles that are inserted as single particles
-#fix     integr all nve/sphere
 
 # screen output
 compute         rke all erotate/sphere

@@ -15,7 +15,7 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 // Sutherland coefficients not valid must be checked before real cases
-// for hConst 
+// if instead of janaf, hConst is used
 /*CO2
 {
     specie
@@ -98,7 +98,7 @@ CO2
     }
     thermodynamics
     {
-        Tlow            0;
+        Tlow            200;
         Thigh           5000;
         Tcommon         1000;
         highCpCoeffs    ( 3.85746 0.00441437 -2.21481e-06 5.2349e-10 -4.72084e-14 -48759.2 2.27164 );
@@ -120,7 +120,7 @@ O2
     }
     thermodynamics
     {
-        Tlow            0;
+        Tlow            200;
         Thigh           5000;
         Tcommon         1000;
         highCpCoeffs    ( 3.28254 0.00148309 -7.57967e-07 2.09471e-10 -2.16718e-14 -1088.46 5.45323 );
@@ -142,7 +142,7 @@ N2
     }
     thermodynamics
     {
-        Tlow            0;
+        Tlow            200;
         Thigh           5000;
         Tcommon         1000;
         highCpCoeffs    ( 2.92664 0.00148798 -5.68476e-07 1.0097e-10 -6.75335e-15 -922.798 5.98053 );
@@ -165,7 +165,7 @@ CO
     }
     thermodynamics
     {
-        Tlow            0;
+        Tlow            200;
         Thigh           5000;
         Tcommon         1000;
         highCpCoeffs    ( 2.71518  0.00206252   -9.98825E-07    2.30053E-10     -2.03647E-14    -14151.8724     7.81868 );
