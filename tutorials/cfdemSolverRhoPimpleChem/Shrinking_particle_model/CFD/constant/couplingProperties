@@ -102,16 +102,7 @@ reactionHeatProps
 speciesProps
 {
 	ChemistryFile 		"$casePath/CFD/constant/foam.inp";
-	tempFieldName 		"T";
-	partTempName  		"partTemp";
-	densityFieldName 	"rho";
-	partRhoName		"partRho";
-        voidfractionFieldName   "voidfraction";
-        totalMoleFieldName      "molarConc";
-        partMoleName            "partMolarConc";
-        pressureFieldName       "p";
-        partPName               "partP";
-	Nevery			10;
+	Nevery			1;
 }
 
 SyamlalThermCondProps
