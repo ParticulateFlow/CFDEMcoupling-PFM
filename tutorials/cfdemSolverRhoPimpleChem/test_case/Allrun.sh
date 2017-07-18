@@ -14,10 +14,7 @@ source $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/functions.sh
 
 #- define variables
 casePath="$(dirname "$(readlink -f ${BASH_SOURCE[0]})")"
-headerText="test_case"
-logfileName="$casePath/log_$headerText"
-solverName="cfdemSolverRhoPimpleChem"
-nrProcs="4"
+export casePath
 
 export casePath
 # check if mesh was built
@@ -43,4 +40,4 @@ fi
 
 #- run parallel CFD-DEM in new terminal
 #gnome-terminal -e "bash $casePath/parCFDDEMrun.sh"
-bash $casePath/parCFDDEMrun.sh 
+bash $casePath/parCFDDEMrun.sh   
