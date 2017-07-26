@@ -61,45 +61,6 @@ functions
 	#includeFunc patchAverage(alpha.water,name=outlet)
 	#includeFunc patchAverage(alpha.oil,name=outlet)
 	#includeFunc patchAverage(alpha.air,name=outlet)
-/*    outletSum
-    {
-        type            faceSource;
-        enabled         true;
-        outputControl   timeStep;
-		outputInterval  10;
-        log             false;
-        valueOutput     false;
-        source          patch;
-        sourceName      outlet;
-        operation       sum;
-
-        fields
-        (
-            phi
-        );
-    }
-
-    outletAverage
-    {
-        type            faceSource;
-        enabled         true;
-        outputControl   timeStep;
-		outputInterval  10;
-        log             false;
-        valueOutput     false;
-        source          patch;
-        sourceName      outlet;
-        operation       average;
-
-        fields
-        (
-	    	alpha.air
-            alpha.water
-	    	alpha.oil
-	    	rho
-        );
-    }
-*/
 }
 
 // ************************************************************************* //
