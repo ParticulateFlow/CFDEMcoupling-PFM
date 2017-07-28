@@ -57,10 +57,8 @@ libs (
 
 functions
 {
-	#includeFunc flowRatePatch(name=outlet)
-	#includeFunc patchAverage(alpha.water,name=outlet)
-	#includeFunc patchAverage(alpha.oil,name=outlet)
-	#includeFunc patchAverage(alpha.air,name=outlet)
+	#includeFunc flowRatePatch
+	#includeFunc patchAverage
 }
 
 // ************************************************************************* //

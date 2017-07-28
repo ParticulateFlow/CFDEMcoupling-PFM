@@ -4,11 +4,11 @@ close all
 
 graphics_toolkit gnuplot
 
-time = dlmread('./CFD/postProcessing/flowRatePatch(name=outlet)/0/surfaceRegion.dat','\t',4,0)(:,1);
-phi = dlmread('./CFD/postProcessing/flowRatePatch(name=outlet)/0/surfaceRegion.dat','\t',4,1);
-alphaAir = dlmread('./CFD/postProcessing/patchAverage(alpha.air,name=outlet)/0/surfaceRegion.dat','\t',4,1);
-alphaWater = dlmread('./CFD/postProcessing/patchAverage(alpha.water,name=outlet)/0/surfaceRegion.dat','\t',4,1);
-alphaOil = dlmread('./CFD/postProcessing/patchAverage(alpha.oil,name=outlet)/0/surfaceRegion.dat','\t',4,1);
+time = dlmread('./CFD/postProcessing/flowRatePatch/0/surfaceRegion.dat','\t',4,0)(:,1);
+phi = dlmread('./CFD/postProcessing/flowRatePatch/0/surfaceRegion.dat','\t',4,0)(:,2);
+alphaAir = dlmread('./CFD/postProcessing/patchAverage/0/surfaceRegion.dat','\t',4,0)(:,2);
+alphaWater = dlmread('./CFD/postProcessing/patchAverage/0/surfaceRegion.dat','\t',4,0)(:,3);
+alphaOil = dlmread('./CFD/postProcessing/patchAverage/0/surfaceRegion.dat','\t',4,0)(:,4);
 
 volflowAir = phi.*alphaAir;
 volflowWater = phi.*alphaWater;
