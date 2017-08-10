@@ -79,8 +79,8 @@ public:
 
         void start(int pos) const {}
         void start(int pos,const std::string& identifier) const {}
-        void stop() {}
-        void stop(const std::string& identifier) {}
+        void stop() const {}
+        void stop(const std::string& identifier) const {}
         std::string eval() const { return ""; }
         void evalFile() const {}
         void evalPar() const {}
