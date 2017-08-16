@@ -10,7 +10,7 @@
 casePath="$(dirname "$(readlink -f ${BASH_SOURCE[0]})")"
 
 #- include functions
-source $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/functions.sh
+source $CFDEM_PROJECT_DIR/etc/functions.sh
 
 # check if mesh was built
 if [ -f "$casePath/CFD/constant/polyMesh/points" ]; then

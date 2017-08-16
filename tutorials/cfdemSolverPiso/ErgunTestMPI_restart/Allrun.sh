@@ -92,8 +92,6 @@ if [ $postproc == "true" ]
     #- get VTK data from CFD sim
     cd $casePath/CFD
     foamToVTK                                                   #- serial run of foamToVTK
-    #source $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/functions.sh                       #- include functions
-    #pseudoParallelRun "foamToVTK" $nrPostProcProcessors          #- pseudo parallel run of foamToVTK
 
     #- start paraview
     paraview
