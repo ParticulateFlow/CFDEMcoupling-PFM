@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #===================================================================#
-# allrun script for testcase as part of test routine 
+# allrun script for testcase as part of test routine
 # run settlingTest CFD part
 # Christoph Goniva - Feb. 2011
 #===================================================================#
@@ -42,7 +42,7 @@ rm cfdemSolverPisoMS_ErgunTestMPI.eps
 #- run octave
 octave totalPressureDrop.m
 
-#- show plot 
+#- show plot
 evince cfdemSolverPisoMS_ErgunTestMPI.eps
 #------------------------------#
 

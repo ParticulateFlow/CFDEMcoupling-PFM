@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #===================================================================#
-# allrun script for testcase as part of test routine 
+# allrun script for testcase as part of test routine
 # run settlingTest CFD part
 # Christoph Goniva - Feb. 2011
 #===================================================================#

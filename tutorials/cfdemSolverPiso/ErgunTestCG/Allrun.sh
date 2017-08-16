@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #===================================================================#
-# allrun script for testcase as part of test routine 
+# allrun script for testcase as part of test routine
 # run ErgunTestCG
 # Christoph Goniva - Sept. 2010
 #===================================================================#
@@ -29,4 +29,4 @@ else
 fi
 
 #- run parallel CFD-DEM in new terminal
-gnome-terminal --title='cfdemSolverPiso ErgunTestCG CFD'  -e "bash $casePath/parCFDDEMrun.sh" 
+gnome-terminal --title='cfdemSolverPiso ErgunTestCG CFD'  -e "bash $casePath/parCFDDEMrun.sh"

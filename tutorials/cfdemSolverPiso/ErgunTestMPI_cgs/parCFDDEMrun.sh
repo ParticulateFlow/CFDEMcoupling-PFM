@@ -1,8 +1,8 @@
 #!/bin/bash
 
 #===================================================================#
-# allrun script for testcase as part of test routine 
-# run ErgunTestMPI_cgs 
+# allrun script for testcase as part of test routine
+# run ErgunTestMPI_cgs
 # Christoph Goniva - March 2013
 #===================================================================#
 
@@ -45,7 +45,7 @@ if [ $runOctave == "true" ]
         #- run octave
         octave totalPressureDrop.m
 
-        #- show plot 
+        #- show plot
         evince cfdemSolverPiso_ErgunTestMPI.eps
 
         #- copy log file to test harness

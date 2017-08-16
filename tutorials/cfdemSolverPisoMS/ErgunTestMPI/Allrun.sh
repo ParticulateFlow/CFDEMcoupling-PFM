@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #===================================================================#
-# allrun script for testcase as part of test routine 
+# allrun script for testcase as part of test routine
 # run settlingTest
 # Christoph Goniva - Sept. 2010
 #===================================================================#
@@ -22,7 +22,7 @@ else
 fi
 
 #- run parallel CFD-DEM in new terminal
-gnome-terminal --title='cfdemSolverPisoMS ErgunTestMPI CFD'  -e "bash $casePath/parCFDDEMrun.sh" 
+gnome-terminal --title='cfdemSolverPisoMS ErgunTestMPI CFD'  -e "bash $casePath/parCFDDEMrun.sh"
 
 if [ $postproc == "true" ]
   then

@@ -73,7 +73,7 @@ if [ $postproc == "true" ]
 
     #- get VTK data from CFD sim
     #foamToVTK
-    
+
     #- start paraview
     echo ""
     echo "trying to start paraview..."

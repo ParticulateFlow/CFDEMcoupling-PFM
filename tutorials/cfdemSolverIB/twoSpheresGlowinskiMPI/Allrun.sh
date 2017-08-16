@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #===================================================================#
-# allrun script for testcase as part of test routine 
+# allrun script for testcase as part of test routine
 # run settlingTest
 # Christoph Goniva - July. 2011, mod by Alice Hager - July 2011
 #===================================================================#

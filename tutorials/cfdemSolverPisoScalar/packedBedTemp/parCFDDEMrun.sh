@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #===================================================================#
-# allrun script for testcase as part of test routine 
+# allrun script for testcase as part of test routine
 # run settlingTest CFD part
 # Christoph Goniva - May. 2011
 #===================================================================#
@@ -43,7 +43,7 @@ if [ $runOctave == "true" ]
     #- run octave
     octave totalPressureDropAndNusselt.m
 
-    #- show plots 
+    #- show plots
     evince cfdemSolverPisoScalar_Nusselt.eps &
     evince cfdemSolverPisoScalar_pressureDrop.eps
     #------------------------------#
