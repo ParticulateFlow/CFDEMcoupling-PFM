@@ -298,7 +298,14 @@ cfdemCloud::cfdemCloud
     }
 
     dataExchangeM().setCG();
-    if (!cgOK_ && cg_ > 1) FatalError<< "at least one of your models is not fit for cg !!!"<< abort(FatalError);
+    Switch cgWarnOnly_(couplingProperties_.lookupOrDefault<Switch>("cgWarnOnly", true));
+    if (!cgOK_ && cg_ > 1)
+    {
+        if (cgWarnOnly_)
+            Warning << "at least one of your models is not fit for cg !!!" << endl;
+        else
+            FatalError << "at least one of your models is not fit for cg !!!" << abort(FatalError);
+    }
 
     // check if simulation is a fully periodic box
     const polyBoundaryMesh& patches = mesh_.boundaryMesh();
