@@ -68,8 +68,7 @@ IBVoidFraction::IBVoidFraction
     propsDict_(dict.subDict(typeName + "Props")),
     alphaMin_(readScalar(propsDict_.lookup("alphaMin"))),
     alphaLimited_(0),
-    scaleUpVol_(readScalar(propsDict_.lookup("scaleUpVol"))),
-    checkPeriodicCells_(false)
+    scaleUpVol_(readScalar(propsDict_.lookup("scaleUpVol")))
 {
     Info << "\n\n W A R N I N G - do not use in combination with differentialRegion model! \n\n" << endl;
     //Info << "\n\n W A R N I N G - this model does not yet work properly! \n\n" << endl;
@@ -77,8 +76,6 @@ IBVoidFraction::IBVoidFraction
 
     if(scaleUpVol_ < 1){ FatalError<< "scaleUpVol shloud be > 1."<< abort(FatalError); }
     if(alphaMin_ > 1 || alphaMin_ < 0.01){ FatalError<< "alphaMin shloud be > 1 and < 0.01." << abort(FatalError); }
-    
-    if(propsDict_.found("checkPeriodicCells")) checkPeriodicCells_=true;
 }
 
 
@@ -125,7 +122,7 @@ void IBVoidFraction::setvoidFraction(double** const& mask,double**& voidfraction
                 scalar centreDist=mag(cellCentrePosition-positionCenter);
 
                 vector minPeriodicParticlePos=positionCenter;
-                if(checkPeriodicCells_) //consider minimal distance to all periodic images of this particle
+                if(particleCloud_.checkPeriodicCells()) //consider minimal distance to all periodic images of this particle
                 {
                     centreDist = minPeriodicDistance(cellCentrePosition, positionCenter, globalBb,
                                                         minPeriodicParticlePos);
@@ -142,7 +139,7 @@ void IBVoidFraction::setvoidFraction(double** const& mask,double**& voidfraction
                     {
                         vector vertexPosition = particleCloud_.mesh().points()[vertices[i]];
                         scalar centreVertexDist = mag(vertexPosition-positionCenter);
-                        if(checkPeriodicCells_) //consider minimal distance to all periodic images of this particle
+                        if(particleCloud_.checkPeriodicCells()) //consider minimal distance to all periodic images of this particle
                         {
                             centreVertexDist = minPeriodicDistance(vertexPosition, positionCenter, globalBb,
                                                                         minPeriodicParticlePos);
@@ -202,7 +199,7 @@ void IBVoidFraction::setvoidFraction(double** const& mask,double**& voidfraction
                 buildLabelHashSet(radius, minPeriodicParticlePos, particleCenterCellID, hashSett, true);
 
                 //Add cells of periodic particle images on same processor
-                if(checkPeriodicCells_)
+                if(particleCloud_.checkPeriodicCells())
                 {
                     int doPeriodicImage[3];
                     for (int iDir=0; iDir<3; iDir++)

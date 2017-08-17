@@ -67,8 +67,6 @@ private:
 	mutable bool alphaLimited_;
 
         const scalar scaleUpVol_;        //NP scaling radius, keeping volume of particle
-        
-    	mutable bool checkPeriodicCells_;
 
 public:
 
