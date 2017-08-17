@@ -115,6 +115,7 @@ void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfra
     scalar cellVol(0.);
     scalar scaleVol = weight();
     scalar scaleRadius = pow(porosity(),1./3.);
+    const boundBox& globalBb = particleCloud_.mesh().bounds();
 
     for(int index=0; index< particleCloud_.numberOfParticles(); index++)
     {
