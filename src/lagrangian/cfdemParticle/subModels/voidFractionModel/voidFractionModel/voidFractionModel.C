@@ -170,6 +170,60 @@ void voidFractionModel::reAllocArrays(int nP) const
     }
 }
 
+scalar voidFractionModel::pointInParticle(int index, const vector& positionCenter, const vector& point, double scale) const
+{
+    const scalar radius = particleCloud_.radius(index);
+
+    if(radius > SMALL)
+    {
+        scalar pointDistSq = magSqr(point - positionCenter);
+        return pointDistSq / (scale*scale * radius*radius) - 1.0;
+    }
+    else
+    {
+        return 0.;
+    }
+}
+
+//Function to determine minimal distance of point
+//to one of the periodic images of a particle
+scalar voidFractionModel::minPeriodicDistance(int index,
+                                           const vector& cellCentrePosition,
+                                           const vector& positionCenter,
+                                           const boundBox& globalBb,
+                                           vector& minPeriodicPos) const
+{
+    scalar f = VGREAT;
+    vector positionCenterPeriodic;
+
+    for(label xDir=-1; xDir<=1; ++xDir)
+    {
+        positionCenterPeriodic[0] =  positionCenter[0]
+                                  + static_cast<scalar>(xDir)
+                                  * (globalBb.max()[0]-globalBb.min()[0]);
+        for(label yDir=-1; yDir<=1; ++yDir)
+        {
+            positionCenterPeriodic[1] =  positionCenter[1]
+                                      + static_cast<scalar>(yDir)
+                                      * (globalBb.max()[1]-globalBb.min()[1]);
+            for(label zDir=-1; zDir<=1; ++zDir)
+            {
+                positionCenterPeriodic[2] =  positionCenter[2]
+                                          + static_cast<scalar>(zDir)
+                                          * (globalBb.max()[2]-globalBb.min()[2]);
+
+                if(pointInParticle(index, positionCenterPeriodic, cellCentrePosition) < f)
+                {
+                    f = pointInParticle(index, positionCenterPeriodic, cellCentrePosition);
+                    minPeriodicPos = positionCenterPeriodic;
+                }
+            }
+        }
+    }
+
+    return f;
+}
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
