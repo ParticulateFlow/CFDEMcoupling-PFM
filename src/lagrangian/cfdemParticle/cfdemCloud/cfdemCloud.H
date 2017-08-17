@@ -160,6 +160,8 @@ protected:
 
     mutable volScalarField ddtVoidfraction_;
 
+    mutable Switch checkPeriodicCells_;
+
     const turbulenceModel& turbulence_;
 
     autoPtr<forceModel>* forceModel_;
@@ -395,6 +397,8 @@ public:
         void resetArray(double**&,int,int,double resetVal=0.);
 
         void otherForces(volVectorField&);
+
+        bool checkPeriodicCells() { return checkPeriodicCells_; }
 };
 
 

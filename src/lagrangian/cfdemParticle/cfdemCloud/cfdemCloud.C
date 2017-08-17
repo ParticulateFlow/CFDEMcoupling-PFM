@@ -126,6 +126,7 @@ cfdemCloud::cfdemCloud
         mesh,
         dimensionedScalar("zero", dimensionSet(0,0,-1,0,0), 0)  // 1/s
     ),
+    checkPeriodicCells_(false),
     turbulence_
     (
         mesh.lookupObject<turbulenceModel>
@@ -298,6 +299,29 @@ cfdemCloud::cfdemCloud
 
     dataExchangeM().setCG();
     if (!cgOK_ && cg_ > 1) FatalError<< "at least one of your models is not fit for cg !!!"<< abort(FatalError);
+
+    // check if simulation is a fully periodic box
+    const polyBoundaryMesh& patches = mesh_.boundaryMesh();
+    int nPatchesCyclic(0);
+    int nPatchesNonCyclic(0);
+    forAll(patches, patchI)
+    {
+        const polyPatch& pp = patches[patchI];
+        if (isA<cyclicPolyPatch>(pp) || isA<cyclicAMIPolyPatch>(pp))
+            ++nPatchesCyclic;
+        else if (!isA<processorPolyPatch>(pp))
+            ++nPatchesNonCyclic;
+    }
+
+    if (nPatchesNonCyclic == 0)
+    {
+        checkPeriodicCells_ = true;
+    }
+    else if (nPatchesCyclic > 0 && nPatchesNonCyclic > 0)
+    {
+        if (verbose_) Info << "nPatchesNonCyclic=" << nPatchesNonCyclic << ", nPatchesCyclic=" << nPatchesCyclic << endl;
+        Warning << "Periodic handing is disabled because the domain is not fully periodic!\n" << endl;
+    }
 }
 
 // * * * * * * * * * * * * * * * * Destructors  * * * * * * * * * * * * * * //
