@@ -73,7 +73,7 @@ dividedVoidFraction::dividedVoidFraction
     interpolation_(false),
     cfdemUseOnly_(false)
 {
-    maxCellsPerParticle_ = 29;
+    maxCellsPerParticle_ = numberOfMarkerPoints;
 
     if(alphaMin_ > 1 || alphaMin_ < 0.01){ Warning << "alphaMin should be < 1 and > 0.01 !!!" << endl; }
     if (propsDict_.found("interpolation")){
@@ -89,6 +89,50 @@ dividedVoidFraction::dividedVoidFraction
     if (propsDict_.found("cfdemUseOnly"))
     {
         cfdemUseOnly_ = readBool(propsDict_.lookup("cfdemUseOnly"));
+    }
+
+    // generate marker points on unit sphere
+    label m = 0;
+    offsets[m][0] = offsets[m][1] = offsets[m][2] = 0.0;
+    ++m;
+
+    // for 2 different radii
+    scalar r1 = cbrt(1.0/numberOfMarkerPoints);
+    scalar r2 = cbrt(15.0/numberOfMarkerPoints);
+    scalar r[] = { 0.75 * (r2*r2*r2*r2 - r1*r1*r1*r1)/(r2*r2*r2 - r1*r1*r1),
+                   0.75 * (1.0 - r2*r2*r2*r2)/(1.0 - r2*r2*r2) };
+
+    for (label ir = 0; ir < 2; ++ir)
+    {
+        // try 8 subpoints derived from spherical coordinates
+        for (scalar zeta = M_PI_4; zeta < constant::mathematical::twoPi; zeta += constant::mathematical::piByTwo)
+        {
+            for (scalar theta = M_PI_4; theta < constant::mathematical::pi; theta += constant::mathematical::piByTwo)
+            {
+                offsets[m][0] = r[ir] * Foam::sin(theta) * Foam::cos(zeta);
+                offsets[m][1] = r[ir] * Foam::sin(theta) * Foam::sin(zeta);
+                offsets[m][2] = r[ir] * Foam::cos(theta);
+                ++m;
+            }
+        }
+        // try 2 more subpoints for each coordinate direction (6 total)
+        for (label j = -1; j <= 1; j += 2)
+        {
+            offsets[m][0] = r[ir] * j;
+            offsets[m][1] = 0.;
+            offsets[m][2] = 0.;
+            ++m;
+
+            offsets[m][0] = 0.;
+            offsets[m][1] = r[ir] * j;
+            offsets[m][2] = 0.;
+            ++m;
+
+            offsets[m][0] = 0.;
+            offsets[m][1] = 0.;
+            offsets[m][2] = r[ir] * j;
+            ++m;
+        }
     }
 }
 
@@ -141,7 +185,7 @@ void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfra
             cellVol=0;
 
             //--variables for sub-search
-            int nPoints = 29;
+            int nPoints = numberOfMarkerPoints;
             int nNotFound=0,nUnEqual=0,nTotal=0;
             vector offset(0.,0.,0.);
             int cellsSet = 0;
@@ -150,42 +194,13 @@ void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfra
             {
                 cellVol = particleCloud_.mesh().V()[cellID];
 
-                // for 2 different radii
-                const scalar delta_r = 0.293976*radius;
-                for (scalar r = 0.623926*radius; r < radius; r+=delta_r)
+                for (label i = 1; i < numberOfMarkerPoints; ++i)
                 {
-                    // try 8 subpoint derived from spherical coordinates
-                    for (scalar zeta=M_PI_4; zeta<2.*M_PI; zeta+=M_PI_2)
-                    {
-                        for (scalar theta=M_PI_4; theta<M_PI; theta+=M_PI_2)
-                        {
-                            offset[0] = r * Foam::sin(theta) * Foam::cos(zeta);
-                            offset[1] = r * Foam::sin(theta) * Foam::sin(zeta);
-                            offset[2] = r * Foam::cos(theta);
-                            #include "setWeightedSource.H"   // set source terms at position+offset
-                        }
-                    }
-                    // try 2 more subpoints for each coordinate direction (6 total)
-                    for (int j=-1; j<=1; j+=2)
-                    {
-                        offset[0] = r * static_cast<double>(j);
-                        offset[1] = 0.;
-                        offset[2] = 0.;
-                        #include "setWeightedSource.H"   //NP set source terms at position+offset
+                    offset = radius * offsets[i];
+                    #include "setWeightedSource.H"   // set source terms at position+offset
+                }
 
-                        offset[0] = 0.;
-                        offset[1] = r * static_cast<double>(j);
-                        offset[2] = 0.;
-                        #include "setWeightedSource.H"   //NP set source terms at position+offset
-
-                        offset[0] = 0.;
-                        offset[1] = 0.;
-                        offset[2] = r * static_cast<double>(j);
-                        #include "setWeightedSource.H"   //NP set source terms at position+offset
-                    }
-                }// end loop radiivoidfractions
-
-                if(cellsSet>29 || cellsSet<0)
+                if(cellsSet > maxCellsPerParticle_ || cellsSet < 0)
                 {
                     Info << "ERROR  cellsSet =" << cellsSet << endl;
                 }

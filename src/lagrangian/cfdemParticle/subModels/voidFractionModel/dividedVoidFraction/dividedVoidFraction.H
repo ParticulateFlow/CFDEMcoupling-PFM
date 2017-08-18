@@ -57,6 +57,8 @@ class dividedVoidFraction
 {
 
 private:
+        static const int numberOfMarkerPoints = 29;
+
         dictionary propsDict_;
 
         bool verbose_;
@@ -70,6 +72,8 @@ private:
         bool interpolation_;
 
         bool cfdemUseOnly_;
+
+        vector offsets[numberOfMarkerPoints];
 
         virtual inline scalar Vp(int index, scalar radius, scalar scaleVol) const
         {
