@@ -99,16 +99,7 @@ public:
             labelHashSet& hashSett,
             bool          initialInsert
         ) const;
-        
-        double minPeriodicDistance
-        (
-            vector    cellCentrePosition, 
-            vector    positionCenter, 
-            boundBox  globalBb,
-            vector&   minPeriodicPos
-        ) const;
-        
-        
+
         virtual double segmentParticleIntersection(int index, vector positionCenter, vector pointInside, vector pointOutside) const;
 };
 

@@ -370,43 +370,6 @@ void IBVoidFraction::buildLabelHashSet
     }
 }
 
-//Function to determine minimal distance of point
-//to one of the periodic images of a particle
-double IBVoidFraction::minPeriodicDistance(vector    cellCentrePosition, 
-                                           vector    positionCenter, 
-                                           boundBox  globalBb,
-                                           vector&   minPeriodicPos)const
-{
-    double centreDist = 999e32;
-    vector positionCenterPeriodic;
-
-    for (int xDir=-1; xDir<=1; xDir++)
-    {
-        positionCenterPeriodic[0] =  positionCenter[0]
-                                  + static_cast<double>(xDir)
-                                  * (globalBb.max()[0] - globalBb.min()[0]);
-        for (int yDir=-1; yDir<=1; yDir++)
-        {
-            positionCenterPeriodic[1] =  positionCenter[1]
-                                      + static_cast<double>(yDir)
-                                      * (globalBb.max()[1] - globalBb.min()[1]);
-            for (int zDir=-1; zDir<=1; zDir++)
-            {
-                positionCenterPeriodic[2] =  positionCenter[2]
-                                          + static_cast<double>(zDir)
-                                          * (globalBb.max()[2] - globalBb.min()[2]);
-                if (mag(cellCentrePosition-positionCenterPeriodic) < centreDist)
-                {
-                    centreDist     = mag(cellCentrePosition-positionCenterPeriodic);
-                    minPeriodicPos = positionCenterPeriodic;
-                }
-            }
-        }
-    }
-
-    return centreDist;
-}
-
 double IBVoidFraction::segmentParticleIntersection(int index, vector positionCenter, vector pointInside, vector pointOutside) const
 {
     const scalar radius = particleCloud_.radius(index);
