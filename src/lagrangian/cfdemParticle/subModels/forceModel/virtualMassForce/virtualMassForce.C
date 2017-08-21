@@ -92,8 +92,10 @@ virtualMassForce::virtualMassForce
     {
         splitUrelCalculation_ = readBool(propsDict_.lookup("splitUrelCalculation"));
         if(splitUrelCalculation_)
+        {
             Info << "Virtual mass model: will split the Urel calculation\n";
             Info << "WARNING: be sure that LIGGGHTS integration takes ddtv_p implicitly into account! \n";
+        }
     }
     if(propsDict_.found("Cadd"))
     {
