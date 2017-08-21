@@ -37,7 +37,6 @@ Description
 #include "dataExchangeModel.H"
 #include <math.h>
 
-//#include <mpi.h>
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -265,22 +264,6 @@ void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfra
                     particleVolumes[index][0] += volume*centreWeight;
                     particleV[index][0] += volume*centreWeight;
                 }
-
-                /*//OUTPUT
-                if (index==0 && verbose_)
-                {
-                    Info << "centre cellID = " << cellID << endl;
-                    Info << "cellsPerParticle_=" << cellsPerParticle_[index][0] << endl;
-
-                    for(int i=0;i<cellsPerParticle_[index][0];i++)
-                    {
-                       if(i==0)Info << "cellids, voidfractions, particleWeights, : \n";
-                       Info << particleCloud_.cellIDs()[index][i] << " ," << endl;
-                       Info << voidfractions[index][i] << " ," << endl;
-                       Info << particleWeights[index][i] << " ," << endl;
-                     }
-                }*/
-
             }// end if in cell
         //}// end if in mask
     }// end loop all particles
@@ -295,35 +278,6 @@ void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfra
     //scalar voidfractionAtPos(0);
     for(int index=0; index < particleCloud_.numberOfParticles(); index++)
     {
-        /*if(interpolation_)
-        {
-            label cellI = particleCloud_.cellIDs()[index][0];
-            if(cellI >= 0)
-            {
-                position = particleCloud_.position(index);
-                voidfractionAtPos=voidfractionInterpolator_.interpolate(position,cellI);
-            }else{
-                voidfractionAtPos=-1;
-            }
-    
-            for(int subcell=0;subcell<cellsPerParticle_[index][0];subcell++)
-            {
-                label cellID = particleCloud_.cellIDs()[index][subcell];
-
-                if(cellID >= 0)
-                {
-                    if(voidfractionAtPos > 0)
-                        voidfractions[index][subcell] = voidfractionAtPos;
-                    else
-                        voidfractions[index][subcell] = voidfractionNext_[cellID];
-                } 
-                else
-                {
-                    voidfractions[index][subcell] = -1.;
-                }
-            }
-        }
-        else*/
         {
             for (int subcell=0; subcell < cellsPerParticle_[index][0]; subcell++)
             {

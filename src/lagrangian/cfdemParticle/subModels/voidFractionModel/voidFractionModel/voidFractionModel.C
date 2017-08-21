@@ -126,22 +126,6 @@ void voidFractionModel::resetVoidFractions() const
     voidfractionNext_.ref() = 1.;
 }
 
-/*void voidFractionModel::undoVoidFractions(double**const& mask) const
-{
-    voidfractionPrev_.internalField() = voidfractionNext_.internalField();
-
-    for(int index=0; index< particleCloud_.numberOfParticles(); index++)
-    {
-        if(mask[index][0])
-        {
-            // undo voidfraction cause by particle
-            label cellI = particleCloud_.cellIDs()[index][0];
-            scalar cellVolume=voidfractionNext_.mesh().V()[cellI];
-            voidfractionNext_[cellI] += particleCloud_.particleVolumes()[index][0]/cellVolume;
-        }
-    }
-}*/
-
 int** const& voidFractionModel::cellsPerParticle() const
 {
     return cellsPerParticle_;
