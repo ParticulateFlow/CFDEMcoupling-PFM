@@ -119,84 +119,58 @@ void IBVoidFraction::setvoidFraction(double** const& mask,double**& voidfraction
 
                 //compute the voidfraction for the cell "particleCentreCellID
                 vector cellCentrePosition = particleCloud_.mesh().C()[particleCenterCellID];
-                scalar centreDist=mag(cellCentrePosition-positionCenter);
-
+                scalar fc = pointInParticle(index, positionCenter, cellCentrePosition);
                 vector minPeriodicParticlePos=positionCenter;
+
                 if(particleCloud_.checkPeriodicCells()) //consider minimal distance to all periodic images of this particle
                 {
-                    centreDist = minPeriodicDistance(cellCentrePosition, positionCenter, globalBb,
-                                                        minPeriodicParticlePos);
+                    fc = minPeriodicDistance(index,cellCentrePosition, positionCenter, globalBb, minPeriodicParticlePos);
                 }
 
-                if(centreDist + 0.5*sqrt(3.0)*pow(particleCloud_.mesh().V()[particleCenterCellID],0.33333) < radius)
+                scalar centreDist = mag(cellCentrePosition - minPeriodicParticlePos);
+                scalar corona = 0.5 * sqrt(3.0) * pow(particleCloud_.mesh().V()[particleCenterCellID], 1./3.);
+                vector coronaPoint = cellCentrePosition + (cellCentrePosition - minPeriodicParticlePos) * (corona / centreDist);
+
+                if (pointInParticle(index, minPeriodicParticlePos, coronaPoint) < 0.0)
                 {
                     voidfractionNext_[particleCenterCellID] = 0;
                 }
                 else
                 {
                     const labelList& vertices = particleCloud_.mesh().cellPoints()[particleCenterCellID];
+                    const double ratio = 0.125;
+
                     forAll(vertices, i)
                     {
                         vector vertexPosition = particleCloud_.mesh().points()[vertices[i]];
-                        scalar centreVertexDist = mag(vertexPosition-positionCenter);
+                        scalar fv = pointInParticle(index, positionCenter, vertexPosition);
+
                         if(particleCloud_.checkPeriodicCells()) //consider minimal distance to all periodic images of this particle
                         {
-                            centreVertexDist = minPeriodicDistance(vertexPosition, positionCenter, globalBb,
-                                                                        minPeriodicParticlePos);
+                            fv = minPeriodicDistance(index, vertexPosition, positionCenter, globalBb, minPeriodicParticlePos);
                         }
 
-                        if(centreDist<radius &&  centreVertexDist<radius)
+                        if (fc < 0.0 && fv < 0.0)
                         {
-                            voidfractionNext_[particleCenterCellID]-=0.125;
+                            voidfractionNext_[particleCenterCellID] -= ratio;
                         }
-                        else if(centreDist<radius && centreVertexDist>radius)
+                        else if (fc < 0.0 && fv > 0.0)
                         {
                             //compute lambda
-                            scalar a = (vertexPosition - cellCentrePosition)
-                                     & (vertexPosition - cellCentrePosition);
-                            scalar b = 2. * (vertexPosition - cellCentrePosition)
-                                     &      (cellCentrePosition-minPeriodicParticlePos);
-                            scalar c = ( (cellCentrePosition-minPeriodicParticlePos)
-                                        &(cellCentrePosition-minPeriodicParticlePos)
-                                       )
-                                        - radius*radius;
-
-                            scalar lambda = 0.;
-
-                            if (b*b-4.*a*c>=0.)  lambda =  (-b+sqrt(b*b-4.*a*c))/(2.*a);
-                            if (lambda > 0 && lambda <=1) voidfractionNext_[particleCenterCellID]-=lambda*0.125;
-                            else
-                            {
-                                lambda =  (-b-sqrt(b*b-4.*a*c))/(2.*a);
-                                if (lambda > 0. && lambda <=1.) voidfractionNext_[particleCenterCellID]-=lambda*0.125;
-                            }
+                            scalar lambda = segmentParticleIntersection(index, minPeriodicParticlePos, cellCentrePosition, vertexPosition);
+                            voidfractionNext_[particleCenterCellID] -= ratio * lambda;
                         }
-                        else if(centreDist>radius && centreVertexDist<radius)
+                        else if (fc > 0.0 && fv < 0.0)
                         {
-                            //compute another lambda too
-                            scalar a = (vertexPosition - cellCentrePosition)
-                                     & (vertexPosition - cellCentrePosition);
-                            scalar b = 2.* (vertexPosition - cellCentrePosition)
-                                     &     (cellCentrePosition-minPeriodicParticlePos);
-                            scalar c = ( (cellCentrePosition-minPeriodicParticlePos)
-                                        &(cellCentrePosition-minPeriodicParticlePos)
-                                       )
-                                     - radius*radius;
-                            scalar lambda = 0.;
-
-                            if(b*b-4.*a*c>=0.)  lambda =  (-b+sqrt(b*b-4.*a*c))/(2.*a);
-                            if(lambda > 0. && lambda <=1.) voidfractionNext_[particleCenterCellID]-=(1.-lambda)*0.125;
-                            else
-                            {
-                                lambda =  (-b-sqrt(b*b-4.*a*c))/(2.*a);
-                                if (lambda > 0. && lambda <=1.) voidfractionNext_[particleCenterCellID]-=(1.-lambda)*0.125;
-                            }
+                            //compute lambda
+                            scalar lambda = segmentParticleIntersection(index, minPeriodicParticlePos, vertexPosition, cellCentrePosition);
+                            voidfractionNext_[particleCenterCellID] -= ratio * lambda;
                         }
                     }
                 } //end particle partially overlapping with cell
 
                 //generating list with cell and subcells
-                buildLabelHashSet(radius, minPeriodicParticlePos, particleCenterCellID, hashSett, true);
+                buildLabelHashSet(index, minPeriodicParticlePos, particleCenterCellID, hashSett, true);
 
                 //Add cells of periodic particle images on same processor
                 if(particleCloud_.checkPeriodicCells())
@@ -322,7 +296,7 @@ void IBVoidFraction::setvoidFraction(double** const& mask,double**& voidfraction
 
 void IBVoidFraction::buildLabelHashSet
 (
-    const scalar radius,
+    int index,
     const vector position,
     const label cellID,
     labelHashSet& hashSett,
@@ -338,63 +312,42 @@ void IBVoidFraction::buildLabelHashSet
         vector cellCentrePosition = particleCloud_.mesh().C()[neighbor];
         scalar centreDist = mag(cellCentrePosition-position);
 
-        if(!hashSett.found(neighbor) && centreDist + 0.5*sqrt(3.0)*pow(particleCloud_.mesh().V()[neighbor],0.33333) < radius)
+        scalar fc = pointInParticle(index, position, cellCentrePosition);
+        scalar corona = 0.5 * sqrt(3.0) * pow(particleCloud_.mesh().V()[neighbor], 1./3.);
+        vector coronaPoint = cellCentrePosition + (cellCentrePosition - position) * (corona / centreDist);
+
+        if(!hashSett.found(neighbor) && pointInParticle(index, position, coronaPoint) < 0.0)
         {
             voidfractionNext_[neighbor] = 0.;
-            buildLabelHashSet(radius,position,neighbor,hashSett,true);
+            buildLabelHashSet(index,position,neighbor,hashSett,true);
         }
-        else if(!hashSett.found(neighbor) && centreDist < radius + sqrt(3.0)*pow(particleCloud_.mesh().V()[neighbor],0.33333))
+        else if(!hashSett.found(neighbor))
         {
             scalar scale = 1.;
             const labelList& vertexPoints = particleCloud_.mesh().cellPoints()[neighbor];
+            const scalar ratio = 0.125;
 
             forAll(vertexPoints, j)
             {
                 vector vertexPosition = particleCloud_.mesh().points()[vertexPoints[j]];
-                scalar vertexDist = mag(vertexPosition - position);
+                scalar fv = pointInParticle(index, position, vertexPosition);
 
-                if (centreDist < radius)
+                if (fc < 0.0)
                 {
-                    if (vertexDist < radius)
+                    if (fv < 0.0)
                     {
-                        scale -= 0.125;
+                        scale -= ratio;
                     }
                     else
                     {
-                        scalar a = (vertexPosition - cellCentrePosition)&(vertexPosition - cellCentrePosition);
-                        scalar b = 2.* (vertexPosition - cellCentrePosition)&(cellCentrePosition-position);
-                        scalar c = ((cellCentrePosition-position)&(cellCentrePosition-position))-radius*radius;
-                        scalar lambda = 0.;
-
-                        if(b*b-4.*a*c >= 0.)  lambda =  (-b+sqrt(b*b-4.*a*c))/(2.*a);
-                        if (lambda > 0. && lambda <=1.)
-                        {
-                            scale -=lambda * 0.125;
-                        }
-                        else
-                        {
-                            lambda =  (-b-sqrt(b*b-4.*a*c))/(2.*a);
-                            if (lambda > 0. && lambda <= 1.) scale -=lambda * 0.125;
-                        }
+                        scalar lambda = segmentParticleIntersection(index, position, cellCentrePosition, vertexPosition);
+                        scale -= lambda * ratio;
                     }
                 }
-                else if (vertexDist < radius)
+                else if (fv < 0.0)
                 {
-                    scalar a = (vertexPosition - cellCentrePosition)&(vertexPosition - cellCentrePosition);
-                    scalar b = 2.* (vertexPosition - cellCentrePosition)&(cellCentrePosition-position);
-                    scalar c = ((cellCentrePosition-position)&(cellCentrePosition-position))-radius*radius;
-                    scalar lambda = 0.;
-
-                    if (b*b-4.*a*c >= 0.)  lambda =  (-b+sqrt(b*b-4.*a*c))/(2.*a);
-                    if (lambda > 0. && lambda <= 1.)
-                    {
-                        scale -=(1.-lambda) * 0.125;
-                    }
-                    else
-                    {
-                        lambda =  (-b-sqrt(b*b-4.*a*c))/(2.*a);
-                        if (lambda > 0. && lambda <= 1.) scale -= (1.-lambda) * 0.125;
-                    }
+                    scalar lambda = segmentParticleIntersection(index, position, vertexPosition, cellCentrePosition);
+                    scale -= lambda * ratio;
                 }
             }
 
@@ -407,7 +360,7 @@ void IBVoidFraction::buildLabelHashSet
                 voidfractionNext_[neighbor] -= (1.0-scale);
                 if(voidfractionNext_[neighbor] < 0.) voidfractionNext_[neighbor] = 0.0;
             }
-            if(!(scale == 1.0))  buildLabelHashSet(radius,position,neighbor,hashSett, true);
+            if(!(scale == 1.0))  buildLabelHashSet(index,position,neighbor,hashSett, true);
         }
     }
 }
@@ -447,6 +400,42 @@ double IBVoidFraction::minPeriodicDistance(vector    cellCentrePosition,
     }
 
     return centreDist;
+}
+
+double IBVoidFraction::segmentParticleIntersection(int index, vector positionCenter, vector pointInside, vector pointOutside) const
+{
+    const scalar radius = particleCloud_.radius(index);
+    const scalar a = (pointOutside - pointInside) & (pointOutside - pointInside);
+    const scalar b = 2.*(pointOutside - pointInside) & (pointInside - positionCenter);
+    const scalar c = ((pointInside - positionCenter) & (pointInside - positionCenter)) - radius*radius;
+    const scalar D = b*b - 4.0*a*c;
+    const scalar eps = 1e-12;
+    scalar lambda_ = 0.0;
+    scalar lambda = 0.0;
+
+    if (D >= 0.0)
+    {
+        scalar sqrtD = sqrt(D);
+        lambda_ = (-b + sqrtD)/(2.0*a);
+
+        if (lambda_ >= -eps && lambda_ <= 1.0+eps)
+        {
+            lambda = lambda_;
+        }
+        else
+        {
+            lambda_ = (-b - sqrtD)/(2.0*a);
+            if (lambda_ >= -eps && lambda_ <= 1.0+eps)
+                lambda = lambda_;
+         }
+    }
+
+    if (lambda < 0.0)
+        return 0.0;
+    else if (lambda > 1.0)
+        return 1.0;
+
+    return lambda;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

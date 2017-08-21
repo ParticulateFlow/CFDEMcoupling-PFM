@@ -93,7 +93,7 @@ public:
 
         void buildLabelHashSet
         (
-            const scalar radius,
+            int index,
             const vector position,
             const label cellID,
             labelHashSet& hashSett,
@@ -109,6 +109,7 @@ public:
         ) const;
         
         
+        virtual double segmentParticleIntersection(int index, vector positionCenter, vector pointInside, vector pointOutside) const;
 };
 
 
