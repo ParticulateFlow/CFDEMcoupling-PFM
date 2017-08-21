@@ -284,6 +284,8 @@ void IBVoidFraction::setvoidFraction(double** const& mask,double**& voidfraction
 
             if(cellID >= 0)
             {
+                if (voidfractionNext_[cellID] < 0.0)
+                    voidfractionNext_[cellID] = 0.0;
                  voidfractions[index][subcell] = voidfractionNext_[cellID];
             }
             else
@@ -350,6 +352,9 @@ void IBVoidFraction::buildLabelHashSet
                     scale -= lambda * ratio;
                 }
             }
+
+            if (scale < 0.0)
+                scale = 0.0;
 
             if(voidfractionNext_[neighbor] == 1.0)
             {
