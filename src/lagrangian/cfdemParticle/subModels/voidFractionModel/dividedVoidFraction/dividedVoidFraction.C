@@ -242,6 +242,7 @@ void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfra
             }// end if in cell
         //}// end if in mask
     }// end loop all particles
+    voidfractionNext_.correctBoundaryConditions();
 
     // reset counter of lost volume
     if (verbose_) Pout << "Total particle volume neglected: " << tooMuch_ << endl;
