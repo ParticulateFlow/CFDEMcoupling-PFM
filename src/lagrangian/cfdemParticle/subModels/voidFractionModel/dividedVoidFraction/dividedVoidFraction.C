@@ -76,16 +76,20 @@ dividedVoidFraction::dividedVoidFraction
 {
     maxCellsPerParticle_ = numberOfMarkerPoints;
 
-    if(alphaMin_ > 1 || alphaMin_ < 0.01){ Warning << "alphaMin should be < 1 and > 0.01 !!!" << endl; }
-    if (propsDict_.found("interpolation")){
-        interpolation_=true;
+    if (alphaMin_ > 1.0 || alphaMin_ < 0.01)
+        Warning << "alphaMin should be < 1 and > 0.01 !!!" << endl;
+
+    if (propsDict_.found("interpolation"))
+    {
+        interpolation_ = true;
         Warning << "interpolation for dividedVoidFraction does not yet work correctly!" << endl;
-        Info << "Using interpolated voidfraction field - do not use this in combination with interpolation in drag model!"<< endl;
+        Info << "Using interpolated voidfraction field - do not use this in combination with interpolation in drag model!" << endl;
     }
 
     checkWeightNporosity(propsDict_);
 
-    if (propsDict_.found("verbose")) verbose_=true;
+    if (propsDict_.found("verbose"))
+        verbose_ = true;
 
     if (propsDict_.found("cfdemUseOnly"))
     {
@@ -165,7 +169,7 @@ dividedVoidFraction::~dividedVoidFraction()
 
 void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfractions,double**& particleWeights,double**& particleVolumes, double**& particleV) const
 {
-    if(cfdemUseOnly_)
+    if (cfdemUseOnly_)
         reAllocArrays(particleCloud_.numberOfParticles());
     else
         reAllocArrays();
@@ -179,18 +183,18 @@ void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfra
     scalar scaleRadius = pow(porosity(),1./3.);
     const boundBox& globalBb = particleCloud_.mesh().bounds();
 
-    for(int index=0; index< particleCloud_.numberOfParticles(); index++)
+    for (int index=0; index < particleCloud_.numberOfParticles(); index++)
     {
-        if(!checkParticleType(index)) continue; //skip this particle if not correct type
+        if (!checkParticleType(index)) continue; //skip this particle if not correct type
 
         //if(mask[index][0])
         //{
             // reset
 
-            for(int subcell=0;subcell<cellsPerParticle_[index][0];subcell++)
+            for (int subcell=0; subcell < cellsPerParticle_[index][0]; subcell++)
             {
-                particleWeights[index][subcell]=0;
-                particleVolumes[index][subcell]=0;
+                particleWeights[index][subcell] = 0.;
+                particleVolumes[index][subcell] = 0.;
             }
             particleV[index][0] = 0.;
 
@@ -200,11 +204,11 @@ void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfra
             radius = particleCloud_.radius(index);
             volume = Vp(index,radius,scaleVol);
             radius *= scaleRadius;
-            cellVol=0;
+            cellVol = 0;
 
             //--variables for sub-search
             int nPoints = numberOfMarkerPoints;
-            int nNotFound=0,nUnEqual=0,nTotal=0;
+            int nNotFound = 0, nUnEqual = 0, nTotal = 0;
             vector offset(0.,0.,0.);
             int cellsSet = 0;
 
@@ -232,31 +236,34 @@ void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfra
                     #include "setWeightedSource.H"   // set source terms at position+offset
                 }
 
-                if(cellsSet > maxCellsPerParticle_ || cellsSet < 0)
+                if (cellsSet > maxCellsPerParticle_ || cellsSet < 0)
                 {
                     Info << "ERROR  cellsSet =" << cellsSet << endl;
                 }
 
                 if (!procBoundaryCorrection_)
                 {
-                // set source for particle center; source 1/nPts+weight of all subpoints that have not been found
-                scalar centreWeight = 1./nPoints*(nPoints-cellsSet);
+                    // set source for particle center; source 1/nPts+weight of all subpoints that have not been found
+                    scalar centreWeight = 1./nPoints*(nPoints-cellsSet);
 
-                // update voidfraction for each particle read
-                scalar newAlpha = voidfractionNext_[cellID]- volume*centreWeight/cellVol;
-                if(newAlpha > alphaMin_) voidfractionNext_[cellID] = newAlpha;
-                else
-                {
-                    voidfractionNext_[cellID] = alphaMin_;
-                    tooMuch_ += (alphaMin_-newAlpha) * cellVol;
-                }
+                    // update voidfraction for each particle read
+                    scalar newAlpha = voidfractionNext_[cellID]- volume*centreWeight/cellVol;
+                    if (newAlpha > alphaMin_)
+                    {
+                        voidfractionNext_[cellID] = newAlpha;
+                    }
+                    else
+                    {
+                        voidfractionNext_[cellID] = alphaMin_;
+                        tooMuch_ += (alphaMin_-newAlpha) * cellVol;
+                    }
 
-                // store cellweight for each particle --- this should be done for subpoints as well!!
-                particleWeights[index][0] += centreWeight;
+                    // store cellweight for each particle --- this should be done for subpoints as well!!
+                    particleWeights[index][0] += centreWeight;
 
-                // store particleVolume for each particle
-                particleVolumes[index][0] += volume*centreWeight;
-                particleV[index][0] += volume*centreWeight;
+                    // store particleVolume for each particle
+                    particleVolumes[index][0] += volume*centreWeight;
+                    particleV[index][0] += volume*centreWeight;
                 }
 
                 /*//OUTPUT
@@ -286,7 +293,7 @@ void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfra
     // bring voidfraction from Eulerian Field to particle array
     //interpolationCellPoint<scalar> voidfractionInterpolator_(voidfractionNext_);
     //scalar voidfractionAtPos(0);
-    for(int index=0; index< particleCloud_.numberOfParticles(); index++)
+    for(int index=0; index < particleCloud_.numberOfParticles(); index++)
     {
         /*if(interpolation_)
         {
@@ -318,14 +325,14 @@ void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfra
         }
         else*/
         {
-            for(int subcell=0;subcell<cellsPerParticle_[index][0];subcell++)
+            for (int subcell=0; subcell < cellsPerParticle_[index][0]; subcell++)
             {
                 label cellID = particleCloud_.cellIDs()[index][subcell];
 
-                if(cellID >= 0)
+                if (cellID >= 0)
                 {
                     voidfractions[index][subcell] = voidfractionNext_[cellID];
-                } 
+                }
                 else
                 {
                     voidfractions[index][subcell] = -1.;

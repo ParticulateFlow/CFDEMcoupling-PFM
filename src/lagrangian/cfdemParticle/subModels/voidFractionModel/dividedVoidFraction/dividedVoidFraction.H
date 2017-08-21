@@ -67,7 +67,7 @@ private:
 
         const scalar alphaMin_;          // min value of voidFraction
 
-	    mutable bool alphaLimited_;
+        mutable bool alphaLimited_;
 
         mutable scalar tooMuch_;         // particle volume which is lost due to voidFraction limitation
 

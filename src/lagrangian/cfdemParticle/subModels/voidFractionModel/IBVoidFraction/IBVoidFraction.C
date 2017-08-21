@@ -70,12 +70,13 @@ IBVoidFraction::IBVoidFraction
     alphaLimited_(0),
     scaleUpVol_(readScalar(propsDict_.lookup("scaleUpVol")))
 {
-    Info << "\n\n W A R N I N G - do not use in combination with differentialRegion model! \n\n" << endl;
-    //Info << "\n\n W A R N I N G - this model does not yet work properly! \n\n" << endl;
-    maxCellsPerParticle_=readLabel(propsDict_.lookup("maxCellsPerParticle"));
+    Info << "\n\n W A R N I N G - do not use in combination with differentialRegion model!\n\n" << endl;
+    maxCellsPerParticle_ = readLabel(propsDict_.lookup("maxCellsPerParticle"));
 
-    if(scaleUpVol_ < 1){ FatalError<< "scaleUpVol shloud be > 1."<< abort(FatalError); }
-    if(alphaMin_ > 1 || alphaMin_ < 0.01){ FatalError<< "alphaMin shloud be > 1 and < 0.01." << abort(FatalError); }
+    if (scaleUpVol_ < 1.0)
+        FatalError << "scaleUpVol shloud be > 1." << abort(FatalError);
+    if (alphaMin_ > 1.0 || alphaMin_ < 0.01)
+        FatalError << "alphaMin shloud be > 1 and < 0.01." << abort(FatalError);
 }
 
 
@@ -93,25 +94,26 @@ void IBVoidFraction::setvoidFraction(double** const& mask,double**& voidfraction
 
     reAllocArrays();
 
-    voidfractionNext_.ref()=1;
+    voidfractionNext_.ref() = 1.0;
 
-    for(int index=0; index< particleCloud_.numberOfParticles(); index++)
+    for (int index=0; index < particleCloud_.numberOfParticles(); index++)
     {
         //if(mask[index][0])
         //{
             //reset
-            for(int subcell=0;subcell<cellsPerParticle_[index][0];subcell++)
+            for (int subcell=0; subcell < cellsPerParticle_[index][0]; subcell++)
             {
-                particleWeights[index][subcell]=0;
-                particleVolumes[index][subcell]=0;
+                particleWeights[index][subcell] = 0.0;
+                particleVolumes[index][subcell] = 0.0;
             }
+
             cellsPerParticle_[index][0]=1;
             particleV[index][0]=0;
 
             //collecting data
             label particleCenterCellID=particleCloud_.cellIDs()[index][0];
             scalar radius =  particleCloud_.radius(index);
-            vector positionCenter=particleCloud_.position(index);
+            vector positionCenter = particleCloud_.position(index);
 
             if (particleCenterCellID >= 0)
             {
@@ -120,9 +122,9 @@ void IBVoidFraction::setvoidFraction(double** const& mask,double**& voidfraction
                 //compute the voidfraction for the cell "particleCentreCellID
                 vector cellCentrePosition = particleCloud_.mesh().C()[particleCenterCellID];
                 scalar fc = pointInParticle(index, positionCenter, cellCentrePosition);
-                vector minPeriodicParticlePos=positionCenter;
+                vector minPeriodicParticlePos = positionCenter;
 
-                if(particleCloud_.checkPeriodicCells()) //consider minimal distance to all periodic images of this particle
+                if (particleCloud_.checkPeriodicCells()) //consider minimal distance to all periodic images of this particle
                 {
                     fc = minPeriodicDistance(index,cellCentrePosition, positionCenter, globalBb, minPeriodicParticlePos);
                 }
@@ -133,7 +135,7 @@ void IBVoidFraction::setvoidFraction(double** const& mask,double**& voidfraction
 
                 if (pointInParticle(index, minPeriodicParticlePos, coronaPoint) < 0.0)
                 {
-                    voidfractionNext_[particleCenterCellID] = 0;
+                    voidfractionNext_[particleCenterCellID] = 0.0;
                 }
                 else
                 {
@@ -145,7 +147,7 @@ void IBVoidFraction::setvoidFraction(double** const& mask,double**& voidfraction
                         vector vertexPosition = particleCloud_.mesh().points()[vertices[i]];
                         scalar fv = pointInParticle(index, positionCenter, vertexPosition);
 
-                        if(particleCloud_.checkPeriodicCells()) //consider minimal distance to all periodic images of this particle
+                        if (particleCloud_.checkPeriodicCells()) //consider minimal distance to all periodic images of this particle
                         {
                             fv = minPeriodicDistance(index, vertexPosition, positionCenter, globalBb, minPeriodicParticlePos);
                         }
@@ -173,12 +175,12 @@ void IBVoidFraction::setvoidFraction(double** const& mask,double**& voidfraction
                 buildLabelHashSet(index, minPeriodicParticlePos, particleCenterCellID, hashSett, true);
 
                 //Add cells of periodic particle images on same processor
-                if(particleCloud_.checkPeriodicCells())
+                if (particleCloud_.checkPeriodicCells())
                 {
                     int doPeriodicImage[3];
-                    for (int iDir=0; iDir<3; iDir++)
+                    for (int iDir=0; iDir < 3; iDir++)
                     {
-                        doPeriodicImage[iDir]= 0;
+                        doPeriodicImage[iDir] = 0;
                         if ((minPeriodicParticlePos[iDir]+radius) > globalBb.max()[iDir])
                         {
                             doPeriodicImage[iDir] = -1;
@@ -209,10 +211,10 @@ void IBVoidFraction::setvoidFraction(double** const& mask,double**& voidfraction
                         copyCounter++;
                     }
                     //y-direction
-                    int currCopyCounter=copyCounter;
+                    int currCopyCounter = copyCounter;
                     if (doPeriodicImage[1] != 0)
                     {
-                        for(int yDirCop=0; yDirCop<=currCopyCounter; yDirCop++)
+                        for (int yDirCop=0; yDirCop <= currCopyCounter; yDirCop++)
                         {
                             particlePosList.append( particlePosList[yDirCop]
                                                     + vector(
@@ -225,10 +227,10 @@ void IBVoidFraction::setvoidFraction(double** const& mask,double**& voidfraction
                         }
                     }
                     //z-direction
-                    currCopyCounter=copyCounter;
+                    currCopyCounter = copyCounter;
                     if (doPeriodicImage[2] != 0)
                     {
-                        for(int zDirCop=0; zDirCop<=currCopyCounter; zDirCop++)
+                        for (int zDirCop=0; zDirCop <= currCopyCounter; zDirCop++)
                         {
                             particlePosList.append( particlePosList[zDirCop]
                                                     + vector(
@@ -244,7 +246,7 @@ void IBVoidFraction::setvoidFraction(double** const& mask,double**& voidfraction
 
                     //add the nearest cell labels
                     particleLabelList.append(particleCenterCellID);
-                    for(int iPeriodicImage=1; iPeriodicImage<=copyCounter; iPeriodicImage++)
+                    for (int iPeriodicImage=1; iPeriodicImage <= copyCounter; iPeriodicImage++)
                     {
                         label partCellId = particleCloud_.mesh().findNearestCell(particlePosList[iPeriodicImage]);
                         particleLabelList.append(partCellId);
@@ -258,17 +260,17 @@ void IBVoidFraction::setvoidFraction(double** const& mask,double**& voidfraction
                 label hashSetLength = hashSett.size();
                 if (hashSetLength > maxCellsPerParticle_)
                 {
-                    FatalError<< "big particle algo found more cells ("<< hashSetLength 
-                              <<") than storage is prepared ("<<maxCellsPerParticle_<<")" << abort(FatalError);
+                    FatalError << "big particle algo found more cells (" << hashSetLength
+                               << ") than storage is prepared (" << maxCellsPerParticle_ << ")" << abort(FatalError);
                 }
                 else if (hashSetLength > 0)
                 {
                     cellsPerParticle_[index][0]=hashSetLength;
                     hashSett.erase(particleCenterCellID);
 
-                    for(label i=0;i<hashSetLength-1;i++)
+                    for (label i=0; i < hashSetLength-1; i++)
                     {
-                        label cellI=hashSett.toc()[i];
+                        label cellI = hashSett.toc()[i];
                         particleCloud_.cellIDs()[index][i+1]=cellI; //adding subcell represenation
                     }
                 }//end cells found on this proc
@@ -276,9 +278,9 @@ void IBVoidFraction::setvoidFraction(double** const& mask,double**& voidfraction
         //}// end if masked
     }// end loop all particles
 
-    for(label index=0; index< particleCloud_.numberOfParticles(); index++)
+    for (label index=0; index < particleCloud_.numberOfParticles(); index++)
     {
-        for(label subcell=0;subcell<cellsPerParticle_[index][0];subcell++)
+        for (label subcell=0; subcell < cellsPerParticle_[index][0]; subcell++)
         {
             label cellID = particleCloud_.cellIDs()[index][subcell];
 
@@ -305,7 +307,8 @@ void IBVoidFraction::buildLabelHashSet
     bool initialInsert //initial insertion of own cell
 )const
 {
-    if(initialInsert)  hashSett.insert(cellID);
+    if(initialInsert)
+        hashSett.insert(cellID);
 
     const labelList& nc = particleCloud_.mesh().cellCells()[cellID];
     forAll(nc,i)
@@ -318,7 +321,7 @@ void IBVoidFraction::buildLabelHashSet
         scalar corona = 0.5 * sqrt(3.0) * pow(particleCloud_.mesh().V()[neighbor], 1./3.);
         vector coronaPoint = cellCentrePosition + (cellCentrePosition - position) * (corona / centreDist);
 
-        if(!hashSett.found(neighbor) && pointInParticle(index, position, coronaPoint) < 0.0)
+        if (!hashSett.found(neighbor) && pointInParticle(index, position, coronaPoint) < 0.0)
         {
             voidfractionNext_[neighbor] = 0.;
             buildLabelHashSet(index,position,neighbor,hashSett,true);
@@ -356,16 +359,19 @@ void IBVoidFraction::buildLabelHashSet
             if (scale < 0.0)
                 scale = 0.0;
 
-            if(voidfractionNext_[neighbor] == 1.0)
+            if (voidfractionNext_[neighbor] == 1.0)
             {
                 voidfractionNext_[neighbor] = scale;
             }
             else
             {
                 voidfractionNext_[neighbor] -= (1.0-scale);
-                if(voidfractionNext_[neighbor] < 0.) voidfractionNext_[neighbor] = 0.0;
+                if (voidfractionNext_[neighbor] < 0.)
+                    voidfractionNext_[neighbor] = 0.0;
             }
-            if(!(scale == 1.0))  buildLabelHashSet(index,position,neighbor,hashSett, true);
+
+            if (!(scale == 1.0))
+                buildLabelHashSet(index,position,neighbor,hashSett, true);
         }
     }
 }
@@ -395,7 +401,7 @@ double IBVoidFraction::segmentParticleIntersection(int index, vector positionCen
             lambda_ = (-b - sqrtD)/(2.0*a);
             if (lambda_ >= -eps && lambda_ <= 1.0+eps)
                 lambda = lambda_;
-         }
+        }
     }
 
     if (lambda < 0.0)
