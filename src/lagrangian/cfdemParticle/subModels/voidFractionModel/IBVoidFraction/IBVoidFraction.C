@@ -36,8 +36,6 @@ Description
 #include "locateModel.H"
 #include "dataExchangeModel.H"
 
-#include <mpi.h>
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam

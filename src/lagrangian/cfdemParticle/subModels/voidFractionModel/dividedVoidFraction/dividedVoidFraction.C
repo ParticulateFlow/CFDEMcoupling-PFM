@@ -35,7 +35,6 @@ Description
 #include "addToRunTimeSelectionTable.H"
 #include "locateModel.H"
 #include "dataExchangeModel.H"
-#include <math.h>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
