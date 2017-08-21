@@ -67,6 +67,7 @@ dividedVoidFraction::dividedVoidFraction
     voidFractionModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
     verbose_(false),
+    procBoundaryCorrection_(propsDict_.lookupOrDefault<Switch>("procBoundaryCorrection", false)),
     alphaMin_(readScalar(propsDict_.lookup("alphaMin"))),
     alphaLimited_(0),
     tooMuch_(0.0),
@@ -89,6 +90,23 @@ dividedVoidFraction::dividedVoidFraction
     if (propsDict_.found("cfdemUseOnly"))
     {
         cfdemUseOnly_ = readBool(propsDict_.lookup("cfdemUseOnly"));
+    }
+
+    if (procBoundaryCorrection_)
+    {
+        if (!(particleCloud_.locateM().type() == "engineIB"))
+        {
+            FatalError << typeName << ": You are requesting procBoundaryCorrection, this requires the use of engineIB!\n"
+                       << abort(FatalError);
+        }
+    }
+    else
+    {
+        if (particleCloud_.locateM().type() == "engineIB")
+        {
+            FatalError << typeName << ": You are using engineIB, this requires using procBoundaryCorrection=true!\n"
+                       << abort(FatalError);
+        }
     }
 
     // generate marker points on unit sphere
@@ -190,9 +208,23 @@ void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfra
             vector offset(0.,0.,0.);
             int cellsSet = 0;
 
+            if (procBoundaryCorrection_)
+            {
+                label cellWithCenter(-1);
+                // switch off cellIDs for force calc if steming from parallel search success
+                cellWithCenter = particleCloud_.locateM().findSingleCell(position,cellID);
+                particleCloud_.cellIDs()[index][0] = cellWithCenter;
+            }
+
             if (cellID >= 0)  // particel centre is in domain
             {
                 cellVol = particleCloud_.mesh().V()[cellID];
+
+                if (procBoundaryCorrection_)
+                {
+                    offset = radius * offsets[0];
+                    #include "setWeightedSource.H"   // set source terms at position+offset
+                }
 
                 for (label i = 1; i < numberOfMarkerPoints; ++i)
                 {
@@ -205,6 +237,8 @@ void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfra
                     Info << "ERROR  cellsSet =" << cellsSet << endl;
                 }
 
+                if (!procBoundaryCorrection_)
+                {
                 // set source for particle center; source 1/nPts+weight of all subpoints that have not been found
                 scalar centreWeight = 1./nPoints*(nPoints-cellsSet);
 
@@ -223,6 +257,7 @@ void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfra
                 // store particleVolume for each particle
                 particleVolumes[index][0] += volume*centreWeight;
                 particleV[index][0] += volume*centreWeight;
+                }
 
                 /*//OUTPUT
                 if (index==0 && verbose_)
