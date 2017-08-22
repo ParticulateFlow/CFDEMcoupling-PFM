@@ -36,7 +36,6 @@ checkDirComment "$CFDEM_LIGGGHTS_SRC_DIR" '$CFDEM_LIGGGHTS_SRC_DIR' "yes"
 checkEnvComment "$CFDEM_LIGGGHTS_BIN_DIR" '$CFDEM_LIGGGHTS_BIN_DIR' "yes"
 checkDirComment "$CFDEM_LPP_DIR" '$CFDEM_LPP_DIR' "yes"
 checkDirComment "$CFDEM_ADD_LIBS_DIR" '$CFDEM_ADD_LIBS_DIR' "yes"
-checkDirComment "$CFDEM_PIZZA_DIR" '$CFDEM_PIZZA_DIR' "no"
 checkDirComment "$CFDEM_TEST_HARNESS_PATH" '$CFDEM_TEST_HARNESS_PATH' "no"
 echo ""
 
