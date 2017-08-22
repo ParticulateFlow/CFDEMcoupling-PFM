@@ -41,6 +41,7 @@ echo ""
 
 echo "library names"
 echo '$CFDEM_LIB_NAME = '"$CFDEM_LIB_NAME"
+echo '$PATH = '"$PATH"
 echo '$LD_LIBRARY_PATH  = '"$LD_LIBRARY_PATH"
 echo '$WM_NCOMPPROCS  = '"$WM_NCOMPPROCS"
 
