@@ -1,51 +1,109 @@
 #----------------------------------*-sh-*--------------------------------------
 # CFDEMcoupling
-# Christoph Goniva
-# June 2012
+#
+# Copyright 2009-2012 JKU Linz
+# Copyright 2012-2015 DCS Computing GmbH, Linz
+# Copyright 2015-     JKU Linz
 #------------------------------------------------------------------------------
 #
-# Script
+# File
 #     etc/cshrc
 #
 # Description
-#     Startup file for cfdem exporting environment variables
-#     Sourced  ~/.cshrc
+#     Startup file for CFDEMcoupling
+#     Sourced from ~/.cshrc
+#------------------------------------------------------------------------------
+
+setenv CFDEM_PROJECT CFDEM
+setenv CFDEM_VERSION 17.02
+
+################################################################################
+# USER EDITABLE PART: Changes made here may be lost with the next upgrade
 #
-#- adapt this and add to ./cshrc 
-#- you can test the correctness using cfdemSystemTest.sh
+# Please set to the appropriate path if the default is not correct.
+#
+# activate compatible OpenFOAM version
+. $HOME/OpenFOAM/OpenFOAM-4.x/etc/cshrc
+#
+# CFDEMcoupling
+setenv CFDEM_INST_DIR $HOME/$CFDEM_PROJECT
+setenv CFDEM_PROJECT_DIR $CFDEM_INST_DIR/CFDEMcoupling
+setenv CFDEM_PROJECT_USER_DIR $CFDEM_INST_DIR/$USER-$WM_PROJECT_VERSION
+#
+# LIGGGHTS
+setenv CFDEM_LIGGGHTS_INST_DIR $CFDEM_INST_DIR/LIGGGHTS
+#
+# LPP installation path
+setenv CFDEM_LPP_INST_DIR $CFDEM_INST_DIR/LPP
+#
+# Path to additional libraries
+setenv CFDEM_ADD_LIBS_DIR
+#
+# END OF (NORMAL) USER EDITABLE PART
+################################################################################
 
-##================================================#
-##- source cfdem env vars
-#setenv CFDEM_VERSION PUBLIC
-#setenv CFDEM_PROJECT_DIR $HOME/CFDEM/CFDEMcoupling-$CFDEM_VERSION-$WM_PROJECT_VERSION
-#setenv CFDEM_SRC_DIR $CFDEM_PROJECT_DIR/src/lagrangian/cfdemParticle
-#setenv CFDEM_SOLVER_DIR $CFDEM_PROJECT_DIR/applications/solvers
-#setenv CFDEM_DOC_DIR $CFDEM_PROJECT_DIR/doc
-#setenv CFDEM_UT_DIR $CFDEM_PROJECT_DIR/applications/utilities
-#setenv CFDEM_TUT_DIR $CFDEM_PROJECT_DIR/tutorials
-#setenv CFDEM_PROJECT_USER_DIR $HOME/CFDEM/$LOGNAME-$CFDEM_VERSION-$WM_PROJECT_VERSION
-#setenv CFDEM_bashrc $CFDEM_PROJECT_DIR/etc/cshrc
-#setenv CFDEM_LIGGGHTS_SRC_DIR $HOME/LIGGGHTS/LIGGGHTS-PUBLIC/src
-#setenv CFDEM_LIGGGHTS_MAKEFILE_NAME fedora_fpic
-#setenv CFDEM_LPP_DIR $HOME/LIGGGHTS/mylpp/src
-#setenv CFDEM_PIZZA_DIR $HOME/LIGGGHTS/PIZZA/gran_pizza_17Aug10/src
-#source $CFDEM_bashrc
-#================================================#
-#------------------------------------------------------------------------------
-
-#------------------------------------------------------------------------------
-#- export environment variables (adapt to your paths)
-#------------------------------------------------------------------------------
-
-#check if default lammps lib path should be used
-if ( ! ($?CFDEM_LAMMPS_LIB_DIR) ) then
-    setenv CFDEM_LAMMPS_LIB_DIR $CFDEM_LIGGGHTS_SRC_DIR"/../lib/"
-else
-    echo "using CFDEM_LAMMPS_LIB_DIR=$CFDEM_LAMMPS_LIB_DIR defined by user."
+#- The old dirs to be cleaned from the environment variables
+set cfdemOldDirs=
+if ( $?CFDEM_LIGGGHTS_BIN_DIR ) then
+   set cfdemOldDirs="$cfdemOldDirs $CFDEM_LIGGGHTS_BIN_DIR"
+endif
+if ( $?CFDEM_APP_DIR ) then
+   set cfdemOldDirs="$cfdemOldDirs $CFDEM_APP_DIR"
+endif
+if ( $?CFDEM_LIB_DIR ) then
+   set cfdemOldDirs="$cfdemOldDirs $CFDEM_LIB_DIR"
 endif
 
-#- LIGGGHTS lib name
-setenv CFDEM_LIGGGHTS_LIB_NAME lmp_$CFDEM_LIGGGHTS_MAKEFILE_NAME
+setenv CFDEM_LIGGGHTS_SRC_DIR $CFDEM_LIGGGHTS_INST_DIR/src
+setenv CFDEM_LIGGGHTS_BIN_DIR $CFDEM_LIGGGHTS_INST_DIR/src-build
+
+#------------------------------------------------------------------------------
+# Source files, possibly with some verbosity
+#------------------------------------------------------------------------------
+alias _foamSource 'if ($?FOAM_VERBOSE && $?prompt) echo "Sourcing: \!*"; if (\!* != "") source \!*'
+
+#------------------------------------------------------------------------------
+# Evaluate command-line parameters
+# these can be used to set/unset values
+#------------------------------------------------------------------------------
+while ( $#argv > 0 )
+    switch ($argv[1])
+    case -*:
+        # stray option (not meant for us here) -> get out
+        break
+        breaksw
+    case *=:
+        # name=       -> unsetenv name
+        if ($?FOAM_VERBOSE && $?prompt) echo "unsetenv $argv[1]:s/=//"
+        eval "unsetenv $argv[1]:s/=//"
+        breaksw
+    case *=*:
+        # name=value  -> setenv name value
+        if ($?FOAM_VERBOSE && $?prompt) echo "setenv $argv[1]:s/=/ /"
+        eval "setenv $argv[1]:s/=/ /"
+        breaksw
+    default:
+        # filename: source it
+        if ( -f "$1" ) then
+            _foamSource "$1"
+        else
+            _foamSource `$WM_PROJECT_DIR/bin/foamEtcFile -silent "$1"`
+        endif
+        breaksw
+    endsw
+    shift
+end
+
+#------------------------------------------------------------------------------
+
+setenv CFDEM_SRC_DIR $CFDEM_PROJECT_DIR/src
+setenv CFDEM_SOLVER_DIR $CFDEM_PROJECT_DIR/applications/solvers
+setenv CFDEM_UT_DIR $CFDEM_PROJECT_DIR/applications/utilities
+setenv CFDEM_DOC_DIR $CFDEM_PROJECT_DIR/doc
+setenv CFDEM_TUT_DIR $CFDEM_PROJECT_DIR/tutorials
+setenv CFDEM_LPP_DIR $CFDEM_LPP_INST_DIR/src
+
+#------------------------------------------------------------------------------
 
 #- CFDEM lib name
 setenv CFDEM_LIB_NAME lagrangianCFDEM-$CFDEM_VERSION-$WM_PROJECT_VERSION
@@ -53,36 +111,64 @@ setenv CFDEM_LIB_NAME lagrangianCFDEM-$CFDEM_VERSION-$WM_PROJECT_VERSION
 #- CFDEM compressible lib name
 setenv CFDEM_LIB_COMP_NAME lagrangianCFDEMcomp-$CFDEM_VERSION-$WM_PROJECT_VERSION
 
-#check if additional libraries should be compiled together with solvers
+#- Check if additional libraries should be compiled together with solvers
 if ( ! ($?CFDEM_ADD_LIBS_DIR) ) then
     setenv CFDEM_ADD_LIBS_DIR $CFDEM_PROJECT_DIR/etc
 else
     echo "using CFDEM_ADD_LIBS_DIR=$CFDEM_ADD_LIBS_DIR defined by user."
 endif
 
-#-----------------------------------------------------
-# additional libraries
+#------------------------------------------------------------------------------
 
 #- LMP Many2Many lib path and makefile
 setenv CFDEM_Many2ManyLIB_PATH $CFDEM_SRC_DIR/lagrangian/cfdemParticle/subModels/dataExchangeModel/twoWayMany2Many/library
-setenv CFDEM_Many2ManyLIB_MAKEFILENAME $CFDEM_LIGGGHTS_MAKEFILE_NAME
+setenv CFDEM_Many2ManyLIB_MAKEFILENAME fedora_fpic
 
-#- LMP M2M lib path
-setenv CFDEM_M2MLIB_PATH $CFDEM_SRC_DIR/lagrangian/cfdemParticle/subModels/dataExchangeModel/twoWayM2M/library
-setenv CFDEM_M2MLIB_MAKEFILENAME $CFDEM_LIGGGHTS_MAKEFILE_NAME
-
-#- LMP POEMS lib path
-setenv CFDEM_POEMSLIB_PATH $CFDEM_LIGGGHTS_SRC_DIR/../lib/poems
-setenv CFDEM_POEMSLIB_MAKEFILENAME g++
+#------------------------------------------------------------------------------
 
 #- path to test harness
 setenv CFDEM_TEST_HARNESS_PATH $CFDEM_PROJECT_USER_DIR/log/logFilesCFDEM-$CFDEM_VERSION-$WM_PROJECT_VERSION
 
 #- path to libraries
-setenv CFDEM_LIB_DIR $FOAM_USER_LIBBIN
+setenv CFDEM_LIB_DIR $CFDEM_PROJECT_DIR/platforms/$WM_OPTIONS/lib
 
 #- path to apps
-setenv CFDEM_APP_DIR $FOAM_USER_APPBIN
+setenv CFDEM_APP_DIR $CFDEM_PROJECT_DIR/platforms/$WM_OPTIONS/bin
+
+#- create directories
+mkdir -p $CFDEM_LIB_DIR
+mkdir -p $CFDEM_APP_DIR
+
+#- path to OF version flag file
+setenv CFDEM_OFVERSION_DIR $CFDEM_PROJECT_DIR/etc/OFversion
+
+#------------------------------------------------------------------------------
+# Clean standard environment variables (PATH, LD_LIBRARY_PATH)
+#------------------------------------------------------------------------------
+set foamClean=$WM_PROJECT_DIR/bin/foamCleanPath
+
+#- prevent local variables from shadowing setenv variables
+unset PATH LD_LIBRARY_PATH
+
+if (! $?LD_LIBRARY_PATH ) setenv LD_LIBRARY_PATH ''
+
+#- Clean PATH
+set cleaned=`$foamClean "$PATH" "$cfdemOldDirs"`
+if ( $status == 0 ) setenv PATH $cleaned
+
+#- Clean LD_LIBRARY_PATH
+set cleaned=`$foamClean "$LD_LIBRARY_PATH" "$cfdemOldDirs"`
+if ( $status == 0 ) setenv LD_LIBRARY_PATH $cleaned
+
+#- add binary directories to $PATH
+_foamAddPath $CFDEM_APP_DIR:$CFDEM_LIGGGHTS_BIN_DIR
+_foamAddLib $CFDEM_LIB_DIR
+
+#------------------------------------------------------------------------------
+# Cleanup environment:
+#------------------------------------------------------------------------------
+unset cleaned foamClean cfdemOldDirs
+unalias _foamSource
 
 #------------------------------------------------------------------------------
 #- settings for lpp postproc tool
@@ -98,8 +184,9 @@ setenv CFDEM_LPP_CHUNKSIZE 1
 alias lpp 'python -i $CFDEM_LPP_DIR/lpp.py --cpunum $CFDEM_LPP_NPROCS --chunksize $CFDEM_LPP_CHUNKSIZE \!:1'
 
 #------------------------------------------------------------------------------
-#- aliases for easy navigation (no changes necessary)
+# aliases for easy navigation (no changes necessary)
 #------------------------------------------------------------------------------
+
 #- shortcut to cfdem path
 alias cfdem 'cd $CFDEM_PROJECT_DIR'
 
@@ -178,13 +265,13 @@ alias cfdemLiggghtsPar 'echo "mpirun -np xx -machinefile mynodes $CFDEM_LIGGGHTS
 #- shortcut to run lpp
 alias lpp 'python -i $CFDEM_LPP_DIR/lpp.py \!:1'
 
-# check if the directory exists
+#- check if the user directory exists
 if ( -d "$CFDEM_PROJECT_USER_DIR" ) then
     :
 else
     if ( -d "$CFDEM_PROJECT_DIR" ) then
         echo "make new dirs $CFDEM_PROJECT_USER_DIR ? (y/n)"
-	set YN=$<
+        set YN=$<
         if ( $YN == "y" ) then
             mkdir -p $CFDEM_PROJECT_USER_DIR
             cd $CFDEM_PROJECT_USER_DIR

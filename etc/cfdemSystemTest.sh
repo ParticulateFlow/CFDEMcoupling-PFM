@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #===================================================================#
-# sytsem settings test routine for cfdem project 
+# sytsem settings test routine for cfdem project
 # Christoph Goniva - May. 2011, DCS Computing GmbH
 #===================================================================#
 
@@ -36,16 +36,14 @@ checkDirComment "$CFDEM_LIGGGHTS_SRC_DIR" '$CFDEM_LIGGGHTS_SRC_DIR' "yes"
 checkEnvComment "$CFDEM_LIGGGHTS_BIN_DIR" '$CFDEM_LIGGGHTS_BIN_DIR' "yes"
 checkDirComment "$CFDEM_LPP_DIR" '$CFDEM_LPP_DIR' "yes"
 checkDirComment "$CFDEM_ADD_LIBS_DIR" '$CFDEM_ADD_LIBS_DIR' "yes"
-checkDirComment "$CFDEM_PIZZA_DIR" '$CFDEM_PIZZA_DIR' "no"
 checkDirComment "$CFDEM_TEST_HARNESS_PATH" '$CFDEM_TEST_HARNESS_PATH' "no"
-#checkDirComment "$C3PO_SRC_DIR" '$C3PO_SRC_DIR' "no"
 echo ""
 
 echo "library names"
-echo '$CFDEM_LIGGGHTS_LIB_NAME = '"$CFDEM_LIGGGHTS_LIB_NAME"
 echo '$CFDEM_LIB_NAME = '"$CFDEM_LIB_NAME"
-echo '$LD_LIBRARY_PATH  = '"$LD_LIBRARY_PATH"
-echo '$WM_NCOMPPROCS  = '"$WM_NCOMPPROCS"
+echo '$PATH = '"$PATH"
+echo '$LD_LIBRARY_PATH = '"$LD_LIBRARY_PATH"
+echo '$WM_NCOMPPROCS = '"$WM_NCOMPPROCS"
 
 echo "*******************"
 
@@ -79,6 +77,6 @@ if [ $checkAddOn == "true" ]
     if [ $(checkDir $filePath) == "true" ]; then
         source $filePath/etc/$packageName"SystemTest.sh"
     else
-        echo "$packageName does not exist." 
+        echo "$packageName does not exist."
     fi
 fi
