@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #===================================================================#
-# sytsem settings test routine for cfdem project 
+# sytsem settings test routine for cfdem project
 # Christoph Goniva - May. 2011, DCS Computing GmbH
 #===================================================================#
 
@@ -42,8 +42,8 @@ echo ""
 echo "library names"
 echo '$CFDEM_LIB_NAME = '"$CFDEM_LIB_NAME"
 echo '$PATH = '"$PATH"
-echo '$LD_LIBRARY_PATH  = '"$LD_LIBRARY_PATH"
-echo '$WM_NCOMPPROCS  = '"$WM_NCOMPPROCS"
+echo '$LD_LIBRARY_PATH = '"$LD_LIBRARY_PATH"
+echo '$WM_NCOMPPROCS = '"$WM_NCOMPPROCS"
 
 echo "*******************"
 
@@ -77,6 +77,6 @@ if [ $checkAddOn == "true" ]
     if [ $(checkDir $filePath) == "true" ]; then
         source $filePath/etc/$packageName"SystemTest.sh"
     else
-        echo "$packageName does not exist." 
+        echo "$packageName does not exist."
     fi
 fi
