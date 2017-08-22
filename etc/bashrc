@@ -38,12 +38,6 @@
 #- export environment variables (adapt to your paths)
 #------------------------------------------------------------------------------
 
-#check if default lammps lib path should be used
-if [[ $CFDEM_LAMMPS_LIB_DIR == "" ]]; then
-    export CFDEM_LAMMPS_LIB_DIR=$CFDEM_LIGGGHTS_SRC_DIR/../lib/
-else
-    echo "using CFDEM_LAMMPS_LIB_DIR=$CFDEM_LAMMPS_LIB_DIR defined by user."
-fi
 
 #- LIGGGHTS lib name
 export CFDEM_LIGGGHTS_LIB_NAME=lmp_$CFDEM_LIGGGHTS_MAKEFILE_NAME
@@ -68,20 +62,6 @@ fi
 export CFDEM_Many2ManyLIB_PATH=$CFDEM_SRC_DIR/lagrangian/cfdemParticle/subModels/dataExchangeModel/twoWayMany2Many/library
 export CFDEM_Many2ManyLIB_MAKEFILENAME=$CFDEM_LIGGGHTS_MAKEFILE_NAME
 
-#- LMP M2M lib path and makefile
-export CFDEM_M2MLIB_PATH=$CFDEM_SRC_DIR/lagrangian/cfdemParticle/subModels/dataExchangeModel/twoWayM2M/library
-export CFDEM_M2MLIB_MAKEFILENAME=$CFDEM_LIGGGHTS_MAKEFILE_NAME
-
-#- LMP POEMS lib path and makefile
-export CFDEM_POEMSLIB_PATH=$CFDEM_LAMMPS_LIB_DIR/poems
-export CFDEM_POEMSLIB_MAKEFILENAME=g++
-
-#- LMP ASPHERE lib path and makefile
-export CFDEM_ASPHERELIB_PATH=$CFDEM_LAMMPS_LIB_DIR/poems
-export CFDEM_ASPHERELIB_MAKEFILENAME=g++
-
-#-C3PO library
-export C3PO_SRC_DIR=$CFDEM_SRC_DIR/c3po
 #-----------------------------------------------------
 
 #- path to test harness

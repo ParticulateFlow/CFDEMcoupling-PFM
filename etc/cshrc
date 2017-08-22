@@ -37,13 +37,6 @@
 #- export environment variables (adapt to your paths)
 #------------------------------------------------------------------------------
 
-#check if default lammps lib path should be used
-if ( ! ($?CFDEM_LAMMPS_LIB_DIR) ) then
-    setenv CFDEM_LAMMPS_LIB_DIR $CFDEM_LIGGGHTS_SRC_DIR"/../lib/"
-else
-    echo "using CFDEM_LAMMPS_LIB_DIR=$CFDEM_LAMMPS_LIB_DIR defined by user."
-endif
-
 #- LIGGGHTS lib name
 setenv CFDEM_LIGGGHTS_LIB_NAME lmp_$CFDEM_LIGGGHTS_MAKEFILE_NAME
 
@@ -66,14 +59,6 @@ endif
 #- LMP Many2Many lib path and makefile
 setenv CFDEM_Many2ManyLIB_PATH $CFDEM_SRC_DIR/lagrangian/cfdemParticle/subModels/dataExchangeModel/twoWayMany2Many/library
 setenv CFDEM_Many2ManyLIB_MAKEFILENAME $CFDEM_LIGGGHTS_MAKEFILE_NAME
-
-#- LMP M2M lib path
-setenv CFDEM_M2MLIB_PATH $CFDEM_SRC_DIR/lagrangian/cfdemParticle/subModels/dataExchangeModel/twoWayM2M/library
-setenv CFDEM_M2MLIB_MAKEFILENAME $CFDEM_LIGGGHTS_MAKEFILE_NAME
-
-#- LMP POEMS lib path
-setenv CFDEM_POEMSLIB_PATH $CFDEM_LIGGGHTS_SRC_DIR/../lib/poems
-setenv CFDEM_POEMSLIB_MAKEFILENAME g++
 
 #- path to test harness
 setenv CFDEM_TEST_HARNESS_PATH $CFDEM_PROJECT_USER_DIR/log/logFilesCFDEM-$CFDEM_VERSION-$WM_PROJECT_VERSION
