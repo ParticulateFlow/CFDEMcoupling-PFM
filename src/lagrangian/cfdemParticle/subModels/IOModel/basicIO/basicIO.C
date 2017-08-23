@@ -92,15 +92,15 @@ int basicIO::dumpDEMdata() const
         {
             Info << "createTimeDir(path_), path="<<path_ << endl;
             Info << "lagPath_=createTimeDir(fileName(lagPath_/lagrangian)), lagPath="<<path_ << endl;
-        	lagPath_=createTimeDir(path_);
-        	lagPath_=createTimeDir(fileName(lagPath_/"lagrangian"));
+            lagPath_ = createTimeDir(path_);
+            lagPath_ = createTimeDir(fileName(lagPath_/"lagrangian"));
         }
         // calc the number of particles on proc
         int count(0);
         for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)
             if (particleCloud_.cellIDs()[index][0] > -1) count++;
-        nPProc_=count;
-        
+        nPProc_ = count;
+
         // stream data to file
         streamDataToPath(lagPath_, particleCloud_.positions(),nPProc_,"positions","position","Cloud<passiveParticle>","0");
         streamDataToPath(lagPath_, particleCloud_.velocities(),nPProc_,"v","vector","vectorField","");

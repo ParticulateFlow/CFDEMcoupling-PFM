@@ -111,25 +111,32 @@ void IOModel::streamDataToPath(fileName path, double** array,int nPProc,word nam
 
     if (type == "origProcId")
     {
-        if(nPProc>0) fileStream <<"{0}"<< "\n";
-        else fileStream <<"{}"<< "\n";
+        if (nPProc > 0) fileStream << "{0}" << "\n";
+        else fileStream << "{}" << "\n";
         return;
     }
 
     fileStream << token::BEGIN_LIST << nl;
 
     int ** cellIDs = particleCloud_.cellIDs();
-    for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)
+    for (int index = 0; index < particleCloud_.numberOfParticles(); ++index)
     {
         if (cellIDs[index][0] > -1) // particle Found
         {
-            if (type=="scalar"){
+            if (type == "scalar")
+            {
                 fileStream << array[index][0] << " \n";
-            }else if (type=="position"){
-                fileStream <<"( "<< array[index][0] <<" "<<array[index][1]<<" "<<array[index][2]<<" ) "<< cellIDs[index][0] << " \n";
-            }else if (type=="vector"){
-                fileStream <<"( "<< array[index][0] <<" "<<array[index][1]<<" "<<array[index][2]<<" ) " << " \n";
-            }else if (type=="label"){
+            }
+            else if (type == "position")
+            {
+                fileStream << "( "<< array[index][0] << " " << array[index][1] << " " << array[index][2] << " ) " << cellIDs[index][0] << " \n";
+            }
+            else if (type == "vector")
+            {
+                fileStream << "( "<< array[index][0] << " " << array[index][1] << " " << array[index][2] << " ) " << " \n";
+            }
+            else if (type == "label")
+            {
                 fileStream << index << " \n";
             }
         }
@@ -152,12 +159,12 @@ IOModel::IOModel
     time_(sm.mesh().time()),
     parOutput_(true)
 {
-	if (
+    if (
             particleCloud_.dataExchangeM().myType()=="oneWayVTK" ||
             dict_.found("serialOutput")
        )
     {
-        parOutput_=false;
+        parOutput_ = false;
         Warning << "IO model is in serial write mode, only data on proc 0 is written" << endl;
     }
 }
