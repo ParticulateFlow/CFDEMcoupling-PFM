@@ -101,13 +101,14 @@ void IOModel::streamDataToPath(fileName path, double** array,int nPProc,word nam
     fileStream << "{version 2.0; format ascii;class "<< className << "; location 0;object  "<< name <<";}\n";
     fileStream << nPProc <<"\n";
 
-
-    if(type!="origProcId") fileStream << "(\n";
-    else if(type=="origProcId")
+    if (type == "origProcId")
     {
         if(nPProc>0) fileStream <<"{0}"<< "\n";
         else fileStream <<"{}"<< "\n";
+        return;
     }
+
+    fileStream << token::BEGIN_LIST << nl;
 
     for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)
     {
@@ -123,7 +124,7 @@ void IOModel::streamDataToPath(fileName path, double** array,int nPProc,word nam
         }
     }
 
-    if(type!="origProcId") fileStream << ")\n";
+    fileStream << token::END_LIST << nl;
 }
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
