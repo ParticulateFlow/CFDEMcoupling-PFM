@@ -96,17 +96,17 @@ fileName IOModel::buildFilePath(word dirName) const
 
 void IOModel::streamDataToPath(fileName path, double** array,int nPProc,word name,word type,word className,word finaliser) const
 {
-    OFstream* fileStream = new OFstream(fileName(path/name));
-    *fileStream << "FoamFile\n";
-    *fileStream << "{version 2.0; format ascii;class "<< className << "; location 0;object  "<< name <<";}\n";
-    *fileStream << nPProc <<"\n";
+    OFstream fileStream(path/name);
+    fileStream << "FoamFile\n";
+    fileStream << "{version 2.0; format ascii;class "<< className << "; location 0;object  "<< name <<";}\n";
+    fileStream << nPProc <<"\n";
 
 
-    if(type!="origProcId")*fileStream << "(\n";
+    if(type!="origProcId") fileStream << "(\n";
     else if(type=="origProcId")
     {
-        if(nPProc>0) *fileStream <<"{0}"<< "\n";
-        else *fileStream <<"{}"<< "\n";
+        if(nPProc>0) fileStream <<"{0}"<< "\n";
+        else fileStream <<"{}"<< "\n";
     }
 
     for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)
@@ -114,17 +114,16 @@ void IOModel::streamDataToPath(fileName path, double** array,int nPProc,word nam
         if (particleCloud_.cellIDs()[index][0] > -1) // particle Found
         {
             if (type=="scalar"){
-                *fileStream << array[index][0] << " \n";
+                fileStream << array[index][0] << " \n";
             }else if (type=="position" || type=="vector"){
-                *fileStream <<"( "<< array[index][0] <<" "<<array[index][1]<<" "<<array[index][2]<<" ) "<< finaliser << " \n";
+                fileStream <<"( "<< array[index][0] <<" "<<array[index][1]<<" "<<array[index][2]<<" ) "<< finaliser << " \n";
             }else if (type=="label"){
-                *fileStream << index << finaliser << " \n";
+                fileStream << index << finaliser << " \n";
             }
         }
     }
 
-    if(type!="origProcId")*fileStream << ")\n";
-    delete fileStream;
+    if(type!="origProcId") fileStream << ")\n";
 }
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
