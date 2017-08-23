@@ -118,14 +118,15 @@ void IOModel::streamDataToPath(fileName path, double** array,int nPProc,word nam
 
     fileStream << token::BEGIN_LIST << nl;
 
+    int ** cellIDs = particleCloud_.cellIDs();
     for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)
     {
-        if (particleCloud_.cellIDs()[index][0] > -1) // particle Found
+        if (cellIDs[index][0] > -1) // particle Found
         {
             if (type=="scalar"){
                 fileStream << array[index][0] << " \n";
             }else if (type=="position"){
-                fileStream <<"( "<< array[index][0] <<" "<<array[index][1]<<" "<<array[index][2]<<" ) "<< finaliser << " \n";
+                fileStream <<"( "<< array[index][0] <<" "<<array[index][1]<<" "<<array[index][2]<<" ) "<< cellIDs[index][0] << " \n";
             }else if (type=="vector"){
                 fileStream <<"( "<< array[index][0] <<" "<<array[index][1]<<" "<<array[index][2]<<" ) " << " \n";
             }else if (type=="label"){
