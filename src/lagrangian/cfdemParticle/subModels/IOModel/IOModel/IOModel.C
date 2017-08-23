@@ -88,8 +88,7 @@ fileName IOModel::buildFilePath(word dirName) const
 		path=fileName("."/dirName);
     	mkDir(path,0777);
     	mkDir(fileName(path/"constant"),0777);
-    	OFstream* stubFile = new OFstream(fileName(path/"particles.foam"));
-    	delete stubFile;
+       OFstream stubFile(path/"particles.foam");
         }
     return path;
 }
