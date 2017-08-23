@@ -7,20 +7,20 @@
 #===================================================================#
  
 #- include functions
-source $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/functions.sh
+source $CFDEM_PROJECT_DIR/etc/functions.sh
 
 NOW="$(date +"%Y-%m-%d-%H:%M")"
 logDir="log"
 
 
-cd $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc
+cd $CFDEM_PROJECT_DIR/etc
 mkdir -p $logDir
 
 
 #================================================================================#
 # compile src
 #================================================================================#
-whitelist="$CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/library-list.txt"
+whitelist="$CFDEM_PROJECT_DIR/etc/library-list.txt"
 echo ""
 echo "Please provide the libraries to be compiled in the $CWD/$whitelist file."
 
