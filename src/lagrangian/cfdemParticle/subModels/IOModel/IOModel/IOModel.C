@@ -96,7 +96,6 @@ fileName IOModel::buildFilePath(word dirName) const
 
 void IOModel::streamDataToPath(fileName path, double** array,int nPProc,word name,word type,word className,word finaliser) const
 {
-    vector vec;
     OFstream* fileStream = new OFstream(fileName(path/name));
     *fileStream << "FoamFile\n";
     *fileStream << "{version 2.0; format ascii;class "<< className << "; location 0;object  "<< name <<";}\n";
@@ -117,8 +116,7 @@ void IOModel::streamDataToPath(fileName path, double** array,int nPProc,word nam
             if (type=="scalar"){
                 *fileStream << array[index][0] << " \n";
             }else if (type=="position" || type=="vector"){
-                for(int i=0;i<3;i++) vec[i] = array[index][i];
-                *fileStream <<"( "<< vec[0] <<" "<<vec[1]<<" "<<vec[2]<<" ) "<< finaliser << " \n";
+                *fileStream <<"( "<< array[index][0] <<" "<<array[index][1]<<" "<<array[index][2]<<" ) "<< finaliser << " \n";
             }else if (type=="label"){
                 *fileStream << index << finaliser << " \n";
             }
