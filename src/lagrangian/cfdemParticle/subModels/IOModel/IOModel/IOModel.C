@@ -124,8 +124,10 @@ void IOModel::streamDataToPath(fileName path, double** array,int nPProc,word nam
         {
             if (type=="scalar"){
                 fileStream << array[index][0] << " \n";
-            }else if (type=="position" || type=="vector"){
+            }else if (type=="position"){
                 fileStream <<"( "<< array[index][0] <<" "<<array[index][1]<<" "<<array[index][2]<<" ) "<< finaliser << " \n";
+            }else if (type=="vector"){
+                fileStream <<"( "<< array[index][0] <<" "<<array[index][1]<<" "<<array[index][2]<<" ) " << " \n";
             }else if (type=="label"){
                 fileStream << index << " \n";
             }
