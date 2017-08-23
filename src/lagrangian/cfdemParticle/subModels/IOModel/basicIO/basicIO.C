@@ -102,7 +102,7 @@ int basicIO::dumpDEMdata() const
         nPProc_=count;
         
         // stream data to file
-        streamDataToPath(lagPath_, particleCloud_.positions(),nPProc_,"positions","vector","Cloud<passiveParticle>","0");
+        streamDataToPath(lagPath_, particleCloud_.positions(),nPProc_,"positions","position","Cloud<passiveParticle>","0");
         streamDataToPath(lagPath_, particleCloud_.velocities(),nPProc_,"v","vector","vectorField","");
         streamDataToPath(lagPath_, particleCloud_.radii(),nPProc_,"r","scalar","scalarField","");
     }
