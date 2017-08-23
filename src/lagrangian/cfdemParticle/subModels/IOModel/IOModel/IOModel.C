@@ -78,18 +78,19 @@ fileName IOModel::createLagrangianDir(fileName path) const
 fileName IOModel::buildFilePath(word dirName) const
 {
     // create file structure
-	fileName path("");
+    fileName path("");
     if(parOutput_)
     {
-    	path=fileName(particleCloud_.mesh().time().path()/particleCloud_.mesh().time().timeName()/dirName/"particleCloud");
-    	mkDir(path,0777);
-    } else
+        path = fileName(particleCloud_.mesh().time().path()/particleCloud_.mesh().time().timeName()/dirName/"particleCloud");
+        mkDir(path,0777);
+    }
+    else
     {
-		path=fileName("."/dirName);
-    	mkDir(path,0777);
-    	mkDir(fileName(path/"constant"),0777);
-       OFstream stubFile(path/"particles.foam");
-        }
+        path = fileName("."/dirName);
+        mkDir(path,0777);
+        mkDir(path/"constant",0777);
+        OFstream stubFile(path/"particles.foam");
+    }
     return path;
 }
 
