@@ -97,8 +97,16 @@ fileName IOModel::buildFilePath(word dirName) const
 void IOModel::streamDataToPath(fileName path, double** array,int nPProc,word name,word type,word className,word finaliser) const
 {
     OFstream fileStream(path/name);
-    fileStream << "FoamFile\n";
-    fileStream << "{version 2.0; format ascii;class "<< className << "; location 0;object  "<< name <<";}\n";
+
+    fileStream
+        << "FoamFile\n{\n"
+        << "    version     " << fileStream.version() << ";\n"
+        << "    format      " << fileStream.format() << ";\n"
+        << "    class       " << className << ";\n"
+        << "    location    " << 0 << ";\n"
+        << "    object      " << name << ";\n"
+        << "}" << nl;
+
     fileStream << nPProc <<"\n";
 
     if (type == "origProcId")
