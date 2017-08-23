@@ -175,8 +175,8 @@ void diffusionCoefficient::execute()
     scalar Texp(0);
     List<scalar> dBinarytot_;
     dBinarytot_.setSize(diffusantGasNames_.size());
-    List<scalar> dCoeff_;
-    dCoeff_.setSize(diffusantGasNames_.size());
+    List<scalar> molecularDiffusion_;
+    molecularDiffusion_.setSize(diffusantGasNames_.size());
     List<scalar> Xstag_tot_;
     Xstag_tot_.setSize(diffusantGasNames_.size());
 
@@ -229,7 +229,7 @@ void diffusionCoefficient::execute()
                 volDiff_[i]     =   new double [speciesNames_.size()];
 
                 dBinarytot_[i]  =   0.0;
-                dCoeff_[i]      =   0.0;
+                molecularDiffusion_[i]      =   0.0;
                 Xstag_tot_[i]   =   0.0;
                 for (int j=0; j < speciesNames_.size();j++)
                 {
@@ -272,17 +272,17 @@ void diffusionCoefficient::execute()
                             // dCoeff -- diffusion component of diffusant gas
                             if (Xstag_tot_[i] == 0.0) //(Xstag_tot_[i] == 0. || (1-Xfluid_[i]) == 0.)
                             {
-                                dCoeff_[i] = 0.0;
+                                molecularDiffusion_[i] = 0.0;
                             } else
                             {
-                                dCoeff_[i]  =   (1-Xfluid_[i])*dBinarytot_[i]/Xstag_tot_[i];
+                                molecularDiffusion_[i]  =   (1-Xfluid_[i])*dBinarytot_[i]/Xstag_tot_[i];
                             }
 
                             Info << "Multicomp. mix diffusion for species " << diffusantGasNames_[i]
-                                 << " is: " << dCoeff_[i] << nl << endl;
+                                 << " is: " << molecularDiffusion_[i] << nl << endl;
 
                             // pass on dCoeff values to array
-                            diffusionCoefficients_[i][index][0]= dCoeff_[i];
+                            diffusionCoefficients_[i][index][0]= molecularDiffusion_[i];
 
                         }else
                         {
