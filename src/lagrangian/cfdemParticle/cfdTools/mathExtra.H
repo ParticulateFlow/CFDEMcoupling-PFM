@@ -44,6 +44,28 @@ Description
 
 #define TOLERANCE_ORTHO 1e-10
 
+namespace Foam
+{
+namespace constant
+{
+namespace mathematical
+{
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+    const scalar piByFour(0.25*pi);
+    const scalar fourPiByThree(4.0*pi/3.0);
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace mathematical
+} // End namespace constant
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace Foam
+
+
 namespace MathExtra 
 {
 
