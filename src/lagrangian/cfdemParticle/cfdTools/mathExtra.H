@@ -27,7 +27,7 @@ License
 Description
     This code is designed to realize coupled CFD-DEM simulations using LIGGGHTS
     and OpenFOAM(R). Note: this code is not part of OpenFOAM(R) (see DISCLAIMER).
-    
+
     Copyright of this contribution:
     Copyright 2014-     TU Graz, IPPT
 ------------------------------------------------------------------------- */
@@ -66,7 +66,7 @@ namespace mathematical
 } // End namespace Foam
 
 
-namespace MathExtra 
+namespace MathExtra
 {
 
 //  inline void     outerProduct(double *vec1, double *vec2, double **m);
@@ -103,13 +103,13 @@ inline bool spheroidGeometry(double radius, double aspectRatio, //inputs
     //INPUT
     //  radius      ...volume-equivalent radius of the spheroid
     //  aspectRatio ...major/minor aspect ratio
-    
+
     //OUTPUT
-    //  ai  ... 
-    //  bi  ... 
-    //  ei  ... 
-    //  Le  ... 
-  
+    //  ai  ...
+    //  bi  ...
+    //  ei  ...
+    //  Le  ...
+
     if(radius<=0.0)     //avoid troubles in case radius is 0 or negative
         return false;
 
@@ -141,7 +141,7 @@ inline bool spheroidGeometry2(double radius,  double aspectRatio, //inputs
     //INPUT
     //  radius      ...volume-equivalent radius of the spheroid
     //  aspectRatio ...major/minor aspect ratio
-    
+
     //OUTPUT
     //  XAe  ...Eccentricity dependet parameter
     //  YAe  ...Eccentricity dependet parameter
@@ -234,7 +234,7 @@ inline bool permutationDotDyadic(
     //Generate permutation tensor
     double permutationT[3][3][3];
     permutationTensor(permutationT);
-    
+
     //Step 1: compute dot prodcut of permutation tensor
     double permutationDotProd[3][3];
     zeroize33(permutationDotProd);
@@ -249,7 +249,7 @@ inline bool permutationDotDyadic(
         for(int iY=0; iY<3; iY++)
             for(int iZ=0; iZ<3; iZ++)
                 tensor[iX][iY][iZ] = permutationDotProd[iX][iY]
-                                   * vector[iZ]; 
+                                   * vector[iZ];
     return true;
 
 }
@@ -262,7 +262,7 @@ inline bool doubleDotTensor333Tensor33(double tensor333[3][3][3],
                                       )
 {
     result[0]=0.0;result[1]=0.0;result[2]=0.0;
-    
+
     for(int iX=0; iX<3; iX++)
         for(int iY=0; iY<3; iY++)
             for(int iZ=0; iZ<3; iZ++)
