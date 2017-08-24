@@ -121,7 +121,7 @@ public:
 
     fileName buildFilePath(word) const;
 
-    void streamDataToPath(fileName,double**,int,word,word type,word className,word finaliser) const;
+    void streamDataToPath(fileName,double**,int,word,word type,word className) const;
 };
 
 

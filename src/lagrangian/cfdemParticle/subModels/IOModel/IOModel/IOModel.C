@@ -94,7 +94,7 @@ fileName IOModel::buildFilePath(word dirName) const
     return path;
 }
 
-void IOModel::streamDataToPath(fileName path, double** array,int nPProc,word name,word type,word className,word finaliser) const
+void IOModel::streamDataToPath(fileName path, double** array,int nPProc,word name,word type,word className) const
 {
     OFstream fileStream(path/name);
 
