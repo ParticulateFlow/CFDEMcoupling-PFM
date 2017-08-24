@@ -1,4 +1,4 @@
-
+{
   //========================================================================//
   scalar countCell=0;              // number of cells touched by particles
   int points=0;                    // number of particles and sub-points
@@ -93,3 +93,4 @@
   Info <<"meanR_array = "<< meanR_array << endl;
   Info <<"=============================================================================" << endl;
   Info << endl;
+}
