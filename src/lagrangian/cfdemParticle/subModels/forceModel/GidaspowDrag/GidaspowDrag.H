@@ -74,7 +74,7 @@ private:
 
     const scalar phi_;
 
-    word UsFieldName_;   
+    word UsFieldName_;
 
     const volVectorField& UsField_;  // the average particle velocity field
 

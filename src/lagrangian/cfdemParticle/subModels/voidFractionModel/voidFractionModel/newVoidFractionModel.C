@@ -32,7 +32,6 @@ Description
 #include "error.H"
 
 #include "voidFractionModel.H"
-#include "centreVoidFraction.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

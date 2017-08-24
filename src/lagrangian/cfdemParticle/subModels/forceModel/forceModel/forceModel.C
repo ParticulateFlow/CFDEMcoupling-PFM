@@ -88,14 +88,16 @@ forceModel::forceModel
     probeIt_(sm.probeM().active()),
     requiresEx_(false),
     forceSubModels_(0),
-    forceSubModel_(new autoPtr<forceSubModel>[nrForceSubModels()])
+    forceSubModel_(NULL)
 {}
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 forceModel::~forceModel()
-{}
+{
+  delete [] forceSubModel_;
+}
 
 // * * * * * * * * * * * * * * * * Member Fct  * * * * * * * * * * * * * * * //
 /*tmp<volScalarField> forceModel::provideScalarField()

@@ -73,16 +73,16 @@ MeiLift::MeiLift
     // init force sub model
     setForceSubModels(propsDict_);
     // define switches which can be read from dict
-    forceSubM(0).setSwitchesList(0,true); // activate treatExplicit switch
-    forceSubM(0).setSwitchesList(3,true); // activate search for verbose switch
-    forceSubM(0).setSwitchesList(4,true); // activate search for interpolate switch
-    forceSubM(0).setSwitchesList(8,true); // activate scalarViscosity switch
+    forceSubM(0).setSwitchesList(SW_TREAT_FORCE_EXPLICIT,true); // activate treatExplicit switch
+    forceSubM(0).setSwitchesList(SW_VERBOSE,true); // activate search for verbose switch
+    forceSubM(0).setSwitchesList(SW_INTERPOLATION,true); // activate search for interpolate switch
+    forceSubM(0).setSwitchesList(SW_SCALAR_VISCOSITY,true); // activate scalarViscosity switch
     forceSubM(0).readSwitches();
 
     particleCloud_.checkCG(false);
 
     //Append the field names to be probed
-    particleCloud_.probeM().initialize(typeName, "meiLift.logDat");
+    particleCloud_.probeM().initialize(typeName, typeName+".logDat");
     particleCloud_.probeM().vectorFields_.append("liftForce"); //first entry must the be the force
     particleCloud_.probeM().vectorFields_.append("Urel");        //other are debug
     particleCloud_.probeM().vectorFields_.append("vorticity");  //other are debug
@@ -134,11 +134,11 @@ void MeiLift::setForce() const
 
     #include "setupProbeModel.H"
 
-    for(int index = 0;index <  particleCloud_.numberOfParticles(); index++)
+    for(int index = 0; index < particleCloud_.numberOfParticles(); ++index)
     {
         //if(mask[index][0])
         //{
-            lift           = vector::zero;
+            lift = vector::zero;
             label cellI = particleCloud_.cellIDs()[index][0];
 
             if (cellI > -1) // particle Found
@@ -147,10 +147,10 @@ void MeiLift::setForce() const
 
                 if( forceSubM(0).interpolation() )
                 {
-	                position       = particleCloud_.position(index);
-                    Ur               = UInterpolator_.interpolate(position,cellI) 
-                                        - Us;
-                    vorticity       = VorticityInterpolator_.interpolate(position,cellI);
+                    position  = particleCloud_.position(index);
+                    Ur        = UInterpolator_.interpolate(position,cellI)
+                                - Us;
+                    vorticity = VorticityInterpolator_.interpolate(position,cellI);
                 }
                 else
                 {
@@ -159,7 +159,7 @@ void MeiLift::setForce() const
                     vorticity=vorticityField[cellI];
                 }
 
-                magUr           = mag(Ur);
+                magUr        = mag(Ur);
                 magVorticity = mag(vorticity);
 
                 if (magUr > 0 && magVorticity > 0)
@@ -170,26 +170,26 @@ void MeiLift::setForce() const
 
                     // calc dimensionless properties
                     Rep = ds*magUr/nuf;
-		            Rew = magVorticity*ds*ds/nuf;
+                    Rew = magVorticity*ds*ds/nuf;
 
-                    alphaStar   = magVorticity*ds/magUr/2.0;
-                    epsilon       =  sqrt(2.0*alphaStar /Rep );
-                    omega_star=2.0*alphaStar;
+                    alphaStar  = magVorticity*ds/magUr/2.0;
+                    epsilon    = sqrt(2.0*alphaStar /Rep );
+                    omega_star = 2.0*alphaStar;
 
                     //Basic model for the correction to the Saffman lift
                     //Based on McLaughlin (1991)
                     if(epsilon < 0.1)
                     {
-                        J_star = -140 *epsilon*epsilon*epsilon*epsilon*epsilon 
+                        J_star = -140 *epsilon*epsilon*epsilon*epsilon*epsilon
                                              *log( 1./(epsilon*epsilon+SMALL) );
                     }
                     else if(epsilon > 20)
                     {
-                      J_star = 1.0-0.287/(epsilon*epsilon+SMALL);
+                        J_star = 1.0-0.287/(epsilon*epsilon+SMALL);
                     }
                     else
                     {
-                     J_star = 0.3
+                        J_star = 0.3
                                 *(     1.0
                                       +tanh(  2.5 * log10(epsilon+0.191)  )
                                  )
@@ -197,11 +197,11 @@ void MeiLift::setForce() const
                                      +tanh(  6.0 * (epsilon-0.32)  )
                                   );
                     }
-                    Cl=J_star*4.11*epsilon; //multiply McLaughlin's correction to the basic Saffman model
+                    Cl = J_star * 4.11 * epsilon; //multiply McLaughlin's correction to the basic Saffman model
 
-                    //Second order terms given by Loth and Dorgan 2009 
+                    //Second order terms given by Loth and Dorgan 2009
                     if(useSecondOrderTerms_)
-                    {   
+                    {
                         Omega_eq = omega_star/2.0*(1.0-0.0075*Rew)*(1.0-0.062*sqrt(Rep)-0.001*Rep);
                         Cl_star=1.0-(0.675+0.15*(1.0+tanh(0.28*(omega_star/2.0-2.0))))*tanh(0.18*sqrt(Rep));
                         Cl += Omega_eq*Cl_star;
@@ -209,21 +209,21 @@ void MeiLift::setForce() const
 
                     lift =  0.125*M_PI
                            *rho
-                           *Cl  
+                           *Cl
                            *magUr*Ur^vorticity/magVorticity
                            *ds*ds;
 
-                    if (modelType_=="B")
+                    if (modelType_ == "B")
                     {
                         voidfraction = particleCloud_.voidfraction(index);
                         lift /= voidfraction;
                     }
                 }
 
-                //**********************************        
+                //**********************************
                 //SAMPLING AND VERBOSE OUTOUT
-                if( forceSubM(0).verbose() )
-                {   
+                if ( forceSubM(0).verbose() )
+                {
                     Pout << "index = " << index << endl;
                     Pout << "Us = " << Us << endl;
                     Pout << "Ur = " << Ur << endl;
@@ -240,7 +240,7 @@ void MeiLift::setForce() const
                 }
 
                 //Set value fields and write the probe
-                if(probeIt_)
+                if (probeIt_)
                 {
                     #include "setupProbeModelfields.H"
                     vValues.append(lift);   //first entry must the be the force
@@ -252,7 +252,7 @@ void MeiLift::setForce() const
                     particleCloud_.probeM().writeProbe(index, sValues, vValues);
                 }
                 // END OF SAMPLING AND VERBOSE OUTOUT
-                //**********************************        
+                //**********************************
 
             }
             // write particle based data to global array

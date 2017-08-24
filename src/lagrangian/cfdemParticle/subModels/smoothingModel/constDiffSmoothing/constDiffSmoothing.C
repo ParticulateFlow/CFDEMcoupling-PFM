@@ -6,7 +6,7 @@
                                 Christoph Goniva, christoph.goniva@cfdem.com
                                 Copyright 2009-2012 JKU Linz
                                 Copyright 2012-     DCS Computing GmbH, Linz
-                                Copyright (C) 2013-     Graz University of  
+                                Copyright (C) 2013-     Graz University of
                                                         Technology, IPPT
 -------------------------------------------------------------------------------
 License
@@ -71,10 +71,10 @@ constDiffSmoothing::constDiffSmoothing
     verbose_(false)
 {
 
-    if(propsDict_.found("verbose"))  
+    if(propsDict_.found("verbose"))
         verbose_ = true;
 
-    if(propsDict_.found("smoothingLengthReferenceField"))  
+    if(propsDict_.found("smoothingLengthReferenceField"))
        smoothingLengthReferenceField_.value() = double(readScalar(propsDict_.lookup("smoothingLengthReferenceField")));
 
     checkFields(sSmoothField_);
@@ -94,7 +94,7 @@ bool constDiffSmoothing::doSmoothing() const
 }
 
 
-void Foam::constDiffSmoothing::smoothen(volScalarField& fieldSrc) const
+void constDiffSmoothing::smoothen(volScalarField& fieldSrc) const
 {
     // Create scalar smooth field from virgin scalar smooth field template
     volScalarField sSmoothField = sSmoothField_;
@@ -120,11 +120,11 @@ void Foam::constDiffSmoothing::smoothen(volScalarField& fieldSrc) const
     forAll(sSmoothField,cellI)
     {
         sSmoothField[cellI]=max(lowerLimit_,min(upperLimit_,sSmoothField[cellI]));
-    }  
+    }
 
     // get data from working sSmoothField - will copy only values at new time
     fieldSrc=sSmoothField;
-    fieldSrc.correctBoundaryConditions(); 
+    fieldSrc.correctBoundaryConditions();
 
     if(verbose_)
     {
@@ -135,7 +135,7 @@ void Foam::constDiffSmoothing::smoothen(volScalarField& fieldSrc) const
 
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-void Foam::constDiffSmoothing::smoothen(volVectorField& fieldSrc) const
+void constDiffSmoothing::smoothen(volVectorField& fieldSrc) const
 {
     // Create scalar smooth field from virgin scalar smooth field template
     volVectorField vSmoothField = vSmoothField_;
@@ -159,7 +159,7 @@ void Foam::constDiffSmoothing::smoothen(volVectorField& fieldSrc) const
 
     // get data from working vSmoothField
     fieldSrc=vSmoothField;
-    fieldSrc.correctBoundaryConditions(); 
+    fieldSrc.correctBoundaryConditions();
 
     if(verbose_)
     {
@@ -170,7 +170,7 @@ void Foam::constDiffSmoothing::smoothen(volVectorField& fieldSrc) const
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-void Foam::constDiffSmoothing::smoothenReferenceField(volVectorField& fieldSrc) const
+void constDiffSmoothing::smoothenReferenceField(volVectorField& fieldSrc) const
 {
     // Create scalar smooth field from virgin scalar smooth field template
     volVectorField vSmoothField = vSmoothField_;
@@ -185,7 +185,7 @@ void Foam::constDiffSmoothing::smoothenReferenceField(volVectorField& fieldSrc) 
     double sourceStrength = 1e5; //large number to keep reference values constant
 
     dimensionedScalar deltaT = vSmoothField.mesh().time().deltaT();
-    DT_.value() = smoothingLengthReferenceField_.value() 
+    DT_.value() = smoothingLengthReferenceField_.value()
                          * smoothingLengthReferenceField_.value() / deltaT.value();
 
     tmp<volScalarField> NLarge
@@ -194,7 +194,7 @@ void Foam::constDiffSmoothing::smoothenReferenceField(volVectorField& fieldSrc) 
         (
             IOobject
             (
-                "xxx",
+                "NLarge",
                 particleCloud_.mesh().time().timeName(),
                 particleCloud_.mesh(),
                 IOobject::NO_READ,
@@ -218,14 +218,14 @@ void Foam::constDiffSmoothing::smoothenReferenceField(volVectorField& fieldSrc) 
     (
         fvm::ddt(vSmoothField)
        -fvm::laplacian( DT_, vSmoothField)
-       == 
+       ==
         NLarge() / deltaT * vSmoothField.oldTime()  //add source to keep cell values constant
        -fvm::Sp( NLarge() / deltaT, vSmoothField)   //add sink to keep cell values constant
     );
 
     // get data from working vSmoothField
     fieldSrc=vSmoothField;
-    fieldSrc.correctBoundaryConditions(); 
+    fieldSrc.correctBoundaryConditions();
 
     if(verbose_)
     {

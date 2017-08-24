@@ -53,21 +53,21 @@ class cfdemCloudEnergy
 protected:
 
     const wordList energyModels_;
-    
+
     bool implicitEnergyModel_;
-    
+
     const wordList chemistryModels_;
 
     autoPtr<energyModel>* energyModel_;
-    
+
     autoPtr<thermCondModel> thermCondModel_;
-    
+
     autoPtr<chemistryModel> chemistryModel_;
-    
+
     void calcEnergyContributions();
 
     void speciesExecute();
-    
+
 public:
 
     friend class energyModel;
@@ -89,23 +89,23 @@ public:
 
 
        const energyModel& energyM(int);
-       
+
        const thermCondModel& thermCondM();
-       
+
        const chemistryModel& chemistryM();
 
-       int nrEnergyModels();
+       label nrEnergyModels() const;
 
-       inline const wordList& energyModels();
-       
-       bool& implicitEnergyModel();
-       
+       inline const wordList& energyModels() const;
+
+       bool implicitEnergyModel() const;
+
        void energyContributions(volScalarField&);
-       
+
        void energyCoefficients(volScalarField&);
-       
+
        bool evolve(volScalarField&,volVectorField&,volVectorField&);
-       
+
        void postFlow();
 
 };

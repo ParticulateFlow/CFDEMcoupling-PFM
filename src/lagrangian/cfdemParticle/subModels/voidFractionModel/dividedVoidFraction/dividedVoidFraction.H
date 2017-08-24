@@ -57,19 +57,25 @@ class dividedVoidFraction
 {
 
 private:
+        static const int numberOfMarkerPoints = 29;
+
         dictionary propsDict_;
 
         bool verbose_;
 
+        Switch procBoundaryCorrection_;
+
         const scalar alphaMin_;          // min value of voidFraction
 
-	    mutable bool alphaLimited_;
+        mutable bool alphaLimited_;
 
         mutable scalar tooMuch_;         // particle volume which is lost due to voidFraction limitation
 
         bool interpolation_;
 
         bool cfdemUseOnly_;
+
+        vector offsets[numberOfMarkerPoints];
 
         virtual inline scalar Vp(int index, scalar radius, scalar scaleVol) const
         {

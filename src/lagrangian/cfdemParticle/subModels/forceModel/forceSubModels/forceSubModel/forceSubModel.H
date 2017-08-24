@@ -47,6 +47,19 @@ SourceFiles
 namespace Foam
 {
 
+enum {
+    SW_TREAT_FORCE_EXPLICIT = 0,
+    SW_TREAT_FORCE_DEM,
+    SW_IMPL_FORCE_DEM,
+    SW_VERBOSE,
+    SW_INTERPOLATION,
+    SW_FILTERED_DRAG_MODEL,
+    SW_PARCEL_SIZE_DEPENDENT_FILTERED_DRAG,
+    SW_IMPL_FORCE_DEM_ACCUMULATED,
+    SW_SCALAR_VISCOSITY,
+    SW_MAX
+};
+
 /*---------------------------------------------------------------------------*\
                            Class forceSubModel Declaration
 \*---------------------------------------------------------------------------*/
@@ -67,9 +80,9 @@ protected:
 
         wordList switchesNameList_;                 // names of switches available
 
-        mutable List<Switch> switchesList_;         // switches which are requested in dict
+        List<Switch> switchesList_;         // switches which are requested from dict
 
-        mutable List<Switch> switches_;
+        List<Switch> switches_;             // switch status
 
         mutable volScalarField nu_;
 
@@ -130,35 +143,33 @@ public:
 
 
     // Member Functions
-        virtual void partToArray(label&, vector&, const vector&, const vector& Ufluid=vector::zero, scalar Cd=scalar(0)) const;
+        virtual void partToArray(label, vector&, const vector&, const vector& Ufluid=vector::zero, scalar Cd=scalar(0)) const;
 
         virtual void explicitCorr(vector&, vector&, scalar&, vector&, const vector&, vector&, const vector&, bool,label index=100) const;
 
     // Access
 
-        inline bool verbose() const      { return switches_[3]; }
+        inline bool verbose() const      { return switches_[SW_VERBOSE]; }
 
-        inline bool interpolation() const { return switches_[4]; }
+        inline bool interpolation() const { return switches_[SW_INTERPOLATION]; }
 
-        inline bool useFilteredDragModel() const { return switches_[5]; }
+        inline bool useFilteredDragModel() const { return switches_[SW_FILTERED_DRAG_MODEL]; }
 
-        inline bool useParcelSizeDependentFilteredDrag() const { return switches_[6]; }
+        inline bool useParcelSizeDependentFilteredDrag() const { return switches_[SW_PARCEL_SIZE_DEPENDENT_FILTERED_DRAG]; }
 
-        virtual word myType() const=0;
+        virtual word myType() const = 0;
 
-        inline forceModel& myForceM() const { return forceModel_;}
+        inline forceModel& myForceM() const { return forceModel_; }
 
-        inline const List<Switch>& switches() const { return switches_;}
+        inline const List<Switch>& switches() const { return switches_; }
 
-        inline const wordList& switchesNameList() const { return switchesNameList_;}
+        inline const wordList& switchesNameList() const { return switchesNameList_; }
 
-        void setSwitchesList(label i, bool v) const { switchesList_[i] = v;}
+        void setSwitchesList(label i, Switch v) { switchesList_[i] = v; }
 
-        void setSwitches(label i, Switch v) const { switches_[i] = v;}
+        void setSwitches(label i, Switch v) { switches_[i] = v; }
 
-        virtual void readSwitches() const;
-
-        const label& nrDefaultSwitches() const {return nrDefaultSwitches_;}
+        virtual void readSwitches();
 
         const volScalarField& nuField() const;
 

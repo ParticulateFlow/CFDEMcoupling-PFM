@@ -50,18 +50,18 @@ private:
     word voidfractionFieldName_;
 
     const volScalarField& voidfraction_;
-    
+
     const volScalarField& dSauter_;
-    
+
     const volScalarField& dSauterMix_;
-    
+
     const volScalarField& alphaP_;
-    
+
     const volScalarField& alphaSt_;
 
     const scalar phi_;
 
-    word UsFieldName_;   
+    word UsFieldName_;
 
     const volVectorField& UsField_;  // the average particle velocity field
 

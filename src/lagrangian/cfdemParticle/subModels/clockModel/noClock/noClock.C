@@ -56,10 +56,10 @@ addToRunTimeSelectionTable
 noClock::noClock
 (
     const dictionary& dict,
-    cfdemCloud& sm
+    const Time& time
 )
 :
-    clockModel(dict,sm)
+  clockModel(dict,time)
 {
     initElems();
 }

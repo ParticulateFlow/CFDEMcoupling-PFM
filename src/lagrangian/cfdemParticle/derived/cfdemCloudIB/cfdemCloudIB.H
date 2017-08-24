@@ -90,7 +90,7 @@ public:
         void calcVelocityCorrection(volScalarField&,volVectorField&,volScalarField&,volScalarField&); // this could be moved to an IB mom couple model
 
       // Access
-        vector angularVelocity(int);
+        vector angularVelocity(int) const;
 
         inline double ** angularVelocities() const
         {

@@ -70,13 +70,13 @@ noSmoothing::~noSmoothing()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void Foam::noSmoothing::smoothen(volScalarField& field) const
+void noSmoothing::smoothen(volScalarField& field) const
 {}
 
-void Foam::noSmoothing::smoothen(volVectorField& field) const
+void noSmoothing::smoothen(volVectorField& field) const
 {}
 
-void Foam::noSmoothing::smoothenReferenceField(volVectorField& field) const
+void noSmoothing::smoothenReferenceField(volVectorField& field) const
 {}
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

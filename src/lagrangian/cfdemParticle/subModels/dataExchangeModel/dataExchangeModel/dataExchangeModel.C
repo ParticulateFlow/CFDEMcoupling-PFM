@@ -45,7 +45,7 @@ defineRunTimeSelectionTable(dataExchangeModel, dictionary);
 
 // * * * * * * * * * * * * * * protected Member Functions  * * * * * * * * * * * * * //
 
-void Foam::dataExchangeModel::setNumberOfParticles(int numberOfParticles) const
+void dataExchangeModel::setNumberOfParticles(int numberOfParticles) const
 {
     particleCloud_.setNumberOfParticles(numberOfParticles);
 }
@@ -55,7 +55,7 @@ void Foam::dataExchangeModel::setNumberOfParticles(int numberOfParticles) const
 //====
 // double **
 
-void Foam::dataExchangeModel::allocateArray
+void dataExchangeModel::allocateArray
 (
     double**& array,
     double initVal,
@@ -77,7 +77,7 @@ void Foam::dataExchangeModel::allocateArray
     }
 }
 
-void Foam::dataExchangeModel::allocateArray
+void dataExchangeModel::allocateArray
 (
     double**& array,
     double initVal,
@@ -92,7 +92,7 @@ void Foam::dataExchangeModel::allocateArray
     allocateArray(array,initVal,width,len);
 }
 
-void Foam::dataExchangeModel::destroy(double** array,int /*len*/) const
+void dataExchangeModel::destroy(double** array,int /*len*/) const
 {
     if (array == NULL) return;
 
@@ -103,7 +103,7 @@ void Foam::dataExchangeModel::destroy(double** array,int /*len*/) const
 
 //====
 // int **
-void Foam::dataExchangeModel::allocateArray
+void dataExchangeModel::allocateArray
 (
     int**& array,
     int initVal,
@@ -125,7 +125,7 @@ void Foam::dataExchangeModel::allocateArray
     }
 }
 
-void Foam::dataExchangeModel::allocateArray
+void dataExchangeModel::allocateArray
 (
     int**& array,
     int initVal,
@@ -140,7 +140,7 @@ void Foam::dataExchangeModel::allocateArray
     allocateArray(array,initVal,width,len);
 }
 
-void Foam::dataExchangeModel::destroy(int** array,int /*len*/) const
+void dataExchangeModel::destroy(int** array,int /*len*/) const
 {
     if (array == NULL) return;
 
@@ -152,7 +152,7 @@ void Foam::dataExchangeModel::destroy(int** array,int /*len*/) const
 
 //====
 // int *
-void Foam::dataExchangeModel::allocateArray
+void dataExchangeModel::allocateArray
 (
     int*& array,
     int initVal,
@@ -166,16 +166,15 @@ void Foam::dataExchangeModel::allocateArray
         array[i] = initVal;
 }
 
-void Foam::dataExchangeModel::destroy(int* array) const
+void dataExchangeModel::destroy(int* array) const
 {
-    if (array == NULL) return;
     delete [] array;
 }
 //====
 
 //====
 // double *
-void Foam::dataExchangeModel::allocateArray
+void dataExchangeModel::allocateArray
 (
     double*& array,
     double initVal,
@@ -189,16 +188,14 @@ void Foam::dataExchangeModel::allocateArray
         array[i] = initVal;
 }
 
-void Foam::dataExchangeModel::destroy(double* array) const
+void dataExchangeModel::destroy(double* array) const
 {
-    if (array == NULL) return;
-
     delete [] array;
 }
 //====
 
 
-bool Foam::dataExchangeModel::couple(int i) const
+bool dataExchangeModel::couple(int i) const
 {
     bool coupleNow = false;
     if (doCoupleNow())
@@ -209,7 +206,7 @@ bool Foam::dataExchangeModel::couple(int i) const
     return coupleNow;
 }
 
-scalar Foam::dataExchangeModel::timeStepFraction() const
+scalar dataExchangeModel::timeStepFraction() const
 {
     //return fraction between previous coupling TS and actual TS
     //scalar DEMtime = DEMts_ * couplingInterval_;
@@ -220,25 +217,25 @@ scalar Foam::dataExchangeModel::timeStepFraction() const
     return frac;
 }
 
-int Foam::dataExchangeModel::getNumberOfParticles() const
+int dataExchangeModel::getNumberOfParticles() const
 {
     Warning << "ask for nr of particles - which is not supported for this dataExchange model" << endl;
     return -1;
 }
 
-int Foam::dataExchangeModel::getNumberOfClumps() const
+int dataExchangeModel::getNumberOfClumps() const
 {
     Warning << "ask for nr of clumps - which is not supported for this dataExchange model" << endl;
     return -1;
 }
 
-int Foam::dataExchangeModel::getNumberOfTypes() const
+int dataExchangeModel::getNumberOfTypes() const
 {
     Warning << "ask for nr of types - which is not supported for this dataExchange model" << endl;
     return -1;
 }
 
-double* Foam::dataExchangeModel::getTypeVol() const
+double* dataExchangeModel::getTypeVol() const
 {
     Warning << "ask for type volume - which is not supported for this dataExchange model" << endl;
     return NULL;
