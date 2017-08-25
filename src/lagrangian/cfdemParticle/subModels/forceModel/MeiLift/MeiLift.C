@@ -190,12 +190,8 @@ void MeiLift::setForce() const
                     else
                     {
                         J_star = 0.3
-                                *(     1.0
-                                      +tanh(  2.5 * log10(epsilon+0.191)  )
-                                 )
-                                *(    0.667
-                                     +tanh(  6.0 * (epsilon-0.32)  )
-                                  );
+                                 * (1.0   + tanh(2.5 * (log10(epsilon) + 0.191)))
+                                 * (0.667 + tanh(6.0 * (      epsilon  - 0.32 )));
                     }
                     Cl = J_star * 4.11 * epsilon; //multiply McLaughlin's correction to the basic Saffman model
 
