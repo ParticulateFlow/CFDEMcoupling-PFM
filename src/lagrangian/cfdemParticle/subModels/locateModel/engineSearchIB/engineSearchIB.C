@@ -67,8 +67,16 @@ engineSearchIB::engineSearchIB
     engineSearch(dict.subDict(typeName + "Props"),sm),
     propsDict_(dict.subDict(typeName + "Props")),
     zSplit_(readLabel(propsDict_.lookup("zSplit"))),
-    xySplit_(readLabel(propsDict_.lookup("xySplit")))
+    xySplit_(readLabel(propsDict_.lookup("xySplit"))),
+    thetaSize_(180./zSplit_),
+    phiSize_(360./xySplit_),
+    deg2rad_(constant::mathematical::pi/180.),
+    numberOfSatellitePoints_((zSplit_-1)*xySplit_ + 2)
 {
+    for(int countPoints = 0; countPoints < numberOfSatellitePoints_; ++countPoints)
+    {
+        satellitePoints_.push_back(generateSatellitePoint(countPoints));
+    }
 }
 
 
@@ -111,34 +119,11 @@ label engineSearchIB::findCell
             //mod by alice upon from here
             if(cellIDs[index][0] < 0)
             {
-                vector pos = position;
                 label altStartPos = -1;
-                label numberOfPoints = (zSplit_-1)*xySplit_ + 2; // 1 point at bottom, 1 point at top
-                label thetaLevel = 0;
-                scalar theta, phi;
-                const scalar thetaSize = 180./zSplit_, phiSize = 360./xySplit_;
-                const scalar deg2rad = M_PI/180.;
 
-                for(int countPoints = 0; countPoints < numberOfPoints; ++countPoints)
+                for(int countPoints = 0; countPoints < numberOfSatellitePoints_; ++countPoints)
                 {
-                    pos = position;
-                    if(countPoints == 0)
-                    {
-                        pos[2] += radius;
-                    }
-                    else if(countPoints == 1)
-                    {
-                        pos[2] -= radius;
-                    }
-                    else
-                    {
-                        thetaLevel = (countPoints - 2) / xySplit_;
-                        theta = deg2rad * thetaSize * (thetaLevel+1);
-                        phi = deg2rad * phiSize * (countPoints - 2 - thetaLevel*xySplit_);
-                        pos[0] += radius * sin(theta) * cos(phi);
-                        pos[1] += radius * sin(theta) * sin(phi);
-                        pos[2] += radius * cos(theta);
-                    }
+                    vector pos = getSatellitePoint(index, countPoints);
 
             		altStartPos=findSingleCell(pos,oldID); //particleCloud_.mesh().findCell(pos);//
                     //check for periodic domains
@@ -169,6 +154,32 @@ label engineSearchIB::findCell
         }
     }
     return 1;
+}
+
+vector engineSearchIB::generateSatellitePoint(int countPoints) const
+{
+    // 1 point at bottom, 1 point at top
+    if(countPoints == 0)
+    {
+        return vector(0., 0., 1.);
+    }
+    else if(countPoints == 1)
+    {
+        return vector(0., 0., -1.);
+    }
+    else
+    {
+        const scalar thetaLevel = (countPoints - 2) / xySplit_;
+        const scalar theta = deg2rad_ * thetaSize_ * (thetaLevel + 1);
+        const scalar phi = deg2rad_ * phiSize_ * (countPoints - 2 - thetaLevel * xySplit_);
+        return vector(sin(theta) * cos(phi), sin(theta) * sin(phi), cos(theta));
+    }
+}
+
+vector engineSearchIB::getSatellitePoint(int index, int countPoints) const
+{
+    return particleCloud_.position(index)
+         + particleCloud_.radius(index) * satellitePoints_[countPoints];
 }
 
 

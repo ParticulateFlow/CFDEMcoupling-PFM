@@ -63,6 +63,13 @@ private:
 
     	const label xySplit_;
     	
+        const scalar thetaSize_;
+        const scalar phiSize_;
+        const scalar deg2rad_;
+
+        const label numberOfSatellitePoints_;
+
+        std::vector<vector> satellitePoints_;
 
 public:
 
@@ -93,6 +100,17 @@ public:
             int size
         ) const;
 
+private:
+        vector generateSatellitePoint
+        (
+            int countPoints
+        ) const;
+
+        vector getSatellitePoint
+        (
+            int index,
+            int countPoints
+        ) const;
 };
 
 
