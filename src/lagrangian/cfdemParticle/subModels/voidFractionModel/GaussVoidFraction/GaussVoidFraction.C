@@ -69,7 +69,7 @@ GaussVoidFraction::GaussVoidFraction
     alphaLimited_(0)
 {
     Info << "\n\n W A R N I N G - do not use in combination with differentialRegion model! \n\n" << endl;
-    Info << "\n\n W A R N I N G - this model does not yet work properly! \n\n" << endl;
+    FatalError << "\n\n This model does not yet work properly! \n\n" << endl;
     //reading maxCellsPerParticle from dictionary
     maxCellsPerParticle_=readLabel(propsDict_.lookup("maxCellsPerParticle"));
 
