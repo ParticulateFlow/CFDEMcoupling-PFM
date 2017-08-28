@@ -119,8 +119,8 @@ void GaussVoidFraction::setvoidFraction(double** const& mask,double**& voidfract
             radius *= scaleRadius;
 
             vector positionCenter=particleCloud_.position(index);
-	        scalar core;
-	        scalar dist;
+            scalar core;
+            scalar dist;
 
             if (particleCenterCellID >= 0)
             {
@@ -151,8 +151,8 @@ void GaussVoidFraction::setvoidFraction(double** const& mask,double**& voidfract
                     //==========================//
                     //setting the voidfractions
 
-		    dist = mag(particleCloud_.mesh().C()[particleCenterCellID]-particleCloud_.position(index));
-		    core = pow(2.0/radius/radius/M_PI,1.5)*exp(-dist*dist/2.0/radius/radius)*particleCloud_.mesh().V()[particleCenterCellID];
+                    dist = mag(particleCloud_.mesh().C()[particleCenterCellID]-particleCloud_.position(index));
+                    core = pow(2.0/radius/radius/M_PI,1.5)*exp(-dist*dist/2.0/radius/radius)*particleCloud_.mesh().V()[particleCenterCellID];
 
                     // volume occupied in every covered cell
                     scalar occupiedVolume = volume*core;
@@ -164,8 +164,8 @@ void GaussVoidFraction::setvoidFraction(double** const& mask,double**& voidfract
                     particleVolumes[index][0] += occupiedVolume;
                     particleV[index][0] += occupiedVolume;
 
-                      //Info << "Centre:set voidfraction in cellI=" << particleCenterCellID
-                      //     << ", voidfraction =" << voidfractionNext_[particleCenterCellID] << endl;
+                    //Info << "Centre:set voidfraction in cellI=" << particleCenterCellID
+                    //     << ", voidfraction =" << voidfractionNext_[particleCenterCellID] << endl;
 
                     // correct volumefraction of sub-cells
                     for(label i=0;i<hashSetLength-1;i++)
@@ -173,17 +173,16 @@ void GaussVoidFraction::setvoidFraction(double** const& mask,double**& voidfract
                         label cellI=hashSett.toc()[i];
                         particleCloud_.cellIDs()[index][i+1]=cellI; //adding subcell represenation
 
-		    dist = mag(particleCloud_.mesh().C()[cellI]-particleCloud_.position(index));
-		    core = pow(2.0/radius/radius/M_PI,1.5)*exp(-dist*dist/2.0/radius/radius)*particleCloud_.mesh().V()[cellI];
-                    scalar occupiedVolume = volume*core;
+                        dist = mag(particleCloud_.mesh().C()[cellI]-particleCloud_.position(index));
+                        core = pow(2.0/radius/radius/M_PI,1.5)*exp(-dist*dist/2.0/radius/radius)*particleCloud_.mesh().V()[cellI];
+                        scalar occupiedVolume = volume*core;
                         voidfractionNext_[cellI] -=occupiedVolume/particleCloud_.mesh().V()[cellI];
                         particleWeights[index][i+1] += core;
                         particleVolumes[index][i+1] += occupiedVolume;
                         particleV[index][0] += occupiedVolume;
 
-                          //Info << "AFTER:set voidfraction in cellI=" << cellI
-                          //     << ", voidfraction =" << voidfractionNext_[cellI] << endl;
-
+                        //Info << "AFTER:set voidfraction in cellI=" << cellI
+                        //     << ", voidfraction =" << voidfractionNext_[cellI] << endl;
                     }
 
                     // debug
@@ -235,12 +234,13 @@ void GaussVoidFraction::buildLabelHashSet
     forAll(nc,i)
     {
         label neighbor=nc[i];
-        if(!hashSett.found(neighbor) && mag(position-particleCloud_.mesh().C()[neighbor])<radius){
+        if(!hashSett.found(neighbor) && mag(position-particleCloud_.mesh().C()[neighbor])<radius)
+        {
             buildLabelHashSet(radius,position,neighbor,hashSett);
         }
     }
-
 }
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
