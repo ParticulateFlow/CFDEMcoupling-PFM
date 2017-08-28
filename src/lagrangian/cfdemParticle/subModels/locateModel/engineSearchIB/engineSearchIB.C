@@ -67,12 +67,8 @@ engineSearchIB::engineSearchIB
     engineSearch(dict.subDict(typeName + "Props"),sm),
     propsDict_(dict.subDict(typeName + "Props")),
     zSplit_(readLabel(propsDict_.lookup("zSplit"))),
-    xySplit_(readLabel(propsDict_.lookup("xySplit"))),
-    checkPeriodicCells_(false)
+    xySplit_(readLabel(propsDict_.lookup("xySplit")))
 {
-
-    if(propsDict_.found("checkPeriodicCells")) checkPeriodicCells_=true;
-
 }
 
 
@@ -93,6 +89,7 @@ label engineSearchIB::findCell
     int size
 ) const
 {
+    bool checkPeriodicCells(particleCloud_.checkPeriodicCells());
     const boundBox& globalBb = particleCloud_.mesh().bounds();
 
     vector position;
@@ -145,7 +142,7 @@ label engineSearchIB::findCell
 
             		altStartPos=findSingleCell(pos,oldID); //particleCloud_.mesh().findCell(pos);//
                     //check for periodic domains
-                    if(checkPeriodicCells_)
+                    if(checkPeriodicCells)
                     {
                         for(int iDir=0;iDir<3;iDir++)
                         {
