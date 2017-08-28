@@ -45,6 +45,7 @@ else
     // Update the pressure BCs to ensure flux consistency
     constrainPressure(p, rhoeps, U, phi, rhorAUf);
 
+    volScalarField SmbyP(particleCloud.chemistryM(0).Sm() / p);
     while (pimple.correctNonOrthogonal())
     {
         // Pressure corrector
@@ -55,7 +56,8 @@ else
           + fvc::div(phi)
           - fvm::laplacian(rhorAUf, p)
           ==
-           particleCloud.chemistryM(0).Sm()
+     //      particleCloud.chemistryM(0).Sm()
+            fvm::Sp(SmbyP, p)
           + fvOptions(psi, p, rho.name())
 
         );

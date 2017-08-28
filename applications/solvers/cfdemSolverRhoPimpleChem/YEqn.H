@@ -42,6 +42,8 @@ tmp<fv::convectionScheme<scalar> > mvConvection
 
             fvOptions.correct(Yi);
 
+            #include "debugYEqn.H"
+
             Yi.max(0.0);
             Yt += Yi;
         }
