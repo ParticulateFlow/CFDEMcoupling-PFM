@@ -249,7 +249,7 @@ void IBVoidFraction::setvoidFraction(double** const& mask,double**& voidfraction
                         label partCellId = particleCloud_.mesh().findNearestCell(particlePosList[iPeriodicImage]);
                         particleLabelList.append(partCellId);
 
-                        buildLabelHashSet(radius, particlePosList[iPeriodicImage], particleLabelList[iPeriodicImage], hashSett, false);
+                        buildLabelHashSet(index, particlePosList[iPeriodicImage], particleLabelList[iPeriodicImage], hashSett, false);
                     }
 
                 } //end checkPeriodicCells_
