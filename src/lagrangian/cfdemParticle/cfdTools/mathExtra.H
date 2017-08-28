@@ -36,11 +36,11 @@ Description
 #define CFDEM_MATH_EXTRA_H
 
 #include <vector>
-//#include "math.h"
 #include <stdio.h>
 #include <string.h>
 #include <error.h>
 #include <ctype.h>
+#include "mathematicalConstants.H"
 
 #define TOLERANCE_ORTHO 1e-10
 
