@@ -30,7 +30,7 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include "error.H"
-
+#include "mathExtra.H"
 #include "GaussVoidFraction.H"
 #include "addToRunTimeSelectionTable.H"
 #include "locateModel.H"
@@ -115,7 +115,7 @@ void GaussVoidFraction::setvoidFraction(double** const& mask,double**& voidfract
             label particleCenterCellID=particleCloud_.cellIDs()[index][0];
 
             radius = particleCloud_.radius(index);
-            volume = 4.188790205*radius*radius*radius*scaleVol;
+            volume = constant::mathematical::fourPiByThree*radius*radius*radius*scaleVol;
             radius *= scaleRadius;
 
             vector positionCenter=particleCloud_.position(index);
