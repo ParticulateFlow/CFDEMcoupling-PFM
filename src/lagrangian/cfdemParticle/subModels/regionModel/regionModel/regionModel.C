@@ -46,13 +46,13 @@ defineRunTimeSelectionTable(regionModel, dictionary);
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void Foam::regionModel::reAllocArrays() const
+void regionModel::reAllocArrays() const
 {
     if(particleCloud_.numberOfParticlesChanged())
     {
         // get arrays of new length
-        particleCloud_.dataExchangeM().allocateArray(inRegion_,1,1);
-        particleCloud_.dataExchangeM().allocateArray(outRegion_,1,1);
+        particleCloud_.dataExchangeM().allocateArray(inRegion_,1.,1);
+        particleCloud_.dataExchangeM().allocateArray(outRegion_,1.,1);
     }
 }
 
@@ -83,8 +83,8 @@ regionModel::regionModel
 
 regionModel::~regionModel()
 {
-    free(inRegion_);
-    free(outRegion_);
+    particleCloud_.dataExchangeM().destroy(inRegion_,1);
+    particleCloud_.dataExchangeM().destroy(outRegion_,1);
 }
 
 

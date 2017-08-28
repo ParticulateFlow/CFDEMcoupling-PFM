@@ -122,40 +122,19 @@ implicitCouple::~implicitCouple()
 
 tmp<volScalarField> implicitCouple::impMomSource() const
 {
-    tmp<volScalarField> tsource
-    (
-        new volScalarField
-        (
-            IOobject
-            (
-                "Ksl_implicitCouple",
-                particleCloud_.mesh().time().timeName(),
-                particleCloud_.mesh(),
-                IOobject::NO_READ,
-                IOobject::NO_WRITE
-            ),
-            particleCloud_.mesh(),
-            dimensionedScalar
-            (
-                "zero",
-                dimensionSet(1, -3, -1, 0, 0), // N/m3 / m/s
-                0
-            )
-        )
-    );
-
     scalar tsf = particleCloud_.dataExchangeM().timeStepFraction();
 
     // calc Ksl
-    scalar Ur;
 
-    if(1-tsf < 1e-4) //tsf==1
+    if (1. - tsf < 1e-4) //tsf==1
     {
+        scalar Ur;
+
         forAll(KslNext_,cellI)
         {
             Ur = mag(U_[cellI] - Us_[cellI]);
 
-            if(Ur > SMALL && alpha_[cellI] < maxAlpha_) //momentum exchange switched off if alpha too big
+            if (Ur > SMALL && alpha_[cellI] < maxAlpha_) //momentum exchange switched off if alpha too big
             {
                 KslNext_[cellI] = mag(particleCloud_.forceM(0).impParticleForces()[cellI])
                             / Ur
@@ -166,16 +145,21 @@ tmp<volScalarField> implicitCouple::impMomSource() const
             // limiter
             if (KslNext_[cellI] > KslLimit_) KslNext_[cellI] = KslLimit_;
         }
-        tsource.ref() = KslPrev_;
-    }else
-    {
-        tsource.ref() = (1 - tsf) * KslPrev_ + tsf * KslNext_;
+        return tmp<volScalarField>
+        (
+            new volScalarField("Ksl_implicitCouple", KslPrev_)
+        );
     }
-
-    return tsource;
+    else
+    {
+        return tmp<volScalarField>
+        (
+            new volScalarField("Ksl_implicitCouple", (1. - tsf) * KslPrev_ + tsf * KslNext_)
+        );
+    }
 }
 
-void Foam::implicitCouple::resetMomSourceField() const
+void implicitCouple::resetMomSourceField() const
 {
     KslPrev_.ref() = KslNext_.ref();
     KslNext_.primitiveFieldRef() = 0;

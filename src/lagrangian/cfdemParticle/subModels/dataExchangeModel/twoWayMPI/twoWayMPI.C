@@ -127,7 +127,7 @@ void twoWayMPI::giveData
 
 //============
 // double **
-void Foam::twoWayMPI::allocateArray
+void twoWayMPI::allocateArray
 (
     double**& array,
     double initVal,
@@ -138,7 +138,7 @@ void Foam::twoWayMPI::allocateArray
     allocate_external_double(array, width, length, initVal, lmp);
 }
 
-void Foam::twoWayMPI::allocateArray
+void twoWayMPI::allocateArray
 (
     double**& array,
     double initVal,
@@ -149,7 +149,7 @@ void Foam::twoWayMPI::allocateArray
     allocate_external_double(array, width, length, initVal, lmp);
 }
 
-void Foam::twoWayMPI::destroy(double** array,int /*len*/) const
+void twoWayMPI::destroy(double** array,int /*len*/) const
 {
     if (array == NULL) return;
 
@@ -160,7 +160,7 @@ void Foam::twoWayMPI::destroy(double** array,int /*len*/) const
 
 //============
 // int **
-void Foam::twoWayMPI::allocateArray
+void twoWayMPI::allocateArray
 (
     int**& array,
     int initVal,
@@ -171,7 +171,7 @@ void Foam::twoWayMPI::allocateArray
     allocate_external_int(array, width, length, initVal, lmp);
 }
 
-void Foam::twoWayMPI::allocateArray
+void twoWayMPI::allocateArray
 (
     int**& array,
     int initVal,
@@ -182,7 +182,7 @@ void Foam::twoWayMPI::allocateArray
     allocate_external_int(array, width, length, initVal, lmp);
 }
 
-void Foam::twoWayMPI::destroy(int** array,int /*len*/) const
+void twoWayMPI::destroy(int** array,int /*len*/) const
 {
     if (array == NULL) return;
 
@@ -192,21 +192,19 @@ void Foam::twoWayMPI::destroy(int** array,int /*len*/) const
 }
 //============
 // int *
-void Foam::twoWayMPI::destroy(int* array) const
+void twoWayMPI::destroy(int* array) const
 {
-    if (array == NULL) return;
     free(array);
 }
 //============
 // double *
-void Foam::twoWayMPI::destroy(double* array) const
+void twoWayMPI::destroy(double* array) const
 {
-    if (array == NULL) return;
     free(array);
 }
 //============
 
-bool Foam::twoWayMPI::couple(int i) const
+bool twoWayMPI::couple(int i) const
 {
     bool coupleNow = false;
     if (i==0)
@@ -354,12 +352,12 @@ bool Foam::twoWayMPI::couple(int i) const
     return coupleNow;
 }
 
-int Foam::twoWayMPI::getNumberOfParticles() const
+int twoWayMPI::getNumberOfParticles() const
 {
     return liggghts_get_maxtag(lmp);
 }
 
-int Foam::twoWayMPI::getNumberOfClumps() const
+int twoWayMPI::getNumberOfClumps() const
 {
     #ifdef multisphere
         return liggghts_get_maxtag_ms(lmp);
@@ -369,7 +367,7 @@ int Foam::twoWayMPI::getNumberOfClumps() const
     return -1;
 }
 
-int Foam::twoWayMPI::getNumberOfTypes() const
+int twoWayMPI::getNumberOfTypes() const
 {
     #ifdef multisphere
         return liggghts_get_ntypes_ms(lmp);
@@ -378,7 +376,7 @@ int Foam::twoWayMPI::getNumberOfTypes() const
     return -1;
 }
 
-double* Foam::twoWayMPI::getTypeVol() const
+double* twoWayMPI::getTypeVol() const
 {
     #ifdef multisphere
         return liggghts_get_vclump_ms(lmp);

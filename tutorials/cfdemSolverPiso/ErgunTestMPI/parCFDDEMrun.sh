@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #===================================================================#
-# allrun script for testcase as part of test routine 
+# allrun script for testcase as part of test routine
 # run settlingTest CFD part
 # Christoph Goniva - Feb. 2011
 #===================================================================#
@@ -10,7 +10,7 @@
 . ~/.bashrc
 
 #- include functions
-source $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/functions.sh
+source $CFDEM_PROJECT_DIR/etc/functions.sh
 
 #--------------------------------------------------------------------------------#
 #- define variables
@@ -45,7 +45,7 @@ if [ $runOctave == "true" ]
         #- run octave
         octave totalPressureDrop.m
 
-        #- show plot 
+        #- show plot
         evince cfdemSolverPiso_ErgunTestMPI.eps
 
         #- copy log file to test harness
@@ -67,8 +67,6 @@ if [ $postproc == "true" ]
     #- get VTK data from CFD sim
     cd $casePath/CFD
     foamToVTK                                                   #- serial run of foamToVTK
-    #source $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/functions.sh                       #- include functions
-    #pseudoParallelRun "foamToVTK" $nrPostProcProcessors          #- pseudo parallel run of foamToVTK
 
     #- start paraview
     paraview

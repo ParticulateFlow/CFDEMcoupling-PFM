@@ -25,7 +25,7 @@ License
     along with CFDEMcoupling.  If not, see <http://www.gnu.org/licenses/>.
 
 Application
-    cfdemSolverPiso
+    cfdemSolverPisoScalar
 
 Description
     Transient solver for incompressible flow.

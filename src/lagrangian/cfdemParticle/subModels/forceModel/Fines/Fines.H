@@ -41,7 +41,7 @@ class Fines
     public forceModel
 {
 private:
-    mutable FinesFields finesFields_;    
+    mutable FinesFields finesFields_;
 
 public:
 

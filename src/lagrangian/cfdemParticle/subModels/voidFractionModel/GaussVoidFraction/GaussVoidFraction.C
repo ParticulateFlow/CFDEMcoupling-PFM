@@ -137,7 +137,7 @@ void GaussVoidFraction::setvoidFraction(double** const& mask,double**& voidfract
                 if (hashSetLength > maxCellsPerParticle_)
                 {
                     FatalError<< "big particle algo found more cells ("<< hashSetLength
-                              <<") than storage is prepered ("<<maxCellsPerParticle_<<")" << abort(FatalError);
+                              <<") than storage is prepared ("<<maxCellsPerParticle_<<")" << abort(FatalError);
                 }
                 else if (hashSetLength > 0)
                 {

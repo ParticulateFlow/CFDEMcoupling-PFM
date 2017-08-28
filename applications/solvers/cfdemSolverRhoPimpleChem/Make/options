@@ -5,6 +5,7 @@ PFLAGS+= -Dcompre
 EXE_INC = \
      $(PFLAGS) \
     -I../. \
+    -I$(CFDEM_OFVERSION_DIR) \
     -I$(LIB_SRC)/finiteVolume/cfdTools \
     -I$(LIB_SRC)/finiteVolume/lnInclude \
     -I$(LIB_SRC)/TurbulenceModels/turbulenceModels/lnInclude \

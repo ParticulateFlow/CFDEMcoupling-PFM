@@ -113,6 +113,7 @@ $(voidFractionModels)/dividedVoidFractionMS/dividedVoidFractionMS.C
 $(voidFractionModels)/bigParticleVoidFraction/bigParticleVoidFraction.C
 $(voidFractionModels)/GaussVoidFraction/GaussVoidFraction.C
 $(voidFractionModels)/IBVoidFraction/IBVoidFraction.C
+$(voidFractionModels)/trilinearVoidFraction/trilinearVoidFraction.C
 
 $(locateModels)/locateModel/locateModel.C
 $(locateModels)/locateModel/newLocateModel.C

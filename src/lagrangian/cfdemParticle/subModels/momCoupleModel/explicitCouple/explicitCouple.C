@@ -108,38 +108,15 @@ explicitCouple::~explicitCouple()
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 tmp<volVectorField> explicitCouple::expMomSource() const
 {
-    tmp<volVectorField> tsource
-    (
-        new volVectorField
-        (
-            IOobject
-            (
-                "f_explicitCouple",
-                particleCloud_.mesh().time().timeName(),
-                particleCloud_.mesh(),
-                IOobject::NO_READ,
-                IOobject::NO_WRITE
-            ),
-            particleCloud_.mesh(),
-            dimensionedVector
-            (
-                "zero",
-                dimensionSet(1, -2, -2, 0, 0), // N/m3
-                vector::zero
-            ),
-            "zeroGradient"
-        )
-    );
-
     scalar tsf = particleCloud_.dataExchangeM().timeStepFraction();
 
-    if(1-tsf < 1e-4) //tsf==1
+    if (1. - tsf < 1e-4) //tsf==1
     {
         // calc fNext
         forAll(fNext_,cellI)
         {
             fNext_[cellI] = arrayToField(cellI);
-    
+
             // limiter
             for (int i=0;i<3;i++)
             {
@@ -147,21 +124,27 @@ tmp<volVectorField> explicitCouple::expMomSource() const
                 if (magF > fLimit_[i]) fNext_[cellI][i] *= fLimit_[i]/magF;
             }
         }
-        tsource.ref() = fPrev_;
-    }else
-    {
-        tsource.ref() = (1 - tsf) * fPrev_ + tsf * fNext_;
+        return tmp<volVectorField>
+        (
+            new volVectorField("f_explicitCouple", fPrev_)
+        );
     }
-    return tsource;
+    else
+    {
+        return tmp<volVectorField>
+        (
+            new volVectorField("f_explicitCouple", (1. - tsf) * fPrev_ + tsf * fNext_)
+        );
+    }
 }
 
-void Foam::explicitCouple::resetMomSourceField() const
+void explicitCouple::resetMomSourceField() const
 {
     fPrev_.ref() = fNext_.ref();
     fNext_.primitiveFieldRef() = vector::zero;
 }
 
-inline vector Foam::explicitCouple::arrayToField(label cellI) const
+inline vector explicitCouple::arrayToField(label cellI) const
 {
     return particleCloud_.forceM(0).expParticleForces()[cellI] / particleCloud_.mesh().V()[cellI];
 }

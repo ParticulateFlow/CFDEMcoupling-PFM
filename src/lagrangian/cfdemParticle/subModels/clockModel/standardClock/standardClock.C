@@ -30,7 +30,6 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include "error.H"
-#include "IOModel.H"
 #include "standardClock.H"
 #include "addToRunTimeSelectionTable.H"
 
@@ -57,12 +56,14 @@ addToRunTimeSelectionTable
 standardClock::standardClock
 (
     const dictionary& dict,
-    cfdemCloud& sm
+    const Time& time
 )
 :
-    clockModel(dict,sm)
+  clockModel(dict,time)
 {
-    path_=particleCloud_.IOM().createTimeDir(path_);
+    path_ = path_/time_.timeName();
+    mkDir(path_,0777);
+
     initElems();
 }
 

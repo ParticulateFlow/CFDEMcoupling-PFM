@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #===================================================================#
-# allrun script for testcase as part of test routine 
+# allrun script for testcase as part of test routine
 # run ErgunTestCG
 # Christoph Goniva - Sept. 2010
 #===================================================================#
@@ -10,7 +10,7 @@
 casePath="$(dirname "$(readlink -f ${BASH_SOURCE[0]})")"
 
 #- include functions
-source $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/functions.sh
+source $CFDEM_PROJECT_DIR/etc/functions.sh
 
 # check if mesh was built
 if [ -f "$casePath/CFD/constant/polyMesh/points" ]; then
@@ -29,4 +29,4 @@ else
 fi
 
 #- run parallel CFD-DEM in new terminal
-gnome-terminal --title='cfdemSolverPiso ErgunTestCG CFD'  -e "bash $casePath/parCFDDEMrun.sh" 
+gnome-terminal --title='cfdemSolverPiso ErgunTestCG CFD'  -e "bash $casePath/parCFDDEMrun.sh"

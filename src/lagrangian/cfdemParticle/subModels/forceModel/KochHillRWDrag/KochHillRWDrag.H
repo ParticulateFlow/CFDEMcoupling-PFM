@@ -29,7 +29,7 @@ Description
     and OpenFOAM(R). Note: this code is not part of OpenFOAM(R) (see DISCLAIMER).
 
     Koch, Hill drag law
-    based on Koch Hill 2001,"Inertial effects in suspensions and porous-media 
+    based on Koch Hill 2001,"Inertial effects in suspensions and porous-media
     flows", Annual Review of fluid mechanics.
     including interpolation of the velocity to the exact position
     including drag coefficient for implicit drag for DEM
@@ -75,7 +75,7 @@ private:
 
     const volScalarField& voidfraction_;
 
-    word UsFieldName_;   
+    word UsFieldName_;
 
     const volVectorField& UsField_;  // the average particle velocity field
 

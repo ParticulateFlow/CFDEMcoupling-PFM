@@ -4,7 +4,6 @@
     CFDEMcoupling is part of the CFDEMproject
     www.cfdem.com
                                 Christoph Goniva, christoph.goniva@cfdem.com
-                                Copyright 2009-2012 JKU Linz
                                 Copyright 2012-     DCS Computing GmbH, Linz
 -------------------------------------------------------------------------------
 License
@@ -29,17 +28,17 @@ Description
     and OpenFOAM(R). Note: this code is not part of OpenFOAM(R) (see DISCLAIMER).
 
 Class
-    noClock
+    trilinearVoidFraction
 
 SourceFiles
-    noClock.C
+    trilinearVoidFraction.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef noClock_H
-#define noClock_H
+#ifndef trilinearVoidFraction_H
+#define trilinearVoidFraction_H
 
-#include "clockModel.H"
+#include "voidFractionModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -47,44 +46,49 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class noClock Declaration
+                           Class trilinearVoidFraction Declaration
 \*---------------------------------------------------------------------------*/
 
-class noClock
+class trilinearVoidFraction
 :
-    public clockModel
+    public voidFractionModel
 {
+
+private:
+        dictionary propsDict_;
+
+        const scalar alphaMin_;
+
+        boundBox bb_;
+
+        scalar cellVol_;
+
+        scalar cellLength_;
+
+        vector nCellXYZ_;
 
 public:
 
     //- Runtime type information
-    TypeName("off");
+    TypeName("trilinear");
 
 
     // Constructors
 
         //- Construct from components
-        noClock
+        trilinearVoidFraction
         (
             const dictionary& dict,
-            const Time& time
+            cfdemCloud& sm
         );
 
     // Destructor
 
-        ~noClock();
+        ~trilinearVoidFraction();
 
 
     // Member Functions
-
-        void start(int pos) const {}
-        void start(int pos,const std::string& identifier) const {}
-        void stop() const {}
-        void stop(const std::string& identifier) const {}
-        std::string eval() const { return ""; }
-        void evalFile() const {}
-        void evalPar() const {}
-        void normHist() const {}
+        void setvoidFraction(double** const& ,double**&, double**&, double**&, double**&) const;
 };
 
 

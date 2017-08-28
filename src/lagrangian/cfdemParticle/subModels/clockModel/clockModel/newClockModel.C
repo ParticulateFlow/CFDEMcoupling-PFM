@@ -44,7 +44,7 @@ namespace Foam
 autoPtr<clockModel> clockModel::New
 (
     const dictionary& dict,
-    cfdemCloud& sm
+    const Time& time
 )
 {
     word clockModelType
@@ -52,7 +52,7 @@ autoPtr<clockModel> clockModel::New
         dict.lookup("clockModel")
     );
 
-    Info<< "Selecting clockModel "
+    Info << "Selecting clockModel "
          << clockModelType << endl;
 
 
@@ -73,7 +73,7 @@ autoPtr<clockModel> clockModel::New
             << abort(FatalError);
     }
 
-    return autoPtr<clockModel>(cstrIter()(dict,sm));
+    return autoPtr<clockModel>(cstrIter()(dict,time));
 }
 
 

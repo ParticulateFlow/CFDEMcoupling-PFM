@@ -132,7 +132,7 @@ void bigParticleVoidFraction::setvoidFraction(double** const& mask,double**& voi
                 if (hashSetLength > maxCellsPerParticle_)
                 {
                     FatalError<< "big particle algo found more cells ("<< hashSetLength
-                              <<") than storage is prepered ("<<maxCellsPerParticle_<<")" << abort(FatalError);
+                              <<") than storage is prepared ("<<maxCellsPerParticle_<<")" << abort(FatalError);
                 }
                 else if (hashSetLength > 0)
                 {
