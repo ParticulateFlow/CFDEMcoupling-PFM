@@ -124,6 +124,7 @@ void MeiLift::setForce() const
     scalar J_star(0);
     scalar Omega_eq(0);
     scalar alphaStar(0);
+    scalar epsilonSqr(0.0);
     scalar epsilon(0);
     scalar omega_star(0);
     vector vorticity(0,0,0);
@@ -172,16 +173,16 @@ void MeiLift::setForce() const
                     Rep = ds*magUr/nuf;
                     Rew = magVorticity*ds*ds/nuf;
 
-                    alphaStar  = magVorticity*ds/magUr/2.0;
-                    epsilon    = sqrt(2.0*alphaStar /Rep );
-                    omega_star = 2.0*alphaStar;
+                    omega_star = magVorticity * ds / magUr;
+                    alphaStar = 0.5 * omega_star;
+                    epsilonSqr = omega_star / Rep;
+                    epsilon = sqrt(epsilonSqr);
 
                     //Basic model for the correction to the Saffman lift
                     //Based on McLaughlin (1991)
                     if(epsilon < 0.1)
                     {
-                        J_star = -140 *epsilon*epsilon*epsilon*epsilon*epsilon
-                                             *log( 1./(epsilon*epsilon+SMALL) );
+                        J_star = -140.0 * epsilonSqr * epsilonSqr * epsilon * log(1. / (epsilonSqr+SMALL));
                     }
                     else if(epsilon > 20)
                     {
@@ -198,9 +199,10 @@ void MeiLift::setForce() const
                     //Second order terms given by Loth and Dorgan 2009
                     if(useSecondOrderTerms_)
                     {
-                        Omega_eq = omega_star/2.0*(1.0-0.0075*Rew)*(1.0-0.062*sqrt(Rep)-0.001*Rep);
-                        Cl_star=1.0-(0.675+0.15*(1.0+tanh(0.28*(omega_star/2.0-2.0))))*tanh(0.18*sqrt(Rep));
-                        Cl += Omega_eq*Cl_star;
+                        scalar sqrtRep = sqrt(Rep);
+                        Cl_star = 1.0 - (0.675 + 0.15 * (1.0 + tanh(0.28 * (alphaStar - 2.0)))) * tanh(0.18 * sqrtRep);
+                        Omega_eq = alphaStar * (1.0 - 0.0075 * Rew) * (1.0 - 0.062 * sqrtRep - 0.001 * Rep);
+                        Cl += Omega_eq * Cl_star;
                     }
 
                     lift =  0.125*M_PI
