@@ -39,6 +39,7 @@ SourceFiles
 #ifndef dividedVoidFraction_H
 #define dividedVoidFraction_H
 
+#include "mathExtra.H"
 #include "voidFractionModel.H"
 #include "interpolationCellPoint.H"
 
@@ -79,8 +80,8 @@ private:
 
         virtual inline scalar Vp(int index, scalar radius, scalar scaleVol) const
         {
-            return 4.188790205*radius*radius*radius*scaleVol; //4/3*pi=4.188790205
-        };
+            return constant::mathematical::fourPiByThree*radius*radius*radius*scaleVol;
+        }
 
 public:
 
