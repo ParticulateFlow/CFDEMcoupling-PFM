@@ -102,22 +102,12 @@ voidFractionModel::~voidFractionModel()
 // * * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * * //
 tmp<volScalarField> voidFractionModel::voidFractionInterp() const
 {
-    scalar tsf = particleCloud_.dataExchangeM().timeStepFraction();
+    const scalar tsf = particleCloud_.dataExchangeM().timeStepFraction();
 
-    if (1. - tsf < 1e-4 && particleCloud_.dataExchangeM().couplingStep() > 1) //tsf==1
-    {
-        return tmp<volScalarField>
-        (
-            new volScalarField("alpha_voidFractionModel", voidfractionPrev_)
-        );
-    }
-    else
-    {
-        return tmp<volScalarField>
-        (
-            new volScalarField("alpha_voidFractionModel", (1. - tsf) * voidfractionPrev_ + tsf * voidfractionNext_)
-        );
-    }
+    return tmp<volScalarField>
+    (
+        new volScalarField("alpha_voidFractionModel", (1. - tsf) * voidfractionPrev_ + tsf * voidfractionNext_)
+    );
 }
 
 void voidFractionModel::resetVoidFractions() const

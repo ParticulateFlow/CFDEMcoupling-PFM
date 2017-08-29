@@ -122,11 +122,13 @@ implicitCouple::~implicitCouple()
 
 tmp<volScalarField> implicitCouple::impMomSource() const
 {
-    scalar tsf = particleCloud_.dataExchangeM().timeStepFraction();
+    const scalar tsf = particleCloud_.dataExchangeM().timeStepFraction();
 
     // calc Ksl
 
-    if (1. - tsf < 1e-4) //tsf==1
+    // update KslNext in first subTS
+    // NOTE: without following if we could update Ksl every subTS (based on current values) and use this value
+    if(tsf < particleCloud_.mesh().time().deltaT().value()/particleCloud_.dataExchangeM().couplingTime() + 0.000001 )
     {
         scalar Ur;
 
@@ -145,18 +147,12 @@ tmp<volScalarField> implicitCouple::impMomSource() const
             // limiter
             if (KslNext_[cellI] > KslLimit_) KslNext_[cellI] = KslLimit_;
         }
-        return tmp<volScalarField>
-        (
-            new volScalarField("Ksl_implicitCouple", KslPrev_)
-        );
     }
-    else
-    {
-        return tmp<volScalarField>
-        (
-            new volScalarField("Ksl_implicitCouple", (1. - tsf) * KslPrev_ + tsf * KslNext_)
-        );
-    }
+
+    return tmp<volScalarField>
+    (
+        new volScalarField("Ksl_implicitCouple", (1. - tsf) * KslPrev_ + tsf * KslNext_)
+    );
 }
 
 void implicitCouple::resetMomSourceField() const
