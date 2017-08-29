@@ -47,7 +47,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class noDrag Declaration
+                           Class engineSearchIB Declaration
 \*---------------------------------------------------------------------------*/
 
 class engineSearchIB
@@ -59,10 +59,10 @@ private:
 
         dictionary propsDict_;
 
-    	const label zSplit_;
+        const label zSplit_;
 
-    	const label xySplit_;
-    	
+        const label xySplit_;
+
         const scalar thetaSize_;
         const scalar phiSize_;
         const scalar deg2rad_;
