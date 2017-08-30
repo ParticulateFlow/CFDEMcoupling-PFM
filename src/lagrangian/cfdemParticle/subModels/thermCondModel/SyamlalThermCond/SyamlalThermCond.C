@@ -104,9 +104,9 @@ tmp<volScalarField> SyamlalThermCond::thermCond() const
         )
     );
     volScalarField& svf = tvf.ref();
-    
-    svf = (1-sqrt(1-voidfraction_)) / (voidfraction_) * kf0_;
-    
+
+    svf = (1-sqrt(1-voidfraction_+SMALL)) / (voidfraction_) * kf0_;
+
     // if a wallQFactor field is present, use it to scale heat transport through a patch
     if (hasWallQFactor_)
     {
