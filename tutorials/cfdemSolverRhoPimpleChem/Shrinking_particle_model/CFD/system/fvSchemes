@@ -29,7 +29,7 @@ divSchemes
 {
     default         none;
 
-    div(phi,U)         Gauss linear; //Gauss upwind;
+    div(phi,U)         Gauss upwind;
     div(phid,p)        Gauss linear; //Gauss upwind;
     div(phi,K)         Gauss linear;
     div(phi,h)         Gauss upwind;
