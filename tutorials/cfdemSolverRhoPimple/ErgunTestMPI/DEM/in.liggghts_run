@@ -1,4 +1,4 @@
-# Pour granular particles into chute container, then induce flow
+# Pour granular particles into a cylinder, then induce flow
 log             ../DEM/log.liggghts
 thermo_log      ../DEM/post/thermo.txt
 
@@ -40,7 +40,7 @@ fix         cylwalls all wall/gran model hertz tangential history primitive type
 
 # heat transfer
 fix         ftco all property/global thermalConductivity peratomtype 1. # lambda in [W/(K*m)]
-fix         ftca all property/global thermalCapacity peratomtype 1000.    # cp in [J/(kg*K)]
+fix         ftca all property/global thermalCapacity peratomtype 1000.  # cp in [J/(kg*K)]
 fix         heattransfer all heat/gran initial_temperature 300.
 
 # set particle temperature for the bed
@@ -54,7 +54,7 @@ set         group all density 2000
 # cfd coupling
 fix         cfd all couple/cfd couple_every 25 mpi
 fix         cfd2 all couple/cfd/force/implicit
-fix     cfd3 all couple/cfd/convection T0 300
+fix         cfd3 all couple/cfd/convection T0 300
 
 # apply nve integration to all particles that are inserted as single particles
 fix         integr all nve/sphere
@@ -72,6 +72,6 @@ thermo          10
 thermo_modify   lost ignore norm no
 compute_modify  thermo_temp dynamic yes
 
-dump            dmp all custom/vtk 10000 ../DEM/post/dump*.liggghts_run.vtk id type radius x y z vx vy vz fx fy fz f_dragforce[1] f_dragforce[2] f_dragforce[3] f_Temp[0] 
+dump            dmp all custom/vtk 10000 ../DEM/post/dump*.liggghts_run.vtk id type radius x y z vx vy vz fx fy fz f_dragforce[1] f_dragforce[2] f_dragforce[3] f_Temp[0]
 
 run             1
