@@ -81,6 +81,7 @@ cfdemCloud::cfdemCloud
     solveFlow_(true),
     verbose_(false),
     ignore_(false),
+    allowCFDsubTimestep_(true),
     limitDEMForces_(false),
     modelType_(couplingProperties_.lookup("modelType")),
     positions_(NULL),
@@ -251,17 +252,6 @@ cfdemCloud::cfdemCloud
     else
         Info << "ignoring ddt(voidfraction)" << endl;
 
-    forceModel_ = new autoPtr<forceModel>[nrForceModels()];
-    for (int i=0;i<nrForceModels();i++)
-    {
-        forceModel_[i] = forceModel::New
-        (
-            couplingProperties_,
-            *this,
-            forceModels_[i]
-        );
-    }
-
     momCoupleModel_ = new autoPtr<momCoupleModel>[momCoupleModels_.size()];
     for (int i=0;i<momCoupleModels_.size();i++)
     {
@@ -270,6 +260,17 @@ cfdemCloud::cfdemCloud
             couplingProperties_,
             *this,
             momCoupleModels_[i]
+        );
+    }
+
+    forceModel_ = new autoPtr<forceModel>[nrForceModels()];
+    for (int i=0;i<nrForceModels();i++)
+    {
+        forceModel_[i] = forceModel::New
+        (
+            couplingProperties_,
+            *this,
+            forceModels_[i]
         );
     }
 
@@ -324,7 +325,14 @@ cfdemCloud::cfdemCloud
     {
         checkPeriodicCells_ = true;
     }
-    else if (nPatchesCyclic > 0 && nPatchesNonCyclic > 0)
+
+    //hard set checkperiodic cells if wished
+    if(this->couplingProperties().found("checkPeriodicCells"))
+    {
+        checkPeriodicCells_ = couplingProperties().lookupOrDefault<Switch>("checkPeriodicCells", checkPeriodicCells_);
+    }
+
+    if (nPatchesCyclic > 0 && nPatchesNonCyclic > 0)
     {
         if (verbose_) Info << "nPatchesNonCyclic=" << nPatchesNonCyclic << ", nPatchesCyclic=" << nPatchesCyclic << endl;
         Warning << "Periodic handing is disabled because the domain is not fully periodic!\n" << endl;
@@ -612,6 +620,10 @@ bool cfdemCloud::evolve
         //      IMPLICIT FORCE CONTRIBUTION AND SOLVER USE EXACTLY THE SAME AVERAGED
         //      QUANTITIES AT THE GRID!
         Info << "\n timeStepFraction() = " << dataExchangeM().timeStepFraction() << endl;
+        if(dataExchangeM().timeStepFraction() > 1.0000001)
+        {
+            FatalError << "cfdemCloud::dataExchangeM().timeStepFraction()>1: Do not do this, since dangerous. This might be due to the fact that you used a adjustable CFD time step. Please use a fixed CFD time step." << abort(FatalError);
+        }
         clockM().start(24,"interpolateEulerFields");
 
         // update voidFractionField

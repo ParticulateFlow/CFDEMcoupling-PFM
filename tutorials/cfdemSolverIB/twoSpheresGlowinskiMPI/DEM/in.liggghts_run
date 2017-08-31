@@ -19,8 +19,7 @@ neighbor        0.3 bin
 neigh_modify    delay 0 binsize 0.01
 
 
-# Material properties required for new pair styles
-
+# Material properties required for granular pair styles
 fix             m1 all property/global youngsModulus peratomtype 5.e7
 fix             m2 all property/global poissonsRatio peratomtype 0.45
 fix             m3 all property/global coefficientRestitution peratomtypepair 1 0.9
@@ -49,8 +48,8 @@ fix     cfd2 all couple/cfd/force
 
 
 # create single partciles
-create_atoms 1 single .5 .5 3.5  units box
-create_atoms 1 single .5 .5 3.16 units box
+create_atoms 1 single 0.5 0.5 3.5  units box
+create_atoms 1 single 0.5 0.5 3.16 units box
 set atom 1 diameter 0.167 density 1.5 vx 0 vy 0 vz 0
 set atom 2 diameter 0.167 density 1.5 vx 0 vy 0 vz 0
 
@@ -85,7 +84,7 @@ thermo_modify   lost ignore norm no
 compute_modify  thermo_temp dynamic yes
 
 # insert the first particles so that dump is not empty
-dump            dmp all custom 100 ../DEM/post/dump.liggghts_run id type x y z ix iy iz vx vy vz fx fy fz omegax omegay omegaz radius 
+dump            dmp all custom 100 ../DEM/post/dump.liggghts_run id type x y z vx vy vz fx fy fz omegax omegay omegaz radius
 
 #force : f_couple_cfd[0] f_couple_cfd[1] f_couple_cfd[2]
 #node : f_couple_cfd[6]

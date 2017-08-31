@@ -92,6 +92,8 @@ protected:
 
     bool ignore_;
 
+    bool allowCFDsubTimestep_;
+
     bool limitDEMForces_;
 
     scalar maxDEMForce_;
@@ -226,6 +228,10 @@ public:
 // public Member Functions
 
     // Access
+       bool allowCFDsubTimestep() { return allowCFDsubTimestep_; }
+
+       void setAllowCFDsubTimestep(bool b) { allowCFDsubTimestep_ = b; }
+
        void checkCG(bool);
 
        void setPos(double **&);
