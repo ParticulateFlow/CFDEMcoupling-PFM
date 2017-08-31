@@ -138,6 +138,8 @@ tmp<volScalarField> implicitCouple::impMomSource() const
 
             if (Ur > SMALL && alpha_[cellI] < maxAlpha_) //momentum exchange switched off if alpha too big
             {
+                // NOTE: impParticleForces() are calculated at coupling step based on current values
+                //       therefore the use of Next fields in forceM and here is recommended
                 KslNext_[cellI] = mag(particleCloud_.forceM(0).impParticleForces()[cellI])
                             / Ur
                             / particleCloud_.mesh().V()[cellI];
