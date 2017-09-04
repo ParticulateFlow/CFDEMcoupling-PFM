@@ -190,7 +190,7 @@ void diffusionCoefficient::execute()
     interpolationCellPoint <scalar> PInterpolator_(P_);
     interpolationCellPoint <scalar> molarConcInterpolator_(molarConc_);
 
-    for (int index=0; index<particleCloud_.numberOfParticles(); index++)
+    for (int index=0; index<particleCloud_.numberOfParticles(); ++index)
     {
         cellI=particleCloud_.cellIDs()[index][0];
         if (cellI >=0)
