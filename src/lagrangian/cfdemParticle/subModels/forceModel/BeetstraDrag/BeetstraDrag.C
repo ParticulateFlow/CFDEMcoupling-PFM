@@ -59,7 +59,7 @@ BeetstraDrag::BeetstraDrag
     scaleDrag_(1.)
 {
     //Append the field names to be probed
-    particleCloud_.probeM().initialize(typeName, "BeetstraDrag.logDat");
+    particleCloud_.probeM().initialize(typeName, typeName+".logDat");
     particleCloud_.probeM().vectorFields_.append("dragForce"); //first entry must  be the force
     particleCloud_.probeM().vectorFields_.append("Urel");
     particleCloud_.probeM().scalarFields_.append("Rep");
@@ -70,11 +70,11 @@ BeetstraDrag::BeetstraDrag
     // init force sub model
     setForceSubModels(propsDict_);
     // define switches which can be read from dict
-    forceSubM(0).setSwitchesList(0,true); // activate treatExplicit switch
-    forceSubM(0).setSwitchesList(2,true); // activate implDEM switch
-    forceSubM(0).setSwitchesList(3,true); // activate search for verbose switch
-    forceSubM(0).setSwitchesList(4,true); // activate search for interpolate switch
-    forceSubM(0).setSwitchesList(8,true); // activate scalarViscosity switch
+    forceSubM(0).setSwitchesList(SW_TREAT_FORCE_EXPLICIT,true); // activate treatExplicit switch
+    forceSubM(0).setSwitchesList(SW_IMPL_FORCE_DEM,true); // activate implDEM switch
+    forceSubM(0).setSwitchesList(SW_VERBOSE,true); // activate search for verbose switch
+    forceSubM(0).setSwitchesList(SW_INTERPOLATION,true); // activate search for interpolate switch
+    forceSubM(0).setSwitchesList(SW_SCALAR_VISCOSITY,true); // activate scalarViscosity switch
     forceSubM(0).readSwitches();
 
     particleCloud_.checkCG(true);
@@ -97,8 +97,11 @@ BeetstraDrag::~BeetstraDrag()
 void BeetstraDrag::setForce() const
 {
     if (scaleDia_ > 1)
+    {
         Info << "Beetstra using scale = " << scaleDia_ << endl;
-    else if (particleCloud_.cg() > 1){
+    }
+    else if (particleCloud_.cg() > 1)
+    {
         scaleDia_=particleCloud_.cg();
         Info << "Beetstra using scale from liggghts cg = " << scaleDia_ << endl;
     }
@@ -125,13 +128,13 @@ void BeetstraDrag::setForce() const
 
     vector dragExplicit(0,0,0);
     scalar dragCoefficient(0);
-    
+
     interpolationCellPoint<scalar> voidfractionInterpolator_(voidfraction_);
     interpolationCellPoint<vector> UInterpolator_(U_);
 
     #include "setupProbeModel.H"
 
-    for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
+    for(int index = 0; index < particleCloud_.numberOfParticles(); ++index)
     {
             cellI = particleCloud_.cellIDs()[index][0];
             drag = vector(0,0,0);
@@ -163,7 +166,7 @@ void BeetstraDrag::setForce() const
                 Ur = Ufluid-Us;
                 magUr = mag(Ur);
                 ds = 2*particleCloud_.radius(index);
-		ds_scaled = ds/scaleDia_;
+                ds_scaled = ds/scaleDia_;
                 rho = rhoField[cellI];
                 nuf = nufField[cellI];
 
@@ -171,7 +174,7 @@ void BeetstraDrag::setForce() const
                 localPhiP = 1.0f-voidfraction+SMALL;
 
                 // calc particle's drag coefficient (i.e., Force per unit slip velocity and Stokes drag)
-               
+
                 Rep=ds_scaled*voidfraction*magUr/nuf+SMALL;
                 dragCoefficient = 10.0*localPhiP/(voidfraction*voidfraction) +
                                   voidfraction*voidfraction*(1.0+1.5*Foam::sqrt(localPhiP)) +

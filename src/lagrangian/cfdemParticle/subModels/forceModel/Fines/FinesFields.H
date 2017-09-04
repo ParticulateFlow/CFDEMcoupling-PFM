@@ -39,11 +39,11 @@ class FinesFields
 {
 private:
     cfdemCloud& particleCloud_;
-  
+
     dictionary propsDict_;
-    
+
     bool smoothing_;
-    
+
     bool verbose_;
 
     word velFieldName_;
@@ -54,95 +54,95 @@ private:
 
     volScalarField& voidfraction_;
 
-    word UsFieldName_;   
+    word UsFieldName_;
 
     const volVectorField& UsField_;
-    
+
     word pFieldName_;
 
     const volScalarField& p_;
-    
+
     word rhoGFieldName_;
 
     const volScalarField& rhoG_;
-    
+
     const volScalarField& dSauter_;
-    
+
     volScalarField alphaG_;
-    
+
     volScalarField alphaDyn_;
-    
+
     volScalarField alphaP_;
 
     volScalarField alphaSt_;
 
     volScalarField deltaAlpha_;
-    
+
     volScalarField dHydMix_;
-    
+
     volScalarField DragCoeff_;
-    
+
     volScalarField dSauterMix_;
-    
+
     volScalarField FanningCoeff_;
-    
+
     volScalarField Froude_;
-    
+
     volScalarField Sds_;
-    
+
     //volVectorField massFluxDyn_;
     surfaceScalarField massFluxDyn_;
-    
+
     volVectorField uDyn_;
 
     dimensionedScalar dFine_;
-    
+
     dimensionedScalar diffCoeff_;
-    
+
     dimensionedScalar nuAve_;
-    
+
     dimensionedScalar rhoFine_;
-    
+
     const dimensionedVector g_;
-    
+
     scalar alphaDynMax_;
-    
+
     scalar alphaMax_;
-    
+
     scalar critVoidfraction_;
-    
+
     scalar depRate_;
-    
+
     scalar exponent_;
-    
+
     scalar nCrit_;
-    
+
     scalar poresizeWidth_;
-    
+
     scalar prefactor_;
-    
+
     scalar ratioHydraulicPore_;
-       
+
     void calcSource();
-    
+
     void integrateFields();
-    
+
     void updateAlphaG();
-       
+
     void updateAlphaP();
-    
+
     void updateDHydMix();
-    
+
     void updateDragCoeff();
-    
+
     void updateDSauter();
-    
+
     void updateFanningCoeff();
-    
+
     void updateFroude();
-      
+
     void updateUDyn();
-    
+
 public:
 
     //- Runtime type information
@@ -165,7 +165,7 @@ public:
 
     // Member Functions
 
-    
+
     void update();
 };
 

@@ -65,16 +65,16 @@ FanningDynFines::FanningDynFines
     // init force sub model
     setForceSubModels(propsDict_);
     // define switches which can be read from dict
-    forceSubM(0).setSwitchesList(0,true); // activate treatExplicit switch
-    forceSubM(0).setSwitchesList(3,true); // activate search for verbose switch
+    forceSubM(0).setSwitchesList(SW_TREAT_FORCE_EXPLICIT,true); // activate treatExplicit switch
+    forceSubM(0).setSwitchesList(SW_VERBOSE,true); // activate search for verbose switch
     forceSubM(0).readSwitches();
-    forceSubM(0).setSwitches(0,true);
+    forceSubM(0).setSwitches(SW_TREAT_FORCE_EXPLICIT,true);
 
     particleCloud_.checkCG(true);
     if (propsDict_.found("scale"))
-        scaleDia_=scalar(readScalar(propsDict_.lookup("scale")));
+        scaleDia_ = scalar(readScalar(propsDict_.lookup("scale")));
     if (propsDict_.found("scaleDrag"))
-        scaleDrag_=scalar(readScalar(propsDict_.lookup("scaleDrag")));
+        scaleDrag_ = scalar(readScalar(propsDict_.lookup("scaleDrag")));
 
 }
 
@@ -91,18 +91,20 @@ void FanningDynFines::setForce() const
 {
     if(forceSubM(0).verbose())
         Info << "Entering force loop of FanningDynFines.\n" << endl;
- 
+
     if (scaleDia_ > 1)
+    {
         Info << "FanningDynFines using scale = " << scaleDia_ << endl;
+    }
     else if (particleCloud_.cg() > 1)
     {
         scaleDia_=particleCloud_.cg();
         Info << "FanningDynFines using scale from liggghts cg = " << scaleDia_ << endl;
     }
-   
+
     vector UDyn(0,0,0);
     vector drag(0,0,0);
-    label cellI=0;
+    label cellI = 0;
 
     vector Us(0,0,0);
     vector Ur(0,0,0);
@@ -111,11 +113,11 @@ void FanningDynFines::setForce() const
     scalar scaleDia3 = scaleDia_*scaleDia_*scaleDia_;
 
     scalar dragCoefficient(0);
-    
+
 
     #include "setupProbeModel.H"
 
-    for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
+    for(int index = 0; index < particleCloud_.numberOfParticles(); ++index)
     {
             cellI = particleCloud_.cellIDs()[index][0];
             drag = vector(0,0,0);
@@ -127,14 +129,14 @@ void FanningDynFines::setForce() const
                 UDyn = UDyn_[cellI];
                 Us = UsField_[cellI];
                 Ur = UDyn-Us;
-                ds = 2*particleCloud_.radius(index);
-		ds_scaled = ds/scaleDia_;
-		
+                ds = 2 * particleCloud_.radius(index);
+                ds_scaled = ds/scaleDia_;
+
                 dragCoefficient = FanningCoeff_[cellI];
 
                 // calc particle's drag
                 dragCoefficient *= M_PI/6 * ds_scaled * ds_scaled / alphaP_[cellI] * dSauter_[cellI] * scaleDia3 * scaleDrag_;
-                if (modelType_=="B")
+                if (modelType_ == "B")
                     dragCoefficient /= voidfraction_[cellI];
 
                 drag = dragCoefficient * Ur;
@@ -143,8 +145,8 @@ void FanningDynFines::setForce() const
             // write particle based data to global array
             forceSubM(0).partToArray(index,drag,vector::zero);
     }
-    
-    if(forceSubM(0).verbose())
+
+    if (forceSubM(0).verbose())
         Info << "Leaving force loop of FanningDynFines.\n" << endl;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -195,6 +195,7 @@ template<class Type>
 void uniformFixedValueTubeFvPatchField<Type>::write(Ostream& os) const
 {
     fvPatchField<Type>::write(os);
+    this->writeEntry("value", os);
     uniformValue_->writeData(os);
     os.writeKeyword("tubeLength") << tubeLength_ << token::END_STATEMENT << nl;
     os.writeKeyword("tubeDiameter") << tubeDiameter_ << token::END_STATEMENT << nl;

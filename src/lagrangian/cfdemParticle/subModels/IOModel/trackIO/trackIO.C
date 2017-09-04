@@ -82,8 +82,8 @@ int trackIO::dumpDEMdata() const
         npProcs = sophIO::dumpDEMdata();
 
         // stream data to file
-        streamDataToPath(lagPath_, particleCloud_.velocities(),npProcs,"origId","label","labelField","");
-        streamDataToPath(lagPath_, particleCloud_.velocities(),npProcs,"origProcId","origProcId","labelField","");
+        streamDataToPath(lagPath_, particleCloud_.velocities(),npProcs,"origId","label","labelField");
+        streamDataToPath(lagPath_, particleCloud_.velocities(),npProcs,"origProcId","origProcId","labelField");
     }
 
     return npProcs;

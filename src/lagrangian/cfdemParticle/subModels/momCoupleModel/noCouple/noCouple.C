@@ -72,7 +72,7 @@ noCouple::~noCouple()
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-void Foam::noCouple::resetMomSourceField() const
+void noCouple::resetMomSourceField() const
 {
     FatalError<<"the solver calls for resetMomSourceField() although you use IB method where this is not needed!\n"
               <<", check your solver! - PANIC -\n";

@@ -66,7 +66,7 @@ ErgunStatFines::ErgunStatFines
     switchingVoidfraction_(0.8)
 {
     //Append the field names to be probed
-    particleCloud_.probeM().initialize(typeName, "ErgunStatFines.logDat");
+    particleCloud_.probeM().initialize(typeName, typeName+".logDat");
     particleCloud_.probeM().vectorFields_.append("dragForce"); //first entry must  be the force
     particleCloud_.probeM().vectorFields_.append("Urel");
     particleCloud_.probeM().scalarFields_.append("Rep");
@@ -77,26 +77,26 @@ ErgunStatFines::ErgunStatFines
     // init force sub model
     setForceSubModels(propsDict_);
     // define switches which can be read from dict
-    forceSubM(0).setSwitchesList(0,true); // activate treatExplicit switch
-    forceSubM(0).setSwitchesList(2,true); // activate implDEM switch
-    forceSubM(0).setSwitchesList(3,true); // activate search for verbose switch
-    forceSubM(0).setSwitchesList(4,true); // activate search for interpolate switch
-    forceSubM(0).setSwitchesList(8,true); // activate scalarViscosity switch
+    forceSubM(0).setSwitchesList(SW_TREAT_FORCE_EXPLICIT,true); // activate treatExplicit switch
+    forceSubM(0).setSwitchesList(SW_IMPL_FORCE_DEM,true); // activate implDEM switch
+    forceSubM(0).setSwitchesList(SW_VERBOSE,true); // activate search for verbose switch
+    forceSubM(0).setSwitchesList(SW_INTERPOLATION,true); // activate search for interpolate switch
+    forceSubM(0).setSwitchesList(SW_SCALAR_VISCOSITY,true); // activate scalarViscosity switch
     forceSubM(0).readSwitches();
 
     particleCloud_.checkCG(true);
     if (propsDict_.found("scale"))
-        scaleDia_=scalar(readScalar(propsDict_.lookup("scale")));
+        scaleDia_ = scalar(readScalar(propsDict_.lookup("scale")));
     if (propsDict_.found("scaleDrag"))
-        scaleDrag_=scalar(readScalar(propsDict_.lookup("scaleDrag")));
+        scaleDrag_ = scalar(readScalar(propsDict_.lookup("scaleDrag")));
 
     if (propsDict_.found("switchingVoidfraction"))
         switchingVoidfraction_ = readScalar(propsDict_.lookup("switchingVoidfraction"));
 
     dictionary SauterDict(dict.subDict("dSauterProps"));
     if (SauterDict.found("scaleDist"))
-        scaleDist_=scalar(readScalar(SauterDict.lookup("scaleDist")));
-    
+        scaleDist_ = scalar(readScalar(SauterDict.lookup("scaleDist")));
+
 }
 
 
@@ -117,7 +117,9 @@ scalar ErgunStatFines::dSauter(label cellI) const
 void ErgunStatFines::setForce() const
 {
     if (scaleDia_ > 1)
+    {
         Info << "ErgunStatFines using scale = " << scaleDia_ << endl;
+    }
     else if (particleCloud_.cg() > 1)
     {
         scaleDia_=particleCloud_.cg();
@@ -131,7 +133,7 @@ void ErgunStatFines::setForce() const
     scalar voidfraction(1);
     vector Ufluid(0,0,0);
     vector drag(0,0,0);
-    label cellI=0;
+    label cellI = 0;
 
     vector Us(0,0,0);
     vector Ur(0,0,0);
@@ -144,13 +146,13 @@ void ErgunStatFines::setForce() const
     scalar alphaPartEff(0);
 
     scalar CdMagUrLag(0);       //Cd of the very particle
-    scalar betaP(0);             //momentum exchange of the very particle
+    scalar betaP(0);            //momentum exchange of the very particle
 
     vector dragExplicit(0,0,0);
     scalar dragCoefficient(0);
 
     scalar scaleDia3 = scaleDia_*scaleDia_*scaleDia_;
-    
+
     interpolationCellPoint<scalar> voidfractionInterpolator_(voidfraction_);
     interpolationCellPoint<vector> UInterpolator_(U_);
 
@@ -158,15 +160,15 @@ void ErgunStatFines::setForce() const
 
     if(forceSubM(0).verbose())
                 Info << "Entering force loop of ErgunStatFines.\n" << endl;
-    
-    for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
-    {	    
+
+    for(int index = 0; index < particleCloud_.numberOfParticles(); ++index)
+    {
             cellI = particleCloud_.cellIDs()[index][0];
             drag = vector(0,0,0);
             dragExplicit = vector(0,0,0);
             betaP = 0;
-            Ufluid =vector(0,0,0);
-            voidfraction=0;
+            Ufluid = vector(0,0,0);
+            voidfraction = 0;
             dragCoefficient = 0;
 
             if (cellI > -1) // particle found
@@ -174,34 +176,34 @@ void ErgunStatFines::setForce() const
 
                 if( forceSubM(0).interpolation() )
                 {
-	            position     = particleCloud_.position(index);
+                    position     = particleCloud_.position(index);
                     voidfraction = voidfractionInterpolator_.interpolate(position,cellI);
-                    Ufluid       = UInterpolator_.interpolate(position,cellI);      
+                    Ufluid       = UInterpolator_.interpolate(position,cellI);
                 }
                 else
                 {
-		    voidfraction = voidfraction_[cellI];
+                    voidfraction = voidfraction_[cellI];
                     Ufluid = U_[cellI];
                 }
 
                 // ensure voidfraction to be meaningful
                 // problems could arise from interpolation or empty cells
 
-                if(voidfraction>0.999) 
+                if(voidfraction > 0.999)
                     voidfraction = 0.999;
-                else if(voidfraction<0.05)
+                else if(voidfraction < 0.05)
                     voidfraction = 0.05;
 
                 Us = particleCloud_.velocity(index);
                 Ur = Ufluid-Us;
                 magUr = mag(Ur);
-		dSauterMix = dSauterMix_[cellI];
-		ds = 2*particleCloud_.radius(index);
+                dSauterMix = dSauterMix_[cellI];
+                ds = 2*particleCloud_.radius(index);
                 rho = rhoField[cellI];
                 nuf = nufField[cellI];
 
-                Rep=0.0;
-		alphaPartEff = 1.0 - voidfraction + alphaSt_[cellI] + SMALL;
+                Rep = 0.0;
+                alphaPartEff = 1.0 - voidfraction + alphaSt_[cellI] + SMALL;
 
                 // calc particle's drag coefficient (i.e., Force per unit slip velocity and per m³ PARTICLE)
                 if(voidfraction > switchingVoidfraction_) //dilute, no static hold-up present
@@ -210,7 +212,7 @@ void ErgunStatFines::setForce() const
                     CdMagUrLag = (24.0*nuf/(dSauterMix*voidfraction)) //1/magUr missing here, but compensated in expression for betaP!
                                  *(scalar(1.0)+0.15*Foam::pow(Rep, 0.687));
 
-                    betaP = 0.75* alphaPartEff * ( 
+                    betaP = 0.75* alphaPartEff * (
                                             rho*voidfraction*CdMagUrLag
                                           /
                                             (dSauterMix*Foam::pow(voidfraction,2.65))
@@ -224,12 +226,12 @@ void ErgunStatFines::setForce() const
                               (1.75 * magUr * rho * alphaPartEff)
                              /((dSauterMix*phi_));
                 }
-       
+
                 // calc particle's drag
                 betaP /= (1-alphaPartEff);
                 dragCoefficient = M_PI/6 * ds/scaleDia_ * ds/scaleDia_ * dSauter(cellI) * voidfraction / (1 - voidfraction) * betaP * scaleDrag_;
                 dragCoefficient *= scaleDia3;
-                if (modelType_=="B")
+                if (modelType_ == "B")
                     dragCoefficient /= voidfraction;
 
                 drag = dragCoefficient * Ur;
@@ -237,7 +239,7 @@ void ErgunStatFines::setForce() const
                 // explicitCorr
                 forceSubM(0).explicitCorr(drag,dragExplicit,dragCoefficient,Ufluid,U_[cellI],Us,UsField_[cellI],forceSubM(0).verbose());
 
-                if(forceSubM(0).verbose() && index >=0 && index <2)
+                if(forceSubM(0).verbose() && index >= 0 && index < 2)
                 {
                     Pout << "cellI = " << cellI << endl;
                     Pout << "index = " << index << endl;
@@ -271,7 +273,7 @@ void ErgunStatFines::setForce() const
             forceSubM(0).partToArray(index,drag,dragExplicit,Ufluid,dragCoefficient);
 
     }// end loop particles
-    
+
     if(forceSubM(0).verbose())
         Pout << "Leaving force loop of ErgunStatFines.\n" << endl;
 }

@@ -145,6 +145,7 @@ template<class Type>
 void uniformFixedValueVoidfractionFvPatchField<Type>::write(Ostream& os) const
 {
     fvPatchField<Type>::write(os);
+    this->writeEntry("value", os);
     uniformValue_->writeData(os);
 }
 

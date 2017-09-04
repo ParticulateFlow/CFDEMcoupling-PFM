@@ -155,7 +155,7 @@ public:
 
         void treatVoidCells() const;
 
-        inline const wordList& forceSubModels(){ return forceSubModels_; }
+        inline const wordList& forceSubModels() { return forceSubModels_; }
 
         inline forceSubModel& forceSubM(int i) const { return forceSubModel_[i](); }
 

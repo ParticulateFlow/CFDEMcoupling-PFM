@@ -28,7 +28,7 @@ Description
     This code is designed to realize coupled CFD-DEM simulations using LIGGGHTS
     and OpenFOAM(R). Note: this code is not part of OpenFOAM(R) (see DISCLAIMER).
 
-    void fraction model for the smooth representation of spheres with 
+    void fraction model for the smooth representation of spheres with
     radius > cell length.
     contribution from Alice Hager
 
@@ -64,11 +64,9 @@ private:
 
         const scalar alphaMin_;          //NP min value of voidFraction
 
-	mutable bool alphaLimited_;
+        mutable bool alphaLimited_;
 
         const scalar scaleUpVol_;        //NP scaling radius, keeping volume of particle
-        
-    	mutable bool checkPeriodicCells_;
 
 public:
 
@@ -95,22 +93,14 @@ public:
 
         void buildLabelHashSet
         (
-            const scalar radius,
+            int index,
             const vector position,
             const label cellID,
             labelHashSet& hashSett,
             bool          initialInsert
         ) const;
-        
-        double minPeriodicDistance
-        (
-            vector    cellCentrePosition, 
-            vector    positionCenter, 
-            boundBox  globalBb,
-            vector&   minPeriodicPos
-        ) const;
-        
-        
+
+        virtual double segmentParticleIntersection(int index, vector positionCenter, vector pointInside, vector pointOutside) const;
 };
 
 

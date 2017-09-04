@@ -78,55 +78,71 @@ fileName IOModel::createLagrangianDir(fileName path) const
 fileName IOModel::buildFilePath(word dirName) const
 {
     // create file structure
-	fileName path("");
+    fileName path("");
     if(parOutput_)
     {
-    	path=fileName(particleCloud_.mesh().time().path()/particleCloud_.mesh().time().timeName()/dirName/"particleCloud");
-    	mkDir(path,0777);
-    } else
+        path = fileName(particleCloud_.mesh().time().path()/particleCloud_.mesh().time().timeName()/dirName/"particleCloud");
+        mkDir(path,0777);
+    }
+    else
     {
-		path=fileName("."/dirName);
-    	mkDir(path,0777);
-    	mkDir(fileName(path/"constant"),0777);
-    	OFstream* stubFile = new OFstream(fileName(path/"particles.foam"));
-    	delete stubFile;
-        }
+        path = fileName("."/dirName);
+        mkDir(path,0777);
+        mkDir(path/"constant",0777);
+        OFstream stubFile(path/"particles.foam");
+    }
     return path;
 }
 
-void IOModel::streamDataToPath(fileName path, double** array,int nPProc,word name,word type,word className,word finaliser) const
+void IOModel::streamDataToPath(fileName path, double** array,int nPProc,word name,word type,word className) const
 {
-    vector vec;
-    OFstream* fileStream = new OFstream(fileName(path/name));
-    *fileStream << "FoamFile\n";
-    *fileStream << "{version 2.0; format ascii;class "<< className << "; location 0;object  "<< name <<";}\n";
-    *fileStream << nPProc <<"\n";
+    OFstream fileStream(path/name);
 
+    fileStream
+        << "FoamFile\n{\n"
+        << "    version     " << fileStream.version() << ";\n"
+        << "    format      " << fileStream.format() << ";\n"
+        << "    class       " << className << ";\n"
+        << "    location    " << 0 << ";\n"
+        << "    object      " << name << ";\n"
+        << "}" << nl;
 
-    if(type!="origProcId")*fileStream << "(\n";
-    else if(type=="origProcId")
+    fileStream << nPProc <<"\n";
+
+    if (type == "origProcId")
     {
-        if(nPProc>0) *fileStream <<"{0}"<< "\n";
-        else *fileStream <<"{}"<< "\n";
+        if (nPProc > 0) fileStream << "{0}" << "\n";
+        else fileStream << "{}" << "\n";
+        return;
     }
 
-    for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)
+    fileStream << token::BEGIN_LIST << nl;
+
+    int ** cellIDs = particleCloud_.cellIDs();
+    for (int index = 0; index < particleCloud_.numberOfParticles(); ++index)
     {
-        if (particleCloud_.cellIDs()[index][0] > -1) // particle Found
+        if (cellIDs[index][0] > -1) // particle Found
         {
-            if (type=="scalar"){
-                *fileStream << array[index][0] << " \n";
-            }else if (type=="position" || type=="vector"){
-                for(int i=0;i<3;i++) vec[i] = array[index][i];
-                *fileStream <<"( "<< vec[0] <<" "<<vec[1]<<" "<<vec[2]<<" ) "<< finaliser << " \n";
-            }else if (type=="label"){
-                *fileStream << index << finaliser << " \n";
+            if (type == "scalar")
+            {
+                fileStream << array[index][0] << " \n";
+            }
+            else if (type == "position")
+            {
+                fileStream << "( "<< array[index][0] << " " << array[index][1] << " " << array[index][2] << " ) " << cellIDs[index][0] << " \n";
+            }
+            else if (type == "vector")
+            {
+                fileStream << "( "<< array[index][0] << " " << array[index][1] << " " << array[index][2] << " ) " << " \n";
+            }
+            else if (type == "label")
+            {
+                fileStream << index << " \n";
             }
         }
     }
 
-    if(type!="origProcId")*fileStream << ")\n";
-    delete fileStream;
+    fileStream << token::END_LIST << nl;
 }
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
@@ -143,12 +159,12 @@ IOModel::IOModel
     time_(sm.mesh().time()),
     parOutput_(true)
 {
-	if (
+    if (
             particleCloud_.dataExchangeM().myType()=="oneWayVTK" ||
             dict_.found("serialOutput")
        )
     {
-        parOutput_=false;
+        parOutput_ = false;
         Warning << "IO model is in serial write mode, only data on proc 0 is written" << endl;
     }
 }

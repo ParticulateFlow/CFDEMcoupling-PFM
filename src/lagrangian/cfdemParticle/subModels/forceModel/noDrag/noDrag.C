@@ -72,7 +72,7 @@ noDrag::noDrag
     setForceSubModels(propsDict_);
 
     // define switches which can be read from dict
-    forceSubM(0).setSwitchesList(0,true); // activate treatExplicit
+    forceSubM(0).setSwitchesList(SW_TREAT_FORCE_EXPLICIT,true); // activate treatExplicit
 
     // read those switches defined above, if provided in dict
     forceSubM(0).readSwitches();
@@ -98,7 +98,7 @@ void noDrag::setForce() const
     // Do nothing
     Info << "noDrag::setForce" << endl;
     label cellI=0;
-    bool treatExplicit=forceSubM(0).switches()[0];
+    bool treatExplicit = forceSubM(0).switches()[SW_TREAT_FORCE_EXPLICIT];
     for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
     {
         cellI = particleCloud_.cellIDs()[index][0];
@@ -125,7 +125,7 @@ void noDrag::setForce() const
                 }
             }
             //==========================
-        }        
+        }
     }
 }
 

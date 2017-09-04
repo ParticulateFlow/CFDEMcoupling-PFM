@@ -115,17 +115,13 @@ species::species
 
 species::~species()
 {
-    int nP_ = particleCloud_.numberOfParticles();
+    particleCloud_.dataExchangeM().destroy(partTemp_,1);
+    particleCloud_.dataExchangeM().destroy(partRho_,1);
+    particleCloud_.dataExchangeM().destroy(partMolarConc_,1);
 
-    particleCloud_.dataExchangeM().destroy(partTemp_,nP_);
-    particleCloud_.dataExchangeM().destroy(partRho_,nP_);
-    particleCloud_.dataExchangeM().destroy(partMolarConc_,nP_);
 
-    for (int i=0; i<speciesNames_.size(); i++)
-    {
-        particleCloud_.dataExchangeM().destroy(molarFractions_[i],nP_);
-        particleCloud_.dataExchangeM().destroy(changeOfSpeciesMass_[i],nP_);
-    }
+    for (int i=0; i<speciesNames_.size();i++) particleCloud_.dataExchangeM().destroy(molarFractions_[i],1);
+    for (int i=0; i<speciesNames_.size();i++) particleCloud_.dataExchangeM().destroy(changeOfSpeciesMass_[i],1);
 }
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
@@ -247,7 +243,7 @@ void species::execute()
     for (int index=0; index<particleCloud_.numberOfParticles(); index++)
     {
         cellI=particleCloud_.cellIDs()[index][0];
-        if (cellI >=0)
+        if (cellI >= 0)
         {
             if(interpolation_)
             {
@@ -278,7 +274,7 @@ void species::execute()
 
             for (int i=0; i<speciesNames_.size();i++)
             {
-	      // attention for indices when not communicating all species
+            // attention for indices when not communicating all species
                 molarFractions_[i][index][0]=Xfluid_[i];
             }
         }
