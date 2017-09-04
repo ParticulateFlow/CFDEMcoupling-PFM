@@ -1,0 +1,12 @@
+set logscale y
+set title "Residuals"
+set ylabel 'Residual'
+set xlabel 'Iteration'
+set grid
+plot "< cat log_test_case | grep 'Solving for Ux' | cut -d' ' -f9 | tr -d ','" title 'Ux' with lines lw 3,\
+"< cat log_test_case | grep 'Solving for Uy' | cut -d' ' -f9 | tr -d ','" title 'Uy' with lines lw 3,\
+"< cat log_test_case | grep 'Solving for Uz' | cut -d' ' -f9 | tr -d ','" title 'Uz' with lines lw 3,\
+"< cat log_test_case | grep -w 'Solving for CO2' | cut -d' ' -f9 | tr -d ','" title 'CO2' with lines lw 3,\
+"< cat log_test_case | grep -w 'Solving for CO' | cut -d' ' -f9 | tr -d ','" title 'CO' with lines lw 3
+pause 1
+reread

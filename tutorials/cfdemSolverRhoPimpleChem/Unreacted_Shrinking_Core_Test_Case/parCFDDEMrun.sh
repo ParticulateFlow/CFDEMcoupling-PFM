@@ -16,10 +16,10 @@ source $CFDEM_PROJECT_DIR/etc/functions.sh
 #- define variables
 casePath="$(dirname "$(readlink -f ${BASH_SOURCE[0]})")"
 logpath=$casePath
-headerText="Particle_in_Duct"
+headerText="test_case_Valipour_2009"
 logfileName="log_$headerText"
 solverName="cfdemSolverRhoPimpleChem"
-nrProcs="2"
+nrProcs="4"
 machineFileName="none"   # yourMachinefileName | none
 debugMode="off"          # on | off| strict
 testHarnessPath="$CFDEM_TEST_HARNESS_PATH"
@@ -27,7 +27,7 @@ runOctave="false"
 postproc="true"
 
 #--------------------------------------------------------------------------------#
-export casePath
+
 #- call function to run a parallel CFD-DEM case
 parCFDDEMrun $logpath $logfileName $casePath $headerText $solverName $nrProcs $machineFileName $debugMode
 

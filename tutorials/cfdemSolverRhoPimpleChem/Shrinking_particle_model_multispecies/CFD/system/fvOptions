@@ -22,7 +22,7 @@ source1
     {
         active          yes;
         selectionMode   all;
-        Tmin     1293.1;
-        Tmax     1293.2;
+        Tmin     1293.15;
+        Tmax     2000;
     }
 }

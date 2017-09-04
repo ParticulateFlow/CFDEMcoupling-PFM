@@ -132,7 +132,7 @@ void massTransferCoeff::execute()
     interpolationCellPoint <vector> UluidInterpolator_(U_);
     interpolationCellPoint <scalar> voidfractionInterpolator_(voidfraction_);
 
-    for (int index=0; index<particleCloud_.numberOfParticles(); index++)
+    for (int index=0; index<particleCloud_.numberOfParticles(); ++index)
     {
         cellI=particleCloud_.cellIDs()[index][0];
         if (cellI >=0)

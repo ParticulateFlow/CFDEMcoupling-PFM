@@ -9,46 +9,45 @@ FoamFile
 {
     version     2.0;
     format      ascii;
-    class       volScalarField;
+    class       volVectorField;
     location    "0";
-    object      T;
+    object      U;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [0 0 0 1 0 0 0];
+dimensions      [0 1 -1 0 0 0 0];
 
-internalField   uniform 1293.15; 
+internalField   uniform (1.33e-4 0 0);	
 
 boundaryField
 {
     top
     {
-        type            fixedValue;
-        value           uniform 1293.15;
+	type		noSlip;
+/*        type            fixedValue;
+        value           uniform (0.0 0 0);*/ 
     }
-
     bottom
     {
-        type            fixedValue;
-        value           uniform 1293.15;
+	type		noSlip;
+/*        type            fixedValue;
+        value           uniform (0.0 0 0);*/
     }
-
     side-walls
     {
-        type            fixedValue;
-        value           uniform 1293.15;
+	type		noSlip;
+/*        type            fixedValue;
+        value           uniform (0.0 0 0);	*/
     }
-
     inlet
     {
         type            fixedValue;
-        value           uniform 1293.15;
+        value           uniform (1.33e-4 0 0); 
     }
 
     outlet
     {
-        type            fixedValue;
-        value           uniform 1293.15;
+        type            zeroGradient;
     }
 }
 

@@ -21,14 +21,15 @@ fields
     rho
     p
     T
-    molarConc
+    molC
     O2
-    O
     CO2
     CO
     ModSpeciesMassField_O2
     ModSpeciesMassField_CO2
     ModSpeciesMassField_CO
+	X_CO
+	X_CO2
 );
 
 writeControl   timeStep;

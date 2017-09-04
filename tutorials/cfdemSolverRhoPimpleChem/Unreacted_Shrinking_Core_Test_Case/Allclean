@@ -9,8 +9,9 @@ source $CFDEM_PROJECT_DIR/etc/functions.sh
 casePath="$(dirname "$(readlink -f ${BASH_SOURCE[0]})")"
 cd $casePath/CFD
 cleanCase
-rm $casePath/CFD/shrink*.dat
 rm $casePath/CFD/rmass*.dat
+rm $casePath/CFD/*.dat
+rm $casePath/*.dat
 rm $casePath/log*
 #rm $casePath/run_error.log
 #cp -R 0/Org/p 0/p
