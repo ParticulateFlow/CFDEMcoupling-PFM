@@ -137,17 +137,15 @@ int main(int argc, char *argv[])
 	        #include "molConc.H"
                 #include "pEqn.H"
             }
-            m=gSum(rhoeps*1.0*rhoeps.mesh().V());
-            if(counter==0) m0=m;
-	    counter++;
-            Info << "\ncurrent gas mass = " << m << "\n" << endl;
-	    Info << "\ncurrent added gas mass = " << m-m0 << "\n" << endl;
+           
             if (pimple.turbCorr())
             {
                 turbulence->correct();
             }
         }
 
+        #include "monitorMass.H"
+        
         particleCloud.clockM().start(31,"postFlow");
         particleCloud.postFlow();
         particleCloud.clockM().stop("postFlow");

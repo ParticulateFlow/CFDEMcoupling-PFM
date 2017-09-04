@@ -25,11 +25,11 @@ stopAt          endTime;
 
 endTime         5.0;
 
-deltaT          0.0001;
+deltaT          0.00001;
 
 writeControl    timeStep;
 
-writeInterval   50;
+writeInterval   1000;
 
 purgeWrite      0;
 
@@ -104,6 +104,7 @@ functions
         (
             rhoeps
             rho
+            molarConc
         );
     }
 

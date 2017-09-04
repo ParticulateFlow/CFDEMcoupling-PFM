@@ -58,14 +58,14 @@ solvers
     {
         solver          smoothSolver;
         smoother        symGaussSeidel;
-        tolerance       1e-05;
+        tolerance       1e-06;
         relTol          0.1;
     }
 
     "(U|h|R|k|epsilon)Final"
     {
         $U;
-        tolerance       1e-05;
+        tolerance       1e-07;
         relTol          0;
     }
 
@@ -77,7 +77,7 @@ solvers
     "(Yi|CO2|O2)Final"
     {
         $Yi;
-        tolerance       1e-06;
+        tolerance       1e-08;
         relTol          0;
     }
 }
@@ -98,13 +98,13 @@ relaxationFactors
 {
     fields
     {
-        ".*"            1;
+          p               0.3;
     }
     equations
     {
         ".*"            1;
     }
 }
-
+*/
 
 // ************************************************************************* //
