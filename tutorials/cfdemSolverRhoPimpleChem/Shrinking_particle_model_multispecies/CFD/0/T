@@ -23,27 +23,32 @@ boundaryField
 {
     top
     {
-        type            zeroGradient;
+        type            fixedValue;
+        value           uniform 1293.15;
     }
 
     bottom
     {
-        type            zeroGradient;
+        type            fixedValue;
+        value           uniform 1293.15;
     }
 
     side-walls
     {
-        type            zeroGradient;
+        type            fixedValue;
+        value           uniform 1293.15;
     }
 
     inlet
     {
-        type            zeroGradient;
+        type            fixedValue;
+        value           uniform 1293.15;
     }
 
     outlet
     {
-        type            zeroGradient;
+        type            fixedValue;
+        value           uniform 1293.15;
     }
 }
 

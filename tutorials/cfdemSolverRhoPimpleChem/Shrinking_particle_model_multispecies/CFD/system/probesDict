@@ -21,7 +21,7 @@ fields
     rho
     p
     T
-    molC
+    molarConc
     O2
     O
     CO2
