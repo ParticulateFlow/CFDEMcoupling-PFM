@@ -334,7 +334,7 @@ void species::execute()
         }
         massSourceCurr_ = gSum(changeOfGasMassField_*1.0*changeOfGasMassField_.mesh().V() * Nevery_ * timestep);
 	massSourceTot_ += massSourceCurr_;
-	Info << "total conversion of mass:\tcurrent source = " << massSourceCurr_ << ", total source = " << massSourceTot_ << "\n" << endl;
+	Info << "total conversion of mass:\n\tcurrent source = " << massSourceCurr_ << "\n\ttotal source = " << massSourceTot_ << "\n" << endl;
         Info << "get data done" << endl;
 }
 
