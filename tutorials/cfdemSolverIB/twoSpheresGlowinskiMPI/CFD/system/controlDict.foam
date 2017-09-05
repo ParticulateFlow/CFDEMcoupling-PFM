@@ -73,8 +73,8 @@ functions
         fields ( particleForces );
 
         // Write at same frequency as fields
-        outputControl   timeStep;//outputTime;
-        outputInterval  1;
+        writeControl   timeStep;//outputTime;
+        writeInterval  1;
     }
 }
 

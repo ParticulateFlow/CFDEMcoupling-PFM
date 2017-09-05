@@ -1,0 +1,259 @@
+#----------------------------------*-sh-*--------------------------------------
+# CFDEMcoupling
+#
+# Copyright 2009-2012 JKU Linz
+# Copyright 2012-2015 DCS Computing GmbH, Linz
+# Copyright 2015-     JKU Linz
+#------------------------------------------------------------------------------
+#
+# File
+#     etc/bashrc
+#
+# Description
+#     Startup file for CFDEMcoupling
+#     Sourced from ~/.profile or ~/.bashrc
+#
+# you can test the correctness using cfdemSystemTest.sh
+#------------------------------------------------------------------------------
+
+export CFDEM_PROJECT=CFDEM
+export CFDEM_VERSION=17.08
+
+################################################################################
+# USER EDITABLE PART: Changes made here may be lost with the next upgrade
+#
+# Please set to the appropriate path if the default is not correct.
+#
+# activate compatible OpenFOAM version
+. $HOME/OpenFOAM/OpenFOAM-4.x/etc/bashrc
+#
+# CFDEMcoupling
+export CFDEM_INST_DIR=$HOME/$CFDEM_PROJECT
+export CFDEM_PROJECT_DIR=$CFDEM_INST_DIR/CFDEMcoupling
+export CFDEM_PROJECT_USER_DIR=$CFDEM_INST_DIR/$USER-$WM_PROJECT_VERSION
+#
+# LIGGGHTS
+export CFDEM_LIGGGHTS_INST_DIR=$CFDEM_INST_DIR/LIGGGHTS
+#
+# LPP installation path
+export CFDEM_LPP_INST_DIR=$CFDEM_INST_DIR/LPP
+#
+# Path to additional libraries
+export CFDEM_ADD_LIBS_DIR=
+#
+# END OF (NORMAL) USER EDITABLE PART
+################################################################################
+
+#- The old dirs to be cleaned from the environment variables
+cfdemOldDirs="$CFDEM_LIGGGHTS_BIN_DIR $CFDEM_APP_DIR $CFDEM_LIB_DIR"
+
+export CFDEM_LIGGGHTS_SRC_DIR=$CFDEM_LIGGGHTS_INST_DIR/src
+export CFDEM_LIGGGHTS_BIN_DIR=$CFDEM_LIGGGHTS_INST_DIR/src-build
+
+#------------------------------------------------------------------------------
+# Source initialization functions
+#------------------------------------------------------------------------------
+. $WM_PROJECT_DIR/etc/config.sh/functions
+
+#------------------------------------------------------------------------------
+# Evaluate command-line parameters
+# these can be used to set/unset values
+#------------------------------------------------------------------------------
+_foamEval $@
+
+#------------------------------------------------------------------------------
+
+export CFDEM_SRC_DIR=$CFDEM_PROJECT_DIR/src
+export CFDEM_SOLVER_DIR=$CFDEM_PROJECT_DIR/applications/solvers
+export CFDEM_UT_DIR=$CFDEM_PROJECT_DIR/applications/utilities
+export CFDEM_DOC_DIR=$CFDEM_PROJECT_DIR/doc
+export CFDEM_TUT_DIR=$CFDEM_PROJECT_DIR/tutorials
+export CFDEM_LPP_DIR=$CFDEM_LPP_INST_DIR/src
+
+#------------------------------------------------------------------------------
+
+#- CFDEM lib name
+export CFDEM_LIB_NAME=lagrangianCFDEM-$CFDEM_VERSION-$WM_PROJECT_VERSION
+
+#- CFDEM compressible lib name
+export CFDEM_LIB_COMP_NAME=lagrangianCFDEMcomp-$CFDEM_VERSION-$WM_PROJECT_VERSION
+
+#- Check if additional libraries should be compiled together with solvers
+if [[ $CFDEM_ADD_LIBS_DIR == "" ]]; then
+    export CFDEM_ADD_LIBS_DIR=$CFDEM_PROJECT_DIR/etc
+else
+    echo "using CFDEM_ADD_LIBS_DIR=$CFDEM_ADD_LIBS_DIR defined by user."
+fi
+
+#------------------------------------------------------------------------------
+
+#- LMP Many2Many lib path and makefile
+export CFDEM_Many2ManyLIB_PATH=$CFDEM_SRC_DIR/lagrangian/cfdemParticle/subModels/dataExchangeModel/twoWayMany2Many/library
+export CFDEM_Many2ManyLIB_MAKEFILENAME=fedora_fpic
+
+#------------------------------------------------------------------------------
+
+#- path to test harness
+export CFDEM_TEST_HARNESS_PATH=$CFDEM_PROJECT_USER_DIR/log/logFilesCFDEM-$CFDEM_VERSION-$WM_PROJECT_VERSION
+
+#- path to libraries
+export CFDEM_LIB_DIR=$CFDEM_PROJECT_DIR/platforms/$WM_OPTIONS/lib
+
+#- path to apps
+export CFDEM_APP_DIR=$CFDEM_PROJECT_DIR/platforms/$WM_OPTIONS/bin
+
+#- create directories
+mkdir -p $CFDEM_LIB_DIR
+mkdir -p $CFDEM_APP_DIR
+
+#- path to OF version flag file
+export CFDEM_OFVERSION_DIR=$CFDEM_PROJECT_DIR/etc/OFversion
+
+#------------------------------------------------------------------------------
+# Clean standard environment variables (PATH, LD_LIBRARY_PATH)
+#------------------------------------------------------------------------------
+foamClean=$WM_PROJECT_DIR/bin/foamCleanPath
+
+#- Clean PATH
+cleaned=`$foamClean "$PATH" "$cfdemOldDirs"` && PATH="$cleaned"
+
+#- Clean LD_LIBRARY_PATH
+cleaned=`$foamClean "$LD_LIBRARY_PATH" "$cfdemOldDirs"` \
+    && LD_LIBRARY_PATH="$cleaned"
+
+export PATH LD_LIBRARY_PATH
+
+#- add binary directories to $PATH
+_foamAddPath $CFDEM_APP_DIR:$CFDEM_LIGGGHTS_BIN_DIR
+_foamAddLib $CFDEM_LIB_DIR
+
+#------------------------------------------------------------------------------
+# Cleanup environment:
+#------------------------------------------------------------------------------
+unset cleaned foamClean cfdemOldDirs
+
+#------------------------------------------------------------------------------
+# Unload initialization functions:
+#------------------------------------------------------------------------------
+. $WM_PROJECT_DIR/etc/config.sh/functions
+
+#------------------------------------------------------------------------------
+# Settings for lpp postproc tool
+#------------------------------------------------------------------------------
+
+#- nr of procs for lpp tool
+export CFDEM_LPP_NPROCS=4
+
+#- nr of procs for lpp tool
+export CFDEM_LPP_CHUNKSIZE=1
+
+#- shortcut to run lpp
+alias lpp='python -i $CFDEM_LPP_DIR/lpp.py --cpunum $CFDEM_LPP_NPROCS --chunksize $CFDEM_LPP_CHUNKSIZE'
+
+#------------------------------------------------------------------------------
+# aliases for easy navigation (no changes necessary)
+#------------------------------------------------------------------------------
+
+#- shortcut to cfdem path
+alias cfdem='cd $CFDEM_PROJECT_DIR'
+
+#- shortcut to src path
+alias cfdemSrc='cd $CFDEM_SRC_DIR'
+
+#- shortcut to tutorial path
+alias cfdemTut='cd $CFDEM_TUT_DIR'
+
+#- shortcut to solver path
+alias cfdemSol='cd $CFDEM_SOLVER_DIR'
+
+#- shortcut to utilities path
+alias cfdemUt='cd $CFDEM_UT_DIR'
+
+#- shortcut to run path
+alias cfdemRun='cd $CFDEM_PROJECT_USER_DIR/run'
+
+#- shortcut to user solver path
+alias cfdemUsrSol='cd $CFDEM_PROJECT_USER_DIR/applications/solvers'
+
+#- shortcut to documentation path
+alias cfdemDoc='cd $CFDEM_DOC_DIR'
+
+#- shortcut to open the doxygen with firefox
+alias cfdemDox='firefox $CFDEM_DOC_DIR/doxygen/html/index.html'
+
+#- shortcut to LIGGGHTS path
+alias cfdemLIG='cd $CFDEM_LIGGGHTS_SRC_DIR'
+
+#- shortcut to system test
+alias cfdemSysTest='bash $CFDEM_PROJECT_DIR/etc/cfdemSystemTest.sh'
+
+#- shortcut to pull LIGGGHTS
+alias cfdemPullLIG='bash $CFDEM_PROJECT_DIR/etc/pullLIGGGHTS.sh'
+
+#- shortcut to pull CFDEMcoupling
+alias cfdemPullCFDEMcoupling='bash $CFDEM_PROJECT_DIR/etc/pullCFDEMcoupling.sh'
+
+#- shortcut to clean CFDEM
+alias cfdemCleanCFDEM='bash $CFDEM_PROJECT_DIR/etc/cleanCFDEMcoupling.sh'
+
+#- shortcut to compile LIGGGHTS + sublibraries
+alias cfdemCompLIG='bash $CFDEM_PROJECT_DIR/etc/compileLIGGGHTS.sh'
+
+#- shortcut to compile CFDEMcoupling +LIGGGHTS
+alias cfdemCompCFDEMall='bash $CFDEM_PROJECT_DIR/etc/compileCFDEMcoupling_all.sh'
+
+#- shortcut to compile CFDEMcoupling (src+solvers)
+alias cfdemCompCFDEM='bash $CFDEM_PROJECT_DIR/etc/compileCFDEMcoupling.sh'
+
+#- shortcut to compile CFDEMcoupling src
+alias cfdemCompCFDEMsrc='bash $CFDEM_PROJECT_DIR/etc/compileCFDEMcoupling_src.sh'
+
+#- shortcut to compile CFDEMcoupling solvers
+alias cfdemCompCFDEMsol='bash $CFDEM_PROJECT_DIR/etc/compileCFDEMcoupling_sol.sh'
+
+#- shortcut to compile CFDEMcoupling utilities
+alias cfdemCompCFDEMuti='bash $CFDEM_PROJECT_DIR/etc/compileCFDEMcoupling_uti.sh'
+
+#- shortcut to test basic tutorials
+alias cfdemTestTUT='bash $CFDEM_PROJECT_DIR/etc/testTutorials.sh'
+
+#- shortcut to visualize the clock model data
+alias vizClock='python $CFDEM_UT_DIR/vizClock/matPlot.py'
+
+#- recursive touch of current directory
+alias touchRec='find ./* -exec touch {} \;'
+
+#- shortcut to run liggghts in serial
+cfdemLiggghts() { $CFDEM_LIGGGHTS_BIN_DIR/liggghts < $1; }
+export -f cfdemLiggghts
+
+#- shortcut to run liggghts in parallel
+cfdemLiggghtsPar() { mpirun -np $2 $CFDEM_LIGGGHTS_BIN_DIR/liggghts < $1; }
+export -f cfdemLiggghtsPar
+
+#- shortcut to open files including a pattern
+cfdemGrep() { grep -rl "$1" ./* | xargs gedit; }
+export -f cfdemGrep
+
+#- shortcut lo list files in a directory
+#cfdemListFiles() { find $1 | sed s:""$1"":: > listOfFiles.txt; }   #leave out the dir iteslf in list
+cfdemListFiles() { find $1 > listOfFiles.txt; }                     #keep the dir in list
+export -f cfdemListFiles
+
+#- check if the user directory exists
+if [ -d "$CFDEM_PROJECT_USER_DIR" ]; then
+    :
+else
+        echo "make new dirs $CFDEM_PROJECT_USER_DIR ? (y/n)"
+        read YN
+        if [ $YN == "y" ]; then
+            mkdir -p $CFDEM_PROJECT_USER_DIR
+            cd $CFDEM_PROJECT_USER_DIR
+            mkdir run
+            mkdir -p log/logFilesCFDEM-$CFDEM_VERSION-$WM_PROJECT_VERSION
+            mkdir -p applications/solvers
+        else
+            echo "aborted by user."
+            #exit
+        fi
+fi

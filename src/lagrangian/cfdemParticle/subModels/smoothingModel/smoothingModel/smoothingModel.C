@@ -50,7 +50,7 @@ defineRunTimeSelectionTable(smoothingModel, dictionary);
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 // Construct from components
-Foam::smoothingModel::smoothingModel
+smoothingModel::smoothingModel
 (
     const dictionary& dict,
     cfdemCloud& sm
@@ -59,7 +59,7 @@ Foam::smoothingModel::smoothingModel
     dict_(dict),
     particleCloud_(sm),
     vSmoothField_
-    (   
+    (
         IOobject
         (
             "vSmoothField",
@@ -72,7 +72,7 @@ Foam::smoothingModel::smoothingModel
         dimensionedVector("zero", dimensionSet(0,0,0,0,0), vector::zero)
     ),
     sSmoothField_
-    (   
+    (
         IOobject
         (
             "sSmoothField",
@@ -89,7 +89,7 @@ Foam::smoothingModel::smoothingModel
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-Foam::smoothingModel::~smoothingModel()
+smoothingModel::~smoothingModel()
 {}
 
 
@@ -110,7 +110,7 @@ void smoothingModel::checkFields(volVectorField& vSmoothField_) const
 {
     // currently it is detected if field was auto generated or defined
     // improvement would be changing the type here automatically
-    forAll(vSmoothField_.boundaryField(),patchI)      
+    forAll(vSmoothField_.boundaryField(),patchI)
         if(vSmoothField_.boundaryField()[patchI].type()=="calculated")
             FatalError <<"Vector field:"<< vSmoothField_.name() << " must be defined.\n" << abort(FatalError);
 

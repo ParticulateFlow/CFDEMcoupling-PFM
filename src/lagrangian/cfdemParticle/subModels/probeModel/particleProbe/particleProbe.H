@@ -63,7 +63,7 @@ private:
 
     dictionary propsDict_;
 
-    mutable word name_;
+    word name_;
 
     cfdemCloud& particleCloud_;
 
@@ -75,7 +75,7 @@ private:
 
     word dirName_;
 
-    mutable int rank_;
+    int rank_;
 
     mutable OFstream* sPtr;
 
@@ -89,25 +89,23 @@ private:
 
     const labelList particleIDsToSample_;
 
-    mutable wordList itemsToSample_;
+    wordList itemsToSample_;
 
-    mutable List<OFstream*> sPtrList_;
+    List<OFstream*> sPtrList_;
 
-    mutable int itemCounter_;
+    int itemCounter_;
 
-    mutable int currItemId_;
+    int currItemId_;
 
-    mutable int printCounter_;
+    int printCounter_;
 
-    mutable bool printNow_;
+    bool printNow_;
 
-    mutable std::vector< std::vector<double> > sProbes_;
+    std::vector<std::string> probeName_;
 
-    mutable std::vector< std::vector<double*> > vProbes_;
+    int probeIndex_;
 
-    mutable  std::vector<std::string> probeName_;
-
-    mutable int probeIndex_;
+    void setCounter();
 
 public:
 
@@ -131,17 +129,11 @@ public:
         ~particleProbe();
 
     // Member Functions
-    void updateProbes(int index, Field<scalar> sValues, Field<vector> vValues) const;
-    void initialize(word typeName, word logFileName) const;
-    void setOutputFile() const;
+    void initialize(const word& modelName, const word& logFileName);
+    void setOutputFile(const word& logFileName);
     void writeHeader() const;
-    void writeProbe(int index, Field<scalar> sValues, Field<vector> vValues) const;
+    void writeProbe(int index, Field<scalar> sValues, Field<vector> vValues);
     bool checkIDForPrint(int) const;
-    void setCounter() const;
-    void clearProbes() const;
-    std::vector< std::vector<double*> >* getVprobe() { return &vProbes_; }
-    std::vector< std::vector<double> >* getSprobe() { return &sProbes_; }
-
 };
 
 

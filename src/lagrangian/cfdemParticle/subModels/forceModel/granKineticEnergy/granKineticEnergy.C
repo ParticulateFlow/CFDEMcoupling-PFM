@@ -67,12 +67,12 @@ granKineticEnergy::granKineticEnergy
         ),
         sm.mesh(),
         dimensionedScalar("zero", dimensionSet(0,2,-2,0,0), 0),
-	"zeroGradient"
+        "zeroGradient"
     )
 {
     allocateMyArrays();
     granKineticEnergy_.write();
-    
+
 
     // init force sub model
     setForceSubModels(propsDict_);
@@ -82,14 +82,14 @@ granKineticEnergy::granKineticEnergy
 
 granKineticEnergy::~granKineticEnergy()
 {
-    delete vfluc_;
+    particleCloud_.dataExchangeM().destroy(vfluc_,1);
 }
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
 void granKineticEnergy::allocateMyArrays() const
 {
     // get memory for 2d arrays
-    double initVal=0.0;
+    double initVal = 0.0;
     particleCloud_.dataExchangeM().allocateArray(vfluc_,initVal,1);
 }
 // * * * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * * //
@@ -98,20 +98,20 @@ void granKineticEnergy::setForce() const
 {
     allocateMyArrays();
 
-    label cellI=0;
+    label cellI = 0;
     vector velfluc(0,0,0);
 
-    
-    for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)
+
+    for(int index = 0; index < particleCloud_.numberOfParticles(); ++index)
     {
         cellI = particleCloud_.cellIDs()[index][0];
         if(cellI >= 0)
         {
-	    velfluc = particleCloud_.velocity(index) - UsField_[cellI];
-	    vfluc_[index][0] = magSqr(velfluc);
-	}
+            velfluc = particleCloud_.velocity(index) - UsField_[cellI];
+            vfluc_[index][0] = magSqr(velfluc);
+        }
     }
-    
+
     granKineticEnergy_.primitiveFieldRef() = 0.0;
 
     particleCloud_.averagingM().resetWeightFields();
@@ -120,10 +120,10 @@ void granKineticEnergy::setForce() const
         granKineticEnergy_,
         vfluc_,
         particleCloud_.particleWeights(),
-	particleCloud_.averagingM().UsWeightField(),
+        particleCloud_.averagingM().UsWeightField(),
         NULL
     );
-    
+
     granKineticEnergy_ *= 0.5;
 
 }

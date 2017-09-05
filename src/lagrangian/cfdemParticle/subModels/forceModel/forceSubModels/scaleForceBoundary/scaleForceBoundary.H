@@ -45,19 +45,19 @@ class scaleForceBoundary
     public forceSubModel
 {
 private:
-  
+
     dictionary propsDict_;
-  
+
     scalar coordinateInner_;
-    
+
     scalar coordinateOuter_;
-    
+
     scalar dist_;
-    
+
     scalar outerVal_;
-    
+
     int dim_;
-    
+
     int orientation_;
 
 public:
@@ -82,10 +82,10 @@ public:
 
 
     // Member Functions
-	
-	void partToArray(label&, vector&, const vector&, const vector& Ufluid=vector::zero, scalar Cd=scalar(0)) const;
 
-        word myType() const{return typeName; };
+        void partToArray(label, vector&, const vector&, const vector& Ufluid=vector::zero, scalar Cd=scalar(0)) const;
+
+        word myType() const {return typeName; }
 };
 
 

@@ -92,12 +92,12 @@ void cfdemCloudEnergy::speciesExecute()
 }
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-int cfdemCloudEnergy::nrEnergyModels()
+label cfdemCloudEnergy::nrEnergyModels() const
 {
     return energyModels_.size();
 }
 
-bool& cfdemCloudEnergy::implicitEnergyModel()
+bool cfdemCloudEnergy::implicitEnergyModel() const
 {
     return implicitEnergyModel_;
 }

@@ -69,9 +69,9 @@ ArchimedesIB::ArchimedesIB
     g_(sm.mesh().lookupObject<uniformDimensionedVectorField> (gravityFieldName_))
 {
     //Append the field names to be probed
-    particleCloud_.probeM().initialize(typeName, "archimedesIBF.logDat");
+    particleCloud_.probeM().initialize(typeName, typeName+".logDat");
     particleCloud_.probeM().vectorFields_.append("archimedesIBForce");  //first entry must the be the force
-    particleCloud_.probeM().writeHeader();  
+    particleCloud_.probeM().writeHeader();
 
     if (propsDict_.found("twoDimensional"))
     {
@@ -83,12 +83,12 @@ ArchimedesIB::ArchimedesIB
     setForceSubModels(propsDict_);
 
     // define switches which can be read from dict
-    forceSubM(0).setSwitchesList(0,true); // activate treatExplicit switch
+    forceSubM(0).setSwitchesList(SW_TREAT_FORCE_EXPLICIT,true); // activate treatExplicit switch
 
     // read those switches defined above, if provided in dict
     forceSubM(0).readSwitches();
 
-    forceSubM(0).setSwitches(1,true); // treatDEM = true
+    forceSubM(0).setSwitches(SW_TREAT_FORCE_DEM,true); // treatDEM = true
     Info << "accounting for Archimedes only on DEM side!" << endl;
 
     particleCloud_.checkCG(true);
@@ -109,7 +109,7 @@ void ArchimedesIB::setForce() const
 
     #include "setupProbeModel.H"
 
-    for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
+    for(int index = 0; index < particleCloud_.numberOfParticles(); ++index)
     {
         //if(mask[index][0])
         //{
@@ -120,8 +120,8 @@ void ArchimedesIB::setForce() const
                 if (cellI > -1) // particle Found
                 {
                     //force += -g_.value()*forceSubM(0).rhoField()[cellI]*forceSubM(0).rhoField().mesh().V()[cellI]*(1-particleCloud_.voidfractions()[index][subCell]);//mod by alice
-                	force += -g_.value()*forceSubM(0).rhoField()[cellI]*particleCloud_.mesh().V()[cellI]*(1-voidfractions_[cellI]);//mod by alice
-        	    }
+                    force += -g_.value()*forceSubM(0).rhoField()[cellI]*particleCloud_.mesh().V()[cellI]*(1-voidfractions_[cellI]);//mod by alice
+                }
             }
 
             //Set value fields and write the probe

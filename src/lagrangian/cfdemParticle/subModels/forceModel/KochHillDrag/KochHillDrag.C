@@ -74,7 +74,7 @@ KochHillDrag::KochHillDrag
     scaleDrag_(1.)
 {
     //Append the field names to be probed
-    particleCloud_.probeM().initialize(typeName, "kochHillDrag.logDat");
+    particleCloud_.probeM().initialize(typeName, typeName+".logDat");
     particleCloud_.probeM().vectorFields_.append("dragForce");      //first entry must the be the force
     particleCloud_.probeM().vectorFields_.append("Urel");           //other are debug
     particleCloud_.probeM().scalarFields_.append("Rep");            //other are debug
@@ -86,12 +86,12 @@ KochHillDrag::KochHillDrag
     setForceSubModels(propsDict_);
 
     // define switches which can be read from dict
-    forceSubM(0).setSwitchesList(0,true); // activate treatExplicit switch
-    forceSubM(0).setSwitchesList(2,true); // activate implDEM switch
-    forceSubM(0).setSwitchesList(3,true); // activate search for verbose switch
-    forceSubM(0).setSwitchesList(4,true); // activate search for interpolate switch
-    forceSubM(0).setSwitchesList(7,true); // activate implForceDEMacc switch
-    forceSubM(0).setSwitchesList(8,true); // activate scalarViscosity switch
+    forceSubM(0).setSwitchesList(SW_TREAT_FORCE_EXPLICIT,true); // activate treatExplicit switch
+    forceSubM(0).setSwitchesList(SW_IMPL_FORCE_DEM,true); // activate implDEM switch
+    forceSubM(0).setSwitchesList(SW_VERBOSE,true); // activate search for verbose switch
+    forceSubM(0).setSwitchesList(SW_INTERPOLATION,true); // activate search for interpolate switch
+    forceSubM(0).setSwitchesList(SW_IMPL_FORCE_DEM_ACCUMULATED,true); // activate implForceDEMacc switch
+    forceSubM(0).setSwitchesList(SW_SCALAR_VISCOSITY,true); // activate scalarViscosity switch
 
     // read those switches defined above, if provided in dict
     forceSubM(0).readSwitches();
@@ -99,9 +99,9 @@ KochHillDrag::KochHillDrag
     particleCloud_.checkCG(true);
 
     if (propsDict_.found("scale"))
-        scaleDia_=scalar(readScalar(propsDict_.lookup("scale")));
+        scaleDia_ = scalar(readScalar(propsDict_.lookup("scale")));
     if (propsDict_.found("scaleDrag"))
-        scaleDrag_=scalar(readScalar(propsDict_.lookup("scaleDrag")));
+        scaleDrag_ = scalar(readScalar(propsDict_.lookup("scaleDrag")));
 }
 
 
@@ -134,7 +134,7 @@ void KochHillDrag::setForce() const
     vector drag(0,0,0);
     vector dragExplicit(0,0,0);
     scalar dragCoefficient(0);
-    label cellI=0;
+    label cellI = 0;
 
     vector Us(0,0,0);
     vector Ur(0,0,0);
@@ -154,16 +154,16 @@ void KochHillDrag::setForce() const
 
     #include "setupProbeModel.H"
 
-    for (int index=0; index<particleCloud_.numberOfParticles(); index++)
+    for (int index = 0; index<particleCloud_.numberOfParticles(); ++index)
     {
             cellI = particleCloud_.cellIDs()[index][0];
             drag = vector(0,0,0);
             dragExplicit = vector(0,0,0);
-            dragCoefficient=0;
+            dragCoefficient = 0;
             betaP = 0;
             Vs = 0;
-            Ufluid =vector(0,0,0);
-            voidfraction=0;
+            Ufluid = vector(0,0,0);
+            voidfraction = 0;
 
             if (cellI > -1) // particle Found
             {
@@ -174,8 +174,8 @@ void KochHillDrag::setForce() const
                     Ufluid = UInterpolator_.interpolate(position,cellI);
                     //Ensure interpolated void fraction to be meaningful
                     // Info << " --> voidfraction: " << voidfraction << endl;
-                    if (voidfraction > 1.00) voidfraction = 1.00;
-                    if (voidfraction < 0.40) voidfraction = 0.40;
+                    if (voidfraction > 1.0) voidfraction = 1.0;
+                    else if (voidfraction < 0.4) voidfraction = 0.4;
                 }
                 else
                 {
@@ -227,10 +227,10 @@ void KochHillDrag::setForce() const
 
                     // calc particle's drag
                     dragCoefficient = Vs*betaP*scaleDrag_;
-                    if (modelType_=="B")
+                    if (modelType_ == "B")
                         dragCoefficient /= voidfraction;
 
-                    if (forceSubM(0).switches()[7]) // implForceDEMaccumulated=true
+                    if (forceSubM(0).switches()[SW_IMPL_FORCE_DEM_ACCUMULATED]) // implForceDEMaccumulated=true
                     {
                         //get drag from the particle itself
                         for (int j=0; j<3; j++) drag[j] = particleCloud_.fAccs()[index][j]/couplingInterval;
@@ -270,7 +270,7 @@ void KochHillDrag::setForce() const
                     sValues.append(betaP);
                     sValues.append(voidfraction);
                     particleCloud_.probeM().writeProbe(index, sValues, vValues);
-                }    
+                }
             }
 
             // write particle based data to global array

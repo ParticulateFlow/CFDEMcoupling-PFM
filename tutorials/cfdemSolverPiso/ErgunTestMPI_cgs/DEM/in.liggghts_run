@@ -1,4 +1,4 @@
-# Pour granular particles into chute container, then induce flow
+# Pour granular particles into a cylinder, then induce flow
 log             ../DEM/log.liggghts
 thermo_log      ../DEM/post/thermo.txt
 
@@ -26,7 +26,7 @@ fix         m3 all property/global coefficientRestitution peratomtypepair 1 0.3
 fix         m4 all property/global coefficientFriction peratomtypepair 1 0.5
 
 # pair style
-pair_style  gran model hertz tangential history # Hertzian without cohesion
+pair_style  gran model hertz tangential history
 pair_coeff  * *
 
 # timestep, gravity
@@ -61,6 +61,6 @@ thermo          10
 thermo_modify   lost ignore norm no
 compute_modify  thermo_temp dynamic yes
 
-dump            dmp all custom 5000 ../DEM/post/dump*.liggghts_run id type x y z vx vy vz fx fy fz f_dragforce[1] f_dragforce[2] f_dragforce[3] radius 
+dump            dmp all custom 5000 ../DEM/post/dump*.liggghts_run id type x y z vx vy vz fx fy fz f_dragforce[1] f_dragforce[2] f_dragforce[3] radius
 
 run             1

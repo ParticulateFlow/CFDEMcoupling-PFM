@@ -48,7 +48,7 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * IO * * * * * * * * * * * * * //
 
-void cfdemCloud::writeScalarFieldToTerminal(double**& array)
+void cfdemCloud::writeScalarFieldToTerminal(double**& array) const
 {
     // init double array
     for (int i=0; i<numberOfParticles(); i++)
@@ -57,7 +57,7 @@ void cfdemCloud::writeScalarFieldToTerminal(double**& array)
     }
 }
 
-void cfdemCloud::writeVectorFieldToTerminal(double**& array)
+void cfdemCloud::writeVectorFieldToTerminal(double**& array) const
 {
     // init double array
     for (int i=0; i<numberOfParticles(); i++)

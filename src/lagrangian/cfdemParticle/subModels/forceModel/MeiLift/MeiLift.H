@@ -5,7 +5,8 @@
     www.cfdem.com
                                 Christoph Goniva, christoph.goniva@cfdem.com
                                 Copyright 2009-2012 JKU Linz
-                                Copyright 2012-     DCS Computing GmbH, Linz
+                                Copyright 2012-2015 DCS Computing GmbH, Linz
+                                Copyright 2015-     JKU Linz
 -------------------------------------------------------------------------------
 License
     This file is part of CFDEMcoupling.
@@ -28,18 +29,20 @@ Description
     This code is designed to realize coupled CFD-DEM simulations using LIGGGHTS
     and OpenFOAM(R). Note: this code is not part of OpenFOAM(R) (see DISCLAIMER).
 
-     This function is based on the derivation in R. Kurose, S. Komori, 
-     Drag and lift forces on a rotating sphere in a linear shear flow, 
-     Journal of Fluid Mechanics. 384 (1999) 183-206.
+    This function is based on the derivation in R. Mei,
+    An approximate expression for shear lift force on a spherical  particle at a
+    finite Reynolds number,
+    Int. J. Multiph. Flow 18 (1992) 145–147
 
-     The data for this functions is based on J.B. Mclaughlin, 
-     Inertial migration of a small sphere in linear shear flows, 
-     Journal of Fluid Mechanics. 224 (1991) 261-274.
+    The data for this functions is based on J.B. Mclaughlin,
+    Inertial migration of a small sphere in linear shear flows,
+    Journal of Fluid Mechanics. 224 (1991) 261-274.
 
-     The second order terms are based on: 
-     Mei Lift force following Loth and Dorgan 2009,
-     and can be added to the lift coefficient if desired
-     (contribution from RQ)
+    The second order terms are based on E. Loth and A. J. Dorgan,
+    An equation of motion for particles of finite Reynolds number and size,
+    Environ. Fluid Mech. 9 (2009) 187–206
+    and can be added to the lift coefficient if desired
+    (contribution from RQ)
 
     - including interpolation of the velocity to the particle position (optional)
     - including output to file for testing/data analysis (optional)

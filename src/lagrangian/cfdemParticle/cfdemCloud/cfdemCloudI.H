@@ -44,38 +44,38 @@ namespace Foam
 {
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-inline void cfdemCloud::setCG(double cg) const
+inline void cfdemCloud::setCG(double cg)
 {
     cg_ = cg;
     Info << "cg is set to: " << cg_ << endl;
 }
 
-inline const bool& cfdemCloud::impDEMdrag() const
+inline bool cfdemCloud::impDEMdrag() const
 {
     return impDEMdrag_;
 }
 
-inline const bool& cfdemCloud::impDEMdragAcc() const
+inline bool cfdemCloud::impDEMdragAcc() const
 {
     return impDEMdragAcc_;
 }
 
-inline const scalar& cfdemCloud::imExSplitFactor() const
+inline scalar cfdemCloud::imExSplitFactor() const
 {
     return imExSplitFactor_;
 }
 
-inline const bool& cfdemCloud::treatVoidCellsAsExplicitForce() const
+inline bool cfdemCloud::treatVoidCellsAsExplicitForce() const
 {
     return treatVoidCellsAsExplicitForce_;
 }
 
-inline const scalar& cfdemCloud::cg() const
+inline scalar cfdemCloud::cg() const
 {
     return cg_;
 }
 
-inline const bool& cfdemCloud::ignore() const
+inline bool cfdemCloud::ignore() const
 {
     return ignore_;
 }
@@ -177,24 +177,24 @@ inline double ** cfdemCloud::particleWeights() const
     return particleWeights_;
 }
 
-inline label cfdemCloud::body(int index)
+inline label cfdemCloud::body(int index) const
 {
     return index;
 }
 
-inline double cfdemCloud::particleVolume(int index)
+inline double cfdemCloud::particleVolume(int index) const
 {
     return particleV_[index][0];
 }
 
-inline scalar cfdemCloud::radius(int index)
+inline scalar cfdemCloud::radius(int index) const
 {
     return radii_[index][0];
 }
 
-inline double cfdemCloud::d(int index)
+inline double cfdemCloud::d(int index) const
 {
-    return 2*radii_[index][0];
+    return 2.*radii_[index][0];
 }
 
 inline double cfdemCloud::d32(bool recalc)
@@ -237,7 +237,7 @@ inline bool cfdemCloud::arraysReallocated() const
     return arraysReallocated_;
 }
 
-inline const wordList& cfdemCloud::forceModels()
+inline const wordList& cfdemCloud::forceModels() const
 {
     return forceModels_;
 }
@@ -252,9 +252,9 @@ inline const momCoupleModel& cfdemCloud::momCoupleM(int i) const
     return momCoupleModel_[i];
 }
 
-inline const dataExchangeModel& cfdemCloud::dataExchangeM() const
+inline dataExchangeModel& cfdemCloud::dataExchangeM()
 {
-    return dataExchangeModel_;
+    return dataExchangeModel_();
 }
 
 inline const IOModel& cfdemCloud::IOM() const
@@ -262,9 +262,9 @@ inline const IOModel& cfdemCloud::IOM() const
     return IOModel_;
 }
 
-inline const probeModel& cfdemCloud::probeM() const
+inline probeModel& cfdemCloud::probeM()
 {
-    return probeModel_;
+    return probeModel_();
 }
 
 inline const voidFractionModel& cfdemCloud::voidFractionM() const
