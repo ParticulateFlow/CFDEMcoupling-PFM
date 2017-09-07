@@ -34,8 +34,8 @@ Description
 #ifndef versionInfo_H
 #define versionInfo_H
 
-word CFDEMversion="PFM 17.02";
-word compatibleLIGGGHTSversion="PFM 17.02";
+word CFDEMversion="PFM 17.08";
+word compatibleLIGGGHTSversion="PFM 17.08";
 word OFversion="4.x";
 
 Info << "\nCFDEMcoupling version: " << CFDEMversion <<  endl;
