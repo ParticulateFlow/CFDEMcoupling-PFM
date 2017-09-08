@@ -1,7 +1,9 @@
 include $(CFDEM_ADD_LIBS_DIR)/additionalLibs
 
 EXE_INC = \
-    -I$(LIB_SRC)/turbulenceModels/incompressible/turbulenceModel \
+    -I$(CFDEM_OFVERSION_DIR) \
+    -I$(LIB_SRC)/TurbulenceModels/turbulenceModels/lnInclude \
+    -I$(LIB_SRC)/TurbulenceModels/incompressible/lnInclude \
     -I$(LIB_SRC)/transportModels \
     -I$(LIB_SRC)/transportModels/incompressible/singlePhaseTransportModel \
     -I$(LIB_SRC)/finiteVolume/lnInclude \
@@ -11,8 +13,8 @@ EXE_INC = \
 
 EXE_LIBS = \
     -L$(CFDEM_LIB_DIR)\
-    -lincompressibleRASModels \
-    -lincompressibleLESModels \
+    -lturbulenceModels \
+    -lincompressibleTurbulenceModels \
     -lincompressibleTransportModels \
     -lfiniteVolume \
     -l$(CFDEM_LIB_NAME) \

@@ -136,30 +136,30 @@ heatTransferGunn::heatTransferGunn
     if (calcPartTempField_)
     {
         if (propsDict_.found("partRefTemp"))
-	    partRefTemp_.value()=readScalar(propsDict_.lookup ("partRefTemp"));
-	partTempField_.writeOpt() = IOobject::AUTO_WRITE;
-	partRelTempField_.writeOpt() = IOobject::AUTO_WRITE;
-	partTempField_.write();
-	partRelTempField_.write();
-	Info <<  "Particle temperature field activated." << endl;
+            partRefTemp_.value()=readScalar(propsDict_.lookup ("partRefTemp"));
+        partTempField_.writeOpt() = IOobject::AUTO_WRITE;
+        partRelTempField_.writeOpt() = IOobject::AUTO_WRITE;
+        partTempField_.write();
+        partRelTempField_.write();
+        Info <<  "Particle temperature field activated." << endl;
     }
  
     if (verbose_)
     {
         ReField_.writeOpt() = IOobject::AUTO_WRITE;
-	NuField_.writeOpt() = IOobject::AUTO_WRITE;
-	ReField_.write();
-	NuField_.write();
-	if (expNusselt_)
-	{
-	  FatalError <<"Cannot read and create NuField at the same time!\n" << abort(FatalError);
-	}
+        NuField_.writeOpt() = IOobject::AUTO_WRITE;
+        ReField_.write();
+        NuField_.write();
+        if (expNusselt_)
+        {
+          FatalError <<"Cannot read and create NuField at the same time!\n" << abort(FatalError);
+        }
     }
     
     if (expNusselt_)
     {
         NuField_.writeOpt() = IOobject::AUTO_WRITE;
-	NuField_.write();
+        NuField_.write();
         Info <<  "Using predefined Nusselt number field." << endl;
     }
 }
@@ -169,10 +169,10 @@ heatTransferGunn::heatTransferGunn
 
 heatTransferGunn::~heatTransferGunn()
 {
-    delete partTemp_;
-    delete partHeatFlux_;
-    delete partRe_;
-    delete partNu_;
+    particleCloud_.dataExchangeM().destroy(partTemp_,1);
+    particleCloud_.dataExchangeM().destroy(partHeatFlux_,1);
+    particleCloud_.dataExchangeM().destroy(partRe_,1);
+    particleCloud_.dataExchangeM().destroy(partNu_,1);
 }
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
@@ -182,7 +182,7 @@ void heatTransferGunn::allocateMyArrays() const
     double initVal=0.0;
     particleCloud_.dataExchangeM().allocateArray(partTemp_,initVal,1);  // field/initVal/with/lenghtFromLigghts
     particleCloud_.dataExchangeM().allocateArray(partHeatFlux_,initVal,1);
-    
+
     if(verbose_)
     {
         particleCloud_.dataExchangeM().allocateArray(partRe_,initVal,1);
@@ -207,7 +207,7 @@ void heatTransferGunn::calcEnergyContribution()
     
     if(calcPartTempField_)
     {       
-	partTempField_.primitiveFieldRef() = 0.0;
+        partTempField_.primitiveFieldRef() = 0.0;
         particleCloud_.averagingM().resetWeightFields();
         particleCloud_.averagingM().setScalarAverage
         (
@@ -218,10 +218,10 @@ void heatTransferGunn::calcEnergyContribution()
             NULL
         );
 
-	volScalarField sumTp (particleCloud_.averagingM().UsWeightField() * partTempField_);
-	dimensionedScalar aveTemp("aveTemp",dimensionSet(0,0,0,1,0,0,0), gSum(sumTp) / particleCloud_.numberOfParticles());
-	partRelTempField_ = (partTempField_ - aveTemp) / (aveTemp - partRefTemp_);
-	Info << "heatTransferGunn: average part. temp = " << aveTemp.value() << endl;
+        volScalarField sumTp (particleCloud_.averagingM().UsWeightField() * partTempField_);
+        dimensionedScalar aveTemp("aveTemp",dimensionSet(0,0,0,1,0,0,0), gSum(sumTp) / particleCloud_.numberOfParticles());
+        partRelTempField_ = (partTempField_ - aveTemp) / (aveTemp - partRefTemp_);
+        Info << "heatTransferGunn: average part. temp = " << aveTemp.value() << endl;
     }
 
     #ifdef compre
@@ -229,7 +229,7 @@ void heatTransferGunn::calcEnergyContribution()
     #else
        const volScalarField mufField = particleCloud_.turbulence().nu()*rho_;
     #endif
-    
+
 
     // calc La based heat flux
     scalar voidfraction(1);
@@ -267,20 +267,21 @@ void heatTransferGunn::calcEnergyContribution()
                     Ufluid = U_[cellI];
                     Tfluid = tempField_[cellI];
                 }
+
                 
                 if (voidfraction < 0.01)
-		    voidfraction = 0.01;
+                    voidfraction = 0.01;
 
                 ds = 2.*particleCloud_.radius(index);
-		
-		if (expNusselt_)
-		{
-		    Nup = NuField_[cellI];
-		    if (Nup < 2.0)
-		        Nup = 2.0;
-		}
-		else
-		{
+
+                if (expNusselt_)
+                {
+                    Nup = NuField_[cellI];
+                    if (Nup < 2.0)
+                        Nup = 2.0;
+                }
+                else
+                {
                     Us = particleCloud_.velocity(index);
                     magUr = mag(Ufluid - Us);
                 
@@ -289,8 +290,9 @@ void heatTransferGunn::calcEnergyContribution()
                     Pr = max(SMALL, Cp_ * muf / kf0_);
 
                     Nup = Nusselt(voidfraction, Rep, Pr);
-		}
+                }
                 
+
 
                 scalar h = kf0_ * Nup / ds;
                 scalar As = ds * ds * M_PI; // surface area of sphere
@@ -298,14 +300,14 @@ void heatTransferGunn::calcEnergyContribution()
                 // calc convective heat flux [W]
                 heatFlux(index, h, As, Tfluid);
                 heatFluxCoeff(index, h, As);
-		
-		if(verbose_)
-		{
-		    partRe_[index][0] = Rep;
-		    partNu_[index][0] = Nup;
-		}
-		
-		if(particleCloud_.verbose() && index >=0 && index <2)
+
+                if(verbose_)
+                {
+                    partRe_[index][0] = Rep;
+                    partNu_[index][0] = Nup;
+                }
+
+                if(particleCloud_.verbose() && index >=0 && index <2)
                 {
                     Info << "partHeatFlux = " << partHeatFlux_[index][0] << endl;
                     Info << "magUr = " << magUr << endl;
@@ -334,27 +336,27 @@ void heatTransferGunn::calcEnergyContribution()
     if(verbose_)
     {
         ReField_.primitiveFieldRef() = 0.0;
-	NuField_.primitiveFieldRef() = 0.0;
-	particleCloud_.averagingM().resetWeightFields();
+        NuField_.primitiveFieldRef() = 0.0;
+        particleCloud_.averagingM().resetWeightFields();
         particleCloud_.averagingM().setScalarAverage
         (
             ReField_,
             partRe_,
             particleCloud_.particleWeights(),
-	    particleCloud_.averagingM().UsWeightField(),
+            particleCloud_.averagingM().UsWeightField(),
             NULL
         );
-	particleCloud_.averagingM().resetWeightFields();
+        particleCloud_.averagingM().resetWeightFields();
         particleCloud_.averagingM().setScalarAverage
         (
             NuField_,
             partNu_,
             particleCloud_.particleWeights(),
-	    particleCloud_.averagingM().UsWeightField(),
+            particleCloud_.averagingM().UsWeightField(),
             NULL
         );
     }
-    
+
     // limit source term
     forAll(QPartFluid_,cellI)
     {
@@ -362,13 +364,13 @@ void heatTransferGunn::calcEnergyContribution()
 
         if(mag(EuFieldInCell) > maxSource_ )
         {
-	     Pout << "limiting source term\n"  << endl  ;
+             Pout << "limiting source term\n"  << endl  ;
              QPartFluid_[cellI] = sign(EuFieldInCell) * maxSource_;
         }
     }
-    
+
     QPartFluid_.correctBoundaryConditions();
-    
+
     giveData(0);
 
 }
@@ -380,13 +382,10 @@ void heatTransferGunn::addEnergyContribution(volScalarField& Qsource) const
 
 scalar heatTransferGunn::Nusselt(scalar voidfraction, scalar Rep, scalar Pr) const
 {
-    scalar Nup(0.0);
-    Nup = (7 - 10 * voidfraction + 5 * voidfraction * voidfraction) *
+    return (7 - 10 * voidfraction + 5 * voidfraction * voidfraction) *
                         (1 + 0.7 * Foam::pow(Rep,0.2) * Foam::pow(Pr,0.33)) +
-			(1.33 - 2.4 * voidfraction + 1.2 * voidfraction * voidfraction) *
-			Foam::pow(Rep,0.7) * Foam::pow(Pr,0.33);
-                        
-    return Nup;
+                        (1.33 - 2.4 * voidfraction + 1.2 * voidfraction * voidfraction) *
+                        Foam::pow(Rep,0.7) * Foam::pow(Pr,0.33);
 }
 
 void heatTransferGunn::heatFlux(label index, scalar h, scalar As, scalar Tfluid)
@@ -396,7 +395,7 @@ void heatTransferGunn::heatFlux(label index, scalar h, scalar As, scalar Tfluid)
 
 void heatTransferGunn::heatFluxCoeff(label index, scalar h, scalar As)
 {
-   //no heat transfer coefficient in explicit model   
+    //no heat transfer coefficient in explicit model
 }
 
 void heatTransferGunn::giveData(int call)
@@ -404,10 +403,10 @@ void heatTransferGunn::giveData(int call)
     if(call == 0)
     {
         Info << "total convective particle-fluid heat flux [W] (Eulerian) = " << gSum(QPartFluid_*1.0*QPartFluid_.mesh().V()) << endl;
-	
+
         particleCloud_.clockM().start(30,"giveDEM_Tdata");
         particleCloud_.dataExchangeM().giveData(partHeatFluxName_,"scalar-atom", partHeatFlux_);
-	particleCloud_.clockM().stop("giveDEM_Tdata");
+        particleCloud_.clockM().stop("giveDEM_Tdata");
     }
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

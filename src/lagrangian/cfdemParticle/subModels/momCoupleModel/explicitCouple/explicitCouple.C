@@ -69,12 +69,12 @@ explicitCouple::explicitCouple
             "fPrev",
             sm.mesh().time().timeName(),
             sm.mesh(),
-            IOobject::READ_IF_PRESENT,//MUST_READ,
-            IOobject::AUTO_WRITE
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
         ),
-        sm.mesh().lookupObject<volVectorField> ("f")
-        //sm.mesh(),
-        //dimensionedVector("zero", dimensionSet(1,-2,-2,0,0), vector(0,0,0)) // N/m3
+        sm.mesh(),
+        dimensionedVector("zero", dimensionSet(1,-2,-2,0,0), vector(0,0,0)), // N/m3
+        "zeroGradient"
     ),
     fNext_
     (   IOobject
@@ -82,12 +82,12 @@ explicitCouple::explicitCouple
             "fNext",
             sm.mesh().time().timeName(),
             sm.mesh(),
-            IOobject::READ_IF_PRESENT,//MUST_READ,
-            IOobject::AUTO_WRITE
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
         ),
-        sm.mesh().lookupObject<volVectorField> ("f")
-        //sm.mesh(),
-        //dimensionedVector("zero", dimensionSet(1,-2,-2,0,0), vector(0,0,0)) // N/m3
+        sm.mesh(),
+        dimensionedVector("zero", dimensionSet(1,-2,-2,0,0), vector(0,0,0)), // N/m3
+        "zeroGradient"
     ),
     fLimit_(1e10,1e10,1e10)
 {
@@ -108,58 +108,41 @@ explicitCouple::~explicitCouple()
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 tmp<volVectorField> explicitCouple::expMomSource() const
 {
-    tmp<volVectorField> tsource
-    (
-        new volVectorField
-        (
-            IOobject
-            (
-                "f_explicitCouple",
-                particleCloud_.mesh().time().timeName(),
-                particleCloud_.mesh(),
-                IOobject::NO_READ,
-                IOobject::NO_WRITE
-            ),
-            particleCloud_.mesh(),
-            dimensionedVector
-            (
-                "zero",
-                dimensionSet(1, -2, -2, 0, 0), // N/m3
-                vector::zero
-            )
-        )
-    );
+    const scalar tsf = particleCloud_.dataExchangeM().timeStepFraction();
 
-    scalar tsf = particleCloud_.dataExchangeM().timeStepFraction();
+    // calc Ksl
 
-    if(1-tsf < 1e-4) //tsf==1
+    // update KslNext in first subTS
+    // NOTE: without following if we could update f every subTS (based on current values) and use this value
+    if(tsf < particleCloud_.mesh().time().deltaT().value()/particleCloud_.dataExchangeM().couplingTime() + 0.000001 )
     {
         // calc fNext
         forAll(fNext_,cellI)
         {
             fNext_[cellI] = arrayToField(cellI);
-    
+
             // limiter
             for (int i=0;i<3;i++)
             {
-                if (fNext_[cellI][i] > fLimit_[i]) fNext_[cellI][i] = fLimit_[i];
+                scalar magF = mag(fNext_[cellI][i]);
+                if (magF > fLimit_[i]) fNext_[cellI][i] *= fLimit_[i]/magF;
             }
         }
-        tsource.ref() = fPrev_;
-    }else
-    {
-        tsource.ref() = (1 - tsf) * fPrev_ + tsf * fNext_;
     }
-    return tsource;
+
+    return tmp<volVectorField>
+    (
+        new volVectorField("f_explicitCouple", (1. - tsf) * fPrev_ + tsf * fNext_)
+    );
 }
 
-void Foam::explicitCouple::resetMomSourceField() const
+void explicitCouple::resetMomSourceField() const
 {
     fPrev_.ref() = fNext_.ref();
     fNext_.primitiveFieldRef() = vector::zero;
 }
 
-inline vector Foam::explicitCouple::arrayToField(label cellI) const
+inline vector explicitCouple::arrayToField(label cellI) const
 {
     return particleCloud_.forceM(0).expParticleForces()[cellI] / particleCloud_.mesh().V()[cellI];
 }

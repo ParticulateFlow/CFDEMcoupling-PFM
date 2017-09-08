@@ -13,4 +13,4 @@ recStatAnalysis/recStatAnalysis/newRecStatAnalysis.C
 recStatAnalysis/noRecStatAnalysis/noRecStatAnalysis.C
 recStatAnalysis/standardRecStatAnalysis/standardRecStatAnalysis.C
 
-LIB = $(FOAM_USER_LIBBIN)/librecurrence
+LIB = $(CFDEM_LIB_DIR)/librecurrence

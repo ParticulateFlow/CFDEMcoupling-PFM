@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #===================================================================#
-# allrun script for testcase as part of test routine 
+# allrun script for testcase as part of test routine
 # run settlingTest
 # Christoph Goniva - Sept. 2010
 #===================================================================#
@@ -35,7 +35,7 @@ cp $casePath/CFD/system/controlDict_run $casePath/CFD/system/controlDict
 #-------------------------------------------------------#
 
 #- run parallel CFD-DEM in new terminal
-gnome-terminal --title='cfdemSolverPiso ErgunTestMPI_restart CFD'  -e "bash $casePath/parCFDDEMrun.sh" 
+gnome-terminal --title='cfdemSolverPiso ErgunTestMPI_restart CFD'  -e "bash $casePath/parCFDDEMrun.sh"
 
 #- wait until sim has finished then run octave
 echo "simulation finished? ...press enter to proceed"
@@ -49,7 +49,7 @@ cp $casePath/CFD/constant/couplingProperties_restart $casePath/CFD/constant/coup
 cp $casePath/CFD/system/controlDict_restart $casePath/CFD/system/controlDict
 
 #- run parallel CFD-DEM in new terminal
-#gnome-terminal --title='cfdemSolverPiso ErgunTestMPI_restart CFD'  -e "bash $casePath/parCFDDEMrun.sh" 
+#gnome-terminal --title='cfdemSolverPiso ErgunTestMPI_restart CFD'  -e "bash $casePath/parCFDDEMrun.sh"
 bash $casePath/parCFDDEMrun.sh
 
 
@@ -70,7 +70,7 @@ if [ $runOctave == "true" ]
     #- run octave
     octave totalPressureDrop.m
 
-    #- show plot 
+    #- show plot
     evince cfdemSolverPiso_ErgunTestMPI.eps
 
     #- copy log file to test harness
@@ -92,8 +92,6 @@ if [ $postproc == "true" ]
     #- get VTK data from CFD sim
     cd $casePath/CFD
     foamToVTK                                                   #- serial run of foamToVTK
-    #source $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/functions.sh                       #- include functions
-    #pseudoParallelRun "foamToVTK" $nrPostProcProcessors          #- pseudo parallel run of foamToVTK
 
     #- start paraview
     paraview

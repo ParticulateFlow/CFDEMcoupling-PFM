@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #===================================================================#
-# allrun script for testcase as part of test routine 
+# allrun script for testcase as part of test routine
 # run settlingTest CFD part
 # Christoph Goniva - Feb. 2011
 #===================================================================#
@@ -10,7 +10,7 @@
 . ~/.bashrc
 
 #- include functions
-source $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/functions.sh
+source $CFDEM_PROJECT_DIR/etc/functions.sh
 
 #--------------------------------------------------------------------------------#
 #- define variables
@@ -32,11 +32,11 @@ parCFDDEMrun $logpath $logfileName $casePath $headerText $solverName $nrProcs $m
 
 if [ $runOctave == "true" ]
   then
-    
+
     cd $casePath/CFD/octave
     octave postproc.m
-    evince pos_y_two_part_rec_glow.eps 
-    evince vel_y_two_part_rec_glow.eps 
+    evince pos_z_two_part_rec_glow.eps
+    evince vel_z_two_part_rec_glow.eps
     #display pos_y_two_part_rec_glow.png &
     #display vel_y_two_part_rec_glow.png &
 fi

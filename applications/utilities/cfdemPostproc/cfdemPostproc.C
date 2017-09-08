@@ -33,7 +33,7 @@ Description
 
 #include "fvCFD.H"
 #include "singlePhaseTransportModel.H"
-#include "turbulenceModel.H"
+#include "turbulentTransportModel.H"
 
 #include "cfdemCloud.H"
 #include "dataExchangeModel.H"
@@ -109,7 +109,7 @@ int main(int argc, char *argv[])
 
         particleCloud.voidFractionM().setvoidFraction(NULL,voidfractions_,particleWeights_,particleVolumes_,particleV_);
 
-        voidfraction.internalField() = particleCloud.voidFractionM().voidFractionInterp();
+        voidfraction.ref() = particleCloud.voidFractionM().voidFractionInterp();
         voidfraction.correctBoundaryConditions();
 
         particleCloud.averagingM().setVectorAverage

@@ -5,6 +5,10 @@
 log_*
 log.*
 *~
+<<<<<<< HEAD
 
 linux64Gcc*
 lnInclude
+=======
+**/linux64GccDPInt32Opt
+>>>>>>> b8921ec6ca10719a4aa4990fcbaf730076fb67fd

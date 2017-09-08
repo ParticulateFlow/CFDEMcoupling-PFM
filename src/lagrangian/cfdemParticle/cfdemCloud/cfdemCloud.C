@@ -44,6 +44,7 @@ Description
 #include "clockModel.H"
 #include "smoothingModel.H"
 #include "liggghtsCommandModel.H"
+#include "otherForceModel.H"
 
 namespace Foam
 {
@@ -80,6 +81,8 @@ cfdemCloud::cfdemCloud
     solveFlow_(true),
     verbose_(false),
     ignore_(false),
+    allowCFDsubTimestep_(true),
+    limitDEMForces_(false),
     modelType_(couplingProperties_.lookup("modelType")),
     positions_(NULL),
     velocities_(NULL),
@@ -102,6 +105,7 @@ cfdemCloud::cfdemCloud
     forceModels_(couplingProperties_.lookup("forceModels")),
     momCoupleModels_(couplingProperties_.lookup("momCoupleModels")),
     liggghtsCommandModelList_(liggghtsCommandDict_.lookup("liggghtsCommandModels")),
+    otherForceModels_(couplingProperties_.lookupOrDefault<wordList>("otherForceModels",wordList(0))),
     turbulenceModelType_(couplingProperties_.lookup("turbulenceModelType")),
     cg_(1.),
     cgOK_(true),
@@ -111,7 +115,7 @@ cfdemCloud::cfdemCloud
     treatVoidCellsAsExplicitForce_(false),
     useDDTvoidfraction_(false),
     ddtVoidfraction_
-    (   
+    (
         IOobject
         (
             "ddtVoidfraction",
@@ -123,6 +127,7 @@ cfdemCloud::cfdemCloud
         mesh,
         dimensionedScalar("zero", dimensionSet(0,0,-1,0,0), 0)  // 1/s
     ),
+    checkPeriodicCells_(false),
     turbulence_
     (
         mesh.lookupObject<turbulenceModel>
@@ -193,7 +198,7 @@ cfdemCloud::cfdemCloud
         clockModel::New
         (
             couplingProperties_,
-            *this
+            mesh.time()
         )
     ),
     smoothingModel_
@@ -222,28 +227,30 @@ cfdemCloud::cfdemCloud
         solveFlow_=Switch(couplingProperties_.lookup("solveFlow"));
     if (couplingProperties_.found("imExSplitFactor"))
         imExSplitFactor_ = readScalar(couplingProperties_.lookup("imExSplitFactor"));
+
+    if(imExSplitFactor_ > 1.0)
+        FatalError << "You have set imExSplitFactor > 1 in your couplingProperties. Must be <= 1."
+                   << abort(FatalError);
+    if(imExSplitFactor_ < 0.0)
+        FatalError << "You have set imExSplitFactor < 0 in your couplingProperties. Must be >= 0."
+                   << abort(FatalError);
+
     if (couplingProperties_.found("treatVoidCellsAsExplicitForce"))
         treatVoidCellsAsExplicitForce_ = readBool(couplingProperties_.lookup("treatVoidCellsAsExplicitForce"));
     if (couplingProperties_.found("verbose")) verbose_=true;
     if (couplingProperties_.found("ignore")) ignore_=true;
+    if (couplingProperties_.found("limitDEMForces"))
+    {
+        limitDEMForces_=true;
+        maxDEMForce_ = readScalar(couplingProperties_.lookup("limitDEMForces"));
+    }
     if (turbulenceModelType_=="LESProperties")
         Info << "WARNING - LES functionality not yet tested!" << endl;
 
     if (couplingProperties_.found("useDDTvoidfraction"))
         useDDTvoidfraction_=true;
-    else        
+    else
         Info << "ignoring ddt(voidfraction)" << endl;
-
-    forceModel_ = new autoPtr<forceModel>[nrForceModels()];
-    for (int i=0;i<nrForceModels();i++)
-    {
-        forceModel_[i] = forceModel::New
-        (
-            couplingProperties_,
-            *this,
-            forceModels_[i]
-        );
-    }
 
     momCoupleModel_ = new autoPtr<momCoupleModel>[momCoupleModels_.size()];
     for (int i=0;i<momCoupleModels_.size();i++)
@@ -253,6 +260,17 @@ cfdemCloud::cfdemCloud
             couplingProperties_,
             *this,
             momCoupleModels_[i]
+        );
+    }
+
+    forceModel_ = new autoPtr<forceModel>[nrForceModels()];
+    for (int i=0;i<nrForceModels();i++)
+    {
+        forceModel_[i] = forceModel::New
+        (
+            couplingProperties_,
+            *this,
+            forceModels_[i]
         );
     }
 
@@ -269,8 +287,56 @@ cfdemCloud::cfdemCloud
         );
     }
 
+    otherForceModel_ = new autoPtr<otherForceModel>[otherForceModels_.size()];
+    for (int i=0;i<otherForceModels_.size();i++)
+    {
+        otherForceModel_[i] = otherForceModel::New
+        (
+            couplingProperties_,
+            *this,
+            otherForceModels_[i]
+        );
+    }
+
     dataExchangeM().setCG();
-    if (!cgOK_ && cg_ > 1) FatalError<< "at least one of your models is not fit for cg !!!"<< abort(FatalError); 
+    Switch cgWarnOnly_(couplingProperties_.lookupOrDefault<Switch>("cgWarnOnly", true));
+    if (!cgOK_ && cg_ > 1)
+    {
+        if (cgWarnOnly_)
+            Warning << "at least one of your models is not fit for cg !!!" << endl;
+        else
+            FatalError << "at least one of your models is not fit for cg !!!" << abort(FatalError);
+    }
+
+    // check if simulation is a fully periodic box
+    const polyBoundaryMesh& patches = mesh_.boundaryMesh();
+    int nPatchesCyclic(0);
+    int nPatchesNonCyclic(0);
+    forAll(patches, patchI)
+    {
+        const polyPatch& pp = patches[patchI];
+        if (isA<cyclicPolyPatch>(pp) || isA<cyclicAMIPolyPatch>(pp))
+            ++nPatchesCyclic;
+        else if (!isA<processorPolyPatch>(pp))
+            ++nPatchesNonCyclic;
+    }
+
+    if (nPatchesNonCyclic == 0)
+    {
+        checkPeriodicCells_ = true;
+    }
+
+    //hard set checkperiodic cells if wished
+    if(this->couplingProperties().found("checkPeriodicCells"))
+    {
+        checkPeriodicCells_ = couplingProperties().lookupOrDefault<Switch>("checkPeriodicCells", checkPeriodicCells_);
+    }
+
+    if (nPatchesCyclic > 0 && nPatchesNonCyclic > 0)
+    {
+        if (verbose_) Info << "nPatchesNonCyclic=" << nPatchesNonCyclic << ", nPatchesCyclic=" << nPatchesCyclic << endl;
+        Warning << "Periodic handing is disabled because the domain is not fully periodic!\n" << endl;
+    }
 }
 
 // * * * * * * * * * * * * * * * * Destructors  * * * * * * * * * * * * * * //
@@ -347,6 +413,19 @@ void cfdemCloud::setForces()
     resetArray(DEMForces_,numberOfParticles(),3);
     resetArray(Cds_,numberOfParticles(),1);
     for (int i=0;i<cfdemCloud::nrForceModels();i++) cfdemCloud::forceM(i).setForce();
+
+    if (limitDEMForces_)
+    {
+        scalar maxF = 0.0;
+        for (int index = 0;index <  numberOfParticles(); ++index)
+        {
+            scalar F = mag(expForce(index));
+            if (F > maxF) maxF = F;
+            if (F > maxDEMForce_)
+              for(int i=0;i<3;i++) DEMForces_[index][i] *= maxDEMForce_/F;
+        }
+        Info << "largest particle-fluid interaction on particle: " << maxF << endl;
+    }
 }
 
 void cfdemCloud::setParticleForceField()
@@ -380,12 +459,15 @@ void cfdemCloud::setVectorAverages()
     );
     if(verbose_) Info << "setVectorAverage done." << endl;
 }
+
 // * * * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * * //
+
 void cfdemCloud::checkCG(bool ok)
 {
     if(!cgOK_) return;
     if(!ok) cgOK_ = ok;
 }
+
 void cfdemCloud::setPos(double**& pos)
 {
     for(int index = 0;index <  numberOfParticles(); ++index)
@@ -395,33 +477,32 @@ void cfdemCloud::setPos(double**& pos)
         }
     }
 }
+
 // * * * * * * * * * * * * * * * ACCESS  * * * * * * * * * * * * * //
 
-label cfdemCloud::particleCell(int index)
+label cfdemCloud::particleCell(int index) const
 {
-    label cellI = cellIDs()[index][0];
-    return cellI;
+    return cellIDs()[index][0];
 }
 
-vector cfdemCloud::position(int index)
+vector cfdemCloud::position(int index) const
 {
-    vector pos;
-    for(int i=0;i<3;i++) pos[i] = positions()[index][i];
-    return pos;
+    return vector(positions()[index][0],positions()[index][1],positions()[index][2]);
 }
 
-vector cfdemCloud::velocity(int index)
+vector cfdemCloud::velocity(int index) const
 {
-    vector vel;
-    for(int i=0;i<3;i++) vel[i] = velocities()[index][i];
-    return vel;
+    return vector(velocities()[index][0],velocities()[index][1],velocities()[index][2]);
 }
 
-vector cfdemCloud::fluidVel(int index)
+vector cfdemCloud::expForce(int index) const
 {
-    vector vel;
-    for(int i=0;i<3;i++) vel[i] = fluidVels()[index][i];
-    return vel;
+    return vector(DEMForces()[index][0],DEMForces()[index][1],DEMForces()[index][2]);
+}
+
+vector cfdemCloud::fluidVel(int index) const
+{
+    return vector(fluidVels()[index][0],fluidVels()[index][1],fluidVels()[index][2]);
 }
 
 const forceModel& cfdemCloud::forceM(int i)
@@ -429,43 +510,31 @@ const forceModel& cfdemCloud::forceM(int i)
     return forceModel_[i];
 }
 
-int cfdemCloud::nrForceModels()
+label cfdemCloud::nrForceModels() const
 {
     return forceModels_.size();
 }
 
-int cfdemCloud::nrMomCoupleModels()
+label cfdemCloud::nrMomCoupleModels() const
 {
     return momCoupleModels_.size();
 }
 
-scalar cfdemCloud::voidfraction(int index)
+scalar cfdemCloud::voidfraction(int index) const
 {
     return voidfractions()[index][0];
 }
 
-label cfdemCloud::liggghtsCommandModelIndex(word name)
+label cfdemCloud::liggghtsCommandModelIndex(word name) const
 {
-    int index=-1;
     forAll(liggghtsCommandModelList_,i)
     {
         if(liggghtsCommand()[i]().name() == name)
         {
-            index = i;
-            break;
+            return i;
         }
     }
-    return index;
-}
-
-std::vector< std::vector<double*> >* cfdemCloud::getVprobe()
-{
- return probeModel_->getVprobe();
-}
-
-std::vector< std::vector<double> >* cfdemCloud::getSprobe()
-{
- return probeModel_->getSprobe();
+    return -1;
 }
 
 // * * * * * * * * * * * * * * * WRITE  * * * * * * * * * * * * * //
@@ -495,7 +564,7 @@ bool cfdemCloud::evolve
             clockM().start(16,"resetVolFields");
             if(verbose_)
             {
-                Info << "couplingStep:" << dataExchangeM().couplingStep() 
+                Info << "couplingStep:" << dataExchangeM().couplingStep()
                      << "\n- resetVolFields()" << endl;
             }
             averagingM().resetVectorAverage(averagingM().UsPrev(),averagingM().UsNext(),false);
@@ -533,24 +602,28 @@ bool cfdemCloud::evolve
             setVectorAverages();
 
 
-            //Smoothen "next" fields            
+            //Smoothen "next" fields
             smoothingM().dSmoothing();
             smoothingM().smoothen(voidFractionM().voidFractionNext());
 
             //only smoothen if we use implicit force coupling in cells void of particles
-            //because we need unsmoothened Us field to detect cells for explicit 
+            //because we need unsmoothened Us field to detect cells for explicit
             //force coupling
             if(!treatVoidCellsAsExplicitForce())
                 smoothingM().smoothenReferenceField(averagingM().UsNext());
-            
+
             clockM().stop("setVectorAverage");
         }
-        
+
         //============================================
-        //CHECK JUST TIME-INTERPOATE ALREADY SMOOTHENED VOIDFRACTIONNEXT AND UsNEXT FIELD 
+        //CHECK JUST TIME-INTERPOATE ALREADY SMOOTHENED VOIDFRACTIONNEXT AND UsNEXT FIELD
         //      IMPLICIT FORCE CONTRIBUTION AND SOLVER USE EXACTLY THE SAME AVERAGED
         //      QUANTITIES AT THE GRID!
         Info << "\n timeStepFraction() = " << dataExchangeM().timeStepFraction() << endl;
+        if(dataExchangeM().timeStepFraction() > 1.0000001)
+        {
+            FatalError << "cfdemCloud::dataExchangeM().timeStepFraction()>1: Do not do this, since dangerous. This might be due to the fact that you used a adjustable CFD time step. Please use a fixed CFD time step." << abort(FatalError);
+        }
         clockM().start(24,"interpolateEulerFields");
 
         // update voidFractionField
@@ -636,29 +709,6 @@ bool cfdemCloud::reAllocArrays()
     return false;
 }
 
-bool cfdemCloud::reAllocArrays(int nP, bool forceRealloc)
-{
-    if( (numberOfParticlesChanged_ && !arraysReallocated_) || forceRealloc)
-    {
-        // get arrays of new length
-        dataExchangeM().allocateArray(positions_,0.,3,nP);
-        dataExchangeM().allocateArray(velocities_,0.,3,nP);
-        dataExchangeM().allocateArray(fluidVel_,0.,3,nP);
-        dataExchangeM().allocateArray(impForces_,0.,3,nP);
-        dataExchangeM().allocateArray(expForces_,0.,3,nP);
-        dataExchangeM().allocateArray(DEMForces_,0.,3,nP);
-        dataExchangeM().allocateArray(Cds_,0.,1,nP);
-        dataExchangeM().allocateArray(radii_,0.,1,nP);
-        dataExchangeM().allocateArray(voidfractions_,1.,voidFractionM().maxCellsPerParticle(),nP);
-        dataExchangeM().allocateArray(cellIDs_,-1,voidFractionM().maxCellsPerParticle(),nP);
-        dataExchangeM().allocateArray(particleWeights_,0.,voidFractionM().maxCellsPerParticle(),nP);
-        dataExchangeM().allocateArray(particleVolumes_,0.,voidFractionM().maxCellsPerParticle(),nP);
-        arraysReallocated_ = true;
-        return true;
-    }
-    return false;
-}
-
 tmp<fvVectorMatrix> cfdemCloud::divVoidfractionTau(volVectorField& U,volScalarField& voidfraction) const
 {
     return
@@ -691,7 +741,7 @@ void cfdemCloud::calcDdtVoidfraction(volScalarField& voidfraction) const
 /*tmp<fvVectorMatrix> cfdemCloud::ddtVoidfractionU(volVectorField& U,volScalarField& voidfraction) const
 {
     if (dataExchangeM().couplingStep() <= 2) return fvm::ddt(U);
-    
+
     return fvm::ddt(voidfraction,U);
 }*/
 
@@ -728,6 +778,14 @@ void cfdemCloud::resetArray(double**& array,int length,int width,double resetVal
             array[index][i] = resetVal;
         }
     }
+}
+
+void cfdemCloud::otherForces(volVectorField& forcefield)
+{
+  forcefield.primitiveFieldRef() = vector::zero;
+  forcefield.boundaryFieldRef() = vector::zero;
+  for (int i=0;i<otherForceModels_.size();i++)
+      forcefield += otherForceModel_[i]().exportForceField();
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -23,7 +23,7 @@ startTime       0;
 
 stopAt          endTime;
 
-endTime         0.5;
+endTime         0.1;
 
 deltaT          0.0005;
 
@@ -89,9 +89,9 @@ functions
         fields ( p U voidfraction volAverage_voidfraction voidfractionNext voidfractionPrev);
 
         // Write at same frequency as fields
-        outputControl   timeStep;//outputTime;
-        outputInterval  1;
+        writeControl   timeStep;//outputTime;
+        writeInterval  1;
     }
 
-};
+}
 // ************************************************************************* //

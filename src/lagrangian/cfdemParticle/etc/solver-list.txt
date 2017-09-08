@@ -1,8 +1,0 @@
-rcfdemSolverHeattransfer/dir
-rStatAnalysis/dir
-rcfdemSolverBase/dir
-rtfmSolverSpecies/dir
-cfdemSolverRhoPimple/dir
-cfdemSolverPisoMS/dir
-cfdemSolverPiso/dir
-cfdemSolverPisoScalar/dir

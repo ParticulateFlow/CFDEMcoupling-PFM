@@ -1,0 +1,123 @@
+# Pour granular particles into a cylinder, then induce flow
+
+###############################################
+#variables
+
+# DEM-parameters
+variable partDens equal 1732                # density
+variable partRad equal 0.00184              # particle radius
+variable partVol equal 4*3.14/3*${partRad}^3
+variable yM equal 5.e6                      # Young's modulus
+variable pR equal 0.25                      # Poisson ratio
+variable rest equal 0.66                    # coefficient of restitution
+variable fric equal 0.95                    # coefficient of friction
+variable roll equal 0.15                    # for particles and walls with friction
+variable noRoll equal 0                     # for frictionless walls
+variable cV equal 0.1                       # characteristic velocity
+
+# Geometry
+variable cylrad equal 0.05
+variable fillH equal 0.53
+variable fillV equal ${fillH}*${cylrad}^2*3.14
+variable nPart equal ceil(${fillV}*0.7/${partVol})
+
+#variable nPart equal 1
+#variable partDens equal 1.13               # density
+
+variable dt equal 0.00005
+variable skin equal 0.005
+
+
+
+# particle settling loop parameters
+variable vthre equal 0.0005
+###############################################
+
+atom_style      granular
+atom_modify     map array
+communicate     single vel yes
+
+boundary        f f f
+newton          off
+units           si
+processors      1 1 4
+
+region          reg block -${cylrad} ${cylrad} -${cylrad} ${cylrad} 0.0 0.9 units box
+create_box      1 reg
+
+neighbor        0.001 bin
+neigh_modify    delay 0
+
+#Material properties required for granular pair styles
+
+fix         m1 all property/global youngsModulus peratomtype ${yM}
+fix         m2 all property/global poissonsRatio peratomtype ${pR}
+fix         m3 all property/global coefficientRestitution peratomtypepair 1 ${rest}
+fix         m4 all property/global coefficientFriction peratomtypepair 1 ${fric}
+fix         m5 all property/global coefficientRollingFriction peratomtypepair 1 ${roll}
+fix         m6 all property/global characteristicVelocity scalar ${cV}
+
+#pair style
+pair_style  gran model hertz tangential history rolling_friction cdt
+pair_coeff  * *
+
+#timestep, gravity
+timestep    ${dt}
+fix         gravi all gravity 9.81 vector 0.0 0.0 -1.0
+
+fix zwall    all wall/gran model hertz tangential history primitive type 1 zplane 0.0
+fix cylwalls all wall/gran model hertz tangential history primitive type 1 zcylinder ${cylrad} 0. 0.
+
+fix         pts1 all particletemplate/sphere 1 atom_type 1 density constant ${partDens} radius constant ${partRad}
+fix         pdd1 all particledistribution/discrete 1.0 1 pts1 1.0
+
+region      insReg cylinder z 0. 0. ${cylrad} 0.5 0.9 units box
+
+fix         ins all insert/rate/region seed 1001 distributiontemplate pdd1 nparticles ${nPart} particlerate 10000 insert_every 1000 vel constant 0. 0. -0.1 overlapcheck yes all_in yes region insReg ntry_mc 10000
+
+#fix         loadBalancing all balance 10000 z 10 1.05
+
+fix         integr all nve/sphere
+
+fix ts_check all check/timestep/gran 10000 0.1 0.1
+
+#screen output
+compute         rke all erotate/sphere
+thermo_style    custom step atoms ke c_rke vol
+thermo          10000
+thermo_modify   lost ignore norm no
+compute_modify  thermo_temp dynamic yes
+
+#======================================================================
+#- settling
+
+variable vcmx equal vcm(all,x)
+variable vcmy equal vcm(all,y)
+variable vcmz equal vcm(all,z)
+
+variable vave equal sqrt(v_vcmx*v_vcmx+v_vcmy*v_vcmy+v_vcmz*v_vcmz)
+print ${vave}
+
+dump    dmp1 all custom/vtk 20000 ../DEM/post/dump*.liggghts_filling.vtk id type x y z vx vy vz fx fy fz radius
+
+run     200000
+
+label loop
+  print "-----> Checking Velocity..."
+  if "${vave}<${vthre}" then "jump in.liggghts_init endloop"
+  print "-----> v ave ${vave}, v threshold ${vthre}, continuing run"
+
+  run 10000
+jump in.liggghts_init loop
+
+label endloop
+#======================================================================
+
+
+region      delReg block -${cylrad} ${cylrad} -${cylrad} ${cylrad} ${fillH} INF units box
+run         1 every 1 "delete_atoms region delReg"
+
+#write_restart   liggghts.restart.prelim
+run 10000
+write_restart   liggghts.restart_${partRad}
+print "everything done"

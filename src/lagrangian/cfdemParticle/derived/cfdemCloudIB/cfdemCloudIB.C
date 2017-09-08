@@ -91,7 +91,7 @@ bool cfdemCloudIB::reAllocArrays()
     if(cfdemCloud::reAllocArrays())
     {
         // get arrays of new length
-        dataExchangeM().allocateArray(angularVelocities_,0,3);
+        dataExchangeM().allocateArray(angularVelocities_,0.,3);
         return true;
     }
     return false;
@@ -224,11 +224,9 @@ void cfdemCloudIB::calcVelocityCorrection
 
 }
 
-vector cfdemCloudIB::angularVelocity(int index)
+vector cfdemCloudIB::angularVelocity(int index) const
 {
-    vector vel;
-    for(int i=0;i<3;i++) vel[i] = angularVelocities_[index][i];
-    return vel;
+    return vector(angularVelocities_[index][0],angularVelocities_[index][1],angularVelocities_[index][2]);
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

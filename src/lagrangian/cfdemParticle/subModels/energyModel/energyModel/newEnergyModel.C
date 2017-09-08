@@ -65,4 +65,3 @@ autoPtr<energyModel> energyModel::New
 } // End namespace Foam
 
 // ************************************************************************* //
-

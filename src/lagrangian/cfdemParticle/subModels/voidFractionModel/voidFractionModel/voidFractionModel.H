@@ -163,6 +163,17 @@ public:
         virtual void setParticleType(label type) const {}
 
         virtual bool checkParticleType(label) const { return true; } //consider all particles by default
+
+        virtual scalar minPeriodicDistance
+        (
+            int index,
+            const vector& cellCentrePosition,
+            const vector& positionCenter,
+            const boundBox& globalBb,
+            vector& minPeriodicPos
+        ) const;
+
+        virtual scalar pointInParticle(int index, const vector& positionCenter, const vector& point, double scale=1.0) const;
 };
 
 

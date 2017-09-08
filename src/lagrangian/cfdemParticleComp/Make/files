@@ -32,6 +32,7 @@ $(energyModels)/energyModel/energyModel.C
 $(energyModels)/energyModel/newEnergyModel.C
 $(energyModels)/heatTransferGunn/heatTransferGunn.C
 $(energyModels)/heatTransferGunnImplicit/heatTransferGunnImplicit.C
+$(energyModels)/reactionHeat/reactionHeat.C
 
 $(thermCondModels)/thermCondModel/thermCondModel.C
 $(thermCondModels)/thermCondModel/newThermCondModel.C
@@ -61,12 +62,27 @@ $(forceModels)/deactivateForce/deactivateForce.C
 $(forceModels)/freeStreaming/freeStreaming.C
 $(forceModels)/isotropicFluctuations/isotropicFluctuations.C
 $(forceModels)/BeetstraDrag/BeetstraDrag.C
+$(forceModels)/dSauter/dSauter.C
+$(forceModels)/Fines/Fines.C
+$(forceModels)/Fines/FinesFields.C
+$(forceModels)/Fines/FanningDynFines.C
+$(forceModels)/Fines/ErgunStatFines.C
+$(forceModels)/granKineticEnergy/granKineticEnergy.C
 
 $(forceSubModels)/forceSubModel/newForceSubModel.C
 $(forceSubModels)/forceSubModel/forceSubModel.C
 $(forceSubModels)/ImEx/ImEx.C
 $(forceSubModels)/recF/recF.C
 $(forceSubModels)/recU/recU.C
+$(forceSubModels)/ScaleForce/ScaleForce.C
+$(forceSubModels)/scaleForceBoundary/scaleForceBoundary.C
+
+$(otherForceModels)/otherForceModel/otherForceModel.C
+$(otherForceModels)/otherForceModel/newOtherForceModel.C
+$(otherForceModels)/gravity/gravity.C
+$(otherForceModels)/weightSecondaryPhase/weightSecondaryPhase.C
+$(otherForceModels)/expParticleForces/expParticleForces.C
+
 
 $(chemistryModels)/chemistryModel/chemistryModel.C
 $(chemistryModels)/chemistryModel/newChemistryModel.C

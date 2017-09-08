@@ -71,7 +71,7 @@ private:
 
     word voidfractionFieldName_;
 
-    const volScalarField& voidfraction_;    // ref to voidfraction field
+    const volScalarField& voidfraction_;         // ref to voidfraction field
 
     scalar maxSource_;                           // max (limited) value of src field
 
@@ -81,7 +81,7 @@ private:
 
     word partTempName_;
 
-    mutable double **partTemp_;                          // Lagrangian array
+    mutable double **partTemp_;                  // Lagrangian array
 
     word partHeatFluxName_;
 

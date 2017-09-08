@@ -62,7 +62,7 @@ momCoupleModels
 (
 );
 
-turbulenceModelType RASProperties;//LESProperties; //
+turbulenceModelType "turbulenceProperties";
 
 //===========================================================================//
 // sub-model properties

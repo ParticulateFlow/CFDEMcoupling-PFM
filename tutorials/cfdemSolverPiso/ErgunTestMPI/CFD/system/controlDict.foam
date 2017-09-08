@@ -52,7 +52,7 @@ maxCo 0.1;
 libs ("libOpenFOAM.so" "libgroovyBC.so");
 
 functions
-(
+{
 
     probes
     {
@@ -90,8 +90,8 @@ functions
         fields ( p U voidfraction volAverage_voidfraction);
 
         // Write at same frequency as fields
-        outputControl   timeStep;//outputTime;
-        outputInterval  1;
+        writeControl   timeStep;//outputTime;
+        writeInterval  1;
     }
 
    /*pressureDrop
@@ -113,5 +113,5 @@ functions
      );
      factor  1;
    }*/
-);
+}
 // ************************************************************************* //

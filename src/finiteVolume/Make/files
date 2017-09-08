@@ -3,6 +3,7 @@ derivedFvPatchFields = $(fvPatchFields)/derived
 
 general = cfdTools/general
 
+$(derivedFvPatchFields)/uniformFixedValueVoidfraction/uniformFixedValueVoidfractionFvPatchFields.C
 $(derivedFvPatchFields)/uniformFixedValueTube/uniformFixedValueTubeFvPatchFields.C
 
 LIB = $(CFDEM_LIB_DIR)/libfiniteVolumeCFDEM

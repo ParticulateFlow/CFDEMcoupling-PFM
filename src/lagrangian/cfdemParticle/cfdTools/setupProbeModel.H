@@ -1,3 +1,2 @@
- //set probeModel parameters for this force model
- particleCloud_.probeM().setOutputFile();
- particleCloud_.probeM().setCounter();
+//set probeModel parameters for this force model
+if (probeIt_) { particleCloud_.probeM().setOutputFile(typeName+".logDat"); }

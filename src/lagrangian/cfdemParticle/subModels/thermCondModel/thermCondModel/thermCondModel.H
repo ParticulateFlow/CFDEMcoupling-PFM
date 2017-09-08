@@ -59,7 +59,6 @@ protected:
 	dimensionedScalar Cp_;
 	
 	dimensionedScalar Cv_;
-	
 
 public:
 

@@ -1,17 +1,15 @@
-// total energy equation according to
+// contributions to internal energy equation can be found in
 // Crowe et al.: "Multiphase flows with droplets and particles", CRC Press 1998
 {
+    // dim he = J / kg
     volScalarField& he = thermo.he();
-    volScalarField& T = thermo.T();
-    volScalarField keff = voidfraction*turbulence->kappaEff()
-            + (1-voidfraction)*particleCloud.heatTransferM().thermCondPart();
-    particleCloud.heatTransferM().partFluidHeatTrans(Qsource);
-    Qsource.correctBoundaryConditions();
+    particleCloud.energyContributions(Qsource);
+    particleCloud.energyCoefficients(QCoeff);
 
-    fvScalarMatrix EEqn
-    (
-        fvm::ddt(rhoeps, he) + fvm::div(phi, he)
-      + fvc::ddt(rhoeps, K) + fvc::div(phi, K)
+    //thDiff=particleCloud.thermCondM().thermDiff();   
+    thCond=particleCloud.thermCondM().thermCond(); 
+
+    addSource = fvc::ddt(rhoeps, K) + fvc::div(phi, K)
       + (
             he.name() == "e"
           ? fvc::div
@@ -21,17 +19,27 @@
                 "div(phiv,p)"
             )
           : -dpdt
-        )
-      // + particle-fluid energy transfer due to work:
-            //- fvc::div(fvc::interpolate(Us),(1-voidfraction)*p) +
-      // + fluid energy dissipation due to shearing
+        );
+
+    Cpv = he.name() == "e" ? thermo.Cv() : thermo.Cp();
+
+
+    fvScalarMatrix EEqn
+    (
+        fvm::ddt(rhoeps, he) + fvm::div(phi, he)
+      + addSource
      // net heat transfer from particles to fluid
       - Qsource
+      - fvm::Sp(QCoeff/Cpv, he)
      // thermal conduction of the fluid with effective conductivity
-      - fvc::laplacian(keff, T)
+     // - fvm::laplacian(rhoeps*thDiff,he)
+      - fvm::laplacian(voidfraction*thCond/Cpv,he)
+      // + particle-fluid energy transfer due to work
+      // + fluid energy dissipation due to shearing
      ==
-        fvOptions(rho, he, T)
+        fvOptions(rho, he)
     );
+    
 
     EEqn.relax();
 
@@ -42,4 +50,10 @@
     fvOptions.correct(he);
 
     thermo.correct();
+
+    Info<< "T max/min : " << max(T).value() << " " << min(T).value() << endl;
+
+    particleCloud.clockM().start(31,"postFlow");
+    particleCloud.postFlow();
+    particleCloud.clockM().stop("postFlow");
 }

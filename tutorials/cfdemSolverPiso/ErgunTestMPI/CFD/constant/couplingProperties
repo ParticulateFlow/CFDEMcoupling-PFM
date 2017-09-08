@@ -55,12 +55,12 @@ smoothingModel off;// localPSizeDiffSmoothing;// constDiffSmoothing; //
 
 forceModels
 (
-    GidaspowDrag
+    //GidaspowDrag
     //BeetstraDrag
     //DiFeliceDrag
     gradPForce
     viscForce
-    //KochHillDrag
+    KochHillDrag
     //DEMbasedDrag
     //RongDrag
     //Archimedes

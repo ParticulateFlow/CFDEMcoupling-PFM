@@ -62,7 +62,7 @@ SyamlalThermCond::SyamlalThermCond
             sm.mesh().time().timeName(),
             sm.mesh(),
             IOobject::READ_IF_PRESENT,
-            IOobject::NO_WRITE
+            IOobject::AUTO_WRITE
         ),
         sm.mesh(),
         dimensionedScalar("zero", dimensionSet(0,0,0,0,0,0,0), 1.0)
@@ -71,7 +71,7 @@ SyamlalThermCond::SyamlalThermCond
 {
     if (wallQFactor_.headerOk())
     {
-        Info << "Found field for scaling wall heat flux.\n" << endl;     
+        Info << "Found field for scaling wall heat flux.\n" << endl;
         hasWallQFactor_ = true;
     }
 }
@@ -100,18 +100,22 @@ tmp<volScalarField> SyamlalThermCond::thermCond() const
                 IOobject::NO_WRITE
             ),
             voidfraction_.mesh(),
-	    dimensionedScalar("zero", dimensionSet(1,1,-3,-1,0,0,0), 0.0)
+            dimensionedScalar("zero", dimensionSet(1,1,-3,-1,0,0,0), 0.0)
         )
     );
+
     volScalarField& svf = tvf.ref();
-    
-    svf = (1-sqrt(1-voidfraction_)) / (voidfraction_) * kf0_;
-    
+
+    svf = (1-sqrt(1-voidfraction_+SMALL)) / (voidfraction_) * kf0_;
+
     // if a wallQFactor field is present, use it to scale heat transport through a patch
     if (hasWallQFactor_)
+    {
+        wallQFactor_.correctBoundaryConditions();
         forAll(wallQFactor_.boundaryField(), patchi)
             svf.boundaryFieldRef()[patchi] *= wallQFactor_.boundaryField()[patchi];
-  
+    }
+
     return tvf;
 }
 

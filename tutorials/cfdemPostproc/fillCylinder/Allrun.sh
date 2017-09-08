@@ -9,7 +9,7 @@
 . ~/.bashrc
 
 #- include functions
-source $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/functions.sh
+source $CFDEM_PROJECT_DIR/etc/functions.sh
 
 #- define variables
 casePath="$(dirname "$(readlink -f ${BASH_SOURCE[0]})")"
@@ -73,7 +73,7 @@ if [ $postproc == "true" ]
 
     #- get VTK data from CFD sim
     #foamToVTK
-    
+
     #- start paraview
     echo ""
     echo "trying to start paraview..."
@@ -97,4 +97,4 @@ rm -r $casePath/DEM/log.*
 echo "done"
 
 #- preserve post directory
-echo "dummyfile" >> $casePath/DEM/post/dummy
+touch $casePath/DEM/post/.gitignore

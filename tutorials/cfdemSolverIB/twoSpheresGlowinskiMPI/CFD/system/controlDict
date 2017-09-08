@@ -56,7 +56,7 @@ maxDeltaT       1;
 
 
 functions
-(
+{
     probes
     {
         type        probes;
@@ -73,9 +73,9 @@ functions
         fields ( particleForces );
 
         // Write at same frequency as fields
-        outputControl   timeStep;//outputTime;
-        outputInterval  1;
+        writeControl   timeStep;//outputTime;
+        writeInterval  1;
     }
-);
+}
 
 // ************************************************************************* //

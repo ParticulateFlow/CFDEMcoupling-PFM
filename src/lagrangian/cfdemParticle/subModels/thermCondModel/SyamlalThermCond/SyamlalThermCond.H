@@ -64,7 +64,7 @@ private:
     word wallQFactorName_;
     
     // ratio of half-cell-size and near-wall film
-    volScalarField wallQFactor_;
+    mutable volScalarField wallQFactor_;
     
     bool hasWallQFactor_;
 

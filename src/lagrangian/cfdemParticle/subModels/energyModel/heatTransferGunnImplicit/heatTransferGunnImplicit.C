@@ -58,7 +58,7 @@ heatTransferGunnImplicit::heatTransferGunnImplicit
     partHeatFluxCoeff_(NULL)
 {
     allocateMyArrays();
-    
+
     // no limiting necessary for implicit heat transfer
     maxSource_ = 1e30;
 }
@@ -68,13 +68,13 @@ heatTransferGunnImplicit::heatTransferGunnImplicit
 
 heatTransferGunnImplicit::~heatTransferGunnImplicit()
 {
-    delete partHeatFluxCoeff_;
+    particleCloud_.dataExchangeM().destroy(partHeatFluxCoeff_,1);
 }
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
 void heatTransferGunnImplicit::allocateMyArrays() const
 {
-  //  heatTransferGunn::allocateMyArrays();
+//    heatTransferGunn::allocateMyArrays();
     double initVal=0.0;
     particleCloud_.dataExchangeM().allocateArray(partHeatFluxCoeff_,initVal,1);
 }
@@ -87,7 +87,7 @@ void heatTransferGunnImplicit::calcEnergyContribution()
     heatTransferGunn::calcEnergyContribution();
 
     QPartFluidCoeff_.primitiveFieldRef() = 0.0;
-    
+
     particleCloud_.averagingM().setScalarSum
     (
         QPartFluidCoeff_,
@@ -97,8 +97,9 @@ void heatTransferGunnImplicit::calcEnergyContribution()
     );
 
     QPartFluidCoeff_.primitiveFieldRef() /= -QPartFluidCoeff_.mesh().V();
-    
-  //  QPartFluidCoeff_.correctBoundaryConditions();
+
+//    QPartFluidCoeff_.correctBoundaryConditions();
+
 }
 
 void heatTransferGunnImplicit::addEnergyCoefficient(volScalarField& Qsource) const
@@ -120,9 +121,10 @@ void heatTransferGunnImplicit::giveData(int call)
 {
     if(call == 1)
     {
+
         particleCloud_.clockM().start(30,"giveDEM_Tdata");
         particleCloud_.dataExchangeM().giveData(partHeatFluxName_,"scalar-atom", partHeatFlux_);
-	particleCloud_.clockM().stop("giveDEM_Tdata");
+        particleCloud_.clockM().stop("giveDEM_Tdata");
     }
 }
 
@@ -132,7 +134,7 @@ void heatTransferGunnImplicit::postFlow()
     scalar Tfluid(0.0);
     scalar Tpart(0.0);
     interpolationCellPoint<scalar> TInterpolator_(tempField_);
-        
+
     for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)
     {
             cellI = particleCloud_.cellIDs()[index][0];
@@ -145,12 +147,12 @@ void heatTransferGunnImplicit::postFlow()
                 }
                 else
                     Tfluid = tempField_[cellI];
-                
+
                 Tpart = partTemp_[index][0];
                 partHeatFlux_[index][0] = (Tfluid - Tpart) * partHeatFluxCoeff_[index][0];
             }
     }
-                
+
     giveData(1);
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -158,4 +160,3 @@ void heatTransferGunnImplicit::postFlow()
 } // End namespace Foam
 
 // ************************************************************************* //
-

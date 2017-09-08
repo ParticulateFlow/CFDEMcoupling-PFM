@@ -19,6 +19,7 @@ clockModels = subModels/clockModel
 liggghtsCommandModels = subModels/liggghtsCommandModel
 smoothingModels = subModels/smoothingModel
 probeModels = subModels/probeModel
+otherForceModels = subModels/otherForceModel
 
 $(cfdemCloud)/cfdemCloud.C
 $(cfdemCloud)/cfdemCloudIO.C
@@ -33,6 +34,7 @@ $(energyModels)/energyModel/energyModel.C
 $(energyModels)/energyModel/newEnergyModel.C
 $(energyModels)/heatTransferGunn/heatTransferGunn.C
 $(energyModels)/heatTransferGunnImplicit/heatTransferGunnImplicit.C
+$(energyModels)/reactionHeat/reactionHeat.C
 
 $(thermCondModels)/thermCondModel/thermCondModel.C
 $(thermCondModels)/thermCondModel/newThermCondModel.C
@@ -65,6 +67,12 @@ $(forceModels)/deactivateForce/deactivateForce.C
 $(forceModels)/freeStreaming/freeStreaming.C
 $(forceModels)/isotropicFluctuations/isotropicFluctuations.C
 $(forceModels)/BeetstraDrag/BeetstraDrag.C
+$(forceModels)/dSauter/dSauter.C
+$(forceModels)/Fines/Fines.C
+$(forceModels)/Fines/FinesFields.C
+$(forceModels)/Fines/FanningDynFines.C
+$(forceModels)/Fines/ErgunStatFines.C
+$(forceModels)/granKineticEnergy/granKineticEnergy.C
 
 $(forceModelsMS)/forceModelMS/forceModelMS.C
 $(forceModelsMS)/forceModelMS/newForceModelMS.C
@@ -75,6 +83,14 @@ $(forceSubModels)/forceSubModel/forceSubModel.C
 $(forceSubModels)/ImEx/ImEx.C
 $(forceSubModels)/recF/recF.C
 $(forceSubModels)/recU/recU.C
+$(forceSubModels)/ScaleForce/ScaleForce.C
+$(forceSubModels)/scaleForceBoundary/scaleForceBoundary.C
+
+$(otherForceModels)/otherForceModel/otherForceModel.C
+$(otherForceModels)/otherForceModel/newOtherForceModel.C
+$(otherForceModels)/gravity/gravity.C
+$(otherForceModels)/weightSecondaryPhase/weightSecondaryPhase.C
+$(otherForceModels)/expParticleForces/expParticleForces.C
 
 $(chemistryModels)/chemistryModel/chemistryModel.C
 $(chemistryModels)/chemistryModel/newChemistryModel.C
@@ -102,6 +118,7 @@ $(voidFractionModels)/bigParticleVoidFraction/bigParticleVoidFraction.C
 $(voidFractionModels)/GaussVoidFraction/GaussVoidFraction.C
 $(voidFractionModels)/IBVoidFraction/IBVoidFraction.C
 $(voidFractionModels)/noVoidFraction/noVoidFraction.C
+$(voidFractionModels)/trilinearVoidFraction/trilinearVoidFraction.C
 
 $(locateModels)/locateModel/locateModel.C
 $(locateModels)/locateModel/newLocateModel.C

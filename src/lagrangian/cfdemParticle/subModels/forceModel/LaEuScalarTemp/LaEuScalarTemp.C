@@ -89,9 +89,9 @@ LaEuScalarTemp::LaEuScalarTemp
     setForceSubModels(propsDict_);
 
     // define switches which can be read from dict
-    forceSubM(0).setSwitchesList(3,true); // activate search for verbose switch
-    forceSubM(0).setSwitchesList(4,true); // activate search for interpolate switch
-    forceSubM(0).setSwitchesList(8,true); // activate scalarViscosity switch
+    forceSubM(0).setSwitchesList(SW_VERBOSE,true); // activate search for verbose switch
+    forceSubM(0).setSwitchesList(SW_INTERPOLATION,true); // activate search for interpolate switch
+    forceSubM(0).setSwitchesList(SW_SCALAR_VISCOSITY,true); // activate scalarViscosity switch
 
     // read those switches defined above, if provided in dict
     forceSubM(0).readSwitches();
@@ -105,15 +105,15 @@ LaEuScalarTemp::LaEuScalarTemp
 
 LaEuScalarTemp::~LaEuScalarTemp()
 {
-    delete partTemp_;
-    delete partHeatFlux_;
+    particleCloud_.dataExchangeM().destroy(partTemp_,1);
+    particleCloud_.dataExchangeM().destroy(partHeatFlux_,1);
 }
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
 void LaEuScalarTemp::allocateMyArrays() const
 {
     // get memory for 2d arrays
-    double initVal=0.0;
+    double initVal = 0.0;
     particleCloud_.dataExchangeM().allocateArray(partTemp_,initVal,1);  // field/initVal/with/lenghtFromLigghts
     particleCloud_.dataExchangeM().allocateArray(partHeatFlux_,initVal,1);
 }
@@ -156,14 +156,14 @@ void LaEuScalarTemp::manipulateScalarField(volScalarField& EuField) const
     interpolationCellPoint<vector> UInterpolator_(U_);
     interpolationCellPoint<scalar> TInterpolator_(tempField_);
 
-    for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)
+    for(int index = 0; index < particleCloud_.numberOfParticles(); ++index)
     {
         //if(particleCloud_.regionM().inRegion()[index][0])
         //{
             cellI = particleCloud_.cellIDs()[index][0];
-            if(cellI >= 0)
+            if (cellI >= 0)
             {
-                if(forceSubM(0).interpolation())
+                if (forceSubM(0).interpolation())
                 {
                     vector position = particleCloud_.position(index);
                     voidfraction = voidfractionInterpolator_.interpolate(position,cellI);
@@ -206,7 +206,7 @@ void LaEuScalarTemp::manipulateScalarField(volScalarField& EuField) const
                 partHeatFlux_[index][0] = partHeatFlux;
 
 
-                if(forceSubM(0).verbose() && index >=0 && index <2)
+                if(forceSubM(0).verbose() && index >= 0 && index < 2)
                 {
                     Info << "partHeatFlux = " << partHeatFlux << endl;
                     Info << "magUr = " << magUr << endl;

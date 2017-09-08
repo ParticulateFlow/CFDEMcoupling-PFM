@@ -42,10 +42,8 @@ SourceFiles
 #define START(x) start(__COUNTER__,x)
 
 #include "fvCFD.H"
-#include "cfdemCloud.H"
-#include "dataExchangeModel.H"
-
 #include <vector>
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -61,7 +59,7 @@ protected:
 
     // Protected data
     const dictionary& dict_;
-    cfdemCloud& particleCloud_;
+    const Time& time_;
     fileName path_;
     scalar startTime_;
 
@@ -88,9 +86,9 @@ public:
             dictionary,
             (
                 const dictionary& dict,
-                cfdemCloud& sm
+                const Time& time
             ),
-            (dict,sm)
+            (dict,time)
         );
 
 
@@ -100,7 +98,7 @@ public:
         clockModel
         (
             const dictionary& dict,
-            cfdemCloud& sm
+            const Time& time
         );
 
 
@@ -114,7 +112,7 @@ public:
         static autoPtr<clockModel> New
         (
             const dictionary& dict,
-            cfdemCloud& sm
+            const Time& time
         );
 
 
@@ -129,9 +127,9 @@ public:
         virtual void evalPar() const;
         void initElems();
         std::vector<int> calcShift() const;	                //detects empty indices in vector, when times are evaluated
-        void Hist() const;                                  //calc Histogram
-        virtual void normHist() const;                      //calc normalized Histogram
-        void plotHist(double,const std::string&,int,int) const;    //plot histogramm to terminal
+        void Hist() const;                                      //calc Histogram
+        virtual void normHist() const;                          //calc normalized Histogram
+        void plotHist(double,const std::string&,int,int) const; //plot histogramm to terminal
         void getRAMUsage() const;
 
 };
