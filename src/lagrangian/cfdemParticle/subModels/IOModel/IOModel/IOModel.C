@@ -160,7 +160,7 @@ IOModel::IOModel
     parOutput_(true)
 {
     if (
-            particleCloud_.dataExchangeM().myType()=="oneWayVTK" ||
+            particleCloud_.dataExchangeM().type()=="oneWayVTK" ||
             dict_.found("serialOutput")
        )
     {

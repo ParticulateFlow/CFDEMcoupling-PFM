@@ -158,7 +158,6 @@ public:
         int getNumberOfTypes() const;
         double* getTypeVol() const;
 
-        word myType() const { return typeName; }
 
         void setCG() { particleCloud_.setCG(lmp->force->cg()); }
 };
