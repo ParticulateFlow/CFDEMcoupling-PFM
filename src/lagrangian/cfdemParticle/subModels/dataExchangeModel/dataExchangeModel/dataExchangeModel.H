@@ -258,7 +258,7 @@ public:
         }
 
 
-        virtual void setCG() { Warning << "setCG() not executed correctly!" << endl; }
+        virtual scalar getCG() const { Warning << "getCG() not executed correctly!" << endl; return 1.; }
 };
 
 

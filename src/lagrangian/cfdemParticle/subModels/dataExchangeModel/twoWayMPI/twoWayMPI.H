@@ -159,7 +159,7 @@ public:
         double* getTypeVol() const;
 
 
-        void setCG() { particleCloud_.setCG(lmp->force->cg()); }
+        scalar getCG() const { return lmp->force->cg(); }
 };
 
 

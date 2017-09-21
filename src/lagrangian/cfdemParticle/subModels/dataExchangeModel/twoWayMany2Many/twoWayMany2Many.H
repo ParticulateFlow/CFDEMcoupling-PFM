@@ -208,7 +208,7 @@ public:
 
         void syncIDs() const;
         void locateParticle(int*, bool) const;
-        void setCG() { particleCloud_.setCG(lmp->force->cg()); }
+        scalar getCG() const { return lmp->force->cg(); }
 };
 
 
