@@ -173,12 +173,10 @@ void diffusionCoefficient::execute()
     scalar Pfluid(0);
     scalar molarConcfluid(0);
     scalar Texp(0);
-    List<scalar> dBinarytot_;
-    dBinarytot_.setSize(diffusantGasNames_.size());
-    List<scalar> molecularDiffusion_;
-    molecularDiffusion_.setSize(diffusantGasNames_.size());
-    List<scalar> Xstag_tot_;
-    Xstag_tot_.setSize(diffusantGasNames_.size());
+    List<scalar> MixtureBinaryDiffusion_;
+    MixtureBinaryDiffusion_.setSize(diffusantGasNames_.size());
+    List<scalar> TotalFraction_;
+    TotalFraction_.setSize(diffusantGasNames_.size());
 
     double  **dBinary_   = new double*[diffusantGasNames_.size()];
     double  **molNum_    = new double*[diffusantGasNames_.size()];
@@ -220,7 +218,7 @@ void diffusionCoefficient::execute()
                 }
             }
 
-            Texp            =   pow(Tfluid,1.75);
+            Texp    =   pow(Tfluid,1.75);
 
             for (int i=0; i<diffusantGasNames_.size();i++)
             {
@@ -228,9 +226,8 @@ void diffusionCoefficient::execute()
                 molNum_[i]      =   new double [speciesNames_.size()];
                 volDiff_[i]     =   new double [speciesNames_.size()];
 
-                dBinarytot_[i]  =   0.0;
-                molecularDiffusion_[i]      =   0.0;
-                Xstag_tot_[i]   =   0.0;
+                MixtureBinaryDiffusion_[i]  =   0.0;
+                TotalFraction_[i]   =   0.0;
                 for (int j=0; j < speciesNames_.size();j++)
                 {
                     // get molecular diffusion coefficients if diffusant gas and reactant gas are not equal
@@ -256,33 +253,22 @@ void diffusionCoefficient::execute()
                             Info << "Molecular diffusion for species " << diffusantGasNames_[i] << " in "
                                  << speciesNames_[j] << " is : " << dBinary_[i][j] << nl << endl;
 
-                            // sum of all binary diffusion coefficients except i = j
-                            dBinarytot_[i]  +=  dBinary_[i][j];
-                            Info << "Sum of binary mol. diffusion coefficients for diffusing gas " << diffusantGasNames_[i]
-                                 << " : " << dBinarytot_[i] << nl << endl;
-
                             Info << "Molar fraction of species " << speciesNames_[j] << " : " << Xfluid_[j] << nl << endl;
-                            Info << "What is value of xstag? " << Xstag_tot_[i] << nl << endl;
 
-                            // sum of all molar fractions except the diffusant gas
-                            Xstag_tot_[i]   +=  Xfluid_[j];
-                            Info << "Sum of stagnant gases molar fractions according to diffusing gas " << diffusantGasNames_[i]
-                                 << " : " << Xstag_tot_[i] << nl << endl;
+                            if (Xfluid_[j] != 0.)
+                            {
+                                // sum of all stagnant gases to sum of binary diffusion
+                                TotalFraction_[i]   +=  Xfluid_[j]/dBinary_[i][j];
 
-                            // dCoeff -- diffusion component of diffusant gas
-                            if (Xstag_tot_[i] == 0.0) //(Xstag_tot_[i] == 0. || (1-Xfluid_[i]) == 0.)
-                            {
-                                molecularDiffusion_[i] = 0.0;
-                            } else
-                            {
-                                molecularDiffusion_[i]  =   (1-Xfluid_[i])*dBinarytot_[i]/Xstag_tot_[i];
+                                // dCoeff -- diffusion component of diffusant gas
+                                MixtureBinaryDiffusion_[i]  =   (1.0-Xfluid_[i])/TotalFraction_[i];
                             }
 
                             Info << "Multicomp. mix diffusion for species " << diffusantGasNames_[i]
-                                 << " is: " << molecularDiffusion_[i] << nl << endl;
+                                 << " is: " << MixtureBinaryDiffusion_[i] << nl << endl;
 
                             // pass on dCoeff values to array
-                            diffusionCoefficients_[i][index][0]= molecularDiffusion_[i];
+                            diffusionCoefficients_[i][index][0]= MixtureBinaryDiffusion_[i];
 
                         }else
                         {
@@ -300,7 +286,7 @@ void diffusionCoefficient::execute()
         {
             for(int i =0; i<diffusantGasNames_.size();i++)
             {
-                Info << "effective diffusionCoefficient of species " << diffusantGasNames_[i] << " = " << diffusionCoefficients_[i][index][0] << endl;
+                Info << "diffusionCoefficient of species " << diffusantGasNames_[i] << " = " << diffusionCoefficients_[i][index][0] << endl;
             }
         }
     }
