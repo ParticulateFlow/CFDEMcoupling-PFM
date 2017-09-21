@@ -228,7 +228,7 @@ public:
 // public Member Functions
 
     // Access
-       bool allowCFDsubTimestep() { return allowCFDsubTimestep_; }
+       bool allowCFDsubTimestep() const { return allowCFDsubTimestep_; }
 
        void setAllowCFDsubTimestep(bool b) { allowCFDsubTimestep_ = b; }
 
@@ -404,7 +404,7 @@ public:
 
         void otherForces(volVectorField&);
 
-        bool checkPeriodicCells() { return checkPeriodicCells_; }
+        bool checkPeriodicCells() const { return checkPeriodicCells_; }
 };
 
 
