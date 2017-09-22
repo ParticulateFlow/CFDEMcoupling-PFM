@@ -1,31 +1,32 @@
 #!/bin/bash
 
 #===================================================================#
-# compile routine for CFDEMcoupling, part of CFDEMproject 
+# compile routine for CFDEMcoupling + LIGGGHTS, part of CFDEMproject 
 # Christoph Goniva - May. 2012, DCS Computing GmbH
+#                    update March 2014
 #===================================================================#
 
 #- include functions
-source $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/functions.sh
+source $CFDEM_PROJECT_DIR/etc/functions.sh
 
 NOW="$(date +"%Y-%m-%d-%H:%M")"
 logDir="log"
 
 
-cd $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc
+cd $CFDEM_PROJECT_DIR/etc
 mkdir -p $logDir
 
 #================================================================================#
-# compile src
+# compile LIGGGHTS src
 #================================================================================#
-bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/compileCFDEMcoupling_src.sh
+bash $CFDEM_PROJECT_DIR/etc/compileLIGGGHTS.sh
 
 #================================================================================#
-# compile solvers
+# compile LIGGGHTS libraries
 #================================================================================#
-bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/compileCFDEMcoupling_sol.sh
+bash $CFDEM_PROJECT_DIR/etc/compileLIGGGHTS_lib.sh
 
 #================================================================================#
-# compile utilities
+# compile CFDEMcoupling
 #================================================================================#
-bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/compileCFDEMcoupling_uti.sh
+bash $CFDEM_PROJECT_DIR/etc/compileCFDEMcoupling.sh

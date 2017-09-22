@@ -49,7 +49,7 @@ SourceFiles
 #include "fvCFD.H"
 #include "IFstream.H"
 
-#include <turbulenceModel.H>
+#include "turbulenceModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -91,6 +91,8 @@ protected:
     bool verbose_;
 
     bool ignore_;
+
+    bool allowCFDsubTimestep_;
 
     bool limitDEMForces_;
 
@@ -160,6 +162,8 @@ protected:
 
     mutable volScalarField ddtVoidfraction_;
 
+    mutable Switch checkPeriodicCells_;
+
     const turbulenceModel& turbulence_;
 
     autoPtr<forceModel>* forceModel_;
@@ -224,45 +228,49 @@ public:
 // public Member Functions
 
     // Access
+       bool allowCFDsubTimestep() { return allowCFDsubTimestep_; }
+
+       void setAllowCFDsubTimestep(bool b) { allowCFDsubTimestep_ = b; }
+
        void checkCG(bool);
 
        void setPos(double **&);
 
-       word modelType(){ return modelType_; }
+       const word& modelType() const { return modelType_; }
 
-       label particleCell(int);
+       label particleCell(int) const;
 
-       vector position(int);
+       vector position(int) const;
 
-       vector velocity(int);
+       vector velocity(int) const;
 
-       vector expForce(int);
+       vector expForce(int) const;
 
-       vector fluidVel(int);
+       vector fluidVel(int) const;
 
        virtual const forceModel& forceM(int);
 
-       virtual int nrForceModels();
+       virtual label nrForceModels() const;
 
-       virtual int nrMomCoupleModels();
+       virtual label nrMomCoupleModels() const;
 
-       scalar voidfraction(int);
+       scalar voidfraction(int) const;
 
-       label liggghtsCommandModelIndex(word);
+       label liggghtsCommandModelIndex(word) const;
 
-       inline void setCG(double) const;
+       inline void setCG(double);
 
-       inline const scalar& cg() const;
+       inline scalar cg() const;
 
-       inline const bool& impDEMdrag() const;
+       inline bool impDEMdrag() const;
 
-       inline const bool& impDEMdragAcc() const;
+       inline bool impDEMdragAcc() const;
 
-       inline const scalar& imExSplitFactor() const;
+       inline scalar imExSplitFactor() const;
 
-       inline const bool& treatVoidCellsAsExplicitForce() const;
+       inline bool treatVoidCellsAsExplicitForce() const;
 
-       inline const bool& ignore() const;
+       inline bool ignore() const;
 
        inline const fvMesh& mesh() const;
 
@@ -300,13 +308,13 @@ public:
 
        inline double ** particleWeights() const;
 
-       virtual inline label body(int);
+       virtual inline label body(int) const;
 
-       virtual inline double particleVolume(int);
+       virtual inline double particleVolume(int) const;
 
-       inline scalar radius(int);
+       inline scalar radius(int) const;
 
-       virtual inline double d(int);
+       virtual inline double d(int) const;
 
        inline scalar d32(bool recalc=true);
        virtual inline double dMin() {return -1;}
@@ -322,11 +330,11 @@ public:
        //access to the particle's rotation and torque data
        virtual inline double ** DEMTorques() const {return NULL;}
        virtual inline double ** omegaArray() const {return NULL;}
-       virtual vector omega(int) const {return Foam::vector(0,0,0);}
+       virtual vector omega(int) const {return vector(0,0,0);}
 
        //access to the particles' orientation information
        virtual inline double ** exArray() const {return NULL;}
-       virtual vector ex(int) const {return Foam::vector(0,0,0);}
+       virtual vector ex(int) const {return vector(0,0,0);}
 
        //Detector if SRF module is enable or not
        virtual inline bool SRFOn(){return false;}
@@ -339,7 +347,7 @@ public:
 
        inline bool arraysReallocated() const;
 
-       inline const wordList& forceModels();
+       inline const wordList& forceModels() const;
 
        inline const voidFractionModel& voidFractionM() const;
 
@@ -347,11 +355,11 @@ public:
 
        inline const momCoupleModel& momCoupleM(int) const;
 
-       inline const dataExchangeModel& dataExchangeM() const;
+       inline dataExchangeModel& dataExchangeM();
 
        inline const IOModel& IOM() const;
 
-       inline const probeModel& probeM() const;
+       inline probeModel& probeM();
 
        inline const averagingModel& averagingM() const;
 
@@ -376,13 +384,10 @@ public:
 
         virtual bool reAllocArrays();
 
-        virtual bool reAllocArrays(int nP, bool forceRealloc);  //force number of particles during reallocation
-
-
     // IO
-        void writeScalarFieldToTerminal(double**&);
+        void writeScalarFieldToTerminal(double**&) const;
 
-        void writeVectorFieldToTerminal(double**&);
+        void writeVectorFieldToTerminal(double**&) const;
 
     // functions
         tmp<fvVectorMatrix> divVoidfractionTau(volVectorField& ,volScalarField&) const;
@@ -397,11 +402,9 @@ public:
 
         void resetArray(double**&,int,int,double resetVal=0.);
 
-        std::vector< std::vector<double*> >* getVprobe();
-
-        std::vector< std::vector<double> >* getSprobe();
-
         void otherForces(volVectorField&);
+
+        bool checkPeriodicCells() { return checkPeriodicCells_; }
 };
 
 

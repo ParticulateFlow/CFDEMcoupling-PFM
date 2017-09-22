@@ -117,9 +117,9 @@ public:
 
     // Member Functions
       // Access
-       inline label body(int);
+       inline label body(int) const;
 
-       inline double particleVolume(int);
+       inline double particleVolume(int) const;
 
        inline vector positionCM(int);
 
@@ -127,9 +127,9 @@ public:
 
        inline label cellIDCM(int);
 
-       inline label nrigid(int);
+       inline label nrigid(int) const;
 
-       inline int nrForceModels();
+       inline label nrForceModels() const;
 
        inline double **& positionsCM() const;
 

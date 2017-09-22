@@ -51,7 +51,7 @@ private:
 
     const volScalarField& voidfraction_;
 
-    word UsFieldName_;   
+    word UsFieldName_;
 
     const volVectorField& UsField_;
 

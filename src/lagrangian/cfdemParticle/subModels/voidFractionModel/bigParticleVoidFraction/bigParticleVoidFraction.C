@@ -30,7 +30,7 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include "error.H"
-
+#include "mathExtra.H"
 #include "bigParticleVoidFraction.H"
 #include "addToRunTimeSelectionTable.H"
 #include "locateModel.H"
@@ -113,7 +113,7 @@ void bigParticleVoidFraction::setvoidFraction(double** const& mask,double**& voi
             //collecting data
             label particleCenterCellID=particleCloud_.cellIDs()[index][0];
             radius =  particleCloud_.radius(index);
-            volume = 4.188790205*radius*radius*radius*scaleVol;
+            volume = constant::mathematical::fourPiByThree*radius*radius*radius*scaleVol;
             radius *= scaleRadius;
             vector positionCenter=particleCloud_.position(index);
 
@@ -132,7 +132,7 @@ void bigParticleVoidFraction::setvoidFraction(double** const& mask,double**& voi
                 if (hashSetLength > maxCellsPerParticle_)
                 {
                     FatalError<< "big particle algo found more cells ("<< hashSetLength
-                              <<") than storage is prepered ("<<maxCellsPerParticle_<<")" << abort(FatalError);
+                              <<") than storage is prepared ("<<maxCellsPerParticle_<<")" << abort(FatalError);
                 }
                 else if (hashSetLength > 0)
                 {

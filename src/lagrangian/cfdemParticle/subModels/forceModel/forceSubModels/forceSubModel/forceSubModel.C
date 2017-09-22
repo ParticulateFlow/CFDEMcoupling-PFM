@@ -59,7 +59,7 @@ forceSubModel::forceSubModel
     dict_(dict),
     particleCloud_(sm),
     forceModel_(fm),
-    nrDefaultSwitches_(9),                                          // !!!
+    nrDefaultSwitches_(SW_MAX),
     switchesNameList_(nrDefaultSwitches_),
     switchesList_(nrDefaultSwitches_),
     switches_(nrDefaultSwitches_),
@@ -106,16 +106,15 @@ forceSubModel::forceSubModel
     rho_(sm.mesh().lookupObject<volScalarField> (densityFieldName_))
 {
     // init standard switch list
-    int iCounter(0);
-    switchesNameList_[iCounter]="treatForceExplicit"; iCounter++;   //0
-    switchesNameList_[iCounter]="treatForceDEM";iCounter++;         //1
-    switchesNameList_[iCounter]="implForceDEM";iCounter++;          //2
-    switchesNameList_[iCounter]="verbose";iCounter++;               //3
-    switchesNameList_[iCounter]="interpolation";iCounter++;         //4
-    switchesNameList_[iCounter]="useFilteredDragModel";iCounter++;  //5
-    switchesNameList_[iCounter]="useParcelSizeDependentFilteredDrag";iCounter++;  //6
-    switchesNameList_[iCounter]="implForceDEMaccumulated";iCounter++;             //7
-    switchesNameList_[iCounter]="scalarViscosity";iCounter++;                     //8
+    switchesNameList_[SW_TREAT_FORCE_EXPLICIT] = "treatForceExplicit";
+    switchesNameList_[SW_TREAT_FORCE_DEM] = "treatForceDEM";
+    switchesNameList_[SW_IMPL_FORCE_DEM] = "implForceDEM";
+    switchesNameList_[SW_VERBOSE] = "verbose";
+    switchesNameList_[SW_INTERPOLATION] = "interpolation";
+    switchesNameList_[SW_FILTERED_DRAG_MODEL] ="useFilteredDragModel";
+    switchesNameList_[SW_PARCEL_SIZE_DEPENDENT_FILTERED_DRAG] = "useParcelSizeDependentFilteredDrag";
+    switchesNameList_[SW_IMPL_FORCE_DEM_ACCUMULATED] = "implForceDEMaccumulated";
+    switchesNameList_[SW_SCALAR_VISCOSITY] = "scalarViscosity";
 
     // sanity check of what is defined above
     if(switchesNameList_.size() != nrDefaultSwitches_)
@@ -131,7 +130,7 @@ forceSubModel::~forceSubModel()
 // * * * * * * * * * * * * * * * * Member Fct  * * * * * * * * * * * * * * * //
 void forceSubModel::partToArray
 (
-    label& index,
+    label index,
     vector& dragTot,
     const vector& dragEx,
     const vector& Ufluid,
@@ -139,17 +138,17 @@ void forceSubModel::partToArray
 ) const
 {
     // forces for CFD
-    if(!switches_[1])// !treatDEM
+    if(!switches_[SW_TREAT_FORCE_DEM])// !treatDEM
     {
-        if(switches_[0]) // treatExplicit
+        if(switches_[SW_TREAT_FORCE_EXPLICIT]) // treatExplicit
         {
             for(int j=0;j<3;j++)
                 myForceM().expForces()[index][j] += dragTot[j];
-        }    
+        }
         else   //implicit treatment, taking explicit force contribution into account
         {
-            for(int j=0;j<3;j++) 
-            { 
+            for(int j=0;j<3;j++)
+            {
                 myForceM().impForces()[index][j] += dragTot[j] - dragEx[j]; //only consider implicit part!
                 myForceM().expForces()[index][j] += dragEx[j];
             }
@@ -157,16 +156,16 @@ void forceSubModel::partToArray
     }
 
     // forces for DEM
-    if(switches_[2]) // implForceDEM
+    if(switches_[SW_IMPL_FORCE_DEM]) // implForceDEM
     {
         for(int j=0;j<3;j++)
             myForceM().fluidVel()[index][j]=Ufluid[j];
 
-        myForceM().Cds()[index][0]=Cd;
+        myForceM().Cds()[index][0] = Cd;
     }
     else
     {
-        for(int j=0;j<3;j++) 
+        for(int j=0;j<3;j++)
             myForceM().DEMForces()[index][j] += dragTot[j];
     }
 }
@@ -183,7 +182,7 @@ void forceSubModel::explicitCorr
     vector& Us,
     const vector& UsCell,
     bool verbose,
-    label index    
+    label index
 ) const
 {
     dragExplicit=vector::zero;
@@ -191,7 +190,7 @@ void forceSubModel::explicitCorr
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-void forceSubModel::readSwitches() const
+void forceSubModel::readSwitches()
 {
     Info << "\nreading switches for forceSubModel:" << myType() << endl;
     forAll(switchesNameList_,i)
@@ -200,23 +199,23 @@ void forceSubModel::readSwitches() const
         {
             Info << "  looking for " << switchesNameList_[i] << " ..." << endl;
             if (dict_.found(switchesNameList_[i]))
-                switches_[i]=Switch(dict_.lookup(switchesNameList_[i]));
-                
+                switches_[i] = Switch(dict_.lookup(switchesNameList_[i]));
+
             Info << "\t" << switchesNameList_[i] << " = " << switches_[i] << endl;
-        }        
+        }
     }
     Info << endl;
 
-    if(switches_[2]) // implForceDEM=true
+    if(switches_[SW_IMPL_FORCE_DEM]) // implForceDEM=true
     {
         // communicate implForceDEM to particleCloud
-        particleCloud_.impDEMdrag_=true;
+        particleCloud_.impDEMdrag_ = true;
 
         // do sanity check
         // This can work if the accumulator is used, but is explicitely applied on the CFD side
         // Sanity check is therefore not necessary here
         /*
-        if(switches_[0]) // treatExplicit=true
+        if(switches_[SW_TREAT_FORCE_EXPLICIT]) // treatExplicit=true
         {
             FatalError << "Please check your settings, treatExplicit together with implForceDEM does not work!."
                        << abort(FatalError);
@@ -224,24 +223,24 @@ void forceSubModel::readSwitches() const
         */
     }
 
-    if(switches_[7]) // implForceDEMaccumulated=true
+    if(switches_[SW_IMPL_FORCE_DEM_ACCUMULATED]) // implForceDEMaccumulated=true
     {
         // sanity check for implForceDEMaccumulated
-        if(!switches_[2]) //implForceDEM=false
+        if(!switches_[SW_IMPL_FORCE_DEM]) //implForceDEM=false
         {
             Warning<< "please check your settings, implForceDEMaccumulated without implForceDEM does not work! (using implForceDEMaccumulated=false)" << endl;
-            switches_[3]=false;
+            switches_[SW_VERBOSE] = false;
         }else
         {
-            particleCloud_.impDEMdragAcc_=true;
+            particleCloud_.impDEMdragAcc_ = true;
         }
     }
 
-    if(switches_[8]) // scalarViscosity=true
+    if(switches_[SW_SCALAR_VISCOSITY]) // scalarViscosity=true
     {
         Info << "Using a constant viscosity for this force model." << endl;
         dimensionedScalar  nu0_("nu", dimensionSet(0, 2, -1, 0, 0), dict_.lookup("nu"));
-        nu_=volScalarField
+        nu_ = volScalarField
         (
             IOobject
             (
@@ -259,7 +258,7 @@ void forceSubModel::readSwitches() const
     // look for old nomenclature
     if (dict_.found("treatExplicit") || dict_.found("treatDEM") || dict_.found("implDEM"))
         FatalError<< "You are using an old nomenclature for force model settings, please have a look at the forceSubModel doc." << abort(FatalError);
-        
+
     // look for old nomenclature
     if (dict_.found("verbose"))
         Warning<< "Please make sure you use the new nomenclature for verbose force model settings, please have a look at the forceSubModel doc." << endl;
@@ -274,7 +273,7 @@ const volScalarField& forceSubModel::nuField() const
         nu_=particleCloud_.turbulence().mu() / rho_;
         return nu_;
     #else
-        if(switches_[8]) // scalarViscosity=true
+        if(switches_[SW_SCALAR_VISCOSITY]) // scalarViscosity=true
             return nu_;
         else
             return particleCloud_.turbulence().nu();
@@ -287,9 +286,9 @@ const volScalarField& forceSubModel::muField() const
         return particleCloud_.turbulence().mu();
     #else
         // passing the ref to nu*rho will not work->generate a mu_ field like nu_
-        FatalError<< "implementation not complete!" << abort(FatalError);
+        FatalError << "implementation not complete!" << abort(FatalError);
 
-        if(switches_[8]) // scalarViscosity=true
+        if(switches_[SW_SCALAR_VISCOSITY]) // scalarViscosity=true
             return nu_*rho_;
         else
             return particleCloud_.turbulence().nu()*rho_;

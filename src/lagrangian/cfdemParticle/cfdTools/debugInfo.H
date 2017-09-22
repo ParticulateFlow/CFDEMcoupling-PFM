@@ -1,7 +1,7 @@
-
+{
   //========================================================================//
-  scalar countCell=0;              // number of cells touched by particles
-  int points=0;                    // number of particles and sub-points
+  label countCell=0;               // number of cells touched by particles
+  label points=0;                  // number of particles and sub-points
   scalar totalParticleWeights=0;   // total weight of all particles and sub-points
   vector totalForce_array(0,0,0);  // total force on particles based on particle array
   vector totalForce_field(0,0,0);  // forceField of forceM(), used to calc Ksl
@@ -93,3 +93,4 @@
   Info <<"meanR_array = "<< meanR_array << endl;
   Info <<"=============================================================================" << endl;
   Info << endl;
+}

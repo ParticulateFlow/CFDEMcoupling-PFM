@@ -262,7 +262,7 @@ void averagingModel::setDSauter
     for(int index=0; index< particleCloud_.numberOfParticles(); index++)
     {
         if(myParticleType!=0) //in case a particle type is specified, only consider particles of the right type
-            if(myParticleType != particleCloud_.particleType(index)) continue; 
+            if(myParticleType != particleCloud_.particleType(index)) continue;
 
         radius         = particleCloud_.radii()[index][0] / scale_; //the primary particle diameter
         radiusPow2 = radius*radius;
@@ -313,7 +313,7 @@ void averagingModel::resetWeightFields() const
 }
 
 
-void Foam::averagingModel::undoWeightFields(double**const& mask) const
+void averagingModel::undoWeightFields(double**const& mask) const
 {
     for(int index=0; index< particleCloud_.numberOfParticles(); index++)
     {
@@ -326,41 +326,14 @@ void Foam::averagingModel::undoWeightFields(double**const& mask) const
     }
 }
 
-tmp<volVectorField> Foam::averagingModel::UsInterp() const
+tmp<volVectorField> averagingModel::UsInterp() const
 {
-    tmp<volVectorField> tsource
+    const scalar tsf = particleCloud_.dataExchangeM().timeStepFraction();
+
+    return tmp<volVectorField>
     (
-        new volVectorField
-        (
-            IOobject
-            (
-                "Us_averagingModel",
-                particleCloud_.mesh().time().timeName(),
-                particleCloud_.mesh(),
-                IOobject::NO_READ,
-                IOobject::NO_WRITE
-            ),
-            particleCloud_.mesh(),
-            dimensionedVector
-            (
-                "zero",
-                dimensionSet(0, 1, -1, 0, 0),
-                vector::zero
-            )
-        )
+        new volVectorField("Us_averagingModel", (1. - tsf) * UsPrev_ + tsf * UsNext_)
     );
-
-    if (particleCloud_.dataExchangeM().couplingStep() > 1)
-    {
-        tsource.ref() = (1 - particleCloud_.dataExchangeM().timeStepFraction()) * UsPrev_
-                    + particleCloud_.dataExchangeM().timeStepFraction() * UsNext_;
-    }
-    else
-    {
-        tsource.ref() = UsNext_;
-    }
-
-    return tsource;
 }
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //

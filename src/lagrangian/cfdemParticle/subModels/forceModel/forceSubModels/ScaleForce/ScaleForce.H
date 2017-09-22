@@ -41,9 +41,9 @@ class ScaleForce
     public forceSubModel
 {
 private:
-  
+
     dictionary propsDict_;
-  
+
     word scaleFieldName_;
 
     const volScalarField& scaleField_;
@@ -70,8 +70,8 @@ public:
 
 
     // Member Functions
-	
-	void partToArray(label&, vector&, const vector&, const vector& Ufluid=vector::zero, scalar Cd=scalar(0)) const;
+
+        void partToArray(label, vector&, const vector&, const vector& Ufluid=vector::zero, scalar Cd=scalar(0)) const;
 
         word myType() const{return typeName; };
 };

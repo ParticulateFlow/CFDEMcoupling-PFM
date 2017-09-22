@@ -39,6 +39,7 @@ SourceFiles
 #ifndef dividedVoidFraction_H
 #define dividedVoidFraction_H
 
+#include "mathExtra.H"
 #include "voidFractionModel.H"
 #include "interpolationCellPoint.H"
 
@@ -57,13 +58,17 @@ class dividedVoidFraction
 {
 
 private:
+        static const int numberOfMarkerPoints = 29;
+
         dictionary propsDict_;
 
         bool verbose_;
 
+        Switch procBoundaryCorrection_;
+
         const scalar alphaMin_;          // min value of voidFraction
 
-	    mutable bool alphaLimited_;
+        mutable bool alphaLimited_;
 
         mutable scalar tooMuch_;         // particle volume which is lost due to voidFraction limitation
 
@@ -71,10 +76,12 @@ private:
 
         bool cfdemUseOnly_;
 
+        vector offsets[numberOfMarkerPoints];
+
         virtual inline scalar Vp(int index, scalar radius, scalar scaleVol) const
         {
-            return 4.188790205*radius*radius*radius*scaleVol; //4/3*pi=4.188790205
-        };
+            return constant::mathematical::fourPiByThree*radius*radius*radius*scaleVol;
+        }
 
 public:
 

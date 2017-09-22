@@ -100,70 +100,28 @@ voidFractionModel::~voidFractionModel()
 }
 
 // * * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * * //
-tmp<volScalarField> Foam::voidFractionModel::voidFractionInterp() const
+tmp<volScalarField> voidFractionModel::voidFractionInterp() const
 {
-    tmp<volScalarField> tsource
-    (
-        new volScalarField
-        (
-            IOobject
-            (
-                "alpha_voidFractionModel",
-                particleCloud_.mesh().time().timeName(),
-                particleCloud_.mesh(),
-                IOobject::NO_READ,
-                IOobject::NO_WRITE
-            ),
-            particleCloud_.mesh(),
-            dimensionedScalar
-            (
-                "zero",
-                dimensionSet(0, 0, 0, 0, 0),
-                0
-            )
-        )
-    );
+    const scalar tsf = particleCloud_.dataExchangeM().timeStepFraction();
 
-    scalar tsf = particleCloud_.dataExchangeM().timeStepFraction();
-    if(1-tsf < 1e-4 && particleCloud_.dataExchangeM().couplingStep() > 1) //tsf==1
-    {
-        tsource.ref() = voidfractionPrev_;
-    }
-    else
-    {
-        tsource.ref() = (1 - tsf) * voidfractionPrev_ + tsf * voidfractionNext_;
-    }
-    return tsource;
+    return tmp<volScalarField>
+    (
+        new volScalarField("alpha_voidFractionModel", (1. - tsf) * voidfractionPrev_ + tsf * voidfractionNext_)
+    );
 }
 
-void Foam::voidFractionModel::resetVoidFractions() const
+void voidFractionModel::resetVoidFractions() const
 {
     voidfractionPrev_.ref() = voidfractionNext_.ref();
-    voidfractionNext_.ref() = 1;
+    voidfractionNext_.ref() = 1.;
 }
-
-/*void Foam::voidFractionModel::undoVoidFractions(double**const& mask) const
-{
-    voidfractionPrev_.internalField() = voidfractionNext_.internalField();
-
-    for(int index=0; index< particleCloud_.numberOfParticles(); index++)
-    {
-        if(mask[index][0])
-        {
-            // undo voidfraction cause by particle
-            label cellI = particleCloud_.cellIDs()[index][0];
-            scalar cellVolume=voidfractionNext_.mesh().V()[cellI];
-            voidfractionNext_[cellI] += particleCloud_.particleVolumes()[index][0]/cellVolume;
-        }
-    }
-}*/
 
 int** const& voidFractionModel::cellsPerParticle() const
 {
     return cellsPerParticle_;
 }
 
-int Foam::voidFractionModel::maxCellsPerParticle() const
+int voidFractionModel::maxCellsPerParticle() const
 {
     return maxCellsPerParticle_;
 }
@@ -184,6 +142,60 @@ void voidFractionModel::reAllocArrays(int nP) const
         // get arrays of new length
         particleCloud_.dataExchangeM().allocateArray(cellsPerParticle_,1,1,nP);
     }
+}
+
+scalar voidFractionModel::pointInParticle(int index, const vector& positionCenter, const vector& point, double scale) const
+{
+    const scalar radius = particleCloud_.radius(index);
+
+    if(radius > SMALL)
+    {
+        scalar pointDistSq = magSqr(point - positionCenter);
+        return pointDistSq / (scale*scale * radius*radius) - 1.0;
+    }
+    else
+    {
+        return 0.;
+    }
+}
+
+//Function to determine minimal distance of point
+//to one of the periodic images of a particle
+scalar voidFractionModel::minPeriodicDistance(int index,
+                                           const vector& cellCentrePosition,
+                                           const vector& positionCenter,
+                                           const boundBox& globalBb,
+                                           vector& minPeriodicPos) const
+{
+    scalar f = VGREAT;
+    vector positionCenterPeriodic;
+
+    for(label xDir=-1; xDir<=1; ++xDir)
+    {
+        positionCenterPeriodic[0] =  positionCenter[0]
+                                  + static_cast<scalar>(xDir)
+                                  * (globalBb.max()[0]-globalBb.min()[0]);
+        for(label yDir=-1; yDir<=1; ++yDir)
+        {
+            positionCenterPeriodic[1] =  positionCenter[1]
+                                      + static_cast<scalar>(yDir)
+                                      * (globalBb.max()[1]-globalBb.min()[1]);
+            for(label zDir=-1; zDir<=1; ++zDir)
+            {
+                positionCenterPeriodic[2] =  positionCenter[2]
+                                          + static_cast<scalar>(zDir)
+                                          * (globalBb.max()[2]-globalBb.min()[2]);
+
+                if(pointInParticle(index, positionCenterPeriodic, cellCentrePosition) < f)
+                {
+                    f = pointInParticle(index, positionCenterPeriodic, cellCentrePosition);
+                    minPeriodicPos = positionCenterPeriodic;
+                }
+            }
+        }
+    }
+
+    return f;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
