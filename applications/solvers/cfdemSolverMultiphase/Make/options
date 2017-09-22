@@ -1,8 +1,7 @@
 include $(CFDEM_ADD_LIBS_DIR)/additionalLibs
 
 EXE_INC = \
-    -I. \
-    -I../interFoam \
+	-I$(CFDEM_OFVERSION_DIR) \
     -ImultiphaseMixture/lnInclude \
     -I$(LIB_SRC)/transportModels \
     -I$(LIB_SRC)/transportModels/incompressible/lnInclude \
