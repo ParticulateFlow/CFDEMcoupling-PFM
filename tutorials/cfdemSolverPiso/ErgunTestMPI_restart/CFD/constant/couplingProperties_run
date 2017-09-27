@@ -48,7 +48,7 @@ averagingModel dense;//dilute;//
 
 clockModel standardClock;//off;
 
-smoothingModel off;// localPSizeDiffSmoothing;// constDiffSmoothing; //
+smoothingModel off;// constDiffSmoothing; //
 
 forceModels
 (
@@ -73,14 +73,6 @@ turbulenceModelType "turbulenceProperties";
 
 //===========================================================================//
 // sub-model properties
-
-localPSizeDiffSmoothingProps
-{
-    lowerLimit 0.1;
-    upperLimit 1e10;
-    dSmoothingLength 1.5e-3;
-    Csmoothing    1.0; 
-}
 
 constDiffSmoothingProps
 {
