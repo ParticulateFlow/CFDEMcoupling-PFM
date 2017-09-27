@@ -61,7 +61,6 @@ forceModels
     gradPForce
     viscForce
     //KochHillDrag
-    //RongDrag
     //Archimedes
     //volWeightedAverage
     //totalMomentumExchange
@@ -198,17 +197,6 @@ BeetstraDragProps
     k       0.05;
     aLimit  0.0;
 //    verbose true;
-}
-
-RongDragProps
-{
-    verbose true;
-    velFieldName "U";
-    voidfractionFieldName "voidfraction";
-    interpolation true;
-    implForceDEM true;
-    implForceDEMaccumulated true;
-    granVelFieldName "Us";
 }
 
 virtualMassForceProps
