@@ -60,7 +60,6 @@ forceModels
     viscForce
     //Archimedes
     //volWeightedAverage
-    //totalMomentumExchange
     //particleCellVolume
 );
 
@@ -118,13 +117,7 @@ volWeightedAverageProps
     lowerThreshold 0;
     verbose;
 }
-totalMomentumExchangeProps
-{
-    implicitMomExFieldName "Ksl";
-    explicitMomExFieldName "none";
-    fluidVelFieldName "U";
-    granVelFieldName "Us";
-}
+
 GidaspowDragProps
 {
     verbose;

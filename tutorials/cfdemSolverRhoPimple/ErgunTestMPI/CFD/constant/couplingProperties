@@ -63,7 +63,6 @@ forceModels
     //KochHillDrag
     //Archimedes
     //volWeightedAverage
-    //totalMomentumExchange
     //particleCellVolume
     //fieldTimeAverage
 );
@@ -144,13 +143,7 @@ volWeightedAverageProps
     lowerThreshold 0;
     verbose true;
 }
-totalMomentumExchangeProps
-{
-    implicitMomExFieldName "Ksl";
-    explicitMomExFieldName "none";
-    fluidVelFieldName "U";
-    granVelFieldName "Us";
-}
+
 GidaspowDragProps
 {
     verbose true;
