@@ -61,7 +61,6 @@ forceModels
     gradPForce
     viscForce
     //KochHillDrag
-    //DEMbasedDrag
     //RongDrag
     //Archimedes
     //volWeightedAverage
@@ -161,11 +160,6 @@ GidaspowDragProps
     voidfractionFieldName "voidfraction";
     interpolation true;
     phi 1;
-}
-DEMbasedDragProps
-{
-    velFieldName "U";
-    voidfractionFieldName "voidfraction";
 }
 
 DiFeliceDragProps
