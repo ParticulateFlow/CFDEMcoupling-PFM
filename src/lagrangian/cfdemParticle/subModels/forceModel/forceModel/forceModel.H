@@ -137,15 +137,10 @@ public:
 
         inline volVectorField& expParticleForces() const { return expParticleForces_; }
 
-        inline double ** impForces() const { return particleCloud_.impForces_; }
 
-        inline double ** expForces() const { return particleCloud_.expForces_; }
 
-        inline double ** DEMForces() const { return particleCloud_.DEMForces_; }
 
-        inline double ** Cds() const { return particleCloud_.Cds_; }
 
-        inline double ** fluidVel() const { return particleCloud_.fluidVel_; }
 
         inline bool coupleForce() const { return coupleForce_; }
 
