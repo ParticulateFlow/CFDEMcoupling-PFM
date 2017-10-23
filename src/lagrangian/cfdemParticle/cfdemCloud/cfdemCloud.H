@@ -86,7 +86,7 @@ protected:
 
     IOdictionary liggghtsCommandDict_;
 
-    Switch solveFlow_;
+    const bool solveFlow_;
 
     const bool verbose_;
 

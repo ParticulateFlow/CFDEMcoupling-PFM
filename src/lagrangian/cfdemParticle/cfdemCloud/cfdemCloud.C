@@ -78,11 +78,12 @@ cfdemCloud::cfdemCloud
             IOobject::NO_WRITE
         )
     ),
-    solveFlow_(true),
+    solveFlow_(couplingProperties_.lookupOrDefault<bool>("solveFlow", true)),
     verbose_(couplingProperties_.lookupOrDefault<bool>("verbose", false)),
     ignore_(couplingProperties_.lookupOrDefault<bool>("ignore", false)),
     allowCFDsubTimestep_(true),
-    limitDEMForces_(false),
+    limitDEMForces_(couplingProperties_.lookupOrDefault<bool>("limitDEMForces",false)),
+    maxDEMForce_(0.),
     modelType_(couplingProperties_.lookup("modelType")),
     positions_(NULL),
     velocities_(NULL),
@@ -223,8 +224,8 @@ cfdemCloud::cfdemCloud
     buildInfo.info();
 
     Info << "If BC are important, please provide volScalarFields -imp/expParticleForces-" << endl;
-    if (couplingProperties_.found("solveFlow"))
-        solveFlow_=Switch(couplingProperties_.lookup("solveFlow"));
+    /*if (couplingProperties_.found("solveFlow"))
+        solveFlow_=Switch(couplingProperties_.lookup("solveFlow"));*/
     if (couplingProperties_.found("imExSplitFactor"))
         imExSplitFactor_ = readScalar(couplingProperties_.lookup("imExSplitFactor"));
 
@@ -238,9 +239,8 @@ cfdemCloud::cfdemCloud
     if (couplingProperties_.found("treatVoidCellsAsExplicitForce"))
         treatVoidCellsAsExplicitForce_ = readBool(couplingProperties_.lookup("treatVoidCellsAsExplicitForce"));
 
-    if (couplingProperties_.found("limitDEMForces"))
+    if (limitDEMForces_)
     {
-        limitDEMForces_=true;
         maxDEMForce_ = readScalar(couplingProperties_.lookup("limitDEMForces"));
     }
     if (turbulenceModelType_=="LESProperties")
@@ -469,9 +469,10 @@ void cfdemCloud::checkCG(bool ok)
 
 void cfdemCloud::setPos(double**& pos)
 {
-    for(int index = 0;index <  numberOfParticles(); ++index)
+    for(int index = 0; index <  numberOfParticles(); ++index)
     {
-        for(int i=0;i<3;i++){
+        for(int i=0; i<3; i++)
+        {
             positions_[index][i] = pos[index][i];
         }
     }
