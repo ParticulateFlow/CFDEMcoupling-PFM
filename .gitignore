@@ -6,3 +6,5 @@ log_*
 log.*
 *~
 **/linux64GccDPInt32Opt
+**/lnInclude
+**/html
