@@ -79,8 +79,8 @@ cfdemCloud::cfdemCloud
         )
     ),
     solveFlow_(true),
-    verbose_(false),
-    ignore_(false),
+    verbose_(couplingProperties_.lookupOrDefault<bool>("verbose", false)),
+    ignore_(couplingProperties_.lookupOrDefault<bool>("ignore", false)),
     allowCFDsubTimestep_(true),
     limitDEMForces_(false),
     modelType_(couplingProperties_.lookup("modelType")),
@@ -237,8 +237,7 @@ cfdemCloud::cfdemCloud
 
     if (couplingProperties_.found("treatVoidCellsAsExplicitForce"))
         treatVoidCellsAsExplicitForce_ = readBool(couplingProperties_.lookup("treatVoidCellsAsExplicitForce"));
-    if (couplingProperties_.found("verbose")) verbose_=true;
-    if (couplingProperties_.found("ignore")) ignore_=true;
+
     if (couplingProperties_.found("limitDEMForces"))
     {
         limitDEMForces_=true;

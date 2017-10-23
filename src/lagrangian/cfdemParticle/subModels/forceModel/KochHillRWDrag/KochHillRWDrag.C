@@ -64,24 +64,20 @@ KochHillRWDrag::KochHillRWDrag
 :
     forceModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
-    verbose_(false),
+    verbose_(propsDict_.lookupOrDefault<bool>("verbose", false)),
     velFieldName_(propsDict_.lookup("velFieldName")),
     U_(sm.mesh().lookupObject<volVectorField> (velFieldName_)),
     voidfractionFieldName_(propsDict_.lookup("voidfractionFieldName")),
     voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
     UsFieldName_(propsDict_.lookupOrDefault("granVelFieldName",word("Us"))),
     UsField_(sm.mesh().lookupObject<volVectorField> (UsFieldName_)),
-    interpolation_(false),
+    interpolation_(propsDict_.lookupOrDefault<bool>("interpolation", false)),
     scale_(1.),
-    randomTauE_(false),
+    randomTauE_(propsDict_.lookupOrDefault<bool>("randomTauE", false)),
     partTime_(NULL),
     partUfluct_(NULL),
     RanGen_(label(0))
 {
-
-    if (propsDict_.found("verbose")) verbose_ = true;
-    if (propsDict_.found("interpolation")) interpolation_ = true;
-    if (propsDict_.found("randomTauE")) randomTauE_ = true;
 
     // init force sub model
     setForceSubModels(propsDict_);

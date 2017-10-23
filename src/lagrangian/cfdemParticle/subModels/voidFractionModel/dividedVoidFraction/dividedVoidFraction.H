@@ -62,9 +62,9 @@ private:
 
         dictionary propsDict_;
 
-        bool verbose_;
+        const bool verbose_;
 
-        Switch procBoundaryCorrection_;
+        const Switch procBoundaryCorrection_;
 
         const scalar alphaMin_;          // min value of voidFraction
 
@@ -72,9 +72,9 @@ private:
 
         mutable scalar tooMuch_;         // particle volume which is lost due to voidFraction limitation
 
-        bool interpolation_;
+        const bool interpolation_;
 
-        bool cfdemUseOnly_;
+        const bool cfdemUseOnly_;
 
         vector offsets[numberOfMarkerPoints];
 

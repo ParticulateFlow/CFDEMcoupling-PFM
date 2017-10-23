@@ -88,9 +88,9 @@ protected:
 
     Switch solveFlow_;
 
-    bool verbose_;
+    const bool verbose_;
 
-    bool ignore_;
+    const bool ignore_;
 
     bool allowCFDsubTimestep_;
 

@@ -68,32 +68,22 @@ particleProbe::particleProbe
     propsDict_(dict.subDict(typeName + "Props")),
     name_(typeName),
     particleCloud_(sm),
-    verbose_(false),
-    verboseToFile_(false),
-    writePrecision_(3),
+    verbose_(propsDict_.lookupOrDefault<bool>("verbose", false)),
+    verboseToFile_(propsDict_.lookupOrDefault<bool>("verboseToFile", false)),
+    writePrecision_(propsDict_.lookupOrDefault<int>("writePrecision", 3)),
     dirName_("particleProbes"),
     rank_(-1),
     sPtr(NULL),
-    printEvery_(1),
-    sampleAll_(false),
-    probeDebug_(false),
-    includePosition_(false),
+    printEvery_(propsDict_.lookupOrDefault<int>("printEvery", 1)),
+    sampleAll_(propsDict_.lookupOrDefault<bool>("sampleAll", false)),
+    probeDebug_(propsDict_.lookupOrDefault<bool>("probeDebug", false)),
+    includePosition_(propsDict_.lookupOrDefault<bool>("includePosition", false)),
     particleIDsToSample_(propsDict_.lookup("particleIDsToSample")),
     itemCounter_(0),
     currItemId_(0),
     printCounter_(0),
     printNow_(false)
 {
-    if (propsDict_.found("verbose")) verbose_=true;
-    if (propsDict_.found("verboseToFile")) verboseToFile_=true;
-
-    if (propsDict_.found("printEvery")) printEvery_ = readScalar(propsDict_.lookup("printEvery"));
-    if (propsDict_.found("sampleAll")) sampleAll_ = true;
-    if (propsDict_.found("probeDebug")) probeDebug_ = true;
-    if (propsDict_.found("includePosition")) includePosition_ = true;
-
-    if (propsDict_.found("writePrecision")) writePrecision_ = readScalar(propsDict_.lookup("writePrecision"));
-
 }
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //

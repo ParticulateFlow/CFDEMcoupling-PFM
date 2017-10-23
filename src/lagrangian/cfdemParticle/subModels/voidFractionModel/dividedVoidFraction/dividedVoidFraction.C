@@ -64,35 +64,26 @@ dividedVoidFraction::dividedVoidFraction
 :
     voidFractionModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
-    verbose_(false),
+    verbose_(propsDict_.lookupOrDefault<bool>("verbose", false)),
     procBoundaryCorrection_(propsDict_.lookupOrDefault<Switch>("procBoundaryCorrection", false)),
     alphaMin_(readScalar(propsDict_.lookup("alphaMin"))),
     alphaLimited_(0),
     tooMuch_(0.0),
-    interpolation_(false),
-    cfdemUseOnly_(false)
+    interpolation_(propsDict_.lookupOrDefault<bool>("interpolation", false)),
+    cfdemUseOnly_(propsDict_.lookupOrDefault<bool>("cfdemUseOnly", false))
 {
     maxCellsPerParticle_ = numberOfMarkerPoints;
 
     if (alphaMin_ > 1.0 || alphaMin_ < 0.01)
         Warning << "alphaMin should be < 1 and > 0.01 !!!" << endl;
 
-    if (propsDict_.found("interpolation"))
+    if (interpolation_)
     {
-        interpolation_ = true;
         Warning << "interpolation for dividedVoidFraction does not yet work correctly!" << endl;
         Info << "Using interpolated voidfraction field - do not use this in combination with interpolation in drag model!" << endl;
     }
 
     checkWeightNporosity(propsDict_);
-
-    if (propsDict_.found("verbose"))
-        verbose_ = true;
-
-    if (propsDict_.found("cfdemUseOnly"))
-    {
-        cfdemUseOnly_ = readBool(propsDict_.lookup("cfdemUseOnly"));
-    }
 
     if (procBoundaryCorrection_)
     {

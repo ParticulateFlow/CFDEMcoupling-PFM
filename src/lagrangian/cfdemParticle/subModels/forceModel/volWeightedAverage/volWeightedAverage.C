@@ -64,25 +64,17 @@ volWeightedAverage::volWeightedAverage
     forceModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
     mesh_(particleCloud_.mesh()),
-    startTime_(0.),
+    startTime_(propsDict_.lookupOrDefault<scalar>("startTime", 0.)),
     scalarFieldNames_(propsDict_.lookup("scalarFieldNames")),
     vectorFieldNames_(propsDict_.lookup("vectorFieldNames")),
     upperThreshold_(readScalar(propsDict_.lookup("upperThreshold"))),
     lowerThreshold_(readScalar(propsDict_.lookup("lowerThreshold"))),
-    verbose_(false)
+    verbose_(propsDict_.lookupOrDefault<bool>("verbose", false))
 {
-    if (propsDict_.found("startTime")){
-        startTime_=readScalar(propsDict_.lookup("startTime"));
-    }
-
-    if (propsDict_.found("verbose")){
-        verbose_ = true;
-    }
-
     // create vol weighted average scalar fields
     scalarFields_.setSize(scalarFieldNames_.size());
 
-    for (int i=0;i < scalarFieldNames_.size(); i++)
+    for (int i=0; i < scalarFieldNames_.size(); i++)
     {
         word fieldName = "volAverage_" + scalarFieldNames_[i];
 
