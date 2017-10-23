@@ -62,46 +62,42 @@ writeLiggghts::writeLiggghts
 )
 :
     liggghtsCommandModel(dict,sm,i),
-    propsDict_(dict),
+    propsDict_(dict.subOrEmptyDict(typeName + "Props")),
     command_("write_restart"),
     path_(word("..")/word("DEM")),
     writeName_("liggghts.restartCFDEM"),
-    writeLast_(true),
+    writeLast_(propsDict_.lookupOrDefault<Switch>("writeLast" ,true)),
     overwrite_(false)
 {
-    if (dict.found(typeName + "Props"))    
+    // check if verbose
+    if (propsDict_.found("verbose"))
     {
-        propsDict_=dictionary(dict.subDict(typeName + "Props"));
-
-        // check if verbose
-        if (propsDict_.found("verbose")) verbose_=true;
-
-        if(propsDict_.found("writeLast"))
-        {
-            writeLast_=Switch(propsDict_.lookup("writeLast"));
-        }
-
-        if (propsDict_.found("path"))
-        {
-            path_=fileName(propsDict_.lookup("path"));
-            if (!checkPath(path_))
-                FatalError<<"The path you provided in writeLiggghtsProps is incorrect: " << path_ << "\n" << abort(FatalError);
-            else
-                Info << "Using user defined path to write LIGGGHTS restart file: " << path_ << endl;
-        }
-
-        if(propsDict_.found("writeName"))
-        {
-            propsDict_.lookup("writeName") >> writeName_;
-        }
-
-        if (!writeLast_ && propsDict_.found("overwrite"))
-        {
-            overwrite_=Switch(propsDict_.lookup("overwrite"));
-        }
+        verbose_ = propsDict_.lookup("verbose");
     }
+
+    if (propsDict_.found("path"))
+    {
+        path_=fileName(propsDict_.lookup("path"));
+        if (!checkPath(path_))
+            FatalError<<"The path you provided in writeLiggghtsProps is incorrect: " << path_ << "\n" << abort(FatalError);
+        else
+            Info << "Using user defined path to write LIGGGHTS restart file: " << path_ << endl;
+    }
+
+    if(propsDict_.found("writeName"))
+    {
+        propsDict_.lookup("writeName") >> writeName_;
+    }
+
+    if (!writeLast_ && propsDict_.found("overwrite"))
+    {
+        overwrite_=Switch(propsDict_.lookup("overwrite"));
+    }
+    
     if(writeLast_)
+    {
         runLast_=true;
+    }
     else
     {
         //Warning << "Using invalid options of writeLiggghts, please use 'writeLast' option." << endl;

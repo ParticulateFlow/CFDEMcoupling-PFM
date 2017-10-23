@@ -62,32 +62,31 @@ execute::execute
 )
 :
     liggghtsCommandModel(dict,sm,i),
+    propsDict_(dict.subOrEmptyDict(typeName + "Props")),
     nrModel_(i),
-    myName_("notYetGiven"),
-    propsDict_(dict),
-    commandList_(0),
+    commandList_(wordList(propsDict_.lookup("command"))),
     command_(""),
     scalarList_(0),
     labelList_(0),
     timeStamp_(false)
 {
-    // define dictionary
-    char h[80];
-    sprintf(h,"%d",nrModel_);
-    myName_=word(typeName + "Props" + h);
-    propsDict_=dictionary(dict.subDict(myName_));
-
-    // read command from dict
-    commandList_ = wordList(propsDict_.lookup("command"));
-
     // read list of scalars
-    if(propsDict_.found("scalars")) scalarList_ = scalarList(propsDict_.lookup("scalars"));
+    if(propsDict_.found("scalars"))
+    {
+        scalarList_ = scalarList(propsDict_.lookup("scalars"));
+    }
 
     // read list of labels
-    if(propsDict_.found("labels")) labelList_ = labelList(propsDict_.lookup("labels"));
+    if(propsDict_.found("labels"))
+    {
+        labelList_ = labelList(propsDict_.lookup("labels"));
+    }
 
     // check if verbose
-    if (propsDict_.found("verbose")) verbose_=true;
+    if (propsDict_.found("verbose"))
+    {
+        verbose_ = propsDict_.lookup("verbose");
+    }
 
     parseCommandList(commandList_, labelList_, scalarList_, command_, propsDict_, timeStamp_);
     Info << "liggghtsCommand " << command_ << endl;

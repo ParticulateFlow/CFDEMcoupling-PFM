@@ -62,19 +62,14 @@ runLiggghts::runLiggghts
 )
 :
     liggghtsCommandModel(dict,sm,i),
-    propsDict_(dict),
+    propsDict_(dict.subOrEmptyDict(typeName + "Props")),
     command_("run"),
-    preNo_(true),
+    preNo_(propsDict_.lookupOrDefault<bool>("preNo", true)),
     stdInterval_(0)
 {
-    word myName=word(typeName + "Props");
-    if (dict.found(myName))    
+    if (propsDict_.found("verbose"))
     {
-        propsDict_=dictionary(dict.subDict(myName));
-        preNo_=Switch(propsDict_.lookup("preNo"));
-
-        // check if verbose
-        if (propsDict_.found("verbose")) verbose_=true;
+        verbose_ = propsDict_.lookup("verbose");
     }
 
     runEveryCouplingStep_=true;

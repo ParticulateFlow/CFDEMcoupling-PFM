@@ -88,15 +88,15 @@ public:
 
     // Member Functions
 
-    const char* command(int);
+        const char* command(int);
 
-    string createCommand(word="",int=0,word="",word="",word="",word="");
+        string createCommand(word="",int=0,word="",word="",word="",word="");
 
-    bool runCommand(int);
+        bool runCommand(int);
 
-    word name(){return "runLiggghts";};
+        word name(){return "runLiggghts";};
 
-    void set(int);
+        void set(int);
 };
 
 

@@ -56,15 +56,15 @@ class readLiggghtsData
 {
 private:
 
+    dictionary propsDict_;
+    
     int nrModel_;
 
     int insertionNr_;
 
     word command_;
 
-    word myName_;
-
-    dictionary propsDict_;
+    //word myName_;
 
     wordList filePathList_;
 
@@ -91,11 +91,11 @@ public:
 
     // Member Functions
 
-    word name(){return myName_;};
+        word name(){return "readLiggghtsData";};
 
-    const char* command(int);
+        const char* command(int);
 
-    bool runCommand(int);
+        bool runCommand(int);
 
 };
 

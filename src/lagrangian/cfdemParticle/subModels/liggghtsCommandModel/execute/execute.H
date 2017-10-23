@@ -57,11 +57,9 @@ class execute
 {
 private:
 
-    int nrModel_;
-
-    word myName_;
-
     dictionary propsDict_;
+
+    int nrModel_;
 
     wordList commandList_;
 
@@ -96,11 +94,11 @@ public:
 
     // Member Functions
 
-    word name(){return myName_;}
+        word name(){return "execute";};
 
-    const char* command(int);
+        const char* command(int);
 
-    bool runCommand(int);
+        bool runCommand(int);
 
 };
 

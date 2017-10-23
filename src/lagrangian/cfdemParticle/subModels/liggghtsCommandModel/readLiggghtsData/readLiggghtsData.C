@@ -62,27 +62,22 @@ readLiggghtsData::readLiggghtsData
 )
 :
     liggghtsCommandModel(dict,sm,i),
+    propsDict_(dict.subOrEmptyDict(typeName + "Props")),
     nrModel_(i),
-    insertionNr_(0.),
+    insertionNr_(readLabel(propsDict_.lookup("startIndex"))),
     command_("read_data"),
-    myName_("notYetGiven"),
-    propsDict_(dict),
     filePathList_(0)
 {
-    // define dictionary
-    char h[80];
-    sprintf(h,"%d",nrModel_);
-    myName_=word(typeName + "Props" + h);
-    propsDict_=dictionary(dict.subDict(myName_));
-
     if (propsDict_.found("exactTiming"))
-        exactTiming_=true;
+    {
+        exactTiming_ = propsDict_.lookup("exactTiming");
+    }
     Info << "exactTiming==" << exactTiming_ << endl;
 
-    if (propsDict_.found("verbose")) verbose_=true;
-
-    // read first index of data file to be injected
-    insertionNr_=readScalar(propsDict_.lookup("startIndex"));
+    if (propsDict_.found("verbose"))
+    {
+        verbose_ = propsDict_.lookup("verbose");
+    }
 
     // read command from dict
     filePathList_ = wordList(propsDict_.lookup("filePath"));

@@ -105,7 +105,8 @@ void liggghtsCommandModel::checkTimeMode(dictionary& propsDict)
         }
     }
 
-    if(verbose_){
+    if(verbose_)
+    {
         Info << "runFirst = " << runFirst_ << endl;
         Info << "runLast = " << runLast_ << endl;
         Info << "runEveryCouplingStep = " << runEveryCouplingStep_ << endl;
@@ -163,7 +164,8 @@ void liggghtsCommandModel::checkTimeSettings(const dictionary& propsDict)
             couplingStepInterval_ =-1;
     }
 
-    if(verbose_){
+    if(verbose_)
+    {
         Info << "firstCouplingStep = " << firstCouplingStep_ << endl;
         Info << "lastCouplingStep = " << lastCouplingStep_ << endl;
         Info << "couplingStepInterval = " << couplingStepInterval_ << endl;
@@ -176,9 +178,9 @@ bool liggghtsCommandModel::runThisCommand(int couplingStep)
     if(verbose_) Info << "couplingStep = " << couplingStep << endl;
     bool runIt=false;
     if(
-       (!runEveryWriteStep_ && firstCouplingStep_  <= couplingStep && lastCouplingStep_  >= couplingStep)  ||
-       (runEveryWriteStep_  && particleCloud_.mesh().time().outputTime())
-      )
+        (!runEveryWriteStep_ && firstCouplingStep_  <= couplingStep && lastCouplingStep_  >= couplingStep)  ||
+        (runEveryWriteStep_  && particleCloud_.mesh().time().outputTime())
+    )
     {
         if(couplingStep >= nextRun_)
         {
@@ -280,15 +282,18 @@ void liggghtsCommandModel::parseCommandList(wordList& commandList,labelList& lab
         {
             add = "";
             addBlank = false;
-        }else if (add=="blanks") // add a blank here and after the following words
+        }
+        else if (add=="blanks") // add a blank here and after the following words
         {
             add = "";
             addBlank = true;
-        }else if (add=="timeStamp") // add a time stamp
+        }
+        else if (add=="timeStamp") // add a time stamp
         {
             add = "";
             timeStamp=true;
-        }else if (add=="number") // next command will be a number read from labelList
+        }
+        else if (add=="number") // next command will be a number read from labelList
         {
             /*if (!propsDict.found("scalars"))
             {
@@ -299,7 +304,8 @@ void liggghtsCommandModel::parseCommandList(wordList& commandList,labelList& lab
             sprintf(h,"%f",scalarList[numberCount]);
             add = h;
             numberCount ++;
-        }else if (add=="label") // next command will be a number read from labelList
+        }
+        else if (add=="label") // next command will be a number read from labelList
         {
             /*if (!propsDict.found("labels"))
             {
@@ -316,7 +322,8 @@ void liggghtsCommandModel::parseCommandList(wordList& commandList,labelList& lab
         if (addBlank)
         {
             command += add + " ";
-        }else
+        }
+        else
         {
             command += add;
         }
