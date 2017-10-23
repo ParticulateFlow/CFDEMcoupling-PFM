@@ -64,8 +64,6 @@ private:
 
     word command_;
 
-    //word myName_;
-
     wordList filePathList_;
 
 public:

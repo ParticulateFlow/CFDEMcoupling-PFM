@@ -88,24 +88,24 @@ void liggghtsCommandModel::checkTimeMode(dictionary& propsDict)
 {
     runFirst_=Switch(propsDict.lookup("runFirst"));
 
-    if(!runFirst_)
+    if (!runFirst_)
     {
         // check if being run only at last coupling step
         runLast_=Switch(propsDict.lookup("runLast"));
 
-        if(!runLast_)
+        if (!runLast_)
         {
             // check if being run every coupling step
             runEveryCouplingStep_=Switch(propsDict.lookup("runEveryCouplingStep"));
 
-            if(!runEveryCouplingStep_)
+            if (!runEveryCouplingStep_)
             {
                 runEveryWriteStep_=Switch(propsDict.lookup("runEveryWriteStep"));
             }
         }
     }
 
-    if(verbose_)
+    if (verbose_)
     {
         Info << "runFirst = " << runFirst_ << endl;
         Info << "runLast = " << runLast_ << endl;
@@ -116,13 +116,13 @@ void liggghtsCommandModel::checkTimeMode(dictionary& propsDict)
 
 void liggghtsCommandModel::checkTimeSettings(const dictionary& propsDict)
 {
-    if(!runFirst_) //lastRun or runEveryCouplingStep or every n steps or every writeStep
+    if (!runFirst_) //lastRun or runEveryCouplingStep or every n steps or every writeStep
     {
         scalar DEMts = particleCloud_.dataExchangeM().DEMts();
         scalar couplingInterval = particleCloud_.dataExchangeM().couplingInterval();
         scalar simStartTime = particleCloud_.mesh().time().startTime().value();
 
-        if(runLast_) // last run
+        if (runLast_) // last run
         {
             // read time options from subdict
             endTime_ = particleCloud_.mesh().time().endTime().value()-simStartTime;
@@ -164,7 +164,7 @@ void liggghtsCommandModel::checkTimeSettings(const dictionary& propsDict)
             couplingStepInterval_ =-1;
     }
 
-    if(verbose_)
+    if (verbose_)
     {
         Info << "firstCouplingStep = " << firstCouplingStep_ << endl;
         Info << "lastCouplingStep = " << lastCouplingStep_ << endl;
@@ -175,14 +175,15 @@ void liggghtsCommandModel::checkTimeSettings(const dictionary& propsDict)
 
 bool liggghtsCommandModel::runThisCommand(int couplingStep)
 {
-    if(verbose_) Info << "couplingStep = " << couplingStep << endl;
+    if (verbose_) Info << "couplingStep = " << couplingStep << endl;
     bool runIt=false;
-    if(
+    if
+    (
         (!runEveryWriteStep_ && firstCouplingStep_  <= couplingStep && lastCouplingStep_  >= couplingStep)  ||
         (runEveryWriteStep_  && particleCloud_.mesh().time().outputTime())
     )
     {
-        if(couplingStep >= nextRun_)
+        if (couplingStep >= nextRun_)
         {
             runIt=true;
             nextRun_=couplingStep + couplingStepInterval_;
@@ -211,7 +212,7 @@ DynamicList<scalar> liggghtsCommandModel::executionsWithinPeriod(scalar TSstart,
     DynamicList<scalar> executions(0);
 
     // current TS within active period
-    if(startTime_+SMALL<TSend && endTime_>TSstart-SMALL )
+    if (startTime_+SMALL<TSend && endTime_>TSstart-SMALL )
     {
         Info << "working time within this TS" << endl;
 
@@ -219,7 +220,7 @@ DynamicList<scalar> liggghtsCommandModel::executionsWithinPeriod(scalar TSstart,
         int startNr = 0;
         scalar t = startTime_ + startNr * timeInterval_;
 
-        if(timeInterval_ > SMALL)
+        if (timeInterval_ > SMALL)
         {
             while (TSend - t > SMALL)
             {
@@ -229,7 +230,7 @@ DynamicList<scalar> liggghtsCommandModel::executionsWithinPeriod(scalar TSstart,
             t -= timeInterval_;
         }
         // check if first exec found within TS
-        if(TSstart < t + SMALL && t +SMALL < TSend)
+        if (TSstart < t + SMALL && t +SMALL < TSend)
         {
             // check for more executions
             while (t < endTime_ + SMALL && TSend - t > SMALL)

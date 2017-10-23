@@ -63,8 +63,6 @@ private:
 
     bool preNo_;
 
-    int stdInterval_;
-
 public:
 
     //- Runtime type information

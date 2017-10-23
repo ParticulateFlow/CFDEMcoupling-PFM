@@ -64,17 +64,16 @@ runLiggghts::runLiggghts
     liggghtsCommandModel(dict,sm,i),
     propsDict_(dict.subOrEmptyDict(typeName + "Props")),
     command_("run"),
-    preNo_(propsDict_.lookupOrDefault<bool>("preNo", true)),
-    stdInterval_(0)
+    preNo_(propsDict_.lookupOrDefault<bool>("preNo", true))
 {
     if (propsDict_.found("verbose"))
     {
         verbose_ = propsDict_.lookup("verbose");
     }
 
-    runEveryCouplingStep_=true;
+    runEveryCouplingStep_ = true;
 
-    strCommand_=createCommand(command_);
+    strCommand_ = createCommand(command_);
 
     checkTimeSettings(dict_);
 }
@@ -97,7 +96,7 @@ string runLiggghts::createCommand( word command, int interval, word appendix, wo
 {
     fileName add;
     char h[50];
-    sprintf(h,"%d",interval);
+    sprintf(h, "%d", interval);
     add = h;
     command += " " + add + " " + appendix + " " + appendix2 + " " + appendix3 + " " + appendix4;
 
@@ -108,9 +107,13 @@ bool runLiggghts::runCommand(int couplingStep)
 {
     //change command to  "run xxx pre no"
     if (preNo_ && (couplingStep > firstCouplingStep_))
-        strCommand_=createCommand(command_, particleCloud_.dataExchangeM().couplingInterval(),"pre","no","post","no");
+    {
+        strCommand_ = createCommand(command_, particleCloud_.dataExchangeM().couplingInterval(),"pre","no","post","no");
+    }
     else
-        strCommand_=createCommand(command_, particleCloud_.dataExchangeM().couplingInterval());
+    {
+        strCommand_ = createCommand(command_, particleCloud_.dataExchangeM().couplingInterval());
+    }
 
     return runThisCommand(couplingStep);
 }
@@ -118,9 +121,13 @@ bool runLiggghts::runCommand(int couplingStep)
 void runLiggghts::set(int interval)
 {
     if (preNo_)
+    {
         strCommand_ = createCommand(command_, interval,"pre","no","post","no");
+    }
     else
+    {
         strCommand_ = createCommand(command_, interval);
+    }
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

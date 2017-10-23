@@ -77,41 +77,49 @@ writeLiggghts::writeLiggghts
 
     if (propsDict_.found("path"))
     {
-        path_=fileName(propsDict_.lookup("path"));
+        path_ = fileName(propsDict_.lookup("path"));
         if (!checkPath(path_))
-            FatalError<<"The path you provided in writeLiggghtsProps is incorrect: " << path_ << "\n" << abort(FatalError);
+        {
+            FatalError << "The path you provided in writeLiggghtsProps is incorrect: " << path_ << "\n" << abort(FatalError);
+        }
         else
+        {
             Info << "Using user defined path to write LIGGGHTS restart file: " << path_ << endl;
+        }
     }
 
-    if(propsDict_.found("writeName"))
+    if (propsDict_.found("writeName"))
     {
         propsDict_.lookup("writeName") >> writeName_;
     }
 
     if (!writeLast_ && propsDict_.found("overwrite"))
     {
-        overwrite_=Switch(propsDict_.lookup("overwrite"));
+        overwrite_ = Switch(propsDict_.lookup("overwrite"));
     }
     
-    if(writeLast_)
+    if (writeLast_)
     {
-        runLast_=true;
+        runLast_ = true;
     }
     else
     {
         //Warning << "Using invalid options of writeLiggghts, please use 'writeLast' option." << endl;
-        runEveryWriteStep_=true;
+        runEveryWriteStep_ = true;
     }    
 
 
     command_ += " " + path_ + "/" + writeName_;
-    if(overwrite_)
+    if (overwrite_)
+    {
         strCommand_=string(command_);
+    }
     else
+    {
         command_ += "_";
+    }
 
-    Info << "writeLiggghts: A restart file writeName_"<< command_ <<" is written." << endl;
+    Info << "writeLiggghts: A restart file writeName_" << command_ << " is written." << endl;
 
     checkTimeSettings(dict_);
 }
@@ -132,7 +140,7 @@ const char* writeLiggghts::command(int commandLine)
 
 bool writeLiggghts::runCommand(int couplingStep)
 {
-    if(!overwrite_) strCommand_=addTimeStamp(command_);
+    if (!overwrite_) strCommand_ = addTimeStamp(command_);
     return runThisCommand(couplingStep);
 }
 

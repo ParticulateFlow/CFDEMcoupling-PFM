@@ -71,13 +71,13 @@ execute::execute
     timeStamp_(false)
 {
     // read list of scalars
-    if(propsDict_.found("scalars"))
+    if (propsDict_.found("scalars"))
     {
         scalarList_ = scalarList(propsDict_.lookup("scalars"));
     }
 
     // read list of labels
-    if(propsDict_.found("labels"))
+    if (propsDict_.found("labels"))
     {
         labelList_ = labelList(propsDict_.lookup("labels"));
     }
@@ -91,7 +91,7 @@ execute::execute
     parseCommandList(commandList_, labelList_, scalarList_, command_, propsDict_, timeStamp_);
     Info << "liggghtsCommand " << command_ << endl;
 
-    strCommand_=string(command_);
+    strCommand_ = string(command_);
 
     checkTimeMode(propsDict_);
 
@@ -114,7 +114,7 @@ const char* execute::command(int commandLine)
 
 bool execute::runCommand(int couplingStep)
 {
-    if(timeStamp_) strCommand_=addTimeStamp(command_);
+    if (timeStamp_) strCommand_ = addTimeStamp(command_);
     checkTimeSettings(propsDict_);
 
     return runThisCommand(couplingStep);
