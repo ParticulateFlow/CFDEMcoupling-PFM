@@ -262,7 +262,7 @@ void species::execute()
                 for (int i = 0; i<speciesNames_.size();i++)
                 {
                     Xfluid_[i] = X_[i][cellI];
-		    if (Xfluid_[i] <= 0.0) Xfluid_[i] = 0.0;
+                    if (Xfluid_[i] <= 0.0) Xfluid_[i] = 0.0;
                 }
             }
             //fill arrays
@@ -291,7 +291,7 @@ void species::execute()
                 Info << "partTemp_[index][0] = " << partTemp_[index][0] << endl;
                 Info << "Tfluid = " << Tfluid << endl  ;
                 Info << "voidfraction =" << voidfraction << endl;
-                Info << "molarConc_" << molarConc_ << endl;
+                // Info << "molarConc_" << molarConc_ << endl;
             }
         }
     }
@@ -333,8 +333,8 @@ void species::execute()
             Info << "total conversion of species" << speciesNames_[i] << " = " << gSum(changeOfSpeciesMassFields_[i]*1.0*changeOfSpeciesMassFields_[i].mesh().V() * Nevery_ * timestep) << endl;
         }
         massSourceCurr_ = gSum(changeOfGasMassField_*1.0*changeOfGasMassField_.mesh().V() * Nevery_ * timestep);
-	massSourceTot_ += massSourceCurr_;
-	Info << "total conversion of mass:\n\tcurrent source = " << massSourceCurr_ << "\n\ttotal source = " << massSourceTot_ << "\n" << endl;
+        massSourceTot_ += massSourceCurr_;
+        Info << "total conversion of mass:\n\tcurrent source = " << massSourceCurr_ << "\n\ttotal source = " << massSourceTot_ << "\n" << endl;
         Info << "get data done" << endl;
 }
 
