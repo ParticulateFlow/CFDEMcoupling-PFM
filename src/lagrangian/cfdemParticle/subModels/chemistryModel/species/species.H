@@ -120,7 +120,6 @@ private:
 
 public:
 
-    friend class diffusionCoefficient;
 
     //- Runtime type information
     TypeName("species");
