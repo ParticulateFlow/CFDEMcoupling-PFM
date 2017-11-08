@@ -317,7 +317,7 @@ void species::execute()
             particleCloud_.dataExchangeM().getData(mod_spec_names_[i],"scalar-atom",changeOfSpeciesMass_[i]);
             changeOfSpeciesMassFields_[i].primitiveFieldRef() = 0.0;
             changeOfSpeciesMassFields_[i].boundaryFieldRef() = 0.0;
-            particleCloud_.averagingM().setScalarSum
+            particleCloud_.averagingM().setScalarSumCentre
             (
                 changeOfSpeciesMassFields_[i],
                 changeOfSpeciesMass_[i],

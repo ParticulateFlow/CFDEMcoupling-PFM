@@ -18,10 +18,10 @@
                     artMass[cellI] *=0.0;
                 }
             }
-            Info << "\nartificial mass of " << Y[i].name() << " per time step: "<< fvc::domainIntegrate(artMass) << endl;
+            Info << "\nartificial mass of species " << Y[i].name() << " per time step: "<< fvc::domainIntegrate(artMass) << endl;
             if(lVCell > -1)
             {
-                Info << "lowest value of " << lowestValue << " at cell " << lVCell << "with coordinates" << endl;
-                Info << "\t" << mesh.C()[lVCell].component(0) << "\t" << mesh.C()[lVCell].component(1)  << "\t" << mesh.C()[lVCell].component(2) << endl;
+                Pout << "lowest value of " << lowestValue << " at cell " << lVCell << " with coordinates" << endl;
+                Pout << "\t" << mesh.C()[lVCell].component(0) << "\t" << mesh.C()[lVCell].component(1)  << "\t" << mesh.C()[lVCell].component(2) << endl;
             }
 }
