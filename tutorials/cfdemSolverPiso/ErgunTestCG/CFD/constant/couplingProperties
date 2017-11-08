@@ -33,7 +33,7 @@ couplingInterval 100;
 
 voidFractionModel divided;//centre;//
 
-locateModel engine;//turboEngineM2M;//
+locateModel engine;//turboEngine;//
 
 meshMotionModel noMeshMotion;
 
