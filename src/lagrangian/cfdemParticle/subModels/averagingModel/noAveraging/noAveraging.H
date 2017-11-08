@@ -66,7 +66,7 @@ public:
         (
             volScalarField& field,
             double**& value,
-            double**& weight,
+            double** const& weight,
             volScalarField& weightField,
             double**const& mask
         ) const;
@@ -75,7 +75,7 @@ public:
         (
             volVectorField& field,
             double**& value,
-            double**& weight,
+            double** const& weight,
             volScalarField& weightField,
             double**const& mask
         ) const;

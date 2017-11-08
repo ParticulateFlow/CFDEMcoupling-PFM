@@ -154,6 +154,7 @@ $(averagingModels)/averagingModel/averagingModel.C
 $(averagingModels)/averagingModel/newAveragingModel.C
 $(averagingModels)/dilute/dilute.C
 $(averagingModels)/dense/dense.C
+$(averagingModels)/noAveraging/noAveraging.C
 
 $(clockModels)/clockModel/clockModel.C
 $(clockModels)/clockModel/newClockModel.C

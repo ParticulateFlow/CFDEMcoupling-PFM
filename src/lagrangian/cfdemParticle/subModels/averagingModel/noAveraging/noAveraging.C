@@ -71,7 +71,7 @@ void noAveraging::setScalarAverage
 (
     volScalarField& field,
     double**& value,
-    double**& weight,
+    double** const& weight,
     volScalarField& weightField,
     double**const& mask
 ) const
@@ -81,7 +81,7 @@ void noAveraging::setVectorAverage
 (
     volVectorField& field,
     double**& value,
-    double**& weight,
+    double** const& weight,
     volScalarField& weightField,
     double**const& mask
 ) const
