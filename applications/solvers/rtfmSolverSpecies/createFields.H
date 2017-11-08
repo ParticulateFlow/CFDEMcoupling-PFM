@@ -34,7 +34,7 @@
     (
         IOobject
         (
-            "U.1Rec",
+            "U1Rec",
             runTime.timeName(),
             mesh,
             IOobject::MUST_READ,
@@ -47,7 +47,7 @@
     (
         IOobject
         (
-            "alpha.1Rec",
+            "alpha1Rec",
             runTime.timeName(),
             mesh,
             IOobject::MUST_READ,
@@ -60,7 +60,7 @@
     (
         IOobject
         (
-            "U.2Rec",
+            "U2Rec",
             runTime.timeName(),
             mesh,
             IOobject::MUST_READ,
@@ -75,7 +75,7 @@
     (
         IOobject
         (
-            "alpha.2Rec",
+            "alpha2Rec",
             runTime.timeName(),
             mesh,
             IOobject::NO_READ,
@@ -96,7 +96,7 @@ surfaceScalarField phi2Rec
  (
      IOobject
      (
-        "phi.2Rec",
+        "phi2Rec",
         runTime.timeName(),
         mesh,
         IOobject::READ_IF_PRESENT,
@@ -105,7 +105,7 @@ surfaceScalarField phi2Rec
      linearInterpolate(U2Rec*alpha2Rec) & mesh.Sf()
  );
 phi2Rec.write();
- 
+
   singlePhaseTransportModel laminarTransport(U2Rec, phi2Rec);
 
     autoPtr<incompressible::turbulenceModel> turbulence
@@ -113,7 +113,6 @@ phi2Rec.write();
         incompressible::turbulenceModel::New(U2Rec, phi2Rec, laminarTransport)
     );
     
-
     // transport stuff
 
  // create concentration field
