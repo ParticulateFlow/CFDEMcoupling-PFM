@@ -1,0 +1,84 @@
+/*---------------------------------------------------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.4                                   |
+|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+
+    root            "";
+    case            "";
+    instance        "";
+    local           "";
+
+    class           dictionary;
+    object          couplingProperties;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+//===========================================================================//
+// sub-models & settings
+
+modelType "none";
+
+couplingInterval 1;
+
+voidFractionModel off;
+
+locateModel engine;//turboEngineM2M;//
+
+meshMotionModel noMeshMotion;
+
+regionModel allRegion;
+
+IOModel "off";
+
+dataExchangeModel noDataExchange;
+
+averagingModel off;
+
+clockModel standardClock;//off;
+
+smoothingModel off;
+
+probeModel off;
+
+//forceModelsRec
+//();
+
+forceModels
+();
+
+momCoupleModels
+(
+    off
+);
+
+turbulenceModelType "turbulenceProperties";
+
+
+
+//===========================================================================//
+// sub-model properties
+
+engineProps
+{
+    treeSearch true;
+}
+
+turboEngineM2MProps
+{
+    turboEngineProps
+    {
+        treeSearch true;
+    }
+}
+
+// ************************************************************************* //
