@@ -218,7 +218,12 @@ void diffusionCoefficient::execute()
                 }
             }
 
-            Texp    =   pow(Tfluid,1.75);
+            // change fluid pressure to 1 bar instead of Pa
+            Pfluid  =  Pfluid/101325;
+            Info << "pressure field" << Pfluid << nl << endl;
+
+            // Texp    =  pow(Tfluid,1.75);
+            Texp  = sqrt(Tfluid*Tfluid*Tfluid)*sqrt(sqrt(Tfluid));
 
             for (int i=0; i<diffusantGasNames_.size();i++)
             {
@@ -249,7 +254,8 @@ void diffusionCoefficient::execute()
                             //  Unit of dBinary is [m^2/s]
                             //  INFO:: Normally unit of dBinary is cm^2/s, but the 1st term in RHS is 10^-3 instead
                             //  So here it is already converted
-                            dBinary_[i][j] = pow(10,-7)*Texp*molNum_[i][j]/(Pfluid*volDiff_[i][j]);
+                            dBinary_[i][j] = 1e-7*Texp*molNum_[i][j]/(Pfluid*volDiff_[i][j]);
+
                             Info << "Molecular diffusion for species " << diffusantGasNames_[i] << " in "
                                  << speciesNames_[j] << " is : " << dBinary_[i][j] << nl << endl;
 
