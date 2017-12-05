@@ -232,7 +232,8 @@ void diffusionCoefficient::execute()
             Info << "pressure field" << Pfluid << nl << endl;
 
             // Texp    =  pow(Tfluid,1.75);
-            Texp  = sqrt(Tfluid*Tfluid*Tfluid)*sqrt(sqrt(Tfluid));
+            Texp  = Tfluid*sqrt(sqrt(Tfluid*Tfluid*Tfluid));
+            Info << "T - exponent calculation" << Texp << nl << endl;
 
             dBinary_ = new double *[diffusantGasNames_.size()];
             molNum_ = new double *[diffusantGasNames_.size()];
