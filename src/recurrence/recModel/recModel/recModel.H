@@ -155,6 +155,8 @@ public:
     virtual const volVectorField& exportVolVectorField(word, label) const = 0;
     virtual const surfaceScalarField& exportSurfaceScalarField(word, label) const = 0;
     
+//     virtual tmp<surfaceScalarField> exportAveragedSurfaceScalarField(word, scalar) const = 0;
+    
     const HashTable<label,word>& timeIndexList() const;
     
     SymmetricSquareMatrix<scalar>& recurrenceMatrix();

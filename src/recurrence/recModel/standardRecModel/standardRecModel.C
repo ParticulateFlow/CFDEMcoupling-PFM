@@ -140,6 +140,34 @@ void standardRecModel::exportSurfaceScalarField(word fieldname, surfaceScalarFie
     field = exportSurfaceScalarField(fieldname, virtualTimeIndex);
 }
 
+// tmp<surfaceScalarField> standardRecModel::exportAveragedSurfaceScalarField(word fieldname, scalar threshold) const
+// {
+//     const label fieldI = getSurfaceScalarFieldIndex(fieldname, virtualTimeIndex);
+//     
+//     tmp<surfaceScalarField> tAveragedSurfaceScalarField(surfaceScalarFieldList_[fieldI][virtualTimeIndex]);
+//     
+//     label counter = 1;
+//     scalar recErr;
+//     label delay = 10;
+//     label lastMin = -1000;
+//     
+//     for(int runningTimeIndex = 1; runningTimeIndex < numRecFields_-1 ; runningTimeIndex++)
+//     {
+//         recErr = recurrenceMatrix_[virtualTimeIndex][runningTimeIndex];
+//         if(recErr > threshold) continue;
+//         if(recErr > recurrenceMatrix_[virtualTimeIndex][runningTimeIndex-1]) continue;
+//         if(recErr > recurrenceMatrix_[virtualTimeIndex][runningTimeIndex+1]) continue;
+//         if(abs(runningTimeIndex - virtualTimeIndex) < delay) continue;
+//         if(abs(runningTimeIndex - lastMin) < delay) continue;
+// 
+//         lastMin = runningTimeIndex;
+//         counter++;
+//         tAveragedSurfaceScalarField += surfaceScalarFieldList_[fieldI][runningTimeIndex];
+//     }
+//     
+//     tAveragedSurfaceScalarField /= counter;
+//     return tAveragedSurfaceScalarField;
+// }
 
 
 void standardRecModel::readFieldSeries()
