@@ -1,4 +1,19 @@
- volVectorField U_smooth
+IOdictionary recProperties
+    (
+        IOobject
+        (
+            "recProperties",
+            mesh.time().constant(),
+            mesh,
+            IOobject::MUST_READ,
+            IOobject::NO_WRITE
+        )
+    );
+
+dimensionedScalar dThreshold(recProperties.lookup("threshold"));
+scalar threshold = dThreshold.value();
+
+volVectorField U_smooth
     (
         IOobject
         (

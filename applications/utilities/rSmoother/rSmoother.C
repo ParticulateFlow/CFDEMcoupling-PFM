@@ -30,13 +30,11 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
-// #include "fvCFD.H"
-// #include "singlePhaseTransportModel.H"
-// #include "turbulentTransportModel.H"
-// #include "fvOptions.H"
+ #include "fvCFD.H"
+ #include "fvOptions.H"
 
 #include "recBase.H"
-
+#include "recModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -47,6 +45,7 @@ int main(int argc, char *argv[])
     #include "createTime.H"
     #include "createMesh.H"
     #include "createControl.H"
+    #include "createFields.H"
   
  
     recBase recurrenceBase(mesh);
@@ -54,9 +53,8 @@ int main(int argc, char *argv[])
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
     // set time step to that of recurrence database
-    runTime.setDeltaT(recBase.recM().recTimeStep());
+    runTime.setDeltaT(recurrenceBase.recM().recTimeStep());
 
-    scalar threshold = 0.5;
     label index = -1;
 
     Info<< "\nSmoothing recurrence statistics\n" << endl;
@@ -67,7 +65,6 @@ int main(int argc, char *argv[])
         index = runTime.timeIndex();
 	#include "updateFields.H"
         runTime++;
-        recTimeIndex++;
     }
 
     Info<< "End\n" << endl;

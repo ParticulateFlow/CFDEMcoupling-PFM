@@ -407,7 +407,45 @@ void standardRecModel::writeRecMatrix() const
 
 
 
-tmp<surfaceScalarField> standardRecModel::exportAveragedSurfaceScalarField(word fieldname, scalar threshold, label index) const
+// tmp<surfaceScalarField> standardRecModel::exportAveragedSurfaceScalarField(word fieldname, scalar threshold, label index)
+// {
+//     label timeIndex;
+//     if (index < 0)
+//     {
+//         timeIndex = virtualTimeIndex;
+//     }
+//     else
+//     {
+//         timeIndex = index; 
+//     }
+//     const label fieldI = getSurfaceScalarFieldIndex(fieldname, timeIndex);
+//     
+//     tmp<surfaceScalarField> tAveragedSurfaceScalarField(surfaceScalarFieldList_[fieldI][timeIndex]);
+//     
+//     label counter = 1;
+//     scalar recErr;
+//     label delay = 10;
+//     label lastMin = -1000;
+//     
+//     for(int runningTimeIndex = 1; runningTimeIndex < numRecFields_-1 ; runningTimeIndex++)
+//     {
+//         recErr = recurrenceMatrix_[timeIndex][runningTimeIndex];
+//         if(recErr > threshold) continue;
+//         if(recErr > recurrenceMatrix_[timeIndex][runningTimeIndex-1]) continue;
+//         if(recErr > recurrenceMatrix_[timeIndex][runningTimeIndex+1]) continue;
+//         if(abs(runningTimeIndex - timeIndex) < delay) continue;
+//         if(abs(runningTimeIndex - lastMin) < delay) continue;
+// 
+//         lastMin = runningTimeIndex;
+//         counter++;
+//         tAveragedSurfaceScalarField += surfaceScalarFieldList_[fieldI][runningTimeIndex];
+//     }
+//     
+//     tAveragedSurfaceScalarField /= counter;
+//     return tAveragedSurfaceScalarField;
+// }
+
+tmp<volVectorField> standardRecModel::exportAveragedVolVectorField(word fieldname, scalar threshold, label index)
 {
     label timeIndex;
     if (index < 0)
@@ -418,15 +456,15 @@ tmp<surfaceScalarField> standardRecModel::exportAveragedSurfaceScalarField(word 
     {
         timeIndex = index; 
     }
-    const label fieldI = getSurfaceScalarFieldIndex(fieldname, timeIndex);
+    const label fieldI = getVolVectorFieldIndex(fieldname, timeIndex);
     
-    tmp<surfaceScalarField> tAveragedSurfaceScalarField(surfaceScalarFieldList_[fieldI][timeIndex]);
-    
+    tmp<volVectorField> tAveragedVolVectorField(volVectorFieldList_[fieldI][timeIndex]);
+
     label counter = 1;
     scalar recErr;
     label delay = 10;
     label lastMin = -1000;
-    
+
     for(int runningTimeIndex = 1; runningTimeIndex < numRecFields_-1 ; runningTimeIndex++)
     {
         recErr = recurrenceMatrix_[timeIndex][runningTimeIndex];
@@ -438,48 +476,10 @@ tmp<surfaceScalarField> standardRecModel::exportAveragedSurfaceScalarField(word 
 
         lastMin = runningTimeIndex;
         counter++;
-        tAveragedSurfaceScalarField += surfaceScalarFieldList_[fieldI][runningTimeIndex];
+        tAveragedVolVectorField() += volVectorFieldList_[fieldI][runningTimeIndex];
     }
-    
-    tAveragedSurfaceScalarField /= counter;
-    return tAveragedSurfaceScalarField;
-}
-
-tmp<volVectorField> standardRecModel::exportAveragedVolVectorField(word fieldname, scalar threshold, label index) const
-{
-    label timeIndex;
-    if (index < 0)
-    {
-        timeIndex = virtualTimeIndex;
-    }
-    else
-    {
-        timeIndex = index; 
-    }
-    const label fieldI = getSurfaceScalarFieldIndex(fieldname, timeIndex);
-    
-    tmp<volVectorField> tAveragedVolVectorField(surfaceScalarFieldList_[fieldI][timeIndex]);
-    
-    label counter = 1;
-    scalar recErr;
-    label delay = 10;
-    label lastMin = -1000;
-    
-    for(int runningTimeIndex = 1; runningTimeIndex < numRecFields_-1 ; runningTimeIndex++)
-    {
-        recErr = recurrenceMatrix_[timeIndex][runningTimeIndex];
-        if(recErr > threshold) continue;
-        if(recErr > recurrenceMatrix_[timeIndex][runningTimeIndex-1]) continue;
-        if(recErr > recurrenceMatrix_[timeIndex][runningTimeIndex+1]) continue;
-        if(abs(runningTimeIndex - timeIndex) < delay) continue;
-        if(abs(runningTimeIndex - lastMin) < delay) continue;
-
-        lastMin = runningTimeIndex;
-        counter++;
-        tAveragedVolVectorField += volVectorFieldList_[fieldI][runningTimeIndex];
-    }
-    
-    tAveragedVolVectorField /= counter;
+    Info << "time index = " << index << ", counter = " << counter << endl;
+    tAveragedVolVectorField() /= counter;
     return tAveragedVolVectorField;
 }
 
