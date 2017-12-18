@@ -67,20 +67,11 @@ recModel::recModel
     volScalarFieldNames_(recProperties_.lookup("volScalarFields")),
     volVectorFieldNames_(recProperties_.lookup("volVectorFields")),
     surfaceScalarFieldNames_(recProperties_.lookup("surfaceScalarFields")),
-    recTime("dataBase", "", "../system", "../constant", false),
-    timeDirs(recTime.times()),
-    numRecFields_(label(timeDirs.size())),
-    recurrenceMatrix_(numRecFields_,scalar(0.0)),
-    timeIndexList_(numRecFields_-1),
-    timeValueList_(numRecFields_-1),
-    contTimeIndex(0),
-    sequenceStart(0),
-    sequenceEnd(0),
-    lowerSeqLim_(max(1, label(numRecFields_/20))),
-    upperSeqLim_(label(numRecFields_/5)),
     startTime_(readScalar(controlDict_.lookup("startTime"))),
     endTime_(readScalar(controlDict_.lookup("endTime"))),
     timeStep_(readScalar(controlDict_.lookup("deltaT"))),
+    sequenceStart(0),
+    sequenceEnd(0),
     virtualStartIndex(0),
     virtualTimeIndex(0),
     virtualTimeIndexNext(1),
@@ -88,19 +79,8 @@ recModel::recModel
     virtualTimeIndexListPos(0)
 {
     if (recProperties_.found("verbose")) verbose_=true;
-    if (verbose_)
-    {
-    	// be informative on properties of the "recTime" Time-object
-    	Info << "recTime.rootPath() " << recTime.rootPath() << endl;
-    	Info << "recTime.caseName() " << recTime.caseName() << endl;
-    	Info << "recTime.path() " << recTime.path() << endl;
-    	Info << "recTime.timePath() " << recTime.timePath() << endl;
-	Info << "recTime.timeName() " << recTime.timeName() << endl;
-	Info << "timeDirs " << timeDirs << endl;
-    }
-    readTimeSeries();
-    recTimeStep_ = checkTimeStep();
-    totRecSteps_ = 1+static_cast<label> ((endTime_-startTime_) / recTimeStep_);
+    recTimeStep_ = -1.0;
+    totRecSteps_ = -1;
 }
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
@@ -109,35 +89,6 @@ recModel::~recModel()
 {}
 
 // * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * //
-const HashTable<label,word>& recModel::timeIndexList() const
-{
-    return timeIndexList_;
-}
-
-SymmetricSquareMatrix<scalar>& recModel::recurrenceMatrix()
-{
-    return recurrenceMatrix_;
-}
-
-label recModel::lowerSeqLim() const
-{
-    return lowerSeqLim_; 
-}
-
-label recModel::upperSeqLim() const
-{
-    return upperSeqLim_; 
-}
-
-labelPairList& recModel::virtualTimeIndexList()
-{
-    return virtualTimeIndexList_;
-}
-
-label recModel::numRecFields() const
-{
-    return numRecFields_;
-}
 
 label recModel::totRecSteps() const
 {
@@ -145,113 +96,6 @@ label recModel::totRecSteps() const
 }
 // * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * //
 
-void recModel::readTimeSeries()
-{
-  // fill the data structure for the time indices
-    for (instantList::iterator it=timeDirs.begin(); it != timeDirs.end(); ++it)
-    {
-    	// set run-time
-    	recTime.setTime(*it, it->value());
-    	
-    	
-    	// skip constant
-    	if (recTime.timeName() == "constant")
-    	{
-        	continue;
-        }
-        
-        
-        // insert the time name into the hash-table with a continuous second index
-        timeIndexList_.insert(recTime.timeName(), contTimeIndex);
-        
-        
-        if (verbose_)
-    	{
-    		Info << "current time " << recTime.timeName() << endl;
-    		Info << "insert " << recTime.timeName() << " , " << contTimeIndex << endl;
-    	}
-        
-        
-        // insert the time value
-        timeValueList_.insert(contTimeIndex, recTime.timeOutputValue());
-        
-        // increment continuousIndex
-        contTimeIndex++;
-        
-        if (verbose_)
-    	{
-        	Info << "contTimeIndex " << contTimeIndex << endl;
-        }
-    }
-
-    if (verbose_)
-    {
-    	Info << endl;
-    	Info << "Found " << label(timeDirs.size()) << " time folders" << endl;
-        Info << "Found " << label(timeIndexList_.size()) << " time steps" << endl;
-    }
-}
-
-scalar recModel::checkTimeStep()
-{
-   // check time step of provided data
-    scalar dtCur(0.0);
-    scalar dtOld(0.0);
-    
-    if (verbose_)
-    {
-    	Info << "timeValueList : " << timeValueList_ << endl;
-    }
-    
-    forAll(timeValueList_, i)
-    {
-    	// compute time step
-    	if (timeDirs[i].value() == timeDirs.last().value())
-    	{
-    		if (verbose_)
-    		{
-    			Info << ".. leaving loop at " << timeDirs[i] << endl;
-    		}
-    		// leave loop
-    		break;
-    	}
-    	
-    	if (verbose_)
-    	{
-    		Info << "timeDirs.fcIndex(i)].value(),  timeDirs[i].value() : " 
-    			<< timeDirs[timeDirs.fcIndex(i)].value() << "   " << timeDirs[i].value()
-    			<< endl;
-    	}
-    	
-    	// the documentation is in the code ;-)
-    	//	fcIndex() - return forward circular index, i.e. the next index
-        dtCur = timeDirs[timeDirs.fcIndex(i)].value() - timeDirs[i].value();
-        
-        if (dtOld < SMALL)
-        {
-        	dtOld = dtCur;
-        }
-        
-        if (abs(dtOld - dtCur) > SMALL)
-        {
-        	Info << "dtCur, dtOld = " << dtCur << "   " << dtOld << endl;
-        	FatalError << "    in setting up data" << nl
-				<< "    non-constant time-step of provided simulation data" 
-				<< abort(FatalError);
-        }
-    }
-        
-    // set deltaT
-    recTime.setDeltaT(dtCur, false);
-	
-	if (verbose_)
-    {
-		Info << "Setting deltaRecT to " << dtCur << endl;
-		Info << "Actual recTime.deltaT = " << recTime.deltaTValue() << endl;
-		Info << "Actual runTime.deltaT = " << timeStep_ << endl;
-    }
-    return dtCur;
-}
 
 void recModel::init()
 {
@@ -261,10 +105,9 @@ void recModel::init()
     virtualTimeIndexNext=virtualTimeIndex+1; 
 }
 
-void recModel::writeRecMatrix() const
+labelPairList& recModel::virtualTimeIndexList()
 {
-    OFstream matrixFile("recurrenceMatrix");
-    matrixFile << recurrenceMatrix_;
+    return virtualTimeIndexList_;
 }
 
 void recModel::writeRecPath() const

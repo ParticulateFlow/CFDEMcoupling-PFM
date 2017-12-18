@@ -56,10 +56,36 @@ standardRecModel::standardRecModel
 :
     recModel(dict,base),
     propsDict_(dict.subDict(typeName + "Props")),
+    recTime("dataBase", "", "../system", "../constant", false),
+    timeDirs(recTime.times()),
+    numRecFields_(label(timeDirs.size())),
+    recurrenceMatrix_(numRecFields_,scalar(0.0)),
+    timeIndexList_(numRecFields_-1),
+    timeValueList_(numRecFields_-1),
+    contTimeIndex(0),
+    lowerSeqLim_(max(1, label(numRecFields_/20))),
+    upperSeqLim_(label(numRecFields_/5)),
+    
     volScalarFieldList_(volScalarFieldNames_.size()),
     volVectorFieldList_(volVectorFieldNames_.size()),
     surfaceScalarFieldList_(surfaceScalarFieldNames_.size())
 {
+  
+  if (verbose_)
+    {
+    	// be informative on properties of the "recTime" Time-object
+    	Info << "recTime.rootPath() " << recTime.rootPath() << endl;
+    	Info << "recTime.caseName() " << recTime.caseName() << endl;
+    	Info << "recTime.path() " << recTime.path() << endl;
+    	Info << "recTime.timePath() " << recTime.timePath() << endl;
+	Info << "recTime.timeName() " << recTime.timeName() << endl;
+	Info << "timeDirs " << timeDirs << endl;
+    }
+    readTimeSeries();
+  
+  recTimeStep_ = checkTimeStep();
+    totRecSteps_ = 1+static_cast<label> ((endTime_-startTime_) / recTimeStep_);
+  
     for(int i=0; i<volScalarFieldNames_.size(); i++)
         volScalarFieldList_[i].setSize(numRecFields_);
     
@@ -84,91 +110,66 @@ standardRecModel::~standardRecModel()
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-
-void standardRecModel::updateRecFields()
+scalar standardRecModel::checkTimeStep()
 {
-  virtualTimeIndex=virtualTimeIndexNext;
-  virtualTimeIndexNext++;
-  if (virtualTimeIndexNext>sequenceEnd)
-  {
-    virtualTimeIndexListPos++;
-    sequenceStart=virtualTimeIndexList_[virtualTimeIndexListPos].first();
-    sequenceEnd=virtualTimeIndexList_[virtualTimeIndexListPos].second();
-    virtualTimeIndexNext=sequenceStart;
-  }
-  
-  if (verbose_)
-      Info << "\nUpdating virtual time index to " << virtualTimeIndex << ".\n" << endl;  
-}
-
-
-
-
-const volScalarField& standardRecModel::exportVolScalarField(word fieldname, label index) const
-{
-    const label fieldI = getVolScalarFieldIndex(fieldname, index);
+   // check time step of provided data
+    scalar dtCur(0.0);
+    scalar dtOld(0.0);
     
-    return volScalarFieldList_[fieldI][index];
-}
-
-const volVectorField& standardRecModel::exportVolVectorField(word fieldname, label index) const
-{
-    const label fieldI = getVolVectorFieldIndex(fieldname, index);
+    if (verbose_)
+    {
+    	Info << "timeValueList : " << timeValueList_ << endl;
+    }
     
-    return volVectorFieldList_[fieldI][index];
+    forAll(timeValueList_, i)
+    {
+    	// compute time step
+    	if (timeDirs[i].value() == timeDirs.last().value())
+    	{
+    		if (verbose_)
+    		{
+    			Info << ".. leaving loop at " << timeDirs[i] << endl;
+    		}
+    		// leave loop
+    		break;
+    	}
+    	
+    	if (verbose_)
+    	{
+    		Info << "timeDirs.fcIndex(i)].value(),  timeDirs[i].value() : " 
+    			<< timeDirs[timeDirs.fcIndex(i)].value() << "   " << timeDirs[i].value()
+    			<< endl;
+    	}
+    	
+    	// the documentation is in the code ;-)
+    	//	fcIndex() - return forward circular index, i.e. the next index
+        dtCur = timeDirs[timeDirs.fcIndex(i)].value() - timeDirs[i].value();
+        
+        if (dtOld < SMALL)
+        {
+        	dtOld = dtCur;
+        }
+        
+        if (abs(dtOld - dtCur) > SMALL)
+        {
+        	Info << "dtCur, dtOld = " << dtCur << "   " << dtOld << endl;
+        	FatalError << "    in setting up data" << nl
+				<< "    non-constant time-step of provided simulation data" 
+				<< abort(FatalError);
+        }
+    }
+        
+    // set deltaT
+    recTime.setDeltaT(dtCur, false);
+	
+	if (verbose_)
+    {
+		Info << "Setting deltaRecT to " << dtCur << endl;
+		Info << "Actual recTime.deltaT = " << recTime.deltaTValue() << endl;
+		Info << "Actual runTime.deltaT = " << timeStep_ << endl;
+    }
+    return dtCur;
 }
-
-const surfaceScalarField& standardRecModel::exportSurfaceScalarField(word fieldname, label index) const
-{
-    const label fieldI = getSurfaceScalarFieldIndex(fieldname, index);
-    
-    return surfaceScalarFieldList_[fieldI][index];
-}
-
-void standardRecModel::exportVolScalarField(word fieldname, volScalarField& field) const
-{
-    field = exportVolScalarField(fieldname, virtualTimeIndex);
-}
-
-void standardRecModel::exportVolVectorField(word fieldname, volVectorField& field) const
-{
-    field = exportVolVectorField(fieldname, virtualTimeIndex);
-}
-
-void standardRecModel::exportSurfaceScalarField(word fieldname, surfaceScalarField& field) const
-{
-    field = exportSurfaceScalarField(fieldname, virtualTimeIndex);
-}
-
-// tmp<surfaceScalarField> standardRecModel::exportAveragedSurfaceScalarField(word fieldname, scalar threshold) const
-// {
-//     const label fieldI = getSurfaceScalarFieldIndex(fieldname, virtualTimeIndex);
-//     
-//     tmp<surfaceScalarField> tAveragedSurfaceScalarField(surfaceScalarFieldList_[fieldI][virtualTimeIndex]);
-//     
-//     label counter = 1;
-//     scalar recErr;
-//     label delay = 10;
-//     label lastMin = -1000;
-//     
-//     for(int runningTimeIndex = 1; runningTimeIndex < numRecFields_-1 ; runningTimeIndex++)
-//     {
-//         recErr = recurrenceMatrix_[virtualTimeIndex][runningTimeIndex];
-//         if(recErr > threshold) continue;
-//         if(recErr > recurrenceMatrix_[virtualTimeIndex][runningTimeIndex-1]) continue;
-//         if(recErr > recurrenceMatrix_[virtualTimeIndex][runningTimeIndex+1]) continue;
-//         if(abs(runningTimeIndex - virtualTimeIndex) < delay) continue;
-//         if(abs(runningTimeIndex - lastMin) < delay) continue;
-// 
-//         lastMin = runningTimeIndex;
-//         counter++;
-//         tAveragedSurfaceScalarField += surfaceScalarFieldList_[fieldI][runningTimeIndex];
-//     }
-//     
-//     tAveragedSurfaceScalarField /= counter;
-//     return tAveragedSurfaceScalarField;
-// }
-
 
 void standardRecModel::readFieldSeries()
 {
@@ -257,6 +258,237 @@ void standardRecModel::readFieldSeries()
     }
     Info << "Reading fields done" << endl;
 }
+
+
+void standardRecModel::readTimeSeries()
+{
+  // fill the data structure for the time indices
+    for (instantList::iterator it=timeDirs.begin(); it != timeDirs.end(); ++it)
+    {
+    	// set run-time
+    	recTime.setTime(*it, it->value());
+    	
+    	
+    	// skip constant
+    	if (recTime.timeName() == "constant")
+    	{
+        	continue;
+        }
+        
+        
+        // insert the time name into the hash-table with a continuous second index
+        timeIndexList_.insert(recTime.timeName(), contTimeIndex);
+        
+        
+        if (verbose_)
+    	{
+    		Info << "current time " << recTime.timeName() << endl;
+    		Info << "insert " << recTime.timeName() << " , " << contTimeIndex << endl;
+    	}
+        
+        
+        // insert the time value
+        timeValueList_.insert(contTimeIndex, recTime.timeOutputValue());
+        
+        // increment continuousIndex
+        contTimeIndex++;
+        
+        if (verbose_)
+    	{
+        	Info << "contTimeIndex " << contTimeIndex << endl;
+        }
+    }
+
+    if (verbose_)
+    {
+    	Info << endl;
+    	Info << "Found " << label(timeDirs.size()) << " time folders" << endl;
+        Info << "Found " << label(timeIndexList_.size()) << " time steps" << endl;
+    }
+}
+
+
+void standardRecModel::exportVolScalarField(word fieldname, volScalarField& field) const
+{
+    field = exportVolScalarField(fieldname, virtualTimeIndex);
+}
+
+
+void standardRecModel::exportVolVectorField(word fieldname, volVectorField& field) const
+{
+    field = exportVolVectorField(fieldname, virtualTimeIndex);
+}
+
+
+void standardRecModel::exportSurfaceScalarField(word fieldname, surfaceScalarField& field) const
+{
+    field = exportSurfaceScalarField(fieldname, virtualTimeIndex);
+}
+
+
+const volScalarField& standardRecModel::exportVolScalarField(word fieldname, label index) const
+{
+    const label fieldI = getVolScalarFieldIndex(fieldname, index);
+    
+    return volScalarFieldList_[fieldI][index];
+}
+
+const volVectorField& standardRecModel::exportVolVectorField(word fieldname, label index) const
+{
+    const label fieldI = getVolVectorFieldIndex(fieldname, index);
+    
+    return volVectorFieldList_[fieldI][index];
+}
+
+const surfaceScalarField& standardRecModel::exportSurfaceScalarField(word fieldname, label index) const
+{
+    const label fieldI = getSurfaceScalarFieldIndex(fieldname, index);
+    
+    return surfaceScalarFieldList_[fieldI][index];
+}
+
+
+SymmetricSquareMatrix<scalar>& standardRecModel::recurrenceMatrix()
+{
+    return recurrenceMatrix_;
+}
+
+
+const HashTable<label,word>& standardRecModel::timeIndexList() const
+{
+    return timeIndexList_;
+}
+
+
+label standardRecModel::lowerSeqLim() const
+{
+    return lowerSeqLim_; 
+}
+
+label standardRecModel::upperSeqLim() const
+{
+    return upperSeqLim_; 
+}
+
+
+label standardRecModel::numRecFields() const
+{
+    return numRecFields_;
+}
+
+
+void standardRecModel::updateRecFields()
+{
+  virtualTimeIndex=virtualTimeIndexNext;
+  virtualTimeIndexNext++;
+  if (virtualTimeIndexNext>sequenceEnd)
+  {
+    virtualTimeIndexListPos++;
+    sequenceStart=virtualTimeIndexList_[virtualTimeIndexListPos].first();
+    sequenceEnd=virtualTimeIndexList_[virtualTimeIndexListPos].second();
+    virtualTimeIndexNext=sequenceStart;
+  }
+  
+  if (verbose_)
+      Info << "\nUpdating virtual time index to " << virtualTimeIndex << ".\n" << endl;  
+}
+
+
+void standardRecModel::writeRecMatrix() const
+{
+    OFstream matrixFile("recurrenceMatrix");
+    matrixFile << recurrenceMatrix_;
+}
+
+
+
+
+
+
+
+
+tmp<surfaceScalarField> standardRecModel::exportAveragedSurfaceScalarField(word fieldname, scalar threshold, label index) const
+{
+    label timeIndex;
+    if (index < 0)
+    {
+        timeIndex = virtualTimeIndex;
+    }
+    else
+    {
+        timeIndex = index; 
+    }
+    const label fieldI = getSurfaceScalarFieldIndex(fieldname, timeIndex);
+    
+    tmp<surfaceScalarField> tAveragedSurfaceScalarField(surfaceScalarFieldList_[fieldI][timeIndex]);
+    
+    label counter = 1;
+    scalar recErr;
+    label delay = 10;
+    label lastMin = -1000;
+    
+    for(int runningTimeIndex = 1; runningTimeIndex < numRecFields_-1 ; runningTimeIndex++)
+    {
+        recErr = recurrenceMatrix_[timeIndex][runningTimeIndex];
+        if(recErr > threshold) continue;
+        if(recErr > recurrenceMatrix_[timeIndex][runningTimeIndex-1]) continue;
+        if(recErr > recurrenceMatrix_[timeIndex][runningTimeIndex+1]) continue;
+        if(abs(runningTimeIndex - timeIndex) < delay) continue;
+        if(abs(runningTimeIndex - lastMin) < delay) continue;
+
+        lastMin = runningTimeIndex;
+        counter++;
+        tAveragedSurfaceScalarField += surfaceScalarFieldList_[fieldI][runningTimeIndex];
+    }
+    
+    tAveragedSurfaceScalarField /= counter;
+    return tAveragedSurfaceScalarField;
+}
+
+tmp<volVectorField> standardRecModel::exportAveragedVolVectorField(word fieldname, scalar threshold, label index) const
+{
+    label timeIndex;
+    if (index < 0)
+    {
+        timeIndex = virtualTimeIndex;
+    }
+    else
+    {
+        timeIndex = index; 
+    }
+    const label fieldI = getSurfaceScalarFieldIndex(fieldname, timeIndex);
+    
+    tmp<volVectorField> tAveragedVolVectorField(surfaceScalarFieldList_[fieldI][timeIndex]);
+    
+    label counter = 1;
+    scalar recErr;
+    label delay = 10;
+    label lastMin = -1000;
+    
+    for(int runningTimeIndex = 1; runningTimeIndex < numRecFields_-1 ; runningTimeIndex++)
+    {
+        recErr = recurrenceMatrix_[timeIndex][runningTimeIndex];
+        if(recErr > threshold) continue;
+        if(recErr > recurrenceMatrix_[timeIndex][runningTimeIndex-1]) continue;
+        if(recErr > recurrenceMatrix_[timeIndex][runningTimeIndex+1]) continue;
+        if(abs(runningTimeIndex - timeIndex) < delay) continue;
+        if(abs(runningTimeIndex - lastMin) < delay) continue;
+
+        lastMin = runningTimeIndex;
+        counter++;
+        tAveragedVolVectorField += volVectorFieldList_[fieldI][runningTimeIndex];
+    }
+    
+    tAveragedVolVectorField /= counter;
+    return tAveragedVolVectorField;
+}
+
+
+
+
+
+
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

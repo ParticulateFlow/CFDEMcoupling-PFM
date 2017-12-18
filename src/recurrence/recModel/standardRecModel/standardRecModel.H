@@ -42,7 +42,38 @@ class standardRecModel
 {
 protected:
   
+    dictionary propsDict_;
+    Foam::Time recTime;
+    instantList timeDirs;
+    label numRecFields_;
+
+    // matrix that contains the recurrence ERROR
+    SymmetricSquareMatrix<scalar> recurrenceMatrix_;
+    
+    // create a data structure for the time indices
+    //	constant will not be contained
+    //	runTimeIndex -> continuousIndex
+    HashTable<label,word> timeIndexList_;
+    
+    // create a data structure for the time values
+    //	constant will not be contained
+    //	continuousIndex -> time.value()
+    HashTable<label,scalar> timeValueList_;
+    
+    label contTimeIndex;
+    
+    const label lowerSeqLim_;
+    const label upperSeqLim_;
+    
+    scalar checkTimeStep();
+    
+    inline label getVolScalarFieldIndex(word, label) const;
+    inline label getVolVectorFieldIndex(word, label) const;
+    inline label getSurfaceScalarFieldIndex(word, label) const;
+  
     void readFieldSeries();
+    
+    void readTimeSeries();
 
 public:
 
@@ -63,9 +94,6 @@ public:
 
         ~standardRecModel();
 
-
-    void updateRecFields();
-    
     void exportVolScalarField(word, volScalarField&) const;
     void exportVolVectorField(word, volVectorField&) const;
     void exportSurfaceScalarField(word, surfaceScalarField&) const;
@@ -74,15 +102,23 @@ public:
     const volVectorField& exportVolVectorField(word, label) const;
     const surfaceScalarField& exportSurfaceScalarField(word, label) const;
     
-//     tmp<surfaceScalarField> exportAveragedSurfaceScalarField(word, scalar) const;
+    tmp<surfaceScalarField> exportAveragedSurfaceScalarField(word, scalar, label index = -1) const;
+    tmp<volVectorField> exportAveragedvolVectorField(word, scalar, label index = -1) const;
+   
+    SymmetricSquareMatrix<scalar>& recurrenceMatrix();
     
-    inline label getVolScalarFieldIndex(word, label) const;
-    inline label getVolVectorFieldIndex(word, label) const;
-    inline label getSurfaceScalarFieldIndex(word, label) const;
+    const HashTable<label,word>& timeIndexList() const;
+    
+    label lowerSeqLim() const;
+    label upperSeqLim() const;
+    
+    label numRecFields() const;
+    
+    void updateRecFields();
+    
+    void writeRecMatrix() const;
 	
 private:
-  
-    dictionary propsDict_;
     
     List<PtrList<volScalarField> > volScalarFieldList_;
     List<PtrList<volVectorField> > volVectorFieldList_;
