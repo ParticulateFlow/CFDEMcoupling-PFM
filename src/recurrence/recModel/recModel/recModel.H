@@ -58,6 +58,9 @@ protected:
     scalar startTime_;
     scalar endTime_;
     scalar timeStep_;
+    
+    scalar recStartTime_;
+    scalar recEndTime_;
     scalar recTimeStep_;
     label totRecSteps_;
     
@@ -145,6 +148,16 @@ public:
     virtual label numRecFields() const = 0;
     
     label totRecSteps() const;
+    
+    scalar recStartTime() const
+    {
+        return recStartTime_;
+    }
+    
+    scalar recEndTime() const
+    {
+        return recEndTime_;
+    }
     
     scalar recTimeStep() const
     {

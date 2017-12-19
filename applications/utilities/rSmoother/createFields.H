@@ -10,8 +10,8 @@ IOdictionary recProperties
         )
     );
 
-dimensionedScalar dThreshold(recProperties.lookup("threshold"));
-scalar threshold = dThreshold.value();
+
+scalar threshold(readScalar(recProperties.lookup("threshold")));
 
 volVectorField U_smooth
     (

@@ -55,6 +55,19 @@ int main(int argc, char *argv[])
     // set time step to that of recurrence database
     runTime.setDeltaT(recurrenceBase.recM().recTimeStep());
 
+    // check start and end time
+    if (abs(runTime.startTime().value() - recurrenceBase.recM().recStartTime()) > 1e-5)
+    {
+        Info << "Stopping. Start time and database start time are different." << endl;
+        return 0;
+    }
+
+    if (runTime.endTime().value() > recurrenceBase.recM().recEndTime())
+    {
+        runTime.setEndTime(recurrenceBase.recM().recEndTime());
+        Info << "End time set to database end time." << endl;
+    }
+
     label index = -1;
 
     Info<< "\nSmoothing recurrence statistics\n" << endl;

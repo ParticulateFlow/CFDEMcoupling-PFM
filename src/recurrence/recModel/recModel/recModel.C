@@ -70,6 +70,8 @@ recModel::recModel
     startTime_(readScalar(controlDict_.lookup("startTime"))),
     endTime_(readScalar(controlDict_.lookup("endTime"))),
     timeStep_(readScalar(controlDict_.lookup("deltaT"))),
+    recStartTime_(-1.0),
+    recEndTime_(-1.0),
     sequenceStart(0),
     sequenceEnd(0),
     virtualStartIndex(0),

@@ -83,7 +83,7 @@ standardRecModel::standardRecModel
     }
     readTimeSeries();
   
-  recTimeStep_ = checkTimeStep();
+    recTimeStep_ = checkTimeStep();
     totRecSteps_ = 1+static_cast<label> ((endTime_-startTime_) / recTimeStep_);
   
     for(int i=0; i<volScalarFieldNames_.size(); i++)
@@ -298,6 +298,9 @@ void standardRecModel::readTimeSeries()
         	Info << "contTimeIndex " << contTimeIndex << endl;
         }
     }
+    
+    recStartTime_ = recTime.startTime().value();
+    recEndTime_ = recTime.endTime().value();
 
     if (verbose_)
     {
@@ -476,10 +479,10 @@ tmp<volVectorField> standardRecModel::exportAveragedVolVectorField(word fieldnam
 
         lastMin = runningTimeIndex;
         counter++;
-        tAveragedVolVectorField() += volVectorFieldList_[fieldI][runningTimeIndex];
+        tAveragedVolVectorField.ref() += volVectorFieldList_[fieldI][runningTimeIndex];
     }
     Info << "time index = " << index << ", counter = " << counter << endl;
-    tAveragedVolVectorField() /= counter;
+    tAveragedVolVectorField.ref() /= counter;
     return tAveragedVolVectorField;
 }
 
