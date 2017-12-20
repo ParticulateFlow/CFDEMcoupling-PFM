@@ -262,6 +262,7 @@ void standardRecModel::readFieldSeries()
 
 void standardRecModel::readTimeSeries()
 {
+    bool firsttime = true;
   // fill the data structure for the time indices
     for (instantList::iterator it=timeDirs.begin(); it != timeDirs.end(); ++it)
     {
@@ -275,6 +276,12 @@ void standardRecModel::readTimeSeries()
         	continue;
         }
         
+        if (firsttime)
+	{
+	    firsttime = false;
+	    recStartTime_ = recTime.value();
+	}
+	recEndTime_ = recTime.value();
         
         // insert the time name into the hash-table with a continuous second index
         timeIndexList_.insert(recTime.timeName(), contTimeIndex);
@@ -298,15 +305,14 @@ void standardRecModel::readTimeSeries()
         	Info << "contTimeIndex " << contTimeIndex << endl;
         }
     }
-    
-    recStartTime_ = recTime.startTime().value();
-    recEndTime_ = recTime.endTime().value();
 
     if (verbose_)
     {
     	Info << endl;
     	Info << "Found " << label(timeDirs.size()) << " time folders" << endl;
         Info << "Found " << label(timeIndexList_.size()) << " time steps" << endl;
+	Info << "database start time = " << recStartTime_ << endl;
+	Info << "database end time = " << recEndTime_ << endl;
     }
 }
 
@@ -448,7 +454,7 @@ void standardRecModel::writeRecMatrix() const
 //     return tAveragedSurfaceScalarField;
 // }
 
-tmp<volVectorField> standardRecModel::exportAveragedVolVectorField(word fieldname, scalar threshold, label index)
+void standardRecModel::exportAveragedVolVectorField(volVectorField& smoothfield, word fieldname, scalar threshold, label index) const
 {
     label timeIndex;
     if (index < 0)
@@ -461,29 +467,28 @@ tmp<volVectorField> standardRecModel::exportAveragedVolVectorField(word fieldnam
     }
     const label fieldI = getVolVectorFieldIndex(fieldname, timeIndex);
     
-    tmp<volVectorField> tAveragedVolVectorField(volVectorFieldList_[fieldI][timeIndex]);
-
+    smoothfield = volVectorFieldList_[fieldI][timeIndex];
+     
     label counter = 1;
     scalar recErr;
-    label delay = 10;
+    label delay = 1;
     label lastMin = -1000;
 
-    for(int runningTimeIndex = 1; runningTimeIndex < numRecFields_-1 ; runningTimeIndex++)
+    for(int runningTimeIndex = 0; runningTimeIndex < numRecFields_ ; runningTimeIndex++)
     {
         recErr = recurrenceMatrix_[timeIndex][runningTimeIndex];
         if(recErr > threshold) continue;
-        if(recErr > recurrenceMatrix_[timeIndex][runningTimeIndex-1]) continue;
-        if(recErr > recurrenceMatrix_[timeIndex][runningTimeIndex+1]) continue;
+   //     if(recErr > recurrenceMatrix_[timeIndex][runningTimeIndex-1]) continue;
+   //     if(recErr > recurrenceMatrix_[timeIndex][runningTimeIndex+1]) continue;
         if(abs(runningTimeIndex - timeIndex) < delay) continue;
         if(abs(runningTimeIndex - lastMin) < delay) continue;
 
         lastMin = runningTimeIndex;
         counter++;
-        tAveragedVolVectorField.ref() += volVectorFieldList_[fieldI][runningTimeIndex];
+        smoothfield += volVectorFieldList_[fieldI][runningTimeIndex];
     }
     Info << "time index = " << index << ", counter = " << counter << endl;
-    tAveragedVolVectorField.ref() /= counter;
-    return tAveragedVolVectorField;
+    smoothfield /= counter;
 }
 
 

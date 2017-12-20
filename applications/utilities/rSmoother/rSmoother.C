@@ -59,6 +59,8 @@ int main(int argc, char *argv[])
     if (abs(runTime.startTime().value() - recurrenceBase.recM().recStartTime()) > 1e-5)
     {
         Info << "Stopping. Start time and database start time are different." << endl;
+	Info << "Start time = " << runTime.startTime().value() << endl;
+	Info << "Database start time = " << recurrenceBase.recM().recStartTime() << endl;
         return 0;
     }
 

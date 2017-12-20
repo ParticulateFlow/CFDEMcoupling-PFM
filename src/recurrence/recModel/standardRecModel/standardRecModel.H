@@ -103,7 +103,7 @@ public:
     const surfaceScalarField& exportSurfaceScalarField(word, label) const;
     
   //  tmp<surfaceScalarField> exportAveragedSurfaceScalarField(word, scalar, label index = -1);
-    tmp<volVectorField> exportAveragedVolVectorField(word, scalar, label index = -1);
+    void exportAveragedVolVectorField(volVectorField&, word, scalar, label index = -1) const;
    
     SymmetricSquareMatrix<scalar>& recurrenceMatrix();
     
