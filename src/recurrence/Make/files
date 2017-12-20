@@ -8,6 +8,7 @@ recNorm/sqrDiffNorm/sqrDiffNorm.C
 recPath/recPath/recPath.C
 recPath/recPath/newRecPath.C
 recPath/simpleRandomPath/simpleRandomPath.C
+recPath/noPath/noPath.C
 recStatAnalysis/recStatAnalysis/recStatAnalysis.C
 recStatAnalysis/recStatAnalysis/newRecStatAnalysis.C
 recStatAnalysis/noRecStatAnalysis/noRecStatAnalysis.C
