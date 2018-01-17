@@ -43,6 +43,7 @@ class standardRecModel
 protected:
   
     dictionary propsDict_;
+    word dataBaseName_;
     Foam::Time recTime;
     instantList timeDirs;
     label numRecFields_;

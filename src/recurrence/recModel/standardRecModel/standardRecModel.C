@@ -56,7 +56,8 @@ standardRecModel::standardRecModel
 :
     recModel(dict,base),
     propsDict_(dict.subDict(typeName + "Props")),
-    recTime("dataBase", "", "../system", "../constant", false),
+    dataBaseName_(propsDict_.lookupOrDefault<word>("dataBase", word("dataBase"))),
+    recTime(fileName(dataBaseName_), "", "../system", "../constant", false),
     timeDirs(recTime.times()),
     numRecFields_(label(timeDirs.size())),
     recurrenceMatrix_(numRecFields_,scalar(0.0)),
