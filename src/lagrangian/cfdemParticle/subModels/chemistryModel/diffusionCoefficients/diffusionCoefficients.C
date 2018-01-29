@@ -360,7 +360,7 @@ void diffusionCoefficient::molWeightTable()
     molWeight.insert("O2", 32.00);
     molWeight.insert("N2", 28.01);
     molWeight.insert("H2", 2.02);
-    molWeight.insert("H2O", 2.02);
+    molWeight.insert("H2O", 18.01);
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
