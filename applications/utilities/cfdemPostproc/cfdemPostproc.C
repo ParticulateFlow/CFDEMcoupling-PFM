@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
     Info<< "\nStarting time loop\n" << endl;
 
     int count=0;
-    int DEM_dump_Interval=1000;
+    int DEM_dump_Interval(particleCloud.couplingProperties().lookupOrDefault<int>("dumpInterval",1000));
     particleCloud.reAllocArrays();
 
     double **positions_;
