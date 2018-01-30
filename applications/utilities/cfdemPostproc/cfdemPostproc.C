@@ -109,6 +109,7 @@ int main(int argc, char *argv[])
 
         particleCloud.voidFractionM().setvoidFraction(NULL,voidfractions_,particleWeights_,particleVolumes_,particleV_);
 
+        // make sure coupling interval = 1, otherwise update of voidfractionPrev and UsPrev necessary
         voidfraction.ref() = particleCloud.voidFractionM().voidFractionInterp();
         voidfraction.correctBoundaryConditions();
 
@@ -120,6 +121,9 @@ int main(int argc, char *argv[])
             particleCloud.averagingM().UsWeightField(),
             NULL
         );
+
+        Us = particleCloud.averagingM().UsInterp();
+        Us.correctBoundaryConditions();
 
         runTime.write();
 
