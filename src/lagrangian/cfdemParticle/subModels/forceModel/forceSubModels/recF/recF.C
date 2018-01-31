@@ -69,7 +69,7 @@ recF::~recF()
 
 void recF::partToArray
 (
-    label& index,
+    label index,
     vector& dragTot,
     const vector& dummy1,
     const vector& dummy2,

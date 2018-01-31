@@ -69,7 +69,7 @@ recU::~recU()
 
 void recU::partToArray
 (
-    label& index,
+    label index,
     vector& U,
     const vector& dummy1,
     const vector& dummy2,
@@ -78,7 +78,6 @@ void recU::partToArray
 {
         for(int j=0;j<3;j++)
             myForceM().fluidVel()[index][j] += U[j];
-
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

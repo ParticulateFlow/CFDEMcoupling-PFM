@@ -66,7 +66,7 @@ public:
 
     // Member Functions
 	
-	void partToArray(label&, vector&, const vector&, const vector& dummy2=vector::zero, scalar dummy3=scalar(0)) const;
+	void partToArray(label, vector&, const vector&, const vector& dummy2=vector::zero, scalar dummy3=scalar(0)) const;
 
         word myType() const{return typeName; };
 };
