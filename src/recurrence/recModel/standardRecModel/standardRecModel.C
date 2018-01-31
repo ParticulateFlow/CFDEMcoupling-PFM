@@ -65,7 +65,7 @@ standardRecModel::standardRecModel
     timeValueList_(numRecFields_-1),
     contTimeIndex(0),
     lowerSeqLim_(max(1, label(numRecFields_/20))),
-    upperSeqLim_(label(numRecFields_/5)),
+    upperSeqLim_(max(1, label(numRecFields_/5))),
     
     volScalarFieldList_(volScalarFieldNames_.size()),
     volVectorFieldList_(volVectorFieldNames_.size()),
@@ -122,6 +122,11 @@ scalar standardRecModel::checkTimeStep()
     	Info << "timeValueList : " << timeValueList_ << endl;
     }
     
+    if (timeIndexList_.size() == 1)
+    {
+        return 1e10;
+    }
+
     forAll(timeValueList_, i)
     {
     	// compute time step

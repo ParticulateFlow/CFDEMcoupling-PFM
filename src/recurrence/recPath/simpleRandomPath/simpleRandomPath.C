@@ -110,9 +110,15 @@ void simpleRandomPath::computeRecPath()
     labelPair seqStartEnd(seqStart,virtualTimeIndex);
     virtualTimeIndexList_.append(seqStartEnd);
     recSteps+=seqLength;
-    
+
     SymmetricSquareMatrix<scalar>& recurrenceMatrix( base_.recM().recurrenceMatrix() );
     label numRecFields( base_.recM().numRecFields() );
+
+    if(base_.recM().totRecSteps() == 1)
+    {
+        Info<< "\nPrimitive recurrence path with one element.\n" << endl;
+        return;
+    }
    
     while(recSteps <= base_.recM().totRecSteps() )
     {
