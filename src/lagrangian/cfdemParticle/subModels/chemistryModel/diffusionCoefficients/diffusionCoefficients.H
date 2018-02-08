@@ -70,7 +70,11 @@ private:
     // gas pressure at particle location
     word pressureFieldName_;
 
-    const volScalarField& P_;
+    const volScalarField& P_; 
+
+    word partPressureName_;
+
+    mutable double **partPressure_;
 
     word densityFieldName_;
 

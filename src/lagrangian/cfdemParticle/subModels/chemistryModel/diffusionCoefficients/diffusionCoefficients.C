@@ -71,6 +71,8 @@ diffusionCoefficient::diffusionCoefficient
     tempField_(sm.mesh().lookupObject<volScalarField> (tempFieldName_)),
     pressureFieldName_(propsDict_.lookupOrDefault<word>("pressureFieldName","p")),
     P_(sm.mesh().lookupObject<volScalarField>(pressureFieldName_)),
+    partPressureName_(propsDict_.lookupOrDefault<word>("partPressureName","partP")),
+    partPressure_(NULL),
     densityFieldName_(propsDict_.lookupOrDefault<word>("densityFieldName","rho")),
     rho_(sm.mesh().lookupObject<volScalarField> (densityFieldName_)),
     molarConcFieldName_(propsDict_.lookupOrDefault<word>("totalMoleFieldName","molarConc")),
@@ -101,6 +103,8 @@ diffusionCoefficient::~diffusionCoefficient()
     coeffs.clearStorage();
     molWeight.clearStorage();
 
+    particleCloud_.dataExchangeM().destroy(partPressure_,1);
+
     int nP_ = particleCloud_.numberOfParticles();
     for (int i=0; i<diffusantGasNames_.size(); i++)
     {
@@ -121,6 +125,8 @@ diffusionCoefficient::~diffusionCoefficient()
     double initVal=0.0;
     if (particleCloud_.dataExchangeM().maxNumberOfParticles() > 0)
     {
+        particleCloud_.dataExchangeM().allocateArray(partPressure_,initVal,1,"nparticles");
+
         for (int i=0; i<diffusantGasNames_.size(); i++)
         {
             particleCloud_.dataExchangeM().allocateArray(diffusionCoefficients_[i],initVal,1,"nparticles");
@@ -133,6 +139,7 @@ void diffusionCoefficient::reAllocMyArrays() const
     if (particleCloud_.numberOfParticlesChanged())
     {
         double initVal=0.0;
+        particleCloud_.dataExchangeM().allocateArray(partPressure_,initVal,1,"nparticles");
 
         for (int i=0; i<diffusantGasNames_.size(); i++)
         {
@@ -239,6 +246,9 @@ void diffusionCoefficient::execute()
             Pfluid  =  Pfluid/101325;
             Info << "pressure field" << Pfluid << nl << endl;
 
+            partPressure_[index][0] = Pfluid;
+            Info << "partPressure_[index][0] = " << partPressure_[index][0] << endl;
+
             // Texp    =  pow(Tfluid,1.75);
             Texp  = Tfluid*sqrt(sqrt(Tfluid*Tfluid*Tfluid));
             Info << "T - exponent calculation" << Texp << nl << endl;
@@ -323,6 +333,8 @@ void diffusionCoefficient::execute()
             }
         }
     }
+
+    particleCloud_.dataExchangeM().giveData(partPressureName_, "scalar-atom",partPressure_);
 
     for (int i=0; i<diffusantGasNames_.size();i++)
     {
