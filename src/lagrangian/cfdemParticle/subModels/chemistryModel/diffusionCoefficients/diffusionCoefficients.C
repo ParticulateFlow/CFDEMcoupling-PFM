@@ -242,12 +242,12 @@ void diffusionCoefficient::execute()
                 }
             }
 
+            partPressure_[index][0] = Pfluid;
+            Info << "partPressure_[index][0] = " << partPressure_[index][0] << endl;
+
             // change fluid pressure to 1 bar instead of Pa
             Pfluid  =  Pfluid/101325;
             Info << "pressure field" << Pfluid << nl << endl;
-
-            partPressure_[index][0] = Pfluid;
-            Info << "partPressure_[index][0] = " << partPressure_[index][0] << endl;
 
             // Texp    =  pow(Tfluid,1.75);
             Texp  = Tfluid*sqrt(sqrt(Tfluid*Tfluid*Tfluid));
