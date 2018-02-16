@@ -34,6 +34,4 @@ LIB_LIBS = \
     -lmpi_cxx \
     -Wl,-rpath,$(CFDEM_LIGGGHTS_BIN_DIR) \
     -L$(CFDEM_LIGGGHTS_BIN_DIR) \
-    -lliggghts \
-    -L$(CFDEM_Many2ManyLIB_PATH) \
-    -lcoupleMany2Many
+    -lliggghts
