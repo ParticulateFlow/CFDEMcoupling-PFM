@@ -1,0 +1,128 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.3.0                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      foam.dat;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+H2
+{
+    specie
+    {
+        nMoles          1;
+        molWeight       2.02;
+    }
+    thermodynamics
+    {
+        Tlow            200;
+        Thigh           1700;
+        Tcommon         1000;
+        highCpCoeffs    ( 2.932831E+00 8.265980E-04 -1.464006E-07 1.540985E-11	-6.887962E-16	-8.130558E+02  -1.024316E+00);
+        lowCpCoeffs     ( 2.344303E+00	7.980425E-03  -1.947792E-05	2.015697E-08 -7.376029E-12   -9.179241E+02 6.830022E-01);
+    }
+    transport
+    {
+        As              1.67212e-06;
+        Ts              170.6;
+    }
+}
+
+CO2
+{
+    specie
+    {
+        nMoles          1;
+        molWeight       44.01;
+    }
+    thermodynamics
+    {
+        Tlow            200;
+        Thigh           6000;
+        Tcommon         1000;
+        highCpCoeffs    ( 4.636511E+00	2.741457E-03	-9.958976E-07 1.603867E-10 -9.161986E-15 -4.902490E+04 -1.934896E+00 );
+        lowCpCoeffs     ( 2.356813E+00 8.984130E-03 -7.122063E-06 2.457301E-09 -1.428855E-13 -4.837197E+04 9.900904E+00 );
+    }
+    transport
+    {
+        As              1.67212e-06;
+        Ts              170.6;
+    }
+}
+
+O2
+{
+    specie
+    {
+        nMoles          1;
+        molWeight       31.9988;
+    }
+    thermodynamics
+    {
+        Tlow            200;
+        Thigh           5000;
+        Tcommon         1000;
+        highCpCoeffs    ( 3.28254 0.00148309 -7.57967e-07 2.09471e-10 -2.16718e-14 -1088.46 5.45323 );
+        lowCpCoeffs     ( 3.78246 -0.00299673 9.8473e-06 -9.6813e-09 3.24373e-12 -1063.94 3.65768 );
+    }
+    transport
+    {
+        As              1.67212e-06;
+        Ts              170.672;
+    }
+}
+
+N2
+{
+    specie
+    {
+        nMoles          1;
+        molWeight       28.0134;
+    }
+    thermodynamics
+    {
+        Tlow            200;
+        Thigh           6000;
+        Tcommon         1000;
+        highCpCoeffs    ( 2.952541E+00 1.396884E-03	-4.926258E-07 7.860009E-11 -4.607498E-15 -9.239375E+02 5.871822E+00 );
+        lowCpCoeffs     ( 3.530963E+00 -1.236595E-04 -5.029934E-07 2.435277E-09 -1.408795E-12 -1.046964E+03 2.967439E+00 );
+    }
+    transport
+    {
+        As              1.67212e-06;
+        Ts              170.672;
+    }
+}
+
+// added CO - Thermo data from combustion.berkeley.edu/gri-mech/data/species/thermo.dat
+CO
+{
+    specie
+    {
+        nMoles          1;
+        molWeight       28.01;
+    }
+    thermodynamics
+    {
+        Tlow            200;
+        Thigh           6000;
+        Tcommon         1000;
+        highCpCoeffs    ( 3.048486E+00 1.351728E-03 -4.857941E-07 7.885364E-11 -4.698075E-15 -1.426612E+04 6.017098E+00 );
+        lowCpCoeffs     ( 3.579534E+00 -6.103537E-04 1.016814E-06 9.070059E-10 -9.044245E-13 -1.434409E+04 3.508409E+00 );
+    }
+    transport
+    {
+        As              1.67212e-06;
+        Ts              170.672;
+    }
+} 
+
+// ************************************************************************* //

@@ -1,0 +1,174 @@
+# Pour granular particles into chute container, then induce flow
+log             ../DEM/log.liggghts
+thermo_log      ../DEM/post/thermo.txt
+
+atom_style      granular
+atom_modify     map array
+communicate     single vel yes
+
+boundary        f f f
+newton          off
+
+units           si
+processors      2 1 1
+
+# read the restart file
+read_restart    ../DEM/post/restart/liggghts.restart
+
+neighbor        0.0005 bin
+neigh_modify    delay 0 binsize 0.01 
+
+# Material properties required for granular pair styles
+
+fix         m1 all property/global youngsModulus peratomtype 5.e6
+fix         m2 all property/global poissonsRatio peratomtype 0.45
+fix         m3 all property/global coefficientRestitution peratomtypepair 1 0.3
+fix         m4 all property/global coefficientFriction peratomtypepair 1 0.5
+
+# pair style
+pair_style  gran model hertz tangential history # Hertzian without cohesion
+pair_coeff  * *
+
+# timestep, gravity
+timestep    1e-2
+fix         gravi all gravity 0.0 vector 0.0 -1.0 0.0
+
+# walls
+fix     xwalls1 all wall/gran model hertz tangential history primitive type 1 xplane 0.0
+fix     xwalls2 all wall/gran model hertz tangential history primitive type 1 xplane 1.5
+fix     ywalls1 all wall/gran model hertz tangential history primitive type 1 yplane 0.0
+fix     ywalls2 all wall/gran model hertz tangential history primitive type 1 yplane 0.5
+fix     zwalls1 all wall/gran model hertz tangential history primitive type 1 zplane 0.0
+fix     zwalls2 all wall/gran model hertz tangential history primitive type 1 zplane 0.5
+
+###############################################
+
+# cfd coupling
+fix     cfd all couple/cfd couple_every 100 mpi
+fix     cfd2 all couple/cfd/force
+
+# this should invoke chemistry
+fix     cfd3 all couple/cfd/chemistry n_species 5 species_names H2 H2O CO CO2 N2
+
+# Activate for 3-layer unreacted core shrink model
+fix     cfd5 all chem/shrink/core speciesA CO molMassA 0.02801 speciesC CO2 molMassC 0.04401 kch2 0.34 screen yes nevery 1 
+fix     cfd6 all chem/shrink/core speciesA H2 molMassA 0.00202 speciesC H2O molMassC 0.01801 kch2 0.06 screen yes nevery 1 
+
+# Chemical properties for unreacted shrink core (activate only when chem/shrink/core is active)
+fix     k0_CO all property/global k0_cfd5 vector 17 25 2700
+fix     Ea_CO all property/global Ea_cfd5 vector 69488 73674 113859
+
+fix 	k0_H2 all property/global k0_cfd6 vector 30 23 160
+fix 	Ea_H2 all property/global Ea_cfd6 vector 63627 71162 92092
+
+# particle porosity/tortuosity/pore diameter
+fix     porosity 	all property/atom   porosity_ 	    vector yes no no 0.598 0.2122 0.0399 0.02 
+fix     tortuosity 	all property/global tortuosity_     scalar 3
+fix     pore_diameter   all property/global pore_diameter_  scalar 1e-6 
+
+# Material properties for unreacted chemical shrink core (activate only when chem/shrink/core is active)
+fix     density all property/global density_all vector 7870 5740 5170 5240  
+fix     molMass all property/global molMass_all vector 0.055845 0.071844 0.231532 0.1596882
+
+# define layer radius
+fix     layerRelRad all property/atom relRadii vector yes no no 1.0 0.998 0.995 0.98
+
+# define fix for mass layer - initial testing
+fix	massLayer all property/atom massLayer vector no no no 0. 0. 0. 0.
+
+## debug fixes ##
+# fix to compute fracRed
+fix	fracRed	all property/atom fracRed vector yes no no 0. 0. 0. 
+fix	Aterm all property/atom Aterm vector yes no no 0. 0. 0.
+fix 	Bterm all property/atom Bterm vector yes no no 0. 0. 0.
+fix	Massterm all property/atom Massterm scalar yes no no 0.
+fix	effDiffBinary all property/atom effDiffBinary vector yes no no 0. 0. 0.
+fix	effDiffKnud all property/atom effDiffKnud vector yes no no 0. 0. 0.
+
+# apply nve integration to all particles that are inserted as single particles
+# fix     integr all nve/sphere 
+
+###############################################
+
+variable time equal step*dt
+variable m1 equal mass[1]
+variable rp   equal radius[1]
+variable rho1 equal mass[1]/((4/3)*PI*radius[1]*radius[1]*radius[1])
+fix printmass all print 1000 "${time} ${m1} ${rho1} ${rp}" file mass_rho_rad.txt title "#time mass rho rad_par"
+
+compute layerRad1 all reduce sum f_layerRelRad[1]   
+fix     redRad1 all ave/time 1000 1 1000 c_layerRad1 file relRad1.dat
+
+compute layerRad2 all reduce sum f_layerRelRad[2]
+fix     redRad2 all ave/time 1000 1 1000 c_layerRad2 file relRad2.dat 
+
+compute layerRad3 all reduce sum f_layerRelRad[3]
+fix     redRad3 all ave/time 1000 1 1000 c_layerRad3 file relRad3.dat 
+
+compute layerRad4 all reduce sum f_layerRelRad[4]
+fix     redRad4 all ave/time 1000 1 1000 c_layerRad4 file relRad4.dat 
+
+#### give information to file 
+compute Aterm_red all reduce sum f_Aterm[1] f_Aterm[2] f_Aterm[3]
+fix	Aterm1 all ave/time 100 1 100 c_Aterm_red[1] c_Aterm_red[2] c_Aterm_red[3]
+variable a1 equal f_Aterm1[1]
+variable a2 equal f_Aterm1[2]
+variable a3 equal f_Aterm1[3]
+
+compute Bterm_red all reduce sum f_Bterm[1] f_Bterm[2] f_Bterm[3]
+fix	Bterm1 all ave/time 100 1 100 c_Bterm_red[1] c_Bterm_red[2] c_Bterm_red[3]
+variable b1 equal f_Bterm1[1]
+variable b2 equal f_Bterm1[2]
+variable b3 equal f_Bterm1[3]
+
+compute Massterm_red all reduce sum f_Massterm
+fix	Massterm1 all ave/time 100 1 100 c_Massterm_red
+variable mt1 equal f_Massterm1
+
+compute fracRedTerm all reduce sum f_fracRed[1] f_fracRed[2] f_fracRed[3]
+fix	fracRed1 all ave/time 100 1 100 c_fracRedTerm[1] c_fracRedTerm[2] c_fracRedTerm[3]
+variable fr1 equal f_fracRed1[1]
+variable fr2 equal f_fracRed1[2]
+variable fr3 equal f_fracRed1[3]
+
+compute effDiffBinary_red all reduce sum f_effDiffBinary[1] f_effDiffBinary[2] f_effDiffBinary[3]
+fix	effDiffBinary1 all ave/time 1000 1 1000 c_effDiffBinary_red[1] c_effDiffBinary_red[2] c_effDiffBinary_red[3]
+variable dij1 equal f_effDiffBinary1[1]
+variable dij2 equal f_effDiffBinary1[2]
+variable dij3 equal f_effDiffBinary1[3]
+
+compute effDiffKnud_red all reduce sum f_effDiffKnud[1] f_effDiffKnud[2] f_effDiffKnud[3]
+fix	effDiffKnud1 all ave/time 1000 1 1000 c_effDiffKnud_red[1] c_effDiffKnud_red[2] c_effDiffKnud_red[3]
+variable dik1 equal f_effDiffKnud1[1]
+variable dik2 equal f_effDiffKnud1[2]
+variable dik3 equal f_effDiffKnud1[3]
+
+compute porosity_red all reduce sum f_porosity[1] f_porosity[2] f_porosity[3] f_porosity[4]
+fix	porosity1 all ave/time 1000 1 1000 c_porosity_red[1] c_porosity_red[2] c_porosity_red[3] c_porosity_red[4]
+variable p1 equal f_porosity1[1]
+variable p2 equal f_porosity1[2]
+variable p3 equal f_porosity1[3]
+variable p4 equal f_porosity1[4]
+
+compute mass_layer all reduce sum f_massLayer[1] f_massLayer[2] f_massLayer[3] f_massLayer[4]
+fix	massLayerPrintout all ave/time 100 1 100 c_mass_layer[1] c_mass_layer[2] c_mass_layer[3] c_mass_layer[4]
+variable mL1 equal f_massLayerPrintout[1]
+variable mL2 equal f_massLayerPrintout[2]
+variable mL3 equal f_massLayerPrintout[3]
+variable mL4 equal f_massLayerPrintout[4]
+
+fix printOutput all print 100 "${time} ${a1} ${a2} ${a3} ${b1} ${b2} ${b3} ${mt1} ${fr1} ${fr2} ${fr3}" file Output.dat title "#time a1 a2 a3 b1 b2 b3 mt1 fr1 fr2 fr3"
+fix printDiffTerms all print 1000 "${time} ${dij1} ${dij2} ${dij3} ${dik1} ${dik2} ${dik3} ${p1} ${p2} ${p3} ${p4}" file DiffTerm.dat title "#time dij1 dij2 dij3 dik1 dik2 dik3 p_fe p_w p_m p_h"
+fix printMassLayer all print 100 "${time} ${mL1} ${mL2} ${mL3} ${mL4}" file MassLayers.dat title "#time mL_Fe mL_w mL_m mL_h"
+
+###############################################
+# screen output
+compute         rke all erotate/sphere
+thermo_style    custom step atoms ke c_rke vol
+thermo          1000
+thermo_modify   lost ignore norm no
+compute_modify  thermo_temp dynamic yes
+
+dump        dmp all custom 10000 ../DEM/post/dump.liggghts_run id type x y z ix iy iz vx vy vz fx fy fz omegax omegay omegaz radius 
+
+run         1
