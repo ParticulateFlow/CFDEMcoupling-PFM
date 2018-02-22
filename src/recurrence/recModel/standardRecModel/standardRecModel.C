@@ -59,7 +59,8 @@ standardRecModel::standardRecModel
     dataBaseName_(propsDict_.lookupOrDefault<word>("dataBase", word("dataBase"))),
     recTime(fileName(dataBaseName_), "", "../system", "../constant", false),
     timeDirs(recTime.times()),
-    numRecFields_(label(timeDirs.size())),
+    skipZero_(propsDict_.lookupOrDefault<Switch>("skipZero", Switch(false))),
+    numRecFields_(skipZero_ ? label(timeDirs.size())-1 : label(timeDirs.size())),
     recurrenceMatrix_(numRecFields_,scalar(0.0)),
     timeIndexList_(numRecFields_-1),
     timeValueList_(numRecFields_-1),
@@ -79,8 +80,9 @@ standardRecModel::standardRecModel
     	Info << "recTime.caseName() " << recTime.caseName() << endl;
     	Info << "recTime.path() " << recTime.path() << endl;
     	Info << "recTime.timePath() " << recTime.timePath() << endl;
-	Info << "recTime.timeName() " << recTime.timeName() << endl;
-	Info << "timeDirs " << timeDirs << endl;
+    	Info << "recTime.timeName() " << recTime.timeName() << endl;
+    	Info << "timeDirs " << timeDirs << endl;
+    	Info << "consider 0 directory: " << skipZero_ << endl;
     }
     readTimeSeries();
   
@@ -129,6 +131,16 @@ scalar standardRecModel::checkTimeStep()
 
     forAll(timeValueList_, i)
     {
+    	// skip zero
+    	if (skipZero_ and timeDirs[i].value() == 0)
+    	{
+    	    if (verbose_)
+    	    {
+    	        Info << " ... skipping 0 in checkTimeStep()" << endl;
+    	    }
+    	    continue;
+    	}
+    	
     	// compute time step
     	if (timeDirs[i].value() == timeDirs.last().value())
     	{
@@ -196,6 +208,17 @@ void standardRecModel::readFieldSeries()
       
         // set time
         recTime.setTime(*it, it->value());
+        
+        // skip zero
+        if (skipZero_ and recTime.timeName() == "0")
+        {
+            if (verbose_)
+    	    {
+    	        Info << " ... skipping 0 in readFieldSeries()" << endl;
+    	    }
+    	    
+    	    continue;
+        }
         
         // skip constant
         if (recTime.timeName() == "constant")
@@ -280,6 +303,17 @@ void standardRecModel::readTimeSeries()
     	if (recTime.timeName() == "constant")
     	{
         	continue;
+        }
+        
+        // skip zero
+        if (skipZero_ and recTime.timeName() == "0")
+        {
+            if (verbose_)
+    	    {
+    	        Info << " ... skipping 0 in readTimeSeries()" << endl;
+    	    }
+            
+            continue;
         }
         
         if (firsttime)

@@ -46,6 +46,7 @@ protected:
     word dataBaseName_;
     Foam::Time recTime;
     instantList timeDirs;
+    Switch skipZero_;
     label numRecFields_;
 
     // matrix that contains the recurrence ERROR
