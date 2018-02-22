@@ -82,7 +82,7 @@ standardRecModel::standardRecModel
     	Info << "recTime.timePath() " << recTime.timePath() << endl;
     	Info << "recTime.timeName() " << recTime.timeName() << endl;
     	Info << "timeDirs " << timeDirs << endl;
-    	Info << "consider 0 directory: " << skipZero_ << endl;
+    	Info << "ignoring 0 directory: " << skipZero_ << endl;
     }
     readTimeSeries();
   
