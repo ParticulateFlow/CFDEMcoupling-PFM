@@ -166,23 +166,30 @@ void species::init()
     // look-up of molar fraction fields can't happen in constructor because functionObject
     // has not been created at that time
   
-    Info << " Read species list from: " << specDict_.name() << endl;
-    Info << " Reading species list: " << speciesNames_ << endl;
+    if(verbose_)
+    {
+        Info << " Read species list from: " << specDict_.name() << endl;
+        Info << " Reading species list: " << speciesNames_ << endl;
+    }
+
 
     for (int i=0; i<speciesNames_.size(); i++)
     {
-        // Defining the Species volume scalar fields
-        Info << " Looking up species fields \n " << "X_"+speciesNames_[i] << endl;
+        // Defining the Species volume scalar fields        
         volScalarField& X = const_cast<volScalarField&>
                 (mesh_.lookupObject<volScalarField>("X_"+speciesNames_[i]));
         X_.set(i, &X);
 
-         Info << "The molar fraction fields (X_i): \n" << X_[i].name() << endl;
         // define the modified species names
         mod_spec_names_[i] = "Modified_" + speciesNames_[i];
 
-        // Check if mod species are correct
-        Info << "Modified species names are: \n" << mod_spec_names_[i] << endl;
+        if(verbose_)
+        {
+            Info << " Looking up species fields \n " << "X_"+speciesNames_[i] << endl;
+            Info << "The molar fraction fields (X_i): \n" << X_[i].name() << endl;
+            // Check if mod species are correct
+            Info << "Modified species names are: \n" << mod_spec_names_[i] << endl;
+        }
 
         // Create new volScalarFields for the changed values of the species mass fields
         changeOfSpeciesMassFields_.set
@@ -279,7 +286,7 @@ void species::execute()
             }
         }
 
-        if(verbose_ && index >=0 && index < 2)
+        if(verbose_)
         {
             for(int i =0; i<speciesNames_.size();i++)
             {
