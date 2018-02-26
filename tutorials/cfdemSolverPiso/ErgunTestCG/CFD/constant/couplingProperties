@@ -33,7 +33,7 @@ couplingInterval 100;
 
 voidFractionModel divided;//centre;//
 
-locateModel engine;//turboEngineM2M;//
+locateModel engine;//turboEngine;//
 
 meshMotionModel noMeshMotion;
 
@@ -49,7 +49,7 @@ averagingModel dense;//dilute;//
 
 clockModel off;//standardClock;//
 
-smoothingModel off;// localPSizeDiffSmoothing;// constDiffSmoothing; //
+smoothingModel off;// constDiffSmoothing; //
 
 forceModels
 (
@@ -61,7 +61,6 @@ forceModels
     GidaspowDrag
     //Archimedes
     //volWeightedAverage
-    //totalMomentumExchange
     particleCellVolume
 );
 
@@ -74,14 +73,6 @@ turbulenceModelType "turbulenceProperties";
 
 //===========================================================================//
 // sub-model properties
-
-localPSizeDiffSmoothingProps
-{
-    lowerLimit 0.1;
-    upperLimit 1e10;
-    dSmoothingLength 1.5e-3;
-    Csmoothing    1.0; 
-}
 
 constDiffSmoothingProps
 {
@@ -132,13 +123,7 @@ volWeightedAverageProps
     lowerThreshold 0;
     verbose true;
 }
-totalMomentumExchangeProps
-{
-    implicitMomExFieldName "Ksl";
-    explicitMomExFieldName "none";
-    fluidVelFieldName "U";
-    granVelFieldName "Us";
-}
+
 GidaspowDragProps
 {
     verbose true;
