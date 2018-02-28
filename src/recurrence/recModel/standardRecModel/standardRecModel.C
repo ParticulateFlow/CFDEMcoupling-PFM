@@ -26,7 +26,6 @@ License
 #include "Random.H"
 #include "standardRecModel.H"
 #include "addToRunTimeSelectionTable.H"
-#include <mpi.h>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

@@ -30,7 +30,6 @@ License
 #include "HashTable.H"
 #include "labelPair.H"
 #include "OFstream.H"
-#include <mpi.h>
 
 
 namespace Foam

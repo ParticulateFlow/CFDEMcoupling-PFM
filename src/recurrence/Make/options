@@ -1,6 +1,3 @@
-sinclude $(GENERAL_RULES)/mplib$(WM_MPLIB)
-sinclude $(RULES)/mplib$(WM_MPLIB)
-
 GIT_VERSION := $(shell git describe --abbrev=4 --dirty --always --tags)
 PFLAGS+= -DGITVERSION=\"$(GIT_VERSION)\"
 
@@ -26,7 +23,6 @@ LIB_LIBS = \
     -lfiniteVolume \
     -lmeshTools \
     -llagrangian \
-    -lmpi_cxx \
     -Wl,-rpath,$(CFDEM_LIGGGHTS_BIN_DIR) \
     -L$(CFDEM_LIGGGHTS_BIN_DIR) \
     -lliggghts \

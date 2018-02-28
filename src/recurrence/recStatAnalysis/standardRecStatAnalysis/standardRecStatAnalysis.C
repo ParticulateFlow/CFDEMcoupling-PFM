@@ -27,7 +27,6 @@ License
 #include "standardRecStatAnalysis.H"
 #include "recModel.H"
 #include "addToRunTimeSelectionTable.H"
-#include <mpi.h>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
