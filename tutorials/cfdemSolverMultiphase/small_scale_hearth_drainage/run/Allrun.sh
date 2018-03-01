@@ -1,7 +1,8 @@
 #!/bin/bash
 
 #===================================================================#
-# allrun script for cfdemSolverMultiphase 
+# This tutorial runs a drainage simulation of a small-scale blast
+# furnace hearth from an initial state generated from ../init 
 #===================================================================#
 
 #- define variables

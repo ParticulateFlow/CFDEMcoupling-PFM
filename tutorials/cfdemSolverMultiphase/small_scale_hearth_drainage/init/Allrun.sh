@@ -1,7 +1,9 @@
 #!/bin/bash
 
 #===================================================================#
-# allrun script for cfdemSolverMultiphase 
+# This tutorial initializes a drainage simulation of a small-scale
+# blast furnace hearth. A short coupled CFD-DEM simulation must be
+# carried out so the particle bed can settle in buoyancy equilibrium.
 #===================================================================#
 
 #- define variables
@@ -35,3 +37,15 @@ cd $casePath
 # generate files for post processing
 cd $casePath
 ./postRun.sh
+
+##########################################################################################
+# The following commands were used to set up the run case.
+# The outlet boundary conditions were manually changed in ../run/CFD/1.org/p_rgh to 
+# type fixedValue; value uniform 0; and in ../run/CFD/1.org/U to type zeroGradient;
+##########################################################################################
+
+#cd $casePath
+#cp ./CFD/0.org/pSmooth ./CFD/1
+#cp -r ./CFD/1/ ../run/CFD/1.org
+#cp ./DEM/post/restart/liggghts.restartCFDEM_1.000000 ../run/DEM/post/restart/liggghts.restart
+
