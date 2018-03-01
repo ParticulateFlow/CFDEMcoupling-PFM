@@ -80,7 +80,7 @@ momCoupleModels
     implicitCouple
 );
 
-turbulenceModelType "RASProperties";//"LESProperties";//
+turbulenceModelType "turbulenceProperties"; //"RASProperties";//"LESProperties";//
 
 //===========================================================================//
 // sub-model properties
@@ -271,12 +271,12 @@ dividedProps
 
 twoWayMPIProps
 {
-    liggghtsPath "../DEM/in.liggghts_equilibrate";
+    liggghtsPath "../DEM/in.liggghts_run";
 }
 twoWayM2MProps
 {
     maxNumberOfParticles 10100;
-    liggghtsPath "../DEM/in.liggghts_equilibrate";
+    liggghtsPath "../DEM/in.liggghts_run";
 }
 surfaceTensionForceProps
 {
