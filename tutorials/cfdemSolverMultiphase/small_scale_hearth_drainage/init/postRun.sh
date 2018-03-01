@@ -13,6 +13,7 @@ reconstructPar -withZero -noLagrangian
 foamToVTK
 
 cd $casePath
+cp ./CFD/0.org/pSmooth ./CFD/1
 cp -r ./CFD/1/ ../run/CFD/1.org
 cp ./DEM/post/restart/liggghts.restartCFDEM_1.000000 ../run/DEM/post/restart/liggghts.restart
 

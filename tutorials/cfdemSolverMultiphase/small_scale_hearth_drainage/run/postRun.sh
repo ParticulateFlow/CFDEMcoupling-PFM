@@ -9,7 +9,7 @@ python $CFDEM_LPP_DIR/lpp.py dump*.liggghts_run
 
 #- get VTK data from CFD sim
 cd $casePath/CFD
-reconstructPar -zeroTime -noLagrangian
+reconstructPar -noLagrangian
 foamToVTK
 
 #rm -r $casePath/CFD/processor*     

@@ -28,7 +28,6 @@ fi
 cd $casePath/CFD
 cp -r 0.org 0
 setFields
-decomposePar -force
 
 cd $casePath
 ./parCFDDEMrun.sh
