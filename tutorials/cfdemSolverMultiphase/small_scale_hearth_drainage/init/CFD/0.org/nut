@@ -39,7 +39,7 @@ boundaryField
     atmosphere
     {
         type            calculated;
-	uniform		0;
+		value			uniform	0;
     } 
 }
 

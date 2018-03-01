@@ -18,20 +18,20 @@ else
 fi
 
 # check if initialization was done
-if [ -f "$casePath/DEM/post/restart/liggghts.restartCFDEM_5.000000" ];  then
+if [ -f "$casePath/DEM/post/restart/liggghts.restart" ];  then
     echo "Initialization was run before - using existing restart file"
 else
 	cd $casePath
-	bash init.sh
+	./parDEMrun.sh
 fi
 
-# run the drainage simulation
 cd $casePath/CFD
-cp system/controlDict.run system/controlDict
-cp constant/couplingProperties.run constant couplingProperties
-cp -r $casePath/DEM/post/restart/5/ .
+cp -r 0.org 0
+setFields
 decomposePar -force
-mpirun -np $nrProcs cfdemSolverMultiphase -parallel |& tee $casePath/log_run
+
+cd $casePath
+./parCFDDEMrun.sh
 
 # generate files for post processing
 cd $casePath

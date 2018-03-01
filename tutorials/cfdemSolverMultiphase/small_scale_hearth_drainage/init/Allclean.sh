@@ -20,6 +20,5 @@ echo "Enter: yes, Ctrl + C: no"
 read
 
 rm $casePath/DEM/post/restart/*.*
-rm -r $casePath/DEM/post/restart/5/
 
 

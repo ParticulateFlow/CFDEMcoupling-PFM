@@ -61,13 +61,13 @@ forceModels
     //BeetstraDrag
     //DiFeliceDrag
     //gradPForce
-    gradPForceSmooth
-    viscForce
-    KochHillDrag
+    //gradPForceSmooth
+    //viscForce
+    //KochHillDrag
     //interface
     //DEMbasedDrag
     //RongDrag
-    //Archimedes
+    Archimedes
     //volWeightedAverage
     //totalMomentumExchange
     //particleCellVolume

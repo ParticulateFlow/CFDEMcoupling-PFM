@@ -75,7 +75,7 @@ units           si
 processors      2 2 1
 
 # read the restart file
-read_restart    ../DEM/post/restart/liggghts.restartCFDEM_5.000000
+read_restart    ../DEM/post/restart/liggghts.restart
 
 neighbor        ${skin} bin
 neigh_modify    delay 0

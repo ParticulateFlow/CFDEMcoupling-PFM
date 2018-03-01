@@ -95,4 +95,4 @@ run         ${nrIterations} upto
 region particleRm cylinder z 0 0 ${cylRadius} 0.08 0.15
 delete_atoms region particleRm
 
-write_restart   post/restart/fill.restart
+write_restart   post/restart/liggghts.restart
