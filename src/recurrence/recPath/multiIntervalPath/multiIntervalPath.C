@@ -185,7 +185,7 @@ void multiIntervalPath::computeRecPath()
 	if ((randJump > Pjump_ && !intervalBorder) || prevStepWasJump)
 	{
 	    virtualTimeIndex++;
-	    recSteps++;
+	    //recSteps++;
 	    prevStepWasJump = false;
 	}
 	else
