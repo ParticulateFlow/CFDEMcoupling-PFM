@@ -26,7 +26,7 @@ License
 #define recNorm_H
 
 #include "recBase.H"
-#include "fvCFD.H"
+//#include "fvCFD.H"
 #include "HashTable.H"
 // #include "labelPair.H"
 #include "OFstream.H"

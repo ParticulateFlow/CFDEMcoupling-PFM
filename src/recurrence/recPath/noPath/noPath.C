@@ -68,27 +68,26 @@ noPath::~noPath()
 void noPath::getRecPath()
 {
     label numRecIntervals = 0;
-    int root = 0;
-    int rank;
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     
-    if(rank==root)
+    if(Pstream::master())
     {
-      computeRecPath();
-      numRecIntervals=virtualTimeIndexList_.size();
+        computeRecPath();
+        numRecIntervals=virtualTimeIndexList_.size();
     }
     
-    MPI_Bcast(&numRecIntervals,sizeof(numRecIntervals),MPI_BYTE,root,MPI_COMM_WORLD);
+    Pstream::scatter(numRecIntervals);
     
-    if(rank!=root)
-      virtualTimeIndexList_.setSize(numRecIntervals);
+    if(not Pstream::master())
+    {
+        virtualTimeIndexList_.setSize(numRecIntervals);
+    }
     
-    int listSizeBytes = 2*sizeof(numRecIntervals)*numRecIntervals;
-    
-    MPI_Bcast(&virtualTimeIndexList_[0], listSizeBytes, MPI_BYTE, root, MPI_COMM_WORLD);
+    Pstream::scatter(virtualTimeIndexList_);
     
     if(verbose_)
-      Info << "\nRecurrence path communicated to all processors.\n" << endl;
+    {
+        Info << "\nRecurrence path communicated to all processors.\n" << endl;
+    }
 }
 
 
@@ -96,11 +95,16 @@ void noPath::computeRecPath()
 {
     labelPair seqStartEnd(0,1);
     virtualTimeIndexList_.append(seqStartEnd);
+    
+    if (verbose_)
+    {
+        Info << " virtualTimeIndexList_ : " << virtualTimeIndexList_ << endl;
+    }
 }
 
 label noPath::seqEnd(label seqStart, label & seqLength)
 {
-  return 0;
+    return 0;
 }
 
 void noPath::computeJumpVector()

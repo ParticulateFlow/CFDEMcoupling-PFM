@@ -68,27 +68,26 @@ simpleRandomPath::~simpleRandomPath()
 void simpleRandomPath::getRecPath()
 {
     label numRecIntervals = 0;
-    int root = 0;
-    int rank;
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     
-    if(rank==root)
+    if(Pstream::master())
     {
-      computeRecPath();
-      numRecIntervals=virtualTimeIndexList_.size();
+        computeRecPath();
+        numRecIntervals = virtualTimeIndexList_.size();
     }
     
-    MPI_Bcast(&numRecIntervals,sizeof(numRecIntervals),MPI_BYTE,root,MPI_COMM_WORLD);
+    Pstream::scatter(numRecIntervals);
     
-    if(rank!=root)
-      virtualTimeIndexList_.setSize(numRecIntervals);
+    if(not Pstream::master())
+    {
+        virtualTimeIndexList_.setSize(numRecIntervals);
+    }
     
-    int listSizeBytes = 2*sizeof(numRecIntervals)*numRecIntervals;
-    
-    MPI_Bcast(&virtualTimeIndexList_[0], listSizeBytes, MPI_BYTE, root, MPI_COMM_WORLD);
+    Pstream::scatter(virtualTimeIndexList_);
     
     if(verbose_)
-      Info << "\nRecurrence path communicated to all processors.\n" << endl;
+    {
+        Info << "\nRecurrence path communicated to all processors.\n" << endl;
+    }
 }
 
 
@@ -99,21 +98,21 @@ void simpleRandomPath::computeRecPath()
     
     Random ranGen(osRandomInteger());
     
-    label virtualTimeIndex=0;
-    label recSteps=0;
-    label seqStart=0;
+    label virtualTimeIndex = 0;
+    label recSteps = 0;
+    label seqStart = 0;
     label lowerSeqLim( base_.recM().lowerSeqLim() );
     label upperSeqLim( base_.recM().upperSeqLim() );
-    label seqLength=ranGen.integer(lowerSeqLim, upperSeqLim);
+    label seqLength = ranGen.integer(lowerSeqLim, upperSeqLim);
     
-    virtualTimeIndex=seqEnd(seqStart,seqLength);
+    virtualTimeIndex = seqEnd(seqStart,seqLength);
     labelPair seqStartEnd(seqStart,virtualTimeIndex);
     virtualTimeIndexList_.append(seqStartEnd);
-    recSteps+=seqLength;
-
+    recSteps += seqLength;
+    
     SymmetricSquareMatrix<scalar>& recurrenceMatrix( base_.recM().recurrenceMatrix() );
     label numRecFields( base_.recM().numRecFields() );
-
+    
     if(base_.recM().totRecSteps() == 1)
     {
         Info<< "\nPrimitive recurrence path with one element.\n" << endl;
@@ -129,9 +128,9 @@ void simpleRandomPath::computeRecPath()
         // the new starting point of the next sequence
         if (virtualTimeIndex < numRecFields/2)
         {
-        	startLoop = numRecFields/2;
-        	endLoop = numRecFields-1 - upperSeqLim/2;  // avoid running into end of recurrence database too often
-		endLoop--; // start of next sequence one snapshot AFTER minimum position
+            startLoop = numRecFields/2;
+            endLoop = numRecFields-1 - upperSeqLim/2;  // avoid running into end of recurrence database too often
+            endLoop--; // start of next sequence one snapshot AFTER minimum position
         }
         else
         {
@@ -151,61 +150,73 @@ void simpleRandomPath::computeRecPath()
         }
         
         seqLength = ranGen.integer(lowerSeqLim, upperSeqLim);  
-        virtualTimeIndex=seqEnd(seqStart,seqLength);
+        virtualTimeIndex = seqEnd(seqStart,seqLength);
         labelPair seqStartEnd(seqStart,virtualTimeIndex);
         virtualTimeIndexList_.append(seqStartEnd);
-        recSteps+=seqLength;
+        recSteps += seqLength;
     }
+    
     Info<< "\nComputing recurrence path done\n" << endl;
+    
+    if (verbose_)
+    {
+        Info << " virtualTimeIndexList_ : " << virtualTimeIndexList_ << endl;
+    }
+    
     computeJumpVector();
 }
 
 label simpleRandomPath::seqEnd(label seqStart, label & seqLength)
 {
-  label numRecFields( base_.recM().numRecFields() );
-  if(seqStart+seqLength > numRecFields-1)
-      seqLength=numRecFields-1-seqStart;
-  return seqStart+seqLength;
+    label numRecFields( base_.recM().numRecFields() );
+    if(seqStart+seqLength > numRecFields-1)
+    {
+        seqLength=numRecFields-1-seqStart;
+    }
+    
+    return seqStart+seqLength;
 }
 
 void simpleRandomPath::computeJumpVector()
 {
     Info << "\nComputing recurrence jump vector\n" << endl;
-    
+
     OFstream jumpvec("rec_jump.dat");
     label numRecFields( base_.recM().numRecFields() );
     label startLoop = 0;
     label endLoop = 0;
     SymmetricSquareMatrix<scalar>& recurrenceMatrix( base_.recM().recurrenceMatrix() );
-    
+
     for (label i = 0; i < numRecFields; i++)
     {
-       if (i < numRecFields/2)
+        if (i < numRecFields/2)
         {
-        	startLoop = numRecFields/2;
-        	endLoop = numRecFields-1;
+            startLoop = numRecFields/2;
+            endLoop = numRecFields-1;
         }
         else
         {
-        	startLoop = 0;
-        	endLoop = numRecFields/2-1;
+            startLoop = 0;
+            endLoop = numRecFields/2-1;
         }
-        
+
         scalar nextMinimum(GREAT);
-	label jumpdest = 0;
+        label jumpdest = 0;
+        
         for (label j = startLoop; j < endLoop; j++)
         {
-        	if (recurrenceMatrix[j][i] < nextMinimum)
-        	{
-        		nextMinimum = recurrenceMatrix[j][i];
-        		jumpdest = j+1;
-        		continue;
-        	}
+            if (recurrenceMatrix[j][i] < nextMinimum)
+            {
+                nextMinimum = recurrenceMatrix[j][i];
+                jumpdest = j+1;
+                
+                continue;
+            }
         }
 
         jumpvec << jumpdest << endl;
     }
-    
+
     Info<< "\nComputing recurrence jump vector done\n" << endl;
 }
 

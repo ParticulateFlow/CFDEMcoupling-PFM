@@ -26,7 +26,6 @@ License
 #include "Random.H"
 #include "standardRecModel.H"
 #include "addToRunTimeSelectionTable.H"
-#include <mpi.h>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -56,12 +55,14 @@ standardRecModel::standardRecModel
 :
     recModel(dict,base),
     propsDict_(dict.subDict(typeName + "Props")),
+    //dataBaseName_("dataBase"),
     dataBaseName_(propsDict_.lookupOrDefault<word>("dataBase", word("dataBase"))),
+    //recTime("dataBase", "", "../system", "../constant", false),
     recTime(fileName(dataBaseName_), "", "../system", "../constant", false),
     timeDirs(recTime.times()),
     skipZero_(propsDict_.lookupOrDefault<Switch>("skipZero", Switch(false))),
     numRecFields_(skipZero_ ? label(timeDirs.size())-1 : label(timeDirs.size())),
-    recurrenceMatrix_(numRecFields_,scalar(0.0)),
+    recurrenceMatrix_(numRecFields_,scalar(-1.0)),
     timeIndexList_(numRecFields_-1),
     timeValueList_(numRecFields_-1),
     contTimeIndex(0),
@@ -71,38 +72,39 @@ standardRecModel::standardRecModel
     volScalarFieldList_(volScalarFieldNames_.size()),
     volVectorFieldList_(volVectorFieldNames_.size()),
     surfaceScalarFieldList_(surfaceScalarFieldNames_.size())
-{
-  
-  if (verbose_)
+{   
+    if (verbose_)
     {
-    	// be informative on properties of the "recTime" Time-object
-    	Info << "recTime.rootPath() " << recTime.rootPath() << endl;
-    	Info << "recTime.caseName() " << recTime.caseName() << endl;
-    	Info << "recTime.path() " << recTime.path() << endl;
-    	Info << "recTime.timePath() " << recTime.timePath() << endl;
-    	Info << "recTime.timeName() " << recTime.timeName() << endl;
-    	Info << "timeDirs " << timeDirs << endl;
-    	Info << "ignoring 0 directory: " << skipZero_ << endl;
+        // be informative on properties of the "recTime" Time-object
+        Info << "recTime.rootPath() " << recTime.rootPath() << endl;
+        Info << "recTime.caseName() " << recTime.caseName() << endl;
+        Info << "recTime.path() " << recTime.path() << endl;
+        Info << "recTime.timePath() " << recTime.timePath() << endl;
+        Info << "recTime.timeName() " << recTime.timeName() << endl;
+        Info << "timeDirs " << timeDirs << endl;
+        Info << "ignoring 0 directory: " << skipZero_ << endl;
     }
     readTimeSeries();
-  
+
     recTimeStep_ = checkTimeStep();
-    totRecSteps_ = 1+static_cast<label> ((endTime_-startTime_) / recTimeStep_);
-  
+    totRecSteps_ = 1 + static_cast<label>( (endTime_-startTime_) / recTimeStep_ );
+
     for(int i=0; i<volScalarFieldNames_.size(); i++)
+    {
         volScalarFieldList_[i].setSize(numRecFields_);
-    
+    }
+
     for(int i=0; i<volVectorFieldNames_.size(); i++)
+    {
         volVectorFieldList_[i].setSize(numRecFields_);
-    
+    }
+
     for(int i=0; i<surfaceScalarFieldNames_.size(); i++)
+    {
         surfaceScalarFieldList_[i].setSize(numRecFields_);
-       
+    }
 
-    
- //   setRecFields();
-    
-
+    //   setRecFields();
 }
 
 
@@ -126,9 +128,9 @@ scalar standardRecModel::checkTimeStep()
     
     if (timeIndexList_.size() == 1)
     {
-        return 1e10;
+        return 1.e10;
     }
-
+    
     forAll(timeValueList_, i)
     {
     	// skip zero
@@ -200,11 +202,11 @@ void standardRecModel::readFieldSeries()
     for (instantList::iterator it=timeDirs.begin(); it != timeDirs.end(); ++it)
     {
         if(counter >= 0.1 * percentage * size)
-	{
-	    Info << "\t" << 10 * percentage << " \% done" << endl;
-	    percentage++;
-	}
-	counter++;
+	    {
+	        Info << "\t" << 10 * percentage << " \% done" << endl;
+	        percentage++;
+	    }
+	    counter++;
       
         // set time
         recTime.setTime(*it, it->value());
@@ -232,9 +234,10 @@ void standardRecModel::readFieldSeries()
         }
         
         for(int i=0; i<volScalarFieldNames_.size(); i++)
+        {
             volScalarFieldList_[i].set
             (
-	        timeIndexList_(recTime.timeName()),
+	            timeIndexList_(recTime.timeName()),
                 new volScalarField
                 (
                     IOobject
@@ -247,12 +250,14 @@ void standardRecModel::readFieldSeries()
                     ),
                     base_.mesh()
                 )
-	    );
+	        );
+	    }
 	    
-	for(int i=0; i<volVectorFieldNames_.size(); i++)
+	    for(int i=0; i<volVectorFieldNames_.size(); i++)
+	    {
             volVectorFieldList_[i].set
             (
-	        timeIndexList_(recTime.timeName()),
+	            timeIndexList_(recTime.timeName()),
                 new volVectorField
                 (
                     IOobject
@@ -265,12 +270,14 @@ void standardRecModel::readFieldSeries()
                     ),
                     base_.mesh()
                 )
-	    );
+	        );
+	    }
 	    
-	for(int i=0; i<surfaceScalarFieldNames_.size(); i++)
+	    for(int i=0; i<surfaceScalarFieldNames_.size(); i++)
+	    {
             surfaceScalarFieldList_[i].set
             (
-	        timeIndexList_(recTime.timeName()),
+                timeIndexList_(recTime.timeName()),
                 new surfaceScalarField
                 (
                     IOobject
@@ -283,7 +290,8 @@ void standardRecModel::readFieldSeries()
                     ),
                     base_.mesh()
                 )
-            );    
+            );
+        } 
     }
     Info << "Reading fields done" << endl;
 }
@@ -292,7 +300,7 @@ void standardRecModel::readFieldSeries()
 void standardRecModel::readTimeSeries()
 {
     bool firsttime = true;
-  // fill the data structure for the time indices
+    // fill the data structure for the time indices
     for (instantList::iterator it=timeDirs.begin(); it != timeDirs.end(); ++it)
     {
     	// set run-time
@@ -317,11 +325,11 @@ void standardRecModel::readTimeSeries()
         }
         
         if (firsttime)
-	{
-	    firsttime = false;
-	    recStartTime_ = recTime.value();
-	}
-	recEndTime_ = recTime.value();
+        {
+            firsttime = false;
+            recStartTime_ = recTime.value();
+        }
+	    recEndTime_ = recTime.value();
         
         // insert the time name into the hash-table with a continuous second index
         timeIndexList_.insert(recTime.timeName(), contTimeIndex);
@@ -348,48 +356,48 @@ void standardRecModel::readTimeSeries()
 
     if (verbose_)
     {
-    	Info << endl;
-    	Info << "Found " << label(timeDirs.size()) << " time folders" << endl;
+        Info << endl;
+        Info << "Found " << label(timeDirs.size()) << " time folders" << endl;
         Info << "Found " << label(timeIndexList_.size()) << " time steps" << endl;
-	Info << "database start time = " << recStartTime_ << endl;
-	Info << "database end time = " << recEndTime_ << endl;
+        Info << "database start time = " << recStartTime_ << endl;
+        Info << "database end time = " << recEndTime_ << endl;
     }
 }
 
 
-void standardRecModel::exportVolScalarField(word fieldname, volScalarField& field) const
+void standardRecModel::exportVolScalarField(word fieldname, volScalarField& field)
 {
     field = exportVolScalarField(fieldname, virtualTimeIndex);
 }
 
 
-void standardRecModel::exportVolVectorField(word fieldname, volVectorField& field) const
+void standardRecModel::exportVolVectorField(word fieldname, volVectorField& field)
 {
     field = exportVolVectorField(fieldname, virtualTimeIndex);
 }
 
 
-void standardRecModel::exportSurfaceScalarField(word fieldname, surfaceScalarField& field) const
+void standardRecModel::exportSurfaceScalarField(word fieldname, surfaceScalarField& field)
 {
     field = exportSurfaceScalarField(fieldname, virtualTimeIndex);
 }
 
 
-const volScalarField& standardRecModel::exportVolScalarField(word fieldname, label index) const
+const volScalarField& standardRecModel::exportVolScalarField(word fieldname, label index)
 {
     const label fieldI = getVolScalarFieldIndex(fieldname, index);
     
     return volScalarFieldList_[fieldI][index];
 }
 
-const volVectorField& standardRecModel::exportVolVectorField(word fieldname, label index) const
+const volVectorField& standardRecModel::exportVolVectorField(word fieldname, label index)
 {
     const label fieldI = getVolVectorFieldIndex(fieldname, index);
     
     return volVectorFieldList_[fieldI][index];
 }
 
-const surfaceScalarField& standardRecModel::exportSurfaceScalarField(word fieldname, label index) const
+const surfaceScalarField& standardRecModel::exportSurfaceScalarField(word fieldname, label index)
 {
     const label fieldI = getSurfaceScalarFieldIndex(fieldname, index);
     
@@ -425,21 +433,36 @@ label standardRecModel::numRecFields() const
     return numRecFields_;
 }
 
+label standardRecModel::numDataBaseFields() const
+{
+    return numRecFields_;
+}
+
 
 void standardRecModel::updateRecFields()
 {
-  virtualTimeIndex=virtualTimeIndexNext;
-  virtualTimeIndexNext++;
-  if (virtualTimeIndexNext>sequenceEnd)
-  {
-    virtualTimeIndexListPos++;
-    sequenceStart=virtualTimeIndexList_[virtualTimeIndexListPos].first();
-    sequenceEnd=virtualTimeIndexList_[virtualTimeIndexListPos].second();
-    virtualTimeIndexNext=sequenceStart;
-  }
-  
-  if (verbose_)
-      Info << "\nUpdating virtual time index to " << virtualTimeIndex << ".\n" << endl;  
+    virtualTimeIndex = virtualTimeIndexNext;
+    virtualTimeIndexNext++;
+    
+    if (virtualTimeIndexNext > sequenceEnd)
+    {
+        virtualTimeIndexListPos++; // this is problematic with noPath
+        
+        sequenceStart = virtualTimeIndexList_[virtualTimeIndexListPos].first();
+        sequenceEnd = virtualTimeIndexList_[virtualTimeIndexListPos].second();
+        
+        virtualTimeIndexNext = sequenceStart;
+        
+        if (verbose_)
+        {
+            Info << " new sequence (start/end) : " << sequenceStart << " / " << sequenceEnd << endl;
+        }
+    }
+
+    if (verbose_)
+    {
+        Info << "\nUpdating virtual time index to " << virtualTimeIndex << ".\n" << endl;
+    }
 }
 
 

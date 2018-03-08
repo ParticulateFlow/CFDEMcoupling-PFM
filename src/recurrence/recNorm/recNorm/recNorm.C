@@ -24,7 +24,7 @@ License
 
 #include "error.H"
 #include "recNorm.H"
-#include <unistd.h>
+//#include <unistd.h>
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -52,9 +52,8 @@ recNorm::recNorm
 :
     base_(base),
     recProperties_(dict),
-    verbose_(false)
+    verbose_(dict.lookupOrDefault<Switch>("verbose", false))
 {
-    if (recProperties_.found("verbose")) verbose_=true;
 }
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //

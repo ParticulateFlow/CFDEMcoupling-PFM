@@ -27,8 +27,6 @@ License
 #include "noRecStatAnalysis.H"
 #include "recModel.H"
 #include "addToRunTimeSelectionTable.H"
-#include <mpi.h>
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam

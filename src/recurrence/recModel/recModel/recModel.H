@@ -125,16 +125,24 @@ public:
 
     // Member Functions
       
-    virtual void exportVolScalarField(word, volScalarField&) const = 0;
+    /*virtual void exportVolScalarField(word, volScalarField&) const = 0;
     virtual void exportVolVectorField(word, volVectorField&) const = 0;
     virtual void exportSurfaceScalarField(word, surfaceScalarField&) const = 0;
     
     virtual const volScalarField& exportVolScalarField(word, label) const = 0;
     virtual const volVectorField& exportVolVectorField(word, label) const = 0;
-    virtual const surfaceScalarField& exportSurfaceScalarField(word, label) const = 0;
+    virtual const surfaceScalarField& exportSurfaceScalarField(word, label) const = 0;*/
+    
+    virtual void exportVolScalarField(word, volScalarField&)  = 0;
+    virtual void exportVolVectorField(word, volVectorField&)  = 0;
+    virtual void exportSurfaceScalarField(word, surfaceScalarField&)  = 0;
+
+    virtual const volScalarField& exportVolScalarField(word, label)  = 0;
+    virtual const volVectorField& exportVolVectorField(word, label)  = 0;
+    virtual const surfaceScalarField& exportSurfaceScalarField(word, label)  = 0;
     
   //  virtual tmp<surfaceScalarField> exportAveragedSurfaceScalarField(word, scalar, label index = -1) = 0;
-    virtual void exportAveragedVolVectorField(volVectorField&, word, scalar, label index = -1) const = 0;
+    //virtual void exportAveragedVolVectorField(volVectorField&, word, scalar, label index = -1) const = 0;
     
     virtual SymmetricSquareMatrix<scalar>& recurrenceMatrix() = 0;
     
@@ -146,6 +154,7 @@ public:
     virtual label upperSeqLim() const = 0;
     
     virtual label numRecFields() const = 0;
+    virtual label numDataBaseFields() const = 0;
     
     label totRecSteps() const;
     
