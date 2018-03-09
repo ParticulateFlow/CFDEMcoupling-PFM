@@ -69,71 +69,141 @@ sqrDiffNorm::~sqrDiffNorm()
 
 void sqrDiffNorm::computeRecMatrix()
 {
-    Info<< "\nsqrDiffNorm: computing recurrence matrix\n" << endl;
-    
+    Info << nl << type() << ": computing recurrence matrix\n" << endl;
+
     const HashTable<label,word>& timeIndexList( base_.recM().timeIndexList() );
     SymmetricSquareMatrix<scalar>& recurrenceMatrix( base_.recM().recurrenceMatrix() );
-    
+
     scalar normIJ(0.0);
     scalar maxNormIJ(0.0);
-    
-    label size = timeIndexList.size();
+
+    /*
+        total number of computed elements: total number of matrix entries
+            minus the main diagonal entries, divided by two, 
+            since the matrix is symmetric
+    */
+    label size = (timeIndexList.size()*(timeIndexList.size()-1))/2;
     label counter = 0;
     label percentage = 0;
-
-    // perform un-normalized calculation for lower half of the recurrence matrix
-    forAll(timeIndexList, ti)
+    
+    
+    label N(this->base_.recM().numRecFields());
+    label M(this->base_.recM().numDataBaseFields());
+    
+    if (verbose_)
     {
-        if(counter >= 0.1 * percentage * size)
-	{
-	    Info << "\t" << 10 * percentage << " \% done" << endl;
-	    percentage++;
-	}
-	counter++;
-    	forAll(timeIndexList, tj)
-    	{
-	        if(verbose_)
-		    Info<<"\n Doing calculation for element " << ti << " " << tj << "\n" << endl;
-		
-    		// skip main diagonal and upper half
-    		if (ti >= tj)
-    		{
-    			recurrenceMatrix[ti][tj] = 0;
-    			continue;
-    		}
-    		
-    		// compute elements
-    		if (fieldType_ == "volScalarField")
-		    normIJ = normVSF(ti,tj);
-		else if (fieldType_ == "volVectorField")
-		    normIJ = normVVF(ti,tj);
-		else if (fieldType_ == "surfaceScalarField")
-		    normIJ = normSSF(ti,tj);
-		else
-		    FatalError<<"sqrDiffNorm: Unknown field type " << fieldType_ << abort(FatalError);
-		
-    		recurrenceMatrix[ti][tj] = normIJ;
-		
-		if (normIJ > maxNormIJ)
-		    maxNormIJ = normIJ;
-    	}
+        Info << " N = " << N << ",  M = " << M << endl;
     }
     
+    label ti(0);
+    label tj(0);
+    label tmp(-1);
+    
+    for (int j=0; j<=N/(M-1); j++)
+    {
+        for (int i=0; i<timeIndexList.size(); i++)
+        {
+            if (verbose_)
+            {
+                Info << " i = " << i << ",  j = " << j << endl;
+            }
+            
+            if(counter >= 0.1 * percentage * size)
+	        {
+	            Info << "\t" << 10 * percentage << " \% done" << endl;
+	            percentage++;
+	        }
+	        
+            
+            for (int k=i; k<i+(M-1); k++)
+            {
+                ti = i;
+                tj = j*(M-1) + k;
+                
+                if (ti > tj)
+                {
+                    tmp = ti;
+                    ti = tj;
+                    tj = tmp;
+                }
+                
+                // skip coordinates outside the recurrence space                
+                if (ti >= N or tj >= N)
+                {
+                    continue;
+                }
+                
+                // start
+                // skip main diagonal and upper half
+                if (ti >= tj)
+                {
+                    recurrenceMatrix[ti][tj] = 0;
+                    continue;
+                }
+                
+                if (verbose_)
+                {
+                    Info << " Doing calculation for element " 
+                        << ti << " " << tj << endl;
+                }
+                
+                counter++;
+
+                // compute elements
+                if (fieldType_ == "volScalarField")
+                {
+                    normIJ = normVSF(ti,tj);
+                }
+                else if (fieldType_ == "volVectorField")
+                {
+                    normIJ = normVVF(ti,tj);
+                }
+                else if (fieldType_ == "surfaceScalarField")
+                {
+                    normIJ = normSSF(ti,tj);
+                }
+                else
+                {
+                    FatalError
+                        << "sqrDiffNorm: Unknown field type " << fieldType_ 
+                        << abort(FatalError);
+                }
+
+                recurrenceMatrix[ti][tj] = normIJ;
+
+                if (normIJ > maxNormIJ)
+                {
+                    maxNormIJ = normIJ;
+                }
+                // end
+            }
+        }
+    }
+    
+
+
     // normalize matrix and copy lower to upper half
     if(normConstant_ > 0.0) maxNormIJ = normConstant_;
+    
     forAll(timeIndexList, ti)
     {
-    	forAll(timeIndexList, tj)
-    	{
-	    if (ti >= tj)
-	        continue;
-	    
-	    recurrenceMatrix[ti][tj] /= maxNormIJ;
-	    recurrenceMatrix[tj][ti] = recurrenceMatrix[ti][tj];
-	}
+        forAll(timeIndexList, tj)
+        {
+            if (ti >= tj) continue;
+            
+            if (recurrenceMatrix[ti][tj] < 0)
+            {
+                FatalErrorInFunction << "Error in computation of recurrence matrix!"
+                    << nl << "Negative elements encountered. This should not happen!"
+                    << abort(FatalError);
+            }
+
+            recurrenceMatrix[ti][tj] /= maxNormIJ;
+            recurrenceMatrix[tj][ti] = recurrenceMatrix[ti][tj];
+        }
     }
-    
-    Info<< "\nComputing recurrence matrix done\n" << endl;
+
+    Info << "\nComputing recurrence matrix done\n" << endl;
 }
 
 scalar sqrDiffNorm::normVSF(label ti, label tj)
@@ -141,6 +211,7 @@ scalar sqrDiffNorm::normVSF(label ti, label tj)
     const volScalarField& t1( base_.recM().exportVolScalarField(fieldName_,ti) );
     const volScalarField& t2( base_.recM().exportVolScalarField(fieldName_,tj) );
     dimensionedScalar tNorm( fvc::domainIntegrate( sqr( t1 - t2 ) ) );
+    
     return tNorm.value();
 }
 
@@ -149,6 +220,7 @@ scalar sqrDiffNorm::normVVF(label ti, label tj)
     const volVectorField& t1( base_.recM().exportVolVectorField(fieldName_,ti) );
     const volVectorField& t2( base_.recM().exportVolVectorField(fieldName_,tj) );
     dimensionedScalar tNorm( fvc::domainIntegrate( magSqr( t1 - t2 ) ) );
+    
     return tNorm.value();
 }
 
@@ -158,6 +230,7 @@ scalar sqrDiffNorm::normSSF(label ti, label tj)
     const surfaceScalarField& t2( base_.recM().exportSurfaceScalarField(fieldName_,tj) );
     volVectorField t12 (fvc::reconstruct( t1-t2 ) );
     dimensionedScalar tNorm( fvc::domainIntegrate( magSqr( t12 ) ) );
+    
     return tNorm.value();
 }
 

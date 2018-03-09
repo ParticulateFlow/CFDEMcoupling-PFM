@@ -20,6 +20,11 @@ License
 
     You should have received a copy of the GNU General Public License
     along with CFDEMcoupling academic.  If not, see <http://www.gnu.org/licenses/>.
+
+Description
+    Create a path based on the recurrence statistics and add some randomness.
+    The minimum data base size is 5 entries for this model to work.
+
 \*---------------------------------------------------------------------------*/
 
 #ifndef simpleRandomPath_H

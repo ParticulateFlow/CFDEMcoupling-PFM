@@ -63,7 +63,7 @@ recModel::recModel
             IOobject::NO_WRITE
         )
     ),
-    verbose_(false),
+    verbose_(dict.lookupOrDefault<Switch>("verbose", false)),
     volScalarFieldNames_(recProperties_.lookup("volScalarFields")),
     volVectorFieldNames_(recProperties_.lookup("volVectorFields")),
     surfaceScalarFieldNames_(recProperties_.lookup("surfaceScalarFields")),
@@ -80,7 +80,6 @@ recModel::recModel
     virtualTimeIndexList_(0),
     virtualTimeIndexListPos(0)
 {
-    if (recProperties_.found("verbose")) verbose_=true;
     recTimeStep_ = -1.0;
     totRecSteps_ = -1;
 }

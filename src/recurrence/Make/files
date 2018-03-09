@@ -2,6 +2,7 @@ recBase/recBase.C
 recModel/recModel/recModel.C
 recModel/recModel/newRecModel.C
 recModel/standardRecModel/standardRecModel.C
+recModel/gerhardsRecModel/gerhardsRecModel.C
 recNorm/recNorm/recNorm.C
 recNorm/recNorm/newRecNorm.C
 recNorm/sqrDiffNorm/sqrDiffNorm.C

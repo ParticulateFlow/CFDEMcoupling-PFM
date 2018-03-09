@@ -95,11 +95,16 @@ void noPath::computeRecPath()
 {
     labelPair seqStartEnd(0,1);
     virtualTimeIndexList_.append(seqStartEnd);
+    
+    if (verbose_)
+    {
+        Info << " virtualTimeIndexList_ : " << virtualTimeIndexList_ << endl;
+    }
 }
 
 label noPath::seqEnd(label seqStart, label & seqLength)
 {
-  return 0;
+    return 0;
 }
 
 void noPath::computeJumpVector()

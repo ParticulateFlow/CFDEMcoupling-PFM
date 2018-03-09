@@ -20,18 +20,35 @@ License
 
     You should have received a copy of the GNU General Public License
     along with CFDEMcoupling academic.  If not, see <http://www.gnu.org/licenses/>.
+    
+Class
+    Foam::gerhardsRecModel
 
 Description
-    Standard Recurrence Model
+    A recurrence model for a dataBase with a smaller, or equal number of slots 
+    than there are snapshots on disk.
     
-    This class sets limits for the length of a recurrence-sequence. As of now, 
-    such a sequence is between one 20-th and 5-th of the total number of data 
-    base entries.
+    In the case of less slots than snapshots, we follow the Least Recently Used
+    page replacement algorithm described in computer science literature.
+    A label list is used to keep track of which slot was most recently used,
+    the least recently used slot is then vacated if a new snapshot needs to be 
+    read from disk.
+    
+    Reference:
+    \verbatim
+        "Modern Operating Systems"
+        Andrew S. Tannenbaum,
+        Prentice Hall, 1992
+    \endverbatim
+
+SourceFiles
+    gerhardsRecModelI.H
+    gerhardsRecModel.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef standardRecModel_H
-#define standardRecModel_H
+#ifndef gerhardsRecModel_H
+#define gerhardsRecModel_H
 
 #include "recModel.H"
 
@@ -41,10 +58,10 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class standardRecModel Declaration
+                           Class gerhardsRecModel Declaration
 \*---------------------------------------------------------------------------*/
 
-class standardRecModel
+class gerhardsRecModel
 :
     public recModel
 {
@@ -55,7 +72,11 @@ protected:
     Foam::Time recTime;
     instantList timeDirs;
     Switch skipZero_;
+    Switch checkSkipZero_;
     label numRecFields_;
+    
+    const Switch verboseVerbose_;
+    const Switch verboseVacate_;
 
     // matrix that contains the recurrence ERROR
     SymmetricSquareMatrix<scalar> recurrenceMatrix_;
@@ -64,6 +85,8 @@ protected:
     //	constant will not be contained
     //	runTimeIndex -> continuousIndex
     HashTable<label,word> timeIndexList_;
+    
+    HashTable<word, label> revTimeIndexList_;
     
     // create a data structure for the time values
     //	constant will not be contained
@@ -84,17 +107,25 @@ protected:
     void readFieldSeries();
     
     void readTimeSeries();
+    
+    void fetchStateForDataBase(label);
+    
+    void updateStorageUsageList(label);
+    
+    void readNewSnapshot(label, label);
+    
+    Switch checkSkipZero();
 
 public:
 
     //- Runtime type information
-    TypeName("standardRecModel");
+    TypeName("gerhardsRecModel");
 
 
     // Constructors
 
         //- Construct from components
-        standardRecModel
+        gerhardsRecModel
         (
             const dictionary& dict,
             recBase& base
@@ -102,7 +133,7 @@ public:
 
     // Destructor
 
-        ~standardRecModel();
+        ~gerhardsRecModel();
 
     void exportVolScalarField(word, volScalarField&);
     void exportVolVectorField(word, volVectorField&);
@@ -131,10 +162,35 @@ public:
 	
 private:
     
+    /*
+        Number of fields kept in the dataBase, this number is smaller, or equal, as the 
+        number of snapshots.
+    */
+    const label numDataBaseFields_;
+    
+    /*
+        As the data base holds less states than there are snapshots, we need to translate
+        the index of the snapshot to an appropriate index of the dataBase.
+    */
+    List<label> storageIndex_;
+    
+    /*
+        As we repeatedly need to replace fields in the dataBase with new snapshots from 
+        disk, we need a way to judge, which slot to vacate for the new snapshot.
+        Here, we follow the lead of paging algorithms used by OS'es in memory management.
+        
+        The storageUsageList_ represents the recentness of a slot's use; with 1 for the 
+        most recently used element, and higher values for less recently used ones.
+    */
+    List<label> storageUsageList_;
+    
+    // this class does not read all the fields
     List<PtrList<volScalarField> > volScalarFieldList_;
     List<PtrList<volVectorField> > volVectorFieldList_;
     List<PtrList<surfaceScalarField> > surfaceScalarFieldList_;
     
+    // book-keeping
+    label nrOfReadsFromDisk_;
 };
 
 
@@ -144,7 +200,7 @@ private:
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#include "standardRecModelI.H"
+#include "gerhardsRecModelI.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

@@ -53,10 +53,9 @@ recPath::recPath
 :
     base_(base),
     recProperties_(dict),
-    verbose_(false),
+    verbose_(dict.lookupOrDefault<Switch>("verbose", false)),
     virtualTimeIndexList_( base_.recM().virtualTimeIndexList() )
 {
-    if (recProperties_.found("verbose")) verbose_=true;
 }
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
