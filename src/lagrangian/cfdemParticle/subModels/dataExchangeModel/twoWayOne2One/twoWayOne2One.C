@@ -102,11 +102,9 @@ twoWayOne2One::twoWayOne2One
     // get DEM time step size
     DEMts_ = lmp->update->dt;
     checkTSsize();
-
-    createProcMap();
 }
 
-void twoWayOne2One::createProcMap()
+void twoWayOne2One::createProcMap() const
 {
     const cfdemCloud& sm = this->particleCloud_;
 
@@ -145,6 +143,9 @@ void twoWayOne2One::createProcMap()
     ligBoxes[Pstream::myProcNo()] = thisLigBox;
     Pstream::gatherList(ligBoxes);
     Pstream::scatterList(ligBoxes);
+
+    thisLigPartner_.clear();
+    thisFoamPartner_.clear();
 
     // detect LIG subdomains which this FOAM has to interact with
     forAll(ligBoxes, ligproci)
@@ -618,6 +619,8 @@ bool twoWayOne2One::couple(int i) const
         particleCloud_.clockM().stop("LIGGGHTS");
         Info<< "LIGGGHTS finished" << endl;
 
+        createProcMap();
+
         setupLig2FoamCommunication();
 
         locateParticles();
@@ -673,8 +676,12 @@ void twoWayOne2One::locateParticles() const
     double*  my_flattened_positions = nullptr;
     allocateArray(my_flattened_positions, 0., 3*lmp->atom->nlocal);
     for (int atomi = 0; atomi < lmp->atom->nlocal; atomi++)
+    {
         for (int coordi = 0; coordi < 3; coordi++)
+        {
             my_flattened_positions[atomi*3+coordi] = my_positions[atomi][coordi];
+        }
+    }
 
     double* collected_flattened_positions = nullptr;
     allocateArray(collected_flattened_positions, 0., 3*lig2foam_->ncollected_);
@@ -712,6 +719,18 @@ void twoWayOne2One::locateParticles() const
 
     setNumberOfParticles(n_located);
     particleCloud_.reAllocArrays();
+
+    Pout<< "Located " << n_located << " out of " << lig2foam_->ncollected_ << " . "
+        << endl;
+
+    reduce(n_located, sumOp<label>());
+    if (n_located != lmp->atom->tag_max())
+    {
+        Warning << "Have located " << n_located
+                << " ouf of " << lmp->atom->tag_max() << " particles in OpenFOAM. "
+                << endl;
+    }
+
 
     // copy positions/cellids/ids of located particles into arrays
     allocateArray(lig2foam_ids_, 0, getNumberOfParticles());
@@ -771,13 +790,13 @@ void twoWayOne2One::setupFoam2LigCommunication() const
     allocateArray
     (
         foam2lig_vec_tmp_,
-        1.,
+        0.,
         3 * foam2lig_->ncollected_
     );
     allocateArray
     (
         foam2lig_scl_tmp_,
-        1.,
+        0.,
         foam2lig_->ncollected_
     );
 }
@@ -793,7 +812,7 @@ void twoWayOne2One::extractCollected(T**& src, T**& dst, int width) const
 
         for (int coordi = 0; coordi < width; coordi++)
         {
-            dst[locali][coordi] = src[atomi][coordi] ;
+            dst[locali][coordi] = src[atomi][coordi];
         }
         locali++;
     }

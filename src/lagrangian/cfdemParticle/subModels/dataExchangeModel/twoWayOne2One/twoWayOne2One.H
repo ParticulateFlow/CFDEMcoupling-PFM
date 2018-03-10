@@ -93,9 +93,9 @@ private:
     mutable MPI_Comm comm_liggghts_;
 
 
-         // LIG ranks from which to retrieve particle data
-    labelList        thisLigPartner_;
-    labelList        thisFoamPartner_;
+    // LIG ranks from which to retrieve particle data
+    mutable labelList        thisLigPartner_;
+    mutable labelList        thisFoamPartner_;
 
     mutable One2One* lig2foam_;
     mutable One2One* foam2lig_;
@@ -114,7 +114,7 @@ private:
   // private member functions
 
     //- creates a geometric mapping between FOAM and LIG domains
-    void createProcMap();
+    void createProcMap() const;
 
     //- create a One2One communicator which transfers from LIG to FOAM
     void setupLig2FoamCommunication() const;
