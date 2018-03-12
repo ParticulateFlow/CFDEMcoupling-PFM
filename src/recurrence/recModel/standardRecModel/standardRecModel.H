@@ -51,11 +51,13 @@ class standardRecModel
 protected:
   
     dictionary propsDict_;
-    word dataBaseName_;
-    Foam::Time recTime;
-    instantList timeDirs;
+    wordList dataBaseNames_;
+    label numDataBases_;
+    List<Foam::Time> recTimes_;
+    List<instantList> timeDirs_;
     Switch skipZero_;
-    label numRecFields_;
+    labelList numRecFields_;
+    label totNumRecFields_;
 
     // matrix that contains the recurrence ERROR
     SymmetricSquareMatrix<scalar> recurrenceMatrix_;
@@ -72,10 +74,10 @@ protected:
     
     label contTimeIndex;
     
-    const label lowerSeqLim_;
-    const label upperSeqLim_;
+    label lowerSeqLim_;
+    label upperSeqLim_;
     
-    scalar checkTimeStep();
+  //  scalar checkTimeStep();
     
     inline label getVolScalarFieldIndex(word, label) const;
     inline label getVolVectorFieldIndex(word, label) const;
@@ -123,6 +125,7 @@ public:
     label upperSeqLim() const;
     
     label numRecFields() const;
+    label numRecFields(label) const;
     label numDataBaseFields() const;
     
     void updateRecFields();

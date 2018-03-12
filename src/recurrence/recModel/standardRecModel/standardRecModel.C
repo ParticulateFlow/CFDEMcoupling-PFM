@@ -55,56 +55,75 @@ standardRecModel::standardRecModel
 :
     recModel(dict,base),
     propsDict_(dict.subDict(typeName + "Props")),
-    //dataBaseName_("dataBase"),
-    dataBaseName_(propsDict_.lookupOrDefault<word>("dataBase", word("dataBase"))),
-    //recTime("dataBase", "", "../system", "../constant", false),
-    recTime(fileName(dataBaseName_), "", "../system", "../constant", false),
-    timeDirs(recTime.times()),
+    dataBaseNames_(propsDict_.lookupOrDefault<wordList>("dataBases", wordList(1,"dataBase"))),
+    numDataBases_(dataBaseNames_.size()),
+    timeDirs_(),
     skipZero_(propsDict_.lookupOrDefault<Switch>("skipZero", Switch(false))),
-    numRecFields_(skipZero_ ? label(timeDirs.size())-1 : label(timeDirs.size())),
-    recurrenceMatrix_(numRecFields_,scalar(-1.0)),
-    timeIndexList_(numRecFields_-1),
-    timeValueList_(numRecFields_-1),
+    numRecFields_(),
+    totNumRecFields_(0),
+    recurrenceMatrix_(1,scalar(-1.0)),
+    timeIndexList_(),
+    timeValueList_(),
     contTimeIndex(0),
-    lowerSeqLim_(max(1, label(numRecFields_/20))),
-    upperSeqLim_(max(1, label(numRecFields_/5))),
-    
     volScalarFieldList_(volScalarFieldNames_.size()),
     volVectorFieldList_(volVectorFieldNames_.size()),
     surfaceScalarFieldList_(surfaceScalarFieldNames_.size())
-{   
-    if (verbose_)
+{
+    for(label i=0;i<numDataBases_;i++)
     {
-        // be informative on properties of the "recTime" Time-object
-        Info << "recTime.rootPath() " << recTime.rootPath() << endl;
-        Info << "recTime.caseName() " << recTime.caseName() << endl;
-        Info << "recTime.path() " << recTime.path() << endl;
-        Info << "recTime.timePath() " << recTime.timePath() << endl;
-        Info << "recTime.timeName() " << recTime.timeName() << endl;
-        Info << "timeDirs " << timeDirs << endl;
-        Info << "ignoring 0 directory: " << skipZero_ << endl;
+        Foam::Time recTime(fileName(dataBaseNames_[i]), "", "../system", "../constant", false);
+
+        instantList timeDirs(recTime.times());
+        timeDirs_.append(timeDirs);
+
+        numRecFields_.append(label(timeDirs_[i].size()));
+        if(skipZero_) numRecFields_[i]--;
+
+        totNumRecFields_ += numRecFields_[i];
+
+        if (verbose_)
+        {
+            // be informative on properties of the "recTime" Time-object
+            Info << "information on database " << i << endl;
+            Info << "recTime.rootPath() " << recTime.rootPath() << endl;
+            Info << "recTime.caseName() " << recTime.caseName() << endl;
+            Info << "recTime.path() " << recTime.path() << endl;
+            Info << "recTime.timePath() " << recTime.timePath() << endl;
+            Info << "recTime.timeName() " << recTime.timeName() << endl;
+            Info << "timeDirs " << timeDirs_[i] << endl;
+            Info << "ignoring 0 directory: " << skipZero_ << endl;
+        }
     }
+    Info << "total number of recurrence fields = " << totNumRecFields_ << endl;
+    recurrenceMatrix_.setSize(totNumRecFields_,totNumRecFields_);
+
+    lowerSeqLim_ = max(1, label(totNumRecFields_/20));
+    upperSeqLim_ = max(1, label(totNumRecFields_/5));
+
     readTimeSeries();
 
+    // check if time steps in databases are consistent
+    // if no initial number of time steps has been specified, create path for full runtime immediately
     recTimeStep_ = checkTimeStep();
-    totRecSteps_ = 1 + static_cast<label>( (endTime_-startTime_) / recTimeStep_ );
+    if(totRecSteps_ < 0)
+    {
+        totRecSteps_ = 1 + static_cast<label>( (endTime_-startTime_) / recTimeStep_ );
+    }
 
     for(int i=0; i<volScalarFieldNames_.size(); i++)
     {
-        volScalarFieldList_[i].setSize(numRecFields_);
+        volScalarFieldList_[i].setSize(totNumRecFields_);
     }
 
     for(int i=0; i<volVectorFieldNames_.size(); i++)
     {
-        volVectorFieldList_[i].setSize(numRecFields_);
+        volVectorFieldList_[i].setSize(totNumRecFields_);
     }
 
     for(int i=0; i<surfaceScalarFieldNames_.size(); i++)
     {
-        surfaceScalarFieldList_[i].setSize(numRecFields_);
+        surfaceScalarFieldList_[i].setSize(totNumRecFields_);
     }
-
-    //   setRecFields();
 }
 
 
@@ -117,250 +136,213 @@ standardRecModel::~standardRecModel()
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 scalar standardRecModel::checkTimeStep()
 {
-   // check time step of provided data
-    scalar dtCur(0.0);
-    scalar dtOld(0.0);
-    
+//    // check time step of provided data
+    scalar dtCur(1.e10);
+    scalar dtOld(1.e10);
+    bool first = true;
+    scalar frac = 0.0;
+    scalar tolerance = 1e-5;
+    for(int i=0;i<numDataBases_;i++)
+    {
+        for(int j=0;j<numRecFields_[i]-1;j++)
+        {
+            dtOld = dtCur;
+            dtCur = timeDirs[i][j+1] - timeDirs[i][j];
+            frac = 1 - dtOld/dtCur;
+            if(!first && fabs(frac) > tolerance)
+            {
+                FatalError <<"detected different time steps in database(s)\n" << abort(FatalError);
+            }
+        }
+
+    }
     if (verbose_)
     {
-    	Info << "timeValueList : " << timeValueList_ << endl;
-    }
-    
-    if (timeIndexList_.size() == 1)
-    {
-        return 1.e10;
-    }
-    
-    forAll(timeValueList_, i)
-    {
-    	// skip zero
-    	if (skipZero_ and timeDirs[i].value() == 0)
-    	{
-    	    if (verbose_)
-    	    {
-    	        Info << " ... skipping 0 in checkTimeStep()" << endl;
-    	    }
-    	    continue;
-    	}
-    	
-    	// compute time step
-    	if (timeDirs[i].value() == timeDirs.last().value())
-    	{
-    		if (verbose_)
-    		{
-    			Info << ".. leaving loop at " << timeDirs[i] << endl;
-    		}
-    		// leave loop
-    		break;
-    	}
-    	
-    	if (verbose_)
-    	{
-    		Info << "timeDirs.fcIndex(i)].value(),  timeDirs[i].value() : " 
-    			<< timeDirs[timeDirs.fcIndex(i)].value() << "   " << timeDirs[i].value()
-    			<< endl;
-    	}
-    	
-    	// the documentation is in the code ;-)
-    	//	fcIndex() - return forward circular index, i.e. the next index
-        dtCur = timeDirs[timeDirs.fcIndex(i)].value() - timeDirs[i].value();
-        
-        if (dtOld < SMALL)
-        {
-        	dtOld = dtCur;
-        }
-        
-        if (abs(dtOld - dtCur) > SMALL)
-        {
-        	Info << "dtCur, dtOld = " << dtCur << "   " << dtOld << endl;
-        	FatalError << "    in setting up data" << nl
-				<< "    non-constant time-step of provided simulation data" 
-				<< abort(FatalError);
-        }
-    }
-        
-    // set deltaT
-    recTime.setDeltaT(dtCur, false);
-	
-	if (verbose_)
-    {
-		Info << "Setting deltaRecT to " << dtCur << endl;
-		Info << "Actual recTime.deltaT = " << recTime.deltaTValue() << endl;
-		Info << "Actual runTime.deltaT = " << timeStep_ << endl;
+        Info << "Setting deltaRecT to " << dtCur << endl;
+        Info << "Actual runTime.deltaT = " << timeStep_ << endl;
     }
     return dtCur;
 }
 
 void standardRecModel::readFieldSeries()
 {
-    Info << "Reading fields\n" << endl;
-    
-    label size = timeDirs.size();
-    label counter = 0;
-    label percentage = 0;
-    
-    for (instantList::iterator it=timeDirs.begin(); it != timeDirs.end(); ++it)
+    label fieldcounter = 0;
+    for(int i=0;i<numDataBases_;i++)
     {
-        if(counter >= 0.1 * percentage * size)
-	    {
-	        Info << "\t" << 10 * percentage << " \% done" << endl;
-	        percentage++;
-	    }
-	    counter++;
-      
-        // set time
-        recTime.setTime(*it, it->value());
-        
-        // skip zero
-        if (skipZero_ and recTime.timeName() == "0")
+        Info << "Reading fields of database " << dataBaseNames_[i] << "\n" << endl;
+
+        Foam::Time recTime(fileName(dataBaseNames_[i]), "", "../system", "../constant", false);
+
+        label size = timeDirs_[i].size();
+        label counter = 0;
+        label percentage = 0;
+    
+        for (instantList::iterator it=timeDirs_[i].begin(); it != timeDirs_[i].end(); ++it)
         {
+            if(counter >= 0.1 * percentage * size)
+            {
+                Info << "\t" << 10 * percentage << " \% done" << endl;
+                percentage++;
+            }
+            counter++;
+
+            // set time
+            recTime.setTime(*it, it->value());
+        
+            // skip zero
+            if (skipZero_ and recTime.timeName() == "0")
+            {
+                if (verbose_)
+                {
+                    Info << " ... skipping 0 in readFieldSeries()" << endl;
+                }
+                continue;
+            }
+        
+            // skip constant
+            if (recTime.timeName() == "constant")
+            {
+                continue;
+            }
+        
             if (verbose_)
-    	    {
-    	        Info << " ... skipping 0 in readFieldSeries()" << endl;
-    	    }
-    	    
-    	    continue;
-        }
+            {
+                Info << "Reading at t = " << recTime.timeName() << endl;
+            }
         
-        // skip constant
-        if (recTime.timeName() == "constant")
-        {
-        	continue;
+            for(int j=0; j<volScalarFieldNames_.size(); j++)
+            {
+                volScalarFieldList_[j].set
+                (
+                    fieldcounter,
+                    new volScalarField
+                    (
+                        IOobject
+                        (
+                            volScalarFieldNames_[j],
+                            recTime.timePath(),
+                            base_.mesh(),
+                            IOobject::MUST_READ,
+                            IOobject::NO_WRITE
+                        ),
+                        base_.mesh()
+                    )
+                );
+            }
+            
+            for(int j=0; j<volVectorFieldNames_.size(); j++)
+            {
+                volVectorFieldList_[j].set
+                (
+                    fieldcounter,
+                    new volVectorField
+                    (
+                        IOobject
+                        (
+                            volVectorFieldNames_[j],
+                            recTime.timePath(),
+                            base_.mesh(),
+                            IOobject::MUST_READ,
+                            IOobject::NO_WRITE
+                        ),
+                        base_.mesh()
+                    )
+                );
+            }
+
+            for(int j=0; j<surfaceScalarFieldNames_.size(); j++)
+            {
+                surfaceScalarFieldList_[j].set
+                (
+                    fieldcounter,
+                    new surfaceScalarField
+                    (
+                        IOobject
+                        (
+                            surfaceScalarFieldNames_[j],
+                            recTime.timePath(),
+                            base_.mesh(),
+                            IOobject::MUST_READ,
+                            IOobject::NO_WRITE
+                        ),
+                        base_.mesh()
+                    )
+                );
+            }
+            fieldcounter++;
         }
-        
-        if (verbose_)
-    	{
-        	Info << "Reading at t = " << recTime.timeName() << endl;
-        }
-        
-        for(int i=0; i<volScalarFieldNames_.size(); i++)
-        {
-            volScalarFieldList_[i].set
-            (
-	            timeIndexList_(recTime.timeName()),
-                new volScalarField
-                (
-                    IOobject
-                    (
-                        volScalarFieldNames_[i],
-                        recTime.timePath(),
-                        base_.mesh(),
-                        IOobject::MUST_READ,
-                        IOobject::NO_WRITE
-                    ),
-                    base_.mesh()
-                )
-	        );
-	    }
-	    
-	    for(int i=0; i<volVectorFieldNames_.size(); i++)
-	    {
-            volVectorFieldList_[i].set
-            (
-	            timeIndexList_(recTime.timeName()),
-                new volVectorField
-                (
-                    IOobject
-                    (
-                        volVectorFieldNames_[i],
-                        recTime.timePath(),
-                        base_.mesh(),
-                        IOobject::MUST_READ,
-                        IOobject::NO_WRITE
-                    ),
-                    base_.mesh()
-                )
-	        );
-	    }
-	    
-	    for(int i=0; i<surfaceScalarFieldNames_.size(); i++)
-	    {
-            surfaceScalarFieldList_[i].set
-            (
-                timeIndexList_(recTime.timeName()),
-                new surfaceScalarField
-                (
-                    IOobject
-                    (
-                        surfaceScalarFieldNames_[i],
-                        recTime.timePath(),
-                        base_.mesh(),
-                        IOobject::MUST_READ,
-                        IOobject::NO_WRITE
-                    ),
-                    base_.mesh()
-                )
-            );
-        } 
+        Info << "Reading fields of database " << dataBaseNames_[i] <<" done" << endl;
     }
-    Info << "Reading fields done" << endl;
 }
 
 
 void standardRecModel::readTimeSeries()
 {
-    bool firsttime = true;
-    // fill the data structure for the time indices
-    for (instantList::iterator it=timeDirs.begin(); it != timeDirs.end(); ++it)
+    for(int i=0;i<numDataBases_;i++)
     {
-    	// set run-time
-    	recTime.setTime(*it, it->value());
-    	
-    	
-    	// skip constant
-    	if (recTime.timeName() == "constant")
-    	{
-        	continue;
-        }
-        
-        // skip zero
-        if (skipZero_ and recTime.timeName() == "0")
+        Foam::Time recTime(fileName(dataBaseNames_[i]), "", "../system", "../constant", false);
+        bool firsttime = true;
+        // fill the data structure for the time indices
+        for (instantList::iterator it=timeDirs_[i].begin(); it != timeDirs_[i].end(); ++it)
         {
-            if (verbose_)
-    	    {
-    	        Info << " ... skipping 0 in readTimeSeries()" << endl;
-    	    }
-            
-            continue;
-        }
-        
-        if (firsttime)
-        {
-            firsttime = false;
-            recStartTime_ = recTime.value();
-        }
-	    recEndTime_ = recTime.value();
-        
-        // insert the time name into the hash-table with a continuous second index
-        timeIndexList_.insert(recTime.timeName(), contTimeIndex);
-        
-        
-        if (verbose_)
-    	{
-    		Info << "current time " << recTime.timeName() << endl;
-    		Info << "insert " << recTime.timeName() << " , " << contTimeIndex << endl;
-    	}
-        
-        
-        // insert the time value
-        timeValueList_.insert(contTimeIndex, recTime.timeOutputValue());
-        
-        // increment continuousIndex
-        contTimeIndex++;
-        
-        if (verbose_)
-    	{
-        	Info << "contTimeIndex " << contTimeIndex << endl;
-        }
-    }
+            // set run-time
+            recTime.setTime(*it, it->value());
 
-    if (verbose_)
-    {
-        Info << endl;
-        Info << "Found " << label(timeDirs.size()) << " time folders" << endl;
-        Info << "Found " << label(timeIndexList_.size()) << " time steps" << endl;
-        Info << "database start time = " << recStartTime_ << endl;
-        Info << "database end time = " << recEndTime_ << endl;
+
+            // skip constant
+            if (recTime.timeName() == "constant")
+            {
+                continue;
+            }
+
+            // skip zero
+            if (skipZero_ and recTime.timeName() == "0")
+            {
+                if (verbose_)
+                {
+                    Info << " ... skipping 0 in readTimeSeries()" << endl;
+                }
+                continue;
+            }
+
+            if (firsttime)
+            {
+                firsttime = false;
+                recStartTime_ = recTime.value();
+            }
+            recEndTime_ = recTime.value();
+
+            // insert the time name into the hash-table with a continuous second index
+            timeIndexList_.insert(recTime.timeName(), contTimeIndex);
+
+
+            if (verbose_)
+            {
+                Info << "current time " << recTime.timeName() << endl;
+                Info << "insert " << recTime.timeName() << " , " << contTimeIndex << endl;
+            }
+
+
+            // insert the time value
+            timeValueList_.insert(contTimeIndex, recTime.timeOutputValue());
+
+            // increment continuousIndex
+            contTimeIndex++;
+
+            if (verbose_)
+            {
+                Info << "contTimeIndex " << contTimeIndex << endl;
+            }
+        }
+      
+        if (verbose_)
+        {
+            Info << endl;
+            Info << "Found " << label(timeDirs_[i].size()) << " time folders" << endl;
+            Info << "Found " << label(timeIndexList_.size()) << " time steps" << endl;
+            Info << "database start time = " << recStartTime_ << endl;
+            Info << "database end time = " << recEndTime_ << endl;
+        }
     }
 }
 
@@ -427,15 +409,20 @@ label standardRecModel::upperSeqLim() const
     return upperSeqLim_; 
 }
 
-
 label standardRecModel::numRecFields() const
 {
-    return numRecFields_;
+    return totNumRecFields_;
 }
+
+label standardRecModel::numRecFields(label i) const
+{
+    return numRecFields_[i];
+}
+
 
 label standardRecModel::numDataBaseFields() const
 {
-    return numRecFields_;
+    return totNumRecFields_;
 }
 
 
@@ -537,7 +524,7 @@ void standardRecModel::exportAveragedVolVectorField(volVectorField& smoothfield,
     label delay = 1;
     label lastMin = -1000;
 
-    for(int runningTimeIndex = 0; runningTimeIndex < numRecFields_ ; runningTimeIndex++)
+    for(int runningTimeIndex = 0; runningTimeIndex < totNumRecFields_ ; runningTimeIndex++)
     {
         recErr = recurrenceMatrix_[timeIndex][runningTimeIndex];
         if(recErr > threshold) continue;

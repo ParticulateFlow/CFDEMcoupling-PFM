@@ -154,6 +154,11 @@ public:
     virtual label upperSeqLim() const = 0;
     
     virtual label numRecFields() const = 0;
+    virtual label numRecFields(label i) const
+    {
+        return 0;
+    }
+    
     virtual label numDataBaseFields() const = 0;
     
     label totRecSteps() const;

@@ -26,7 +26,7 @@ License
 
 inline Foam::label Foam::standardRecModel::getVolScalarFieldIndex(word fieldname, label index) const
 {
-    if(index < 0 || index > numRecFields_ - 1)
+    if(index < 0 || index > totNumRecFields_ - 1)
     {
         FatalError<<"standardRecModel: Index out of bounds for volScalarField with name " 
             << fieldname << abort(FatalError);
@@ -53,7 +53,7 @@ inline Foam::label Foam::standardRecModel::getVolScalarFieldIndex(word fieldname
 
 inline Foam::label Foam::standardRecModel::getVolVectorFieldIndex(word fieldname, label index) const
 {
-    if(index < 0 || index > numRecFields_ - 1)
+    if(index < 0 || index > totNumRecFields_ - 1)
     {
         FatalError<<"standardRecModel: Index out of bounds for volVectorField with name " 
             << fieldname << abort(FatalError);
@@ -80,7 +80,7 @@ inline Foam::label Foam::standardRecModel::getVolVectorFieldIndex(word fieldname
 
 inline Foam::label Foam::standardRecModel::getSurfaceScalarFieldIndex(word fieldname, label index) const
 {
-    if(index < 0 || index > numRecFields_ - 1)
+    if(index < 0 || index > totNumRecFields_ - 1)
     {
         FatalError<<"standardRecModel: Index out of bounds for surfaceScalarField with name " 
             << fieldname << abort(FatalError);

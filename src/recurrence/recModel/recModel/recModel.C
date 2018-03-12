@@ -72,6 +72,7 @@ recModel::recModel
     timeStep_(readScalar(controlDict_.lookup("deltaT"))),
     recStartTime_(-1.0),
     recEndTime_(-1.0),
+    totRecSteps_(recProperties_.lookupOrDefault<label>("initialRecSteps",-1)),
     sequenceStart(0),
     sequenceEnd(0),
     virtualStartIndex(0),
@@ -81,7 +82,6 @@ recModel::recModel
     virtualTimeIndexListPos(0)
 {
     recTimeStep_ = -1.0;
-    totRecSteps_ = -1;
 }
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //

@@ -71,7 +71,7 @@ void sqrDiffNorm::computeRecMatrix()
 {
     Info << nl << type() << ": computing recurrence matrix\n" << endl;
 
-    const HashTable<label,word>& timeIndexList( base_.recM().timeIndexList() );
+    label totNumRecSteps = base_.recM().numRecFields();
     SymmetricSquareMatrix<scalar>& recurrenceMatrix( base_.recM().recurrenceMatrix() );
 
     scalar normIJ(0.0);
@@ -82,7 +82,7 @@ void sqrDiffNorm::computeRecMatrix()
             minus the main diagonal entries, divided by two, 
             since the matrix is symmetric
     */
-    label size = (timeIndexList.size()*(timeIndexList.size()-1))/2;
+    label size = (totNumRecSteps*(totNumRecSteps-1))/2;
     label counter = 0;
     label percentage = 0;
     
@@ -101,7 +101,7 @@ void sqrDiffNorm::computeRecMatrix()
     
     for (int j=0; j<=N/(M-1); j++)
     {
-        for (int i=0; i<timeIndexList.size(); i++)
+        for (int i=0; i<totNumRecSteps; i++)
         {
             if (verbose_)
             {
@@ -185,9 +185,9 @@ void sqrDiffNorm::computeRecMatrix()
     // normalize matrix and copy lower to upper half
     if(normConstant_ > 0.0) maxNormIJ = normConstant_;
     
-    forAll(timeIndexList, ti)
+    for(label ti=0;ti<totNumRecSteps;ti++)
     {
-        forAll(timeIndexList, tj)
+        for(label tj=0;tj<totNumRecSteps;tj++)
         {
             if (ti >= tj) continue;
             
