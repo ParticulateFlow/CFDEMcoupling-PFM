@@ -409,6 +409,11 @@ label standardRecModel::upperSeqLim() const
     return upperSeqLim_; 
 }
 
+label standardRecModel::label numIntervals() const
+{
+    return numDataBases_; 
+}
+
 label standardRecModel::numRecFields() const
 {
     return totNumRecFields_;

@@ -124,6 +124,7 @@ public:
     label lowerSeqLim() const;
     label upperSeqLim() const;
     
+    label numIntervals() const;
     label numRecFields() const;
     label numRecFields(label) const;
     label numDataBaseFields() const;

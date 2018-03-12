@@ -153,6 +153,11 @@ public:
     virtual label lowerSeqLim() const = 0;
     virtual label upperSeqLim() const = 0;
     
+    virtual label numIntervals() const
+    {
+        return 1;
+    }
+    
     virtual label numRecFields() const = 0;
     virtual label numRecFields(label i) const
     {

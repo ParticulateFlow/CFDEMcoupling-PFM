@@ -57,21 +57,13 @@ multiIntervalPath::multiIntervalPath
     recPath(dict, base),
     propsDict_(dict.subDict(typeName + "Props")),
     meanIntervalSteps_(propsDict_.lookupOrDefault<label>("meanIntervalSteps",-1)),
-    numIntervals_(0),
-    intervalSizes_(propsDict_.lookup("intervalSizes")),
-    intervalSizesCumulative_(intervalSizes_),
+    numIntervals_(base.recM().numIntervals()),
+    intervalSizes_(numIntervals_),
+    intervalSizesCumulative_(numIntervals_),
     Pjump_(0.0),
-    intervalWeights_(propsDict_.lookup("intervalWeights")),
+    intervalWeights_(propsDict_.lookupOrDefault<scalarList>("intervalWeights",scalarList(numIntervals_,1.0))),
     intervalWeightsCumulative_(intervalWeights_)
-{
-    numIntervals_ = intervalWeights_.size();
-    
-    if(numIntervals_ == 0 || numIntervals_ != intervalSizes_.size())
-    {
-        FatalError << ": bad number of separation times and/or interval weights!\n"
-                       << abort(FatalError);
-    }
-    
+{    
     if(meanIntervalSteps_<0)
     {
         // if no mean interval length for consecutive steps is specified, use 1/5 from first interval
@@ -82,6 +74,7 @@ multiIntervalPath::multiIntervalPath
     scalar wsum = 0.0;
     for(int i=0;i<numIntervals_;i++)
     {
+        intervalSizes_[i] = base.recM().numRecFields(i);
         wsum += intervalWeights_[i];
     }
     
@@ -101,13 +94,6 @@ multiIntervalPath::multiIntervalPath
 	}
 	intervalWeightsCumulative_[i] = sum1;
 	intervalSizesCumulative_[i] = sum2;
-    }
-    
-    label numRecFields = base_.recM().numRecFields();
-    if (numRecFields != intervalSizesCumulative_[numIntervals_ - 1])
-    {
-      FatalError << "total number of recurrence fields " << numRecFields << " does not match sum of intervals "
-          << intervalSizesCumulative_[numIntervals_ - 1] << abort(FatalError);
     }
     
     // given a jump probability of P, the probability of finding a chain of length N is
@@ -185,7 +171,6 @@ void multiIntervalPath::computeRecPath()
 	if ((randJump > Pjump_ && !intervalBorder) || prevStepWasJump)
 	{
 	    virtualTimeIndex++;
-	    //recSteps++;
 	    prevStepWasJump = false;
 	}
 	else
