@@ -60,14 +60,19 @@ standardRecModel::standardRecModel
     timeDirs_(),
     skipZero_(propsDict_.lookupOrDefault<Switch>("skipZero", Switch(false))),
     numRecFields_(),
+    cumulativeNumRecFields_(),
     totNumRecFields_(0),
+    storeAveragedFields_(propsDict_.lookupOrDefault<bool>("storeAveragedFields",false)),
     recurrenceMatrix_(1,scalar(-1.0)),
     timeIndexList_(),
     timeValueList_(),
     contTimeIndex(0),
     volScalarFieldList_(volScalarFieldNames_.size()),
     volVectorFieldList_(volVectorFieldNames_.size()),
-    surfaceScalarFieldList_(surfaceScalarFieldNames_.size())
+    surfaceScalarFieldList_(surfaceScalarFieldNames_.size()),
+    aveVolScalarFieldList_(volScalarFieldNames_.size()),
+    aveVolVectorFieldList_(volVectorFieldNames_.size()),
+    aveSurfaceScalarFieldList_(surfaceScalarFieldNames_.size())
 {
     for(label i=0;i<numDataBases_;i++)
     {
@@ -78,6 +83,13 @@ standardRecModel::standardRecModel
 
         numRecFields_.append(label(timeDirs_[i].size()));
         if(skipZero_) numRecFields_[i]--;
+	
+	label sum=0;
+	for(label j=0;j<=i;j++)
+	{
+	    sum += numRecFields_[j];
+	}
+	cumulativeNumRecFields_.append(sum);
 
         totNumRecFields_ += numRecFields_[i];
 
@@ -113,16 +125,19 @@ standardRecModel::standardRecModel
     for(int i=0; i<volScalarFieldNames_.size(); i++)
     {
         volScalarFieldList_[i].setSize(totNumRecFields_);
+	if(storeAveragedFields_) aveVolScalarFieldList_[i].setSize(numDataBases_);
     }
 
     for(int i=0; i<volVectorFieldNames_.size(); i++)
     {
         volVectorFieldList_[i].setSize(totNumRecFields_);
+	if(storeAveragedFields_) aveVolVectorFieldList_[i].setSize(numDataBases_);
     }
 
     for(int i=0; i<surfaceScalarFieldNames_.size(); i++)
     {
         surfaceScalarFieldList_[i].setSize(totNumRecFields_);
+	if(storeAveragedFields_) aveSurfaceScalarFieldList_[i].setSize(numDataBases_);
     }
 }
 
@@ -273,8 +288,56 @@ void standardRecModel::readFieldSeries()
         }
         Info << "Reading fields of database " << dataBaseNames_[i] <<" done" << endl;
     }
+    
+    if(storeAveragedFields_)
+    {
+        Info << "Calculating field averages." << endl;
+	averageFieldSeries();
+	Info << "Calculating field averages done." << endl;
+    }
 }
 
+void standardRecModel::averageFieldSeries()
+{
+    for(int i=0;i<numDataBases_;i++)
+    {
+        Foam::Time recTime(fileName(dataBaseNames_[i]), "", "../system", "../constant", false);
+        
+	for(int j=0; j<volScalarFieldNames_.size(); j++)
+        {
+	    dimensionedScalar dimZero("zero",0.0,volScalarFieldList_[j][0].dimensionSet());
+            aveVolScalarFieldList_[j].set
+            (
+                i,
+                new volScalarField
+                (
+                    IOobject
+                    (
+                        "ave"+volScalarFieldNames_[j],
+                        recTime.timePath(),
+                        base_.mesh(),
+                        IOobject::NO_READ,
+                        IOobject::NO_WRITE
+                    ),
+                    base_.mesh(),
+                    dimZero
+                )
+            );
+	    
+	    label k1 = 0;
+	    if(i>0) k1 = cumulativeNumRecFields_[i-1];
+	    label k2 = cumulativeNumRecFields_[i];
+	    for(label k = k1; k < k2; k++)
+	    {
+	        aveVolScalarFieldList_[j][i] += volScalarFieldList_[j][k];
+	    }
+	    aveVolScalarFieldList_[j][i] /= k2 - k1;
+        }
+	
+	
+	// do the same for volVector and surfaceScalar fields
+    }
+}
 
 void standardRecModel::readTimeSeries()
 {

@@ -57,7 +57,10 @@ protected:
     List<instantList> timeDirs_;
     Switch skipZero_;
     labelList numRecFields_;
+    labelList cumulativeNumRecFields_;
     label totNumRecFields_;
+    
+    bool storeAveragedFields_;
 
     // matrix that contains the recurrence ERROR
     SymmetricSquareMatrix<scalar> recurrenceMatrix_;
@@ -83,6 +86,8 @@ protected:
     inline label getVolVectorFieldIndex(word, label) const;
     inline label getSurfaceScalarFieldIndex(word, label) const;
   
+    void averageFieldSeries();
+
     void readFieldSeries();
     
     void readTimeSeries();
@@ -138,6 +143,10 @@ private:
     List<PtrList<volScalarField> > volScalarFieldList_;
     List<PtrList<volVectorField> > volVectorFieldList_;
     List<PtrList<surfaceScalarField> > surfaceScalarFieldList_;
+    
+    List<PtrList<volScalarField> > aveVolScalarFieldList_;
+    List<PtrList<volVectorField> > aveVolVectorFieldList_;
+    List<PtrList<surfaceScalarField> > aveSurfaceScalarFieldList_;
     
 };
 
