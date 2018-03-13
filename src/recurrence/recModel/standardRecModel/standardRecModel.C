@@ -162,7 +162,7 @@ scalar standardRecModel::checkTimeStep()
         for(int j=0;j<numRecFields_[i]-1;j++)
         {
             dtOld = dtCur;
-            dtCur = timeDirs[i][j+1] - timeDirs[i][j];
+            dtCur = timeDirs_[i][j+1].value() - timeDirs_[i][j].value();
             frac = 1 - dtOld/dtCur;
             if(!first && fabs(frac) > tolerance)
             {
@@ -178,6 +178,112 @@ scalar standardRecModel::checkTimeStep()
     }
     return dtCur;
 }
+
+
+void standardRecModel::averageFieldSeries()
+{
+    for(int i=0;i<numDataBases_;i++)
+    {
+        Foam::Time recTime(fileName(dataBaseNames_[i]), "", "../system", "../constant", false);
+        
+        // perform averaging over all volScalarFields
+        for(int j=0; j<volScalarFieldNames_.size(); j++)
+        {
+            dimensionedScalar dimZero("zero",volScalarFieldList_[j][0].dimensions(),0.0);
+            aveVolScalarFieldList_[j].set
+            (
+                i,
+                new volScalarField
+                (
+                    IOobject
+                    (
+                        "ave"+volScalarFieldNames_[j],
+                        recTime.timePath(),
+                        base_.mesh(),
+                        IOobject::NO_READ,
+                        IOobject::NO_WRITE
+                    ),
+                    base_.mesh(),
+                    dimZero
+                )
+            );
+
+            label k1 = 0;
+            if(i>0) k1 = cumulativeNumRecFields_[i-1];
+            label k2 = cumulativeNumRecFields_[i];
+            for(label k = k1; k < k2; k++)
+            {
+                aveVolScalarFieldList_[j][i] += volScalarFieldList_[j][k];
+            }
+            aveVolScalarFieldList_[j][i] /= k2 - k1;
+        }
+
+        // perform averaging over all volVectorFields
+        for(int j=0; j<volVectorFieldNames_.size(); j++)
+        {
+            dimensionedVector dimZero("zero",volScalarFieldList_[j][0].dimensions(),vector::zero);
+            aveVolVectorFieldList_[j].set
+            (
+                i,
+                new volVectorField
+                (
+                    IOobject
+                    (
+                        "ave"+volVectorFieldNames_[j],
+                        recTime.timePath(),
+                        base_.mesh(),
+                        IOobject::NO_READ,
+                        IOobject::NO_WRITE
+                    ),
+                    base_.mesh(),
+                    dimZero
+                )
+            );
+
+            label k1 = 0;
+            if(i>0) k1 = cumulativeNumRecFields_[i-1];
+            label k2 = cumulativeNumRecFields_[i];
+            for(label k = k1; k < k2; k++)
+            {
+                aveVolVectorFieldList_[j][i] += volVectorFieldList_[j][k];
+            }
+            aveVolVectorFieldList_[j][i] /= k2 - k1;
+        }
+
+        // perform averaging over all surfaceScalarFields
+        for(int j=0; j<surfaceScalarFieldNames_.size(); j++)
+        {
+            dimensionedScalar dimZero("zero",volScalarFieldList_[j][0].dimensions(),0.0);
+            aveSurfaceScalarFieldList_[j].set
+            (
+                i,
+                new surfaceScalarField
+                (
+                    IOobject
+                    (
+                        "ave"+surfaceScalarFieldNames_[j],
+                        recTime.timePath(),
+                        base_.mesh(),
+                        IOobject::NO_READ,
+                        IOobject::NO_WRITE
+                    ),
+                    base_.mesh(),
+                    dimZero
+                )
+            );
+
+            label k1 = 0;
+            if(i>0) k1 = cumulativeNumRecFields_[i-1];
+            label k2 = cumulativeNumRecFields_[i];
+            for(label k = k1; k < k2; k++)
+            {
+                aveSurfaceScalarFieldList_[j][i] += surfaceScalarFieldList_[j][k];
+            }
+            aveSurfaceScalarFieldList_[j][i] /= k2 - k1;
+        }
+    }
+}
+
 
 void standardRecModel::readFieldSeries()
 {
@@ -292,52 +398,11 @@ void standardRecModel::readFieldSeries()
     if(storeAveragedFields_)
     {
         Info << "Calculating field averages." << endl;
-	averageFieldSeries();
-	Info << "Calculating field averages done." << endl;
+        averageFieldSeries();
+        Info << "Calculating field averages done." << endl;
     }
 }
 
-void standardRecModel::averageFieldSeries()
-{
-    for(int i=0;i<numDataBases_;i++)
-    {
-        Foam::Time recTime(fileName(dataBaseNames_[i]), "", "../system", "../constant", false);
-        
-	for(int j=0; j<volScalarFieldNames_.size(); j++)
-        {
-	    dimensionedScalar dimZero("zero",0.0,volScalarFieldList_[j][0].dimensionSet());
-            aveVolScalarFieldList_[j].set
-            (
-                i,
-                new volScalarField
-                (
-                    IOobject
-                    (
-                        "ave"+volScalarFieldNames_[j],
-                        recTime.timePath(),
-                        base_.mesh(),
-                        IOobject::NO_READ,
-                        IOobject::NO_WRITE
-                    ),
-                    base_.mesh(),
-                    dimZero
-                )
-            );
-	    
-	    label k1 = 0;
-	    if(i>0) k1 = cumulativeNumRecFields_[i-1];
-	    label k2 = cumulativeNumRecFields_[i];
-	    for(label k = k1; k < k2; k++)
-	    {
-	        aveVolScalarFieldList_[j][i] += volScalarFieldList_[j][k];
-	    }
-	    aveVolScalarFieldList_[j][i] /= k2 - k1;
-        }
-	
-	
-	// do the same for volVector and surfaceScalar fields
-    }
-}
 
 void standardRecModel::readTimeSeries()
 {
@@ -410,6 +475,39 @@ void standardRecModel::readTimeSeries()
 }
 
 
+void standardRecModel::exportVolScalarFieldAve(word fieldname, volScalarField& field, label db)
+{
+    if(!storeAveragedFields_)
+    {
+        FatalError <<"no averaged fields available, need to activate \"storeAveragedFields\"\n" << abort(FatalError); 
+    }
+    const label fieldI = getVolScalarFieldIndex(fieldname, 0);
+    field = aveVolScalarFieldList_[fieldI][db];
+}
+
+
+void standardRecModel::exportVolVectorFieldAve(word fieldname, volVectorField& field, label db)
+{
+    if(!storeAveragedFields_)
+    {
+        FatalError <<"no averaged fields available, need to activate \"storeAveragedFields\"\n" << abort(FatalError); 
+    }
+    const label fieldI = getVolVectorFieldIndex(fieldname, 0);
+    field = aveVolVectorFieldList_[fieldI][db];
+}
+
+
+void standardRecModel::exportSurfaceScalarFieldAve(word fieldname, surfaceScalarField& field, label db)
+{
+    if(!storeAveragedFields_)
+    {
+        FatalError <<"no averaged fields available, need to activate \"storeAveragedFields\"\n" << abort(FatalError); 
+    }
+    const label fieldI = getSurfaceScalarFieldIndex(fieldname, 0);
+    field = aveSurfaceScalarFieldList_[fieldI][db];
+}
+
+
 void standardRecModel::exportVolScalarField(word fieldname, volScalarField& field)
 {
     field = exportVolScalarField(fieldname, virtualTimeIndex);
@@ -472,7 +570,7 @@ label standardRecModel::upperSeqLim() const
     return upperSeqLim_; 
 }
 
-label standardRecModel::label numIntervals() const
+label standardRecModel::numIntervals() const
 {
     return numDataBases_; 
 }

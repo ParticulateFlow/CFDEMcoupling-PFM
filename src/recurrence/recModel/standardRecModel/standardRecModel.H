@@ -80,7 +80,7 @@ protected:
     label lowerSeqLim_;
     label upperSeqLim_;
     
-  //  scalar checkTimeStep();
+    scalar checkTimeStep();
     
     inline label getVolScalarFieldIndex(word, label) const;
     inline label getVolVectorFieldIndex(word, label) const;
@@ -110,6 +110,10 @@ public:
     // Destructor
 
         ~standardRecModel();
+
+    void exportVolScalarFieldAve(word, volScalarField&, label);
+    void exportVolVectorFieldAve(word, volVectorField&, label);
+    void exportSurfaceScalarFieldAve(word, surfaceScalarField&, label);
 
     void exportVolScalarField(word, volScalarField&);
     void exportVolVectorField(word, volVectorField&);
