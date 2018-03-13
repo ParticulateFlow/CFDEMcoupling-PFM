@@ -78,6 +78,8 @@ private:
 
     void allocateMyArrays() const;
 
+    mutable scalar scaleDia_;
+
 public:
 
     //- Runtime type information

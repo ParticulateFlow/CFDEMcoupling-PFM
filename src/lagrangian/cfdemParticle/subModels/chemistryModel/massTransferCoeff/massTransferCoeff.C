@@ -65,8 +65,11 @@ massTransferCoeff::massTransferCoeff
     partNuName_(propsDict_.lookupOrDefault<word>("partViscos","partNu")),
     partNu_(NULL),
     partReynolds_(propsDict_.lookupOrDefault<word>("partReynolds","partRe")),
-    partRe_(NULL)
-{}
+    partRe_(NULL),
+    scaleDia_(1)
+{
+    particleCloud_.checkCG(true);
+}
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
@@ -113,6 +116,11 @@ void massTransferCoeff::execute()
         const volScalarField nufField = particleCloud_.turbulence().nu();
     #endif
 
+    if (particleCloud_.cg() > 1.0)
+    {
+        scaleDia_ = particleCloud_.cg();
+        Info << "KochHill using scale from liggghts cg = " << scaleDia_ << endl;
+    }
 
     label  cellI=0;
 
@@ -123,6 +131,7 @@ void massTransferCoeff::execute()
     vector Ur(0,0,0);
     scalar ds(0);
     scalar magUr(0);
+
 
     // give Rep & kin. visc. to DEM
     scalar Rep(0);
@@ -156,17 +165,17 @@ void massTransferCoeff::execute()
             Us  =   particleCloud_.velocity(index);
             Ur  =   Ufluid  -   Us;
             magUr   =   mag(Ur);
+            ds = particleCloud_.d(index);
+            scalar ds_scaled = ds/scaleDia_;
 
             // nu_fluid Field
             nuf =   nufField[cellI];
-            // particle diameter
-            ds  =   2*particleCloud_.radius(index);
 
             if (particleCloud_.modelType()=="A")
                 nuf *=  voidfraction;
 
             // calculate particle Reynolds number
-            Rep =   ds*voidfraction*magUr/(nuf+SMALL);
+            Rep =   ds_scaled*voidfraction*magUr/(nuf+SMALL);
 
             if (Rep == 0.0)
                 Rep = SMALL;
