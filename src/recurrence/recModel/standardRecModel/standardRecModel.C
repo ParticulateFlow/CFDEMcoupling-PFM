@@ -221,7 +221,7 @@ void standardRecModel::averageFieldSeries()
         // perform averaging over all volVectorFields
         for(int j=0; j<volVectorFieldNames_.size(); j++)
         {
-            dimensionedVector dimZero("zero",volScalarFieldList_[j][0].dimensions(),vector::zero);
+            dimensionedVector dimZero("zero",volVectorFieldList_[j][0].dimensions(),vector::zero);
             aveVolVectorFieldList_[j].set
             (
                 i,
@@ -253,7 +253,7 @@ void standardRecModel::averageFieldSeries()
         // perform averaging over all surfaceScalarFields
         for(int j=0; j<surfaceScalarFieldNames_.size(); j++)
         {
-            dimensionedScalar dimZero("zero",volScalarFieldList_[j][0].dimensions(),0.0);
+            dimensionedScalar dimZero("zero",surfaceScalarFieldList_[j][0].dimensions(),0.0);
             aveSurfaceScalarFieldList_[j].set
             (
                 i,
