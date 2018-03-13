@@ -26,7 +26,7 @@ License
 #include "dataExchangeModel.H"
 #include "IFstream.H"
 
-#define SMALL 1e-7
+#define SMALL 1e-8
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -109,9 +109,11 @@ diffusionCoefficient::~diffusionCoefficient()
     particleCloud_.dataExchangeM().destroy(partPressure_,1);
 
     int nP_ = particleCloud_.numberOfParticles();
+
     for (int i=0; i<diffusantGasNames_.size(); i++)
     {
         particleCloud_.dataExchangeM().destroy(diffusionCoefficients_[i],nP_);
+
         if (dBinary_[i]) delete [] dBinary_[i];
         if (molNum_[i]) delete [] molNum_[i];
         if (volDiff_[i]) delete [] volDiff_[i];
@@ -126,6 +128,7 @@ diffusionCoefficient::~diffusionCoefficient()
  void diffusionCoefficient::allocateMyArrays() const
 {
     double initVal=0.0;
+
     if (particleCloud_.dataExchangeM().maxNumberOfParticles() > 0)
     {
         particleCloud_.dataExchangeM().allocateArray(partPressure_,initVal,1,"nparticles");
@@ -186,15 +189,16 @@ void diffusionCoefficient::execute()
     label  cellI=0;
     scalar Tfluid(0);
     scalar rhofluid(0);
-    List<scalar> Xfluid_(0);
-    Xfluid_.setSize(speciesNames_.size());
-    for (int i = 0; i < speciesNames_.size(); i++) Xfluid_[i] = 0.0;
-    List<scalar> XfluidDiffusant_(0);
-    XfluidDiffusant_.setSize(diffusantGasNames_.size());
-    for (int j = 0; j < diffusantGasNames_.size();j++) XfluidDiffusant_[j] = 0.0;
     scalar Pfluid(0);
     scalar molarConcfluid(0);
     scalar Texp(0);
+
+    List<scalar> Xfluid_(0);
+    Xfluid_.setSize(speciesNames_.size());
+    //for (int i = 0; i < speciesNames_.size(); i++) Xfluid_[i] = 0.0;
+    List<scalar> XfluidDiffusant_(0);
+    XfluidDiffusant_.setSize(diffusantGasNames_.size());
+    //for (int j = 0; j < diffusantGasNames_.size();j++) XfluidDiffusant_[j] = 0.0;
     List<scalar> MixtureBinaryDiffusion_;
     MixtureBinaryDiffusion_.setSize(diffusantGasNames_.size());
     List<scalar> TotalFraction_;
@@ -222,8 +226,6 @@ void diffusionCoefficient::execute()
             else
             {
                 Tfluid          =   tempField_[cellI];
-
-
                 rhofluid        =   rho_[cellI];
                 Pfluid          =   P_[cellI];
                 molarConcfluid  =   molarConc_[cellI];
@@ -231,6 +233,7 @@ void diffusionCoefficient::execute()
                 for (int i = 0; i<speciesNames_.size();i++)
                 {
                     Xfluid_[i] = X_[i][cellI];
+
                     for (int j=0; j<diffusantGasNames_.size();j++)
                     {
                         if (diffusantGasNames_[j] == speciesNames_[i])
