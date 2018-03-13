@@ -65,15 +65,15 @@ MarkovPath::MarkovPath
     intervalWeights_(propsDict_.lookupOrDefault<scalarList>("intervalWeights",scalarList(numIntervals_,1.0))),
     intervalWeightsCumulative_(intervalWeights_)
 {    
+    for(int i=0;i<numIntervals_;i++)
+    {
+        intervalSizes_[i] = base.recM().numRecFields(i);
+    }
+    
     if(meanIntervalSteps_<0)
     {
         // if no mean interval length for consecutive steps is specified, use 1/5 from first interval
         meanIntervalSteps_ = (label) (0.2 * intervalSizes_[0]);
-    }
-    
-    for(int i=0;i<numIntervals_;i++)
-    {
-        intervalSizes_[i] = base.recM().numRecFields(i);
     }
     
     // normalize weights and create cumulative distribution
