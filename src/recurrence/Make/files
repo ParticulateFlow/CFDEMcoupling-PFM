@@ -10,6 +10,7 @@ recPath/recPath/recPath.C
 recPath/recPath/newRecPath.C
 recPath/simpleRandomPath/simpleRandomPath.C
 recPath/noPath/noPath.C
+recPath/MarkovPath/MarkovPath.C
 recPath/multiIntervalPath/multiIntervalPath.C
 recStatAnalysis/recStatAnalysis/recStatAnalysis.C
 recStatAnalysis/recStatAnalysis/newRecStatAnalysis.C

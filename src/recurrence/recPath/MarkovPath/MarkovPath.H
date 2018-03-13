@@ -20,70 +20,71 @@ License
 
     You should have received a copy of the GNU General Public License
     along with CFDEMcoupling academic.  If not, see <http://www.gnu.org/licenses/>.
+    
+Description
+    A recurrence database consisting of N separate intervals is assumed with separation
+    times t0 (start time), t1, ... tN (end time) and weights w0, ... wN-1.
 \*---------------------------------------------------------------------------*/
 
-#ifndef recPath_H
-#define recPath_H
+#ifndef MarkovPath_H
+#define MarkovPath_H
 
-#include "recBase.H"
-#include "fvCFD.H"
-#include "HashTable.H"
-#include "labelPair.H"
-#include "OFstream.H"
-
+#include "recPath.H"
+#include "scalarList.H"
 
 namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class recPath Declaration
+                           Class MarkovPath Declaration
 \*---------------------------------------------------------------------------*/
 
-class recPath
+class MarkovPath
+:
+    public recPath
 {
 protected:
 
     // Protected data
-    recBase& base_;
+
+    dictionary propsDict_;
     
-    const dictionary& recProperties_;
+    void extendPath();
     
-    bool verbose_;
+    void getRecPath();
+
+    void computeRecPath();
     
-    labelPairList& virtualTimeIndexList_;
+    void weightsCumulation();
     
-    virtual void getRecPath() = 0;
+    void weightsNormalization();
+
+    label meanIntervalSteps_;
     
-    virtual void computeRecPath() = 0;
+    label numIntervals_;
     
-   
+    label recSteps_;
+    
+    labelList intervalSizes_;
+    
+    labelList intervalSizesCumulative_;
+    
+    scalar Pjump_;
+    
+    scalarList intervalWeights_;
+    
+    scalarList intervalWeightsCumulative_;
+    
 
 public:
-  
-    friend class recBase;
 
     //- Runtime type information
-    TypeName("recPath");
-
-    // Declare runtime constructor selection table
-
-        declareRunTimeSelectionTable
-        (
-            autoPtr,
-            recPath,
-            dictionary,
-            (
-                const dictionary& dict,
-                recBase& base
-            ),
-            (dict,base)
-        );
-
+    TypeName("MarkovPath");
 
     // Constructors
 
         //- Construct from components
-        recPath
+        MarkovPath
         (
             const dictionary& dict,
             recBase& base
@@ -92,20 +93,13 @@ public:
 
     // Destructor
 
-        virtual ~recPath();
+        virtual ~MarkovPath();
 
 
-    // Selector
+    // Member Functions
 
-        static autoPtr<recPath> New
-        (
-            const dictionary& dict,
-            recBase& base
-        );
+    void updateIntervalWeights(scalarList);
   
-
-    virtual void updateIntervalWeights(scalarList)
-    {}
 };
 
 

@@ -85,6 +85,8 @@ public:
     recModel& recM();
     
     recStatAnalysis& recStatA();
+    
+    void extendPath();
  
     void updateRecFields();
     
