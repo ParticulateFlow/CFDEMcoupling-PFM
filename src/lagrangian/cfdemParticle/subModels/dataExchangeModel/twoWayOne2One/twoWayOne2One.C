@@ -182,7 +182,6 @@ twoWayOne2One::~twoWayOne2One()
     destroy(foam2lig_scl_tmp_);
 
     delete lmp;
-    MPI_Comm_free(&comm_liggghts_);
 }
 
 // * * * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * * //
