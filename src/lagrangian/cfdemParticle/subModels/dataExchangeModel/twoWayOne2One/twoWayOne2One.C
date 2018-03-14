@@ -719,14 +719,12 @@ void twoWayOne2One::locateParticles() const
     setNumberOfParticles(n_located);
     particleCloud_.reAllocArrays();
 
-    Pout<< "Located " << n_located << " out of " << lig2foam_->ncollected_ << " . "
-        << endl;
-
     reduce(n_located, sumOp<label>());
-    if (n_located != lmp->atom->tag_max())
+    if (n_located != returnReduce(lmp->atom->nlocal, sumOp<label>()))
     {
         Warning << "Have located " << n_located
-                << " ouf of " << lmp->atom->tag_max() << " particles in OpenFOAM. "
+                << " ouf of " << returnReduce(lmp->atom->nlocal, sumOp<label>())
+                << " particles in OpenFOAM. "
                 << endl;
     }
 
