@@ -84,11 +84,11 @@ twoWayOne2One::twoWayOne2One
     lig2foam_scl_tmp_(nullptr),
     foam2lig_vec_tmp_(nullptr),
     foam2lig_scl_tmp_(nullptr),
+    staticProcMap_(propsDict_.lookupOrDefault<Switch>("useStaticProcMap", false)),
     lmp(nullptr)
 {
     Info<<"Starting up LIGGGHTS for first time execution"<<endl;
 
-//    MPI_Comm_dup(MPI_COMM_WORLD, &comm_liggghts_);
     comm_liggghts_ = MPI_COMM_WORLD;
 
     // read path from dictionary
@@ -102,6 +102,11 @@ twoWayOne2One::twoWayOne2One
     // get DEM time step size
     DEMts_ = lmp->update->dt;
     checkTSsize();
+
+    if(staticProcMap_)
+    {
+        createProcMap();
+    }
 }
 
 void twoWayOne2One::createProcMap() const
@@ -618,7 +623,10 @@ bool twoWayOne2One::couple(int i) const
         particleCloud_.clockM().stop("LIGGGHTS");
         Info<< "LIGGGHTS finished" << endl;
 
-        createProcMap();
+        if (!staticProcMap_)
+        {
+            createProcMap();
+        }
 
         setupLig2FoamCommunication();
 

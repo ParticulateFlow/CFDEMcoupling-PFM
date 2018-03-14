@@ -88,28 +88,30 @@ class twoWayOne2One
 private:
 
   // private data
-    dictionary       propsDict_;
+    dictionary        propsDict_;
 
-    mutable MPI_Comm comm_liggghts_;
+    mutable MPI_Comm  comm_liggghts_;
 
 
     // LIG ranks from which to retrieve particle data
-    mutable labelList        thisLigPartner_;
-    mutable labelList        thisFoamPartner_;
+    mutable labelList thisLigPartner_;
+    mutable labelList thisFoamPartner_;
 
-    mutable One2One* lig2foam_;
-    mutable One2One* foam2lig_;
+    mutable One2One*  lig2foam_;
+    mutable One2One*  foam2lig_;
 
-    mutable bool*    lig2foam_mask_;
+    mutable bool*     lig2foam_mask_;
 
-    mutable int*     lig2foam_ids_;
-    mutable int*     foam2lig_ids_;
+    mutable int*      lig2foam_ids_;
+    mutable int*      foam2lig_ids_;
 
-    mutable double* lig2foam_vec_tmp_;
-    mutable double* lig2foam_scl_tmp_;
+    mutable double*   lig2foam_vec_tmp_;
+    mutable double*   lig2foam_scl_tmp_;
 
-    mutable double* foam2lig_vec_tmp_;
-    mutable double* foam2lig_scl_tmp_;
+    mutable double*   foam2lig_vec_tmp_;
+    mutable double*   foam2lig_scl_tmp_;
+
+    mutable Switch    staticProcMap_;
 
   // private member functions
 
