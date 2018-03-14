@@ -782,7 +782,7 @@ void twoWayOne2One::setupFoam2LigCommunication() const
         0,
         foam2lig_->ncollected_
     );
-    foam2lig_->exchange<int>(lmp->atom->tag, foam2lig_ids_);
+    foam2lig_->exchange<int>(lig2foam_ids_, foam2lig_ids_);
 
     allocateArray
     (
