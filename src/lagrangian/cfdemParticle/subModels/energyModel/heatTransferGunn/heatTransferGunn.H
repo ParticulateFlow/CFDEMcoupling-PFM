@@ -68,6 +68,10 @@ protected:
     dimensionedScalar partRefTemp_;
     
     bool calcPartTempField_;
+    
+    bool calcPartTempAve_;
+    
+    scalar partTempAve_;
 
     word tempFieldName_;
 
@@ -100,6 +104,8 @@ protected:
     mutable double **partNu_;
 
     void allocateMyArrays() const;
+    
+    void partTempField();
     
     scalar Nusselt(scalar, scalar, scalar) const;
     
@@ -136,6 +142,8 @@ public:
 	void addEnergyCoefficient(volScalarField&) const {}
 	
 	void calcEnergyContribution();
+
+        scalar aveTpart() const;
 };
 
 

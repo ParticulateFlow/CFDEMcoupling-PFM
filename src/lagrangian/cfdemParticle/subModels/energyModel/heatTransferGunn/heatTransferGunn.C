@@ -110,6 +110,8 @@ heatTransferGunn::heatTransferGunn
     ),
     partRefTemp_("partRefTemp", dimensionSet(0,0,0,1,0,0,0), 0.0),
     calcPartTempField_(propsDict_.lookupOrDefault<bool>("calcPartTempField",false)),
+    calcPartTempAve_(propsDict_.lookupOrDefault<bool>("calcPartTempAve",false)),
+    partTempAve_(0.0),
     tempFieldName_(propsDict_.lookupOrDefault<word>("tempFieldName","T")),
     tempField_(sm.mesh().lookupObject<volScalarField> (tempFieldName_)),
     voidfractionFieldName_(propsDict_.lookupOrDefault<word>("voidfractionFieldName","voidfraction")),
@@ -133,10 +135,14 @@ heatTransferGunn::heatTransferGunn
         maxSource_=readScalar(propsDict_.lookup ("maxSource"));
         Info << "limiting eulerian source field to: " << maxSource_ << endl;
     }
+
     if (calcPartTempField_)
     {
+        calcPartTempAve_ = true;
         if (propsDict_.found("partRefTemp"))
+        {
             partRefTemp_.value()=readScalar(propsDict_.lookup ("partRefTemp"));
+        }
         partTempField_.writeOpt() = IOobject::AUTO_WRITE;
         partRelTempField_.writeOpt() = IOobject::AUTO_WRITE;
         partTempField_.write();
@@ -204,25 +210,6 @@ void heatTransferGunn::calcEnergyContribution()
     particleCloud_.clockM().start(29,"getDEM_Tdata");
     particleCloud_.dataExchangeM().getData(partTempName_,"scalar-atom",partTemp_);
     particleCloud_.clockM().stop("getDEM_Tdata");
-    
-    if(calcPartTempField_)
-    {       
-        partTempField_.primitiveFieldRef() = 0.0;
-        particleCloud_.averagingM().resetWeightFields();
-        particleCloud_.averagingM().setScalarAverage
-        (
-            partTempField_,
-            partTemp_,
-            particleCloud_.particleWeights(),
-            particleCloud_.averagingM().UsWeightField(),
-            NULL
-        );
-
-        volScalarField sumTp (particleCloud_.averagingM().UsWeightField() * partTempField_);
-        dimensionedScalar aveTemp("aveTemp",dimensionSet(0,0,0,1,0,0,0), gSum(sumTp) / particleCloud_.numberOfParticles());
-        partRelTempField_ = (partTempField_ - aveTemp) / (aveTemp - partRefTemp_);
-        Info << "heatTransferGunn: average part. temp = " << aveTemp.value() << endl;
-    }
 
     #ifdef compre
        const volScalarField mufField = particleCloud_.turbulence().mu();
@@ -243,6 +230,7 @@ void heatTransferGunn::calcEnergyContribution()
     scalar Rep(0);
     scalar Pr(0);
     scalar Nup(0);
+    scalar Tsum(0.0);
 
 
     interpolationCellPoint<scalar> voidfractionInterpolator_(voidfraction_);
@@ -292,7 +280,7 @@ void heatTransferGunn::calcEnergyContribution()
                     Nup = Nusselt(voidfraction, Rep, Pr);
                 }
                 
-
+                Tsum += partTemp_[index][0];
 
                 scalar h = kf0_ * Nup / ds;
                 scalar As = ds * ds * M_PI; // surface area of sphere
@@ -322,6 +310,16 @@ void heatTransferGunn::calcEnergyContribution()
                 }
             }
     }
+    
+    // gather particle temperature sums and obtain average
+    if(calcPartTempAve_)
+    {
+        reduce(Tsum, sumOp<scalar>());
+        partTempAve_ = Tsum / particleCloud_.numberOfParticles();
+        Info << "mean particle temperature = " << partTempAve_ << endl;
+    }
+    
+    if(calcPartTempField_) partTempField();
 
     particleCloud_.averagingM().setScalarSum
     (
@@ -408,6 +406,30 @@ void heatTransferGunn::giveData(int call)
         particleCloud_.dataExchangeM().giveData(partHeatFluxName_,"scalar-atom", partHeatFlux_);
         particleCloud_.clockM().stop("giveDEM_Tdata");
     }
+}
+
+scalar heatTransferGunn::aveTpart() const
+{
+    return partTempAve_;
+}
+
+void heatTransferGunn::partTempField()
+{
+    partTempField_.primitiveFieldRef() = 0.0;
+    particleCloud_.averagingM().resetWeightFields();
+    particleCloud_.averagingM().setScalarAverage
+    (
+        partTempField_,
+        partTemp_,
+        particleCloud_.particleWeights(),
+        particleCloud_.averagingM().UsWeightField(),
+        NULL
+    );
+
+    //volScalarField sumTp (particleCloud_.averagingM().UsWeightField() * partTempField_);
+    // dimensionedScalar aveTemp("aveTemp",dimensionSet(0,0,0,1,0,0,0), gSum(sumTp) / particleCloud_.numberOfParticles());
+    dimensionedScalar aveTemp("aveTemp",dimensionSet(0,0,0,1,0,0,0), partTempAve_);
+    partRelTempField_ = (partTempField_ - aveTemp) / (aveTemp - partRefTemp_);
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

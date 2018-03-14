@@ -111,7 +111,7 @@ void MarkovPath::getRecPath()
         computeRecPath();
         numRecIntervals=virtualTimeIndexList_.size();
     }
-    
+
     Pstream::scatter(numRecIntervals);
     Pstream::scatter(recSteps_);
     

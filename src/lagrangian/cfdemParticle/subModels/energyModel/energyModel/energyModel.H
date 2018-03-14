@@ -107,6 +107,11 @@ public:
 	
 	scalar Cp() const;
 
+        virtual scalar aveTpart() const
+        {
+            return 0.0;
+        }
+
 
 };
 
