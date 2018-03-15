@@ -1,0 +1,42 @@
+"CFDEMproject WWW Site"_lws - "CFDEM Commands"_lc :c
+
+:link(lws,http://www.cfdem.com)
+:link(lc,CFDEMcoupling_Manual.html#comm)
+
+:line
+
+dataExchangeModel_twoWayOne2One command :h3
+
+[Syntax:]
+
+Defined in couplingProperties dictionary.
+
+dataExchangeModel twoWayOne2One;
+twoWayOne2OneProps
+\{
+    liggghtsPath "path";
+\}; :pre
+
+{path} = path to the DEM simulation input file :ulb,l
+:ule
+
+[Examples:]
+
+dataExchangeModel twoWayOne2One;
+twoWayOne2OneProps
+\{
+    liggghtsPath "../DEM/in.liggghts_init";
+\} :pre
+
+[Description:]
+
+The data exchange model performs the data exchange between the DEM code and the CFD code. The twoWayOne2One model is a model that can exchange particle properties from DEM to CFD and from CFD to DEM. Data is exchanged via MPI technique using a more sophisticated mapping scheme than twoWayMPI / all2all and scales much better for large systems and many cores. The DEM run is executed by the coupling model, via a liggghtsCommandModel object.
+
+[Restrictions:]
+
+Must be used in combination with the engineSearchMany2Many locate model! Use the "one2one" cfd datacoupling option in fix couple/cfd in LIGGGHTS!
+
+[Related commands:]
+
+"dataExchangeModel"_dataExchangeModel.html
+
