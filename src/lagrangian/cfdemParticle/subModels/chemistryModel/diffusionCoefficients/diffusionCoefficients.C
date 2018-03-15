@@ -244,8 +244,11 @@ void diffusionCoefficient::execute()
                         if (Xfluid_[i] <= 0.) Xfluid_[i] = 0.0;
                         if (XfluidDiffusant_[j] <= 0.) XfluidDiffusant_[j] = 0.0;
 
-                        Info << "X fluid for species " << speciesNames_[i] << " : " << Xfluid_[i] << nl << endl;
-                        Info << "X fluid for diffusant species " << diffusantGasNames_[j] << " : " << XfluidDiffusant_[j] << nl << endl;
+                        if(verbose_)
+                        {
+                            Info << "X fluid for species " << speciesNames_[i] << " : " << Xfluid_[i] << nl << endl;
+                            Info << "X fluid for diffusant species " << diffusantGasNames_[j] << " : " << XfluidDiffusant_[j] << nl << endl;
+                        }
                     }
                 }
             }
@@ -327,8 +330,11 @@ void diffusionCoefficient::execute()
                                 }
                             }
 
-                            Info << "Multicomp. mix diffusion for species " << diffusantGasNames_[i]
-                                 << " is: " << MixtureBinaryDiffusion_[i] << nl << endl;
+                            if(verbose_)
+                            {
+                                Info << "Multicomp. mix diffusion for species " << diffusantGasNames_[i]
+                                     << " is: " << MixtureBinaryDiffusion_[i] << nl << endl;
+                            }
 
                             // pass on dCoeff values to array
                             diffusionCoefficients_[i][index][0]= MixtureBinaryDiffusion_[i];
