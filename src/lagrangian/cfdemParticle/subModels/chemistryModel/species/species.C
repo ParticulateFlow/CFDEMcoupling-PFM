@@ -337,12 +337,18 @@ void species::execute()
             changeOfSpeciesMassFields_[i].primitiveFieldRef() /= (changeOfSpeciesMassFields_[i].mesh().V() * Nevery_ * timestep);
             changeOfSpeciesMassFields_[i].correctBoundaryConditions();
             changeOfGasMassField_ += changeOfSpeciesMassFields_[i];
-            Info << "total conversion of species" << speciesNames_[i] << " = " << gSum(changeOfSpeciesMassFields_[i]*1.0*changeOfSpeciesMassFields_[i].mesh().V() * Nevery_ * timestep) << endl;
+            if (verbose_)
+            {
+                Info << "total conversion of species" << speciesNames_[i] << " = " << gSum(changeOfSpeciesMassFields_[i]*1.0*changeOfSpeciesMassFields_[i].mesh().V() * Nevery_ * timestep) << endl;
+            }
         }
         massSourceCurr_ = gSum(changeOfGasMassField_*1.0*changeOfGasMassField_.mesh().V() * Nevery_ * timestep);
         massSourceTot_ += massSourceCurr_;
-        Info << "total conversion of mass:\n\tcurrent source = " << massSourceCurr_ << "\n\ttotal source = " << massSourceTot_ << "\n" << endl;
-        Info << "get data done" << endl;
+        if (verbose_)
+        {
+            Info << "total conversion of mass:\n\tcurrent source = " << massSourceCurr_ << "\n\ttotal source = " << massSourceTot_ << "\n" << endl;
+            Info << "get data done" << endl;
+        }
 }
 
 tmp<volScalarField> species::Smi (const label i) const
