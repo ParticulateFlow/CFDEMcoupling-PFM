@@ -58,7 +58,8 @@ heatTransferGunn::heatTransferGunn
             IOobject::AUTO_WRITE
         ),
         sm.mesh(),
-        dimensionedScalar("zero", dimensionSet(1,-1,-3,0,0,0,0), 0.0)
+        dimensionedScalar("zero", dimensionSet(1,-1,-3,0,0,0,0), 0.0),
+	"zeroGradient"
     ),
     partTempField_
     (   IOobject
@@ -70,7 +71,8 @@ heatTransferGunn::heatTransferGunn
             IOobject::NO_WRITE
         ),
         sm.mesh(),
-        dimensionedScalar("zero", dimensionSet(0,0,0,1,0,0,0), 0.0)
+        dimensionedScalar("zero", dimensionSet(0,0,0,1,0,0,0), 0.0),
+	"zeroGradient"
     ),
     partRelTempField_
     (   IOobject
@@ -82,7 +84,8 @@ heatTransferGunn::heatTransferGunn
             IOobject::NO_WRITE
         ),
         sm.mesh(),
-        dimensionedScalar("zero", dimensionSet(0,0,0,0,0,0,0), 0.0)
+        dimensionedScalar("zero", dimensionSet(0,0,0,0,0,0,0), 0.0),
+	"zeroGradient"
     ),
     ReField_
     (   IOobject
@@ -94,7 +97,8 @@ heatTransferGunn::heatTransferGunn
             IOobject::NO_WRITE
         ),
         sm.mesh(),
-        dimensionedScalar("zero", dimensionSet(0,0,0,0,0,0,0), 0.0)
+        dimensionedScalar("zero", dimensionSet(0,0,0,0,0,0,0), 0.0),
+	"zeroGradient"
     ),
     NuField_
     (   IOobject
@@ -106,7 +110,8 @@ heatTransferGunn::heatTransferGunn
             IOobject::NO_WRITE
         ),
         sm.mesh(),
-        dimensionedScalar("zero", dimensionSet(0,0,0,0,0,0,0), 0.0)
+        dimensionedScalar("zero", dimensionSet(0,0,0,0,0,0,0), 0.0),
+	"zeroGradient"
     ),
     partRefTemp_("partRefTemp", dimensionSet(0,0,0,1,0,0,0), 0.0),
     calcPartTempField_(propsDict_.lookupOrDefault<bool>("calcPartTempField",false)),
