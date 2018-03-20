@@ -133,11 +133,11 @@ public:
     virtual const volVectorField& exportVolVectorField(word, label) const = 0;
     virtual const surfaceScalarField& exportSurfaceScalarField(word, label) const = 0;*/
     
-    virtual void exportVolScalarFieldAve(word, volScalarField&, label)
+    virtual void exportVolScalarFieldAve(word, volScalarField&, label = 0)
     {}
-    virtual void exportVolVectorFieldAve(word, volVectorField&, label)
+    virtual void exportVolVectorFieldAve(word, volVectorField&, label = 0)
     {}
-    virtual void exportSurfaceScalarFieldAve(word, surfaceScalarField&, label)
+    virtual void exportSurfaceScalarFieldAve(word, surfaceScalarField&, label = 0)
     {}
     
     virtual void exportVolScalarField(word, volScalarField&)  = 0;
