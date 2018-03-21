@@ -47,6 +47,10 @@ private:
     
     bool interpolate_;
     
+    bool measureDiff_;
+    
+    mutable OFstream recErrorFile_;
+    
     word voidfractionFieldName_;
     
     const volScalarField& voidfraction_;

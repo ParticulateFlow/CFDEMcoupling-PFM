@@ -26,6 +26,7 @@ License
 
 #include "isotropicFluctuations.H"
 #include "addToRunTimeSelectionTable.H"
+#include "OFstream.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -56,6 +57,8 @@ isotropicFluctuations::isotropicFluctuations
     forceModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
     interpolate_(propsDict_.lookupOrDefault<bool>("interpolation", false)),
+    measureDiff_(propsDict_.lookupOrDefault<bool>("measureDiff", false)),
+    recErrorFile_("recurrenceError"),
     voidfractionFieldName_(propsDict_.lookupOrDefault<word>("voidfractionFieldName","voidfraction")),
     voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
     voidfractionRecFieldName_(propsDict_.lookupOrDefault<word>("voidfractionRecFieldName","voidfractionRec")),
@@ -160,7 +163,14 @@ void isotropicFluctuations::setForce() const
 	    }
     }
     
-    particleCloud_.dataExchangeM().giveData("vfluc","vector-atom", vfluc_);   
+    particleCloud_.dataExchangeM().giveData("vfluc","vector-atom", vfluc_);
+    
+    if (measureDiff_)
+    {
+	dimensionedScalar diff( fvc::domainIntegrate( sqr( voidfraction_ - voidfractionRec_ ) ) );
+	scalar t = particleCloud_.mesh().time().timeOutputValue(); 
+	recErrorFile_ << t << "\t" << diff.value() << endl;
+    }
 }
 
 scalar isotropicFluctuations::fluctuationMag(const scalar relVolfractionExcess) const
