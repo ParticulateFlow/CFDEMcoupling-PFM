@@ -21,7 +21,7 @@
         found=false;
         forAll(particleCloud.forceModels(),i)
         {
-            if(particleCloud.forceModels()[i]=="gradPForce")
+            if(particleCloud.forceModels()[i]=="gradPForce" || particleCloud.forceModels()[i]=="gradPForceSmooth")
                 found=true;
         }
         if(!found)
@@ -56,7 +56,7 @@
         found=false;
         forAll(particleCloud.forceModels(),i)
         {
-            if(particleCloud.forceModels()[i]=="gradPForce" || particleCloud.forceModels()[i]=="viscForce")
+            if(particleCloud.forceModels()[i]=="gradPForce" || particleCloud.forceModels()[i]=="gradPForceSmooth" || particleCloud.forceModels()[i]=="viscForce")
                 found=true;
         }
         if(found)
@@ -80,7 +80,7 @@
         found=false;
         forAll(particleCloud.forceModels(),i)
         {
-            if(particleCloud.forceModels()[i]=="gradPForce")
+            if(particleCloud.forceModels()[i]=="gradPForce" || particleCloud.forceModels()[i]=="gradPForceSmooth")
                 found=true;
         }
         if(!found)

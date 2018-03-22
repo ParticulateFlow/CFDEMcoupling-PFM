@@ -63,6 +63,7 @@ int main(int argc, char *argv[])
 
     // create cfdemCloud
     cfdemCloud particleCloud(mesh);
+    #include "checkModelType.H"
 
     if(!particleCloud.couplingProperties().found("useDDTvoidfraction"))
     {
