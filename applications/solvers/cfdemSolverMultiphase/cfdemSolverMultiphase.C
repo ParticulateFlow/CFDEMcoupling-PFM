@@ -56,17 +56,13 @@ int main(int argc, char *argv[])
     #include "initContinuityErrs.H"
     #include "createFields.H"
     #include "createFvOptions.H"
-    //#include "createTimeControls.H"
     #include "correctPhi.H"
     #include "CourantNo.H"
-    //#include "setInitialDeltaT.H"
 
     turbulence->validate();
 
-    
     // create cfdemCloud
     cfdemCloud particleCloud(mesh);
-    const surfaceScalarField& rhoPhi(mixture.rhoPhi());
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

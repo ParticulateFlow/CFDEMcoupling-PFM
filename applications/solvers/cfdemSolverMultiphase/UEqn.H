@@ -1,8 +1,9 @@
+const surfaceScalarField& rhoPhi(mixture.rhoPhi());
+
 fvVectorMatrix UEqn
 (
     fvm::ddt(rhoEps, U) - fvm::Sp(fvc::ddt(rhoEps),U)
   + fvm::div(rhoPhi, U) - fvm::Sp(fvc::div(rhoPhi),U)
-//      + turbulence->divDevRhoReff(rho, U)
   + particleCloud.divVoidfractionTau(U, rhoEps)
  ==
     fvOptions(rho, U)
