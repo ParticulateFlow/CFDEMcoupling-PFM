@@ -16,7 +16,7 @@
         fvc::flux(HbyA*voidfraction)
       + fvc::interpolate(voidfraction*rho*rAU)*fvc::ddtCorr(U, phi)
     );
-    MRF.makeRelative(phiHbyA);    
+
     adjustPhi(phiHbyA, U, p_rgh);
 
     surfaceScalarField phig
@@ -36,7 +36,7 @@
     phiHbyA += phig + phiS;
 
     // Update the pressure BCs to ensure flux consistency
-    constrainPressure(p_rgh, Ueps, phiHbyA, rAUepsf, MRF);
+    constrainPressure(p_rgh, Ueps, phiHbyA, rAUepsf);
     /*setSnGrad<fixedFluxPressureFvPatchScalarField>
     (
         p_rgh.boundaryField(),
@@ -70,6 +70,7 @@
               + fvc::reconstruct(phiS)/voidfraction;
             
             U.correctBoundaryConditions();
+            fvOptions.correct(U);
         }
     }
 
