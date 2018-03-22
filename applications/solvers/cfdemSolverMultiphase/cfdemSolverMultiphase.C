@@ -64,6 +64,10 @@ int main(int argc, char *argv[])
     // create cfdemCloud
     cfdemCloud particleCloud(mesh);
 
+    if(!particleCloud.couplingProperties().found("useDDTvoidfraction"))
+    {
+        Warning << "Suppressing ddt(voidfraction) is not recommended with this solver as it may generate incorrect results!" << endl;
+    }
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
     Info<< "\nStarting time loop\n" << endl;
