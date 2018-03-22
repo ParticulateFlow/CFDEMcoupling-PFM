@@ -7,7 +7,7 @@
     volScalarField rAUepsSq("rAUepsSq", rAU * voidfraction * voidfraction);
     surfaceScalarField rAUepsSqf("rAUepsSqf", fvc::interpolate(rAUepsSq));
     volVectorField Ueps("Ueps", U * voidfraction);
-    
+
     volVectorField HbyA(constrainHbyA(rAU*UEqn.H(), U, p_rgh));
 
     surfaceScalarField phiHbyA
@@ -29,8 +29,7 @@
     
     surfaceScalarField phiS
     (
-        fvc::flux(voidfraction*Us) * rAUf*fvc::interpolate(Ksl)
-        //(fvc::interpolate(voidfraction*Us) & mesh.Sf()) * rAUf*fvc::interpolate(Ksl)
+        fvc::flux(voidfraction*Us*Ksl*rAU)
     );
 
     phiHbyA += phig + phiS;
@@ -49,7 +48,7 @@
     {
         fvScalarMatrix p_rghEqn
         (
-            fvm::laplacian(rAUepsSqf, p_rgh) == fvc::div(phiHbyA) + fvc::ddt(voidfraction)
+            fvm::laplacian(rAUepsSqf, p_rgh) == particleCloud.ddtVoidfraction() + fvc::div(phiHbyA)
         );
 
         p_rghEqn.setReference(pRefCell, getRefCellValue(p_rgh, pRefCell));
