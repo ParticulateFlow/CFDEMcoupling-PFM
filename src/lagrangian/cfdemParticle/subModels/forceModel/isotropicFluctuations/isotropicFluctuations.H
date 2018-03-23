@@ -64,6 +64,15 @@ private:
     scalar D0_;
     
     const scalar dt_;
+    
+    // ignore particles in cells below plane given with ref point and normal vector
+    // normal vector points towards region where fluctuations are permitted
+    
+    bool ignoreReg_;
+    
+    vector ignoreDirection_;
+    
+    vector ignorePoint_;
 
     vector unitRndVec() const;
     

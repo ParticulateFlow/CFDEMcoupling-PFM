@@ -66,27 +66,23 @@ isotropicFluctuations::isotropicFluctuations
     critVoidfraction_(propsDict_.lookupOrDefault<scalar>("critVoidfraction", 1.0)),
     D0_(readScalar(propsDict_.lookup("D0"))),
     dt_(particleCloud_.dataExchangeM().DEMts()),
+    ignoreReg_(propsDict_.lookupOrDefault<bool>("ignoreRegion",false)),
+    ignoreDirection_(propsDict_.lookupOrDefault<vector>("ignoreDirection",vector::zero)),
+    ignorePoint_(propsDict_.lookupOrDefault<vector>("ignorePoint",vector::zero)),
     ranGen_(osRandomInteger()),
     vfluc_(NULL)
 {
-   // dt_=particleCloud_.mesh().time().deltaTValue();
-  
-  /*  forceSubModels_.setSize(1, "recU");
-    delete[] forceSubModel_;
-    forceSubModel_ = new autoPtr<forceSubModel>[nrForceSubModels()];
-    Info << "nrForceSubModels()=" << nrForceSubModels() << endl;
-    for (int i=0;i<nrForceSubModels();i++)
-    {
-        forceSubModel_[i] = forceSubModel::New
-        (
-            dict,
-            particleCloud_,
-            *this,
-            forceSubModels_[i]
-        );
-    }
-  */
     allocateMyArrays();
+    
+    if(ignoreReg_)
+    {
+        if(mag(ignoreDirection_) < SMALL)
+        {
+            FatalError <<"ignoreDirection vector has very little norm, please use larger one\n" << abort(FatalError);
+        }
+        Info << "isotropicFluctuations: ignoring fluctuations below plane specified by point " <<
+        ignorePoint_ << " and normal vector " << ignoreDirection_ << endl;
+    }
 }
 
 
@@ -128,48 +124,56 @@ void isotropicFluctuations::setForce() const
     for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
     {
             cellI = particleCloud_.cellIDs()[index][0];
-	    flucU =vector(0,0,0);
-	    voidfraction=0.0;
-	    voidfractionRec=0.0;
-	    deltaVoidfrac=0.0;
+            flucU =vector(0,0,0);
+            voidfraction=0.0;
+            voidfractionRec=0.0;
+            deltaVoidfrac=0.0;
             if (cellI > -1) // particle found
             {
-	        // particles in empty regions follow trajectories subject to gravity
-		if(voidfractionRec_[cellI] < critVoidfraction_)
-		{
+                if(ignoreReg_)
+                {
+                    // check if cell center is below "ignore plane"
+                    vector cellCenter = particleCloud_.mesh().C()[cellI];
+                    scalar aboveBelow = ignoreDirection_ & (ignorePoint_ - cellCenter);
+                    if(aboveBelow > 0) continue;
+                }
+                // particles in empty regions follow trajectories subject to gravity
+                if(voidfractionRec_[cellI] < critVoidfraction_)
+                {
                     if( interpolate_ )
                     {
                       position = particleCloud_.position(index);
-		      voidfraction = voidfractionInterpolator_.interpolate(position,cellI);
-		      voidfractionRec = voidfractionRecInterpolator_.interpolate(position,cellI);
+                      voidfraction = voidfractionInterpolator_.interpolate(position,cellI);
+                      voidfractionRec = voidfractionRecInterpolator_.interpolate(position,cellI);
                     }
                     else
                     {
-			voidfraction = voidfraction_[cellI];
-			voidfractionRec = voidfractionRec_[cellI];
+                        voidfraction = voidfraction_[cellI];
+                        voidfractionRec = voidfractionRec_[cellI];
                     }
                     // write particle based data to global array
                     
                     deltaVoidfrac=voidfractionRec-voidfraction;
-		    relVolfractionExcess=deltaVoidfrac/(1-voidfraction+SMALL);
-		    if(deltaVoidfrac>0)
-		    {
+                    relVolfractionExcess=deltaVoidfrac/(1-voidfraction+SMALL);
+                    if(deltaVoidfrac>0)
+                    {
                         flucU=unitRndVec()*fluctuationMag(relVolfractionExcess);
-	//		forceSubM(0).partToArray(index,flucU,vector::zero);
-		    }              
-		    for(int i = 0; i < 3; i++)
-		        vfluc_[index][i]=flucU[i];
-		}
-	    }
+                    }              
+                    for(int i = 0; i < 3; i++)
+                    {
+                        vfluc_[index][i]=flucU[i];
+                    }
+                }
+            }
     }
     
     particleCloud_.dataExchangeM().giveData("vfluc","vector-atom", vfluc_);
     
     if (measureDiff_)
     {
-	dimensionedScalar diff( fvc::domainIntegrate( sqr( voidfraction_ - voidfractionRec_ ) ) );
-	scalar t = particleCloud_.mesh().time().timeOutputValue(); 
-	recErrorFile_ << t << "\t" << diff.value() << endl;
+        dimensionedScalar diff( fvc::domainIntegrate( sqr( voidfraction_ - voidfractionRec_ ) ) );
+        scalar t = particleCloud_.mesh().time().timeOutputValue(); 
+        recErrorFile_ << t << "\t" << diff.value() << endl;
     }
 }
 
@@ -184,7 +188,7 @@ scalar isotropicFluctuations::fluctuationMag(const scalar relVolfractionExcess) 
     }
     else
     {
-	fluctuation=Foam::sqrt(6*D0_*relVolfractionExcess/dt_);
+        fluctuation=Foam::sqrt(6*D0_*relVolfractionExcess/dt_);
         return fluctuation;
     }
 }
@@ -201,8 +205,8 @@ vector isotropicFluctuations::unitRndVec() const
     while(s>1.0)
     {
         v1=2*(ranGen_.scalar01()-0.5);
-	v2=2*(ranGen_.scalar01()-0.5);
-	s=v1*v1+v2*v2;
+        v2=2*(ranGen_.scalar01()-0.5);
+        s=v1*v1+v2*v2;
     }
     s2=Foam::sqrt(1-s);
     rvec[0]=2*v1*s2;
