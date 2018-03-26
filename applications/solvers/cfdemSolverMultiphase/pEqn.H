@@ -1,11 +1,7 @@
 {
     volScalarField rAU("rAU", 1.0/UEqn.A());
-    surfaceScalarField rAUf("rAUf", fvc::interpolate(rAU));
-
-    //With included voidfraction
     surfaceScalarField rAUepsf("rAUepsf", fvc::interpolate(rAU*voidfraction));
-    volScalarField rAUepsSq("rAUepsSq", rAU * voidfraction * voidfraction);
-    surfaceScalarField rAUepsSqf("rAUepsSqf", fvc::interpolate(rAUepsSq));
+    surfaceScalarField rAUepsSqf("rAUepsSqf", fvc::interpolate(rAU*voidfraction*voidfraction));
     volVectorField Ueps("Ueps", U * voidfraction);
 
     volVectorField HbyA(constrainHbyA(rAU*UEqn.H(), U, p_rgh));
@@ -32,14 +28,7 @@
 
     // Update the pressure BCs to ensure flux consistency
     constrainPressure(p_rgh, Ueps, phiHbyA, rAUepsf);
-    /*setSnGrad<fixedFluxPressureFvPatchScalarField>
-    (
-        p_rgh.boundaryField(),
-        (
-            phiHbyA.boundaryField()
-          - (mesh.Sf().boundaryField() & U.boundaryField()) * voidfraction.boundaryField()
-        )/(mesh.magSf().boundaryField()*rAUepsSqf.boundaryField())
-    );*/
+
     while (pimple.correctNonOrthogonal())
     {
         fvScalarMatrix p_rghEqn
@@ -56,13 +45,6 @@
             phi = phiHbyA - p_rghEqn.flux();
 
             p_rgh.relax();
-
-          /*  U = HbyA + voidfraction*rAU
-              * fvc::reconstruct
-                (
-                    (phig - p_rghEqn.flux())/rAUepsSqf
-                )
-              + fvc::reconstruct(phiS)/voidfraction;*/
 
             if (modelType == "A")
                 U = HbyA + voidfraction*rAU*fvc::reconstruct((phig-p_rghEqn.flux()+phiSt)/rAUepsf) + rAU*Us*Ksl;
