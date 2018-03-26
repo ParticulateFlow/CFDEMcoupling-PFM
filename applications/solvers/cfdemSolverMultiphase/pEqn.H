@@ -19,20 +19,16 @@
 
     adjustPhi(phiHbyA, U, p_rgh);
 
-    surfaceScalarField phig
-    (
-        (
-            mixture.surfaceTensionForce()
-          - ghf*fvc::snGrad(rho)
-        )*rAUepsSqf*mesh.magSf()
-    );
-    
-    surfaceScalarField phiS
-    (
-        fvc::flux(voidfraction*Us*Ksl*rAU)
-    );
+    if (modelType == "A")
+        rAUepsf = rAUepsSqf;
 
-    phiHbyA += phig + phiS;
+    surfaceScalarField phig (-ghf*fvc::snGrad(rho)*rAUepsf*mesh.magSf());
+
+    surfaceScalarField phiSt (mixture.surfaceTensionForce()*rAUepsSqf*mesh.magSf());
+
+    surfaceScalarField phiS (fvc::flux(voidfraction*Us*Ksl*rAU));
+
+    phiHbyA += phig + phiSt + phiS;
 
     // Update the pressure BCs to ensure flux consistency
     constrainPressure(p_rgh, Ueps, phiHbyA, rAUepsf);
@@ -48,7 +44,7 @@
     {
         fvScalarMatrix p_rghEqn
         (
-            fvm::laplacian(rAUepsSqf, p_rgh) == particleCloud.ddtVoidfraction() + fvc::div(phiHbyA)
+            fvm::laplacian(rAUepsf, p_rgh) == particleCloud.ddtVoidfraction() + fvc::div(phiHbyA)
         );
 
         p_rghEqn.setReference(pRefCell, getRefCellValue(p_rgh, pRefCell));
@@ -61,13 +57,18 @@
 
             p_rgh.relax();
 
-            U = HbyA + voidfraction*rAU
+          /*  U = HbyA + voidfraction*rAU
               * fvc::reconstruct
                 (
                     (phig - p_rghEqn.flux())/rAUepsSqf
                 )
-              + fvc::reconstruct(phiS)/voidfraction;
-            
+              + fvc::reconstruct(phiS)/voidfraction;*/
+
+            if (modelType == "A")
+                U = HbyA + voidfraction*rAU*fvc::reconstruct((phig-p_rghEqn.flux()+phiSt)/rAUepsf) + rAU*Us*Ksl;
+            else
+                U = HbyA + rAU*fvc::reconstruct((phig-p_rghEqn.flux()+phiSt)/rAUepsf) + rAU*Us*Ksl;
+
             U.correctBoundaryConditions();
             fvOptions.correct(U);
         }

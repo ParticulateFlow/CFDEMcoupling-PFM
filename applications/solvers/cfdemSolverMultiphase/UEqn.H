@@ -14,7 +14,27 @@ UEqn.relax();
 
 fvOptions.constrain(UEqn);
 
-if (pimple.momentumPredictor())
+if (pimple.momentumPredictor() && (modelType=="B" || modelType=="Bfull"))
+{
+    solve
+    (
+        UEqn
+     ==
+        fvc::reconstruct
+        (
+            (- ghf*fvc::snGrad(rho) - fvc::snGrad(p_rgh)) * mesh.magSf()
+        )
+     +
+        fvc::reconstruct
+        (
+            mixture.surfaceTensionForce() * mesh.magSf()
+        ) * voidfraction
+     + Ksl*Us
+    );
+    
+    fvOptions.correct(U);
+}        
+else if (pimple.momentumPredictor())
 {
     solve
     (
@@ -28,8 +48,8 @@ if (pimple.momentumPredictor())
               - fvc::snGrad(p_rgh)
             ) * mesh.magSf()
         ) * voidfraction
-      + Ksl*Us  
+     + Ksl*Us
     );
-    
-    fvOptions.correct(U);		    
-}        
+
+    fvOptions.correct(U);
+}
