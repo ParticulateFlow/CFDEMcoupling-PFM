@@ -99,3 +99,6 @@
         Warning << "You chose model type -none- you might get erroneous results!" << endl;
     else
         FatalError <<"no suitable model type specified:" << modelType << "\n" << abort(FatalError);
+
+    if (particleCloud.smoothingM().type() == "temporalSmoothing")
+        FatalError << "the temporalSmoothing model does not support smoothing of the exchange fields, please see documentation!" << endl;
