@@ -1,0 +1,72 @@
+<HTML>
+<CENTER><A HREF = "http://www.cfdem.com">CFDEMproject WWW Site</A> - <A HREF = "CFDEMcoupling_Manual.html#comm">CFDEM Commands</A> 
+</CENTER>
+
+
+
+
+<HR>
+
+<H3>forceModel_gradPForceSmooth command 
+</H3>
+<P><B>Syntax:</B>
+</P>
+<P>Defined in couplingProperties dictionary.
+</P>
+<PRE>forceModels
+(
+    gradPForceSmooth;
+);
+gradPForceSmoothProps
+{
+    pFieldName "pressure";
+    velocityFieldName "U";
+    interpolation switch1;
+    smoothingModel "smoothingModel";
+}; 
+</PRE>
+<UL><LI><I>pressure</I> = name of the finite volume fluid pressure field 
+
+<LI><I>U</I> = name of the finite volume fluid velocity field 
+
+<LI><I>switch1</I> = flag to use interpolated pressure values (normally off) 
+
+<LI><I>smoothingModel</I> = name of smoothing model 
+
+
+</UL>
+<P><B>Examples:</B>
+</P>
+<PRE>forceModels
+(
+    gradPForceSmooth;
+);
+gradPForceSmoothProps
+{
+    pFieldName "p_rgh";
+    velocityFieldName "U";
+    interpolation false;
+    smoothingModel "temporalSmoothing";
+    temporalSmoothingProps
+    {
+        lowerLimit 0.1;
+        upperLimit 1e10;
+        refField "p_rgh";
+        smoothingStrength 1;
+    } 
+</PRE>
+<PRE>} 
+</PRE>
+<P><B>Description:</B>
+</P>
+<P>The gradPForceSmooth model calculates the particle based pressure gradient force identically as the gradPForce model but allows smoothing of the pressure prior to the force calculation (without altering the original pressure). Any smoothing model can be used and does not have to be the same as specified in couplingProperties. Properties for the smoothing model has to be specified in a sub-dictionary within gradPForceSmoothProps.
+</P>
+<P><B>Restrictions:</B>
+</P>
+<P>A volScalarField "pSmooth" MUST be specified in the initial time directory with appropriate boundary conditions!
+</P>
+<P><B>Related commands:</B>
+</P>
+<P><A HREF = "forceModel.html">forceModel</A>
+</P>
+</HTML>
