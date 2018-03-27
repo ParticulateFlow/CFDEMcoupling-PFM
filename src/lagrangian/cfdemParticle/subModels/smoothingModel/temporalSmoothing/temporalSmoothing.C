@@ -66,8 +66,8 @@ temporalSmoothing::temporalSmoothing
     lowerLimit_(readScalar(propsDict_.lookup("lowerLimit"))),
     upperLimit_(readScalar(propsDict_.lookup("upperLimit"))),
     verbose_(false),
-    refFieldName_(propsDict_.lookup("referenceField")),
-    alpha_(readScalar(propsDict_.lookup("alpha")))
+    refFieldName_(propsDict_.lookup("refField")),
+    gamma_(readScalar(propsDict_.lookup("smoothingStrength")))
 {
 
     if(propsDict_.found("verbose"))  
@@ -103,14 +103,16 @@ void Foam::temporalSmoothing::smoothen(volScalarField& fieldSrc) const
     sSmoothField.oldTime().correctBoundaryConditions();
     
     volScalarField refField = particleCloud_.mesh().lookupObject<volScalarField>(refFieldName_);
+
     // do smoothing
     dimensionedScalar deltaT = sSmoothField.mesh().time().deltaT();
     solve
     (
         fvm::ddt(sSmoothField)
         -
-        alpha_/deltaT * (refField - fvm::Sp(1.0,sSmoothField))
+        gamma_/deltaT * (refField - fvm::Sp(1.0,sSmoothField))
     );
+
     // bound sSmoothField_
     forAll(sSmoothField,cellI)
     {
@@ -149,7 +151,7 @@ void Foam::temporalSmoothing::smoothen(volVectorField& fieldSrc) const
     (
         fvm::ddt(vSmoothField)
         -
-        alpha_/deltaT * (refField - fvm::Sp(1.0,vSmoothField))
+        gamma_/deltaT * (refField - fvm::Sp(1.0,vSmoothField))
     );
 
     // get data from working vSmoothField
@@ -169,65 +171,6 @@ void Foam::temporalSmoothing::smoothen(volVectorField& fieldSrc) const
 void Foam::temporalSmoothing::smoothenReferenceField(volVectorField& fieldSrc) const
 {
     FatalError << "Smoothen reference field is not implemented for this smoothing model!" << abort(FatalError);
-//    // Create scalar smooth field from virgin scalar smooth field template
-//    volVectorField vSmoothField = vSmoothField_;
-
-//    vSmoothField.dimensions().reset(fieldSrc.dimensions());
-//    vSmoothField.ref()=fieldSrc.internalField();
-//    vSmoothField.correctBoundaryConditions();
-//    vSmoothField.oldTime().dimensions().reset(fieldSrc.dimensions());
-//    vSmoothField.oldTime()=fieldSrc;
-//    vSmoothField.oldTime().correctBoundaryConditions();
-
-//    double sourceStrength = 1e5; //large number to keep reference values constant
-
-//    dimensionedScalar deltaT = vSmoothField.mesh().time().deltaT();
-
-//    tmp<volScalarField> NLarge
-//    (
-//        new volScalarField
-//        (
-//            IOobject
-//            (
-//                "xxx",
-//                particleCloud_.mesh().time().timeName(),
-//                particleCloud_.mesh(),
-//                IOobject::NO_READ,
-//                IOobject::NO_WRITE
-//            ),
-//            particleCloud_.mesh(),
-//            0.0
-//        )
-//    );
-
-
-//    //loop over particles and map max particle diameter to Euler Grid
-//    forAll(vSmoothField,cellI)
-//    {
-//        if ( mag(vSmoothField.oldTime().internalField()[cellI]) > 0.0f)  // have a vector in the OLD vSmoothField, so keep it!
-//            NLarge.ref()[cellI] = sourceStrength;
-//    }
-
-//    // do the smoothing
-//    solve
-//    (
-//        fvm::ddt(vSmoothField)
-//       -alpha_/deltaT * (refField_ - fvm::Sp(1.0,vSmoothField)
-//       == 
-//        NLarge() / deltaT * vSmoothField.oldTime()  //add source to keep cell values constant
-//       -fvm::Sp( NLarge() / deltaT, vSmoothField)   //add sink to keep cell values constant
-//    );
-
-//    // get data from working vSmoothField
-//    fieldSrc=vSmoothField;
-//    fieldSrc.correctBoundaryConditions(); 
-
-//    if(verbose_)
-//    {
-//        Info << "min/max(fieldoldTime) (unsmoothed): " << min(vSmoothField.oldTime()) << tab << max(vSmoothField.oldTime()) << endl;
-//        Info << "min/max(fieldSrc): " << min(fieldSrc) << tab << max(fieldSrc) << endl;
-//        Info << "min/max(fieldSrc.oldTime): " << min(fieldSrc.oldTime()) << tab << max(fieldSrc.oldTime()) << endl;
-//    }
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

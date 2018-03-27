@@ -81,7 +81,7 @@ gradPForceSmooth::gradPForceSmooth
             sm
         )
     ),
-    pSmooth_    //must read a new field from file to get appropriate b.c's, doesn't work with fixedFlux pressure b.c. for any reason
+    pSmooth_
     (
         IOobject
         (

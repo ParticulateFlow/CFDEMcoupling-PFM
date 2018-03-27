@@ -64,7 +64,7 @@ private:
     scalar upperLimit_;
     bool verbose_;
     word refFieldName_;
-    scalar alpha_;
+    scalar gamma_;
 
 public:
 
