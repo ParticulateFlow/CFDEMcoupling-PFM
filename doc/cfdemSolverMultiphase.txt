@@ -1,0 +1,19 @@
+"CFDEMproject WWW Site"_lws - "CFDEM Commands"_lc :c
+
+:link(lws,http://www.cfdem.com)
+:link(lc,CFDEMcoupling_Manual.html#comm)
+
+:line
+
+cfdemSolverMultiphase command :h3
+
+[Description:]
+
+cfdemSolverMultiphase is a coupled CFD-DEM solver using the CFDEMcoupling framework. Based on the OpenFOAM solver multiphaseInterFoam(R)(*) it has functionality to simulate several (>2) fluids using the Volume of Fluid approach, coupled with the DEM code LIGGGHTS for solid particles. For more information see:
+
+M. Vångö, S. Pirker, T. Lichtenegger, "Unresolved CFD–DEM modeling of multiphase flow in densely packed particle beds", Appl. Math. Model. (2018).
+
+:line
+(*) This offering is not approved or endorsed by OpenCFD Limited, the producer of the OpenFOAM software and owner of the OPENFOAM®  and OpenCFD®  trade marks. OPENFOAM® is a registered trade mark of OpenCFD Limited, a wholly owned subsidiary of the ESI Group.
+
+:line
