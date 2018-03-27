@@ -22,6 +22,7 @@ solverName="cfdemSolverIB"
 nrProcs="4"
 machineFileName="none"   # yourMachinefileName | none
 debugMode="off"          # on | off| strict
+reconstructCase="false"  # true | false
 testHarnessPath="$CFDEM_TEST_HARNESS_PATH"
 runOctave="true"
 postproc="false"
@@ -29,6 +30,14 @@ postproc="false"
 
 #- call function to run a parallel CFD-DEM case
 parCFDDEMrun $logpath $logfileName $casePath $headerText $solverName $nrProcs $machineFileName $debugMode
+
+#- case needs special reconstruction
+if [ $reconstructCase == "true" ]
+  then
+    cd $casePath/CFD
+    reconstructParMesh -mergeTol 1e-06
+    reconstructPar -noLagrangian
+fi
 
 if [ $runOctave == "true" ]
   then
@@ -59,9 +68,6 @@ if [ $postproc == "true" ]
     echo "press Ctr+C to keep data"
     read
 fi
-
-#- copy log file to test harness
-cp ../../$logfileName $testHarnessPath
 
 #- clean up case
 echo "deleting data at: $casePath"
