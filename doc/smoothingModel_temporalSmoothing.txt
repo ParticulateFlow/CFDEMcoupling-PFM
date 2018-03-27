@@ -1,0 +1,48 @@
+"CFDEMproject WWW Site"_lws - "CFDEM Commands"_lc :c
+
+:link(lws,http://www.cfdem.com)
+:link(lc,CFDEMcoupling_Manual.html#comm)
+
+:line
+
+smoothingModel_temporalSmoothing command :h3
+
+[Syntax:]
+
+Defined in dictionary dependent on the application.
+
+smoothingModel temporalSmoothing;
+temporalSmoothingProps
+\{
+    lowerLimit number1;
+    upperLimit number2;
+    refField referenceField;
+    smoothingStrength smoothingControlParameter;
+\} :pre
+
+{number1} = scalar fields will be bound to this lower value :ulb,l
+{number2} = scalar fields will be bound to this upper value :l
+{referenceField} = reference to the un-smoothed field required for the relaxation operation :l
+{smoothingStrength} = control parameter for the smoothing, lower value yields stronger smoothing (smoothingStrength = 1 results in an equal contribution from the un-smoothed and smoothed fields)  :l
+:ule
+
+[Examples:]
+
+temporalSmoothingProps
+\{
+    lowerLimit 0.1;
+    upperLimit 1e10;
+    referenceField "p";
+    smoothingStrength 1;
+\} :pre
+
+[Description:]
+
+The "temporalSmoothing" model is a smoothing model that utilizes temporal relaxation of a desired quantity. This model can be used to filter out high-frequency fluctuations (e.g. numerical noise) controlled via the control parameter smoothingStrength. Note that this model does NOT smooth the calculated fields, instead smoothing is performed on a separate (smooth) field which uses the calculated (un-smooth) field as a reference. Thus its usage is limited and CANNOT be used to smooth the exchange fields similar to the other smoothing models. For further information see Vångö et al., "Unresolved CFD–DEM modeling of multiphase flow in densely packed particle beds", Appl. Math. Model. (2018).
+
+[Restrictions:] This model does NOT smooth the calculated fields and can therefore NOT be used as a general smoothing model to smoothen the exhchange fields. Attempting this will generate an error.
+
+[Related commands:]
+
+"smoothingModel"_smoothingModel.html
+
