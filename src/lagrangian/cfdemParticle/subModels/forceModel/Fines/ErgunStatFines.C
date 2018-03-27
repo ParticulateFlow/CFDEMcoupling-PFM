@@ -164,10 +164,10 @@ void ErgunStatFines::setForce() const
     for(int index = 0; index < particleCloud_.numberOfParticles(); ++index)
     {
             cellI = particleCloud_.cellIDs()[index][0];
-            drag = vector(0,0,0);
-            dragExplicit = vector(0,0,0);
+            drag = vector::zero;
+            dragExplicit = vector::zero;
             betaP = 0;
-            Ufluid = vector(0,0,0);
+            Ufluid = vector::zero;
             voidfraction = 0;
             dragCoefficient = 0;
 

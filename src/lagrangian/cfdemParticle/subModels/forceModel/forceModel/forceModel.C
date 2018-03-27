@@ -69,7 +69,7 @@ forceModel::forceModel
             IOobject::AUTO_WRITE
         ),
         sm.mesh(),
-        dimensionedVector("zero", dimensionSet(1,1,-2,0,0), vector(0,0,0)) // N
+        dimensionedVector("zero", dimensionSet(1,1,-2,0,0), vector::zero) // N
     ),
     expParticleForces_
     (   IOobject
@@ -81,7 +81,7 @@ forceModel::forceModel
             IOobject::AUTO_WRITE
         ),
         sm.mesh(),
-        dimensionedVector("zero", dimensionSet(1,1,-2,0,0), vector(0,0,0)) // N
+        dimensionedVector("zero", dimensionSet(1,1,-2,0,0), vector::zero) // N
     ),
     coupleForce_(true),
     modelType_(sm.modelType()),

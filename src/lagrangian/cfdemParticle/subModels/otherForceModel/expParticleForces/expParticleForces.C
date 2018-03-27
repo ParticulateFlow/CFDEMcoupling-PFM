@@ -69,7 +69,7 @@ tmp<volVectorField> expParticleForces::exportForceField()
             particleCloud_.mesh(),
             dimensionedVector
             (
-                "zero",dimensionSet(1, -2, -2, 0, 0),vector(0,0,0)
+                "zero",dimensionSet(1, -2, -2, 0, 0),vector::zero
             )
         )
     );

@@ -120,8 +120,8 @@ void FanningDynFines::setForce() const
     for(int index = 0; index < particleCloud_.numberOfParticles(); ++index)
     {
             cellI = particleCloud_.cellIDs()[index][0];
-            drag = vector(0,0,0);
-            UDyn = vector(0,0,0);
+            drag = vector::zero;
+            UDyn = vector::zero;
             dragCoefficient = 0;
 
             if (cellI > -1) // particle found

@@ -69,8 +69,8 @@
   else
   {
       meanAlpha_field = 0;
-      meanU_field = vector(0,0,0);
-      meanUs_field = vector(0,0,0);
+      meanU_field = vector::zero;
+      meanUs_field = vector::zero;
   }
   meanUs_array /= numberOfParticles()+SMALL;
   meanR_array /= numberOfParticles()+SMALL;
