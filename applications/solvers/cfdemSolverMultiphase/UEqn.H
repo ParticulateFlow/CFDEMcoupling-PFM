@@ -1,11 +1,17 @@
 const surfaceScalarField& rhoPhi(mixture.rhoPhi());
 
+volScalarField muEff = rho*(turbulence->nu() + turbulence->nut());
+
+if (modelType == "A")
+    muEff *= voidfraction;
+
 fvVectorMatrix UEqn
 (
     fvm::ddt(rhoEps, U) - fvm::Sp(fvc::ddt(rhoEps),U)
   + fvm::div(rhoPhi, U) - fvm::Sp(fvc::div(rhoPhi),U)
-  + particleCloud.divVoidfractionTau(U, rhoEps)
- ==
+  //+ particleCloud.divVoidfractionTau(U, voidfraction)
+  - fvm::laplacian(muEff, U) - fvc::div(muEff*dev2(fvc::grad(U)().T()))
+  ==
     fvOptions(rho, U)
   - fvm::Sp(Ksl,U)
 );
