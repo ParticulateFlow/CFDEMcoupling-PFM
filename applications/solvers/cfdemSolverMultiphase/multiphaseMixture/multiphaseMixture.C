@@ -675,7 +675,7 @@ void Foam::multiphaseMixture::solveAlphas
         MULES::limit
         (
             1.0/mesh_.time().deltaT().value(),
-            voidfraction_
+            voidfraction_,
             alpha,
             phi_,
             alphaPhiCorr,
