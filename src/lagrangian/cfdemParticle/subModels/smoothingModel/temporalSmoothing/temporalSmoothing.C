@@ -68,7 +68,6 @@ temporalSmoothing::temporalSmoothing
 
 temporalSmoothing::~temporalSmoothing()
 {}
-r
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 bool temporalSmoothing::doSmoothing() const
