@@ -26,6 +26,7 @@ Description
     DEM functionalities from the open-source DEM code LIGGGHTS.
 
     Turbulence modelling is generic, i.e. laminar, RAS or LES may be selected.
+
 \*---------------------------------------------------------------------------*/
 
 #include "fvCFD.H"
@@ -59,7 +60,16 @@ int main(int argc, char *argv[])
 
     // create cfdemCloud
     cfdemCloud particleCloud(mesh);
-    #include "checkModelType.H"
+
+    // Useful if one wants to e.g. initialize floating particles using the Archimedes model
+    word modelType;
+    if (particleCloud.couplingProperties().found("unrestrictedForceModelSelection"))
+    {
+        modelType = particleCloud.modelType();
+    } else
+    {
+        #include "checkModelType.H"
+    }
 
     if(!particleCloud.couplingProperties().found("useDDTvoidfraction"))
     {
