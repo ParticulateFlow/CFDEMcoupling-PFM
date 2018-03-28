@@ -110,14 +110,20 @@ diffusionCoefficient::~diffusionCoefficient()
 
     int nP_ = particleCloud_.numberOfParticles();
 
-    for (int i=0; i<diffusantGasNames_.size(); i++)
-    {
-        particleCloud_.dataExchangeM().destroy(diffusionCoefficients_[i],nP_);
+    if (dBinary_ != NULL)
+        for (int i=0; i<diffusantGasNames_.size(); i++)
+            delete dBinary_[i];
 
-        if (dBinary_[i]) delete [] dBinary_[i];
-        if (molNum_[i]) delete [] molNum_[i];
-        if (volDiff_[i]) delete [] volDiff_[i];
-    }
+    if (molNum_ != NULL)
+        for (int i=0; i<diffusantGasNames_.size(); i++)
+            delete molNum_[i];
+
+    if (volDiff_ != NULL)
+        for (int i=0; i<diffusantGasNames_.size(); i++)
+            delete volDiff_[i];
+
+    for (int i=0; i<diffusantGasNames_.size(); i++)
+        particleCloud_.dataExchangeM().destroy(diffusionCoefficients_[i],nP_);
 
     delete[] dBinary_;
     delete[] molNum_;
