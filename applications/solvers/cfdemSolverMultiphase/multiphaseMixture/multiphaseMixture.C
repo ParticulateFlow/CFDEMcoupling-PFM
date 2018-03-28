@@ -1,25 +1,20 @@
 /*---------------------------------------------------------------------------*\
-  =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
-   \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
-     \\/     M anipulation  |
--------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
 
-    OpenFOAM is free software: you can redistribute it and/or modify it
+    This is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
+    This code is distributed in the hope that it will be useful, but WITHOUT
     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
     FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
     for more details.
 
     You should have received a copy of the GNU General Public License
-    along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
+    along with this code.  If not, see <http://www.gnu.org/licenses/>.
+
+    Copyright (C) 2018- Mathias Vångö, JKU Linz, Austria
 
 \*---------------------------------------------------------------------------*/
 
@@ -264,8 +259,8 @@ Foam::multiphaseMixture::rho(const label patchi) const
 Foam::tmp<Foam::volScalarField>
 Foam::multiphaseMixture::mu() const
 {
-    
-    return nu()*rho();
+    Info << "In multiphasemixture mu()" << endl;
+    return rho()*nu();
 //    PtrDictionary<phase>::const_iterator iter = phases_.begin();
 
 //    tmp<volScalarField> tmu = iter()*iter().rho()*iter().nu();
@@ -327,6 +322,7 @@ Foam::multiphaseMixture::muf() const
 Foam::tmp<Foam::volScalarField>
 Foam::multiphaseMixture::nu() const
 {
+    Info << "Something called nu(), returning nu_ from multiphaseMixture" << endl;
     return nu_;
 }
 
@@ -679,7 +675,7 @@ void Foam::multiphaseMixture::solveAlphas
         MULES::limit
         (
             1.0/mesh_.time().deltaT().value(),
-            geometricOneField(), //voidfraction_
+            voidfraction_
             alpha,
             phi_,
             alphaPhiCorr,
