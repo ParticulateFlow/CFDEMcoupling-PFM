@@ -101,11 +101,21 @@ void One2One::setup
   );
 
   ncollected_ = 0;
+  int nrequests = 0;
   for (int i = 0; i < nsrc_procs_; i++)
-    ncollected_ += natoms_[src_procs_[i]];
+  {
+    if (natoms_[src_procs_[i]] > 0)
+    {
+      ncollected_ += natoms_[src_procs_[i]];
+      nrequests++;
+    }
+  }
 
-  request_ = new MPI_Request[nsrc_procs_];
-  status_ = new MPI_Status[nsrc_procs_];
+  if (nrequests > 0)
+  {
+    request_ = new MPI_Request[nrequests];
+    status_ = new MPI_Status[nrequests];
+  }
 }
 
 /* ----------------------------------------------------------------------
@@ -120,6 +130,7 @@ void One2One::exchange(T *&src, T *&dst, int data_length)
 
   // post receives
   int offset = 0;
+  int requesti = 0;
   for (int i = 0; i < nsrc_procs_; i++)
   {
   #ifdef O2ODEBUG
@@ -132,17 +143,22 @@ void One2One::exchange(T *&src, T *&dst, int data_length)
            << " offset " << offset
            << std::endl;
   #endif
-    MPI_Irecv
-    (
-      dst+offset,
-      natoms_[src_procs_[i]]*data_length,
-      wrap.mpi_type,
-      src_procs_[i],
-      MPI_ANY_TAG,
-      comm_,
-      &request_[i]
-    );
-    offset += natoms_[src_procs_[i]]*data_length;
+    // do post a receives for procs who own particles
+    if (natoms_[src_procs_[i]] > 0)
+    {
+      MPI_Irecv
+      (
+        dst+offset,
+        natoms_[src_procs_[i]]*data_length,
+        wrap.mpi_type,
+        src_procs_[i],
+        MPI_ANY_TAG,
+        comm_,
+        &request_[requesti]
+      );
+      requesti++;
+      offset += natoms_[src_procs_[i]]*data_length;
+    }
   }
 
   // make sure all receives are posted
@@ -150,27 +166,33 @@ void One2One::exchange(T *&src, T *&dst, int data_length)
 
   // blocking sends - do nonblocking instead
   //                  since doing many-2-many here?
-  for (int i = 0; i < ndst_procs_; i++)
+  // only do sends if I have particles
+  if (nlocal_ > 0)
   {
-  #ifdef O2ODEBUG
-  std::cout<< "[" << me_ << "]"
-           << " SEND to: " << dst_procs_[i]
-           << " nlocal_ " << nlocal_
-           << " data_length " << data_length
-           << std::endl;
-  #endif
-    MPI_Send
-    (
-      src,
-      nlocal_*data_length,
-      wrap.mpi_type,
-      dst_procs_[i],
-      0,
-      comm_
-    );
+    for (int i = 0; i < ndst_procs_; i++)
+    {
+    #ifdef O2ODEBUG
+    std::cout<< "[" << me_ << "]"
+             << " SEND to: " << dst_procs_[i]
+             << " nlocal_ " << nlocal_
+             << " data_length " << data_length
+             << std::endl;
+    #endif
+      MPI_Send
+      (
+        src,
+        nlocal_*data_length,
+        wrap.mpi_type,
+        dst_procs_[i],
+        0,
+        comm_
+      );
+    }
   }
 
-  MPI_Waitall(nsrc_procs_, request_, status_);
+  // only wait if requests were actually posted
+  if (requesti > 0)
+    MPI_Waitall(requesti, request_, status_);
 
   // copy on-proc info instead of communicating everything
   // may yield a first step towards true one2one communication
