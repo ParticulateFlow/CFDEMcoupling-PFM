@@ -61,20 +61,8 @@ int main(int argc, char *argv[])
     // create cfdemCloud
     cfdemCloud particleCloud(mesh);
 
-    // Useful if one wants to e.g. initialize floating particles using the Archimedes model
-    word modelType;
-    if (particleCloud.couplingProperties().found("unrestrictedForceModelSelection"))
-    {
-        modelType = particleCloud.modelType();
-    } else
-    {
-        #include "checkModelType.H"
-    }
+    #include "additionalChecks.H"
 
-    if(!particleCloud.couplingProperties().found("useDDTvoidfraction"))
-    {
-        Warning << "Suppressing ddt(voidfraction) is not recommended with this solver as it may generate incorrect results!" << endl;
-    }
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
     Info<< "\nStarting time loop\n" << endl;
