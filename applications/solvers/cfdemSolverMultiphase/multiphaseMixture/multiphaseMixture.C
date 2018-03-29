@@ -259,7 +259,6 @@ Foam::multiphaseMixture::rho(const label patchi) const
 Foam::tmp<Foam::volScalarField>
 Foam::multiphaseMixture::mu() const
 {
-    Info << "In multiphasemixture mu()" << endl;
     return rho()*nu();
 //    PtrDictionary<phase>::const_iterator iter = phases_.begin();
 
