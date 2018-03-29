@@ -176,10 +176,8 @@ void diffusionCoefficient::execute()
 
     List<scalar> Xfluid_(0);
     Xfluid_.setSize(speciesNames_.size());
-    //for (int i = 0; i < speciesNames_.size(); i++) Xfluid_[i] = 0.0;
     List<scalar> XfluidDiffusant_(0);
     XfluidDiffusant_.setSize(diffusantGasNames_.size());
-    //for (int j = 0; j < diffusantGasNames_.size();j++) XfluidDiffusant_[j] = 0.0;
     List<scalar> MixtureBinaryDiffusion_;
     MixtureBinaryDiffusion_.setSize(diffusantGasNames_.size());
     List<scalar> TotalFraction_;
@@ -237,10 +235,7 @@ void diffusionCoefficient::execute()
             partPressure_[index][0] = Pfluid;
             // change fluid pressure to 1 bar instead of Pa
             Pfluid  =  Pfluid/101325;
-
-            // Texp    =  pow(Tfluid,1.75);
             Texp  = Tfluid*sqrt(sqrt(Tfluid*Tfluid*Tfluid));
-
             if(verbose_)
             {
                 Info << "partPressure_[index][0] = " << partPressure_[index][0] << endl;
@@ -250,7 +245,6 @@ void diffusionCoefficient::execute()
 
             for (int i=0; i<diffusantGasNames_.size();i++)
             {
-
                 MixtureBinaryDiffusion_[i]  =   0.0;
                 TotalFraction_[i]   =   0.0;
                 for (int j=0; j < speciesNames_.size();j++)
@@ -268,9 +262,6 @@ void diffusionCoefficient::execute()
                             Info << "Pressure: " << Pfluid << nl << endl;
                             Info << "Temperature: " << Tfluid << nl << endl;
                         }
-
-                        //calcMolNum(i,j);
-                        //calcDiffVol(i,j);
 
                         if(coeffs.found(diffusantGasNames_[i]) && coeffs.found(speciesNames_[j]))
                         {
