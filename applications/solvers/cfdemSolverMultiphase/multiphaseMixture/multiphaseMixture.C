@@ -322,7 +322,6 @@ Foam::multiphaseMixture::muf() const
 Foam::tmp<Foam::volScalarField>
 Foam::multiphaseMixture::nu() const
 {
-    Info << "Something called nu(), returning nu_ from multiphaseMixture" << endl;
     return nu_;
 }
 
