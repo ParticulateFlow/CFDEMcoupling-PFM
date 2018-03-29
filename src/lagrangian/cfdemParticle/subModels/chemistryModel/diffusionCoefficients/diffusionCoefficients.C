@@ -57,7 +57,6 @@ diffusionCoefficient::diffusionCoefficient
     verbose_(propsDict_.lookupOrDefault<bool>("verbose",false)),
     interpolation_(propsDict_.lookupOrDefault<bool>("interpolation",false)),
     mesh_(sm.mesh()),
-    // define a file name in the coupling properties that contains the species
     specDict_
     (
         IFstream
@@ -91,8 +90,6 @@ diffusionCoefficient::diffusionCoefficient
         }
     }
 
-    dBinary_ = volDiff_ = molNum_ = NULL;
-
     particleCloud_.checkCG(false);
     allocateMyArrays();
     createCoeffs();
@@ -103,42 +100,20 @@ diffusionCoefficient::diffusionCoefficient
 
 diffusionCoefficient::~diffusionCoefficient()
 {
+    particleCloud_.dataExchangeM().destroy(partPressure_,1);
+    for (int i=0; i<diffusantGasNames_.size(); i++) particleCloud_.dataExchangeM().destroy(diffusionCoefficients_[i],1);
+
     coeffs.clearStorage();
     molWeight.clearStorage();
-
-    particleCloud_.dataExchangeM().destroy(partPressure_,1);
-
-    int nP_ = particleCloud_.numberOfParticles();
-
-    if (dBinary_ != NULL)
-        for (int i=0; i<diffusantGasNames_.size(); i++)
-            delete dBinary_[i];
-
-    if (molNum_ != NULL)
-        for (int i=0; i<diffusantGasNames_.size(); i++)
-            delete molNum_[i];
-
-    if (volDiff_ != NULL)
-        for (int i=0; i<diffusantGasNames_.size(); i++)
-            delete volDiff_[i];
-
-    for (int i=0; i<diffusantGasNames_.size(); i++)
-        particleCloud_.dataExchangeM().destroy(diffusionCoefficients_[i],nP_);
-
-    delete[] dBinary_;
-    delete[] molNum_;
-    delete[] volDiff_;
 }
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
  void diffusionCoefficient::allocateMyArrays() const
 {
     double initVal=0.0;
-
     if (particleCloud_.dataExchangeM().maxNumberOfParticles() > 0)
     {
         particleCloud_.dataExchangeM().allocateArray(partPressure_,initVal,1,"nparticles");
-
         for (int i=0; i<diffusantGasNames_.size(); i++)
         {
             particleCloud_.dataExchangeM().allocateArray(diffusionCoefficients_[i],initVal,1,"nparticles");
@@ -152,7 +127,6 @@ void diffusionCoefficient::reAllocMyArrays() const
     {
         double initVal=0.0;
         particleCloud_.dataExchangeM().allocateArray(partPressure_,initVal,1,"nparticles");
-
         for (int i=0; i<diffusantGasNames_.size(); i++)
         {
             particleCloud_.dataExchangeM().allocateArray(diffusionCoefficients_[i],initVal,1);
@@ -198,6 +172,7 @@ void diffusionCoefficient::execute()
     scalar Pfluid(0);
     scalar molarConcfluid(0);
     scalar Texp(0);
+    scalar dBinary_(0);
 
     List<scalar> Xfluid_(0);
     Xfluid_.setSize(speciesNames_.size());
@@ -273,15 +248,8 @@ void diffusionCoefficient::execute()
                 Info << "T - exponent calculation" << Texp << nl << endl;
             }
 
-            dBinary_ = new double *[diffusantGasNames_.size()];
-            molNum_ = new double *[diffusantGasNames_.size()];
-            volDiff_ = new double *[diffusantGasNames_.size()];
-
             for (int i=0; i<diffusantGasNames_.size();i++)
             {
-                dBinary_[i]     =   new double [speciesNames_.size()];
-                molNum_[i]      =   new double [speciesNames_.size()];
-                volDiff_[i]     =   new double [speciesNames_.size()];
 
                 MixtureBinaryDiffusion_[i]  =   0.0;
                 TotalFraction_[i]   =   0.0;
@@ -301,8 +269,8 @@ void diffusionCoefficient::execute()
                             Info << "Temperature: " << Tfluid << nl << endl;
                         }
 
-                        calcMolNum(i,j);
-                        calcDiffVol(i,j);
+                        //calcMolNum(i,j);
+                        //calcDiffVol(i,j);
 
                         if(coeffs.found(diffusantGasNames_[i]) && coeffs.found(speciesNames_[j]))
                         {
@@ -310,12 +278,12 @@ void diffusionCoefficient::execute()
                             //  Unit of dBinary is [m^2/s]
                             //  INFO:: Normally unit of dBinary is cm^2/s, but the 1st term in RHS is 10^-3 instead
                             //  So here it is already converted
-                            dBinary_[i][j] = 1e-7*Texp*molNum_[i][j]/(Pfluid*volDiff_[i][j]);
+                            dBinary_ = 1e-7*Texp*calcMolNum(i,j)/(Pfluid*calcDiffVol(i,j));
 
                             if(verbose_)
                             {
                                 Info << "Molecular diffusion for species " << diffusantGasNames_[i] << " in "
-                                     << speciesNames_[j] << " is : " << dBinary_[i][j] << nl << endl;
+                                     << speciesNames_[j] << " is : " << dBinary_ << nl << endl;
 
                                 Info << "Molar fraction of species (speciesNames)" << speciesNames_[j] << " : " << Xfluid_[j] << nl << endl;
                                 Info << "Molar fraction of species (diffusantNames)" << diffusantGasNames_[i] << " : " << XfluidDiffusant_[i] << nl << endl;
@@ -324,7 +292,7 @@ void diffusionCoefficient::execute()
                             if (Xfluid_[j] != 0.0)
                             {
                                 // sum of all stagnant gases to sum of binary diffusion
-                                TotalFraction_[i]   +=  Xfluid_[j]/dBinary_[i][j];
+                                TotalFraction_[i]   +=  Xfluid_[j]/dBinary_;
 
                                 // dCoeff -- diffusion component of diffusant gas
                                 MixtureBinaryDiffusion_[i]  =   (1.0-XfluidDiffusant_[i])/TotalFraction_[i];                             
@@ -400,10 +368,14 @@ void diffusionCoefficient::createCoeffs()
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-void diffusionCoefficient::calcDiffVol(int i, int j)
+double diffusionCoefficient::calcDiffVol(int i, int j)
 {
-    volDiff_[i][j]  =   coeffs(diffusantGasNames_[i])+coeffs(speciesNames_[j]);
-    volDiff_[i][j]  *=   volDiff_[i][j];
+    double volDiff_ = 0.0;
+
+    volDiff_  =   coeffs(diffusantGasNames_[i])+coeffs(speciesNames_[j]);
+    volDiff_  *=   volDiff_;
+
+    return volDiff_;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -423,13 +395,17 @@ void diffusionCoefficient::molWeightTable()
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 // either calculate Molecular Weight addition (eq. D_ij) or consturct hashtable with diffusant and diffuser species
-void diffusionCoefficient::calcMolNum(int i, int j)
+double diffusionCoefficient::calcMolNum(int i, int j)
 {
+    double molNum_ = 0.0;
+
     double& W1 = molWeight(diffusantGasNames_[i]);
     double& W2 = molWeight(speciesNames_[j]);
 
-    molNum_[i][j]   =   (W1 + W2) / (W1 * W2);
-    molNum_[i][j]   =   sqrt(molNum_[i][j]);
+    molNum_   =   (W1 + W2) / (W1 * W2);
+    molNum_   =   sqrt(molNum_);
+
+    return molNum_;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
