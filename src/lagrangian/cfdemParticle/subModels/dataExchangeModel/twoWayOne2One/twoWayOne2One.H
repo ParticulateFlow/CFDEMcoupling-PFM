@@ -112,6 +112,8 @@ private:
     mutable double*   foam2lig_scl_tmp_;
 
     mutable Switch    staticProcMap_;
+    Switch            verbose_;
+
 
   // private member functions
 

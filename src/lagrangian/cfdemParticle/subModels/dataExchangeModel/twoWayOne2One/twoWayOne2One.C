@@ -85,6 +85,7 @@ twoWayOne2One::twoWayOne2One
     foam2lig_vec_tmp_(nullptr),
     foam2lig_scl_tmp_(nullptr),
     staticProcMap_(propsDict_.lookupOrDefault<Switch>("useStaticProcMap", false)),
+    verbose_(propsDict_.lookupOrDefault("verbose", false)),
     lmp(nullptr)
 {
     Info<<"Starting up LIGGGHTS for first time execution"<<endl;
@@ -168,6 +169,16 @@ void twoWayOne2One::createProcMap() const
         {
             thisFoamPartner_.append(foamproci);
         }
+    }
+
+    if (verbose_)
+    {
+        Pout<< "FOAM bounding box: " << thisFoamBox
+            << " LIG bounding box: " << thisLigBox
+            << nl
+            << "FOAM comm partners: " << thisFoamPartner_
+            << " LIG comm partners: " << thisLigPartner_
+            << endl;
     }
 }
 
@@ -633,6 +644,16 @@ bool twoWayOne2One::couple(int i) const
         locateParticles();
 
         setupFoam2LigCommunication();
+
+        if (verbose_)
+        {
+            Pout<< "FOAM owns " << getNumberOfParticles()
+                << " LIG owns " << lmp->atom->nlocal
+                << nl
+                << "FOAM collects " << lig2foam_->ncollected_
+                << " LIG collects " << foam2lig_->ncollected_
+                << endl;
+        }
     }
 
     return coupleNow;
@@ -728,14 +749,13 @@ void twoWayOne2One::locateParticles() const
     particleCloud_.reAllocArrays();
 
     reduce(n_located, sumOp<label>());
-    if (n_located != returnReduce(lmp->atom->nlocal, sumOp<label>()))
+    if (verbose_ || n_located != returnReduce(lmp->atom->nlocal, sumOp<label>()))
     {
         Warning << "Have located " << n_located
                 << " ouf of " << returnReduce(lmp->atom->nlocal, sumOp<label>())
-                << " particles in OpenFOAM. "
+                << " particles in FOAM. "
                 << endl;
-    }
-
+    } 
 
     // copy positions/cellids/ids of located particles into arrays
     allocateArray(lig2foam_ids_, 0, getNumberOfParticles());
