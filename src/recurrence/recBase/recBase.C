@@ -109,6 +109,11 @@ recModel& recBase::recM()
     return recModel_();
 }
 
+recPath& recBase::recP()
+{
+    return recPath_();
+}
+
 recStatAnalysis& recBase::recStatA()
 {
    return recStatAnalysis_(); 
@@ -117,7 +122,6 @@ recStatAnalysis& recBase::recStatA()
 void recBase::extendPath()
 {
     recPath_         ->  getRecPath();
-    recModel_        ->  writeRecPath();
 }
 
 void recBase::updateRecFields()

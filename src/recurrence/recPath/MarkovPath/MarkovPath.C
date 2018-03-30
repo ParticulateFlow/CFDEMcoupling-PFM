@@ -143,6 +143,7 @@ void MarkovPath::computeRecPath()
     if(recSteps_ > base_.recM().totRecSteps() )
     {
         extendPath();
+	base_.recM().writeRecPathLastInterval();
         Info << "\nExtending recurrence path done\n" << endl;
         return;
     }
@@ -254,14 +255,15 @@ void MarkovPath::weightsNormalization()
 void MarkovPath::updateIntervalWeights(scalarList newWeights)
 {
     // check if number of weights is correct
-    if(newWeights.size() != numIntervals_)
+    if(newWeights.size() > numIntervals_)
     {
-        FatalError <<"number of new weights not equal number of intervals\n" << abort(FatalError);
+        FatalError <<"more weights than databases specified\n" << abort(FatalError);
     }
     
     for(int i=0; i<numIntervals_; i++)
     {
-        intervalWeights_[i] = newWeights[i];
+        if (i < newWeights.size()) intervalWeights_[i] = newWeights[i];
+        else intervalWeights_[i] = 0.0;
     }
     
     weightsNormalization();

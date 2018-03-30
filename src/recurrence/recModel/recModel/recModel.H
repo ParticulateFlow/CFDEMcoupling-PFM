@@ -67,12 +67,16 @@ protected:
     label sequenceStart;
     label sequenceEnd;
     
+    label currDataBase_;
+    label currDataBaseNext_;
     label virtualStartIndex;
     label virtualTimeIndex;
     label virtualTimeIndexNext;
     // list of pairs (start value, end value)
     labelPairList virtualTimeIndexList_;
-    label virtualTimeIndexListPos;
+    label virtualTimeIndexListPos_;
+    
+    OFstream pathFile_;
 
     virtual void readFieldSeries() = 0;
     virtual void init();
@@ -140,6 +144,11 @@ public:
     virtual void exportSurfaceScalarFieldAve(word, surfaceScalarField&, label = 0)
     {}
     
+    virtual tmp<surfaceScalarField> exportSurfaceScalarFieldAve(word, label = 0)
+    {
+        return surfaceScalarField::null();
+    }
+    
     virtual void exportVolScalarField(word, volScalarField&)  = 0;
     virtual void exportVolVectorField(word, volVectorField&)  = 0;
     virtual void exportSurfaceScalarField(word, surfaceScalarField&)  = 0;
@@ -159,6 +168,18 @@ public:
     
     virtual label lowerSeqLim() const = 0;
     virtual label upperSeqLim() const = 0;
+    
+    label currDataBase() const
+    {
+        return currDataBase_; 
+    }
+    
+    label currDataBaseNext() const
+    {
+        return currDataBaseNext_; 
+    }
+    
+    bool endOfPath() const;
     
     virtual label numIntervals() const
     {
@@ -194,7 +215,9 @@ public:
     
     virtual void writeRecMatrix() const = 0;
     
-    void writeRecPath() const;
+    void writeRecPath();
+    
+    void writeRecPathLastInterval();
 };
 
 

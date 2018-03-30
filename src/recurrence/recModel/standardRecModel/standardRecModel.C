@@ -180,6 +180,22 @@ scalar standardRecModel::checkTimeStep()
 }
 
 
+void standardRecModel::init()
+{
+    recModel::init();
+    
+    for(int i = 0; i < numDataBases_; i++)
+    {
+        if (virtualTimeIndex < cumulativeNumRecFields_[i])
+        {
+            currDataBase_ = i;
+            break;
+        }
+    }
+    currDataBaseNext_ = currDataBase_;
+}
+
+
 void standardRecModel::averageFieldSeries()
 {
     for(int i=0;i<numDataBases_;i++)
@@ -481,6 +497,10 @@ void standardRecModel::exportVolScalarFieldAve(word fieldname, volScalarField& f
     {
         FatalError <<"no averaged fields available, need to activate \"storeAveragedFields\"\n" << abort(FatalError); 
     }
+    if (db >= numDataBases_)
+    {
+        FatalError <<"can't find database with number " << db << abort(FatalError); 
+    }
     const label fieldI = getVolScalarFieldIndex(fieldname, 0);
     field = aveVolScalarFieldList_[fieldI][db];
 }
@@ -491,6 +511,10 @@ void standardRecModel::exportVolVectorFieldAve(word fieldname, volVectorField& f
     if(!storeAveragedFields_)
     {
         FatalError <<"no averaged fields available, need to activate \"storeAveragedFields\"\n" << abort(FatalError); 
+    }
+    if (db >= numDataBases_)
+    {
+        FatalError <<"can't find database with number " << db << abort(FatalError); 
     }
     const label fieldI = getVolVectorFieldIndex(fieldname, 0);
     field = aveVolVectorFieldList_[fieldI][db];
@@ -503,10 +527,27 @@ void standardRecModel::exportSurfaceScalarFieldAve(word fieldname, surfaceScalar
     {
         FatalError <<"no averaged fields available, need to activate \"storeAveragedFields\"\n" << abort(FatalError); 
     }
+    if (db >= numDataBases_)
+    {
+        FatalError <<"can't find database with number " << db << abort(FatalError); 
+    }
     const label fieldI = getSurfaceScalarFieldIndex(fieldname, 0);
     field = aveSurfaceScalarFieldList_[fieldI][db];
 }
 
+tmp<surfaceScalarField> standardRecModel::exportSurfaceScalarFieldAve(word fieldname, label db)
+{
+    if(!storeAveragedFields_)
+    {
+        FatalError <<"no averaged fields available, need to activate \"storeAveragedFields\"\n" << abort(FatalError); 
+    }
+    if (db >= numDataBases_)
+    {
+        FatalError <<"can't find database with number " << db << abort(FatalError); 
+    }
+    const label fieldI = getSurfaceScalarFieldIndex(fieldname, 0);
+    return aveSurfaceScalarFieldList_[fieldI][db];
+}
 
 void standardRecModel::exportVolScalarField(word fieldname, volScalarField& field)
 {
@@ -597,18 +638,30 @@ void standardRecModel::updateRecFields()
     virtualTimeIndex = virtualTimeIndexNext;
     virtualTimeIndexNext++;
     
+    currDataBase_ = currDataBaseNext_;
+    
     if (virtualTimeIndexNext > sequenceEnd)
     {
-        virtualTimeIndexListPos++; // this is problematic with noPath
+        virtualTimeIndexListPos_++; // this is problematic with noPath
         
-        sequenceStart = virtualTimeIndexList_[virtualTimeIndexListPos].first();
-        sequenceEnd = virtualTimeIndexList_[virtualTimeIndexListPos].second();
+        sequenceStart = virtualTimeIndexList_[virtualTimeIndexListPos_].first();
+        sequenceEnd = virtualTimeIndexList_[virtualTimeIndexListPos_].second();
         
         virtualTimeIndexNext = sequenceStart;
         
         if (verbose_)
         {
             Info << " new sequence (start/end) : " << sequenceStart << " / " << sequenceEnd << endl;
+        }
+        
+        // check in which DB the new interval lies
+        for(int i = 0; i < numDataBases_; i++)
+        {
+            if (virtualTimeIndexNext < cumulativeNumRecFields_[i])
+            {
+                currDataBaseNext_ = i;
+                break;
+            }
         }
     }
 

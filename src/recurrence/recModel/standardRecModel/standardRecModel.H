@@ -85,11 +85,13 @@ protected:
     inline label getVolScalarFieldIndex(word, label) const;
     inline label getVolVectorFieldIndex(word, label) const;
     inline label getSurfaceScalarFieldIndex(word, label) const;
-  
+
+    void init();
+
     void averageFieldSeries();
 
     void readFieldSeries();
-    
+
     void readTimeSeries();
 
 public:
@@ -114,6 +116,8 @@ public:
     void exportVolScalarFieldAve(word, volScalarField&, label);
     void exportVolVectorFieldAve(word, volVectorField&, label);
     void exportSurfaceScalarFieldAve(word, surfaceScalarField&, label);
+    
+    tmp<surfaceScalarField> exportSurfaceScalarFieldAve(word, label = 0);
 
     void exportVolScalarField(word, volScalarField&);
     void exportVolVectorField(word, volVectorField&);

@@ -84,6 +84,8 @@ public:
     
     recModel& recM();
     
+    recPath& recP();
+    
     recStatAnalysis& recStatA();
     
     void extendPath();

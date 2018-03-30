@@ -885,9 +885,9 @@ void gerhardsRecModel::updateRecFields()
     virtualTimeIndexNext++;
     if (virtualTimeIndexNext>sequenceEnd)
     {
-        virtualTimeIndexListPos++;
-        sequenceStart=virtualTimeIndexList_[virtualTimeIndexListPos].first();
-        sequenceEnd=virtualTimeIndexList_[virtualTimeIndexListPos].second();
+        virtualTimeIndexListPos_++;
+        sequenceStart=virtualTimeIndexList_[virtualTimeIndexListPos_].first();
+        sequenceEnd=virtualTimeIndexList_[virtualTimeIndexListPos_].second();
         virtualTimeIndexNext=sequenceStart;
     }
 

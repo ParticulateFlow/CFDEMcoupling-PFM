@@ -75,11 +75,14 @@ recModel::recModel
     totRecSteps_(recProperties_.lookupOrDefault<label>("initialRecSteps",-1)),
     sequenceStart(0),
     sequenceEnd(0),
+    currDataBase_(0),
+    currDataBaseNext_(0),
     virtualStartIndex(0),
     virtualTimeIndex(0),
     virtualTimeIndexNext(1),
     virtualTimeIndexList_(0),
-    virtualTimeIndexListPos(0)
+    virtualTimeIndexListPos_(0),
+    pathFile_("recurrencePath")
 {
     recTimeStep_ = -1.0;
 }
@@ -103,7 +106,14 @@ void recModel::init()
     sequenceStart = virtualTimeIndexList_[0].first();
     sequenceEnd = virtualTimeIndexList_[0].second();
     virtualTimeIndex=sequenceStart;
-    virtualTimeIndexNext=virtualTimeIndex+1; 
+    virtualTimeIndexNext=virtualTimeIndex+1;
+}
+
+bool recModel::endOfPath() const
+{
+    bool eOP = false;
+    if (virtualTimeIndexListPos_ == virtualTimeIndexList_.size() - 1) eOP = true;
+    return eOP;
 }
 
 labelPairList& recModel::virtualTimeIndexList()
@@ -111,10 +121,14 @@ labelPairList& recModel::virtualTimeIndexList()
     return virtualTimeIndexList_;
 }
 
-void recModel::writeRecPath() const
+void recModel::writeRecPath()
 {
-    OFstream listFile("recurrencePath");
-    listFile << virtualTimeIndexList_;
+    pathFile_ << virtualTimeIndexList_ << endl;
+}
+
+void recModel::writeRecPathLastInterval()
+{
+    pathFile_ << virtualTimeIndexList_.last() << endl;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
