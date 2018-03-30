@@ -7,10 +7,11 @@
             "pRec",
             runTime.timeName(),
             mesh,
-            IOobject::MUST_READ,
+            IOobject::READ_IF_PRESENT,
             IOobject::AUTO_WRITE
         ),
-        mesh
+        mesh,
+        dimensionedScalar("zero", dimensionSet(1,-1,-2,0,0,0,0), 0.0)
     );
 
     // recurrence fields
@@ -23,11 +24,11 @@
             "rhoRec",
             runTime.timeName(),
             mesh,
-            IOobject::MUST_READ,
+            IOobject::READ_IF_PRESENT,
             IOobject::AUTO_WRITE
         ),
-        mesh//,
-        //dimensionedScalar("rhoRec", dimensionSet(1, -3, 0, 0, 0), 1.0)
+        mesh,
+        dimensionedScalar("zero", dimensionSet(1, -3, 0, 0, 0), 1.0)
     );
     
     volVectorField URec
@@ -37,11 +38,13 @@
             "URec",
             runTime.timeName(),
             mesh,
-            IOobject::MUST_READ,
+            IOobject::READ_IF_PRESENT,
             IOobject::AUTO_WRITE
         ),
-        mesh
-    );  
+        mesh,
+        dimensionedVector("zero", dimensionSet(0, 1, -1, 0, 0), vector::zero)
+    );
+    
     volScalarField voidfractionRec
     (
         IOobject
@@ -49,10 +52,11 @@
             "voidfractionRec",
             runTime.timeName(),
             mesh,
-            IOobject::MUST_READ,
+            IOobject::READ_IF_PRESENT,
             IOobject::AUTO_WRITE
         ),
-        mesh
+        mesh,
+        dimensionedScalar("zero", dimensionSet(0,0,0,0,0,0,0), 0.0)
     );
     
     volVectorField UsRec
@@ -62,10 +66,11 @@
             "UsRec",
             runTime.timeName(),
             mesh,
-            IOobject::MUST_READ,
+            IOobject::READ_IF_PRESENT,
             IOobject::AUTO_WRITE
         ),
-        mesh
+        mesh,
+        dimensionedVector("zero", dimensionSet(0, 1, -1, 0, 0), vector::zero)
     );
     
     // heat transfer fields
@@ -206,6 +211,17 @@
         dimensionedScalar("zero", dimensionSet(1,-1,-3,0,0,0,0), 0.0)
     );
     
-    //Info<< "Creating field kinetic energy K\n" << endl;
-    //volScalarField K("K", 0.5*magSqr(URec));
     
+   // place to put weight functions
+    IOdictionary weightDict
+    (
+        IOobject
+        (
+            "weightDict",
+            runTime.constant(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        )
+    );
+    weightDict.add("weights",scalarList(1,1.0));
