@@ -58,21 +58,22 @@ int main(int argc, char *argv[])
     #include "createControl.H"
     #include "createFields.H"
     #include "createFvOptions.H"
-  
+
     cfdemCloudRec<cfdemCloud> particleCloud(mesh);
     recBase recurrenceBase(mesh);
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
     Info<< "\nCalculating particle trajectories based on recurrence statistics\n" << endl;
-    
-    label recTimeIndex(0);
-    scalar recTimeStep_=recurrenceBase.recM().recTimeStep();
-    
+
+    label recTimeIndex = 0;
+    scalar recTimeStep = recurrenceBase.recM().recTimeStep();
+    scalar startTime = runTime.startTime().value();
+
     while (runTime.run())
     {
         runTime++;
-        
+
         // do stuff (every lagrangian time step)
         particleCloud.clockM().start(1,"Global");
 
@@ -84,8 +85,8 @@ int main(int argc, char *argv[])
 
         particleCloud.clockM().stop("Coupling");
 
-        
-        if ( runTime.timeOutputValue() - (recTimeIndex+1)*recTimeStep_ + 1.0e-5 > 0.0 )
+
+        if ( runTime.timeOutputValue() - startTime - (recTimeIndex+1)*recTimeStep + 1.0e-5 > 0.0 )
         {
             recurrenceBase.updateRecFields();
 	    #include "readFields.H"

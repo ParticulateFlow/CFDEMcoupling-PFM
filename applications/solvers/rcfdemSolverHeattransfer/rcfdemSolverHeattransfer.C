@@ -57,16 +57,17 @@ int main(int argc, char *argv[])
     #include "createControl.H"
     #include "createFields.H"
     #include "createFvOptions.H"
-  
+
     cfdemCloudRec<cfdemCloudEnergy> particleCloud(mesh);
     recBase recurrenceBase(mesh);
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
     Info<< "\nCalculating particle trajectories based on recurrence statistics\n" << endl;
-    
-    label recTimeIndex(0);
-    scalar recTimeStep_=recurrenceBase.recM().recTimeStep();
+
+    label recTimeIndex = 0;
+    scalar recTimeStep = recurrenceBase.recM().recTimeStep();
+    scalar startTime = runTime.startTime().value();
 
     // control coupling behavior in case of substepping
     // assumes constant timestep size
@@ -77,12 +78,12 @@ int main(int argc, char *argv[])
     Info << "deltaT_DEM / deltaT_CFD = " << dtDEM2dtCFD << endl;
     if (dtDEM2dtCFD > 1)
         Info << "coupling at substep " << couplingSubStep << endl;
-    
-    
+
+
     while (runTime.run())
     {
         runTime++;
-        
+
         // do stuff (every lagrangian time step)
         particleCloud.clockM().start(1,"Global");
 
@@ -93,26 +94,26 @@ int main(int argc, char *argv[])
         particleCloud.evolve(voidfraction,Us,URec);
 
         particleCloud.clockM().stop("Coupling");
-	
+
 	particleCloud.clockM().start(26,"Flow");
         #include "TEqImp.H"
 	particleCloud.clockM().stop("Flow");
-       
+
 	particleCloud.clockM().start(32,"ReadFields");
-        if ( runTime.timeOutputValue() - (recTimeIndex+1)*recTimeStep_ + 1.0e-5 > 0.0 )
+        if ( runTime.timeOutputValue() - startTime - (recTimeIndex+1)*recTimeStep + 1.0e-5 > 0.0 )
         {
             recurrenceBase.updateRecFields();
 	    #include "updateFields.H"
             recTimeIndex++;
         }
         particleCloud.clockM().stop("ReadFields");
-        
+
         particleCloud.clockM().start(33,"Output");
         runTime.write();
-        particleCloud.clockM().stop("Output");	
+        particleCloud.clockM().stop("Output");
 
         particleCloud.clockM().stop("Global");
-        
+
         Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
         << "  ClockTime = " << runTime.elapsedClockTime() << " s"
         << nl << endl;
