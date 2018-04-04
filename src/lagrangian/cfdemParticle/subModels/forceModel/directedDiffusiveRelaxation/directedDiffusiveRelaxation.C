@@ -59,7 +59,6 @@ directedDiffusiveRelaxation::directedDiffusiveRelaxation
     interpolate_(propsDict_.lookupOrDefault<bool>("interpolation", false)),
     measureDiff_(propsDict_.lookupOrDefault<bool>("measureDiff", false)),
     recErrorFile_("recurrenceError"),
-    recFlucFile_("recurrenceFluctuation"),
     voidfractionFieldName_(propsDict_.lookupOrDefault<word>("voidfractionFieldName","voidfraction")),
     voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
     voidfractionRecFieldName_(propsDict_.lookupOrDefault<word>("voidfractionRecFieldName","voidfractionRec")),
@@ -190,13 +189,6 @@ void directedDiffusiveRelaxation::setForce() const
                     if (voidfraction > 1.0-SMALL) voidfraction = 1.0 - SMALL;
                     flucU /= (1-voidfraction);
                     flucU *= timeFac_;
-
-                    if (index == 0)
-                    {
-                        scalar t = particleCloud_.mesh().time().timeOutputValue(); 
-                        recFlucFile_ << t << "\t" << mag(flucU) << endl; 
-                    }
-                    
 
                     scalar magFlucU = mag(flucU);
                     if (maxVel > 0.0 && magFlucU > maxVel)

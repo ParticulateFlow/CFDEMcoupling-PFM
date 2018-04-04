@@ -51,8 +51,6 @@ private:
     
     mutable OFstream recErrorFile_;
     
-    mutable OFstream recFlucFile_;
-    
     word voidfractionFieldName_;
     
     const volScalarField& voidfraction_;
