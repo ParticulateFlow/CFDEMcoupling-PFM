@@ -160,7 +160,7 @@ void gradPForce::setForce() const
     {
         //if(mask[index][0])
         //{
-            force = vector(0,0,0);
+            force = vector::zero;
             cellI = particleCloud_.cellIDs()[index][0];
 
             if (cellI > -1) // particle Found

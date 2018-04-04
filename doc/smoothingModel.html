@@ -23,8 +23,6 @@
 </PRE>
 <PRE>smoothingModel  constDiffSmoothing; 
 </PRE>
-<PRE>smoothingModel  localPSizeDiffSmoothing; 
-</PRE>
 <P>Note: This examples list might not be complete - please look for other models (smoothingModel_XY) in this documentation.
 </P>
 <P>ATTENTION: In case a smoothing model is used in conjunction with "PimpleImEx" solvers, the fields "f" and "fSmooth" must be placed in the initial time directory! This is because zeroGradient boundary conditions for the fields "f" and "fSmooth" must be specified, otherwise the smoothing operation will give an Error.
