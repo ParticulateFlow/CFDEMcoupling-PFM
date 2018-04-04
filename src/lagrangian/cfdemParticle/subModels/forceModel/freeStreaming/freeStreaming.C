@@ -64,21 +64,21 @@ freeStreaming::freeStreaming
     particleDensity_(propsDict_.lookupOrDefault<scalar>("particleDensity",0.0)),
     gravAcc_(propsDict_.lookupOrDefault<vector>("g",vector(0.0,0.0,-9.81)))
 {
-    forceSubModels_.setSize(1, "recU");
-    forceSubModels_.append("recF");
-    delete[] forceSubModel_;
-    forceSubModel_ = new autoPtr<forceSubModel>[nrForceSubModels()];
-    Info << "nrForceSubModels()=" << nrForceSubModels() << endl;
-    for (int i=0;i<nrForceSubModels();i++)
-    {
-        forceSubModel_[i] = forceSubModel::New
-        (
-            dict,
-            particleCloud_,
-            *this,
-            forceSubModels_[i]
-        );
-    }
+//     forceSubModels_.setSize(1, "recU");
+//     forceSubModels_.append("recF");
+//     delete[] forceSubModel_;
+//     forceSubModel_ = new autoPtr<forceSubModel>[nrForceSubModels()];
+//     Info << "nrForceSubModels()=" << nrForceSubModels() << endl;
+//     for (int i=0;i<nrForceSubModels();i++)
+//     {
+//         forceSubModel_[i] = forceSubModel::New
+//         (
+//             dict,
+//             particleCloud_,
+//             *this,
+//             forceSubModels_[i]
+//         );
+//     }
   
 }
 
@@ -102,36 +102,44 @@ void freeStreaming::setForce() const
     interpolationCellPoint<vector> UsRecInterpolator_(UsRec_);
     interpolationCellPoint<scalar> voidfractionRecInterpolator_(voidfractionRec_);
     
-   for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
+    for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
     {
             cellI = particleCloud_.cellIDs()[index][0];
-	    UNew =vector(0,0,0);
+            UNew =vector(0,0,0);
             if (cellI > -1) // particle found
             {
-	        // let particles in empty regions follow trajectories subject to gravity, otherwise stream
-		if(voidfractionRec_[cellI] < critVoidfraction_)
-		{
+                // let particles in empty regions follow trajectories subject to gravity, otherwise stream
+                if(voidfractionRec_[cellI] < critVoidfraction_)
+                {
                     if( interpolate_ )
                     {
                         position = particleCloud_.position(index);
-		        UNew = UsRecInterpolator_.interpolate(position,cellI);
+                        UNew = UsRecInterpolator_.interpolate(position,cellI);
                     }
                     else
                     {
                         UNew = UsRec_[cellI];
                     }
-		}
-		else
-		{
-		    position = particleCloud_.position(index);
-		    radius = particleCloud_.radius(index);
+                }
+                else
+                {
+                    position = particleCloud_.position(index);
+                    radius = particleCloud_.radius(index);
                     mass = 4.188790205*radius*radius*radius * particleDensity_;
-		    grav = mass*gravAcc_;
-		    forceSubM(1).partToArray(index,grav,vector::zero);
-		    UNew=particleCloud_.velocity(index);
-		}
-		// write particle based data to global array
-                forceSubM(0).partToArray(index,UNew,vector::zero);
+                    grav = mass*gravAcc_;
+              //      forceSubM(1).partToArray(index,grav,vector::zero);
+                    for(int j=0;j<3;j++)
+                    {
+                        particleCloud_.DEMForces()[index][j] += grav[j];
+                    }
+                    UNew=particleCloud_.velocity(index);
+                }
+                // write particle based data to global array
+                for(int j=0;j<3;j++)
+                {
+                    particleCloud_.particleConvVels()[index][j] += UNew[j];
+                }
+          //      forceSubM(0).partToArray(index,UNew,vector::zero);
 	    }
     }
    

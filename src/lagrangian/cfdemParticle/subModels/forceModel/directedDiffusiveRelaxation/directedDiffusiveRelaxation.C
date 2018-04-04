@@ -59,13 +59,14 @@ directedDiffusiveRelaxation::directedDiffusiveRelaxation
     interpolate_(propsDict_.lookupOrDefault<bool>("interpolation", false)),
     measureDiff_(propsDict_.lookupOrDefault<bool>("measureDiff", false)),
     recErrorFile_("recurrenceError"),
+    recFlucFile_("recurrenceFluctuation"),
     voidfractionFieldName_(propsDict_.lookupOrDefault<word>("voidfractionFieldName","voidfraction")),
     voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
     voidfractionRecFieldName_(propsDict_.lookupOrDefault<word>("voidfractionRecFieldName","voidfractionRec")),
     voidfractionRec_(sm.mesh().lookupObject<volScalarField> (voidfractionRecFieldName_)),
     critVoidfraction_(propsDict_.lookupOrDefault<scalar>("critVoidfraction", 1.0)),
     D0_(readScalar(propsDict_.lookup("D0"))),
-    D1_(readScalar(propsDict_.lookup("D1"))),
+    maxDisplacement_(propsDict_.lookupOrDefault<scalar>("maxDisplacement", -1.0)),
     correctedField_
     (   IOobject
         (
@@ -76,6 +77,18 @@ directedDiffusiveRelaxation::directedDiffusiveRelaxation
             IOobject::AUTO_WRITE
         ),
         voidfraction_
+    ),
+    relaxStream_
+    (   IOobject
+        (
+            "relaxStream",
+            sm.mesh().time().timeName(),
+            sm.mesh(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        sm.mesh(),
+        dimensionedVector("zero",dimensionSet(0,1,-1,0,0), vector::zero)
     ),
     DField_
     (   IOobject
@@ -90,14 +103,14 @@ directedDiffusiveRelaxation::directedDiffusiveRelaxation
         dimensionedScalar("zero", dimensionSet(0,2,-1,0,0,0,0), 0.0),
         "zeroGradient"
     ),
-    dt_(particleCloud_.dataExchangeM().DEMts()),
+    dtCFD_(voidfraction_.mesh().time().deltaTValue()),
+    dtDEM_(particleCloud_.dataExchangeM().DEMts()),
+    timeFac_(1.0),
     ignoreReg_(propsDict_.lookupOrDefault<bool>("ignoreRegion",false)),
     ignoreDirection_(propsDict_.lookupOrDefault<vector>("ignoreDirection",vector::zero)),
     ignorePoint_(propsDict_.lookupOrDefault<vector>("ignorePoint",vector::zero)),
-    vfluc_(NULL)
+    relaxForT_(propsDict_.lookupOrDefault<scalar>("relaxForT", -1.0))
 {
-    allocateMyArrays();
-    
     if(ignoreReg_)
     {
         if(mag(ignoreDirection_) < SMALL)
@@ -107,6 +120,8 @@ directedDiffusiveRelaxation::directedDiffusiveRelaxation
         Info << "directedDiffusiveRelaxation: ignoring fluctuations below plane specified by point " <<
         ignorePoint_ << " and normal vector " << ignoreDirection_ << endl;
     }
+
+    if (dtDEM_ > dtCFD_) timeFac_ = dtCFD_ / dtDEM_;
 }
 
 
@@ -114,48 +129,37 @@ directedDiffusiveRelaxation::directedDiffusiveRelaxation
 
 directedDiffusiveRelaxation::~directedDiffusiveRelaxation()
 {
-    delete vfluc_;
-}
-
-
-// * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
-void directedDiffusiveRelaxation::allocateMyArrays() const
-{
-    // get memory for 2d arrays
-    double initVal=0.0;
-    particleCloud_.dataExchangeM().allocateArray(vfluc_,initVal,3); 
 }
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 void directedDiffusiveRelaxation::setForce() const
 {
+    if (relaxForT_ >= 0.0 && particleCloud_.mesh().foundObject<IOdictionary>("lastJumpTime"))
+    {
+        const IOdictionary& lastJumpTimeDict(particleCloud_.mesh().lookupObject<IOdictionary>("lastJumpTime"));
+        scalar lastJumpTime = lastJumpTimeDict.lookupOrDefault("lastJumpTime",-1e5);
+        scalar currTime = particleCloud_.mesh().time().timeOutputValue();
+        if (currTime - lastJumpTime > relaxForT_) return;
+    }
+  
+    relax(D0_);
 
-    relax(D0_,D1_);
-    
-    volVectorField relaxStream = DField_ * fvc::grad(correctedField_ - voidfractionRec_);
-    
-  // volVectorField relaxStream = DField_ * fvc::grad(voidfraction_ - voidfractionRec_);
-    
-     // realloc the arrays
-    allocateMyArrays();
-    
+    relaxStream_ = DField_ * fvc::grad(correctedField_ - voidfractionRec_);
+
+   // explicit evaluation?
+   // relaxStream_ = DField_ * fvc::grad(voidfraction_ - voidfractionRec_);
+
     vector position(0,0,0);
     scalar voidfraction(0.0);
     vector flucU(0,0,0);
     label cellI=0;
-   
-    interpolationCellPoint<scalar> voidfractionInterpolator_(voidfraction_);
-    interpolationCellPoint<vector> relaxStreamInterpolator_(relaxStream);
-    
-    scalar dtDEM = particleCloud_.dataExchangeM().DEMts();
-    scalar dtCFD = voidfraction_.mesh().time().deltaTValue();
-    
-    // if DEM time step > CFD time step, scale velocity down
-    scalar timeFac = 1.0;
-    if (dtDEM > dtCFD) timeFac = dtCFD / dtDEM;
 
-    
+    interpolationCellPoint<scalar> voidfractionInterpolator_(voidfraction_);
+    interpolationCellPoint<vector> relaxStreamInterpolator_(relaxStream_);
+
+    scalar maxVel = maxDisplacement_ / dtDEM_;
+
     for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
     {
             cellI = particleCloud_.cellIDs()[index][0];
@@ -173,29 +177,41 @@ void directedDiffusiveRelaxation::setForce() const
                 {
                     if( interpolate_ )
                     {
-                      position = particleCloud_.position(index);
-                      voidfraction = voidfractionInterpolator_.interpolate(position,cellI);
-                      flucU = relaxStreamInterpolator_.interpolate(position,cellI);      
+                        position = particleCloud_.position(index);
+                        voidfraction = voidfractionInterpolator_.interpolate(position,cellI);
+                        flucU = relaxStreamInterpolator_.interpolate(position,cellI);
                     }
                     else
                     {
                         voidfraction = voidfraction_[cellI];
-                        flucU = relaxStream[cellI];
+                        flucU = relaxStream_[cellI];
                     }
-                    
+
                     if (voidfraction > 1.0-SMALL) voidfraction = 1.0 - SMALL;
                     flucU /= (1-voidfraction);
-		    flucU *= timeFac;
-                    // write particle based data to global array 
-                    for(int i = 0; i < 3; i++)
+                    flucU *= timeFac_;
+
+                    if (index == 0)
                     {
-                        vfluc_[index][i]=flucU[i];
+                        scalar t = particleCloud_.mesh().time().timeOutputValue(); 
+                        recFlucFile_ << t << "\t" << mag(flucU) << endl; 
+                    }
+                    
+
+                    scalar magFlucU = mag(flucU);
+                    if (maxVel > 0.0 && magFlucU > maxVel)
+                    {
+                        flucU *= maxVel / magFlucU;
+                    }
+                    
+                    // write particle based data to global array
+                    for(int j=0;j<3;j++)
+                    {
+                        particleCloud_.particleFlucVels()[index][j] += flucU[j];
                     }
                 }
             }
     }
-    
-    particleCloud_.dataExchangeM().giveData("vfluc","vector-atom", vfluc_);
     
     if (measureDiff_)
     {
@@ -205,13 +221,13 @@ void directedDiffusiveRelaxation::setForce() const
     }
 }
 
-void directedDiffusiveRelaxation::relax(scalar D0, scalar D1) const
+void directedDiffusiveRelaxation::relax(scalar D0) const
 {
     correctedField_.oldTime() = voidfraction_;
     forAll(DField_, cellI)
     {
         if(voidfraction_[cellI] > 0.99) DField_[cellI] = 0.0;
-        else DField_[cellI] = D0 + D1*(voidfractionRec_[cellI] - voidfraction_[cellI]);
+        else DField_[cellI] = D0;
     }
     
     solve

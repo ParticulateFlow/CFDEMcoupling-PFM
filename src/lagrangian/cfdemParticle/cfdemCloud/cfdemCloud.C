@@ -98,6 +98,8 @@ cfdemCloud::cfdemCloud
     particleWeights_(NULL),
     particleVolumes_(NULL),
     particleV_(NULL),
+    particleConvVel_(NULL),
+    particleFlucVel_(NULL),
     numberOfParticles_(0),
     d32_(-1),
     numberOfParticlesChanged_(false),
@@ -358,6 +360,8 @@ cfdemCloud::~cfdemCloud()
     dataExchangeM().destroy(particleWeights_,1);
     dataExchangeM().destroy(particleVolumes_,1);
     dataExchangeM().destroy(particleV_,1);
+    dataExchangeM().destroy(particleConvVel_,3);
+    dataExchangeM().destroy(particleFlucVel_,3);
 }
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
@@ -408,6 +412,8 @@ void cfdemCloud::findCells()
 void cfdemCloud::setForces()
 {
     resetArray(fluidVel_,numberOfParticles(),3);
+    resetArray(particleConvVel_,numberOfParticles(),3);
+    resetArray(particleFlucVel_,numberOfParticles(),3);
     resetArray(impForces_,numberOfParticles(),3);
     resetArray(expForces_,numberOfParticles(),3);
     resetArray(DEMForces_,numberOfParticles(),3);
@@ -693,6 +699,8 @@ bool cfdemCloud::reAllocArrays()
         dataExchangeM().allocateArray(velocities_,0.,3);
         dataExchangeM().allocateArray(fluidVel_,0.,3);
         dataExchangeM().allocateArray(fAcc_,0.,3);
+        dataExchangeM().allocateArray(particleConvVel_,0.,3);
+        dataExchangeM().allocateArray(particleFlucVel_,0.,3);
         dataExchangeM().allocateArray(impForces_,0.,3);
         dataExchangeM().allocateArray(expForces_,0.,3);
         dataExchangeM().allocateArray(DEMForces_,0.,3);

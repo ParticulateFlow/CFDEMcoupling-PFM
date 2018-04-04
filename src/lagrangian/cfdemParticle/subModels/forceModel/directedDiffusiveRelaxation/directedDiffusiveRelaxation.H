@@ -51,6 +51,8 @@ private:
     
     mutable OFstream recErrorFile_;
     
+    mutable OFstream recFlucFile_;
+    
     word voidfractionFieldName_;
     
     const volScalarField& voidfraction_;
@@ -62,14 +64,20 @@ private:
     scalar critVoidfraction_;
     
     scalar D0_;
-    
-    scalar D1_;
+
+    scalar maxDisplacement_;
     
     mutable volScalarField correctedField_;
+
+    mutable volVectorField relaxStream_;
     
     mutable volScalarField DField_;
     
-    const scalar dt_;
+    const scalar dtCFD_;
+    
+    const scalar dtDEM_;
+    
+    scalar timeFac_;
     
     // ignore particles in cells below plane given with ref point and normal vector
     // normal vector points towards region where fluctuations are permitted
@@ -80,11 +88,10 @@ private:
     
     vector ignorePoint_;
     
-    mutable double **vfluc_;              // Lagrangian array
-
-    void allocateMyArrays() const;
+    scalar relaxForT_;
     
-    void relax(scalar, scalar) const;
+    void relax(scalar) const;
+    
 
 public:
 

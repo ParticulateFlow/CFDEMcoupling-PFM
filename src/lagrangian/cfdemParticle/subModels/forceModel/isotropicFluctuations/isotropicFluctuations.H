@@ -79,10 +79,6 @@ private:
     scalar fluctuationMag(const scalar) const;
     
     mutable Random ranGen_;
-    
-    mutable double **vfluc_;              // Lagrangian array
-
-    void allocateMyArrays() const;
 
 public:
 

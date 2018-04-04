@@ -69,11 +69,8 @@ isotropicFluctuations::isotropicFluctuations
     ignoreReg_(propsDict_.lookupOrDefault<bool>("ignoreRegion",false)),
     ignoreDirection_(propsDict_.lookupOrDefault<vector>("ignoreDirection",vector::zero)),
     ignorePoint_(propsDict_.lookupOrDefault<vector>("ignorePoint",vector::zero)),
-    ranGen_(osRandomInteger()),
-    vfluc_(NULL)
+    ranGen_(osRandomInteger())
 {
-    allocateMyArrays();
-    
     if(ignoreReg_)
     {
         if(mag(ignoreDirection_) < SMALL)
@@ -90,25 +87,13 @@ isotropicFluctuations::isotropicFluctuations
 
 isotropicFluctuations::~isotropicFluctuations()
 {
-    delete vfluc_;
 }
 
-
-// * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
-void isotropicFluctuations::allocateMyArrays() const
-{
-    // get memory for 2d arrays
-    double initVal=0.0;
-    particleCloud_.dataExchangeM().allocateArray(vfluc_,initVal,3); 
-}
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 void isotropicFluctuations::setForce() const
 {
-     // realloc the arrays
-    allocateMyArrays();
-    
     vector position(0,0,0);
     scalar voidfraction(0.0);
     scalar voidfractionRec(0.0);
@@ -159,15 +144,15 @@ void isotropicFluctuations::setForce() const
                     {
                         flucU=unitRndVec()*fluctuationMag(relVolfractionExcess);
                     }              
-                    for(int i = 0; i < 3; i++)
+
+                    // write particle based data to global array
+                    for(int j=0;j<3;j++)
                     {
-                        vfluc_[index][i]=flucU[i];
+                        particleCloud_.particleFlucVels()[index][j] += flucU[j];
                     }
                 }
             }
     }
-    
-    particleCloud_.dataExchangeM().giveData("vfluc","vector-atom", vfluc_);
     
     if (measureDiff_)
     {

@@ -115,6 +115,16 @@ inline double ** cfdemCloud::fluidVels() const
     return fluidVel_;
 }
 
+inline double ** cfdemCloud::particleConvVels() const
+{
+    return particleConvVel_;
+}
+
+inline double ** cfdemCloud::particleFlucVels() const
+{
+    return particleFlucVel_;
+}
+
 inline double ** cfdemCloud::fAccs() const
 {
     return fAcc_;

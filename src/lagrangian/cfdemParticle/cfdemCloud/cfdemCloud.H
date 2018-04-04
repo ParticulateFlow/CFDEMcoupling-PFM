@@ -127,6 +127,10 @@ protected:
     mutable double **particleVolumes_;
 
     mutable double **particleV_;
+    
+    mutable double **particleConvVel_;
+
+    mutable double **particleFlucVel_;
 
     int numberOfParticles_;
 
@@ -307,6 +311,10 @@ public:
        inline void get_cellIDs(int**&) const;
 
        inline double ** particleWeights() const;
+       
+       inline double ** particleConvVels() const;
+
+       inline double ** particleFlucVels() const;
 
        virtual inline label body(int) const;
 
