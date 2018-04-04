@@ -63,6 +63,17 @@ recModel::recModel
             IOobject::NO_WRITE
         )
     ),
+    lastJumpTime_
+    (
+        IOobject
+        (
+            "lastJumpTime",
+            base.mesh().time().constant(),
+            base.mesh(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        )
+    ),
     verbose_(dict.lookupOrDefault<Switch>("verbose", false)),
     volScalarFieldNames_(recProperties_.lookup("volScalarFields")),
     volVectorFieldNames_(recProperties_.lookup("volVectorFields")),
@@ -85,6 +96,7 @@ recModel::recModel
     pathFile_("recurrencePath")
 {
     recTimeStep_ = -1.0;
+    lastJumpTime_.add("lastJumpTime",startTime_);
 }
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //

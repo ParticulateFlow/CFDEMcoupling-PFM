@@ -663,6 +663,7 @@ void standardRecModel::updateRecFields()
                 break;
             }
         }
+        lastJumpTime_.set("lastJumpTime",base_.mesh().time().timeOutputValue());
     }
 
     if (verbose_)

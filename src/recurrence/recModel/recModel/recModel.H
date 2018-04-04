@@ -49,6 +49,8 @@ protected:
     
     IOdictionary controlDict_;
     
+    IOdictionary lastJumpTime_;
+    
     bool verbose_;
     
     const wordList volScalarFieldNames_;
