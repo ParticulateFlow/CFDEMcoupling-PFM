@@ -78,11 +78,11 @@ tmp<volVectorField> gravity::exportForceField()
             )
         )
     );
-    
+
     volVectorField& source = tsource.ref();
-    
+
     source = rhoG_ * voidfraction_ * g_;
-    
+
     return tsource;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
