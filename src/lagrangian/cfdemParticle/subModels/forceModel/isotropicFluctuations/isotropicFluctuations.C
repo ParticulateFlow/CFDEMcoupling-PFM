@@ -65,6 +65,7 @@ isotropicFluctuations::isotropicFluctuations
     voidfractionRec_(sm.mesh().lookupObject<volScalarField> (voidfractionRecFieldName_)),
     critVoidfraction_(propsDict_.lookupOrDefault<scalar>("critVoidfraction", 1.0)),
     D0_(readScalar(propsDict_.lookup("D0"))),
+    D1_(propsDict_.lookupOrDefault<scalar>("D1", 0.0)),
     dt_(particleCloud_.dataExchangeM().DEMts()),
     ignoreReg_(propsDict_.lookupOrDefault<bool>("ignoreRegion",false)),
     ignoreDirection_(propsDict_.lookupOrDefault<vector>("ignoreDirection",vector::zero)),
@@ -77,7 +78,7 @@ isotropicFluctuations::isotropicFluctuations
         {
             FatalError <<"ignoreDirection vector has very little norm, please use larger one\n" << abort(FatalError);
         }
-        Info << "isotropicFluctuations: ignoring fluctuations below plane specified by point " <<
+        Info << "isotropicFluctuations: ignoring/decreasing fluctuations below plane specified by point " <<
         ignorePoint_ << " and normal vector " << ignoreDirection_ << endl;
     }
 }
@@ -98,6 +99,7 @@ void isotropicFluctuations::setForce() const
     scalar voidfraction(0.0);
     scalar voidfractionRec(0.0);
     scalar deltaVoidfrac(0.0);
+    scalar D=D0_;
 
     vector flucU(0,0,0);
     label cellI=0;
@@ -113,6 +115,7 @@ void isotropicFluctuations::setForce() const
             voidfraction=0.0;
             voidfractionRec=0.0;
             deltaVoidfrac=0.0;
+
             if (cellI > -1) // particle found
             {
                 if(ignoreReg_)
@@ -120,7 +123,8 @@ void isotropicFluctuations::setForce() const
                     // check if cell center is below "ignore plane"
                     vector cellCenter = particleCloud_.mesh().C()[cellI];
                     scalar aboveBelow = ignoreDirection_ & (ignorePoint_ - cellCenter);
-                    if(aboveBelow > 0) continue;
+                    if(aboveBelow > 0) D=D1_;
+                    else D=D0_;
                 }
                 // particles in empty regions follow trajectories subject to gravity
                 if(voidfractionRec_[cellI] < critVoidfraction_)
@@ -142,7 +146,7 @@ void isotropicFluctuations::setForce() const
                     relVolfractionExcess=deltaVoidfrac/(1-voidfraction+SMALL);
                     if(deltaVoidfrac>0)
                     {
-                        flucU=unitRndVec()*fluctuationMag(relVolfractionExcess);
+                        flucU=unitRndVec()*fluctuationMag(relVolfractionExcess,D);
                     }              
 
                     // write particle based data to global array
@@ -162,18 +166,18 @@ void isotropicFluctuations::setForce() const
     }
 }
 
-scalar isotropicFluctuations::fluctuationMag(const scalar relVolfractionExcess) const
+scalar isotropicFluctuations::fluctuationMag(const scalar relVolfractionExcess, const scalar D) const
 {
     // magnitude of steps dr = sqrt(6*D0*relVolfractionExcess * dt)
     // fluctuation velocity v = dr / dt
     scalar fluctuation;
-    if(relVolfractionExcess<0.0)
+    if(relVolfractionExcess<0.0 || D < 1e-10)
     {
         return 0.0;
     }
     else
     {
-        fluctuation=Foam::sqrt(6*D0_*relVolfractionExcess/dt_);
+        fluctuation=Foam::sqrt(6*D*relVolfractionExcess/dt_);
         return fluctuation;
     }
 }

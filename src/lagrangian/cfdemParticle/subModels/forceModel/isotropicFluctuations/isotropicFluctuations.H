@@ -63,6 +63,8 @@ private:
     
     scalar D0_;
     
+    scalar D1_;
+    
     const scalar dt_;
     
     // ignore particles in cells below plane given with ref point and normal vector
@@ -76,7 +78,7 @@ private:
 
     vector unitRndVec() const;
     
-    scalar fluctuationMag(const scalar) const;
+    scalar fluctuationMag(const scalar, const scalar) const;
     
     mutable Random ranGen_;
 
