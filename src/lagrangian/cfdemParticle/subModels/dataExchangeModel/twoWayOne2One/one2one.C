@@ -138,6 +138,11 @@ void One2One::exchange(T *&src, T *&dst, int data_length)
   int requesti = 0;
   for (int i = 0; i < nsrc_procs_; i++)
   {
+    // do post a receives for procs who own particles
+    if (natoms_[src_procs_[i]] > 0)
+    {
+      if (src_procs_[i] != me_)
+      {
   #ifdef O2ODEBUG
   std::cout<< "[" << me_ << "]"
            << " RCV " << i
@@ -148,11 +153,6 @@ void One2One::exchange(T *&src, T *&dst, int data_length)
            << " offset " << offset
            << std::endl;
   #endif
-    // do post a receives for procs who own particles
-    if (natoms_[src_procs_[i]] > 0)
-    {
-      if (src_procs_[i] != me_)
-      {
         MPI_Irecv
         (
           &dst[offset],
@@ -183,6 +183,8 @@ void One2One::exchange(T *&src, T *&dst, int data_length)
   {
     for (int i = 0; i < ndst_procs_; i++)
     {
+      if (dst_procs_[i] != me_)
+      {
     #ifdef O2ODEBUG
     std::cout<< "[" << me_ << "]"
              << " SEND to: " << dst_procs_[i]
@@ -190,8 +192,6 @@ void One2One::exchange(T *&src, T *&dst, int data_length)
              << " data_length " << data_length
              << std::endl;
     #endif
-      if (dst_procs_[i] != me_)
-      {
         MPI_Send
         (
           src,
@@ -223,7 +223,6 @@ void One2One::exchange(T *&src, T *&dst, int data_length)
       dst[locali+offset_local] = src[locali];
     }
   }
-
 }
 
 template void One2One::exchange<int>(int*&, int*&, int);
