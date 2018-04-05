@@ -107,7 +107,11 @@ void One2One::setup
     if (natoms_[src_procs_[i]] > 0)
     {
       ncollected_ += natoms_[src_procs_[i]];
-      nrequests++;
+
+      if (src_procs_[i] != me_) // no receive for on-proc info
+      {
+        nrequests++;
+      }
     }
   }
 
@@ -129,6 +133,7 @@ void One2One::exchange(T *&src, T *&dst, int data_length)
   mpi_type_wrapper<T> wrap;
 
   // post receives
+  int offset_local = -1;
   int offset = 0;
   int requesti = 0;
   for (int i = 0; i < nsrc_procs_; i++)
@@ -146,8 +151,10 @@ void One2One::exchange(T *&src, T *&dst, int data_length)
     // do post a receives for procs who own particles
     if (natoms_[src_procs_[i]] > 0)
     {
-      MPI_Irecv
-      (
+      if (src_procs_[i] != me_)
+      {
+        MPI_Irecv
+        (
           &dst[offset],
           natoms_[src_procs_[i]]*data_length,
           wrap.mpi_type,
@@ -157,8 +164,13 @@ void One2One::exchange(T *&src, T *&dst, int data_length)
           &request_[requesti]
         );
         requesti++;
-      offset += natoms_[src_procs_[i]]*data_length;
+      }
+      else // data is available on-proc
+      {
+        offset_local = offset;
+      }
     }
+    offset += natoms_[src_procs_[i]]*data_length;
   }
 
   // make sure all receives are posted
@@ -178,15 +190,18 @@ void One2One::exchange(T *&src, T *&dst, int data_length)
              << " data_length " << data_length
              << std::endl;
     #endif
-      MPI_Send
-      (
-        src,
-        nlocal_*data_length,
-        wrap.mpi_type,
-        dst_procs_[i],
-        0,
-        comm_
-      );
+      if (dst_procs_[i] != me_)
+      {
+        MPI_Send
+        (
+          src,
+          nlocal_*data_length,
+          wrap.mpi_type,
+          dst_procs_[i],
+          0,
+          comm_
+        );
+      }
     }
   }
 
@@ -194,10 +209,20 @@ void One2One::exchange(T *&src, T *&dst, int data_length)
   if (requesti > 0)
     MPI_Waitall(requesti, request_, status_);
 
-  // copy on-proc info instead of communicating everything
-  // may yield a first step towards true one2one communication
-  //for (i = 0; i < nown; i++)
-  //    dest[dest_own[i]] = src[src_own[i]];
+  // copy on-proc data
+  if (offset_local > -1)
+  {
+    const int max_locali = nlocal_ * data_length;
+    for 
+    (
+      int locali = 0;
+      locali < max_locali;
+      locali++
+    )
+    {
+      dst[locali+offset_local] = src[locali];
+    }
+  }
 
 }
 
