@@ -148,15 +148,15 @@ void One2One::exchange(T *&src, T *&dst, int data_length)
     {
       MPI_Irecv
       (
-        dst+offset,
-        natoms_[src_procs_[i]]*data_length,
-        wrap.mpi_type,
-        src_procs_[i],
-        MPI_ANY_TAG,
-        comm_,
-        &request_[requesti]
-      );
-      requesti++;
+          &dst[offset],
+          natoms_[src_procs_[i]]*data_length,
+          wrap.mpi_type,
+          src_procs_[i],
+          MPI_ANY_TAG,
+          comm_,
+          &request_[requesti]
+        );
+        requesti++;
       offset += natoms_[src_procs_[i]]*data_length;
     }
   }
