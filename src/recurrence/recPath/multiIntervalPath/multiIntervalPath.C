@@ -67,7 +67,7 @@ multiIntervalPath::multiIntervalPath
     if(meanIntervalSteps_<0)
     {
         // if no mean interval length for consecutive steps is specified, use 1/5 from first interval
-        meanIntervalSteps_ = (label) (0.2 * intervalSizes_[0]);
+        meanIntervalSteps_ = static_cast<label>(0.2 * intervalSizes_[0]);
     }
     
     // normalize weights
