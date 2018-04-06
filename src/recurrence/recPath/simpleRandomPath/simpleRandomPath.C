@@ -1,6 +1,6 @@
 /*---------------------------------------------------------------------------*\
     CFDEMcoupling academic - Open Source CFD-DEM coupling
-    
+
     Contributing authors:
     Thomas Lichtenegger
     Copyright (C) 2015- Johannes Kepler University, Linz
@@ -68,22 +68,22 @@ simpleRandomPath::~simpleRandomPath()
 void simpleRandomPath::getRecPath()
 {
     label numRecIntervals = 0;
-    
+
     if(Pstream::master())
     {
         computeRecPath();
         numRecIntervals = virtualTimeIndexList_.size();
     }
-    
+
     Pstream::scatter(numRecIntervals);
-    
+
     if(not Pstream::master())
     {
         virtualTimeIndexList_.setSize(numRecIntervals);
     }
-    
+
     Pstream::scatter(virtualTimeIndexList_);
-    
+
     if(verbose_)
     {
         Info << "\nRecurrence path communicated to all processors.\n" << endl;
@@ -94,37 +94,37 @@ void simpleRandomPath::getRecPath()
 void simpleRandomPath::computeRecPath()
 {
     Info << "\nComputing recurrence path\n" << endl;
-    
-    
+
+
     Random ranGen(osRandomInteger());
-    
+
     label virtualTimeIndex = 0;
     label recSteps = 0;
     label seqStart = 0;
     label lowerSeqLim( base_.recM().lowerSeqLim() );
     label upperSeqLim( base_.recM().upperSeqLim() );
     label seqLength = ranGen.integer(lowerSeqLim, upperSeqLim);
-    
+
     virtualTimeIndex = seqEnd(seqStart,seqLength);
     labelPair seqStartEnd(seqStart,virtualTimeIndex);
     virtualTimeIndexList_.append(seqStartEnd);
     recSteps += seqLength;
-    
+
     SymmetricSquareMatrix<scalar>& recurrenceMatrix( base_.recM().recurrenceMatrix() );
     label numRecFields( base_.recM().numRecFields() );
-    
+
     if(base_.recM().totRecSteps() == 1)
     {
-        Info<< "\nPrimitive recurrence path with one element.\n" << endl;
+        Info << "\nPrimitive recurrence path with one element.\n" << endl;
         return;
     }
-   
+
     while(recSteps <= base_.recM().totRecSteps() )
     {
         label startLoop = 0;
         label endLoop = 0;
 
-        // search the other half of the recurrence matrix for 
+        // search the other half of the recurrence matrix for
         // the new starting point of the next sequence
         if (virtualTimeIndex < numRecFields/2)
         {
@@ -134,35 +134,35 @@ void simpleRandomPath::computeRecPath()
         }
         else
         {
-        	startLoop = 0;
-        	endLoop = numRecFields/2-1;
+            startLoop = 0;
+            endLoop = numRecFields/2-1;
         }
-        
+
         scalar nextMinimum(GREAT);
         for (label j = startLoop; j < endLoop; j++)
         {
-        	if (recurrenceMatrix[j][virtualTimeIndex] < nextMinimum)
-        	{
-        		nextMinimum = recurrenceMatrix[j][virtualTimeIndex];
-        		seqStart = j+1;
-        		continue;
-        	}
+            if (recurrenceMatrix[j][virtualTimeIndex] < nextMinimum)
+            {
+                nextMinimum = recurrenceMatrix[j][virtualTimeIndex];
+                seqStart = j+1;
+                continue;
+            }
         }
-        
-        seqLength = ranGen.integer(lowerSeqLim, upperSeqLim);  
+
+        seqLength = ranGen.integer(lowerSeqLim, upperSeqLim);
         virtualTimeIndex = seqEnd(seqStart,seqLength);
         labelPair seqStartEnd(seqStart,virtualTimeIndex);
         virtualTimeIndexList_.append(seqStartEnd);
         recSteps += seqLength;
     }
-    
-    Info<< "\nComputing recurrence path done\n" << endl;
-    
+
+    Info << "\nComputing recurrence path done\n" << endl;
+
     if (verbose_)
     {
         Info << " virtualTimeIndexList_ : " << virtualTimeIndexList_ << endl;
     }
-    
+
     computeJumpVector();
 }
 
@@ -173,7 +173,7 @@ label simpleRandomPath::seqEnd(label seqStart, label & seqLength)
     {
         seqLength=numRecFields-1-seqStart;
     }
-    
+
     return seqStart+seqLength;
 }
 
@@ -202,14 +202,14 @@ void simpleRandomPath::computeJumpVector()
 
         scalar nextMinimum(GREAT);
         label jumpdest = 0;
-        
+
         for (label j = startLoop; j < endLoop; j++)
         {
             if (recurrenceMatrix[j][i] < nextMinimum)
             {
                 nextMinimum = recurrenceMatrix[j][i];
                 jumpdest = j+1;
-                
+
                 continue;
             }
         }
@@ -217,7 +217,7 @@ void simpleRandomPath::computeJumpVector()
         jumpvec << jumpdest << endl;
     }
 
-    Info<< "\nComputing recurrence jump vector done\n" << endl;
+    Info << "\nComputing recurrence jump vector done\n" << endl;
 }
 
 

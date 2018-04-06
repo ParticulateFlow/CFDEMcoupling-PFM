@@ -1,6 +1,6 @@
 /*---------------------------------------------------------------------------*\
     CFDEMcoupling academic - Open Source CFD-DEM coupling
-    
+
     Contributing authors:
     Thomas Lichtenegger, Gerhard Holzinger
     Copyright (C) 2015- Johannes Kepler University, Linz
@@ -44,31 +44,31 @@ protected:
 
     // Protected data
     recBase& base_;
-    
+
     const dictionary& recProperties_;
-    
+
     IOdictionary controlDict_;
-    
+
     IOdictionary lastJumpTime_;
-    
+
     bool verbose_;
-    
+
     const wordList volScalarFieldNames_;
     const wordList volVectorFieldNames_;
     const wordList surfaceScalarFieldNames_;
-    
+
     scalar startTime_;
     scalar endTime_;
     scalar timeStep_;
-    
+
     scalar recStartTime_;
     scalar recEndTime_;
     scalar recTimeStep_;
     label totRecSteps_;
-    
+
     label sequenceStart;
     label sequenceEnd;
-    
+
     label currDataBase_;
     label currDataBaseNext_;
     label virtualStartIndex;
@@ -77,14 +77,14 @@ protected:
     // list of pairs (start value, end value)
     labelPairList virtualTimeIndexList_;
     label virtualTimeIndexListPos_;
-    
+
     OFstream pathFile_;
 
     virtual void readFieldSeries() = 0;
     virtual void init();
 
 public:
-  
+
     friend class recBase;
 
     //- Runtime type information
@@ -130,27 +130,27 @@ public:
 
 
     // Member Functions
-      
+
     /*virtual void exportVolScalarField(word, volScalarField&) const = 0;
     virtual void exportVolVectorField(word, volVectorField&) const = 0;
     virtual void exportSurfaceScalarField(word, surfaceScalarField&) const = 0;
-    
+
     virtual const volScalarField& exportVolScalarField(word, label) const = 0;
     virtual const volVectorField& exportVolVectorField(word, label) const = 0;
     virtual const surfaceScalarField& exportSurfaceScalarField(word, label) const = 0;*/
-    
+
     virtual void exportVolScalarFieldAve(word, volScalarField&, label = 0)
     {}
     virtual void exportVolVectorFieldAve(word, volVectorField&, label = 0)
     {}
     virtual void exportSurfaceScalarFieldAve(word, surfaceScalarField&, label = 0)
     {}
-    
+
     virtual tmp<surfaceScalarField> exportSurfaceScalarFieldAve(word, label = 0)
     {
         return surfaceScalarField::null();
     }
-    
+
     virtual void exportVolScalarField(word, volScalarField&)  = 0;
     virtual void exportVolVectorField(word, volVectorField&)  = 0;
     virtual void exportSurfaceScalarField(word, surfaceScalarField&)  = 0;
@@ -158,67 +158,67 @@ public:
     virtual const volScalarField& exportVolScalarField(word, label)  = 0;
     virtual const volVectorField& exportVolVectorField(word, label)  = 0;
     virtual const surfaceScalarField& exportSurfaceScalarField(word, label)  = 0;
-    
+
   //  virtual tmp<surfaceScalarField> exportAveragedSurfaceScalarField(word, scalar, label index = -1) = 0;
     //virtual void exportAveragedVolVectorField(volVectorField&, word, scalar, label index = -1) const = 0;
-    
+
     virtual SymmetricSquareMatrix<scalar>& recurrenceMatrix() = 0;
-    
+
     virtual const HashTable<label,word>& timeIndexList() const = 0;
-    
+
     labelPairList& virtualTimeIndexList();
-    
+
     virtual label lowerSeqLim() const = 0;
     virtual label upperSeqLim() const = 0;
-    
+
     label currDataBase() const
     {
-        return currDataBase_; 
+        return currDataBase_;
     }
-    
+
     label currDataBaseNext() const
     {
-        return currDataBaseNext_; 
+        return currDataBaseNext_;
     }
-    
+
     bool endOfPath() const;
-    
+
     virtual label numIntervals() const
     {
         return 1;
     }
-    
+
     virtual label numRecFields() const = 0;
     virtual label numRecFields(label i) const
     {
         return 0;
     }
-    
+
     virtual label numDataBaseFields() const = 0;
-    
+
     label totRecSteps() const;
-    
+
     scalar recStartTime() const
     {
         return recStartTime_;
     }
-    
+
     scalar recEndTime() const
     {
         return recEndTime_;
     }
-    
+
     scalar recTimeStep() const
     {
         return recTimeStep_;
     }
 
     virtual void updateRecFields() = 0;
-    
+
     virtual void writeRecMatrix() const = 0;
-    
+
     void writeRecPath();
-    
+
     void writeRecPathLastInterval();
 };
 

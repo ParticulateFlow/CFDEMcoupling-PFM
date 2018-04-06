@@ -30,8 +30,6 @@ Description
     Read time series and extend it by mirrored fields if geometry possesses
     the same symmetry
 
-
-
 \*---------------------------------------------------------------------------*/
 
 #include "fvCFD.H"
@@ -66,12 +64,12 @@ int main(int argc, char *argv[])
 
     #include "createFields.H"
 
-Info << fieldName << endl;
+    Info << fieldName << endl;
 
     volScalarField transformedField = origField;
 
     scalar t;
-    
+
     label shiftedTimeI = 0;
 
     // check number of time directories
@@ -80,8 +78,8 @@ Info << fieldName << endl;
     {
        runTime.setTime(timeDirs[timeI], timeI);
        t = runTime.value();
-       if(t<startTime) continue;
-       if(t>endTime) continue;
+       if(t < startTime) continue;
+       if(t > endTime) continue;
        shift++;
     }
 
@@ -93,12 +91,12 @@ Info << fieldName << endl;
     {
        runTime.setTime(timeDirs[timeI], timeI);
        t = runTime.value();
-       if(t<startTime) continue;
-       if(t>endTime) continue;
+       if(t < startTime) continue;
+       if(t > endTime) continue;
        Info << "time = " << t << ", time index = " << timeI << endl;
 
        #include "createFields.H"
- 
+
        forAll(transformedField, cellI)
        {
            vector position = mesh.C()[cellI];
@@ -123,7 +121,7 @@ Info << fieldName << endl;
        transformedField.write();
     }
 
-    Info<< "\nEnd" << endl;
+    Info << "\nEnd" << endl;
 
     return 0;
 }

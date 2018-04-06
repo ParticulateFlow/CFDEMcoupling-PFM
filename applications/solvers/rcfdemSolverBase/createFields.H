@@ -1,5 +1,5 @@
     // dummy fields
-    Info<< "\nCreating dummy pressure and density fields\n" << endl;
+    Info << "\nCreating dummy pressure and density fields\n" << endl;
     volScalarField p
     (
         IOobject
@@ -13,7 +13,7 @@
         mesh,
         dimensionedScalar("p", dimensionSet(1, 2, -2, 0, 0), 1.0)
     );
-    
+
     volScalarField rho
     (
         IOobject
@@ -27,9 +27,9 @@
         mesh,
         dimensionedScalar("rho", dimensionSet(1, -3, 0, 0, 0), 1.0)
     );
-    
+
     // recurrence fields
-    Info<< "\nCreating recurrence fields.\n" << endl;
+    Info << "\nCreating recurrence fields.\n" << endl;
     volVectorField URec
     (
         IOobject
@@ -42,7 +42,7 @@
         ),
         mesh
     );
-    
+
     volScalarField voidfractionRec
     (
         IOobject
@@ -55,7 +55,7 @@
         ),
         mesh
     );
-    
+
     volVectorField UsRec
     (
         IOobject
@@ -70,7 +70,7 @@
     );
 
     // calculated fields
-    Info<< "\nCreating fields subject to calculation\n" << endl;
+    Info << "\nCreating fields subject to calculation\n" << endl;
     volScalarField voidfraction
     (
         IOobject
@@ -83,7 +83,7 @@
         ),
         voidfractionRec
     );
-        
+
     volVectorField Us
     (
         IOobject
@@ -96,28 +96,28 @@
         ),
         UsRec
     );
-    
+
     // write fields for t=t_start
     voidfraction.write();
     Us.write();
 //===============================
 
-Info<< "Calculating face flux field phi\n" << endl;
-surfaceScalarField phiRec
- (
-     IOobject
-     (
-        "phiRec",
-        runTime.timeName(),
-        mesh,
-        IOobject::READ_IF_PRESENT,
-        IOobject::AUTO_WRITE
-     ),
-     linearInterpolate(URec*voidfractionRec) & mesh.Sf()
- );
-phiRec.write();
- 
-  singlePhaseTransportModel laminarTransport(URec, phiRec);
+    Info << "Calculating face flux field phi\n" << endl;
+    surfaceScalarField phiRec
+    (
+        IOobject
+        (
+            "phiRec",
+            runTime.timeName(),
+            mesh,
+            IOobject::READ_IF_PRESENT,
+            IOobject::AUTO_WRITE
+        ),
+        linearInterpolate(URec*voidfractionRec) & mesh.Sf()
+    );
+    phiRec.write();
+
+    singlePhaseTransportModel laminarTransport(URec, phiRec);
 
     autoPtr<incompressible::turbulenceModel> turbulence
     (

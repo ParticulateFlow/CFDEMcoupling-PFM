@@ -1,6 +1,6 @@
 /*---------------------------------------------------------------------------*\
     CFDEMcoupling academic - Open Source CFD-DEM coupling
-    
+
     Contributing authors:
     Thomas Lichtenegger, Gerhard Holzinger
     Copyright (C) 2015- Johannes Kepler University, Linz
@@ -42,8 +42,7 @@ class noRecStatAnalysis
     public recStatAnalysis
 {
 protected:
-  
-    
+
 
 public:
 
@@ -65,14 +64,13 @@ public:
         ~noRecStatAnalysis();
 
     void init();
-	
+
     void statistics();
-    
-	
+
+
 private:
-  
-    
-    
+
+
 };
 
 

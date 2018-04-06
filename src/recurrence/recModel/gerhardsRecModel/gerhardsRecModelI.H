@@ -1,6 +1,6 @@
 /*---------------------------------------------------------------------------*\
     CFDEMcoupling academic - Open Source CFD-DEM coupling
-    
+
     Contributing authors:
     Thomas Lichtenegger, Gerhard Holzinger
     Copyright (C) 2015- Johannes Kepler University, Linz
@@ -28,61 +28,61 @@ inline Foam::label Foam::gerhardsRecModel::getVolScalarFieldIndex(word fieldname
 {
     if(index < 0 || index > numRecFields_ - 1)
     {
-        FatalError<<"gerhardsRecModel: Index out of bounds for volScalarField with name " 
+        FatalError<<"gerhardsRecModel: Index out of bounds for volScalarField with name "
             << fieldname << abort(FatalError);
     }
-    
+
     label fieldI(-1);
-    
+
     for(int i=0; i<volScalarFieldNames_.size(); i++)
     {
         if(volScalarFieldNames_[i].match(fieldname))
-	    {
-	        fieldI = i;
-	    }
-	}
-	
-	if (fieldI == -1)
-	{
-	    FatalError<<"gerhardsRecModel: Could not find volScalarField with name " 
-	        << fieldname << abort(FatalError);
-	}
-	
-	return fieldI;
+        {
+            fieldI = i;
+        }
+    }
+
+    if (fieldI == -1)
+    {
+        FatalError<<"gerhardsRecModel: Could not find volScalarField with name "
+            << fieldname << abort(FatalError);
+    }
+
+    return fieldI;
 }
 
 inline Foam::label Foam::gerhardsRecModel::getVolVectorFieldIndex(word fieldname, label index) const
 {
     if(index < 0 || index > numRecFields_ - 1)
     {
-        FatalError<<"gerhardsRecModel: Index out of bounds for volVectorField with name " 
+        FatalError<<"gerhardsRecModel: Index out of bounds for volVectorField with name "
             << fieldname << abort(FatalError);
     }
-    
+
     label fieldI(-1);
-    
+
     for(int i=0; i<volVectorFieldNames_.size(); i++)
     {
         if(volVectorFieldNames_[i].match(fieldname))
-	    {
-	        fieldI = i;
-	    }
-	}
-	
-	if (fieldI == -1)
-	{
-	    FatalError<<"gerhardsRecModel: Could not find volVectorField with name " 
-	        << fieldname << abort(FatalError);
-	}
-	
-	return fieldI;
+        {
+            fieldI = i;
+        }
+    }
+
+    if (fieldI == -1)
+    {
+        FatalError<<"gerhardsRecModel: Could not find volVectorField with name "
+            << fieldname << abort(FatalError);
+    }
+
+    return fieldI;
 }
 
 inline Foam::label Foam::gerhardsRecModel::getSurfaceScalarFieldIndex(word fieldname, label index) const
 {
     if(index < 0 || index > numRecFields_ - 1)
     {
-        FatalError<<"gerhardsRecModel: Index out of bounds for surfaceScalarField with name " 
+        FatalError<<"gerhardsRecModel: Index out of bounds for surfaceScalarField with name "
             << fieldname << abort(FatalError);
     }
 
@@ -98,7 +98,7 @@ inline Foam::label Foam::gerhardsRecModel::getSurfaceScalarFieldIndex(word field
 
     if (fieldI == -1)
     {
-        FatalError<<"gerhardsRecModel: Could not find surfaceScalarField with name " 
+        FatalError<<"gerhardsRecModel: Could not find surfaceScalarField with name "
             << fieldname << abort(FatalError);
     }
 

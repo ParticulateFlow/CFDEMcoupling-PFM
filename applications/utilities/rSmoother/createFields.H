@@ -1,4 +1,4 @@
-IOdictionary recProperties
+    IOdictionary recProperties
     (
         IOobject
         (
@@ -11,9 +11,9 @@ IOdictionary recProperties
     );
 
 
-scalar threshold(readScalar(recProperties.lookup("threshold")));
+    scalar threshold(readScalar(recProperties.lookup("threshold")));
 
-volVectorField U_smooth
+    volVectorField U_smooth
     (
         IOobject
         (

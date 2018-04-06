@@ -1,6 +1,6 @@
 /*---------------------------------------------------------------------------*\
     CFDEMcoupling academic - Open Source CFD-DEM coupling
-    
+
     Contributing authors:
     Thomas Lichtenegger, Gerhard Holzinger
     Copyright (C) 2015- Johannes Kepler University, Linz
@@ -83,13 +83,13 @@ standardRecModel::standardRecModel
 
         numRecFields_.append(label(timeDirs_[i].size()));
         if(skipZero_) numRecFields_[i]--;
-	
-	label sum=0;
-	for(label j=0;j<=i;j++)
-	{
-	    sum += numRecFields_[j];
-	}
-	cumulativeNumRecFields_.append(sum);
+
+        label sum=0;
+        for(label j=0;j<=i;j++)
+        {
+            sum += numRecFields_[j];
+        }
+        cumulativeNumRecFields_.append(sum);
 
         totNumRecFields_ += numRecFields_[i];
 
@@ -125,19 +125,19 @@ standardRecModel::standardRecModel
     for(int i=0; i<volScalarFieldNames_.size(); i++)
     {
         volScalarFieldList_[i].setSize(totNumRecFields_);
-	if(storeAveragedFields_) aveVolScalarFieldList_[i].setSize(numDataBases_);
+        if(storeAveragedFields_) aveVolScalarFieldList_[i].setSize(numDataBases_);
     }
 
     for(int i=0; i<volVectorFieldNames_.size(); i++)
     {
         volVectorFieldList_[i].setSize(totNumRecFields_);
-	if(storeAveragedFields_) aveVolVectorFieldList_[i].setSize(numDataBases_);
+        if(storeAveragedFields_) aveVolVectorFieldList_[i].setSize(numDataBases_);
     }
 
     for(int i=0; i<surfaceScalarFieldNames_.size(); i++)
     {
         surfaceScalarFieldList_[i].setSize(totNumRecFields_);
-	if(storeAveragedFields_) aveSurfaceScalarFieldList_[i].setSize(numDataBases_);
+        if(storeAveragedFields_) aveSurfaceScalarFieldList_[i].setSize(numDataBases_);
     }
 }
 
@@ -151,7 +151,7 @@ standardRecModel::~standardRecModel()
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 scalar standardRecModel::checkTimeStep()
 {
-//    // check time step of provided data
+    // check time step of provided data
     scalar dtCur(1.e10);
     scalar dtOld(1.e10);
     bool first = true;
@@ -169,13 +169,14 @@ scalar standardRecModel::checkTimeStep()
                 FatalError <<"detected different time steps in database(s)\n" << abort(FatalError);
             }
         }
-
     }
+
     if (verbose_)
     {
         Info << "Setting deltaRecT to " << dtCur << endl;
         Info << "Actual runTime.deltaT = " << timeStep_ << endl;
     }
+
     return dtCur;
 }
 
@@ -183,7 +184,7 @@ scalar standardRecModel::checkTimeStep()
 void standardRecModel::init()
 {
     recModel::init();
-    
+
     for(int i = 0; i < numDataBases_; i++)
     {
         if (virtualTimeIndex < cumulativeNumRecFields_[i])
@@ -192,6 +193,7 @@ void standardRecModel::init()
             break;
         }
     }
+
     currDataBaseNext_ = currDataBase_;
 }
 
@@ -201,7 +203,7 @@ void standardRecModel::averageFieldSeries()
     for(int i=0;i<numDataBases_;i++)
     {
         Foam::Time recTime(fileName(dataBaseNames_[i]), "", "../system", "../constant", false);
-        
+
         // perform averaging over all volScalarFields
         for(int j=0; j<volScalarFieldNames_.size(); j++)
         {
@@ -313,7 +315,7 @@ void standardRecModel::readFieldSeries()
         label size = timeDirs_[i].size();
         label counter = 0;
         label percentage = 0;
-    
+
         for (instantList::iterator it=timeDirs_[i].begin(); it != timeDirs_[i].end(); ++it)
         {
             if(counter >= 0.1 * percentage * size)
@@ -325,7 +327,7 @@ void standardRecModel::readFieldSeries()
 
             // set time
             recTime.setTime(*it, it->value());
-        
+
             // skip zero
             if (skipZero_ and recTime.timeName() == "0")
             {
@@ -335,18 +337,18 @@ void standardRecModel::readFieldSeries()
                 }
                 continue;
             }
-        
+
             // skip constant
             if (recTime.timeName() == "constant")
             {
                 continue;
             }
-        
+
             if (verbose_)
             {
                 Info << "Reading at t = " << recTime.timeName() << endl;
             }
-        
+
             for(int j=0; j<volScalarFieldNames_.size(); j++)
             {
                 volScalarFieldList_[j].set
@@ -366,7 +368,7 @@ void standardRecModel::readFieldSeries()
                     )
                 );
             }
-            
+
             for(int j=0; j<volVectorFieldNames_.size(); j++)
             {
                 volVectorFieldList_[j].set
@@ -410,7 +412,7 @@ void standardRecModel::readFieldSeries()
         }
         Info << "Reading fields of database " << dataBaseNames_[i] <<" done" << endl;
     }
-    
+
     if(storeAveragedFields_)
     {
         Info << "Calculating field averages." << endl;
@@ -478,7 +480,7 @@ void standardRecModel::readTimeSeries()
                 Info << "contTimeIndex " << contTimeIndex << endl;
             }
         }
-      
+
         if (verbose_)
         {
             Info << endl;
@@ -495,11 +497,11 @@ void standardRecModel::exportVolScalarFieldAve(word fieldname, volScalarField& f
 {
     if(!storeAveragedFields_)
     {
-        FatalError <<"no averaged fields available, need to activate \"storeAveragedFields\"\n" << abort(FatalError); 
+        FatalError <<"no averaged fields available, need to activate \"storeAveragedFields\"\n" << abort(FatalError);
     }
     if (db >= numDataBases_)
     {
-        FatalError <<"can't find database with number " << db << abort(FatalError); 
+        FatalError <<"can't find database with number " << db << abort(FatalError);
     }
     const label fieldI = getVolScalarFieldIndex(fieldname, 0);
     field = aveVolScalarFieldList_[fieldI][db];
@@ -510,11 +512,11 @@ void standardRecModel::exportVolVectorFieldAve(word fieldname, volVectorField& f
 {
     if(!storeAveragedFields_)
     {
-        FatalError <<"no averaged fields available, need to activate \"storeAveragedFields\"\n" << abort(FatalError); 
+        FatalError <<"no averaged fields available, need to activate \"storeAveragedFields\"\n" << abort(FatalError);
     }
     if (db >= numDataBases_)
     {
-        FatalError <<"can't find database with number " << db << abort(FatalError); 
+        FatalError <<"can't find database with number " << db << abort(FatalError);
     }
     const label fieldI = getVolVectorFieldIndex(fieldname, 0);
     field = aveVolVectorFieldList_[fieldI][db];
@@ -525,11 +527,11 @@ void standardRecModel::exportSurfaceScalarFieldAve(word fieldname, surfaceScalar
 {
     if(!storeAveragedFields_)
     {
-        FatalError <<"no averaged fields available, need to activate \"storeAveragedFields\"\n" << abort(FatalError); 
+        FatalError <<"no averaged fields available, need to activate \"storeAveragedFields\"\n" << abort(FatalError);
     }
     if (db >= numDataBases_)
     {
-        FatalError <<"can't find database with number " << db << abort(FatalError); 
+        FatalError <<"can't find database with number " << db << abort(FatalError);
     }
     const label fieldI = getSurfaceScalarFieldIndex(fieldname, 0);
     field = aveSurfaceScalarFieldList_[fieldI][db];
@@ -539,11 +541,11 @@ tmp<surfaceScalarField> standardRecModel::exportSurfaceScalarFieldAve(word field
 {
     if(!storeAveragedFields_)
     {
-        FatalError <<"no averaged fields available, need to activate \"storeAveragedFields\"\n" << abort(FatalError); 
+        FatalError <<"no averaged fields available, need to activate \"storeAveragedFields\"\n" << abort(FatalError);
     }
     if (db >= numDataBases_)
     {
-        FatalError <<"can't find database with number " << db << abort(FatalError); 
+        FatalError <<"can't find database with number " << db << abort(FatalError);
     }
     const label fieldI = getSurfaceScalarFieldIndex(fieldname, 0);
     return aveSurfaceScalarFieldList_[fieldI][db];
@@ -570,21 +572,21 @@ void standardRecModel::exportSurfaceScalarField(word fieldname, surfaceScalarFie
 const volScalarField& standardRecModel::exportVolScalarField(word fieldname, label index)
 {
     const label fieldI = getVolScalarFieldIndex(fieldname, index);
-    
+
     return volScalarFieldList_[fieldI][index];
 }
 
 const volVectorField& standardRecModel::exportVolVectorField(word fieldname, label index)
 {
     const label fieldI = getVolVectorFieldIndex(fieldname, index);
-    
+
     return volVectorFieldList_[fieldI][index];
 }
 
 const surfaceScalarField& standardRecModel::exportSurfaceScalarField(word fieldname, label index)
 {
     const label fieldI = getSurfaceScalarFieldIndex(fieldname, index);
-    
+
     return surfaceScalarFieldList_[fieldI][index];
 }
 
@@ -603,17 +605,17 @@ const HashTable<label,word>& standardRecModel::timeIndexList() const
 
 label standardRecModel::lowerSeqLim() const
 {
-    return lowerSeqLim_; 
+    return lowerSeqLim_;
 }
 
 label standardRecModel::upperSeqLim() const
 {
-    return upperSeqLim_; 
+    return upperSeqLim_;
 }
 
 label standardRecModel::numIntervals() const
 {
-    return numDataBases_; 
+    return numDataBases_;
 }
 
 label standardRecModel::numRecFields() const
@@ -637,23 +639,23 @@ void standardRecModel::updateRecFields()
 {
     virtualTimeIndex = virtualTimeIndexNext;
     virtualTimeIndexNext++;
-    
+
     currDataBase_ = currDataBaseNext_;
-    
+
     if (virtualTimeIndexNext > sequenceEnd)
     {
         virtualTimeIndexListPos_++; // this is problematic with noPath
-        
+
         sequenceStart = virtualTimeIndexList_[virtualTimeIndexListPos_].first();
         sequenceEnd = virtualTimeIndexList_[virtualTimeIndexListPos_].second();
-        
+
         virtualTimeIndexNext = sequenceStart;
-        
+
         if (verbose_)
         {
             Info << " new sequence (start/end) : " << sequenceStart << " / " << sequenceEnd << endl;
         }
-        
+
         // check in which DB the new interval lies
         for(int i = 0; i < numDataBases_; i++)
         {
@@ -681,11 +683,6 @@ void standardRecModel::writeRecMatrix() const
 
 
 
-
-
-
-
-
 // tmp<surfaceScalarField> standardRecModel::exportAveragedSurfaceScalarField(word fieldname, scalar threshold, label index)
 // {
 //     label timeIndex;
@@ -695,17 +692,17 @@ void standardRecModel::writeRecMatrix() const
 //     }
 //     else
 //     {
-//         timeIndex = index; 
+//         timeIndex = index;
 //     }
 //     const label fieldI = getSurfaceScalarFieldIndex(fieldname, timeIndex);
-//     
+//
 //     tmp<surfaceScalarField> tAveragedSurfaceScalarField(surfaceScalarFieldList_[fieldI][timeIndex]);
-//     
+//
 //     label counter = 1;
 //     scalar recErr;
 //     label delay = 10;
 //     label lastMin = -1000;
-//     
+//
 //     for(int runningTimeIndex = 1; runningTimeIndex < numRecFields_-1 ; runningTimeIndex++)
 //     {
 //         recErr = recurrenceMatrix_[timeIndex][runningTimeIndex];
@@ -714,12 +711,12 @@ void standardRecModel::writeRecMatrix() const
 //         if(recErr > recurrenceMatrix_[timeIndex][runningTimeIndex+1]) continue;
 //         if(abs(runningTimeIndex - timeIndex) < delay) continue;
 //         if(abs(runningTimeIndex - lastMin) < delay) continue;
-// 
+//
 //         lastMin = runningTimeIndex;
 //         counter++;
 //         tAveragedSurfaceScalarField += surfaceScalarFieldList_[fieldI][runningTimeIndex];
 //     }
-//     
+//
 //     tAveragedSurfaceScalarField /= counter;
 //     return tAveragedSurfaceScalarField;
 // }
@@ -733,12 +730,12 @@ void standardRecModel::exportAveragedVolVectorField(volVectorField& smoothfield,
     }
     else
     {
-        timeIndex = index; 
+        timeIndex = index;
     }
     const label fieldI = getVolVectorFieldIndex(fieldname, timeIndex);
-    
+
     smoothfield = volVectorFieldList_[fieldI][timeIndex];
-     
+
     label counter = 1;
     scalar recErr;
     label delay = 1;
@@ -760,11 +757,6 @@ void standardRecModel::exportAveragedVolVectorField(volVectorField& smoothfield,
     Info << "time index = " << index << ", counter = " << counter << endl;
     smoothfield /= counter;
 }
-
-
-
-
-
 
 
 

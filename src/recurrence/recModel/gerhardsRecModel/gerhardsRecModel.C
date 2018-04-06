@@ -1,6 +1,6 @@
 /*---------------------------------------------------------------------------*\
     CFDEMcoupling academic - Open Source CFD-DEM coupling
-    
+
     Contributing authors:
     Thomas Lichtenegger, Gerhard Holzinger
     Copyright (C) 2015- Johannes Kepler University, Linz
@@ -80,7 +80,7 @@ gerhardsRecModel::gerhardsRecModel
 {
     /*
         Sanity checks
-        
+
         "Sanity is just another weird form of Madness"
                                                 --- Darkwell
     */
@@ -90,32 +90,32 @@ gerhardsRecModel::gerhardsRecModel
             << propsDict_.name() << " is smaller than 2!"
             << abort(FatalError);
     }
-    
+
     if (numDataBaseFields_ > numRecFields_)
-    {   
+    {
         FatalError << "Number of fields in dataBase specified in "
             << propsDict_.name() << " is larger than number of snapshots!"
             << abort(FatalError);
     }
-    
+
     if (dataBaseName_ == "")
     {
         FatalError << "Empty dataBase path provided"
             << abort(FatalError);
     }
-    
+
     if (upperSeqLim_ == 0)
     {
         FatalError << "Bad sequence limits! The dataBase is most probably too small."
             << abort(FatalError);
     }
-    
+
     // initialize data structures
     forAll(storageUsageList_, i)
     {
         storageUsageList_[i] = storageUsageList_.size()+1;
     }
-    
+
     if (verbose_)
     {
         // be informative on properties of the "recTime" Time-object
@@ -165,69 +165,70 @@ scalar gerhardsRecModel::checkTimeStep()
    // check time step of provided data
     scalar dtCur(0.0);
     scalar dtOld(0.0);
-    
+
     if (verbose_)
     {
-    	Info << "timeValueList : " << timeValueList_ << endl;
+        Info << "timeValueList : " << timeValueList_ << endl;
     }
-    
+
     forAll(timeValueList_, i)
     {
-    	// skip zero
-    	if (skipZero_ and timeDirs[i].value() == 0)
-    	{
-    	    if (verbose_)
-    	    {
-    	        Info << " ... skipping 0 in checkTimeStep()" << endl;
-    	    }
-    	    continue;
-    	}
-    	
-    	// compute time step
-    	if (timeDirs[i].value() == timeDirs.last().value())
-    	{
-    		if (verbose_)
-    		{
-    			Info << ".. leaving loop at " << timeDirs[i] << endl;
-    		}
-    		// leave loop
-    		break;
-    	}
-    	
-    	if (verbose_)
-    	{
-    		Info << "timeDirs.fcIndex(i)].value(),  timeDirs[i].value() : " 
-    			<< timeDirs[timeDirs.fcIndex(i)].value() << "   " << timeDirs[i].value()
-    			<< endl;
-    	}
-    	
-    	// the documentation is in the code ;-)
-    	//	fcIndex() - return forward circular index, i.e. the next index
+        // skip zero
+        if (skipZero_ and timeDirs[i].value() == 0)
+        {
+            if (verbose_)
+            {
+                Info << " ... skipping 0 in checkTimeStep()" << endl;
+            }
+            continue;
+        }
+
+        // compute time step
+        if (timeDirs[i].value() == timeDirs.last().value())
+        {
+            if (verbose_)
+            {
+                Info << ".. leaving loop at " << timeDirs[i] << endl;
+            }
+            // leave loop
+            break;
+        }
+
+        if (verbose_)
+        {
+            Info << "timeDirs.fcIndex(i)].value(),  timeDirs[i].value() : "
+                    << timeDirs[timeDirs.fcIndex(i)].value() << "   " << timeDirs[i].value()
+                    << endl;
+        }
+
+        // the documentation is in the code ;-)
+        //    fcIndex() - return forward circular index, i.e. the next index
         dtCur = timeDirs[timeDirs.fcIndex(i)].value() - timeDirs[i].value();
-        
+
         if (dtOld < SMALL)
         {
-        	dtOld = dtCur;
+            dtOld = dtCur;
         }
-        
+
         if (abs(dtOld - dtCur) > SMALL)
         {
-        	Info << "dtCur, dtOld = " << dtCur << "   " << dtOld << endl;
-        	FatalError << "    in setting up data" << nl
-				<< "    non-constant time-step of provided simulation data" 
-				<< abort(FatalError);
+            Info << "dtCur, dtOld = " << dtCur << "   " << dtOld << endl;
+            FatalError << "    in setting up data" << nl
+                            << "    non-constant time-step of provided simulation data"
+                            << abort(FatalError);
         }
     }
-        
+
     // set deltaT
     recTime.setDeltaT(dtCur, false);
-	
-	if (verbose_)
+
+    if (verbose_)
     {
-		Info << "Setting deltaRecT to " << dtCur << endl;
-		Info << "Actual recTime.deltaT = " << recTime.deltaTValue() << endl;
-		Info << "Actual runTime.deltaT = " << timeStep_ << endl;
+        Info << "Setting deltaRecT to " << dtCur << endl;
+        Info << "Actual recTime.deltaT = " << recTime.deltaTValue() << endl;
+        Info << "Actual runTime.deltaT = " << timeStep_ << endl;
     }
+
     return dtCur;
 }
 
@@ -255,13 +256,13 @@ void gerhardsRecModel::readFieldSeries()
         if (skipZero_ and recTime.timeName() == "0")
         {
             if (verbose_)
-    	    {
-    	        Info << " ... skipping 0 in readFieldSeries()" << endl;
-    	    }
-    	    
-    	    continue;
+            {
+                Info << " ... skipping 0 in readFieldSeries()" << endl;
+            }
+
+            continue;
         }
-        
+
         // skip constant
         if (recTime.timeName() == "constant")
         {
@@ -272,7 +273,7 @@ void gerhardsRecModel::readFieldSeries()
         {
             Info << "Checking fields at t = " << recTime.timeName() << endl;
         }
-        
+
         for (int i=0; i<volScalarFieldNames_.size(); i++)
         {
             IOobject header
@@ -282,10 +283,10 @@ void gerhardsRecModel::readFieldSeries()
                 base_.mesh(),
                 IOobject::MUST_READ
             );
-            
+
             // Check if volScalarFieldNames_[i] is a valid field
             /*
-                COMPAT: replace the method typeHeaderOk<volScalarField>(true) with headerOk() 
+                COMPAT: replace the method typeHeaderOk<volScalarField>(true) with headerOk()
                 for OpenFOAM versions prior to OpenFOAM-5.0
                 Do this the other way around for OpenFOAM-5.0 and potentially later versions
             */
@@ -296,7 +297,7 @@ void gerhardsRecModel::readFieldSeries()
                 << exit(FatalError);
             }
         }
-        
+
         for (int i=0; i<volVectorFieldNames_.size(); i++)
         {
             IOobject header
@@ -306,10 +307,10 @@ void gerhardsRecModel::readFieldSeries()
                 base_.mesh(),
                 IOobject::MUST_READ
             );
-            
+
             // Check if volVectorFieldNames_[i] is a valid field
             /*
-                COMPAT: replace the method typeHeaderOk<volScalarField>(true) with headerOk() 
+                COMPAT: replace the method typeHeaderOk<volScalarField>(true) with headerOk()
                 for OpenFOAM versions prior to OpenFOAM-5.0
                 Do this the other way around for OpenFOAM-5.0 and potentially later versions
             */
@@ -320,7 +321,7 @@ void gerhardsRecModel::readFieldSeries()
                 << exit(FatalError);
             }
         }
-        
+
         for (int i=0; i<surfaceScalarFieldNames_.size(); i++)
         {
             IOobject header
@@ -330,10 +331,10 @@ void gerhardsRecModel::readFieldSeries()
                 base_.mesh(),
                 IOobject::MUST_READ
             );
-            
+
             // Check if surfaceScalarFieldNames_[i] is a valid field
             /*
-                COMPAT: replace the method typeHeaderOk<volScalarField>(true) with headerOk() 
+                COMPAT: replace the method typeHeaderOk<volScalarField>(true) with headerOk()
                 for OpenFOAM versions prior to OpenFOAM-5.0
                 Do this the other way around for OpenFOAM-5.0 and potentially later versions
             */
@@ -344,21 +345,21 @@ void gerhardsRecModel::readFieldSeries()
                 << exit(FatalError);
             }
         }
-        
+
         // reset storageIndex_ to -1
         storageIndex_[timeIndexList_(recTime.timeName())] = -1;
     }
-    
+
     Info << "Checking fields done" << nl << endl;
-    
-    
+
+
     Info << "Reading fields for " << numDataBaseFields() << " dataBase slots\n" << endl;
-    
+
     size = numDataBaseFields();
     counter = 0;
     percentage = 0;
-    
-    
+
+
     label fieldCounter(0);
     for (instantList::iterator it=timeDirs.begin(); it != timeDirs.end(); ++it)
     {
@@ -377,15 +378,15 @@ void gerhardsRecModel::readFieldSeries()
         {
             continue;
         }
-        
+
         // skip zero
         if (skipZero_ and recTime.timeName() == "0")
         {
             if (verbose_)
-    	    {
-    	        Info << " ... skipping 0 in readTimeSeries()" << endl;
-    	    }
-            
+            {
+                Info << " ... skipping 0 in readTimeSeries()" << endl;
+            }
+
             continue;
         }
 
@@ -393,9 +394,9 @@ void gerhardsRecModel::readFieldSeries()
         {
             Info << "Reading fields at t = " << recTime.timeName() << endl;
         }
-        
+
         nrOfReadsFromDisk_++;
-        
+
         for (int i=0; i<volScalarFieldNames_.size(); i++)
         {
             volScalarFieldList_[i].set
@@ -415,7 +416,7 @@ void gerhardsRecModel::readFieldSeries()
                 )
             );
         }
-        
+
         for (int i=0; i<volVectorFieldNames_.size(); i++)
         {
             volVectorFieldList_[i].set
@@ -435,7 +436,7 @@ void gerhardsRecModel::readFieldSeries()
                 )
             );
         }
-        
+
         for (int i=0; i<surfaceScalarFieldNames_.size(); i++)
         {
             surfaceScalarFieldList_[i].set
@@ -455,21 +456,21 @@ void gerhardsRecModel::readFieldSeries()
                 )
             );
         }
-        
+
         // set storageIndex_
-        //  storageIndex_[index] translates the index of the snapshot 
+        //  storageIndex_[index] translates the index of the snapshot
         //  to an appropriate index of the dataBase
         storageIndex_[timeIndexList_(recTime.timeName())] = fieldCounter;
-        
-        
+
+
         fieldCounter++;
-        
+
         if (fieldCounter >= numDataBaseFields_)
         {
             break;
         }
     }
-    
+
     Info << "Reading fields done" << endl;
 }
 
@@ -480,55 +481,55 @@ void gerhardsRecModel::readTimeSeries()
     // fill the data structure for the time indices
     for (instantList::iterator it=timeDirs.begin(); it != timeDirs.end(); ++it)
     {
-    	// set run-time
-    	recTime.setTime(*it, it->value());
-    	
-    	
-    	// skip constant
-    	if (recTime.timeName() == "constant")
-    	{
-        	continue;
+        // set run-time
+        recTime.setTime(*it, it->value());
+
+
+        // skip constant
+        if (recTime.timeName() == "constant")
+        {
+                continue;
         }
-        
+
         // skip zero
         if (skipZero_ and recTime.timeName() == "0")
         {
             if (verbose_)
-    	    {
-    	        Info << " ... skipping 0 in readTimeSeries()" << endl;
-    	    }
-            
+            {
+                Info << " ... skipping 0 in readTimeSeries()" << endl;
+            }
+
             continue;
         }
-        
+
         if (firsttime)
         {
             firsttime = false;
             recStartTime_ = recTime.value();
         }
         recEndTime_ = recTime.value();
-        
+
         // insert the time name into the hash-table with a continuous second index
         timeIndexList_.insert(recTime.timeName(), contTimeIndex);
         revTimeIndexList_.insert(contTimeIndex, recTime.timeName());
-        
-        
+
+
         if (verbose_)
-    	{
-    		Info << "current time " << recTime.timeName() << endl;
-    		Info << "insert " << recTime.timeName() << " , " << contTimeIndex << endl;
-    	}
-        
-        
+        {
+            Info << "current time " << recTime.timeName() << endl;
+            Info << "insert " << recTime.timeName() << " , " << contTimeIndex << endl;
+        }
+
+
         // insert the time value
         timeValueList_.insert(contTimeIndex, recTime.timeOutputValue());
-        
+
         // increment continuousIndex
         contTimeIndex++;
-        
+
         if (verbose_)
-    	{
-        	Info << "contTimeIndex " << contTimeIndex << endl;
+        {
+            Info << "contTimeIndex " << contTimeIndex << endl;
         }
     }
 
@@ -552,12 +553,12 @@ void gerhardsRecModel::fetchStateForDataBase(label index)
         Info << "     storageUsageList_ : " << storageUsageList_ << endl;
         Info << "     storageIndex_ : " << storageIndex_ << endl;
     }
-    
+
     // decide which state to remove from the data base
     //  find maximum element in storageUsageList_, as it is the index of the least used state
     label oldIndex(0);
     label maxVal(0);
-    
+
     // find maximum value in storageUsageList_
     forAll(storageUsageList_, i)
     {
@@ -571,20 +572,20 @@ void gerhardsRecModel::fetchStateForDataBase(label index)
     {
         Info << " --> vacate dataBase  : " << oldIndex << endl;
     }
-    
+
     // read state for index from disk and put it into the data base
     readNewSnapshot(index, oldIndex);
-    
-    
+
+
     // reset storageIndex
-    //  the slot at oldIndex in the dataBase is replaced by the 
+    //  the slot at oldIndex in the dataBase is replaced by the
     //  snapshot for index
     storageIndex_[index] = storageIndex_[oldIndex];
     storageIndex_[oldIndex] = -1;
-    
+
     // update storageIndex
     updateStorageUsageList(index);
-    
+
     if (verboseVerbose_)
     {
         Info << " ... finished fetchStateForDataBase(" << index << ")" << endl;
@@ -602,11 +603,11 @@ void gerhardsRecModel::updateStorageUsageList(label index)
         Info << "     storageUsageList_ : " << storageUsageList_ << endl;
         Info << "   storageIndex_ : " << storageIndex_ << endl;
     }
-    
+
     label oldValue(storageUsageList_[index]);
-    
+
     /*
-        increment (make less recent) all elements more recent (smaller) 
+        increment (make less recent) all elements more recent (smaller)
         than the element at slot index
     */
     forAll(storageUsageList_, i)
@@ -616,10 +617,10 @@ void gerhardsRecModel::updateStorageUsageList(label index)
             storageUsageList_[i]++;
         }
     }
-    
+
     // storageUsageList_[index] is the most recently used element in dataBase
     storageUsageList_[index] = 1;
-    
+
     if (verboseVerbose_)
     {
         Info << " ... finished updateStorageUsageList(" << index << ")" << endl;
@@ -638,12 +639,12 @@ void gerhardsRecModel::readNewSnapshot(label index, label oldIndex)
         Info << "          storageUsageList_ : " << storageUsageList_ << endl;
         Info << "          storageIndex_ : " << storageIndex_ << nl << endl;
     }
-    
+
     /*
-        Replace all fields in the slot "oldIndex" of the dataBase with fields 
+        Replace all fields in the slot "oldIndex" of the dataBase with fields
         for the snapshot at "index"
     */
-    
+
     // vacate slot
     for (int i=0; i<volScalarFieldNames_.size(); i++)
     {
@@ -657,27 +658,27 @@ void gerhardsRecModel::readNewSnapshot(label index, label oldIndex)
     {
         surfaceScalarFieldList_[i][storageIndex_[oldIndex]].clear();
     }
-    
-    
+
+
     // build path to read from
     word readPath(dataBaseName_+"/"+timeDirs[index].name());
-    
+
     if (dataBaseName_ == ".")
     {
         readPath = timeDirs[index].name();
     }
-    
+
     nrOfReadsFromDisk_++;
-    
+
     // repopulate slot
     for (int i=0; i<volScalarFieldNames_.size(); i++)
     {
         if (verboseVerbose_)
         {
-            Info << " .... reading " << volScalarFieldNames_[i] << " at time " 
+            Info << " .... reading " << volScalarFieldNames_[i] << " at time "
                 << timeDirs[index] << endl;
         }
-        
+
         volScalarFieldList_[i].set
         (
             storageIndex_[oldIndex],
@@ -695,7 +696,7 @@ void gerhardsRecModel::readNewSnapshot(label index, label oldIndex)
             )
         );
     }
-        
+
     for (int i=0; i<volVectorFieldNames_.size(); i++)
     {
         volVectorFieldList_[i].set
@@ -715,7 +716,7 @@ void gerhardsRecModel::readNewSnapshot(label index, label oldIndex)
             )
         );
     }
-    
+
     for (int i=0; i<surfaceScalarFieldNames_.size(); i++)
     {
         surfaceScalarFieldList_[i].set
@@ -741,19 +742,19 @@ void gerhardsRecModel::readNewSnapshot(label index, label oldIndex)
 
 
 
-void gerhardsRecModel::exportVolScalarField(word fieldname, volScalarField& field) 
+void gerhardsRecModel::exportVolScalarField(word fieldname, volScalarField& field)
 {
     field = exportVolScalarField(fieldname, virtualTimeIndex);
 }
 
 
-void gerhardsRecModel::exportVolVectorField(word fieldname, volVectorField& field) 
+void gerhardsRecModel::exportVolVectorField(word fieldname, volVectorField& field)
 {
     field = exportVolVectorField(fieldname, virtualTimeIndex);
 }
 
 
-void gerhardsRecModel::exportSurfaceScalarField(word fieldname, surfaceScalarField& field) 
+void gerhardsRecModel::exportSurfaceScalarField(word fieldname, surfaceScalarField& field)
 {
     field = exportSurfaceScalarField(fieldname, virtualTimeIndex);
 }
@@ -761,20 +762,20 @@ void gerhardsRecModel::exportSurfaceScalarField(word fieldname, surfaceScalarFie
 
 
 
-const volScalarField& gerhardsRecModel::exportVolScalarField(word fieldname, label index) 
+const volScalarField& gerhardsRecModel::exportVolScalarField(word fieldname, label index)
 {
     const label fieldI = getVolScalarFieldIndex(fieldname, index);
-    
+
     if (verboseVerbose_)
     {
         Info << nl << " ... calling exportVolScalarField(" << fieldname << ", " << index << ")" << endl;
     }
-    
+
     if (numDataBaseFields_ == numRecFields_)
     {
         return volScalarFieldList_[fieldI][index];
     }
-    
+
     // check whether field with index is in the dataBase
     //  translate index to storageIndex
     if (storageIndex_[index] < 0)
@@ -791,21 +792,21 @@ const volScalarField& gerhardsRecModel::exportVolScalarField(word fieldname, lab
 
 
 
-const volVectorField& gerhardsRecModel::exportVolVectorField(word fieldname, label index) 
+const volVectorField& gerhardsRecModel::exportVolVectorField(word fieldname, label index)
 {
     const label fieldI = getVolVectorFieldIndex(fieldname, index);
-    
+
     if (verboseVerbose_)
     {
         Info << nl << " ... calling exportVolVectorField(" << fieldname << ", " << index << ")" << endl;
     }
-    
+
     if (numDataBaseFields_ == numRecFields_)
     {
         return volVectorFieldList_[fieldI][index];
     }
-    
-    
+
+
     // check whether field with index is in the dataBase
     //  translate intex to storageIndex
     if (storageIndex_[index] < 0)
@@ -820,15 +821,15 @@ const volVectorField& gerhardsRecModel::exportVolVectorField(word fieldname, lab
     return volVectorFieldList_[fieldI][storageIndex_[index]];
 }
 
-const surfaceScalarField& gerhardsRecModel::exportSurfaceScalarField(word fieldname, label index) 
+const surfaceScalarField& gerhardsRecModel::exportSurfaceScalarField(word fieldname, label index)
 {
     const label fieldI = getSurfaceScalarFieldIndex(fieldname, index);
-    
+
     if (numDataBaseFields_ == numRecFields_)
     {
         return surfaceScalarFieldList_[fieldI][index];
     }
-    
+
     // check whether field with index is in the dataBase
     //  translate intex to storageIndex
     if (storageIndex_[index] < 0)
@@ -860,12 +861,12 @@ const HashTable<label,word>& gerhardsRecModel::timeIndexList() const
 
 label gerhardsRecModel::lowerSeqLim() const
 {
-    return lowerSeqLim_; 
+    return lowerSeqLim_;
 }
 
 label gerhardsRecModel::upperSeqLim() const
 {
-    return upperSeqLim_; 
+    return upperSeqLim_;
 }
 
 
@@ -893,7 +894,7 @@ void gerhardsRecModel::updateRecFields()
 
     if (verbose_)
     {
-        Info << "\nUpdating virtual time index to " << virtualTimeIndex << ".\n" << endl;  
+        Info << "\nUpdating virtual time index to " << virtualTimeIndex << ".\n" << endl;
     }
 }
 
@@ -904,7 +905,7 @@ void gerhardsRecModel::writeRecMatrix() const
         << "Nr. of reads from disk : " << nrOfReadsFromDisk_
         << "; compared to a theoretical minimum of "
         << numRecFields() << " reads." << endl;
-    
+
     OFstream matrixFile("recurrenceMatrix");
     matrixFile << recurrenceMatrix_;
 }
@@ -917,7 +918,7 @@ Switch gerhardsRecModel::checkSkipZero()
     if (skipZero_)
     {
         bool foundZero(false);
-        
+
         forAll(timeDirs, i)
         {
             if (timeDirs[i].value() == 0)
@@ -925,13 +926,13 @@ Switch gerhardsRecModel::checkSkipZero()
                 foundZero = true;
             }
         }
-        
+
         if (not foundZero)
         {
             skipZero_ = false;
         }
     }
-    
+
     return skipZero_;
 }
 
@@ -946,17 +947,17 @@ Switch gerhardsRecModel::checkSkipZero()
 //     }
 //     else
 //     {
-//         timeIndex = index; 
+//         timeIndex = index;
 //     }
 //     const label fieldI = getSurfaceScalarFieldIndex(fieldname, timeIndex);
-//     
+//
 //     tmp<surfaceScalarField> tAveragedSurfaceScalarField(surfaceScalarFieldList_[fieldI][timeIndex]);
-//     
+//
 //     label counter = 1;
 //     scalar recErr;
 //     label delay = 10;
 //     label lastMin = -1000;
-//     
+//
 //     for(int runningTimeIndex = 1; runningTimeIndex < numRecFields_-1 ; runningTimeIndex++)
 //     {
 //         recErr = recurrenceMatrix_[timeIndex][runningTimeIndex];
@@ -965,12 +966,12 @@ Switch gerhardsRecModel::checkSkipZero()
 //         if(recErr > recurrenceMatrix_[timeIndex][runningTimeIndex+1]) continue;
 //         if(abs(runningTimeIndex - timeIndex) < delay) continue;
 //         if(abs(runningTimeIndex - lastMin) < delay) continue;
-// 
+//
 //         lastMin = runningTimeIndex;
 //         counter++;
 //         tAveragedSurfaceScalarField += surfaceScalarFieldList_[fieldI][runningTimeIndex];
 //     }
-//     
+//
 //     tAveragedSurfaceScalarField /= counter;
 //     return tAveragedSurfaceScalarField;
 // }
@@ -984,12 +985,12 @@ Switch gerhardsRecModel::checkSkipZero()
     }
     else
     {
-        timeIndex = index; 
+        timeIndex = index;
     }
     const label fieldI = getVolVectorFieldIndex(fieldname, timeIndex);
-    
+
     smoothfield = volVectorFieldList_[fieldI][timeIndex];
-     
+
     label counter = 1;
     scalar recErr;
     label delay = 1;
@@ -1012,11 +1013,6 @@ Switch gerhardsRecModel::checkSkipZero()
     smoothfield /= counter;
 }
 */
-
-
-
-
-
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

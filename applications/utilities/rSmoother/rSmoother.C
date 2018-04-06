@@ -1,6 +1,6 @@
 /*---------------------------------------------------------------------------*\
     CFDEMcoupling academic - Open Source CFD-DEM coupling
-    
+
     Contributing authors:
     Thomas Lichtenegger
     Copyright (C) 2015- Johannes Kepler University, Linz
@@ -27,7 +27,6 @@ Application
 Description
     Loops over all recurrence times and averages fields over given similarity range
 
-
 \*---------------------------------------------------------------------------*/
 
  #include "fvCFD.H"
@@ -46,8 +45,8 @@ int main(int argc, char *argv[])
     #include "createMesh.H"
     #include "createControl.H"
     #include "createFields.H"
-  
- 
+
+
     recBase recurrenceBase(mesh);
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -59,8 +58,8 @@ int main(int argc, char *argv[])
     if (abs(runTime.startTime().value() - recurrenceBase.recM().recStartTime()) > 1e-5)
     {
         Info << "Stopping. Start time and database start time are different." << endl;
-	Info << "Start time = " << runTime.startTime().value() << endl;
-	Info << "Database start time = " << recurrenceBase.recM().recStartTime() << endl;
+        Info << "Start time = " << runTime.startTime().value() << endl;
+        Info << "Database start time = " << recurrenceBase.recM().recStartTime() << endl;
         return 0;
     }
 
@@ -72,17 +71,17 @@ int main(int argc, char *argv[])
 
     label index = -1;
 
-    Info<< "\nSmoothing recurrence statistics\n" << endl;
-    
+    Info << "\nSmoothing recurrence statistics\n" << endl;
+
     while (runTime.run())
     {
         // runtime can't be larger than recurrence database size
         index = runTime.timeIndex();
-	#include "updateFields.H"
+        #include "updateFields.H"
         runTime++;
     }
 
-    Info<< "End\n" << endl;
+    Info << "End\n" << endl;
 
     return 0;
 }

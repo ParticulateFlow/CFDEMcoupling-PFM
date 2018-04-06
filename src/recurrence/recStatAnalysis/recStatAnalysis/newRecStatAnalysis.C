@@ -1,6 +1,6 @@
 /*---------------------------------------------------------------------------*\
     CFDEMcoupling academic - Open Source CFD-DEM coupling
-    
+
     Contributing authors:
     Thomas Lichtenegger, Gerhard Holzinger
     Copyright (C) 2015- Johannes Kepler University, Linz
@@ -23,7 +23,6 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "error.H"
-
 #include "recStatAnalysis.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -44,7 +43,7 @@ autoPtr<recStatAnalysis> recStatAnalysis::New
         dict.lookupOrDefault<word>("recStatAnalysis","off")
     );
 
-    Info<< "Selecting recStatAnalysis "
+    Info << "Selecting recStatAnalysis "
          << recStatAnalysisType << endl;
 
 
@@ -61,7 +60,7 @@ autoPtr<recStatAnalysis> recStatAnalysis::New
             << ", constructor not in hash table" << endl << endl
             << "    Valid recStatAnalysis types are :"
             << endl;
-        Info<< dictionaryConstructorTablePtr_->toc()
+        Info << dictionaryConstructorTablePtr_->toc()
             << abort(FatalError);
     }
 

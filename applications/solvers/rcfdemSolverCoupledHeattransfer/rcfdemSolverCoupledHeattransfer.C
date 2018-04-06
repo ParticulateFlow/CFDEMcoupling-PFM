@@ -1,6 +1,6 @@
 /*---------------------------------------------------------------------------*\
     CFDEMcoupling academic - Open Source CFD-DEM coupling
-    
+
     Contributing authors:
     Thomas Lichtenegger
     Copyright (C) 2015- Johannes Kepler University, Linz
@@ -26,7 +26,6 @@ Application
 
 Description
     Solves heat transfer between fluid and particles based on rCFD
-
 
 \*---------------------------------------------------------------------------*/
 
@@ -65,7 +64,7 @@ int main(int argc, char *argv[])
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-    Info<< "\nCalculating particle trajectories based on recurrence statistics\n" << endl;
+    Info << "\nCalculating particle trajectories based on recurrence statistics\n" << endl;
 
     label recTimeIndex = 0;
     scalar recTimeStep = recurrenceBase.recM().recTimeStep();
@@ -89,7 +88,7 @@ int main(int argc, char *argv[])
         // do stuff (every lagrangian time step)
         particleCloud.clockM().start(1,"Global");
 
-        Info<< "Time = " << runTime.timeName() << nl << endl;
+        Info << "Time = " << runTime.timeName() << nl << endl;
 
         particleCloud.clockM().start(2,"Coupling");
 
@@ -97,16 +96,16 @@ int main(int argc, char *argv[])
 
         particleCloud.clockM().stop("Coupling");
 
-	particleCloud.clockM().start(26,"Flow");
+        particleCloud.clockM().start(26,"Flow");
         #include "updateRho.H"
         #include "TEqImp.H"
-	particleCloud.clockM().stop("Flow");
+        particleCloud.clockM().stop("Flow");
 
-	particleCloud.clockM().start(32,"ReadFields");
+        particleCloud.clockM().start(32,"ReadFields");
         if ( runTime.timeOutputValue() - startTime - (recTimeIndex+1)*recTimeStep + 1.0e-5 > 0.0 )
         {
             recurrenceBase.updateRecFields();
-	    #include "updateFields.H"
+            #include "updateFields.H"
             recTimeIndex++;
         }
         particleCloud.clockM().stop("ReadFields");
@@ -117,13 +116,13 @@ int main(int argc, char *argv[])
 
         particleCloud.clockM().stop("Global");
 
-        Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
-        << "  ClockTime = " << runTime.elapsedClockTime() << " s"
-        << nl << endl;
+        Info << "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
+             << "  ClockTime = " << runTime.elapsedClockTime() << " s"
+             << nl << endl;
 
     }
 
-    Info<< "End\n" << endl;
+    Info << "End\n" << endl;
 
     return 0;
 }

@@ -1,6 +1,6 @@
 /*---------------------------------------------------------------------------*\
     CFDEMcoupling academic - Open Source CFD-DEM coupling
-    
+
     Contributing authors:
     Thomas Lichtenegger
     Copyright (C) 2015- Johannes Kepler University, Linz
@@ -23,7 +23,6 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "error.H"
-
 #include "recNorm.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -44,7 +43,7 @@ autoPtr<recNorm> recNorm::New
         dict.lookup("recNorm")
     );
 
-    Info<< "Selecting recNorm "
+    Info << "Selecting recNorm "
          << recNormType << endl;
 
 
@@ -61,7 +60,7 @@ autoPtr<recNorm> recNorm::New
             << ", constructor not in hash table" << endl << endl
             << "    Valid recNorm types are :"
             << endl;
-        Info<< dictionaryConstructorTablePtr_->toc()
+        Info << dictionaryConstructorTablePtr_->toc()
             << abort(FatalError);
     }
 

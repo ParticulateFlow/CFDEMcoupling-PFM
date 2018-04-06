@@ -1,6 +1,6 @@
 /*---------------------------------------------------------------------------*\
     CFDEMcoupling academic - Open Source CFD-DEM coupling
-    
+
     Contributing authors:
     Thomas Lichtenegger
     Copyright (C) 2015- Johannes Kepler University, Linz
@@ -44,17 +44,17 @@ protected:
 
     // Protected data
     recBase& base_;
-    
+
     const dictionary& recProperties_;
-    
+
     bool verbose_;
-    
+
     virtual void computeRecMatrix() = 0;
-    
-   
+
+
 
 public:
-  
+
     friend class recBase;
 
     //- Runtime type information
@@ -97,8 +97,8 @@ public:
             const dictionary& dict,
             recBase& base
         );
-    
-  
+
+
 };
 
 

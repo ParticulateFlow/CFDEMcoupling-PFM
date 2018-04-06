@@ -1,6 +1,6 @@
 /*---------------------------------------------------------------------------*\
     CFDEMcoupling academic - Open Source CFD-DEM coupling
-    
+
     Contributing authors:
     Thomas Lichtenegger
     Copyright (C) 2015- Johannes Kepler University, Linz
@@ -64,22 +64,22 @@ MarkovPath::MarkovPath
     Pjump_(0.0),
     intervalWeights_(propsDict_.lookupOrDefault<scalarList>("intervalWeights",scalarList(numIntervals_,1.0))),
     intervalWeightsCumulative_(intervalWeights_)
-{    
+{
     for(int i=0;i<numIntervals_;i++)
     {
         intervalSizes_[i] = base.recM().numRecFields(i);
     }
-    
+
     if(meanIntervalSteps_<0)
     {
         // if no mean interval length for consecutive steps is specified, use 1/5 from first interval
         meanIntervalSteps_ = static_cast<label>(0.2 * intervalSizes_[0]);
     }
-    
+
     // normalize weights and create cumulative distribution
     weightsNormalization();
     weightsCumulation();
-    
+
     for(int i=0;i<numIntervals_;i++)
     {
         scalar sum1 = 0.0;
@@ -89,7 +89,7 @@ MarkovPath::MarkovPath
         }
         intervalSizesCumulative_[i] = sum1;
     }
-    
+
     // given a jump probability of P, the probability of finding a chain of length N is
     // P(N) = (1 - P)^N * P, and the mean length E(N) = (1 - P) / P
     Pjump_ = 1.0 / (1 + meanIntervalSteps_);
@@ -105,7 +105,7 @@ MarkovPath::~MarkovPath()
 void MarkovPath::getRecPath()
 {
     label numRecIntervals = 0;
-    
+
     if (Pstream::master())
     {
         computeRecPath();
@@ -114,14 +114,14 @@ void MarkovPath::getRecPath()
 
     Pstream::scatter(numRecIntervals);
     Pstream::scatter(recSteps_);
-    
+
     if (not Pstream::master())
     {
         virtualTimeIndexList_.setSize(numRecIntervals);
     }
-    
+
     Pstream::scatter(virtualTimeIndexList_);
-    
+
     if (verbose_)
     {
         Info << "\nRecurrence path communicated to all processors.\n" << endl;
@@ -133,17 +133,17 @@ void MarkovPath::computeRecPath()
 {
     if(base_.recM().totRecSteps() == 1)
     {
-        Info<< "\nPrimitive recurrence path with one element.\n" << endl;
+        Info << "\nPrimitive recurrence path with one element.\n" << endl;
         return;
     }
-   
+
     // extend path if
     // a) it does already exist --> add a single interval
     // b) it does not exist yet --> until number of initial steps is reached
     if(recSteps_ > base_.recM().totRecSteps() )
     {
         extendPath();
-	base_.recM().writeRecPathLastInterval();
+        base_.recM().writeRecPathLastInterval();
         Info << "\nExtending recurrence path done\n" << endl;
         return;
     }
@@ -152,19 +152,19 @@ void MarkovPath::computeRecPath()
     {
         extendPath();
     }
-    Info<< "\nComputing recurrence path done\n" << endl;
+    Info << "\nComputing recurrence path done\n" << endl;
 }
 
 void MarkovPath::extendPath()
 {
     Random ranGen(osRandomInteger());
-    
+
     SymmetricSquareMatrix<scalar>& recurrenceMatrix( base_.recM().recurrenceMatrix() );
-    
+
     label seqStart=0;
     label seqEnd=0;
     label virtualTimeIndex=0;
-    
+
     // if previous intervals exist, perform a jump, otherwise start with step 0
     if(virtualTimeIndexList_.size() > 0 )
     {
@@ -172,7 +172,7 @@ void MarkovPath::extendPath()
 
         // jump to similar state in same or other database
         scalar randInterval = ranGen.scalar01();
-    
+
         label interval = numIntervals_-1;
         for(int i = numIntervals_-2 ;i >= 0; i--)
         {
@@ -182,7 +182,7 @@ void MarkovPath::extendPath()
         label startLoop = 0;
         if (interval > 0) startLoop = intervalSizesCumulative_[interval-1];
         label endLoop = intervalSizesCumulative_[interval] - meanIntervalSteps_;
-    
+
         scalar nextMinimum(GREAT);
         for (label j = startLoop; j <= endLoop; j++)
         {
@@ -193,10 +193,10 @@ void MarkovPath::extendPath()
                 seqStart = j+1;
             }
         }
-    
+
         virtualTimeIndex = seqStart;
     }
-    
+
     // take a series of consecutive steps
     bool takeAnotherStep = true;
     while(takeAnotherStep)
@@ -208,14 +208,14 @@ void MarkovPath::extendPath()
         {
             if (intervalSizesCumulative_[i] - 1 == virtualTimeIndex) takeAnotherStep=false;
         }
-        
+
         // take another step according to jump probability?
         scalar randJump = ranGen.scalar01();
         if (randJump < Pjump_) takeAnotherStep=false;
     }
-    
+
     seqEnd = virtualTimeIndex;
-    
+
     // add interval to recurrence path
     labelPair seqStartEnd(seqStart,seqEnd);
     virtualTimeIndexList_.append(seqStartEnd);
@@ -244,7 +244,7 @@ void MarkovPath::weightsNormalization()
     {
         wsum += intervalWeights_[i];
     }
-    
+
     for(int i=0;i<numIntervals_;i++)
     {
         intervalWeights_[i] /= wsum;
@@ -259,13 +259,13 @@ void MarkovPath::updateIntervalWeights(scalarList newWeights)
     {
         FatalError <<"more weights than databases specified\n" << abort(FatalError);
     }
-    
+
     for(int i=0; i<numIntervals_; i++)
     {
         if (i < newWeights.size()) intervalWeights_[i] = newWeights[i];
         else intervalWeights_[i] = 0.0;
     }
-    
+
     weightsNormalization();
     weightsCumulation();
 }

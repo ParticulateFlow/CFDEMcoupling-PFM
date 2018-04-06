@@ -1,6 +1,6 @@
 /*---------------------------------------------------------------------------*\
     CFDEMcoupling academic - Open Source CFD-DEM coupling
-    
+
     Contributing authors:
     Thomas Lichtenegger
     Copyright (C) 2015- Johannes Kepler University, Linz
@@ -75,9 +75,9 @@ recBase::recBase
     ),
     recStatAnalysis_
     (
-	recStatAnalysis::New
-	(
-	    recProperties_,
+        recStatAnalysis::New
+        (
+            recProperties_,
             *this
         )
     ),
@@ -86,10 +86,10 @@ recBase::recBase
   recModel_        ->  readFieldSeries();
   recNorm_         ->  computeRecMatrix();
   recPath_         ->  getRecPath();
- 
+
   recModel_        ->  init();
-  
-  recModel_        ->  writeRecMatrix();    
+
+  recModel_        ->  writeRecMatrix();
   recModel_        ->  writeRecPath();
 }
 
@@ -116,7 +116,7 @@ recPath& recBase::recP()
 
 recStatAnalysis& recBase::recStatA()
 {
-   return recStatAnalysis_(); 
+   return recStatAnalysis_();
 }
 
 void recBase::extendPath()
@@ -126,7 +126,7 @@ void recBase::extendPath()
 
 void recBase::updateRecFields()
 {
-    recModel_->updateRecFields(); 
+    recModel_->updateRecFields();
 }
 
 label recBase::couplingSubStep() const

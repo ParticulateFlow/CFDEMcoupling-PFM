@@ -1,6 +1,6 @@
 /*---------------------------------------------------------------------------*\
     CFDEMcoupling academic - Open Source CFD-DEM coupling
-    
+
     Contributing authors:
     Thomas Lichtenegger
     Copyright (C) 2015- Johannes Kepler University, Linz
@@ -48,16 +48,15 @@ protected:
     // Protected data
 
     dictionary propsDict_;
-    
+
     void getRecPath();
 
     void computeRecPath();
-    
+
     void computeJumpVector();
-    
+
     label seqEnd(label, label&);
-    
-   
+
 
 public:
 
@@ -80,8 +79,8 @@ public:
 
 
     // Member Functions
-    
-  
+
+
 };
 
 

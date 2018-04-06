@@ -1,5 +1,5 @@
     // dummy fields
-    Info<< "\nCreating dummy pressure field\n" << endl;
+    Info << "\nCreating dummy pressure field\n" << endl;
     volScalarField pRec
     (
         IOobject
@@ -12,11 +12,10 @@
         ),
         mesh
     );
-    
 
     // recurrence fields
-    Info<< "\nCreating recurrence fields.\n" << endl;
-    
+    Info << "\nCreating recurrence fields.\n" << endl;
+
     volScalarField rhoRec
     (
         IOobject
@@ -30,7 +29,7 @@
         mesh//,
         //dimensionedScalar("rhoRec", dimensionSet(1, -3, 0, 0, 0), 1.0)
     );
-    
+
     volVectorField URec
     (
         IOobject
@@ -43,7 +42,7 @@
         ),
         mesh
     );
-    
+
     volScalarField voidfractionRec
     (
         IOobject
@@ -56,7 +55,7 @@
         ),
         mesh
     );
-    
+
     volVectorField UsRec
     (
         IOobject
@@ -69,10 +68,10 @@
         ),
         mesh
     );
-    
+
     // heat transfer fields
-    Info<< "\nCreating heat transfer fields.\n" << endl;
-    
+    Info << "\nCreating heat transfer fields.\n" << endl;
+
     volScalarField Qsource
     (
         IOobject
@@ -86,9 +85,10 @@
         mesh,
         dimensionedScalar("zero", dimensionSet(1,-1,-3,0,0,0,0), 0.0)
     );
-    
+
     volScalarField QCoeff
-    (   IOobject
+    (
+        IOobject
         (
             "QCoeff",
             runTime.timeName(),
@@ -99,7 +99,7 @@
         mesh,
         dimensionedScalar("zero", dimensionSet(1,-1,-3,-1,0,0,0), 0.0)
     );
-    
+
     volScalarField thCond
     (
         IOobject
@@ -113,7 +113,7 @@
         mesh,
         dimensionedScalar("zero", dimensionSet(1,1,-3,-1,0,0,0), 0.0)
     );
-    
+
     volScalarField T
     (
         IOobject
@@ -128,7 +128,7 @@
     );
 
     // calculated fields
-    Info<< "\nCreating fields subject to calculation\n" << endl;
+    Info << "\nCreating fields subject to calculation\n" << endl;
     volScalarField voidfraction
     (
         IOobject
@@ -141,7 +141,7 @@
         ),
         voidfractionRec
     );
-        
+
     volVectorField Us
     (
         IOobject
@@ -154,14 +154,14 @@
         ),
         UsRec
     );
-    
+
     // write fields for t=t_start
     voidfraction.write();
     Us.write();
 //===============================
 
 
-    Info<< "Calculating face flux field phiRec\n" << endl;
+    Info << "Calculating face flux field phiRec\n" << endl;
     surfaceScalarField phiRec
     (
         IOobject
@@ -176,15 +176,15 @@
     );
     phiRec.write();
 
- 
+
     singlePhaseTransportModel laminarTransport(URec, phiRec);
 
     autoPtr<incompressible::turbulenceModel> turbulence
     (
         incompressible::turbulenceModel::New(URec, phiRec, laminarTransport)
     );
-    
-    
+
+
     volScalarField addSource
     (
         IOobject
@@ -198,6 +198,6 @@
         mesh,
         dimensionedScalar("zero", dimensionSet(1,-1,-3,0,0,0,0), 0.0)
     );
-    
-    Info<< "Creating field kinetic energy K\n" << endl;
+
+    Info << "Creating field kinetic energy K\n" << endl;
     volScalarField K("K", 0.5*magSqr(URec));

@@ -1,6 +1,6 @@
 /*---------------------------------------------------------------------------*\
     CFDEMcoupling academic - Open Source CFD-DEM coupling
-    
+
     Contributing authors:
     Thomas Lichtenegger
     Copyright (C) 2015- Johannes Kepler University, Linz
@@ -27,7 +27,6 @@ Application
 Description
     Creates and analyzes a recurrence statistics
 
-
 \*---------------------------------------------------------------------------*/
 
 // #include "fvCFD.H"
@@ -39,8 +38,6 @@ Description
 #include "recStatAnalysis.H"
 
 
-
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 int main(int argc, char *argv[])
@@ -50,18 +47,18 @@ int main(int argc, char *argv[])
     #include "createTime.H"
     #include "createMesh.H"
     #include "createControl.H"
-  
- 
+
+
     recBase recurrenceBase(mesh);
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-    Info<< "\nAnalyzing recurrence statistics\n" << endl;
-    
+    Info << "\nAnalyzing recurrence statistics\n" << endl;
+
     recurrenceBase.recStatA().init();
     recurrenceBase.recStatA().statistics();
 
-    Info<< "End\n" << endl;
+    Info << "End\n" << endl;
 
     return 0;
 }

@@ -1,6 +1,6 @@
 /*---------------------------------------------------------------------------*\
     CFDEMcoupling academic - Open Source CFD-DEM coupling
-    
+
     Contributing authors:
     Thomas Lichtenegger
     Copyright (C) 2015- Johannes Kepler University, Linz
@@ -79,26 +79,26 @@ void sqrDiffNorm::computeRecMatrix()
 
     /*
         total number of computed elements: total number of matrix entries
-            minus the main diagonal entries, divided by two, 
+            minus the main diagonal entries, divided by two,
             since the matrix is symmetric
     */
     label size = (totNumRecSteps*(totNumRecSteps-1))/2;
     label counter = 0;
     label percentage = 0;
-    
-    
+
+
     label N(this->base_.recM().numRecFields());
     label M(this->base_.recM().numDataBaseFields());
-    
+
     if (verbose_)
     {
         Info << " N = " << N << ",  M = " << M << endl;
     }
-    
+
     label ti(0);
     label tj(0);
     label tmp(-1);
-    
+
     for (int j=0; j<=N/(M-1); j++)
     {
         for (int i=0; i<totNumRecSteps; i++)
@@ -107,32 +107,31 @@ void sqrDiffNorm::computeRecMatrix()
             {
                 Info << " i = " << i << ",  j = " << j << endl;
             }
-            
+
             if(counter >= 0.1 * percentage * size)
-	        {
-	            Info << "\t" << 10 * percentage << " \% done" << endl;
-	            percentage++;
-	        }
-	        
-            
+            {
+                Info << "\t" << 10 * percentage << " \% done" << endl;
+                percentage++;
+            }
+
             for (int k=i; k<i+(M-1); k++)
             {
                 ti = i;
                 tj = j*(M-1) + k;
-                
+
                 if (ti > tj)
                 {
                     tmp = ti;
                     ti = tj;
                     tj = tmp;
                 }
-                
-                // skip coordinates outside the recurrence space                
+
+                // skip coordinates outside the recurrence space
                 if (ti >= N or tj >= N)
                 {
                     continue;
                 }
-                
+
                 // start
                 // skip main diagonal and upper half
                 if (ti >= tj)
@@ -140,13 +139,13 @@ void sqrDiffNorm::computeRecMatrix()
                     recurrenceMatrix[ti][tj] = 0;
                     continue;
                 }
-                
+
                 if (verbose_)
                 {
-                    Info << " Doing calculation for element " 
+                    Info << " Doing calculation for element "
                         << ti << " " << tj << endl;
                 }
-                
+
                 counter++;
 
                 // compute elements
@@ -165,7 +164,7 @@ void sqrDiffNorm::computeRecMatrix()
                 else
                 {
                     FatalError
-                        << "sqrDiffNorm: Unknown field type " << fieldType_ 
+                        << "sqrDiffNorm: Unknown field type " << fieldType_
                         << abort(FatalError);
                 }
 
@@ -179,18 +178,17 @@ void sqrDiffNorm::computeRecMatrix()
             }
         }
     }
-    
 
 
     // normalize matrix and copy lower to upper half
     if(normConstant_ > 0.0) maxNormIJ = normConstant_;
-    
+
     for(label ti=0;ti<totNumRecSteps;ti++)
     {
         for(label tj=0;tj<totNumRecSteps;tj++)
         {
             if (ti >= tj) continue;
-            
+
             if (recurrenceMatrix[ti][tj] < 0)
             {
                 FatalErrorInFunction << "Error in computation of recurrence matrix!"
@@ -211,7 +209,7 @@ scalar sqrDiffNorm::normVSF(label ti, label tj)
     const volScalarField& t1( base_.recM().exportVolScalarField(fieldName_,ti) );
     const volScalarField& t2( base_.recM().exportVolScalarField(fieldName_,tj) );
     dimensionedScalar tNorm( fvc::domainIntegrate( sqr( t1 - t2 ) ) );
-    
+
     return tNorm.value();
 }
 
@@ -220,7 +218,7 @@ scalar sqrDiffNorm::normVVF(label ti, label tj)
     const volVectorField& t1( base_.recM().exportVolVectorField(fieldName_,ti) );
     const volVectorField& t2( base_.recM().exportVolVectorField(fieldName_,tj) );
     dimensionedScalar tNorm( fvc::domainIntegrate( magSqr( t1 - t2 ) ) );
-    
+
     return tNorm.value();
 }
 
@@ -230,7 +228,7 @@ scalar sqrDiffNorm::normSSF(label ti, label tj)
     const surfaceScalarField& t2( base_.recM().exportSurfaceScalarField(fieldName_,tj) );
     volVectorField t12 (fvc::reconstruct( t1-t2 ) );
     dimensionedScalar tNorm( fvc::domainIntegrate( magSqr( t12 ) ) );
-    
+
     return tNorm.value();
 }
 

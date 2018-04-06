@@ -1,6 +1,6 @@
 /*---------------------------------------------------------------------------*\
     CFDEMcoupling academic - Open Source CFD-DEM coupling
-    
+
     Contributing authors:
     Thomas Lichtenegger
     Copyright (C) 2015- Johannes Kepler University, Linz
@@ -20,7 +20,7 @@ License
 
     You should have received a copy of the GNU General Public License
     along with CFDEMcoupling academic.  If not, see <http://www.gnu.org/licenses/>.
-    
+
 Description
     A recurrence database consisting of N separate intervals is assumed with separation
     times t0 (start time), t1, ... tN (end time) and weights w0, ... wN-1.
@@ -48,33 +48,33 @@ protected:
     // Protected data
 
     dictionary propsDict_;
-    
+
     void extendPath();
-    
+
     void getRecPath();
 
     void computeRecPath();
-    
+
     void weightsCumulation();
-    
+
     void weightsNormalization();
 
     label meanIntervalSteps_;
-    
+
     label numIntervals_;
-    
+
     label recSteps_;
-    
+
     labelList intervalSizes_;
-    
+
     labelList intervalSizesCumulative_;
-    
+
     scalar Pjump_;
-    
+
     scalarList intervalWeights_;
-    
+
     scalarList intervalWeightsCumulative_;
-    
+
 
 public:
 
@@ -99,7 +99,7 @@ public:
     // Member Functions
 
     void updateIntervalWeights(scalarList);
-  
+
 };
 
 

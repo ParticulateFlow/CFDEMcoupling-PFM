@@ -1,6 +1,6 @@
 /*---------------------------------------------------------------------------*\
     CFDEMcoupling academic - Open Source CFD-DEM coupling
-    
+
     Contributing authors:
     Thomas Lichtenegger, Gerhard Holzinger
     Copyright (C) 2015- Johannes Kepler University, Linz
@@ -29,9 +29,9 @@ Description
     Test-bed for a solver based on recurrence statistics
 
 Rules
-	Solution data to compute the recurrence statistics from, needs to 
-		reside in $CASE_ROOT/dataBase
-	Time step data in dataBase needs to be evenly spaced in time
+    Solution data to compute the recurrence statistics from, needs to
+        reside in $CASE_ROOT/dataBase
+    Time step data in dataBase needs to be evenly spaced in time
 
 \*---------------------------------------------------------------------------*/
 
@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-    Info<< "\nCalculating particle trajectories based on recurrence statistics\n" << endl;
+    Info << "\nCalculating particle trajectories based on recurrence statistics\n" << endl;
 
     label recTimeIndex = 0;
     scalar recTimeStep = recurrenceBase.recM().recTimeStep();
@@ -77,7 +77,7 @@ int main(int argc, char *argv[])
         // do stuff (every lagrangian time step)
         particleCloud.clockM().start(1,"Global");
 
-        Info<< "Time = " << runTime.timeName() << nl << endl;
+        Info << "Time = " << runTime.timeName() << nl << endl;
 
         particleCloud.clockM().start(2,"Coupling");
 
@@ -89,23 +89,23 @@ int main(int argc, char *argv[])
         if ( runTime.timeOutputValue() - startTime - (recTimeIndex+1)*recTimeStep + 1.0e-5 > 0.0 )
         {
             recurrenceBase.updateRecFields();
-	    #include "readFields.H"
+            #include "readFields.H"
             recTimeIndex++;
         }
 
         particleCloud.clockM().start(27,"Output");
         runTime.write();
-        particleCloud.clockM().stop("Output");	
+        particleCloud.clockM().stop("Output");
 
         particleCloud.clockM().stop("Global");
-        
-        Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
-        << "  ClockTime = " << runTime.elapsedClockTime() << " s"
-        << nl << endl;
-        
+
+        Info << "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
+             << "  ClockTime = " << runTime.elapsedClockTime() << " s"
+             << nl << endl;
+
     }
-    
-    Info<< "End\n" << endl;
+
+    Info << "End\n" << endl;
 
     return 0;
 }

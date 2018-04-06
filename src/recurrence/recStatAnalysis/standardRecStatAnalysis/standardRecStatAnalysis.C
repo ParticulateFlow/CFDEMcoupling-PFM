@@ -1,6 +1,6 @@
 /*---------------------------------------------------------------------------*\
     CFDEMcoupling academic - Open Source CFD-DEM coupling
-    
+
     Contributing authors:
     Thomas Lichtenegger, Gerhard Holzinger
     Copyright (C) 2015- Johannes Kepler University, Linz
@@ -101,20 +101,20 @@ void standardRecStatAnalysis::aveSimGeneral()
     {
         aveS = 0.0;
         for(int i = ignoreStepsInit_; i<=n; i++)
-	{
-	    r = 0.0;
-	    for(int j = ignoreStepsInit_; j <= i - ignoreStepsDiag_; j++)
-	    {
-             Rij = 1 - base_.recM().recurrenceMatrix()[i][j];
-	        if( Rij > r)
-		    r = Rij;
-	    }
-	    aveS += r;
-	}
-	aveS /= (n - ignoreStepsInit_ + 1);
+        {
+            r = 0.0;
+            for(int j = ignoreStepsInit_; j <= i - ignoreStepsDiag_; j++)
+            {
+                Rij = 1 - base_.recM().recurrenceMatrix()[i][j];
+                if( Rij > r)
+                    r = Rij;
+            }
+            aveS += r;
+        }
+        aveS /= (n - ignoreStepsInit_ + 1);
         aveSimilarity_[n - ignoreStepsInit_] = aveS;
     }
-    
+
     OFstream aveSimilarityFile("aveSimilarityGeneral");
     aveSimilarityFile << aveSimilarity_;
 }
@@ -136,7 +136,7 @@ void standardRecStatAnalysis::aveSimSpecial()
             r = 0.0;
             for(int j = i + ignoreStepsDiag_; j <= n; j++)
             {
-             Rij = 1 - base_.recM().recurrenceMatrix()[i][j];
+                Rij = 1 - base_.recM().recurrenceMatrix()[i][j];
                 if( Rij > r)
                     r = Rij;
             }
@@ -145,7 +145,7 @@ void standardRecStatAnalysis::aveSimSpecial()
         aveS /= (aveSimSpecialRefLength_ - ignoreStepsInit_ + 1);
         aveSimilarity_[n - ignoreStepsInit_] = aveS;
     }
-    
+
     OFstream aveSimilarityFile("aveSimilaritySpecial");
     aveSimilarityFile << aveSimilarity_;
 
@@ -162,17 +162,17 @@ void standardRecStatAnalysis::mostDistinct()
     {
         r = 1.0;
         for(int i = ignoreStepsInit_; i<=n; i++)
-	{
-	    for(int j = ignoreStepsInit_; j <= i - ignoreStepsDiag_; j++)
-	    {
-             Rij = 1 -  base_.recM().recurrenceMatrix()[i][j];
-	        if( Rij < r)
-		    r = Rij;
-	    }
-	}
+        {
+            for(int j = ignoreStepsInit_; j <= i - ignoreStepsDiag_; j++)
+            {
+                Rij = 1 -  base_.recM().recurrenceMatrix()[i][j];
+                if( Rij < r)
+                    r = Rij;
+            }
+        }
         mostDistinct_[n - ignoreStepsInit_] = r;
     }
-    
+
     OFstream mostDistinctFile("mostDistinct");
     mostDistinctFile << mostDistinct_;
 }

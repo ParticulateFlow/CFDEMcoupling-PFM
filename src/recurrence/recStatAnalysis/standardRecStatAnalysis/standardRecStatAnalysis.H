@@ -1,6 +1,6 @@
 /*---------------------------------------------------------------------------*\
     CFDEMcoupling academic - Open Source CFD-DEM coupling
-    
+
     Contributing authors:
     Thomas Lichtenegger, Gerhard Holzinger
     Copyright (C) 2015- Johannes Kepler University, Linz
@@ -42,8 +42,7 @@ class standardRecStatAnalysis
     public recStatAnalysis
 {
 protected:
-  
-    
+
 
 public:
 
@@ -65,33 +64,32 @@ public:
         ~standardRecStatAnalysis();
 
     void init();
-	
+
     void statistics();
-    
-	
+
+
 private:
-  
+
     dictionary propsDict_;
 
     label aveSimSpecialRefLength_;
-    
+
     label ignoreStepsInit_;
-    
+
     label ignoreStepsDiag_;
-    
+
     scalarList aveSimilarity_;
-    
+
     scalarList correlationSum_;
-    
+
     scalarList mostDistinct_;
-    
+
     void aveSimGeneral();
 
     void aveSimSpecial();
-    
+
     void mostDistinct();
 
-    
 };
 
 

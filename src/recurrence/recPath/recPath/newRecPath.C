@@ -1,6 +1,6 @@
 /*---------------------------------------------------------------------------*\
     CFDEMcoupling academic - Open Source CFD-DEM coupling
-    
+
     Contributing authors:
     Thomas Lichtenegger
     Copyright (C) 2015- Johannes Kepler University, Linz
@@ -44,7 +44,7 @@ autoPtr<recPath> recPath::New
         dict.lookup("recPath")
     );
 
-    Info<< "Selecting recPath "
+    Info << "Selecting recPath "
          << recPathType << endl;
 
 
@@ -61,7 +61,7 @@ autoPtr<recPath> recPath::New
             << ", constructor not in hash table" << endl << endl
             << "    Valid recPath types are :"
             << endl;
-        Info<< dictionaryConstructorTablePtr_->toc()
+        Info << dictionaryConstructorTablePtr_->toc()
             << abort(FatalError);
     }
 

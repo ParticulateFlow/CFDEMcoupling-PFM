@@ -1,6 +1,6 @@
 /*---------------------------------------------------------------------------*\
     CFDEMcoupling academic - Open Source CFD-DEM coupling
-    
+
     Contributing authors:
     Thomas Lichtenegger
     Copyright (C) 2015- Johannes Kepler University, Linz
@@ -47,26 +47,26 @@ class recStatAnalysis;
 
 class recBase
 {
-  
+
 protected:
-    
+
     const fvMesh& mesh_;
 
     IOdictionary recProperties_;
-    
+
     autoPtr<recModel> recModel_;
-    
+
     autoPtr<recNorm> recNorm_;
-    
+
     autoPtr<recPath> recPath_;
-    
+
     autoPtr<recStatAnalysis> recStatAnalysis_;
-    
+
     // in case of substepping: couple passive quantity at this substep
     label couplingSubStep_;
-    
+
 public:
-      
+
       // Constructors
 
     //- Construct from mesh and a list of particles
@@ -74,26 +74,26 @@ public:
     (
             const fvMesh& mesh
     );
-    
+
     //- Destructor
     virtual ~recBase();
-    
+
     // public Member Functions
-    
+
     const fvMesh& mesh() const;
-    
+
     recModel& recM();
-    
+
     recPath& recP();
-    
+
     recStatAnalysis& recStatA();
-    
+
     void extendPath();
- 
+
     void updateRecFields();
-    
+
     label couplingSubStep() const;
-  
+
 };
 
 }

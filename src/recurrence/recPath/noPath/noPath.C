@@ -1,6 +1,6 @@
 /*---------------------------------------------------------------------------*\
     CFDEMcoupling academic - Open Source CFD-DEM coupling
-    
+
     Contributing authors:
     Thomas Lichtenegger
     Copyright (C) 2015- Johannes Kepler University, Linz
@@ -68,22 +68,22 @@ noPath::~noPath()
 void noPath::getRecPath()
 {
     label numRecIntervals = 0;
-    
+
     if (Pstream::master())
     {
         computeRecPath();
         numRecIntervals=virtualTimeIndexList_.size();
     }
-    
+
     Pstream::scatter(numRecIntervals);
-    
+
     if (not Pstream::master())
     {
         virtualTimeIndexList_.setSize(numRecIntervals);
     }
-    
+
     Pstream::scatter(virtualTimeIndexList_);
-    
+
     if(verbose_)
     {
         Info << "\nRecurrence path communicated to all processors.\n" << endl;
@@ -95,7 +95,7 @@ void noPath::computeRecPath()
 {
     labelPair seqStartEnd(0,1);
     virtualTimeIndexList_.append(seqStartEnd);
-    
+
     if (verbose_)
     {
         Info << " virtualTimeIndexList_ : " << virtualTimeIndexList_ << endl;
