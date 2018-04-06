@@ -115,7 +115,7 @@ void MarkovPath::getRecPath()
     Pstream::scatter(numRecIntervals);
     Pstream::scatter(recSteps_);
 
-    if (not Pstream::master())
+    if (!Pstream::master())
     {
         virtualTimeIndexList_.setSize(numRecIntervals);
     }

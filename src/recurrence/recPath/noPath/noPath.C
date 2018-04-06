@@ -77,7 +77,7 @@ void noPath::getRecPath()
 
     Pstream::scatter(numRecIntervals);
 
-    if (not Pstream::master())
+    if (!Pstream::master())
     {
         virtualTimeIndexList_.setSize(numRecIntervals);
     }

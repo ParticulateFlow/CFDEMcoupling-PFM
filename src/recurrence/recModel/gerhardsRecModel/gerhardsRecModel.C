@@ -290,7 +290,7 @@ void gerhardsRecModel::readFieldSeries()
                 for OpenFOAM versions prior to OpenFOAM-5.0
                 Do this the other way around for OpenFOAM-5.0 and potentially later versions
             */
-            if (not header.headerOk())
+            if (! header.headerOk())
             {
                 FatalError
                 << "Field " << volScalarFieldNames_[i] << " not found"
@@ -314,7 +314,7 @@ void gerhardsRecModel::readFieldSeries()
                 for OpenFOAM versions prior to OpenFOAM-5.0
                 Do this the other way around for OpenFOAM-5.0 and potentially later versions
             */
-            if (not header.headerOk())
+            if (! header.headerOk())
             {
                 FatalError
                 << "Field " << volVectorFieldNames_[i] << " not found"
@@ -338,7 +338,7 @@ void gerhardsRecModel::readFieldSeries()
                 for OpenFOAM versions prior to OpenFOAM-5.0
                 Do this the other way around for OpenFOAM-5.0 and potentially later versions
             */
-            if (not header.headerOk())
+            if (! header.headerOk())
             {
                 FatalError
                 << "Field " << surfaceScalarFieldNames_[i] << " not found"
@@ -927,7 +927,7 @@ Switch gerhardsRecModel::checkSkipZero()
             }
         }
 
-        if (not foundZero)
+        if (! foundZero)
         {
             skipZero_ = false;
         }
