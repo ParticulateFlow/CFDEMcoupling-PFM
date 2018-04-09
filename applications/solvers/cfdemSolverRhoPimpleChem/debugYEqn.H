@@ -21,7 +21,7 @@
             Info << "\nartificial mass of species " << Y[i].name() << " per time step: "<< fvc::domainIntegrate(artMass) << endl;
             if(lVCell > -1)
             {
-                Pout << "lowest value of " << lowestValue << " at cell " << lVCell << " with coordinates" << endl;
+                Pout << Y[i].name() << ": time / lowest value " << runTime.timeName() << "\t" << lowestValue << "\n\tat cell " << lVCell << " with coordinates";
                 Pout << "\t" << mesh.C()[lVCell].component(0) << "\t" << mesh.C()[lVCell].component(1)  << "\t" << mesh.C()[lVCell].component(2) << endl;
             }
 }

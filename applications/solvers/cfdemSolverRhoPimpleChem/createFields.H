@@ -17,9 +17,13 @@
     // read molecular weight
     volScalarField W(composition.W());
 
-    bool ignoreInertSpecie = true;
+    bool propagateInertSpecie = true;
 
     const word inertSpecie(thermo.lookup("inertSpecie"));
+
+    const scalar inertLowerBound(thermo.lookupOrDefault<scalar>("inertLowerBound",0.0));
+
+    const scalar inertUpperBound(thermo.lookupOrDefault<scalar>("inertUpperBound",1.0));
 
     if (!composition.contains(inertSpecie))
     {
