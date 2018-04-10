@@ -22,12 +22,11 @@ License
     along with CFDEMcoupling academic.  If not, see <http://www.gnu.org/licenses/>.
 \*---------------------------------------------------------------------------*/
 
-#ifndef isotropicFluctuations_H
-#define isotropicFluctuations_H
+#ifndef evaluateFluctuations_H
+#define evaluateFluctuations_H
 
 #include "forceModel.H"
 #include "interpolationCellPoint.H"
-#include "Random.H"
 #include "autoPtr.H"
 #include "cellSet.H"
 
@@ -37,63 +36,49 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class isotropicFluctuations Declaration
+                           Class evaluateFluctuations Declaration
 \*---------------------------------------------------------------------------*/
 
-class isotropicFluctuations
+class evaluateFluctuations
 :
     public forceModel
 {
 private:
     dictionary propsDict_;
-    
+
     bool interpolate_;
-    
-    bool measureDiff_;
-    
-    mutable OFstream recErrorFile_;
 
-    // ignore fluctuations in region
-    word ignoreCellsName_;
+    // evaluate fluctuations only in region
+    word activeCellsName_;
 
-    autoPtr<cellSet> ignoreCells_;
+    autoPtr<cellSet> activeCells_;
 
     word voidfractionFieldName_;
-    
+
     const volScalarField& voidfraction_;
-    
+
+    mutable volScalarField voidfractionTest_;
+
     word voidfractionRecFieldName_;
 
     const volScalarField& voidfractionRec_;
 
     scalar critVoidfraction_;
 
-    scalar D0_;
-
-    word D0FieldName_;
-
-    volScalarField D0Field_;
-
     const scalar dtDEM_;
 
-    vector unitRndVec() const;
-
-    scalar fluctuationMag(const scalar, const scalar) const;
-
-    mutable Random ranGen_;
-
-    bool ignoreCell(label) const;
+    bool activeCell(label) const;
 
 public:
 
     //- Runtime type information
-    TypeName("isotropicFluctuations");
+    TypeName("evaluateFluctuations");
 
 
     // Constructors
 
         //- Construct from components
-        isotropicFluctuations
+        evaluateFluctuations
         (
             const dictionary& dict,
             cfdemCloud& sm
@@ -101,7 +86,7 @@ public:
 
     // Destructor
 
-        ~isotropicFluctuations();
+        ~evaluateFluctuations();
 
 
     // Member Functions

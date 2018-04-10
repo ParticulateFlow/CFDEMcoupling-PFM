@@ -59,6 +59,8 @@ directedDiffusiveRelaxation::directedDiffusiveRelaxation
     interpolate_(propsDict_.lookupOrDefault<bool>("interpolation", false)),
     measureDiff_(propsDict_.lookupOrDefault<bool>("measureDiff", false)),
     recErrorFile_("recurrenceError"),
+    ignoreCellsName_(propsDict_.lookupOrDefault<word>("ignoreCellsName","none")),
+    ignoreCells_(),
     voidfractionFieldName_(propsDict_.lookupOrDefault<word>("voidfractionFieldName","voidfraction")),
     voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
     voidfractionRecFieldName_(propsDict_.lookupOrDefault<word>("voidfractionRecFieldName","voidfractionRec")),
@@ -105,21 +107,14 @@ directedDiffusiveRelaxation::directedDiffusiveRelaxation
     dtCFD_(voidfraction_.mesh().time().deltaTValue()),
     dtDEM_(particleCloud_.dataExchangeM().DEMts()),
     timeFac_(1.0),
-    ignoreReg_(propsDict_.lookupOrDefault<bool>("ignoreRegion",false)),
-    ignoreDirection_(propsDict_.lookupOrDefault<vector>("ignoreDirection",vector::zero)),
-    ignorePoint_(propsDict_.lookupOrDefault<vector>("ignorePoint",vector::zero)),
     relaxForT_(propsDict_.lookupOrDefault<scalar>("relaxForT", -1.0))
 {
-    if(ignoreReg_)
+    if(ignoreCellsName_ != "none")
     {
-        if(mag(ignoreDirection_) < SMALL)
-        {
-            FatalError <<"ignoreDirection vector has very little norm, please use larger one\n" << abort(FatalError);
-        }
-        Info << "directedDiffusiveRelaxation: ignoring fluctuations below plane specified by point " <<
-        ignorePoint_ << " and normal vector " << ignoreDirection_ << endl;
+       ignoreCells_.set(new cellSet(particleCloud_.mesh(),ignoreCellsName_));
+       Info << "directedDiffusiveRelaxation: ignoring fluctuations in cellSet " << ignoreCells_().name() <<
+        " with " << ignoreCells_().size() << " cells." << endl;
     }
-
     if (dtDEM_ > dtCFD_) timeFac_ = dtCFD_ / dtDEM_;
 }
 
@@ -129,6 +124,15 @@ directedDiffusiveRelaxation::directedDiffusiveRelaxation
 directedDiffusiveRelaxation::~directedDiffusiveRelaxation()
 {
 }
+
+// * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
+
+bool directedDiffusiveRelaxation::ignoreCell(label cell) const
+{
+    if (ignoreCellsName_ == "none") return false;
+    else return ignoreCells_()[cell];
+}
+
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
@@ -162,17 +166,8 @@ void directedDiffusiveRelaxation::setForce() const
     for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
     {
             cellI = particleCloud_.cellIDs()[index][0];
-            if (cellI > -1) // particle found
+            if (cellI > -1 && !ignoreCell(cellI)) // particle found
             {
-                if(ignoreReg_)
-                {
-                    // check if cell center is below "ignore plane"
-                    vector cellCenter = particleCloud_.mesh().C()[cellI];
-                    scalar aboveBelow = ignoreDirection_ & (ignorePoint_ - cellCenter);
-                    if(aboveBelow > 0) continue;
-                }
-
-     //           if(voidfractionRec_[cellI] < critVoidfraction_)
                 {
                     if( interpolate_ )
                     {

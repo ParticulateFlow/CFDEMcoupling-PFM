@@ -66,6 +66,7 @@ $(forceModels)/volWeightedAverage/volWeightedAverage.C
 $(forceModels)/deactivateForce/deactivateForce.C
 $(forceModels)/freeStreaming/freeStreaming.C
 $(forceModels)/isotropicFluctuations/isotropicFluctuations.C
+$(forceModels)/evaluateFluctuations/evaluateFluctuations.C
 $(forceModels)/directedDiffusiveRelaxation/directedDiffusiveRelaxation.C
 $(forceModels)/potentialRelaxation/potentialRelaxation.C
 $(forceModels)/BeetstraDrag/BeetstraDrag.C

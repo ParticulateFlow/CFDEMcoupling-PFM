@@ -27,7 +27,8 @@ License
 
 #include "forceModel.H"
 #include "interpolationCellPoint.H"
-#include "Random.H"
+#include "autoPtr.H"
+#include "cellSet.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -44,51 +45,49 @@ class directedDiffusiveRelaxation
 {
 private:
     dictionary propsDict_;
-    
+
     bool interpolate_;
-    
+
     bool measureDiff_;
-    
+
     mutable OFstream recErrorFile_;
-    
+
+    // ignore fluctuations in region
+    word ignoreCellsName_;
+
+    autoPtr<cellSet> ignoreCells_;
+
     word voidfractionFieldName_;
-    
+
     const volScalarField& voidfraction_;
-    
+
     word voidfractionRecFieldName_;
-    
+
     const volScalarField& voidfractionRec_;
-    
+
     scalar critVoidfraction_;
-    
+
     scalar D0_;
 
     scalar maxDisplacement_;
-    
+
     mutable volScalarField correctedField_;
 
     mutable volVectorField relaxStream_;
-    
+
     mutable volScalarField DField_;
-    
+
     const scalar dtCFD_;
-    
+
     const scalar dtDEM_;
-    
+
     scalar timeFac_;
-    
-    // ignore particles in cells below plane given with ref point and normal vector
-    // normal vector points towards region where fluctuations are permitted
-    
-    bool ignoreReg_;
-    
-    vector ignoreDirection_;
-    
-    vector ignorePoint_;
-    
+
     scalar relaxForT_;
-    
+
     void relax(scalar) const;
+
+    bool ignoreCell(label) const;
     
 
 public:
