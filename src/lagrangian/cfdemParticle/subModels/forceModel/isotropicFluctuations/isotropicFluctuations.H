@@ -57,6 +57,8 @@ private:
     word ignoreCellsName_;
 
     autoPtr<cellSet> ignoreCells_;
+    
+    bool existIgnoreCells_;
 
     word voidfractionFieldName_;
     

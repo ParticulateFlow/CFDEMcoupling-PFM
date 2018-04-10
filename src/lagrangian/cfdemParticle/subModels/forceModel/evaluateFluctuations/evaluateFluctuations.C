@@ -59,6 +59,7 @@ evaluateFluctuations::evaluateFluctuations
     interpolate_(propsDict_.lookupOrDefault<bool>("interpolation", false)),
     activeCellsName_(propsDict_.lookupOrDefault<word>("activeCellsName","all")),
     activeCells_(),
+    allActiveCells_(false),
     voidfractionFieldName_(propsDict_.lookupOrDefault<word>("voidfractionFieldName","voidfraction")),
     voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
     voidfractionTest_(voidfraction_),
@@ -73,6 +74,7 @@ evaluateFluctuations::evaluateFluctuations
        Info << "evaluateFluctuations: evaluating fluctuations in cellSet " << activeCells_().name() <<
         " with " << activeCells_().size() << " cells." << endl;
     }
+    else allActiveCells_ = true;
 }
 
 
@@ -86,7 +88,7 @@ evaluateFluctuations::~evaluateFluctuations()
 
 bool evaluateFluctuations::activeCell(label cell) const
 {
-    if (activeCellsName_ == "all") return true;
+    if (allActiveCells_) return true;
     else return activeCells_()[cell];
 }
 

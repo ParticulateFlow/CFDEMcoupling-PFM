@@ -61,6 +61,7 @@ directedDiffusiveRelaxation::directedDiffusiveRelaxation
     recErrorFile_("recurrenceError"),
     ignoreCellsName_(propsDict_.lookupOrDefault<word>("ignoreCellsName","none")),
     ignoreCells_(),
+    existIgnoreCells_(true),
     voidfractionFieldName_(propsDict_.lookupOrDefault<word>("voidfractionFieldName","voidfraction")),
     voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
     voidfractionRecFieldName_(propsDict_.lookupOrDefault<word>("voidfractionRecFieldName","voidfractionRec")),
@@ -115,6 +116,7 @@ directedDiffusiveRelaxation::directedDiffusiveRelaxation
        Info << "directedDiffusiveRelaxation: ignoring fluctuations in cellSet " << ignoreCells_().name() <<
         " with " << ignoreCells_().size() << " cells." << endl;
     }
+    else existIgnoreCells_ = false;
     if (dtDEM_ > dtCFD_) timeFac_ = dtCFD_ / dtDEM_;
 }
 
@@ -129,7 +131,7 @@ directedDiffusiveRelaxation::~directedDiffusiveRelaxation()
 
 bool directedDiffusiveRelaxation::ignoreCell(label cell) const
 {
-    if (ignoreCellsName_ == "none") return false;
+    if (!existIgnoreCells_) return false;
     else return ignoreCells_()[cell];
 }
 

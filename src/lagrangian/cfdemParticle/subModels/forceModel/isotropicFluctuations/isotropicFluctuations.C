@@ -61,6 +61,7 @@ isotropicFluctuations::isotropicFluctuations
     recErrorFile_("recurrenceError"),
     ignoreCellsName_(propsDict_.lookupOrDefault<word>("ignoreCellsName","none")),
     ignoreCells_(),
+    existIgnoreCells_(true),
     voidfractionFieldName_(propsDict_.lookupOrDefault<word>("voidfractionFieldName","voidfraction")),
     voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
     voidfractionRecFieldName_(propsDict_.lookupOrDefault<word>("voidfractionRecFieldName","voidfractionRec")),
@@ -83,12 +84,13 @@ isotropicFluctuations::isotropicFluctuations
     dtDEM_(particleCloud_.dataExchangeM().DEMts()),
     ranGen_(osRandomInteger())
 {
-     if(ignoreCellsName_ != "none")
+    if(ignoreCellsName_ != "none")
     {
        ignoreCells_.set(new cellSet(particleCloud_.mesh(),ignoreCellsName_));
        Info << "isotropicFluctuations: ignoring fluctuations in cellSet " << ignoreCells_().name() <<
         " with " << ignoreCells_().size() << " cells." << endl;
     }
+    else existIgnoreCells_ = false;
 }
 
 
@@ -102,7 +104,7 @@ isotropicFluctuations::~isotropicFluctuations()
 
 bool isotropicFluctuations::ignoreCell(label cell) const
 {
-    if (ignoreCellsName_ == "none") return false;
+    if (!existIgnoreCells_) return false;
     else return ignoreCells_()[cell];
 }
 

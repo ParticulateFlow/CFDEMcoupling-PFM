@@ -57,6 +57,8 @@ private:
 
     autoPtr<cellSet> ignoreCells_;
 
+    bool existIgnoreCells_;
+
     word voidfractionFieldName_;
 
     const volScalarField& voidfraction_;

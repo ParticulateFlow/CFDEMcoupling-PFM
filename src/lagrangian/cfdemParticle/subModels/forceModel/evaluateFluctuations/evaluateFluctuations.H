@@ -52,6 +52,8 @@ private:
     word activeCellsName_;
 
     autoPtr<cellSet> activeCells_;
+    
+    bool allActiveCells_;
 
     word voidfractionFieldName_;
 
