@@ -239,6 +239,8 @@ void species::execute()
     scalar voidfraction(1);
     Xfluid_.setSize(speciesNames_.size());
     scalar molarConcfluid(0);
+    List<scalar> sumOfMFs;
+    sumOfMFs.setSize(particleCloud_.numberOfParticles());
 
     // defining interpolators for T, rho, voidfraction, molarConc
     interpolationCellPoint <scalar> TInterpolator_(tempField_);
@@ -249,6 +251,7 @@ void species::execute()
 
     for (int index=0; index<particleCloud_.numberOfParticles(); ++index)
     {
+        sumOfMFs[index] = 0.0;
         cellI=particleCloud_.cellIDs()[index][0];
         if (cellI >= 0)
         {
@@ -269,7 +272,7 @@ void species::execute()
                 for (int i = 0; i<speciesNames_.size();i++)
                 {
                     Xfluid_[i] = X_[i][cellI];
-                    if (Xfluid_[i] <= 0.0) Xfluid_[i] = 0.0;
+                    if(Xfluid_[i] < 0.0) Xfluid_[i] = 0.0;
                 }
             }
             //fill arrays
@@ -282,24 +285,28 @@ void species::execute()
             for (int i=0; i<speciesNames_.size();i++)
             {
             // attention for indices when not communicating all species
-                molarFractions_[i][index][0]=Xfluid_[i];
+                molarFractions_[i][index][0]=Xfluid_[i] - 1e-8 ;
+                sumOfMFs[index] += Xfluid_[i] - 1e-8 ;
             }
-        }
+            if(sumOfMFs[index] > 1.0)
+                Info << "Error bigger than 1.0: " << sumOfMFs[index]-1. << endl;
 
-        if(verbose_)
+        }
+    }
+
+    if(verbose_)
+    {
+        for(int i =0; i<speciesNames_.size();i++)
         {
-            for(int i =0; i<speciesNames_.size();i++)
-            {
-                Info << "X_i = " << X_[i].name() << endl;
-                Info << "molarFractions_= " << molarFractions_[i][index][0] << endl;
-                Info << "partRho_[index][0] = " << partRho_[index][0] << endl;
-                Info << "rhofluid =" << rhofluid << endl;
-                Info << "Xfluid = " << Xfluid_[i] << endl;
-                Info << "partTemp_[index][0] = " << partTemp_[index][0] << endl;
-                Info << "Tfluid = " << Tfluid << endl  ;
-                Info << "voidfraction =" << voidfraction << endl;
-                // Info << "molarConc_" << molarConc_ << endl;
-            }
+            Info << "X_i = " << X_[i].name() << endl;
+            Info << "molarFractions_= " << molarFractions_[i][0][0] << endl;
+            Info << "partRho_[index][0] = " << partRho_[0][0] << endl;
+            Info << "rhofluid =" << rhofluid << endl;
+            Info << "Xfluid = " << Xfluid_[i] << endl;
+            Info << "partTemp_[index][0] = " << partTemp_[0][0] << endl;
+            Info << "Tfluid = " << Tfluid << endl  ;
+            Info << "voidfraction =" << voidfraction << endl;
+            // Info << "molarConc_" << molarConc_ << endl;
         }
     }
 
