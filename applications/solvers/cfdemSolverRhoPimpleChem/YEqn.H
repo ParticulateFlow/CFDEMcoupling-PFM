@@ -19,10 +19,11 @@ tmp<fv::convectionScheme<scalar> > mvConvection
 
     forAll(Y, i)
     {
-        if (Y[i].name() != inertSpecie || ignoreInertSpecie)
+        if (Y[i].name() == inertSpecie) inertIndex = i;
+        if (Y[i].name() != inertSpecie || propagateInertSpecie)
         {
             volScalarField& Yi = Y[i];
-	    
+
             fvScalarMatrix YiEqn
             (
                 fvm::ddt(rhoeps, Yi)
@@ -42,23 +43,27 @@ tmp<fv::convectionScheme<scalar> > mvConvection
 
             fvOptions.correct(Yi);
 
-             #include "debugYEqn.H"
-
             Yi.max(0.0);
-            Yt += Yi;
-        }
-        else
-        {
-            inertIndex = i;
+            if (Y[i].name() != inertSpecie) Yt += Yi;
         }
     }
 
-    if (ignoreInertSpecie)
+    if (inertIndex!=-1)
     {
+        Y[inertIndex].max(inertLowerBound);
+        Y[inertIndex].min(inertUpperBound);
+    }
+
+    if (propagateInertSpecie)
+    {
+        if (inertIndex!=-1) Yt /= (1-Y[inertIndex] + VSMALL);
         forAll(Y,i)
         {
-            volScalarField& Yi = Y[i];
-            Yi = Yi/Yt;
+            if (i!=inertIndex)
+            {
+                volScalarField& Yi = Y[i];
+                Yi = Yi/(Yt+VSMALL);
+            }
         }
     }
     else
