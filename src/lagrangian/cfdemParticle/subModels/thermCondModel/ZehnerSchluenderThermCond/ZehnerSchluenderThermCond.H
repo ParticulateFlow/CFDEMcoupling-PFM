@@ -16,100 +16,83 @@ License
 
     Copyright (C) 2015- Thomas Lichtenegger, JKU Linz, Austria
 
+
+Description
+    thermal conductivity of PARTICLE phase in presence of a fluid according to
+    Zehner and Schluender (1970)
+
+Class
+    ZehnerSchluenderThermCond
+
+SourceFiles
+    ZehnerSchluenderThermCond.C
+
 \*---------------------------------------------------------------------------*/
 
-#ifndef energyModel_H
-#define energyModel_H
 
-#include "fvCFD.H"
-#include "cfdemCloudEnergy.H"
-#include "probeModel.H"
-#include "interpolationCellPoint.H"
+#ifndef ZehnerSchluenderThermCond_H
+#define ZehnerSchluenderThermCond_H
+
+#include "thermCondModel.H"
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class energyModel Declaration
+                           Class ZehnerSchluenderThermCond Declaration
 \*---------------------------------------------------------------------------*/
 
-class energyModel
+class ZehnerSchluenderThermCond
+:
+    public thermCondModel
 {
+  
+private:
+  
+    dictionary propsDict_;
+  
+    word voidfractionFieldName_;
+  
+    const volScalarField& voidfraction_;
+    
+    dimensionedScalar ks0_;
+    
+    word wallQFactorName_;
+    
+    // ratio of half-cell-size and near-wall film
+    mutable volScalarField wallQFactor_;
+    
+    bool hasWallQFactor_;
 
-protected:
-
-    // Protected data
-        const dictionary& dict_;
-
-        cfdemCloudEnergy& particleCloud_;
-	
-	IOdictionary transportProperties_;
-	
-	scalar kf0_;                              // fluid thermal conductivity [W/(m*K)]
-
-        scalar Cp_;                                  // specific heat capacity [W*s/(kg*K)]
-       
 public:
 
     //- Runtime type information
-    TypeName("energyModel");
-
-    // Declare runtime constructor selection table
-
-        declareRunTimeSelectionTable
-        (
-            autoPtr,
-            energyModel,
-            dictionary,
-            (
-                const dictionary& dict,
-                cfdemCloudEnergy& sm
-            ),
-            (dict,sm)
-        );
+    TypeName("ZehnerSchluenderThermCond");
 
 
     // Constructors
 
         //- Construct from components
-        energyModel
+        ZehnerSchluenderThermCond
         (
             const dictionary& dict,
-            cfdemCloudEnergy& sm            
+            cfdemCloud& sm
         );
-
 
     // Destructor
 
-        virtual ~energyModel();
-
-
-    // Selector
-
-        static autoPtr<energyModel> New
-        (
-            const dictionary& dict,
-            cfdemCloudEnergy& sm,
-            word energyType
-        );
+        ~ZehnerSchluenderThermCond();
 
 
     // Member Functions
-
-        virtual void addEnergyContribution(volScalarField&) const = 0;
 	
-	virtual void addEnergyCoefficient(volScalarField&) const = 0;
+	tmp<volScalarField> thermCond() const;
 	
-	virtual void calcEnergyContribution() = 0;
-	
-	virtual void postFlow() {}
-
-	virtual void solve() {}
-	
-	scalar Cp() const;
-
-
+	tmp<volScalarField> thermDiff() const;
+       
+       
 };
 
 

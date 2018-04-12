@@ -15,7 +15,7 @@ License
     along with this code.  If not, see <http://www.gnu.org/licenses/>.
 
     Copyright (C) 2015- Thomas Lichtenegger, JKU Linz, Austria
-    
+
     Description
     Correlation for Nusselt number according to
     Gunn, D. J. International Journal of Heat and Mass Transfer 21.4 (1978)
@@ -44,26 +44,38 @@ class heatTransferGunn
 protected:
 
     dictionary propsDict_;
-    
+
+    bool expNusselt_;
+
     bool interpolation_;
-    
+
     bool verbose_;
-    
+
+    bool implicit_;
+
     word QPartFluidName_;
-        
+
     volScalarField QPartFluid_;
-    
-    volScalarField partTempField_;
-    
+
+    word QPartFluidCoeffName_;
+
+    volScalarField QPartFluidCoeff_;
+
+    mutable volScalarField partTempField_;
+
     volScalarField partRelTempField_;
-    
+
     volScalarField ReField_;
-    
+
     volScalarField NuField_;
-    
+
     dimensionedScalar partRefTemp_;
-    
+
     bool calcPartTempField_;
+
+    bool calcPartTempAve_;
+
+    scalar partTempAve_;
 
     word tempFieldName_;
 
@@ -78,33 +90,35 @@ protected:
     word velFieldName_;
 
     const volVectorField& U_;
-    
+
     word densityFieldName_;
-    
+
     const volScalarField& rho_;
 
     word partTempName_;
 
-    mutable double **partTemp_;                          // Lagrangian array
+    mutable double **partTemp_;
 
     word partHeatFluxName_;
 
-    mutable double **partHeatFlux_;              // Lagrangian array
-    
+    mutable double **partHeatFlux_;
+
+    mutable double **partHeatFluxCoeff_;
+
     mutable double **partRe_;
-    
+
     mutable double **partNu_;
 
     void allocateMyArrays() const;
-    
+
+    void partTempField();
+
     scalar Nusselt(scalar, scalar, scalar) const;
-    
-    virtual void giveData(int);
-    
+
+    virtual void giveData();
+
     virtual void heatFlux(label, scalar, scalar, scalar);
-    
-    virtual void heatFluxCoeff(label, scalar, scalar);
-       
+
 public:
 
     //- Runtime type information
@@ -128,10 +142,14 @@ public:
     // Member Functions
 
         void addEnergyContribution(volScalarField&) const;
-	
-	void addEnergyCoefficient(volScalarField&) const {}
-	
+
+	void addEnergyCoefficient(volScalarField&) const;
+
 	void calcEnergyContribution();
+
+	void postFlow();
+
+        scalar aveTpart() const;
 };
 
 
