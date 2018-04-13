@@ -44,7 +44,22 @@ heatTransferGunnPartField::heatTransferGunnPartField
 )
 :
     heatTransferGunn(dict,sm),
-    fvOptions(fv::options::New(sm.mesh())),
+    partCpField_
+    (   
+        IOobject
+        (
+            "partCp",
+            sm.mesh().time().timeName(),
+            sm.mesh(),
+            IOobject::READ_IF_PRESENT,
+            IOobject::NO_WRITE
+        ),
+        sm.mesh(),
+        dimensionedScalar("zero", dimensionSet(0,2,-2,-1,0,0,0), 0.0),
+	"zeroGradient"
+    ),
+    partRhoField_(sm.mesh().lookupObject<volScalarField>("partRho")),
+    partCp_(NULL),
     thermCondModel_
     (
         thermCondModel::New
@@ -52,12 +67,15 @@ heatTransferGunnPartField::heatTransferGunnPartField
             propsDict_,
             sm
         )
-    )
+    ),
+    fvOptions(fv::options::New(sm.mesh()))
 {
     if(!implicit_)
     {
         FatalError << "heatTransferGunnPartField requires implicit heat transfer treatment." << abort(FatalError);
     }
+
+    allocateMyArrays();
 }
 
 
@@ -65,14 +83,36 @@ heatTransferGunnPartField::heatTransferGunnPartField
 
 heatTransferGunnPartField::~heatTransferGunnPartField()
 {
+    particleCloud_.dataExchangeM().destroy(partCp_,1);
 }
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
+
+void heatTransferGunnPartField::allocateMyArrays() const
+{
+    double initVal=0.0;
+    particleCloud_.dataExchangeM().allocateArray(partCp_,initVal,1);
+}
 // * * * * * * * * * * * * * * * * Member Fct  * * * * * * * * * * * * * * * //
 void heatTransferGunnPartField::calcEnergyContribution()
 {
+    allocateMyArrays();
     heatTransferGunn::calcEnergyContribution();
+
     // if heat sources in particles present, pull them here
+
+    // loop over all particles to fill partCp_ based on type
+    partCpField_.primitiveFieldRef() = 0.0;
+    particleCloud_.averagingM().resetWeightFields();
+    particleCloud_.averagingM().setScalarAverage
+    (
+        partCpField_,
+        partCp_,
+        particleCloud_.particleWeights(),
+        particleCloud_.averagingM().UsWeightField(),
+        NULL
+    );
+
 }
 
 void heatTransferGunnPartField::addEnergyContribution(volScalarField& Qsource) const
@@ -114,18 +154,20 @@ void heatTransferGunnPartField::postFlow()
 
 void heatTransferGunnPartField::solve()
 {
-//use gasT and QCoeff to solve particle temp eqn
-    volScalarField Qsource = QPartFluidCoeff_*tempField_;
+    Info << "patch types of partTemp boundary: " << partTempField_.boundaryField().types() << endl;
+    volScalarField Qsource = QPartFluidCoeff_*tempField_/partCpField_;
     volScalarField alphaP = 1.0 - voidfraction_;
-    volScalarField thCond = thermCondModel_().thermCond();
+    volScalarField partRhoEff = alphaP*partRhoField_;
+//    volScalarField thCond = thermCondModel_().thermCond();
+
 
     fvScalarMatrix partTEqn
     (
         Qsource
-      - fvm::Sp(QPartFluidCoeff_, partTempField_)
-      - fvm::laplacian(alphaP*thCond,partTempField_)
+      - fvm::Sp(QPartFluidCoeff_/partCpField_, partTempField_)
+ //     - fvm::laplacian(alphaP*thCond/partCpField_,partTempField_)
      ==
-        fvOptions(rho_, partTempField_)
+        fvOptions(partRhoEff, partTempField_)
     );
   // if transient add time derivative - need particle density and specific heat fields
   // if sources activated add sources

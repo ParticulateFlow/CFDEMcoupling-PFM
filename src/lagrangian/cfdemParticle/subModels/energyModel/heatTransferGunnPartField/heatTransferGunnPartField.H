@@ -44,9 +44,17 @@ class heatTransferGunnPartField
 {
 private:
 
-    fv::options& fvOptions;
+    volScalarField partCpField_;
+
+    const volScalarField& partRhoField_;
+
+    mutable double **partCp_;
 
     autoPtr<thermCondModel> thermCondModel_;
+
+    fv::options& fvOptions;
+
+    void allocateMyArrays() const;
 
     void giveData();
 

@@ -105,17 +105,16 @@ int main(int argc, char *argv[])
         particleCloud.clockM().start(26,"Flow");
 
         volScalarField rhoeps("rhoeps",rho*voidfraction);
-        // --- Pressure-velocity PIMPLE corrector loop
-        {
-            #include "UEqn.H"
-            #include "EEqn.H"
+        // Pressure-velocity SIMPLE corrector
 
-            // besides this pEqn, OF offers a "simple consistent"-option
-            #include "pEqn.H"
-            rhoeps=rho*voidfraction;
+        #include "UEqn.H"
+        #include "EEqn.H"
 
-            turbulence->correct();
-        }
+        // besides this pEqn, OF offers a "simple consistent"-option
+        #include "pEqn.H"
+        rhoeps=rho*voidfraction;
+
+        turbulence->correct();
 
         particleCloud.clockM().start(32,"postFlow");
         particleCloud.postFlow();

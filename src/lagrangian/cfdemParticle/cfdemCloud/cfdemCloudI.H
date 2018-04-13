@@ -216,6 +216,42 @@ inline double cfdemCloud::d32(bool recalc)
     return d32_;
 }
 
+inline double ** cfdemCloud::particleDensity() const
+{
+    if(!getParticleDensities_) return NULL;
+    else
+    {
+        return particleDensities_;
+    }
+}
+
+inline double cfdemCloud::particleDensity(label index) const
+{
+    if(!getParticleDensities_) return -1.0;
+    else
+    {
+        return particleDensities_[index][0];
+    }
+}
+
+inline int ** cfdemCloud::particleTypes() const
+{
+    if(!getParticleTypes_) return NULL;
+    else
+    {
+        return particleTypes_;
+    }
+}
+
+inline label cfdemCloud::particleType(label index) const
+{
+    if(!getParticleDensities_) return -1;
+    else
+    {
+        return particleTypes_[index][0];
+    }
+}
+
 inline int cfdemCloud::numberOfParticles() const
 {
     return numberOfParticles_;

@@ -99,7 +99,8 @@ tmp<volScalarField> ZehnerSchluenderThermCond::thermCond() const
                 IOobject::NO_WRITE
             ),
             voidfraction_.mesh(),
-            dimensionedScalar("zero", dimensionSet(1,1,-3,-1,0,0,0), 0.0)
+            dimensionedScalar("zero", dimensionSet(1,1,-3,-1,0,0,0), 0.0),
+            "zeroGradient"
         )
     );
 
@@ -115,14 +116,24 @@ tmp<volScalarField> ZehnerSchluenderThermCond::thermCond() const
 
     forAll(svf, cellI)
     {
+        // debugging
+        Pout << "calculating field in cell " << cellI << endl;
         voidfraction = voidfraction_[cellI];
-        B = 1.25 * Foam::pow((1 - voidfraction) / voidfraction, 1.11);
-        OnemBoA = 1.0 - B/A;
-        C = (A - 1) / (OnemBoA * OnemBoA) * B/A * log(A/B) - (B - 1)/OnemBoA - 0.5 * (B + 1);
-        C *= 2.0 / OnemBoA;
-        k = Foam::sqrt(1 - voidfraction) * (w * A + (1 - w) * C) * kf0_.value();
-        svf[cellI] = k / (1 - voidfraction);
+        if(voidfraction > 1.0 - SMALL) svf[cellI] = 0.0;
+        else
+        {
+            B = 1.25 * Foam::pow((1 - voidfraction) / voidfraction, 1.11);
+            OnemBoA = 1.0 - B/A;
+            C = (A - 1) / (OnemBoA * OnemBoA) * B/A * log(A/B) - (B - 1)/OnemBoA - 0.5 * (B + 1);
+            C *= 2.0 / OnemBoA;
+            k = Foam::sqrt(1 - voidfraction) * (w * A + (1 - w) * C) * kf0_.value();
+            svf[cellI] = k / (1 - voidfraction);
+        }
     }
+
+    // debugging
+    Pout << "patch types of svf boundary: " << svf.boundaryField().types() << endl;
+    svf.correctBoundaryConditions();
 
     // if a wallQFactor field is present, use it to scale heat transport through a patch
     if (hasWallQFactor_)
