@@ -59,6 +59,7 @@ heatTransferGunnPartField::heatTransferGunnPartField
 	"zeroGradient"
     ),
     partRhoField_(sm.mesh().lookupObject<volScalarField>("partRho")),
+    typeCp_(propsDict_.lookupOrDefault<scalarList>("specificHeatCapacities",scalarList(1,-1.0))),
     partCp_(NULL),
     thermCondModel_
     (
@@ -70,9 +71,14 @@ heatTransferGunnPartField::heatTransferGunnPartField
     ),
     fvOptions(fv::options::New(sm.mesh()))
 {
-    if(!implicit_)
+    if (!implicit_)
     {
         FatalError << "heatTransferGunnPartField requires implicit heat transfer treatment." << abort(FatalError);
+    }
+
+    if (typeCp_[0] < 0.0)
+    {
+        FatalError << "heatTransferGunnPartField: provide list of specific heat capacities." << abort(FatalError);
     }
 
     allocateMyArrays();
@@ -102,6 +108,19 @@ void heatTransferGunnPartField::calcEnergyContribution()
     // if heat sources in particles present, pull them here
 
     // loop over all particles to fill partCp_ based on type
+    label cellI=0;
+    label partType = 0;
+    for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)
+    {
+            cellI = particleCloud_.cellIDs()[index][0];
+            if(cellI >= 0)
+            {
+                partType = particleCloud_.particleType(index);
+                // LIGGGGHTS counts types 1, 2, ..., C++ array starts at 0
+                partCp_[index][0] = typeCp_[partType - 1];
+            }
+    }
+
     partCpField_.primitiveFieldRef() = 0.0;
     particleCloud_.averagingM().resetWeightFields();
     particleCloud_.averagingM().setScalarAverage
@@ -155,19 +174,20 @@ void heatTransferGunnPartField::postFlow()
 void heatTransferGunnPartField::solve()
 {
     Info << "patch types of partTemp boundary: " << partTempField_.boundaryField().types() << endl;
-    volScalarField Qsource = QPartFluidCoeff_*tempField_/partCpField_;
+    volScalarField Qsource = QPartFluidCoeff_*tempField_;
     volScalarField alphaP = 1.0 - voidfraction_;
-    volScalarField partRhoEff = alphaP*partRhoField_;
-//    volScalarField thCond = thermCondModel_().thermCond();
+    volScalarField partCpEff = alphaP*partRhoField_*partCpField_;
+    volScalarField thCondEff = alphaP*thermCondModel_().thermCond();
+//    thCondEff.correctBoundaryConditions();
 
 
     fvScalarMatrix partTEqn
     (
         Qsource
-      - fvm::Sp(QPartFluidCoeff_/partCpField_, partTempField_)
- //     - fvm::laplacian(alphaP*thCond/partCpField_,partTempField_)
+      - fvm::Sp(QPartFluidCoeff_, partTempField_)
+      - fvm::laplacian(thCondEff,partTempField_)
      ==
-        fvOptions(partRhoEff, partTempField_)
+        fvOptions(partCpEff, partTempField_)
     );
   // if transient add time derivative - need particle density and specific heat fields
   // if sources activated add sources

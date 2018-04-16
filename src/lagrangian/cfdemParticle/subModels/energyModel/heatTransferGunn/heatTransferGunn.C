@@ -76,14 +76,15 @@ heatTransferGunn::heatTransferGunn
     partTempField_
     (   IOobject
         (
-            "particleTemp",
+            "partTemp",
             sm.mesh().time().timeName(),
             sm.mesh(),
             IOobject::READ_IF_PRESENT,
             IOobject::NO_WRITE
         ),
         sm.mesh(),
-        dimensionedScalar("zero", dimensionSet(0,0,0,1,0,0,0), 0.0)
+        dimensionedScalar("zero", dimensionSet(0,0,0,1,0,0,0), 0.0),
+        "zeroGradient"
     ),
     partRelTempField_
     (   IOobject

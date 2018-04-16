@@ -34,6 +34,7 @@ SourceFiles
 #define ZehnerSchluenderThermCond_H
 
 #include "thermCondModel.H"
+#include "scalarList.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -52,12 +53,16 @@ class ZehnerSchluenderThermCond
 private:
   
     dictionary propsDict_;
+
+    mutable volScalarField partKsField_;
   
     word voidfractionFieldName_;
   
     const volScalarField& voidfraction_;
     
-    dimensionedScalar ks0_;
+    scalarList typeKs_;
+
+    mutable double **partKs_;
     
     word wallQFactorName_;
     
@@ -65,6 +70,10 @@ private:
     mutable volScalarField wallQFactor_;
     
     bool hasWallQFactor_;
+
+    void allocateMyArrays() const;
+
+    void calcPartKsField() const;
 
 public:
 

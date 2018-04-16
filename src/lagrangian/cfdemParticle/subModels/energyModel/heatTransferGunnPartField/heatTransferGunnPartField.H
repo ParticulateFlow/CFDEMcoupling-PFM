@@ -29,6 +29,7 @@ License
 #include "cfdemCloudEnergy.H"
 #include "heatTransferGunn.H"
 #include "fvOptions.H"
+#include "scalarList.H"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -47,6 +48,8 @@ private:
     volScalarField partCpField_;
 
     const volScalarField& partRhoField_;
+
+    scalarList typeCp_;
 
     mutable double **partCp_;
 

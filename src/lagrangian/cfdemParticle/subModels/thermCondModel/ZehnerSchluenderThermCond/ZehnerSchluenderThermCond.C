@@ -50,9 +50,24 @@ ZehnerSchluenderThermCond::ZehnerSchluenderThermCond
 :
     thermCondModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
+    partKsField_
+    (   
+        IOobject
+        (
+            "partKs",
+            sm.mesh().time().timeName(),
+            sm.mesh(),
+            IOobject::READ_IF_PRESENT,
+            IOobject::NO_WRITE
+        ),
+        sm.mesh(),
+        dimensionedScalar("one", dimensionSet(1, 1, -3, -1,0,0,0), 1.0),
+	"zeroGradient"
+    ),
     voidfractionFieldName_(propsDict_.lookupOrDefault<word>("voidfractionFieldName","voidfraction")),
     voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
-    ks0_(transportProperties_.lookup("ks")),
+    typeKs_(propsDict_.lookupOrDefault<scalarList>("thermalConductivities",scalarList(1,-1.0))),
+    partKs_(NULL),
     wallQFactorName_(propsDict_.lookupOrDefault<word>("wallQFactorName","wallQFactor")),
     wallQFactor_
     (   IOobject
@@ -68,6 +83,17 @@ ZehnerSchluenderThermCond::ZehnerSchluenderThermCond
     ),
     hasWallQFactor_(false)
 {
+    if (typeKs_[0] < 0.0)
+    {
+        FatalError << "ZehnerSchluenderThermCond: provide list of thermal conductivities." << abort(FatalError);
+    }
+
+    if (typeKs_.size() > 1) allocateMyArrays();
+    else
+    {
+        partKsField_ *= typeKs_[0];
+    }
+
     if (wallQFactor_.headerOk())
     {
         Info << "Found field for scaling wall heat flux.\n" << endl;
@@ -79,8 +105,16 @@ ZehnerSchluenderThermCond::ZehnerSchluenderThermCond
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 ZehnerSchluenderThermCond::~ZehnerSchluenderThermCond()
-{}
+{
+    if (typeKs_.size() > 1) particleCloud_.dataExchangeM().destroy(partKs_,1);
+}
 
+
+void ZehnerSchluenderThermCond::allocateMyArrays() const
+{
+    double initVal=0.0;
+    particleCloud_.dataExchangeM().allocateArray(partKs_,initVal,1);
+}
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
@@ -106,7 +140,8 @@ tmp<volScalarField> ZehnerSchluenderThermCond::thermCond() const
 
     volScalarField& svf = tvf.ref();
 
-    scalar A = ks0_.value()/kf0_.value();
+    calcPartKsField();
+    scalar A = 0.0;
     scalar B = 0.0;
     scalar C = 0.0;
     scalar k = 0.0;
@@ -116,12 +151,11 @@ tmp<volScalarField> ZehnerSchluenderThermCond::thermCond() const
 
     forAll(svf, cellI)
     {
-        // debugging
-        Pout << "calculating field in cell " << cellI << endl;
         voidfraction = voidfraction_[cellI];
-        if(voidfraction > 1.0 - SMALL) svf[cellI] = 0.0;
+        if(voidfraction > 1.0 - SMALL || partKsField_[cellI] < SMALL) svf[cellI] = 0.0;
         else
         {
+            A = partKsField_[cellI]/kf0_.value();
             B = 1.25 * Foam::pow((1 - voidfraction) / voidfraction, 1.11);
             OnemBoA = 1.0 - B/A;
             C = (A - 1) / (OnemBoA * OnemBoA) * B/A * log(A/B) - (B - 1)/OnemBoA - 0.5 * (B + 1);
@@ -131,8 +165,6 @@ tmp<volScalarField> ZehnerSchluenderThermCond::thermCond() const
         }
     }
 
-    // debugging
-    Pout << "patch types of svf boundary: " << svf.boundaryField().types() << endl;
     svf.correctBoundaryConditions();
 
     // if a wallQFactor field is present, use it to scale heat transport through a patch
@@ -151,8 +183,35 @@ tmp<volScalarField> ZehnerSchluenderThermCond::thermDiff() const
     FatalError << "ZehnerSchluenderThermCond does not provide thermal diffusivity." << abort(FatalError);
 }
 
+void ZehnerSchluenderThermCond::calcPartKsField() const
+{
+    if (typeKs_.size() <= 1) return;
 
+    allocateMyArrays();
+    label cellI=0;
+    label partType = 0;
+    for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)
+    {
+            cellI = particleCloud_.cellIDs()[index][0];
+            if(cellI >= 0)
+            {
+                partType = particleCloud_.particleType(index);
+                // LIGGGGHTS counts types 1, 2, ..., C++ array starts at 0
+                partKs_[index][0] = typeKs_[partType - 1];
+            }
+    }
 
+    partKsField_.primitiveFieldRef() = 0.0;
+    particleCloud_.averagingM().resetWeightFields();
+    particleCloud_.averagingM().setScalarAverage
+    (
+        partKsField_,
+        partKs_,
+        particleCloud_.particleWeights(),
+        particleCloud_.averagingM().UsWeightField(),
+        NULL
+    );
+}
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
