@@ -19,14 +19,21 @@ fvOptions.constrain(UEqn);
 if (modelType=="B" || modelType=="Bfull")
 {
     solve(UEqn == -fvc::grad(p)+ Ksl*Us);
-
-    fvOptions.correct(U);
-    K = 0.5*magSqr(U);
 }
 else
 {
     solve(UEqn == -voidfraction*fvc::grad(p)+ Ksl*Us);
-
-    fvOptions.correct(U);
-    K = 0.5*magSqr(U);
 }
+
+fvOptions.correct(U);
+
+// limit vel
+
+forAll(U,cellI)
+{
+    scalar mU = mag(U[cellI]);
+    if (mU > 200.0) U[cellI] *= 200.0/mU;
+}
+
+
+K = 0.5*magSqr(U);

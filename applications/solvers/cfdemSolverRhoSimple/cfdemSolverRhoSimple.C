@@ -108,11 +108,13 @@ int main(int argc, char *argv[])
         // Pressure-velocity SIMPLE corrector
 
         #include "UEqn.H"
-        #include "EEqn.H"
+
 
         // besides this pEqn, OF offers a "simple consistent"-option
         #include "pEqn.H"
         rhoeps=rho*voidfraction;
+
+        #include "EEqn.H"
 
         turbulence->correct();
 

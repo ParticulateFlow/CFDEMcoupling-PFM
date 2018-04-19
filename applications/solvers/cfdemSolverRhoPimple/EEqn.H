@@ -39,7 +39,7 @@
      ==
         fvOptions(rho, he)
     );
-    
+
 
     EEqn.relax();
 
@@ -52,4 +52,9 @@
     thermo.correct();
 
     Info<< "T max/min : " << max(T).value() << " " << min(T).value() << endl;
+
+    particleCloud.clockM().start(31,"energySolve");
+    particleCloud.solve();
+    particleCloud.clockM().stop("energySolve");
+
 }

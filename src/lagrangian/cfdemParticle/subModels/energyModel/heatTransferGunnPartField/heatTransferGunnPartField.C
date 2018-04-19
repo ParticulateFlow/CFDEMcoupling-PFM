@@ -81,6 +81,8 @@ heatTransferGunnPartField::heatTransferGunnPartField
         FatalError << "heatTransferGunnPartField: provide list of specific heat capacities." << abort(FatalError);
     }
 
+    partTempField_.writeOpt() = IOobject::AUTO_WRITE;
+
     allocateMyArrays();
 }
 
@@ -173,18 +175,29 @@ void heatTransferGunnPartField::postFlow()
 
 void heatTransferGunnPartField::solve()
 {
-    Info << "patch types of partTemp boundary: " << partTempField_.boundaryField().types() << endl;
-    volScalarField Qsource = QPartFluidCoeff_*tempField_;
+    // for some weird reason, the particle-fluid heat transfer fields were defined with a negative sign
+
     volScalarField alphaP = 1.0 - voidfraction_;
+    volScalarField correctedQPartFluidCoeff(QPartFluidCoeff_);
+    // no heattransfer in empty cells -- for numerical stability, add small amount
+    forAll(correctedQPartFluidCoeff,cellI)
+    {
+        if (-correctedQPartFluidCoeff[cellI] < SMALL) correctedQPartFluidCoeff[cellI] = -SMALL;
+    }
+
+    volScalarField Qsource = correctedQPartFluidCoeff*tempField_;
     volScalarField partCpEff = alphaP*partRhoField_*partCpField_;
     volScalarField thCondEff = alphaP*thermCondModel_().thermCond();
 //    thCondEff.correctBoundaryConditions();
 
 
+
     fvScalarMatrix partTEqn
     (
+     //   fvm::ddt(partCpEff, partTempField_)
+     // + Qsource
         Qsource
-      - fvm::Sp(QPartFluidCoeff_, partTempField_)
+      - fvm::Sp(correctedQPartFluidCoeff, partTempField_)
       - fvm::laplacian(thCondEff,partTempField_)
      ==
         fvOptions(partCpEff, partTempField_)
@@ -199,7 +212,14 @@ void heatTransferGunnPartField::solve()
 
     partTEqn.solve();
 
+    partTempField_.relax();
+
     fvOptions.correct(partTempField_);
+
+    dimensionedScalar pTMin("pTMin",dimensionSet(0,0,0,1,0,0,0),293.0);
+    dimensionedScalar pTMax("pTMin",dimensionSet(0,0,0,1,0,0,0),3000.0);
+    partTempField_ = max(partTempField_, pTMin);
+    partTempField_ = min(partTempField_, pTMax);
 
     Info<< "partT max/min : " << max(partTempField_).value() << " " << min(partTempField_).value() << endl;
 
