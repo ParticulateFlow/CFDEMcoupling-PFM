@@ -5,6 +5,7 @@ recModel/standardRecModel/standardRecModel.C
 recModel/gerhardsRecModel/gerhardsRecModel.C
 recNorm/recNorm/recNorm.C
 recNorm/recNorm/newRecNorm.C
+recNorm/absDiffNorm/absDiffNorm.C
 recNorm/maxNorm/maxNorm.C
 recNorm/sqrDiffNorm/sqrDiffNorm.C
 recPath/recPath/recPath.C
