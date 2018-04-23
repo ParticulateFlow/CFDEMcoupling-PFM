@@ -97,6 +97,8 @@ cfdemCloud::cfdemCloud
     radii_(NULL),
     voidfractions_(NULL),
     cellIDs_(NULL),
+    particleDensities_(NULL),
+    particleTypes_(NULL),
     particleWeights_(NULL),
     particleVolumes_(NULL),
     particleV_(NULL),
@@ -743,8 +745,10 @@ bool cfdemCloud::reAllocArrays()
         dataExchangeM().allocateArray(particleWeights_,0.,voidFractionM().maxCellsPerParticle());
         dataExchangeM().allocateArray(particleVolumes_,0.,voidFractionM().maxCellsPerParticle());
         dataExchangeM().allocateArray(particleV_,0.,1);
+	Info << "\nnow allocating particle densities array.\n" << endl;
         if(getParticleDensities_) dataExchangeM().allocateArray(particleDensities_,0.,1);
-        if(getParticleTypes_) dataExchangeM().allocateArray(particleTypes_,0.,1);
+	Info << "\nnow allocating particle types array.\n" << endl;
+        if(getParticleTypes_) dataExchangeM().allocateArray(particleTypes_,0,1);
         arraysReallocated_ = true;
         return true;
     }

@@ -335,8 +335,10 @@ public:
        virtual inline int maxType() {return -1;}
        virtual inline bool multipleTypesDMax() {return false;}
        virtual inline bool multipleTypesDMin() {return false;}
+       inline bool getParticleDensities() const;
        virtual inline double ** particleDensity() const;
        virtual inline double particleDensity(label index) const;
+       inline bool getParticleTypes() const;
        virtual inline int ** particleTypes() const;
        virtual inline label particleType(label index) const;
 

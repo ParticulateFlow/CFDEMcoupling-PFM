@@ -187,6 +187,11 @@ void ZehnerSchluenderThermCond::calcPartKsField() const
 {
     if (typeKs_.size() <= 1) return;
 
+    if (!particleCloud_.getParticleTypes())
+    {
+        FatalError << "ZehnerSchluenderThermCond needs data for more than one type, but types are not communicated." << abort(FatalError);
+    }
+
     allocateMyArrays();
     label cellI=0;
     label partType = 0;
