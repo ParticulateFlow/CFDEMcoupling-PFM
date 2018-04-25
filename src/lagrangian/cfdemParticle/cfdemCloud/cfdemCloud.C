@@ -98,6 +98,7 @@ cfdemCloud::cfdemCloud
     voidfractions_(NULL),
     cellIDs_(NULL),
     particleDensities_(NULL),
+    particleEffVolFactors_(NULL),
     particleTypes_(NULL),
     particleWeights_(NULL),
     particleVolumes_(NULL),
@@ -376,6 +377,7 @@ cfdemCloud::~cfdemCloud()
     dataExchangeM().destroy(particleVolumes_,1);
     dataExchangeM().destroy(particleV_,1);
     if(getParticleDensities_) dataExchangeM().destroy(particleDensities_,1);
+    if(getParticleEffVolFactors_) dataExchangeM().destroy(particleEffVolFactors_,1);
     if(getParticleTypes_) dataExchangeM().destroy(particleTypes_,1);
 }
 
@@ -390,6 +392,7 @@ void cfdemCloud::getDEMdata()
         dataExchangeM().getData("dragAcc","vector-atom",fAcc_); // array is used twice - might be necessary to clean it first
 
     if(getParticleDensities_) dataExchangeM().getData("density","scalar-atom",particleDensities_);
+    if(getParticleEffVolFactors_) dataExchangeM().getData("effvolfactor","scalar-atom",particleEffVolFactors_);
     if(getParticleTypes_) dataExchangeM().getData("type","scalar-atom",particleTypes_);
 }
 
@@ -745,9 +748,8 @@ bool cfdemCloud::reAllocArrays()
         dataExchangeM().allocateArray(particleWeights_,0.,voidFractionM().maxCellsPerParticle());
         dataExchangeM().allocateArray(particleVolumes_,0.,voidFractionM().maxCellsPerParticle());
         dataExchangeM().allocateArray(particleV_,0.,1);
-	Info << "\nnow allocating particle densities array.\n" << endl;
         if(getParticleDensities_) dataExchangeM().allocateArray(particleDensities_,0.,1);
-	Info << "\nnow allocating particle types array.\n" << endl;
+        if(getParticleEffVolFactors_) dataExchangeM().allocateArray(particleEffVolFactors_,0.,1);
         if(getParticleTypes_) dataExchangeM().allocateArray(particleTypes_,0,1);
         arraysReallocated_ = true;
         return true;

@@ -94,7 +94,7 @@ void bigParticleVoidFraction::setvoidFraction(double** const& mask,double**& voi
 
     scalar radius(-1);
     scalar volume(0);
-    scalar scaleVol= weight();
+    scalar scaleVol = weight();
     scalar scaleRadius = pow(porosity(),1./3.);
 
     for(int index=0; index< particleCloud_.numberOfParticles(); index++)
@@ -113,6 +113,7 @@ void bigParticleVoidFraction::setvoidFraction(double** const& mask,double**& voi
             //collecting data
             label particleCenterCellID=particleCloud_.cellIDs()[index][0];
             radius =  particleCloud_.radius(index);
+            if (multiWeights_) scaleVol = weight(index);
             volume = constant::mathematical::fourPiByThree*radius*radius*radius*scaleVol;
             radius *= scaleRadius;
             vector positionCenter=particleCloud_.position(index);

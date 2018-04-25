@@ -239,6 +239,20 @@ inline double cfdemCloud::particleDensity(label index) const
     }
 }
 
+inline bool cfdemCloud::getParticleEffVolFactors() const
+{
+    return getParticleEffVolFactors_;
+}
+
+inline double cfdemCloud::particleEffVolFactor(label index) const
+{
+    if(!getParticleEffVolFactors_) return -1.0;
+    else
+    {
+        return particleEffVolFactors_[index][0];
+    }
+}
+
 inline bool cfdemCloud::getParticleTypes() const
 {
     return getParticleTypes_;
