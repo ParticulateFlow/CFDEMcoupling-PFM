@@ -14,16 +14,4 @@
     vector refDirection(mirrorProperties.lookup("refDirection"));
 
     word fieldName(mirrorProperties.lookup("fieldName"));
-
-    volScalarField origField
-    (
-        IOobject
-        (
-            fieldName,
-            runTime.timeName(),
-            mesh,
-            IOobject::READ_IF_PRESENT,
-            IOobject::NO_WRITE
-        ),
-        mesh
-    );
+    word dataBaseName(mirrorProperties.lookup("dataBaseName"));

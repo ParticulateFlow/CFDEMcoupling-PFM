@@ -55,14 +55,18 @@ int main(int argc, char *argv[])
     Info << "end time = " << runTime.endTime() << endl;
 
     // check which time directories are present
-
-    instantList timeDirs = timeSelector::select0(runTime, args);
-
-    runTime.setTime(timeDirs[0], 0);
+    // instantList timeDirs = timeSelector::select0(runTime, args);
+    // runTime.setTime(timeDirs[0], 0);
 
     #include "createMesh.H"
 
     #include "createFields.H"
+
+    Foam::Time recTime(fileName(dataBaseName), "", "../system", "../constant", false);
+    instantList timeDirs(recTime.times());
+    recTime.setTime(timeDirs[0],0);
+
+    #include "readFields.H"
 
     Info << fieldName << endl;
 
@@ -76,26 +80,29 @@ int main(int argc, char *argv[])
     label shift = 0;
     forAll(timeDirs, timeI)
     {
-       runTime.setTime(timeDirs[timeI], timeI);
-       t = runTime.value();
+
+       if (recTime.timeName() == "constant") continue;
+       recTime.setTime(timeDirs[timeI], timeI);
+       t = recTime.value();
        if(t < startTime) continue;
        if(t > endTime) continue;
        shift++;
     }
 
     scalar dt = origTimeRange / (shift - 1.0);
-    runTime.setEndTime(startTime + 2 * origTimeRange + dt);
+    recTime.setEndTime(startTime + 2 * origTimeRange + dt);
 
     label cellI_transformed = -1;
     forAll(timeDirs, timeI)
     {
-       runTime.setTime(timeDirs[timeI], timeI);
-       t = runTime.value();
+
+       recTime.setTime(timeDirs[timeI], timeI);
+       t = recTime.value();
        if(t < startTime) continue;
        if(t > endTime) continue;
        Info << "time = " << t << ", time index = " << timeI << endl;
 
-       #include "createFields.H"
+       #include "readFields.H"
 
        forAll(transformedField, cellI)
        {
@@ -115,7 +122,7 @@ int main(int argc, char *argv[])
        }
 
        shiftedTimeI = timeI + shift;
-       t = runTime.value() + origTimeRange + dt;
+       t = recTime.value() + origTimeRange + dt;
        runTime.setTime(t, shiftedTimeI);
        Info << "creating transformed fields for time = " << t << ", time index = " << shiftedTimeI << endl;
        transformedField.write();
