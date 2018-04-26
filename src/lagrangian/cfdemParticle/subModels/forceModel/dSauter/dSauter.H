@@ -49,7 +49,7 @@ private:
     
     mutable double **d3_;
 
-    labelList typeCG_;
+    scalarList typeCG_;
     
     mutable volScalarField d2Field_;
     

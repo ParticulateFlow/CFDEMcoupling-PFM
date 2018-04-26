@@ -60,6 +60,7 @@ $(forceModels)/viscForce/viscForce.C
 $(forceModels)/MeiLift/MeiLift.C
 $(forceModels)/particleCellVolume/particleCellVolume.C
 $(forceModels)/BeetstraDrag/BeetstraDrag.C
+$(forceModels)/BeetstraDragPoly/BeetstraDragPoly.C
 $(forceModels)/dSauter/dSauter.C
 $(forceModels)/Fines/Fines.C
 $(forceModels)/Fines/FinesFields.C

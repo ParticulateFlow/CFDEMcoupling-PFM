@@ -56,7 +56,7 @@ dSauter::dSauter
     multiTypes_(false),
     d2_(NULL),
     d3_(NULL),
-    typeCG_(propsDict_.lookupOrDefault<labelList>("coarseGrainingFactors",labelList(1,1))),
+    typeCG_(propsDict_.lookupOrDefault<scalarList>("coarseGrainingFactors",scalarList(1,1.0))),
     d2Field_
     (   IOobject
         (
@@ -127,7 +127,7 @@ void dSauter::allocateMyArrays() const
 
 void dSauter::setForce() const
 {
-    if (typeCG_.size()>1 || typeCG_[0] > 1)
+    if (typeCG_.size()>1 || typeCG_[0] > 1.0)
     {
         Info << "dSauter using CG factor(s) = " << typeCG_ << endl;
     }
@@ -135,8 +135,8 @@ void dSauter::setForce() const
     allocateMyArrays();
 
     label cellI = 0;
-    label cg = 1;
     label partType = 1;
+    scalar cg = typeCG_[0];
     scalar ds = 0.0;
     scalar effVolFac = 1.0;
 
@@ -150,8 +150,11 @@ void dSauter::setForce() const
             {
                 effVolFac = particleCloud_.particleEffVolFactor(index);
             }
-            if (multiTypes_) partType = particleCloud_.particleType(index);
-            cg = typeCG_[partType - 1];
+            if (multiTypes_) 
+            {
+                partType = particleCloud_.particleType(index);
+                cg = typeCG_[partType - 1];
+            }
             ds = particleCloud_.d(index);
             d2_[index][0] = ds*ds*effVolFac*cg;
             d3_[index][0] = ds*ds*ds*effVolFac;

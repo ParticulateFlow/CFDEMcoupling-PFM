@@ -18,13 +18,13 @@ Description
     Beetstra et al. AIChE J 53.2 (2007)
 
 SourceFiles
-    BeetstraDrag.C
+    BeetstraDragPoly.C
 \*---------------------------------------------------------------------------*/
 
-#ifndef BeetstraDrag_H
-#define BeetstraDrag_H
+#ifndef BeetstraDragPoly_H
+#define BeetstraDragPoly_H
 
-#include "forceModel.H"
+#include "BeetstraDrag.H"
 #include "interpolationCellPoint.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -33,80 +33,37 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class BeetstraDrag Declaration
+                           Class BeetstraDragPoly Declaration
 \*---------------------------------------------------------------------------*/
 
-class BeetstraDrag
+class BeetstraDragPoly
 :
-    public forceModel
+    public BeetstraDrag
 {
 protected:
-    dictionary propsDict_;
 
-    bool multiTypes_;
+    const bool fines_;
 
-    word velFieldName_;
+    autoPtr<volScalarField> alphaSt_;
 
-    const volVectorField& U_;
+    const volScalarField& dSauter_;
 
-    word voidfractionFieldName_;
+    autoPtr<volScalarField> dSauterMix_;
 
-    const volScalarField& voidfraction_;
+    void adaptVoidfraction(double&, label) const;
 
-    const scalar minVoidfraction_;
-
-    word UsFieldName_;
-
-    const volVectorField& UsField_;
-
-    mutable scalar scaleDia_;
-
-    scalarList typeCG_;
-
-    mutable scalar scaleDrag_;
-
-    mutable scalar rhoP_;
-
-    mutable scalar rho_;
-
-    mutable scalar Lc2_;
-
-    mutable scalar dPrim_;
-
-    mutable scalar nuf_;
-
-    mutable scalar g_;
-
-    mutable scalar k_;
-
-    bool useGC_;
-
-    bool usePC_;
-
-    virtual void adaptVoidfraction(double&, label) const {}
-
-    virtual scalar effDiameter(double d, double voidfraction, label cellI, label index) const {return d;}
-
-    double F(double, double) const;
-
-    double terminalVelocity(double, double, double, double, double, double) const; 
-
-    double a(double) const;
-
-    double h(double) const;
-
-
+    scalar effDiameter(double, double, label, label) const;
 
 public:
 
     //- Runtime type information
-    TypeName("BeetstraDrag");
+    TypeName("BeetstraDragPoly");
 
 
     // Constructors
 
         //- Construct from components
-        BeetstraDrag
+        BeetstraDragPoly
         (
             const dictionary& dict,
             cfdemCloud& sm
@@ -114,11 +71,10 @@ public:
 
     // Destructor
 
-        ~BeetstraDrag();
+        ~BeetstraDragPoly();
 
 
     // Member Functions
-        void setForce() const;
 };
 
 
