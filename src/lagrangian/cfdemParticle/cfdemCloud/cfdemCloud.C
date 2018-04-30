@@ -84,6 +84,7 @@ cfdemCloud::cfdemCloud
     allowCFDsubTimestep_(true),
     limitDEMForces_(false),
     getParticleDensities_(couplingProperties_.lookupOrDefault<bool>("getParticleDensities",false)),
+    getParticleEffVolFactors_(couplingProperties_.lookupOrDefault<bool>("getParticleEffVolFactors",false)),
     getParticleTypes_(couplingProperties_.lookupOrDefault<bool>("getParticleTypes",false)),
     modelType_(couplingProperties_.lookup("modelType")),
     positions_(NULL),
