@@ -118,6 +118,8 @@ protected:
 
     mutable double **radii_;
 
+    mutable double **densities_;
+
     mutable double **voidfractions_;
 
     mutable int **cellIDs_;
@@ -298,9 +300,13 @@ public:
 
        inline double ** radii() const;
 
+       inline double ** densities() const;
+
        inline double ** voidfractions() const;
 
        inline void get_radii(double**&) const;
+
+       inline void get_densities(double**&) const;
 
        inline int ** cellIDs() const;
 
@@ -313,6 +319,8 @@ public:
        virtual inline double particleVolume(int) const;
 
        inline scalar radius(int) const;
+
+       inline scalar density(int) const;
 
        virtual inline double d(int) const;
 

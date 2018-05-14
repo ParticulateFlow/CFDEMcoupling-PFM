@@ -63,6 +63,14 @@ private:
 
     const volVectorField& U_;
 
+    word voidfractionFieldName_;
+
+    const volScalarField& voidfraction_;
+
+    word UsFieldName_;
+
+    const volVectorField& Us_;
+
     word phiFieldName_;
 
     const surfaceScalarField& phi_;
@@ -72,8 +80,13 @@ private:
     mutable bool splitUrelCalculation_;    //indicator to split calculation of Urel between CFDEM and LIGGGHTS
                                            //requires the integration fix to take dv/dt into account!
 
-    mutable double Cadd_;                  //indicator to split calculation of Urel between CFDEM and LIGGGHTS
-                                           //requires the integration fix to take dv/dt into account!
+    mutable double Cadd_;                  //custom Cadd value
+
+    mutable bool useUs_;				   //indicator to use averaged Us instead of v_p
+
+    mutable bool useFelderhof_;			   //indicator to use Cadd values from Felderhof
+
+
 
 public:
 

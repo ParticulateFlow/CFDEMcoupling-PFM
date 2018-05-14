@@ -93,6 +93,7 @@ cfdemCloud::cfdemCloud
     DEMForces_(NULL),
     Cds_(NULL),
     radii_(NULL),
+	densities_(NULL),
     voidfractions_(NULL),
     cellIDs_(NULL),
     particleWeights_(NULL),
@@ -353,6 +354,7 @@ cfdemCloud::~cfdemCloud()
     dataExchangeM().destroy(DEMForces_,3);
     dataExchangeM().destroy(Cds_,1);
     dataExchangeM().destroy(radii_,1);
+    dataExchangeM().destroy(densities_,1);
     dataExchangeM().destroy(voidfractions_,1);
     dataExchangeM().destroy(cellIDs_,1);
     dataExchangeM().destroy(particleWeights_,1);
@@ -364,6 +366,7 @@ cfdemCloud::~cfdemCloud()
 void cfdemCloud::getDEMdata()
 {
     dataExchangeM().getData("radius","scalar-atom",radii_);
+    dataExchangeM().getData("density","scalar-atom",densities_);
     dataExchangeM().getData("x","vector-atom",positions_);
     dataExchangeM().getData("v","vector-atom",velocities_);
 
@@ -698,6 +701,7 @@ bool cfdemCloud::reAllocArrays()
         dataExchangeM().allocateArray(DEMForces_,0.,3);
         dataExchangeM().allocateArray(Cds_,0.,1);
         dataExchangeM().allocateArray(radii_,0.,1);
+        dataExchangeM().allocateArray(densities_,0.,1);
         dataExchangeM().allocateArray(voidfractions_,1.,voidFractionM().maxCellsPerParticle());
         dataExchangeM().allocateArray(cellIDs_,-1,voidFractionM().maxCellsPerParticle());
         dataExchangeM().allocateArray(particleWeights_,0.,voidFractionM().maxCellsPerParticle());
