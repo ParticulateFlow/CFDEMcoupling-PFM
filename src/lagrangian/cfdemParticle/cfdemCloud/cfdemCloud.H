@@ -104,6 +104,8 @@ protected:
 
     mutable double **velocities_;
 
+    mutable double **omegas_;
+
     mutable double **fluidVel_;
 
     mutable double **fAcc_;
@@ -246,6 +248,8 @@ public:
 
        vector velocity(int) const;
 
+       vector omega(int) const;
+
        vector expForce(int) const;
 
        vector fluidVel(int) const;
@@ -285,6 +289,8 @@ public:
        inline double ** positions() const;
 
        inline double ** velocities() const;
+
+       inline double ** omegas() const;
 
        inline double ** fluidVels() const;
 
@@ -335,10 +341,8 @@ public:
        virtual inline int ** particleTypes() const {return NULL;}
        virtual label particleType(label index) const {return -1;}
 
-       //access to the particle's rotation and torque data
+       //access to the particle's torque data
        virtual inline double ** DEMTorques() const {return NULL;}
-       virtual inline double ** omegaArray() const {return NULL;}
-       virtual vector omega(int) const {return vector(0,0,0);}
 
        //access to the particles' orientation information
        virtual inline double ** exArray() const {return NULL;}

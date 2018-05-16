@@ -86,6 +86,7 @@ cfdemCloud::cfdemCloud
     modelType_(couplingProperties_.lookup("modelType")),
     positions_(NULL),
     velocities_(NULL),
+	omegas_(NULL),
     fluidVel_(NULL),
     fAcc_(NULL),
     impForces_(NULL),
@@ -347,6 +348,7 @@ cfdemCloud::~cfdemCloud()
     clockM().normHist();
     dataExchangeM().destroy(positions_,3);
     dataExchangeM().destroy(velocities_,3);
+    dataExchangeM().destroy(omegas_,3);
     dataExchangeM().destroy(fluidVel_,3);
     dataExchangeM().destroy(fAcc_,3);
     dataExchangeM().destroy(impForces_,3);
@@ -369,6 +371,7 @@ void cfdemCloud::getDEMdata()
     dataExchangeM().getData("density","scalar-atom",densities_);
     dataExchangeM().getData("x","vector-atom",positions_);
     dataExchangeM().getData("v","vector-atom",velocities_);
+    dataExchangeM().getData("omega","vector-atom",omegas_);
 
     if(impDEMdragAcc_)
         dataExchangeM().getData("dragAcc","vector-atom",fAcc_); // array is used twice - might be necessary to clean it first
@@ -496,6 +499,11 @@ vector cfdemCloud::position(int index) const
 vector cfdemCloud::velocity(int index) const
 {
     return vector(velocities()[index][0],velocities()[index][1],velocities()[index][2]);
+}
+
+vector cfdemCloud::omega(int index) const
+{
+    return vector(omegas()[index][0],omegas()[index][1],omegas()[index][2]);
 }
 
 vector cfdemCloud::expForce(int index) const
@@ -694,6 +702,7 @@ bool cfdemCloud::reAllocArrays()
         // get arrays of new length
         dataExchangeM().allocateArray(positions_,0.,3);
         dataExchangeM().allocateArray(velocities_,0.,3);
+        dataExchangeM().allocateArray(omegas_,0.,3);
         dataExchangeM().allocateArray(fluidVel_,0.,3);
         dataExchangeM().allocateArray(fAcc_,0.,3);
         dataExchangeM().allocateArray(impForces_,0.,3);

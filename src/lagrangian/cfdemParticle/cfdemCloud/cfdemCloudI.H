@@ -110,6 +110,11 @@ inline double ** cfdemCloud::velocities() const
     return velocities_;
 }
 
+inline double ** cfdemCloud::omegas() const
+{
+    return omegas_;
+}
+
 inline double ** cfdemCloud::fluidVels() const
 {
     return fluidVel_;

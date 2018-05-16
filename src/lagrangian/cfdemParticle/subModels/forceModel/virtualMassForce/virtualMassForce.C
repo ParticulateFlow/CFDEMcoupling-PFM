@@ -113,7 +113,7 @@ virtualMassForce::virtualMassForce
         useUs_ = readBool(propsDict_.lookup("useUs"));
         if(useUs_)
         {
-            Info << "Virtual mass model: using averaged Us";
+            Info << "Virtual mass model: using averaged Us \n";
             Info << "WARNING: ignoring virtual mass of relative particle motion/collisions \n";
         }
     }
@@ -122,7 +122,7 @@ virtualMassForce::virtualMassForce
         useFelderhof_ = readBool(propsDict_.lookup("useFelderhof"));
         if(useFelderhof_)
         {
-            Info << "Virtual mass model: using Cadd correlation by Felderhof";
+            Info << "Virtual mass model: using Cadd correlation by Felderhof \n";
             Info << "WARNING: ignoring user-set Cadd \n";
         }
     }
