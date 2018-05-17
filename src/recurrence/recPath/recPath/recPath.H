@@ -52,7 +52,7 @@ protected:
 
     labelPairList& virtualTimeIndexList_;
 
-    virtual void getRecPath() = 0;
+    virtual void getRecPath();
 
     virtual void computeRecPath() = 0;
 
