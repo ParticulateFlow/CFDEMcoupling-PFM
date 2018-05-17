@@ -1,0 +1,10 @@
+recurrenceTurbulenceModel/recurrenceTurbulenceModel.C
+
+
+recurrenceTurbulenceModels.C
+
+recurrenceKEpsilon/recurrenceKEpsilon.C
+recurrenceKOmega/recurrenceKOmega.C
+recurrenceSmagorinsky/recurrenceSmagorinsky.C
+
+LIB = $(FOAM_USER_LIBBIN)/librecurrenceTwoPhaseTurbulenceModels
