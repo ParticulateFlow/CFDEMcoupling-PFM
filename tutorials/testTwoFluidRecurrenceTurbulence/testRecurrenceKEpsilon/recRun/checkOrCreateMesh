@@ -1,0 +1,27 @@
+#!/bin/bash
+cd ${0%/*} || exit 1    # Run from this directory
+
+
+if [ -e constant/polyMesh ];
+then
+    echo "mesh exists"
+else
+    echo "no mesh found"
+    echo "   ... looking for dataBase mesh"
+    
+    if [ -e ../dataBase ];
+    then
+        echo "dataBase mesh exists"
+        echo "   ... copying mesh from dataBase case"
+        
+        cp -r ../dataBase/constant/polyMesh constant/
+    else
+        echo "dataBase mesh not found"
+        
+        exit 666
+    fi
+fi
+
+echo ""
+
+#------------------------------------------------------------------------------
