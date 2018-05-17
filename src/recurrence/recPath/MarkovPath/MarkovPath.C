@@ -104,28 +104,8 @@ MarkovPath::~MarkovPath()
 
 void MarkovPath::getRecPath()
 {
-    label numRecIntervals = 0;
-
-    if (Pstream::master())
-    {
-        computeRecPath();
-        numRecIntervals=virtualTimeIndexList_.size();
-    }
-
-    Pstream::scatter(numRecIntervals);
+    recPath::getRecPath();
     Pstream::scatter(recSteps_);
-
-    if (!Pstream::master())
-    {
-        virtualTimeIndexList_.setSize(numRecIntervals);
-    }
-
-    Pstream::scatter(virtualTimeIndexList_);
-
-    if (verbose_)
-    {
-        Info << "\nRecurrence path communicated to all processors.\n" << endl;
-    }
 }
 
 

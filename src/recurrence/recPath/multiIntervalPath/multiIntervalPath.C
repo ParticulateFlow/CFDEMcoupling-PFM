@@ -108,32 +108,6 @@ multiIntervalPath::~multiIntervalPath()
 
 // * * * * * * * * * * * * * protected Member Functions  * * * * * * * * * * * * //
 
-void multiIntervalPath::getRecPath()
-{
-    label numRecIntervals = 0;
-
-    if (Pstream::master())
-    {
-        computeRecPath();
-        numRecIntervals=virtualTimeIndexList_.size();
-    }
-
-    Pstream::scatter(numRecIntervals);
-
-    if (!Pstream::master())
-    {
-        virtualTimeIndexList_.setSize(numRecIntervals);
-    }
-
-    Pstream::scatter(virtualTimeIndexList_);
-
-    if (verbose_)
-    {
-        Info << "\nRecurrence path communicated to all processors.\n" << endl;
-    }
-}
-
-
 void multiIntervalPath::computeRecPath()
 {
     Info << "\nComputing recurrence path\n" << endl;

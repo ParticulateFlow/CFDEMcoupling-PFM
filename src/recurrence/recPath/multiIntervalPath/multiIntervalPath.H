@@ -49,8 +49,6 @@ protected:
 
     dictionary propsDict_;
 
-    void getRecPath();
-
     void computeRecPath();
 
     label meanIntervalSteps_;
