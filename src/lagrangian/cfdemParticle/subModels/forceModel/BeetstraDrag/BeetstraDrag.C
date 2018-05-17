@@ -236,7 +236,7 @@ void BeetstraDrag::setForce() const
 
                 Rep=ds_scaled*voidfraction*magUr/nuf + SMALL;
 
-                dragCoefficient = F(Rep, voidfraction)
+                dragCoefficient = F(voidfraction, Rep)
                                    *3*M_PI*nuf*rho*voidfraction
                                    *effDiameter(ds_scaled, voidfraction, cellI, index)
                                    *scaleDia3*scaleDrag_;
