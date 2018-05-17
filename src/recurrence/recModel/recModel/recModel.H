@@ -219,6 +219,22 @@ public:
 
     void writeRecPath();
 
+
+    const wordList volScalarFieldNames()
+    {
+        return volScalarFieldNames_;
+    }
+
+    const wordList volVectorFieldNames()
+    {
+        return volVectorFieldNames_;
+    }
+
+    const wordList surfaceScalarFieldNames()
+    {
+        return surfaceScalarFieldNames_;
+    }
+
     void writeRecPathLastInterval();
 };
 
