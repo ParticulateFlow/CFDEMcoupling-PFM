@@ -56,12 +56,24 @@ BeetstraDrag::BeetstraDrag
     UsFieldName_(propsDict_.lookup("granVelFieldName")),
     UsField_(sm.mesh().lookupObject<volVectorField> (UsFieldName_)),
     scaleDia_(1.),
-    scaleDrag_(1.)
+    scaleDrag_(1.),
+	polydisperse_(false),
+	dSauterFieldName_(propsDict_.lookup("dSauterFieldName")),
+	dSauterField_(sm.mesh().lookupObject<volScalarField> (dSauterFieldName_))
 {
+
+	if(propsDict_.found("polydisperse"))
+	{
+	    polydisperse_ = readBool(propsDict_.lookup("polydisperse"));
+	    if(polydisperse_)
+	    {
+	        Info << "Drag model: using polydisperse correction factor \n";
+	    }
+	}
     //Append the field names to be probed
     particleCloud_.probeM().initialize(typeName, typeName+".logDat");
     particleCloud_.probeM().vectorFields_.append("dragForce"); //first entry must  be the force
-    particleCloud_.probeM().vectorFields_.append("Urel");
+    particleCloud_.probeM().vectorFields_.append("Urelsup");
     particleCloud_.probeM().scalarFields_.append("Rep");
     particleCloud_.probeM().scalarFields_.append("betaP");
     particleCloud_.probeM().scalarFields_.append("voidfraction");
@@ -112,35 +124,41 @@ void BeetstraDrag::setForce() const
     vector position(0,0,0);
     scalar voidfraction(1);
     vector Ufluid(0,0,0);
+    vector Ufluidsup(0,0,0);
     vector drag(0,0,0);
-    label cellI=0;
+    label  cellI = 0;
 
     vector Us(0,0,0);
-    vector Ur(0,0,0);
+    vector Ursup(0,0,0);
     scalar ds(0);
     scalar ds_scaled(0);
     scalar scaleDia3 = scaleDia_*scaleDia_*scaleDia_;
     scalar nuf(0);
     scalar rho(0);
-    scalar magUr(0);
+    scalar magUrsup(0);
     scalar Rep(0);
     scalar localPhiP(0);
+    scalar Fdrag(0);
+    scalar yi(0);
+    scalar dSauter(0);
 
     vector dragExplicit(0,0,0);
     scalar dragCoefficient(0);
 
     interpolationCellPoint<scalar> voidfractionInterpolator_(voidfraction_);
+    interpolationCellPoint<scalar> dSauterInterpolator_(dSauterField_);
     interpolationCellPoint<vector> UInterpolator_(U_);
 
     #include "setupProbeModel.H"
 
     for(int index = 0; index < particleCloud_.numberOfParticles(); ++index)
     {
-            cellI = particleCloud_.cellIDs()[index][0];
-            drag = vector(0,0,0);
-            dragExplicit = vector(0,0,0);
-            Ufluid =vector(0,0,0);
-            voidfraction=0;
+            cellI 			= particleCloud_.cellIDs()[index][0];
+            drag			= vector(0,0,0);
+            dragExplicit 	= vector(0,0,0);
+            Ufluid 			= vector(0,0,0);
+            Ufluidsup       = vector(0,0,0);
+            voidfraction	= 0;
             dragCoefficient = 0;
 
             if (cellI > -1) // particle found
@@ -154,7 +172,7 @@ void BeetstraDrag::setForce() const
                     //Ensure interpolated void fraction to be meaningful
                     // Info << " --> voidfraction: " << voidfraction << endl;
                     if(voidfraction>1.00) voidfraction = 1.0;
-                    if(voidfraction<0.10) voidfraction = 0.10;
+                    if(voidfraction<0.30) voidfraction = 0.30;
                 }
                 else
                 {
@@ -162,41 +180,56 @@ void BeetstraDrag::setForce() const
                     Ufluid = U_[cellI];
                 }
 
-                Us = particleCloud_.velocity(index);
-                Ur = Ufluid-Us;
-                magUr = mag(Ur);
-                ds = 2*particleCloud_.radius(index);
-                ds_scaled = ds/scaleDia_;
-                rho = rhoField[cellI];
-                nuf = nufField[cellI];
+                Ufluidsup   = Ufluid*voidfraction;
+                Us 			= particleCloud_.velocity(index);
+                Ursup       = Ufluidsup-Us;
+                magUrsup 	= mag(Ursup);
+                ds 		 	= 2*particleCloud_.radius(index);
+                ds_scaled 	= ds/scaleDia_;
+                rho 		= rhoField[cellI];
+                nuf 		= nufField[cellI];
+                localPhiP 	= 1.0f-voidfraction+SMALL;
 
-                Rep=0.0;
-                localPhiP = 1.0f-voidfraction+SMALL;
+                // Ur is interstitial velocity, Beetstra uses superficial!
+                Rep			=	ds_scaled*magUrsup/nuf+SMALL;
 
-                // calc particle's drag coefficient (i.e., Force per unit slip velocity and Stokes drag)
+                // Beetstra et. al (2007), Eq. (21)
+                Fdrag 		= 10.0*localPhiP/(voidfraction*voidfraction)
+                			+ voidfraction*voidfraction*(1.0+1.5*sqrt(localPhiP))
+							+ 0.413*Rep/(24*voidfraction*voidfraction)
+							* (1.0/voidfraction + 3*voidfraction*localPhiP + 8.4*pow(Rep,-0.343))
+							/ (1+pow(10,3*localPhiP)*pow(Rep,-0.5*(1+4*localPhiP)));
 
-                Rep=ds_scaled*voidfraction*magUr/nuf+SMALL;
-                dragCoefficient = 10.0*localPhiP/(voidfraction*voidfraction) +
-                                  voidfraction*voidfraction*(1.0+1.5*Foam::sqrt(localPhiP)) +
-                                  0.413*Rep/(24*voidfraction*voidfraction)*(1.0/voidfraction+3*voidfraction*localPhiP+8.4*Foam::pow(Rep,-0.343))/
-                                  (1+Foam::pow(10,3*localPhiP)*Foam::pow(Rep,-0.5*(1+4*localPhiP)));
+                if (polydisperse_)
+                {
+                	if( forceSubM(0).interpolation() )
+                		dSauter = dSauterInterpolator_.interpolate(position,cellI);
+                	else
+                		dSauter = dSauterField_[cellI];
+
+                	// Beetstra et. al (2007), Eq. (21)
+                	yi 		= ds_scaled/dSauter;
+                	Fdrag 	*= (voidfraction*yi + localPhiP*yi*yi + 0.064*voidfraction*yi*yi*yi);
+                }
 
                 // calc particle's drag
-                dragCoefficient *= 3*M_PI*ds_scaled*nuf*rho*voidfraction*scaleDia3*scaleDrag_;
+                dragCoefficient = Fdrag*3.0*M_PI*ds_scaled*nuf*rho*scaleDrag_*scaleDia3;
+
                 if (modelType_=="B")
                     dragCoefficient /= voidfraction;
 
-                drag = dragCoefficient * Ur;
+                drag = dragCoefficient * Ursup;
 
                 // explicitCorr
-                forceSubM(0).explicitCorr(drag,dragExplicit,dragCoefficient,Ufluid,U_[cellI],Us,UsField_[cellI],forceSubM(0).verbose());
+                forceSubM(0).explicitCorr(drag,dragExplicit,dragCoefficient,Ufluidsup,U_[cellI]*voidfraction_[cellI],Us,UsField_[cellI],forceSubM(0).verbose());
 
                 if(forceSubM(0).verbose() && index >=0 && index <2)
                 {
                     Pout << "cellI = " << cellI << endl;
                     Pout << "index = " << index << endl;
+                    Pout << "Ufluidsup = " << Ufluidsup << endl;
                     Pout << "Us = " << Us << endl;
-                    Pout << "Ur = " << Ur << endl;
+                    Pout << "Ursup = " << Ursup << endl;
                     Pout << "ds = " << ds << endl;
                     Pout << "ds/scale = " << ds/scaleDia_ << endl;
                     Pout << "rho = " << rho << endl;
@@ -211,7 +244,7 @@ void BeetstraDrag::setForce() const
                 {
                     #include "setupProbeModelfields.H"
                     vValues.append(drag);   //first entry must the be the force
-                    vValues.append(Ur);
+                    vValues.append(Ursup);
                     sValues.append(Rep);
                     sValues.append(voidfraction);
                     particleCloud_.probeM().writeProbe(index, sValues, vValues);
@@ -219,7 +252,7 @@ void BeetstraDrag::setForce() const
             }
 
             // write particle based data to global array
-            forceSubM(0).partToArray(index,drag,dragExplicit,Ufluid,dragCoefficient);
+            forceSubM(0).partToArray(index,drag,dragExplicit,Ufluidsup,dragCoefficient);
     }
 }
 

@@ -69,7 +69,7 @@ virtualMassForce::virtualMassForce
     U_(sm.mesh().lookupObject<volVectorField> (velFieldName_)),
 	voidfractionFieldName_(propsDict_.lookup("voidfractionFieldName")),
 	voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
-	UsFieldName_(propsDict_.lookup("UsFieldName")),
+	UsFieldName_(propsDict_.lookup("granVelFieldName")),
 	Us_(sm.mesh().lookupObject<volVectorField> (UsFieldName_)),
     phiFieldName_(propsDict_.lookup("phiFieldName")),
     phi_(sm.mesh().lookupObject<surfaceScalarField> (phiFieldName_)),

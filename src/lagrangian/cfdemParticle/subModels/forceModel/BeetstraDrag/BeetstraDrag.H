@@ -59,6 +59,12 @@ private:
 
     mutable scalar scaleDrag_;
 
+    mutable bool polydisperse_;
+
+    word dSauterFieldName_;
+
+    const volScalarField& dSauterField_;
+
 public:
 
     //- Runtime type information
