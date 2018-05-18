@@ -51,7 +51,7 @@ ZehnerSchluenderThermCond::ZehnerSchluenderThermCond
     thermCondModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
     partKsField_
-    (   
+    (
         IOobject
         (
             "partKs",
@@ -145,7 +145,7 @@ tmp<volScalarField> ZehnerSchluenderThermCond::thermCond() const
     scalar B = 0.0;
     scalar C = 0.0;
     scalar k = 0.0;
-    scalar OnemBoA = 0.0;
+    scalar InvOnemBoA = 0.0;
     scalar voidfraction = 0.0;
     scalar w = 7.26e-3;
 
@@ -157,9 +157,9 @@ tmp<volScalarField> ZehnerSchluenderThermCond::thermCond() const
         {
             A = partKsField_[cellI]/kf0_.value();
             B = 1.25 * Foam::pow((1 - voidfraction) / voidfraction, 1.11);
-            OnemBoA = 1.0 - B/A;
-            C = (A - 1) / (OnemBoA * OnemBoA) * B/A * log(A/B) - (B - 1)/OnemBoA - 0.5 * (B + 1);
-            C *= 2.0 / OnemBoA;
+            InvOnemBoA = 1.0/(1.0 - B/A);
+            C = (A - 1) * InvOnemBoA * InvOnemBoA * B/A * log(A/B) - (B - 1) * InvOnemBoA - 0.5 * (B + 1);
+            C *= 2.0 * InvOnemBoA;
             k = Foam::sqrt(1 - voidfraction) * (w * A + (1 - w) * C) * kf0_.value();
             svf[cellI] = k / (1 - voidfraction);
         }

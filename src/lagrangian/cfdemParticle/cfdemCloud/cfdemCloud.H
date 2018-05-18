@@ -341,7 +341,7 @@ public:
        virtual inline bool multipleTypesDMin() {return false;}
 
        inline bool getParticleDensities() const;
-       virtual inline double ** particleDensity() const;
+       virtual inline double ** particleDensities() const;
        virtual inline double particleDensity(label index) const;
 
        inline bool getParticleEffVolFactors() const;

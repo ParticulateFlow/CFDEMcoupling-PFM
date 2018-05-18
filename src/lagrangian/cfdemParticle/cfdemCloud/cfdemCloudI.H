@@ -221,7 +221,7 @@ inline bool cfdemCloud::getParticleDensities() const
     return getParticleDensities_;
 }
 
-inline double ** cfdemCloud::particleDensity() const
+inline double ** cfdemCloud::particleDensities() const
 {
     return particleDensities_;
 }
