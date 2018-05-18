@@ -163,6 +163,7 @@ void BeetstraDrag::setForce() const
     vector Ur(0,0,0);
     scalar ds(0);
     scalar ds_scaled(0);
+    scalar dSauter(0);
     scalar scaleDia3 = typeCG_[0]*typeCG_[0]*typeCG_[0];
     scalar nuf(0);
     scalar rho(0);
@@ -225,20 +226,20 @@ void BeetstraDrag::setForce() const
                 magUr = mag(Ur);
                 ds = 2*particleCloud_.radius(index);
                 ds_scaled = ds/cg;
+                dSauter = meanSauterDiameter(ds_scaled, cellI);
 
                 rho = rhoField[cellI];
                 nuf = nufField[cellI];
 
-                Rep=0.0;
                 localPhiP = 1.0f-voidfraction+SMALL;
 
                 // calc particle's drag coefficient (i.e., Force per unit slip velocity and Stokes drag)
 
-                Rep=ds_scaled*voidfraction*magUr/nuf + SMALL;
+                Rep=dSauter*voidfraction*magUr/nuf + SMALL;
 
                 dragCoefficient = F(voidfraction, Rep)
                                    *3*M_PI*nuf*rho*voidfraction
-                                   *effDiameter(ds_scaled, voidfraction, cellI, index)
+                                   *effDiameter(ds_scaled, cellI, index)
                                    *scaleDia3*scaleDrag_;
                 
                 // calculate filtering corrections

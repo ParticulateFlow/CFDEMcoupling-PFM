@@ -85,7 +85,9 @@ protected:
 
     virtual void adaptVoidfraction(double&, label) const {}
 
-    virtual scalar effDiameter(double d, double voidfraction, label cellI, label index) const {return d;}
+    virtual scalar effDiameter(double d, label cellI, label index) const {return d;}
+    
+    virtual scalar meanSauterDiameter(double d, label cellI) const {return d;}
 
     double F(double, double) const;
 

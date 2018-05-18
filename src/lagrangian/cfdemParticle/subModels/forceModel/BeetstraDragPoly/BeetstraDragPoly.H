@@ -43,16 +43,20 @@ class BeetstraDragPoly
 protected:
 
     const bool fines_;
+    
+    scalar dFine_;
 
+    autoPtr<volScalarField> alphaP_;
+    
     autoPtr<volScalarField> alphaSt_;
 
-    const volScalarField& dSauter_;
-
-    autoPtr<volScalarField> dSauterMix_;
+    autoPtr<volScalarField> dSauter_;
 
     void adaptVoidfraction(double&, label) const;
 
-    scalar effDiameter(double, double, label, label) const;
+    scalar effDiameter(double, label, label) const;
+    
+    scalar meanSauterDiameter(double, label) const;
 
 public:
 

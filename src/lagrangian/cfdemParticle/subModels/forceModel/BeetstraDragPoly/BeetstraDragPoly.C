@@ -49,14 +49,26 @@ BeetstraDragPoly::BeetstraDragPoly
 :
     BeetstraDrag(dict,sm),
     fines_(propsDict_.lookupOrDefault<bool>("fines",false)),
-    dSauter_(sm.mesh().lookupObject<volScalarField> ("dSauter"))
+    dFine_(propsDict_.lookupOrDefault<scalar>("dFine",1.0))
 {
+    // if fines are present, take mixture dSauter, otherwise normal dSauter
     if (fines_)
     {
+        if (!propsDict_.found("dFine"))
+        {
+            FatalError << "forceModel BeetstraDragPoly: Define fines diameter." << abort(FatalError);  
+        }
+        volScalarField& alphaP(const_cast<volScalarField&>(sm.mesh().lookupObject<volScalarField> ("alphaP")));
+        alphaP_.set(&alphaP);
         volScalarField& alphaSt(const_cast<volScalarField&>(sm.mesh().lookupObject<volScalarField> ("alphaSt")));
         alphaSt_.set(&alphaSt);
-        volScalarField& dSauterMix(const_cast<volScalarField&>(sm.mesh().lookupObject<volScalarField> ("dSauterMix")));
-        dSauterMix_.set(&dSauterMix);
+        volScalarField& dSauter(const_cast<volScalarField&>(sm.mesh().lookupObject<volScalarField> ("dSauterMix")));
+        dSauter_.set(&dSauter);
+    }
+    else
+    {
+        volScalarField& dSauter(const_cast<volScalarField&>(sm.mesh().lookupObject<volScalarField> ("dSauter")));
+        dSauter_.set(&dSauter);
     }
 }
 
@@ -75,24 +87,30 @@ void BeetstraDragPoly::adaptVoidfraction(double& voidfraction, label cellI) cons
     if (voidfraction < minVoidfraction_) voidfraction = minVoidfraction_;
 }
 
-scalar BeetstraDragPoly::effDiameter(double d, double voidfraction, label cellI, label index) const
+scalar BeetstraDragPoly::effDiameter(double d, label cellI, label index) const
 {
-    scalar dS = dSauter_[cellI];
-    scalar effD = d*d/dS;
+    scalar dS = dSauter_()[cellI];
+    scalar effD = d*d / dS + 0.064*d*d*d*d / (dS*dS*dS);
+    
     if (fines_)
     {
-        scalar pureVoidfraction = voidfraction_[cellI];
-        scalar dSmix = dSauterMix_()[cellI];
-        effD *= pureVoidfraction / voidfraction * (1 - voidfraction) / (1 - pureVoidfraction);
-        effD *= dS * dS / (dSmix * dSmix);
+        scalar fineCorr = dFine_*dFine_ / dS + 0.064*dFine_*dFine_*dFine_*dFine_ / (dS*dS*dS);
+        fineCorr *= d*d*d / (dFine_*dFine_*dFine_) * alphaSt_()[cellI] / alphaP_()[cellI];
+        effD += fineCorr;
     }
+    
     if (particleCloud_.getParticleEffVolFactors()) 
     {
         scalar effVolFac = particleCloud_.particleEffVolFactor(index);
         effD *= effVolFac;
     }
+
     return effD;
-    
+}
+
+scalar BeetstraDragPoly::meanSauterDiameter(double d, label cellI) const
+{
+    return dSauter_()[cellI];
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
