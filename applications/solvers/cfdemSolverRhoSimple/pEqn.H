@@ -76,15 +76,6 @@ else
     U = HbyA - rAU*(fvc::grad(p)-Ksl*Us);
 }
 
-// limit vel
-
-forAll(U,cellI)
-{
-    scalar mU = mag(U[cellI]);
-    if (mU > 200.0) U[cellI] *= 200.0/mU;
-}
-
-
 U.correctBoundaryConditions();
 fvOptions.correct(U);
 K = 0.5*magSqr(U);

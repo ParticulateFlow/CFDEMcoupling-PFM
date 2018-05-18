@@ -119,7 +119,7 @@ int main(int argc, char *argv[])
         turbulence->correct();
 
         particleCloud.clockM().start(32,"postFlow");
-        particleCloud.postFlow();
+        if(hasEvolved) particleCloud.postFlow();
         particleCloud.clockM().stop("postFlow");
 
         runTime.write();
