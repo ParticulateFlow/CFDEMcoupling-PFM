@@ -223,11 +223,7 @@ inline bool cfdemCloud::getParticleDensities() const
 
 inline double ** cfdemCloud::particleDensity() const
 {
-    if(!getParticleDensities_) return NULL;
-    else
-    {
-        return particleDensities_;
-    }
+    return particleDensities_;
 }
 
 inline double cfdemCloud::particleDensity(label index) const
@@ -260,11 +256,7 @@ inline bool cfdemCloud::getParticleTypes() const
 
 inline int ** cfdemCloud::particleTypes() const
 {
-    if(!getParticleTypes_) return NULL;
-    else
-    {
-        return particleTypes_;
-    }
+    return particleTypes_;
 }
 
 inline label cfdemCloud::particleType(label index) const

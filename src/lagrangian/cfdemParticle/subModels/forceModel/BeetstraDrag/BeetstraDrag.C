@@ -12,6 +12,7 @@ License
     along with this code.  If not, see <http://www.gnu.org/licenses/>.
 
     Copyright (C) 2015- Thomas Lichtenegger, JKU Linz, Austria
+    Contributing author: Paul Kieckhefen, TU Hamburg, Germany
 
 \*---------------------------------------------------------------------------*/
 
@@ -214,7 +215,7 @@ void BeetstraDrag::setForce() const
                 // in case a fines phase is present, void fraction needs to be adapted
                 adaptVoidfraction(voidfraction, cellI);
 
-                if (multiTypes_) 
+                if (multiTypes_)
                 {
                     partType = particleCloud_.particleType(index);
                     cg = typeCG_[partType - 1];
@@ -241,14 +242,14 @@ void BeetstraDrag::setForce() const
                                    *3*M_PI*nuf*rho*voidfraction
                                    *effDiameter(ds_scaled, cellI, index)
                                    *scaleDia3*scaleDrag_;
-                
+
                 // calculate filtering corrections
                 if (useGC_)
                 {
-                    GCcorr = 1.-h(localPhiP) 
-                                /(  a(localPhiP) 
-                                    *Lc2_ 
-                                    /Foam::pow(U_.mesh().V()[cellI],.33333333) 
+                    GCcorr = 1.-h(localPhiP)
+                                /(  a(localPhiP)
+                                    *Lc2_
+                                    /std::cbrt(U_.mesh().V()[cellI])
                                   + 1.
                                  );
                     if (usePC_)
@@ -311,8 +312,8 @@ void BeetstraDrag::setForce() const
 double BeetstraDrag::F(double voidfraction, double Rep) const
 {
     double localPhiP = max(SMALL,min(1.-SMALL,1.-voidfraction));
-    return   10.0*localPhiP/(voidfraction*voidfraction) 
-           + voidfraction*voidfraction*(1.0+1.5*Foam::sqrt(localPhiP)) 
+    return   10.0*localPhiP/(voidfraction*voidfraction)
+           + voidfraction*voidfraction*(1.0+1.5*Foam::sqrt(localPhiP))
            + 0.413*Rep/(24*voidfraction*voidfraction)
                        *(1.0/voidfraction
                           +3*voidfraction*localPhiP
@@ -362,7 +363,9 @@ double BeetstraDrag::a(double phiP) const
     {
       a0m =  1.79;
     }
-    return a0m + a1m*(phiP-phipam) + a2m*pow(phiP-phipam,2.) + a3m*pow(phiP-phipam,3.);
+    const double phiP_minus_phipam = phiP-phipam;
+    return a0m + a1m*phiP_minus_phipam + a2m*phiP_minus_phipam*phiP_minus_phipam
+           + a3m*phiP_minus_phipam*phiP_minus_phipam*phiP_minus_phipam;
 }
 
 double BeetstraDrag::h(double phiP) const
@@ -405,7 +408,9 @@ double BeetstraDrag::h(double phiP) const
   {
     h0m = 0.680; h1m = -2.340; h2m = -225.200;                 phiphm = 0.55;
   }
-  return h0m + h1m*(phiP-phiphm) + h2m*pow(phiP-phiphm,2) + h3m*pow(phiP-phiphm,3);
+  const double phiP_minus_phiphm = phiP-phiphm;
+  return h0m + h1m*phiP_minus_phiphm + h2m*phiP_minus_phiphm*phiP_minus_phiphm
+         + h3m*phiP_minus_phiphm*phiP_minus_phiphm*phiP_minus_phiphm;
 }
 
 double BeetstraDrag::terminalVelocity(double voidfraction, double dp, double nuf, double rhof, double rhop, double g) const

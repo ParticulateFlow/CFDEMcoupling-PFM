@@ -49,15 +49,12 @@ BeetstraDragPoly::BeetstraDragPoly
 :
     BeetstraDrag(dict,sm),
     fines_(propsDict_.lookupOrDefault<bool>("fines",false)),
-    dFine_(propsDict_.lookupOrDefault<scalar>("dFine",1.0))
+    dFine_(1.0)
 {
     // if fines are present, take mixture dSauter, otherwise normal dSauter
     if (fines_)
     {
-        if (!propsDict_.found("dFine"))
-        {
-            FatalError << "forceModel BeetstraDragPoly: Define fines diameter." << abort(FatalError);  
-        }
+        dFine_ = readScalar(propsDict_.lookup("dFine"));
         volScalarField& alphaP(const_cast<volScalarField&>(sm.mesh().lookupObject<volScalarField> ("alphaP")));
         alphaP_.set(&alphaP);
         volScalarField& alphaSt(const_cast<volScalarField&>(sm.mesh().lookupObject<volScalarField> ("alphaSt")));
