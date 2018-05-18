@@ -207,7 +207,7 @@ void BeetstraDrag::setForce() const
 
                 	// Beetstra et. al (2007), Eq. (21)
                 	yi 		= ds_scaled/dSauter;
-                	Fdrag 	*= (voidfraction*yi + localPhiP*yi*yi + 0.064*voidfraction*yi*yi*yi);
+                	Fdrag 	*= (voidfraction*yi + 0.064*voidfraction*yi*yi*yi);
                 }
 
                 // calc particle's drag
