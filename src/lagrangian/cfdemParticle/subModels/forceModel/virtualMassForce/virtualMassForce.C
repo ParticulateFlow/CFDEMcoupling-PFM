@@ -113,6 +113,10 @@ virtualMassForce::virtualMassForce
     {
         Info << "Virtual mass model: using Cadd correlation by Felderhof \n";
         Info << "WARNING: ignoring user-set Cadd \n";
+
+        bool getParticleDensities_ =  dict.lookupOrDefault<bool>("getParticleDensities",false);
+	    if(!dict.lookupOrDefault<bool>("getParticleDensities",false))
+	    	FatalError << "Virtual mass model: useFelderhof=true requires getParticleDensities=true in couplingProperties" << abort(FatalError);
     }
 
     particleCloud_.checkCG(true);
@@ -259,7 +263,7 @@ void virtualMassForce::setForce() const
 		            else
 		                voidfraction = voidfraction_[cellI];
 
-                    sg       = particleCloud_.density(index) / rho;
+                    sg       = particleCloud_.particleDensity(index) / rho;
                     logsg    = log(sg);
                     epsilons = 1-voidfraction;
 

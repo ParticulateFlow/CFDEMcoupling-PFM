@@ -216,7 +216,7 @@ inline double cfdemCloud::d32(bool recalc)
     return d32_;
 }
 
-inline double ** cfdemCloud::particleDensity() const
+inline double ** cfdemCloud::particleDensities() const
 {
     if(!getParticleDensities_) return NULL;
     else
@@ -234,21 +234,23 @@ inline double cfdemCloud::particleDensity(label index) const
     }
 }
 
-inline int ** cfdemCloud::particleTypes() const
+inline double ** cfdemCloud::particleAngVels() const
 {
-    if(!getParticleTypes_) return NULL;
+    if(!getParticleAngVels_) return NULL;
     else
     {
-        return particleTypes_;
+        return particleAngVels_;
     }
 }
 
-inline label cfdemCloud::particleType(label index) const
+inline vector cfdemCloud::particleAngVel(label index) const
 {
-    if(!getParticleDensities_) return -1;
+    if(!getParticleAngVels_) return vector::zero;
     else
     {
-        return particleTypes_[index][0];
+    	vector angVel;
+    	for(int i=0;i<3;i++) angVel[i] = particleAngVels_[index][i];
+        return angVel;
     }
 }
 

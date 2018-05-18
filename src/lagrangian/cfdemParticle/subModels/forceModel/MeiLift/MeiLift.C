@@ -94,13 +94,15 @@ MeiLift::MeiLift
     {
 	    Info << "Lift model: including spin-induced term.\n";
 	    Info << "Make sure to use a rolling friction model in LIGGGHTS!\n";
+	    if(!dict.lookupOrDefault<bool>("getParticleAngVels",false))
+	    	FatalError << "Lift model: useSpinInduced=true requires getParticleAngVels=true in couplingProperties" << abort(FatalError);
 	}
 
 	if(combineShearSpin_)
 	{
 	    Info << "Lift model: combining shear- and spin-terms by assuming equilibrium spin-rate.\n";
 	    if(!useShearInduced_ || !useSpinInduced_)
-	        FatalError << "Shear- and spin-induced lift must be activated in order to combine.\n";
+	        FatalError << "Shear- and spin-induced lift must be activated in order to combine." << abort(FatalError);
 	}
 
     // init force sub model
@@ -199,7 +201,7 @@ void MeiLift::setForce() const
             {
                 // properties
             	Us = particleCloud_.velocity(index);
-            	Omega = particleCloud_.omega(index);
+            	Omega = particleCloud_.particleAngVel(index);
 
                 if (forceSubM(0).interpolation())
                 {
@@ -227,26 +229,7 @@ void MeiLift::setForce() const
                 	Rew 			= magVorticity*ds*ds/nuf;
                 	omega_star 		= magVorticity * ds / magUr;
                     alphaStar 		= 0.5 * omega_star;
-                    /*
-                    //Second order terms given by Loth and Dorgan (2009)
-                        if (useSecondOrderTerms_)
-                        {
-                            scalar sqrtRep = sqrt(Rep);
-                            //Loth and Dorgan (2009), Eq (34)
-                            Cl_star = 1.0 - (0.675 + 0.15 * (1.0 + tanh(0.28 * (alphaStar - 2.0)))) * tanh(0.18 * sqrtRep);
-                            //Loth and Dorgan (2009), Eq (38)
-                            Omega_eq = alphaStar * (1.0 - 0.0075 * Rew) * (1.0 - 0.062 * sqrtRep - 0.001 * Rep);
-                            //Loth and Dorgan (2009), Eq (39)
-                            Cl += Omega_eq * Cl_star;
-                        }
-
-                        //Loth and Dorgan (2009), Eq (27)
-                        lift = 0.125 * constant::mathematical::pi
-                               * rho
-                               * Cl
-                               * magUr * Ur ^ vorticity / magVorticity
-                               * ds * ds;
-    				*/      epsilonSqr 		= omega_star / Rep;
+                    epsilonSqr 		= omega_star / Rep;
                     epsilon 		= sqrt(epsilonSqr);
 
 

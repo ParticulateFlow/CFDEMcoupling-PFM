@@ -98,7 +98,7 @@ protected:
 
     bool getParticleDensities_;
 
-    bool getParticleTypes_;
+    bool getParticleAngVels_;
 
     scalar maxDEMForce_;
 
@@ -128,7 +128,7 @@ protected:
 
     mutable double **particleDensities_;
 
-    mutable int **particleTypes_;
+    mutable double **particleAngVels_;
 
     mutable double **particleWeights_;
 
@@ -169,8 +169,6 @@ protected:
     bool useDDTvoidfraction_;
 
     mutable volScalarField ddtVoidfraction_;
-
-    mutable volScalarField particleDensityField_;
 
     mutable Switch checkPeriodicCells_;
 
@@ -214,8 +212,6 @@ protected:
     virtual void setForces();
 
     virtual void setParticleForceField();
-
-    virtual void setScalarAverages();
 
     virtual void setVectorAverages();
 
@@ -335,15 +331,15 @@ public:
        virtual inline int maxType() {return -1;}
        virtual inline bool multipleTypesDMax() {return false;}
        virtual inline bool multipleTypesDMin() {return false;}
-       virtual inline double ** particleDensity() const;
+       virtual inline double ** particleDensities() const;
        virtual inline double particleDensity(label index) const;
-       virtual inline int ** particleTypes() const;
-       virtual inline label particleType(label index) const;
+       virtual inline double ** particleAngVels() const;
+       virtual vector particleAngVel(label index) const;
+       virtual inline int ** particleTypes() const {return NULL;}
+       virtual label particleType(label index) const {return -1;}
 
-       //access to the particle's rotation and torque data
+       //access to the particle's and torque data
        virtual inline double ** DEMTorques() const {return NULL;}
-       virtual inline double ** omegaArray() const {return NULL;}
-       virtual vector omega(int) const {return vector::zero;}
 
        //access to the particles' orientation information
        virtual inline double ** exArray() const {return NULL;}

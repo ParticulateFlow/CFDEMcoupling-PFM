@@ -84,7 +84,7 @@ cfdemCloud::cfdemCloud
     allowCFDsubTimestep_(true),
     limitDEMForces_(false),
     getParticleDensities_(couplingProperties_.lookupOrDefault<bool>("getParticleDensities",false)),
-    getParticleTypes_(couplingProperties_.lookupOrDefault<bool>("getParticleTypes",false)),
+    getParticleAngVels_(couplingProperties_.lookupOrDefault<bool>("getParticleAngVels",false)),
     modelType_(couplingProperties_.lookup("modelType")),
     positions_(NULL),
     velocities_(NULL),
@@ -97,6 +97,8 @@ cfdemCloud::cfdemCloud
     radii_(NULL),
     voidfractions_(NULL),
     cellIDs_(NULL),
+	particleDensities_(NULL),
+	particleAngVels_(NULL),
     particleWeights_(NULL),
     particleVolumes_(NULL),
     particleV_(NULL),
@@ -128,19 +130,6 @@ cfdemCloud::cfdemCloud
         ),
         mesh,
         dimensionedScalar("zero", dimensionSet(0,0,-1,0,0), 0)  // 1/s
-    ),
-    particleDensityField_
-    (
-        IOobject
-        (
-            "partRho",
-            mesh.time().timeName(),
-            mesh,
-            IOobject::READ_IF_PRESENT,
-            IOobject::NO_WRITE
-        ),
-        mesh,
-        dimensionedScalar("zero", dimensionSet(1,-3,0,0,0), 0.0)
     ),
     checkPeriodicCells_(false),
     turbulence_
@@ -374,7 +363,7 @@ cfdemCloud::~cfdemCloud()
     dataExchangeM().destroy(particleVolumes_,1);
     dataExchangeM().destroy(particleV_,1);
     if(getParticleDensities_) dataExchangeM().destroy(particleDensities_,1);
-    if(getParticleTypes_) dataExchangeM().destroy(particleTypes_,1);
+    if(getParticleAngVels_) dataExchangeM().destroy(particleAngVels_,1);
 }
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
@@ -388,7 +377,7 @@ void cfdemCloud::getDEMdata()
         dataExchangeM().getData("dragAcc","vector-atom",fAcc_); // array is used twice - might be necessary to clean it first
 
     if(getParticleDensities_) dataExchangeM().getData("density","scalar-atom",particleDensities_);
-    if(getParticleTypes_) dataExchangeM().getData("type","scalar-atom",particleTypes_);
+    if(getParticleAngVels_) dataExchangeM().getData("omega","vector-atom",particleAngVels_);
 }
 
 void cfdemCloud::giveDEMdata()
@@ -464,25 +453,6 @@ void cfdemCloud::setParticleForceField()
         particleWeights_,
         NULL //mask
     );
-}
-
-void cfdemCloud::setScalarAverages()
-{
-    if(!getParticleDensities_) return;
-    if(verbose_) Info << "- setScalarAverage" << endl;
-
-    particleDensityField_.primitiveFieldRef() = 0.0;
-    averagingM().resetWeightFields();
-    averagingM().setScalarAverage
-    (
-        particleDensityField_,
-        particleDensities_,
-        particleWeights_,
-        averagingM().UsWeightField(),
-        NULL
-    );
-
-    if(verbose_) Info << "setScalarAverage done." << endl;
 }
 
 void cfdemCloud::setVectorAverages()
@@ -637,8 +607,7 @@ bool cfdemCloud::evolve
             clockM().stop("setvoidFraction");
 
             // set average particles velocity field
-            clockM().start(20,"setAverages");
-            setScalarAverages();
+            clockM().start(20,"setVectorAverage");
             setVectorAverages();
 
 
@@ -652,7 +621,7 @@ bool cfdemCloud::evolve
             if(!treatVoidCellsAsExplicitForce())
                 smoothingM().smoothenReferenceField(averagingM().UsNext());
 
-            clockM().stop("setAverages");
+            clockM().stop("setVectorAverage");
         }
 
         //============================================
@@ -744,7 +713,7 @@ bool cfdemCloud::reAllocArrays()
         dataExchangeM().allocateArray(particleVolumes_,0.,voidFractionM().maxCellsPerParticle());
         dataExchangeM().allocateArray(particleV_,0.,1);
         if(getParticleDensities_) dataExchangeM().allocateArray(particleDensities_,0.,1);
-        if(getParticleTypes_) dataExchangeM().allocateArray(particleTypes_,0.,1);
+        if(getParticleAngVels_) dataExchangeM().allocateArray(particleAngVels_,0.,3);
         arraysReallocated_ = true;
         return true;
     }
