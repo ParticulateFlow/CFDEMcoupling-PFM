@@ -110,11 +110,6 @@ inline double ** cfdemCloud::velocities() const
     return velocities_;
 }
 
-inline double ** cfdemCloud::omegas() const
-{
-    return omegas_;
-}
-
 inline double ** cfdemCloud::fluidVels() const
 {
     return fluidVel_;
@@ -150,12 +145,6 @@ inline double ** cfdemCloud::radii() const
     return radii_;
 }
 
-inline double ** cfdemCloud::densities() const
-{
-    return densities_;
-}
-
-
 inline double ** cfdemCloud::voidfractions() const
 {
     return voidfractions_;
@@ -168,11 +157,6 @@ inline void cfdemCloud::get_radii(double **& values) const
 //    for (int i=0;i<numberOfParticles_;i++)
 //        radii_[0][i]=values[0][i];
     values=radii_;
-}
-
-inline void cfdemCloud::get_densities(double **& values) const
-{
-    values=densities_;
 }
 
 inline int ** cfdemCloud::cellIDs() const
@@ -208,11 +192,6 @@ inline scalar cfdemCloud::radius(int index) const
     return radii_[index][0];
 }
 
-inline scalar cfdemCloud::density(int index) const
-{
-    return densities_[index][0];
-}
-
 inline double cfdemCloud::d(int index) const
 {
     return 2.*radii_[index][0];
@@ -235,6 +214,42 @@ inline double cfdemCloud::d32(bool recalc)
     }
 
     return d32_;
+}
+
+inline double ** cfdemCloud::particleDensity() const
+{
+    if(!getParticleDensities_) return NULL;
+    else
+    {
+        return particleDensities_;
+    }
+}
+
+inline double cfdemCloud::particleDensity(label index) const
+{
+    if(!getParticleDensities_) return -1.0;
+    else
+    {
+        return particleDensities_[index][0];
+    }
+}
+
+inline int ** cfdemCloud::particleTypes() const
+{
+    if(!getParticleTypes_) return NULL;
+    else
+    {
+        return particleTypes_;
+    }
+}
+
+inline label cfdemCloud::particleType(label index) const
+{
+    if(!getParticleDensities_) return -1;
+    else
+    {
+        return particleTypes_[index][0];
+    }
 }
 
 inline int cfdemCloud::numberOfParticles() const
