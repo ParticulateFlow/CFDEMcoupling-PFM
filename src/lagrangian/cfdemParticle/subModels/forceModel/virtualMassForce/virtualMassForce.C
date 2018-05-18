@@ -74,9 +74,9 @@ virtualMassForce::virtualMassForce
     phiFieldName_(propsDict_.lookup("phiFieldName")),
     phi_(sm.mesh().lookupObject<surfaceScalarField> (phiFieldName_)),
     UrelOld_(NULL),
-    splitUrelCalculation_(false),
-	useUs_(false),
-	useFelderhof_(false),
+	splitUrelCalculation_(propsDict_.lookupOrDefault<bool>("splitUrelCalculation",false)),
+	useUs_(propsDict_.lookupOrDefault<bool>("useUs",false)),
+	useFelderhof_(propsDict_.lookupOrDefault<bool>("useFelderhof",false)),
     Cadd_(0.5)
 {
 
@@ -94,37 +94,25 @@ virtualMassForce::virtualMassForce
     forceSubM(0).readSwitches();
 
     //Extra switches/settings
-    if(propsDict_.found("splitUrelCalculation"))
+    if(splitUrelCalculation_)
     {
-        splitUrelCalculation_ = readBool(propsDict_.lookup("splitUrelCalculation"));
-        if(splitUrelCalculation_)
-        {
-            Info << "Virtual mass model: will split the Urel calculation\n";
-            Info << "WARNING: be sure that LIGGGHTS integration takes ddtv_p implicitly into account! \n";
-        }
+        Info << "Virtual mass model: will split the Urel calculation\n";
+        Info << "WARNING: be sure that LIGGGHTS integration takes ddtv_p implicitly into account! \n";
     }
     if(propsDict_.found("Cadd"))
     {
         Cadd_ = readScalar(propsDict_.lookup("Cadd"));
         Info << "Virtual mass model: using non-standard Cadd = " << Cadd_ << endl;
     }
-    if(propsDict_.found("useUs"))
+    if(useUs_)
     {
-        useUs_ = readBool(propsDict_.lookup("useUs"));
-        if(useUs_)
-        {
-            Info << "Virtual mass model: using averaged Us \n";
-            Info << "WARNING: ignoring virtual mass of relative particle motion/collisions \n";
-        }
+        Info << "Virtual mass model: using averaged Us \n";
+        Info << "WARNING: ignoring virtual mass of relative particle motion/collisions \n";
     }
-    if(propsDict_.found("useFelderhof"))
+    if(useFelderhof_)
     {
-        useFelderhof_ = readBool(propsDict_.lookup("useFelderhof"));
-        if(useFelderhof_)
-        {
-            Info << "Virtual mass model: using Cadd correlation by Felderhof \n";
-            Info << "WARNING: ignoring user-set Cadd \n";
-        }
+        Info << "Virtual mass model: using Cadd correlation by Felderhof \n";
+        Info << "WARNING: ignoring user-set Cadd \n";
     }
 
     particleCloud_.checkCG(true);

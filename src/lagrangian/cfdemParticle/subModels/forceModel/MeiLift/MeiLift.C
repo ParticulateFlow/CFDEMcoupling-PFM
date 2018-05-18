@@ -81,35 +81,26 @@ MeiLift::MeiLift
     propsDict_(dict.subDict(typeName + "Props")),
     velFieldName_(propsDict_.lookup("velFieldName")),
     U_(sm.mesh().lookupObject<volVectorField> (velFieldName_)),
-    useShearInduced_(true),
-	useSpinInduced_(false),
-	combineShearSpin_(false)
+	useShearInduced_(propsDict_.lookupOrDefault<bool>("useShearInduced",true)),
+	useSpinInduced_(propsDict_.lookupOrDefault<bool>("useSpinInduced",false)),
+	combineShearSpin_(propsDict_.lookupOrDefault<bool>("combineShearSpin",false))
 {
 	// read switches
-	if(propsDict_.found("useShearInduced"))
-	{
-		useShearInduced_ = readBool(propsDict_.lookup("useShearInduced"));
-	    if(useShearInduced_)
-	        Info << "Lift model: including shear-induced term.\n";
+
+	if(useShearInduced_)
+	    Info << "Lift model: including shear-induced term.\n";
+
+	if(useSpinInduced_)
+    {
+	    Info << "Lift model: including spin-induced term.\n";
+	    Info << "Make sure to use a rolling friction model in LIGGGHTS!\n";
 	}
-	if(propsDict_.found("useSpinInduced"))
+
+	if(combineShearSpin_)
 	{
-		useSpinInduced_ = readBool(propsDict_.lookup("useSpinInduced"));
-	    if(useSpinInduced_)
-	    {
-	        Info << "Lift model: including spin-induced term.\n";
-	        Info << "Make sure to use a rolling friction model in LIGGGHTS!\n";
-	    }
-	}
-	if(propsDict_.found("combineShearSpin"))
-	{
-		combineShearSpin_ = readBool(propsDict_.lookup("combineShearSpin"));
-	    if(combineShearSpin_)
-	    {
-	        Info << "Lift model: combining shear- and spin-terms by assuming equilibrium spin-rate.\n";
-	        if(!useShearInduced_ || !useSpinInduced_)
-	        	FatalError << "Shear- and spin-induced lift must be activated in order to combine.\n";
-	    }
+	    Info << "Lift model: combining shear- and spin-terms by assuming equilibrium spin-rate.\n";
+	    if(!useShearInduced_ || !useSpinInduced_)
+	        FatalError << "Shear- and spin-induced lift must be activated in order to combine.\n";
 	}
 
     // init force sub model
