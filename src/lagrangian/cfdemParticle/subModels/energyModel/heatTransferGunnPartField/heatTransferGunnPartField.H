@@ -15,100 +15,84 @@ License
     along with this code.  If not, see <http://www.gnu.org/licenses/>.
 
     Copyright (C) 2015- Thomas Lichtenegger, JKU Linz, Austria
+    
+    Description
+    Correlation for Nusselt number according to
+    Gunn, D. J. International Journal of Heat and Mass Transfer 21.4 (1978)
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef energyModel_H
-#define energyModel_H
+#ifndef heatTransferGunnPartField_H
+#define heatTransferGunnPartField_H
 
 #include "fvCFD.H"
 #include "cfdemCloudEnergy.H"
-#include "probeModel.H"
-#include "interpolationCellPoint.H"
+#include "heatTransferGunn.H"
+#include "fvOptions.H"
+#include "scalarList.H"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
-
+class thermCondModel;
 /*---------------------------------------------------------------------------*\
-                           Class energyModel Declaration
+                           Class heatTransferGunnPartField Declaration
 \*---------------------------------------------------------------------------*/
 
-class energyModel
+class heatTransferGunnPartField
+:
+    public heatTransferGunn
 {
+private:
 
-protected:
+    volScalarField partCpField_;
 
-    // Protected data
-        const dictionary& dict_;
+    const volScalarField& partRhoField_;
 
-        cfdemCloudEnergy& particleCloud_;
-	
-	IOdictionary transportProperties_;
-	
-	scalar kf0_;                              // fluid thermal conductivity [W/(m*K)]
+    scalarList typeCp_;
 
-        scalar Cp_;                                  // specific heat capacity [W*s/(kg*K)]
-       
+    mutable double **partCp_;
+
+    dimensionedScalar pTMax_;
+
+    dimensionedScalar pTMin_;
+
+    autoPtr<thermCondModel> thermCondModel_;
+
+    fv::options& fvOptions;
+
+    void allocateMyArrays() const;
+
+    void giveData();
+
 public:
 
     //- Runtime type information
-    TypeName("energyModel");
-
-    // Declare runtime constructor selection table
-
-        declareRunTimeSelectionTable
-        (
-            autoPtr,
-            energyModel,
-            dictionary,
-            (
-                const dictionary& dict,
-                cfdemCloudEnergy& sm
-            ),
-            (dict,sm)
-        );
-
+    TypeName("heatTransferGunnPartField");
 
     // Constructors
 
         //- Construct from components
-        energyModel
+        heatTransferGunnPartField
         (
             const dictionary& dict,
-            cfdemCloudEnergy& sm            
+            cfdemCloudEnergy& sm
         );
 
 
     // Destructor
 
-        virtual ~energyModel();
-
-
-    // Selector
-
-        static autoPtr<energyModel> New
-        (
-            const dictionary& dict,
-            cfdemCloudEnergy& sm,
-            word energyType
-        );
+        virtual ~heatTransferGunnPartField();
 
 
     // Member Functions
+        void addEnergyContribution(volScalarField&) const;
 
-        virtual void addEnergyContribution(volScalarField&) const = 0;
-	
-	virtual void addEnergyCoefficient(volScalarField&) const = 0;
-	
-	virtual void calcEnergyContribution() = 0;
-	
-	virtual void postFlow() {}
+	void calcEnergyContribution();
 
-	virtual void solve() {}
-	
-	scalar Cp() const;
+	void postFlow();
 
+        void solve();
 
 };
 

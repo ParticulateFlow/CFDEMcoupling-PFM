@@ -40,8 +40,10 @@ class BeetstraDrag
 :
     public forceModel
 {
-private:
+protected:
     dictionary propsDict_;
+
+    bool multiTypes_;
 
     word velFieldName_;
 
@@ -51,13 +53,51 @@ private:
 
     const volScalarField& voidfraction_;
 
+    const scalar minVoidfraction_;
+
     word UsFieldName_;
 
     const volVectorField& UsField_;
 
     mutable scalar scaleDia_;
 
+    scalarList typeCG_;
+
     mutable scalar scaleDrag_;
+
+    mutable scalar rhoP_;
+
+    mutable scalar rho_;
+
+    mutable scalar Lc2_;
+
+    mutable scalar dPrim_;
+
+    mutable scalar nuf_;
+
+    mutable scalar g_;
+
+    mutable scalar k_;
+
+    bool useGC_;
+
+    bool usePC_;
+
+    virtual void adaptVoidfraction(double&, label) const {}
+
+    virtual scalar effDiameter(double d, label cellI, label index) const {return d;}
+    
+    virtual scalar meanSauterDiameter(double d, label cellI) const {return d;}
+
+    double F(double, double) const;
+
+    double terminalVelocity(double, double, double, double, double, double) const; 
+
+    double a(double) const;
+
+    double h(double) const;
+
+
 
 public:
 

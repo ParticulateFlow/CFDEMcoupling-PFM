@@ -31,11 +31,10 @@ Description
 #include "psiThermo.H"
 #include "turbulentFluidThermoModel.H"
 #include "bound.H"
-#include "pimpleControl.H"
+#include "simpleControl.H"
 #include "fvOptions.H"
 #include "localEulerDdtScheme.H"
 #include "fvcSmooth.H"
-
 
 #include "cfdemCloudEnergy.H"
 #include "implicitCouple.H"
@@ -69,21 +68,13 @@ int main(int argc, char *argv[])
     #include "checkModelType.H"
 
     turbulence->validate();
-  //        #include "compressibleCourantNo.H"
-  //  #include "setInitialDeltaT.H"
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
     Info<< "\nStarting time loop\n" << endl;
 
-    while (runTime.run())
+    while (simple.loop())
     {
-        #include "readTimeControls.H"
-        #include "compressibleCourantNo.H"
-        #include "setDeltaT.H"
-
-        runTime++;
-
         particleCloud.clockM().start(1,"Global");
 
         Info<< "Time = " << runTime.timeName() << nl << endl;
@@ -113,34 +104,22 @@ int main(int argc, char *argv[])
 
         particleCloud.clockM().start(26,"Flow");
 
-        if (pimple.nCorrPIMPLE() <= 1)
-        {
-            #include "rhoEqn.H"
-        }
-
         volScalarField rhoeps("rhoeps",rho*voidfraction);
-        // --- Pressure-velocity PIMPLE corrector loop
-        while (pimple.loop())
-        {
-            #include "UEqn.H"
-            #include "EEqn.H"
+        // Pressure-velocity SIMPLE corrector
 
-            // --- Pressure corrector loop
-            while (pimple.correct())
-            {
-                // besides this pEqn, OF offers a "pimple consistent"-option
-                #include "pEqn.H"
-                rhoeps=rho*voidfraction;
-            }
+        #include "UEqn.H"
 
-            if (pimple.turbCorr())
-            {
-                turbulence->correct();
-            }
-        }
 
-        particleCloud.clockM().start(31,"postFlow");
-        particleCloud.postFlow();
+        // besides this pEqn, OF offers a "simple consistent"-option
+        #include "pEqn.H"
+        rhoeps=rho*voidfraction;
+
+        #include "EEqn.H"
+
+        turbulence->correct();
+
+        particleCloud.clockM().start(32,"postFlow");
+        if(hasEvolved) particleCloud.postFlow();
         particleCloud.clockM().stop("postFlow");
 
         runTime.write();

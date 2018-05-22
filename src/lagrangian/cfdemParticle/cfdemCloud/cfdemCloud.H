@@ -96,6 +96,12 @@ protected:
 
     bool limitDEMForces_;
 
+    bool getParticleDensities_;
+
+    bool getParticleEffVolFactors_;
+
+    bool getParticleTypes_;
+
     scalar maxDEMForce_;
 
     const word modelType_;
@@ -121,6 +127,12 @@ protected:
     mutable double **voidfractions_;
 
     mutable int **cellIDs_;
+
+    mutable double **particleDensities_;
+
+    mutable double **particleEffVolFactors_;
+
+    mutable int **particleTypes_;
 
     mutable double **particleWeights_;
 
@@ -161,6 +173,8 @@ protected:
     bool useDDTvoidfraction_;
 
     mutable volScalarField ddtVoidfraction_;
+
+    mutable volScalarField particleDensityField_;
 
     mutable Switch checkPeriodicCells_;
 
@@ -204,6 +218,8 @@ protected:
     virtual void setForces();
 
     virtual void setParticleForceField();
+
+    virtual void setScalarAverages();
 
     virtual void setVectorAverages();
 
@@ -323,9 +339,17 @@ public:
        virtual inline int maxType() {return -1;}
        virtual inline bool multipleTypesDMax() {return false;}
        virtual inline bool multipleTypesDMin() {return false;}
-       virtual inline double ** particleDensity() const {return NULL;}
-       virtual inline int ** particleTypes() const {return NULL;}
-       virtual label particleType(label index) const {return -1;}
+
+       inline bool getParticleDensities() const;
+       virtual inline double ** particleDensities() const;
+       virtual inline double particleDensity(label index) const;
+
+       inline bool getParticleEffVolFactors() const;
+       virtual inline double particleEffVolFactor(label index) const;
+
+       inline bool getParticleTypes() const;
+       virtual inline int ** particleTypes() const;
+       virtual inline label particleType(label index) const;
 
        //access to the particle's rotation and torque data
        virtual inline double ** DEMTorques() const {return NULL;}
