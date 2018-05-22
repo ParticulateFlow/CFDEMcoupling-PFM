@@ -181,6 +181,7 @@ tmp<volScalarField> ZehnerSchluenderThermCond::thermCond() const
 tmp<volScalarField> ZehnerSchluenderThermCond::thermDiff() const
 {
     FatalError << "ZehnerSchluenderThermCond does not provide thermal diffusivity." << abort(FatalError);
+    return tmp<volScalarField>(NULL);
 }
 
 void ZehnerSchluenderThermCond::calcPartKsField() const
