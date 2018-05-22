@@ -164,6 +164,8 @@ void heatTransferGunnPartField::postFlow()
     scalar Tpart(0.0);
     interpolationCellPoint<scalar> partTInterpolator_(partTempField_);
 
+    particleCloud_.dataExchangeM().allocateArray(partTemp_,0.0,1);
+
     for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)
     {
             cellI = particleCloud_.cellIDs()[index][0];
