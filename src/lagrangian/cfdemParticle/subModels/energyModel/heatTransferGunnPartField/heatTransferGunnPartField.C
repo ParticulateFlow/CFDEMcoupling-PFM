@@ -56,11 +56,13 @@ heatTransferGunnPartField::heatTransferGunnPartField
         ),
         sm.mesh(),
         dimensionedScalar("zero", dimensionSet(0,2,-2,-1,0,0,0), 0.0),
-	"zeroGradient"
+        "zeroGradient"
     ),
     partRhoField_(sm.mesh().lookupObject<volScalarField>("partRho")),
     typeCp_(propsDict_.lookupOrDefault<scalarList>("specificHeatCapacities",scalarList(1,-1.0))),
     partCp_(NULL),
+    pTMax_(dimensionedScalar("pTMax",dimensionSet(0,0,0,1,0,0,0), -1.0)),
+    pTMin_(dimensionedScalar("pTMin",dimensionSet(0,0,0,1,0,0,0), -1.0)),
     thermCondModel_
     (
         thermCondModel::New
@@ -79,6 +81,16 @@ heatTransferGunnPartField::heatTransferGunnPartField
     if (typeCp_[0] < 0.0)
     {
         FatalError << "heatTransferGunnPartField: provide list of specific heat capacities." << abort(FatalError);
+    }
+    
+    if (propsDict_.found("pTMax"))
+    {
+        pTMax_.value()=scalar(readScalar(propsDict_.lookup("pTMax"))); 
+    }
+    
+    if (propsDict_.found("pTMin"))
+    {
+        pTMin_.value()=scalar(readScalar(propsDict_.lookup("pTMin"))); 
     }
 
     partTempField_.writeOpt() = IOobject::AUTO_WRITE;
@@ -216,10 +228,9 @@ void heatTransferGunnPartField::solve()
 
     fvOptions.correct(partTempField_);
 
-    dimensionedScalar pTMin("pTMin",dimensionSet(0,0,0,1,0,0,0),293.0);
-    dimensionedScalar pTMax("pTMin",dimensionSet(0,0,0,1,0,0,0),3000.0);
-    partTempField_ = max(partTempField_, pTMin);
-    partTempField_ = min(partTempField_, pTMax);
+    if (pTMax_.value() > 0.0) partTempField_ = min(partTempField_, pTMax_);
+    if (pTMin_.value() > 0.0) partTempField_ = max(partTempField_, pTMin_);
+
 
     Info<< "partT max/min : " << max(partTempField_).value() << " " << min(partTempField_).value() << endl;
 

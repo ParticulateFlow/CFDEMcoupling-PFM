@@ -53,6 +53,10 @@ private:
 
     mutable double **partCp_;
 
+    dimensionedScalar pTMax_;
+
+    dimensionedScalar pTMin_;
+
     autoPtr<thermCondModel> thermCondModel_;
 
     fv::options& fvOptions;
