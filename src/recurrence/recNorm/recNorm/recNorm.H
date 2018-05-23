@@ -48,8 +48,14 @@ protected:
     const dictionary& recProperties_;
 
     bool verbose_;
+    
+    bool readRecMat_;
+    
+    word recMatName_;
 
     virtual void computeRecMatrix() = 0;
+    
+    bool readRecMatrix();
 
 
 

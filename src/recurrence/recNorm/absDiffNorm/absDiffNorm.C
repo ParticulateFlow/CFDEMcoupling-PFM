@@ -59,7 +59,16 @@ absDiffNorm::absDiffNorm
     normConstant_(propsDict_.lookupOrDefault<scalar>("normConstant",-1.0)),
     fieldType_(propsDict_.lookup("fieldType")),
     fieldName_(propsDict_.lookup("fieldName"))
-{}
+{
+    if (propsDict_.found("readRecMat"))
+    {
+        readRecMat_ = bool(propsDict_.lookup("readRecMat"));
+        if (propsDict_.found("recMatName"))
+        {
+            recMatName_ = word(propsDict_.lookup("recMatName"));
+        }
+    }
+}
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 

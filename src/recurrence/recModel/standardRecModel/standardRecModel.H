@@ -62,6 +62,10 @@ protected:
     
     bool storeAveragedFields_;
 
+    bool writeRecMat_;
+
+    word recMatName_;
+
     // matrix that contains the recurrence ERROR
     SymmetricSquareMatrix<scalar> recurrenceMatrix_;
     

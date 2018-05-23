@@ -24,6 +24,7 @@ License
 
 #include "error.H"
 #include "recNorm.H"
+#include "recModel.H"
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -51,7 +52,9 @@ recNorm::recNorm
 :
     base_(base),
     recProperties_(dict),
-    verbose_(dict.lookupOrDefault<Switch>("verbose", false))
+    verbose_(dict.lookupOrDefault<Switch>("verbose", false)),
+    readRecMat_(false),
+    recMatName_("recurrenceMatrix")
 {
 }
 
@@ -64,7 +67,18 @@ recNorm::~recNorm()
 
 
 // * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * //
-
+bool recNorm::readRecMatrix()
+{
+    if (readRecMat_)
+    {
+        Info << nl << type() << ": reading recurrence matrix " << recMatName_ <<"\n" << endl;
+        SymmetricSquareMatrix<scalar>& recurrenceMatrix( base_.recM().recurrenceMatrix() );
+        IFstream matrixFile(recMatName_);
+        matrixFile >> recurrenceMatrix;
+        return true;
+    }
+    return false;
+}
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
