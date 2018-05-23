@@ -61,8 +61,8 @@ maxNorm::maxNorm
 {
     if (propsDict_.found("readRecMat"))
     {
-        readRecMat_ = bool(propsDict_.lookup("readRecMat"));
-        if (propsDict_.found("recMatName"))
+        readRecMat_ = bool(readBool(propsDict_.lookup("readRecMat")));
+        if (readRecMat_ && propsDict_.found("recMatName"))
         {
             recMatName_ = word(propsDict_.lookup("recMatName"));
         }
