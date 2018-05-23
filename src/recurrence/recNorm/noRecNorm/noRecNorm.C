@@ -1,6 +1,6 @@
 /*---------------------------------------------------------------------------*\
     CFDEMcoupling academic - Open Source CFD-DEM coupling
-
+    
     Contributing authors:
     Thomas Lichtenegger
     Copyright (C) 2015- Johannes Kepler University, Linz
@@ -23,8 +23,9 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "error.H"
-#include "recNorm.H"
+#include "noRecNorm.H"
 #include "recModel.H"
+#include "addToRunTimeSelectionTable.H"
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -34,38 +35,38 @@ namespace Foam
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-defineTypeNameAndDebug(recNorm, 0);
+defineTypeNameAndDebug(noRecNorm, 0);
 
-defineRunTimeSelectionTable(recNorm, dictionary);
-
-
-// * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * //
+addToRunTimeSelectionTable
+(
+    recNorm,
+    noRecNorm,
+    dictionary
+);
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 // Construct from components
-recNorm::recNorm
+noRecNorm::noRecNorm
 (
     const dictionary& dict,
     recBase& base
 )
 :
-    base_(base),
-    recProperties_(dict),
-    verbose_(dict.lookupOrDefault<Switch>("verbose", false))
-{
-}
+    recNorm(dict, base)
+ {}
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-recNorm::~recNorm()
+noRecNorm::~noRecNorm()
 {}
 
-// * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * //
+// * * * * * * * * * * * * * protected Member Functions  * * * * * * * * * * * * //
 
-
-// * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * //
-
+void noRecNorm::computeRecMatrix()
+{
+    return;
+}
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

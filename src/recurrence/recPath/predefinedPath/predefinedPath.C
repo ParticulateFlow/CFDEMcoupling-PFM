@@ -1,6 +1,6 @@
 /*---------------------------------------------------------------------------*\
     CFDEMcoupling academic - Open Source CFD-DEM coupling
-
+    
     Contributing authors:
     Thomas Lichtenegger
     Copyright (C) 2015- Johannes Kepler University, Linz
@@ -23,8 +23,10 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "error.H"
-#include "recNorm.H"
+#include "predefinedPath.H"
+#include "Random.H"
 #include "recModel.H"
+#include "addToRunTimeSelectionTable.H"
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -34,38 +36,43 @@ namespace Foam
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-defineTypeNameAndDebug(recNorm, 0);
+defineTypeNameAndDebug(predefinedPath, 0);
 
-defineRunTimeSelectionTable(recNorm, dictionary);
-
-
-// * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * //
+addToRunTimeSelectionTable
+(
+    recPath,
+    predefinedPath,
+    dictionary
+);
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 // Construct from components
-recNorm::recNorm
+predefinedPath::predefinedPath
 (
     const dictionary& dict,
     recBase& base
 )
 :
-    base_(base),
-    recProperties_(dict),
-    verbose_(dict.lookupOrDefault<Switch>("verbose", false))
-{
-}
+    recPath(dict, base),
+    propsDict_(dict.subDict(typeName + "Props")),
+    fileName_(propsDict_.lookupOrDefault<word>("recPathName", "recurrencePath"))
+{}
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-recNorm::~recNorm()
+predefinedPath::~predefinedPath()
 {}
 
-// * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * //
+// * * * * * * * * * * * * * protected Member Functions  * * * * * * * * * * * * //
 
+void predefinedPath::computeRecPath()
+{
+    IFstream f(fileName_);
+    f >> virtualTimeIndexList_;
 
-// * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * //
-
+    Info << "Read recurrence path from file " << fileName_ << endl;
+}
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

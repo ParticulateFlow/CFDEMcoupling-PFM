@@ -1,6 +1,6 @@
 /*---------------------------------------------------------------------------*\
     CFDEMcoupling academic - Open Source CFD-DEM coupling
-
+    
     Contributing authors:
     Thomas Lichtenegger
     Copyright (C) 2015- Johannes Kepler University, Linz
@@ -22,63 +22,37 @@ License
     along with CFDEMcoupling academic.  If not, see <http://www.gnu.org/licenses/>.
 \*---------------------------------------------------------------------------*/
 
-#ifndef recNorm_H
-#define recNorm_H
+#ifndef noRecNorm_H
+#define noRecNorm_H
 
-#include "recBase.H"
-//#include "fvCFD.H"
-#include "HashTable.H"
-// #include "labelPair.H"
-#include "OFstream.H"
+#include "recNorm.H"
 
 namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class recNorm Declaration
+                           Class noRecNorm Declaration
 \*---------------------------------------------------------------------------*/
 
-class recNorm
+class noRecNorm
+:
+    public recNorm
 {
 protected:
 
     // Protected data
-    recBase& base_;
-
-    const dictionary& recProperties_;
-
-    bool verbose_;
+    void computeRecMatrix();
     
-    virtual void computeRecMatrix() = 0;
-    
-
 
 public:
 
-    friend class recBase;
-
     //- Runtime type information
-    TypeName("recNorm");
-
-    // Declare runtime constructor selection table
-
-        declareRunTimeSelectionTable
-        (
-            autoPtr,
-            recNorm,
-            dictionary,
-            (
-                const dictionary& dict,
-                recBase& base
-            ),
-            (dict,base)
-        );
-
+    TypeName("none");
 
     // Constructors
 
         //- Construct from components
-        recNorm
+        noRecNorm
         (
             const dictionary& dict,
             recBase& base
@@ -87,18 +61,12 @@ public:
 
     // Destructor
 
-        virtual ~recNorm();
+        virtual ~noRecNorm();
 
 
-    // Selector
-
-        static autoPtr<recNorm> New
-        (
-            const dictionary& dict,
-            recBase& base
-        );
-
-
+    // Member Functions
+    
+  
 };
 
 

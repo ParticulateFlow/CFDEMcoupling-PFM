@@ -22,63 +22,42 @@ License
     along with CFDEMcoupling academic.  If not, see <http://www.gnu.org/licenses/>.
 \*---------------------------------------------------------------------------*/
 
-#ifndef recNorm_H
-#define recNorm_H
+#ifndef readNorm_H
+#define readNorm_H
 
-#include "recBase.H"
-//#include "fvCFD.H"
-#include "HashTable.H"
-// #include "labelPair.H"
-#include "OFstream.H"
+#include "recNorm.H"
 
 namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class recNorm Declaration
+                           Class readNorm Declaration
 \*---------------------------------------------------------------------------*/
 
-class recNorm
+class readNorm
+:
+    public recNorm
 {
 protected:
 
     // Protected data
-    recBase& base_;
 
-    const dictionary& recProperties_;
+    dictionary propsDict_;
 
-    bool verbose_;
-    
-    virtual void computeRecMatrix() = 0;
-    
+    const word recMatName_;
+
+    void computeRecMatrix();
 
 
 public:
 
-    friend class recBase;
-
     //- Runtime type information
-    TypeName("recNorm");
-
-    // Declare runtime constructor selection table
-
-        declareRunTimeSelectionTable
-        (
-            autoPtr,
-            recNorm,
-            dictionary,
-            (
-                const dictionary& dict,
-                recBase& base
-            ),
-            (dict,base)
-        );
-
+    TypeName("readNorm");
 
     // Constructors
 
         //- Construct from components
-        recNorm
+        readNorm
         (
             const dictionary& dict,
             recBase& base
@@ -87,16 +66,10 @@ public:
 
     // Destructor
 
-        virtual ~recNorm();
+        virtual ~readNorm();
 
 
-    // Selector
-
-        static autoPtr<recNorm> New
-        (
-            const dictionary& dict,
-            recBase& base
-        );
+    // Member Functions
 
 
 };
