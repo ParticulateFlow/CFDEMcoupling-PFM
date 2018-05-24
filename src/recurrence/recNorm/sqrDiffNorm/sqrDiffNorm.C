@@ -51,13 +51,8 @@ sqrDiffNorm::sqrDiffNorm
 (
     const dictionary& dict,
     recBase& base
-)
-:
-    recNorm(dict, base),
-    propsDict_(dict.subDict(typeName + "Props")),
-    normConstant_(propsDict_.lookupOrDefault<scalar>("normConstant",-1.0)),
-    fieldType_(propsDict_.lookup("fieldType")),
-    fieldName_(propsDict_.lookup("fieldName"))
+):
+    diffNorm(dict, base, typeName)
 {}
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
@@ -67,142 +62,7 @@ sqrDiffNorm::~sqrDiffNorm()
 
 // * * * * * * * * * * * * * protected Member Functions  * * * * * * * * * * * * //
 
-void sqrDiffNorm::computeRecMatrix()
-{
-    Info << nl << type() << ": computing recurrence matrix\n" << endl;
 
-    label totNumRecSteps = base_.recM().numRecFields();
-    SymmetricSquareMatrix<scalar>& recurrenceMatrix( base_.recM().recurrenceMatrix() );
-
-    scalar normIJ(0.0);
-    scalar maxNormIJ(0.0);
-
-    /*
-        total number of computed elements: total number of matrix entries
-            minus the main diagonal entries, divided by two,
-            since the matrix is symmetric
-    */
-    label size = (totNumRecSteps*(totNumRecSteps-1))/2;
-    label counter = 0;
-    label percentage = 0;
-
-
-    label N(this->base_.recM().numRecFields());
-    label M(this->base_.recM().numDataBaseFields());
-
-    if (verbose_)
-    {
-        Info << " N = " << N << ",  M = " << M << endl;
-    }
-
-    label ti(0);
-    label tj(0);
-    label tmp(-1);
-
-    for (int j=0; j<=N/(M-1); j++)
-    {
-        for (int i=0; i<totNumRecSteps; i++)
-        {
-            if (verbose_)
-            {
-                Info << " i = " << i << ",  j = " << j << endl;
-            }
-
-            if(counter >= 0.1 * percentage * size)
-            {
-                Info << "\t" << 10 * percentage << " \% done" << endl;
-                percentage++;
-            }
-
-            for (int k=i; k<i+(M-1); k++)
-            {
-                ti = i;
-                tj = j*(M-1) + k;
-
-                if (ti > tj)
-                {
-                    tmp = ti;
-                    ti = tj;
-                    tj = tmp;
-                }
-
-                // skip coordinates outside the recurrence space
-                if (ti >= N or tj >= N)
-                {
-                    continue;
-                }
-
-                // start
-                // skip main diagonal and upper half
-                if (ti >= tj)
-                {
-                    recurrenceMatrix[ti][tj] = 0;
-                    continue;
-                }
-
-                if (verbose_)
-                {
-                    Info << " Doing calculation for element "
-                        << ti << " " << tj << endl;
-                }
-
-                counter++;
-
-                // compute elements
-                if (fieldType_ == "volScalarField")
-                {
-                    normIJ = normVSF(ti,tj);
-                }
-                else if (fieldType_ == "volVectorField")
-                {
-                    normIJ = normVVF(ti,tj);
-                }
-                else if (fieldType_ == "surfaceScalarField")
-                {
-                    normIJ = normSSF(ti,tj);
-                }
-                else
-                {
-                    FatalError
-                        << "sqrDiffNorm: Unknown field type " << fieldType_
-                        << abort(FatalError);
-                }
-
-                recurrenceMatrix[ti][tj] = normIJ;
-
-                if (normIJ > maxNormIJ)
-                {
-                    maxNormIJ = normIJ;
-                }
-                // end
-            }
-        }
-    }
-
-
-    // normalize matrix and copy lower to upper half
-    if(normConstant_ > 0.0) maxNormIJ = normConstant_;
-
-    for(label ti=0;ti<totNumRecSteps;ti++)
-    {
-        for(label tj=0;tj<totNumRecSteps;tj++)
-        {
-            if (ti >= tj) continue;
-
-            if (recurrenceMatrix[ti][tj] < 0)
-            {
-                FatalErrorInFunction << "Error in computation of recurrence matrix!"
-                    << nl << "Negative elements encountered. This should not happen!"
-                    << abort(FatalError);
-            }
-
-            recurrenceMatrix[ti][tj] /= maxNormIJ;
-            recurrenceMatrix[tj][ti] = recurrenceMatrix[ti][tj];
-        }
-    }
-
-    Info << "\nComputing recurrence matrix done\n" << endl;
-}
 
 scalar sqrDiffNorm::normVSF(label ti, label tj)
 {

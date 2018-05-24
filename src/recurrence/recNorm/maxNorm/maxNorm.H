@@ -25,7 +25,7 @@ License
 #ifndef maxNorm_H
 #define maxNorm_H
 
-#include "recNorm.H"
+#include "diffNorm.H"
 
 namespace Foam
 {
@@ -36,29 +36,15 @@ namespace Foam
 
 class maxNorm
 :
-    public recNorm
+    public diffNorm
 {
 protected:
-
-    // Protected data
-
-    dictionary propsDict_;
-
-    const scalar normConstant_;
-
-    word fieldType_;
-
-    word fieldName_;
-
-    void computeRecMatrix();
 
     scalar normVSF(label, label);
 
     scalar normVVF(label, label);
 
     scalar normSSF(label, label);
-
-
 
 public:
 

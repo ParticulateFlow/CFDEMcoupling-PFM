@@ -23,7 +23,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "error.H"
-#include "maxNorm.H"
+#include "EuclideanNorm.H"
 #include "recModel.H"
 #include "addToRunTimeSelectionTable.H"
 
@@ -35,60 +35,61 @@ namespace Foam
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-defineTypeNameAndDebug(maxNorm, 0);
+defineTypeNameAndDebug(EuclideanNorm, 0);
 
 addToRunTimeSelectionTable
 (
     recNorm,
-    maxNorm,
+    EuclideanNorm,
     dictionary
 );
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 // Construct from components
-maxNorm::maxNorm
+EuclideanNorm::EuclideanNorm
 (
     const dictionary& dict,
     recBase& base
-)
-:
+):
     diffNorm(dict, base, typeName)
 {}
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-maxNorm::~maxNorm()
+EuclideanNorm::~EuclideanNorm()
 {}
 
 // * * * * * * * * * * * * * protected Member Functions  * * * * * * * * * * * * //
 
-scalar maxNorm::normVSF(label ti, label tj)
+
+
+scalar EuclideanNorm::normVSF(label ti, label tj)
 {
     const volScalarField& t1( base_.recM().exportVolScalarField(fieldName_,ti) );
     const volScalarField& t2( base_.recM().exportVolScalarField(fieldName_,tj) );
-    volScalarField diff = mag(t1 - t2);
+    dimensionedScalar tNorm( fvc::domainIntegrate( sqr( t1 - t2 ) ) );
 
-    return max(diff).value();
+    return Foam::sqrt(tNorm.value());
 }
 
-scalar maxNorm::normVVF(label ti, label tj)
+scalar EuclideanNorm::normVVF(label ti, label tj)
 {
     const volVectorField& t1( base_.recM().exportVolVectorField(fieldName_,ti) );
     const volVectorField& t2( base_.recM().exportVolVectorField(fieldName_,tj) );
-    volScalarField diff = mag(t1 - t2);
+    dimensionedScalar tNorm( fvc::domainIntegrate( magSqr( t1 - t2 ) ) );
 
-    return max(diff).value();
+    return Foam::sqrt(tNorm.value());
 }
 
-scalar maxNorm::normSSF(label ti, label tj)
+scalar EuclideanNorm::normSSF(label ti, label tj)
 {
     const surfaceScalarField& t1( base_.recM().exportSurfaceScalarField(fieldName_,ti) );
     const surfaceScalarField& t2( base_.recM().exportSurfaceScalarField(fieldName_,tj) );
     volVectorField t12 (fvc::reconstruct( t1-t2 ) );
-    volScalarField diff = mag(t12);
+    dimensionedScalar tNorm( fvc::domainIntegrate( magSqr( t12 ) ) );
 
-    return max(diff).value();
+    return Foam::sqrt(tNorm.value());
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

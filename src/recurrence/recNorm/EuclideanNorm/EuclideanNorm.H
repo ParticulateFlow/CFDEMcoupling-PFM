@@ -22,8 +22,8 @@ License
     along with CFDEMcoupling academic.  If not, see <http://www.gnu.org/licenses/>.
 \*---------------------------------------------------------------------------*/
 
-#ifndef absDiffNorm_H
-#define absDiffNorm_H
+#ifndef EuclideanNorm_H
+#define EuclideanNorm_H
 
 #include "diffNorm.H"
 
@@ -31,10 +31,10 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class absDiffNorm Declaration
+                           Class EuclideanNorm Declaration
 \*---------------------------------------------------------------------------*/
 
-class absDiffNorm
+class EuclideanNorm
 :
     public diffNorm
 {
@@ -49,12 +49,12 @@ protected:
 public:
 
     //- Runtime type information
-    TypeName("absDiffNorm");
+    TypeName("EuclideanNorm");
 
     // Constructors
 
         //- Construct from components
-        absDiffNorm
+        EuclideanNorm
         (
             const dictionary& dict,
             recBase& base
@@ -63,7 +63,7 @@ public:
 
     // Destructor
 
-        virtual ~absDiffNorm();
+        virtual ~EuclideanNorm();
 
 
     // Member Functions
