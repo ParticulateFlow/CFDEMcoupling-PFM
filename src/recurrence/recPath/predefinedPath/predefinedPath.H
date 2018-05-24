@@ -1,6 +1,6 @@
 /*---------------------------------------------------------------------------*\
     CFDEMcoupling academic - Open Source CFD-DEM coupling
-
+    
     Contributing authors:
     Thomas Lichtenegger
     Copyright (C) 2015- Johannes Kepler University, Linz
@@ -22,63 +22,42 @@ License
     along with CFDEMcoupling academic.  If not, see <http://www.gnu.org/licenses/>.
 \*---------------------------------------------------------------------------*/
 
-#ifndef recNorm_H
-#define recNorm_H
+#ifndef predefinedPath_H
+#define predefinedPath_H
 
-#include "recBase.H"
-//#include "fvCFD.H"
-#include "HashTable.H"
-// #include "labelPair.H"
-#include "OFstream.H"
+#include "recPath.H"
 
 namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class recNorm Declaration
+                           Class predefinedPath Declaration
 \*---------------------------------------------------------------------------*/
 
-class recNorm
+class predefinedPath
+:
+    public recPath
 {
 protected:
 
     // Protected data
-    recBase& base_;
 
-    const dictionary& recProperties_;
+    dictionary propsDict_;
 
-    bool verbose_;
+    word fileName_;
     
-    virtual void computeRecMatrix() = 0;
-    
+    void computeRecPath();
 
 
 public:
 
-    friend class recBase;
-
     //- Runtime type information
-    TypeName("recNorm");
-
-    // Declare runtime constructor selection table
-
-        declareRunTimeSelectionTable
-        (
-            autoPtr,
-            recNorm,
-            dictionary,
-            (
-                const dictionary& dict,
-                recBase& base
-            ),
-            (dict,base)
-        );
-
+    TypeName("predefinedPath");
 
     // Constructors
 
         //- Construct from components
-        recNorm
+        predefinedPath
         (
             const dictionary& dict,
             recBase& base
@@ -87,18 +66,12 @@ public:
 
     // Destructor
 
-        virtual ~recNorm();
+        virtual ~predefinedPath();
 
 
-    // Selector
-
-        static autoPtr<recNorm> New
-        (
-            const dictionary& dict,
-            recBase& base
-        );
-
-
+    // Member Functions
+    
+  
 };
 
 

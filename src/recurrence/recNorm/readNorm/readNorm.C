@@ -4,6 +4,8 @@
     Contributing authors:
     Thomas Lichtenegger
     Copyright (C) 2015- Johannes Kepler University, Linz
+
+    Paul Kieckhefen, TUHH
 -------------------------------------------------------------------------------
 License
     This file is part of CFDEMcoupling academic.
@@ -23,8 +25,9 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "error.H"
-#include "recNorm.H"
+#include "readNorm.H"
 #include "recModel.H"
+#include "addToRunTimeSelectionTable.H"
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -34,38 +37,43 @@ namespace Foam
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-defineTypeNameAndDebug(recNorm, 0);
+defineTypeNameAndDebug(readNorm, 0);
 
-defineRunTimeSelectionTable(recNorm, dictionary);
-
-
-// * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * //
+addToRunTimeSelectionTable
+(
+    recNorm,
+    readNorm,
+    dictionary
+);
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 // Construct from components
-recNorm::recNorm
+readNorm::readNorm
 (
     const dictionary& dict,
     recBase& base
 )
 :
-    base_(base),
-    recProperties_(dict),
-    verbose_(dict.lookupOrDefault<Switch>("verbose", false))
-{
-}
+    recNorm(dict, base),
+    propsDict_(dict.subDict(typeName + "Props")),
+    recMatName_(propsDict_.lookupOrDefault<word>("recMatName", "recurrenceMatrix"))
+{}
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-recNorm::~recNorm()
+readNorm::~readNorm()
 {}
 
-// * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * //
+// * * * * * * * * * * * * * protected Member Functions  * * * * * * * * * * * * //
 
-
-// * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * //
-
+void readNorm::computeRecMatrix()
+{
+    Info << nl << type() << ": reading recurrence matrix " << recMatName_ << nl << endl;
+    SymmetricSquareMatrix<scalar>& recurrenceMatrix( base_.recM().recurrenceMatrix() );
+    IFstream matrixFile(recMatName_);
+    matrixFile >> recurrenceMatrix;
+}
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
