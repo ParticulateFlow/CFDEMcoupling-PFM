@@ -976,7 +976,7 @@ Switch gerhardsRecModel::checkSkipZero()
 //     return tAveragedSurfaceScalarField;
 // }
 
-/*void gerhardsRecModel::exportAveragedVolVectorField(volVectorField& smoothfield, word fieldname, scalar threshold, label index) const
+void gerhardsRecModel::exportAveragedVolVectorField(volVectorField& smoothfield, word fieldname, scalar threshold, label index) const
 {
     label timeIndex;
     if (index < 0)
@@ -1012,7 +1012,7 @@ Switch gerhardsRecModel::checkSkipZero()
     Info << "time index = " << index << ", counter = " << counter << endl;
     smoothfield /= counter;
 }
-*/
+
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

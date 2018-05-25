@@ -160,7 +160,7 @@ public:
     virtual const surfaceScalarField& exportSurfaceScalarField(word, label)  = 0;
 
   //  virtual tmp<surfaceScalarField> exportAveragedSurfaceScalarField(word, scalar, label index = -1) = 0;
-    //virtual void exportAveragedVolVectorField(volVectorField&, word, scalar, label index = -1) const = 0;
+    virtual void exportAveragedVolVectorField(volVectorField&, word, scalar, label index = -1) const = 0;
 
     virtual SymmetricSquareMatrix<scalar>& recurrenceMatrix() = 0;
 
