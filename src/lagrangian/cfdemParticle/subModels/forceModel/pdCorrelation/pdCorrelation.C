@@ -110,7 +110,18 @@ pdCorrelation::pdCorrelation
         dimensionedVector("zero", dimMomentum*dimLength, vector::zero),
         "zeroGradient"
     ),
-    cg3FieldPtr_(),
+    cg3Field_
+    (   IOobject
+        (
+            "cg3Field",
+            sm.mesh().time().timeName(),
+            sm.mesh(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        sm.mesh(),
+        dimensionedScalar("zero", dimless, 0)
+    ),
     typeCG_
     (
         propsDict_.lookupOrDefault
@@ -127,8 +138,8 @@ pdCorrelation::pdCorrelation
             scalarList(1, -1.)
         )
     ),
-    constantCG_(typeCG_.size() > 0),
-    CG_(!(constantCG_ && abs(typeCG_[0] - 1.) < SMALL))
+    constantCG_(typeCG_.size() < 2),
+    CG_(!constantCG_ || typeCG_[0] > 1. + SMALL)
 {
     if ((particleDensities_[0] < 0) && !particleCloud_.getParticleDensities())
     {
@@ -139,23 +150,6 @@ pdCorrelation::pdCorrelation
     }
 
     allocateMyArrays();
-    if (CG_)
-    {
-        cg3FieldPtr_.set
-        (   new volScalarField
-            (   IOobject
-                (
-                    "CG3Field",
-                    sm.mesh().time().timeName(),
-                    sm.mesh(),
-                    IOobject::NO_READ,
-                    IOobject::NO_WRITE
-                ),
-                sm.mesh(),
-                dimensionedScalar("zero", dimless, 0)
-            )
-        );
-    }
 
     dField_.write();
     pdField_.write();
@@ -169,10 +163,7 @@ pdCorrelation::pdCorrelation
 
 pdCorrelation::~pdCorrelation()
 {
-    if (!constantCG_)
-    {
-        particleCloud_.dataExchangeM().destroy(cg3_, 1);
-    }
+    particleCloud_.dataExchangeM().destroy(cg3_, 1);
     particleCloud_.dataExchangeM().destroy(d_,  1);
     particleCloud_.dataExchangeM().destroy(p_,  3);
     particleCloud_.dataExchangeM().destroy(d2_, 1);
@@ -188,10 +179,7 @@ void pdCorrelation::allocateMyArrays() const
     particleCloud_.dataExchangeM().allocateArray(p_,  initVal, 3);
     particleCloud_.dataExchangeM().allocateArray(d2_, initVal, 1);
     particleCloud_.dataExchangeM().allocateArray(pd_, initVal, 3);
-    if (CG_)
-    {
-        particleCloud_.dataExchangeM().allocateArray(cg3_, initVal, 1);
-    }
+    particleCloud_.dataExchangeM().allocateArray(cg3_, initVal, 1);
 }
 // * * * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * * //
 
@@ -199,17 +187,22 @@ void pdCorrelation::setForce() const
 {
     const fvMesh& mesh = particleCloud_.mesh();
 
-    if (!mesh.write()) return; // skip if it's not write time
+//    if (!mesh.write()) return; // skip if it's not write time
 
     allocateMyArrays();
 
     const Switch densityFromList
     (
         particleCloud_.getParticleTypes()
-        && particleCloud_.getParticleDensities()
+        && !particleCloud_.getParticleDensities()
     );
-
     const scalar piOverSix = constant::mathematical::pi / 6.;
+
+    dField_.primitiveFieldRef()   = 0.0;
+    pField_.primitiveFieldRef()   = vector::zero;
+    d2Field_.primitiveFieldRef()  = 0.0;
+    pdField_.primitiveFieldRef()  = vector::zero;
+    cg3Field_.primitiveFieldRef() = 0.;
 
     label  celli(0);
     scalar dp(0.);
@@ -228,7 +221,7 @@ void pdCorrelation::setForce() const
             typei = particleCloud_.particleTypes()[pi][0] - 1;
             rhop  = densityFromList ? particleDensities_[typei]
                                     : particleCloud_.particleDensity(pi);
-            cg    = constantCG_     ? typeCG_[typei] : typeCG_[0];
+            cg    = constantCG_     ? typeCG_[0] : typeCG_[typei];
         }
 
         particleV  = piOverSix * rhop * dp * dp * dp;
@@ -241,16 +234,9 @@ void pdCorrelation::setForce() const
         pd_[pi][1] = p_[pi][1] * dp / cg;
         pd_[pi][2] = p_[pi][2] * dp / cg;
 
-        if (CG_)
-        {
-            cg3_[pi][0] = cg * cg * cg;
-        }
+        cg3_[pi][0] = CG_ ? cg * cg * cg : 1.;
     }
 
-    dField_.primitiveFieldRef()  = 0.0;
-    pField_.primitiveFieldRef()  = vector::zero;
-    d2Field_.primitiveFieldRef() = 0.0;
-    pdField_.primitiveFieldRef() = vector::zero;
 
     particleCloud_.averagingM().setScalarSum
     (
@@ -281,29 +267,25 @@ void pdCorrelation::setForce() const
         nullptr
     );
 
-    if (CG_)
+    particleCloud_.averagingM().setScalarSum
+    (
+        cg3Field_,
+        cg3_,
+        particleCloud_.particleWeights(),
+        nullptr
+    );
+
+    scalar oneOverCG3(1.);
+    forAll(cg3Field_, celli)
     {
-        volScalarField& cg3Field_ = cg3FieldPtr_();
-        particleCloud_.averagingM().setScalarSum
-        (
-            cg3Field_,
-            cg3_,
-            particleCloud_.particleWeights(),
-            nullptr
-        );
+        if (cg3Field_[celli] < 1.) continue;
+        oneOverCG3 = 1./cg3Field_[celli];
+        oneOverCG3 = oneOverCG3 * oneOverCG3 * oneOverCG3;
 
-        scalar oneOverCG3(1.);
-        forAll(cg3Field_, celli)
-        {
-            if (cg3Field_[celli] < 1.) continue;
-            oneOverCG3 = 1./cg3Field_[celli];
-            oneOverCG3 = oneOverCG3 * oneOverCG3 * oneOverCG3;
-
-            dField_ [celli] *= oneOverCG3;
-            pField_ [celli] *= oneOverCG3;
-            d2Field_[celli] *= oneOverCG3;
-            pdField_[celli] *= oneOverCG3;
-        }
+        dField_ [celli] *= oneOverCG3;
+        pField_ [celli] *= oneOverCG3;
+        d2Field_[celli] *= oneOverCG3;
+        pdField_[celli] *= oneOverCG3;
     }
 
     scalar denom(0.);

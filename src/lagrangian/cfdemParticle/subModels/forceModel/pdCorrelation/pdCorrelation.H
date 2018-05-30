@@ -54,7 +54,7 @@ private:
     mutable volScalarField d2Field_;
     mutable volVectorField pdField_;
 
-    mutable autoPtr<volScalarField> cg3FieldPtr_;
+    mutable volScalarField cg3Field_;
 
     const scalarList typeCG_;
     const scalarList particleDensities_;
