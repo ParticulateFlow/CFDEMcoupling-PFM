@@ -139,7 +139,8 @@ pdCorrelation::pdCorrelation
         )
     ),
     constantCG_(typeCG_.size() < 2),
-    CG_(!constantCG_ || typeCG_[0] > 1. + SMALL)
+    CG_(!constantCG_ || typeCG_[0] > 1. + SMALL),
+    runOnWriteOnly_(propsDict_.lookupOrDefault("runOnWriteOnly", false))
 {
     if ((particleDensities_[0] < 0) && !particleCloud_.getParticleDensities())
     {
@@ -187,7 +188,7 @@ void pdCorrelation::setForce() const
 {
     const fvMesh& mesh = particleCloud_.mesh();
 
-//    if (!mesh.write()) return; // skip if it's not write time
+    if (runOnWriteOnly_ && !mesh.write()) return; // skip if it's not write time
 
     allocateMyArrays();
 
@@ -276,11 +277,11 @@ void pdCorrelation::setForce() const
     );
 
     scalar oneOverCG3(1.);
+    const scalar oneMinusSmall(1.-SMALL);
     forAll(cg3Field_, celli)
     {
-        if (cg3Field_[celli] < 1.) continue;
+        if (cg3Field_[celli] < oneMinusSmall) continue;
         oneOverCG3 = 1./cg3Field_[celli];
-        oneOverCG3 = oneOverCG3 * oneOverCG3 * oneOverCG3;
 
         dField_ [celli] *= oneOverCG3;
         pField_ [celli] *= oneOverCG3;

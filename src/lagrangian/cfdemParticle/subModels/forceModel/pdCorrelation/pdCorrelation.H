@@ -60,6 +60,7 @@ private:
     const scalarList particleDensities_;
     const Switch     constantCG_;
     const Switch     CG_;
+    const Switch     runOnWriteOnly_;
 
     void allocateMyArrays() const;
 
