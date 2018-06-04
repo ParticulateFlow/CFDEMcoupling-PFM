@@ -11,13 +11,15 @@ License
     You should have received a copy of the GNU General Public License
     along with this code.  If not, see <http://www.gnu.org/licenses/>.
 
-    Copyright (C) 2015- Thomas Lichtenegger, JKU Linz, Austria
 
 Description
-    calculates the granular kinetic energy
+    calculates the correlation between particle diameter and momentum
 
 SourceFiles
     pdCorrelation.C
+
+Contributing Author
+    2018    Paul Kieckhefen, TUHH
 \*---------------------------------------------------------------------------*/
 
 #ifndef pdCorrelation_H
