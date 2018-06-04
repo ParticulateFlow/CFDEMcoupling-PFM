@@ -80,7 +80,7 @@ BeetstraDragPoly::~BeetstraDragPoly()
 
 void BeetstraDragPoly::adaptVoidfraction(double& voidfraction, label cellI) const
 {
-    voidfraction -= alphaSt_()[cellI];
+    if (fines_) voidfraction -= alphaSt_()[cellI];
     if (voidfraction < minVoidfraction_) voidfraction = minVoidfraction_;
 }
 
