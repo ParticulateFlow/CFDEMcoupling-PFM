@@ -66,7 +66,8 @@ IBVoidFraction::IBVoidFraction
     propsDict_(dict.subDict(typeName + "Props")),
     alphaMin_(readScalar(propsDict_.lookup("alphaMin"))),
     alphaLimited_(0),
-    scaleUpVol_(readScalar(propsDict_.lookup("scaleUpVol")))
+    scaleUpVol_(readScalar(propsDict_.lookup("scaleUpVol"))),
+    sqrtThree_(sqrt(3.0))
 {
     Info << "\n\n W A R N I N G - do not use in combination with differentialRegion model!\n\n" << endl;
     maxCellsPerParticle_ = readLabel(propsDict_.lookup("maxCellsPerParticle"));
@@ -128,8 +129,10 @@ void IBVoidFraction::setvoidFraction(double** const& mask,double**& voidfraction
                 }
 
                 scalar centreDist = mag(cellCentrePosition - minPeriodicParticlePos);
-                scalar corona = 0.5 * sqrt(3.0) * pow(particleCloud_.mesh().V()[particleCenterCellID], 1./3.);
-                vector coronaPoint = cellCentrePosition + (cellCentrePosition - minPeriodicParticlePos) * (corona / centreDist);
+                scalar corona = 0.5 * sqrtThree_ * pow(particleCloud_.mesh().V()[particleCenterCellID], 1./3.);
+                vector coronaPoint = cellCentrePosition;
+                if(centreDist > 0.0)
+                  coronaPoint += (cellCentrePosition - minPeriodicParticlePos) * (corona / centreDist);
 
                 if (pointInParticle(index, minPeriodicParticlePos, coronaPoint) < 0.0)
                 {
@@ -249,7 +252,7 @@ void IBVoidFraction::setvoidFraction(double** const& mask,double**& voidfraction
                         label partCellId = particleCloud_.mesh().findNearestCell(particlePosList[iPeriodicImage]);
                         particleLabelList.append(partCellId);
 
-                        buildLabelHashSet(radius, particlePosList[iPeriodicImage], particleLabelList[iPeriodicImage], hashSett, false);
+                        buildLabelHashSet(index, particlePosList[iPeriodicImage], particleLabelList[iPeriodicImage], hashSett, false);
                     }
 
                 } //end checkPeriodicCells_
@@ -316,8 +319,10 @@ void IBVoidFraction::buildLabelHashSet
         scalar centreDist = mag(cellCentrePosition-position);
 
         scalar fc = pointInParticle(index, position, cellCentrePosition);
-        scalar corona = 0.5 * sqrt(3.0) * pow(particleCloud_.mesh().V()[neighbor], 1./3.);
-        vector coronaPoint = cellCentrePosition + (cellCentrePosition - position) * (corona / centreDist);
+        scalar corona = 0.5 * sqrtThree_ * pow(particleCloud_.mesh().V()[neighbor], 1./3.);
+        vector coronaPoint = cellCentrePosition;
+        if (centreDist > 0.0)
+            coronaPoint += (cellCentrePosition - position) * (corona / centreDist);
 
         if (!hashSett.found(neighbor) && pointInParticle(index, position, coronaPoint) < 0.0)
         {

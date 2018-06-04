@@ -47,7 +47,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class noDrag Declaration
+                           Class engineSearchIB Declaration
 \*---------------------------------------------------------------------------*/
 
 class engineSearchIB
@@ -59,11 +59,17 @@ private:
 
         dictionary propsDict_;
 
-    	const label zSplit_;
+        const label zSplit_;
 
-    	const label xySplit_;
-    	
-    	bool checkPeriodicCells_;
+        const label xySplit_;
+
+        const scalar thetaSize_;
+        const scalar phiSize_;
+        const scalar deg2rad_;
+
+        const label numberOfSatellitePoints_;
+
+        std::vector<vector> satellitePoints_;
 
 public:
 
@@ -94,6 +100,17 @@ public:
             int size
         ) const;
 
+private:
+        vector generateSatellitePoint
+        (
+            int countPoints
+        ) const;
+
+        vector getSatellitePoint
+        (
+            int index,
+            int countPoints
+        ) const;
 };
 
 

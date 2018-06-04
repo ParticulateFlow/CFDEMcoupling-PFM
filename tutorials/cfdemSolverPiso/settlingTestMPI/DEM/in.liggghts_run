@@ -27,7 +27,7 @@ fix         m4 all property/global coefficientFriction peratomtypepair 1 0.5
 #fix         m5 all property/global characteristicVelocity scalar 2.0
 
 # pair style
-pair_style  gran model hertz tangential history # hertz without cohesion
+pair_style  gran model hertz tangential history
 pair_coeff  * *
 
 # timestep, gravity
@@ -68,6 +68,6 @@ compute_modify  thermo_temp dynamic yes
 
 # insert the first particles so that dump is not empty
 run     1
-dump    dmp all custom 1000 ../DEM/post/dump.liggghts_run id type x y z ix iy iz vx vy vz fx fy fz omegax omegay omegaz radius
+dump    dmp all custom 1000 ../DEM/post/dump.liggghts_run id type x y z vx vy vz fx fy fz omegax omegay omegaz radius
 
 run     1 upto

@@ -142,7 +142,7 @@ Info << "interface::setForce" << endl;
                 }
 
                 // Initialize an interfaceForce vector
-                vector interfaceForce = Foam::vector(0,0,0);
+                vector interfaceForce = Foam::vector::zero;
 
                 // Calculate the interfaceForce (range of alphap needed for stability)
 

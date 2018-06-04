@@ -156,7 +156,7 @@ void DiFeliceDragMS::setForce() const
         //{
 
             cellI = cloudRefMS().cellIDCM(index);
-            drag = vector(0,0,0);
+            drag = vector::zero;
 
             if (cellI > -1) // particle Found
             {

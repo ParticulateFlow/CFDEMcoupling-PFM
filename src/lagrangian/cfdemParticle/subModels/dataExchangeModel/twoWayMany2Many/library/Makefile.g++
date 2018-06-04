@@ -26,7 +26,7 @@ lib:	$(OBJ)
 	$(ARCHIVE) $(ARFLAGS) $(LIB) $(OBJ)
 
 clean:
-	rm $(LIB) *.o *.d
+	rm -f $(LIB) *.o *.d
 
 # Compilation rules
 
