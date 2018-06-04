@@ -260,6 +260,7 @@ listing below of styles within certain commands.
 "forceModel_Archimedes"_forceModel_Archimedes.html,
 "forceModel_ArchimedesIB"_forceModel_ArchimedesIB.html,
 "forceModel_DiFeliceDrag"_forceModel_DiFeliceDrag.html,
+"forceModel_dSauter"_forceModel_dSauter.html,
 "forceModel_GidaspowDrag"_forceModel_GidaspowDrag.html,
 "forceModel_KochHillDrag"_forceModel_KochHillDrag.html,
 "forceModel_LaEuScalarTemp"_forceModel_LaEuScalarTemp.html,
