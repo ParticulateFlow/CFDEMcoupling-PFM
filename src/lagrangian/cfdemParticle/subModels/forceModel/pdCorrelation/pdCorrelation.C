@@ -80,7 +80,7 @@ pdCorrelation::pdCorrelation
             sm.mesh().time().timeName(),
             sm.mesh(),
             IOobject::NO_READ,
-            IOobject::NO_WRITE
+            IOobject::AUTO_WRITE
         ),
         sm.mesh(),
         dimensionedVector("zero", dimMomentum, vector::zero)
