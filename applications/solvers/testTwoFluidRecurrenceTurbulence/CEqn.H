@@ -4,10 +4,14 @@
     The recurrence-based turbulence models are derived from the standard base classes 
     of OpenFOAM, thus they behave as a normal turbulence model would.
 */
+
+alphaRhoPhiCarrier = linearInterpolate(alpha2*rhoCarrier)*phi2;
+
 fvScalarMatrix CEqn
 (
 	fvm::ddt(alphaCarrier*rhoCarrier, C)
-  + fvm::div(linearInterpolate(alpha2*rhoCarrier)*phi2, C, "div(alphaRhoPhi,C)")
+  + fvm::div(alphaRhoPhiCarrier, C, "div(alphaRhoPhi,C)")
+  - fvm::Sp(fvc::div(alphaRhoPhiCarrier), C)
 
   - fvm::laplacian
 	(

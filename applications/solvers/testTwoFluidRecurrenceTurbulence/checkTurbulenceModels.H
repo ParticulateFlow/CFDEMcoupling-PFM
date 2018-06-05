@@ -12,11 +12,11 @@
             << phase.turbulence().type() << endl;
         
         /*
-            Use appropriate if-statement for OpenFOAM-4.0 resp. OpenFOAM-5.0,
-            as the laminar, multi-phase turbulence model is named Stokes in OF-5.0
+            Check for laminar turbulence. This works with OpenFOAM-4.0 and OpenFOAM-5.0,
+            as the laminar, multi-phase turbulence model is named "laminar" in OF-4.0
+            and "Stokes" in OF-5.0
         */
-        //if (phase.turbulence().type() == "Stokes") // OpenFOAM-5.0
-        if (phase.turbulence().type() == "laminar") // OpenFOAM-4.0
+        if (phase.turbulence().type() == "laminar" || phase.turbulence().type() == "Stokes")
         {
             // do nothing
         }
