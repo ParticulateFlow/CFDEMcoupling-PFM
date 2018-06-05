@@ -31,12 +31,13 @@ $(cfdTools)/newGlobal.C
 $(energyModels)/energyModel/energyModel.C
 $(energyModels)/energyModel/newEnergyModel.C
 $(energyModels)/heatTransferGunn/heatTransferGunn.C
-$(energyModels)/heatTransferGunnImplicit/heatTransferGunnImplicit.C
+$(energyModels)/heatTransferGunnPartField/heatTransferGunnPartField.C
 $(energyModels)/reactionHeat/reactionHeat.C
 
 $(thermCondModels)/thermCondModel/thermCondModel.C
 $(thermCondModels)/thermCondModel/newThermCondModel.C
 $(thermCondModels)/SyamlalThermCond/SyamlalThermCond.C
+$(thermCondModels)/ZehnerSchluenderThermCond/ZehnerSchluenderThermCond.C
 $(thermCondModels)/noTherm/noThermCond.C
 
 $(forceModels)/forceModel/forceModel.C
@@ -64,6 +65,7 @@ $(forceModels)/isotropicFluctuations/isotropicFluctuations.C
 $(forceModels)/evaluateFluctuations/evaluateFluctuations.C
 $(forceModels)/directedDiffusiveRelaxation/directedDiffusiveRelaxation.C
 $(forceModels)/BeetstraDrag/BeetstraDrag.C
+$(forceModels)/BeetstraDragPoly/BeetstraDragPoly.C
 $(forceModels)/dSauter/dSauter.C
 $(forceModels)/Fines/Fines.C
 $(forceModels)/Fines/FinesFields.C

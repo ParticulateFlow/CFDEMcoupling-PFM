@@ -46,7 +46,7 @@ heatTransferGunn::heatTransferGunn
     expNusselt_(propsDict_.lookupOrDefault<bool>("expNusselt",false)),
     interpolation_(propsDict_.lookupOrDefault<bool>("interpolation",false)),
     verbose_(propsDict_.lookupOrDefault<bool>("verbose",false)),
-    NusseltFieldName_(propsDict_.lookupOrDefault<word>("NusseltFieldName","NuField")),
+    implicit_(propsDict_.lookupOrDefault<bool>("implicit",true)),
     QPartFluidName_(propsDict_.lookupOrDefault<word>("QPartFluidName","QPartFluid")),
     QPartFluid_
     (   IOobject
@@ -61,13 +61,26 @@ heatTransferGunn::heatTransferGunn
         dimensionedScalar("zero", dimensionSet(1,-1,-3,0,0,0,0), 0.0),
 	"zeroGradient"
     ),
+    QPartFluidCoeffName_(propsDict_.lookupOrDefault<word>("QPartFluidCoeffName","QPartFluidCoeff")),
+    QPartFluidCoeff_
+    (   IOobject
+        (
+            QPartFluidCoeffName_,
+            sm.mesh().time().timeName(),
+            sm.mesh(),
+            IOobject::READ_IF_PRESENT,
+            IOobject::AUTO_WRITE
+        ),
+        sm.mesh(),
+        dimensionedScalar("zero", dimensionSet(1,-1,-3,-1,0,0,0), 0.0)
+    ),
     partTempField_
     (   IOobject
         (
-            "particleTemp",
+            "partTemp",
             sm.mesh().time().timeName(),
             sm.mesh(),
-            IOobject::NO_READ,
+            IOobject::READ_IF_PRESENT,
             IOobject::NO_WRITE
         ),
         sm.mesh(),
@@ -100,6 +113,7 @@ heatTransferGunn::heatTransferGunn
         dimensionedScalar("zero", dimensionSet(0,0,0,0,0,0,0), 0.0),
 	"zeroGradient"
     ),
+    NusseltFieldName_(propsDict_.lookupOrDefault<word>("NusseltFieldName","NuField")),
     NuField_
     (   IOobject
         (
@@ -130,10 +144,11 @@ heatTransferGunn::heatTransferGunn
     partTemp_(NULL),
     partHeatFluxName_(propsDict_.lookup("partHeatFluxName")),
     partHeatFlux_(NULL),
+    partHeatFluxCoeff_(NULL),
     partRe_(NULL),
     partNu_(NULL)
 {
-     allocateMyArrays();
+    allocateMyArrays();
 
     if (propsDict_.found("maxSource"))
     {
@@ -154,7 +169,12 @@ heatTransferGunn::heatTransferGunn
         partRelTempField_.write();
         Info <<  "Particle temperature field activated." << endl;
     }
- 
+
+    if (!implicit_)
+    {
+        QPartFluidCoeff_.writeOpt() = IOobject::NO_WRITE;
+    }
+
     if (verbose_)
     {
         ReField_.writeOpt() = IOobject::AUTO_WRITE;
@@ -184,6 +204,10 @@ heatTransferGunn::~heatTransferGunn()
     particleCloud_.dataExchangeM().destroy(partHeatFlux_,1);
     particleCloud_.dataExchangeM().destroy(partRe_,1);
     particleCloud_.dataExchangeM().destroy(partNu_,1);
+    if (implicit_)
+    {
+        particleCloud_.dataExchangeM().destroy(partHeatFluxCoeff_,1);
+    }
 }
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
@@ -193,6 +217,10 @@ void heatTransferGunn::allocateMyArrays() const
     double initVal=0.0;
     particleCloud_.dataExchangeM().allocateArray(partTemp_,initVal,1);  // field/initVal/with/lenghtFromLigghts
     particleCloud_.dataExchangeM().allocateArray(partHeatFlux_,initVal,1);
+    if(implicit_)
+    {
+        particleCloud_.dataExchangeM().allocateArray(partHeatFluxCoeff_,initVal,1);
+    }
 
     if(verbose_)
     {
@@ -201,7 +229,68 @@ void heatTransferGunn::allocateMyArrays() const
     }
 }
 
+
+void heatTransferGunn::partTempField()
+{
+    partTempField_.primitiveFieldRef() = 0.0;
+    particleCloud_.averagingM().resetWeightFields();
+    particleCloud_.averagingM().setScalarAverage
+    (
+        partTempField_,
+        partTemp_,
+        particleCloud_.particleWeights(),
+        particleCloud_.averagingM().UsWeightField(),
+        NULL
+    );
+
+    dimensionedScalar aveTemp("aveTemp",dimensionSet(0,0,0,1,0,0,0), partTempAve_);
+    partRelTempField_ = (partTempField_ - aveTemp) / (aveTemp - partRefTemp_);
+}
+
+
+scalar heatTransferGunn::Nusselt(scalar voidfraction, scalar Rep, scalar Pr) const
+{
+    return (7 - 10 * voidfraction + 5 * voidfraction * voidfraction) *
+                        (1 + 0.7 * Foam::pow(Rep,0.2) * Foam::pow(Pr,0.33)) +
+                        (1.33 - 2.4 * voidfraction + 1.2 * voidfraction * voidfraction) *
+                        Foam::pow(Rep,0.7) * Foam::pow(Pr,0.33);
+}
+
+void heatTransferGunn::giveData()
+{
+    Info << "total convective particle-fluid heat flux [W] (Eulerian) = " << gSum(QPartFluid_*1.0*QPartFluid_.mesh().V()) << endl;
+    particleCloud_.clockM().start(30,"giveDEM_Tdata");
+    particleCloud_.dataExchangeM().giveData(partHeatFluxName_,"scalar-atom", partHeatFlux_);
+    particleCloud_.clockM().stop("giveDEM_Tdata");
+}
+
+void heatTransferGunn::heatFlux(label index, scalar h, scalar As, scalar Tfluid)
+{
+    scalar hAs = h * As;
+    partHeatFlux_[index][0] = - hAs * partTemp_[index][0];
+    if(!implicit_)
+    {
+        partHeatFlux_[index][0] += hAs * Tfluid;
+    }
+    else
+    {
+        partHeatFluxCoeff_[index][0] = hAs;
+    }
+}
+
 // * * * * * * * * * * * * * * * * Member Fct  * * * * * * * * * * * * * * * //
+void heatTransferGunn::addEnergyContribution(volScalarField& Qsource) const
+{
+    Qsource += QPartFluid_;
+}
+
+void heatTransferGunn::addEnergyCoefficient(volScalarField& Qsource) const
+{
+    if(implicit_)
+    {
+        Qsource += QPartFluidCoeff_;
+    }
+}
 
 void heatTransferGunn::calcEnergyContribution()
 {
@@ -292,7 +381,6 @@ void heatTransferGunn::calcEnergyContribution()
 
                 // calc convective heat flux [W]
                 heatFlux(index, h, As, Tfluid);
-                heatFluxCoeff(index, h, As);
 
                 if(verbose_)
                 {
@@ -326,6 +414,16 @@ void heatTransferGunn::calcEnergyContribution()
     
     if(calcPartTempField_) partTempField();
 
+    // gather particle temperature sums and obtain average
+    if(calcPartTempAve_)
+    {
+        reduce(Tsum, sumOp<scalar>());
+        partTempAve_ = Tsum / particleCloud_.numberOfParticles();
+        Info << "mean particle temperature = " << partTempAve_ << endl;
+    }
+
+    if(calcPartTempField_) partTempField();
+
     particleCloud_.averagingM().setScalarSum
     (
         QPartFluid_,
@@ -335,6 +433,21 @@ void heatTransferGunn::calcEnergyContribution()
     );
 
     QPartFluid_.primitiveFieldRef() /= -QPartFluid_.mesh().V();
+
+    if(implicit_)
+    {
+        QPartFluidCoeff_.primitiveFieldRef() = 0.0;
+
+        particleCloud_.averagingM().setScalarSum
+        (
+            QPartFluidCoeff_,
+            partHeatFluxCoeff_,
+            particleCloud_.particleWeights(),
+            NULL
+        );
+
+        QPartFluidCoeff_.primitiveFieldRef() /= -QPartFluidCoeff_.mesh().V();
+    }
 
     if(verbose_)
     {
@@ -360,81 +473,59 @@ void heatTransferGunn::calcEnergyContribution()
         );
     }
 
-    // limit source term
-    forAll(QPartFluid_,cellI)
+    // limit source term in explicit treatment
+    if(!implicit_)
     {
-        scalar EuFieldInCell = QPartFluid_[cellI];
-
-        if(mag(EuFieldInCell) > maxSource_ )
+        forAll(QPartFluid_,cellI)
         {
-             Pout << "limiting source term\n"  << endl  ;
-             QPartFluid_[cellI] = sign(EuFieldInCell) * maxSource_;
+            scalar EuFieldInCell = QPartFluid_[cellI];
+
+            if(mag(EuFieldInCell) > maxSource_ )
+            {
+                 Pout << "limiting source term\n"  << endl  ;
+                 QPartFluid_[cellI] = sign(EuFieldInCell) * maxSource_;
+            }
         }
     }
 
     QPartFluid_.correctBoundaryConditions();
-
-    giveData(0);
-
 }
 
-void heatTransferGunn::addEnergyContribution(volScalarField& Qsource) const
+void heatTransferGunn::postFlow()
 {
-    Qsource += QPartFluid_;
-}
-
-scalar heatTransferGunn::Nusselt(scalar voidfraction, scalar Rep, scalar Pr) const
-{
-    return (7 - 10 * voidfraction + 5 * voidfraction * voidfraction) *
-                        (1 + 0.7 * Foam::pow(Rep,0.2) * Foam::pow(Pr,0.33)) +
-                        (1.33 - 2.4 * voidfraction + 1.2 * voidfraction * voidfraction) *
-                        Foam::pow(Rep,0.7) * Foam::pow(Pr,0.33);
-}
-
-void heatTransferGunn::heatFlux(label index, scalar h, scalar As, scalar Tfluid)
-{
-    partHeatFlux_[index][0] = h * As * (Tfluid - partTemp_[index][0]);
-}
-
-void heatTransferGunn::heatFluxCoeff(label index, scalar h, scalar As)
-{
-    //no heat transfer coefficient in explicit model
-}
-
-void heatTransferGunn::giveData(int call)
-{
-    if(call == 0)
+    if(implicit_)
     {
-        Info << "total convective particle-fluid heat flux [W] (Eulerian) = " << gSum(QPartFluid_*1.0*QPartFluid_.mesh().V()) << endl;
+        label cellI;
+        scalar Tfluid(0.0);
+        scalar Tpart(0.0);
+        interpolationCellPoint<scalar> TInterpolator_(tempField_);
 
-        particleCloud_.clockM().start(30,"giveDEM_Tdata");
-        particleCloud_.dataExchangeM().giveData(partHeatFluxName_,"scalar-atom", partHeatFlux_);
-        particleCloud_.clockM().stop("giveDEM_Tdata");
+        for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)
+        {
+                cellI = particleCloud_.cellIDs()[index][0];
+                if(cellI >= 0)
+                {
+                    if(interpolation_)
+                    {
+                        vector position = particleCloud_.position(index);
+                        Tfluid = TInterpolator_.interpolate(position,cellI);
+                    }
+                    else
+                    {
+                        Tfluid = tempField_[cellI];
+                    }
+
+                    Tpart = partTemp_[index][0];
+                    partHeatFlux_[index][0] = (Tfluid - Tpart) * partHeatFluxCoeff_[index][0];
+                }
+        }
     }
+    giveData();
 }
 
 scalar heatTransferGunn::aveTpart() const
 {
     return partTempAve_;
-}
-
-void heatTransferGunn::partTempField()
-{
-    partTempField_.primitiveFieldRef() = 0.0;
-    particleCloud_.averagingM().resetWeightFields();
-    particleCloud_.averagingM().setScalarAverage
-    (
-        partTempField_,
-        partTemp_,
-        particleCloud_.particleWeights(),
-        particleCloud_.averagingM().UsWeightField(),
-        NULL
-    );
-
-    //volScalarField sumTp (particleCloud_.averagingM().UsWeightField() * partTempField_);
-    // dimensionedScalar aveTemp("aveTemp",dimensionSet(0,0,0,1,0,0,0), gSum(sumTp) / particleCloud_.numberOfParticles());
-    dimensionedScalar aveTemp("aveTemp",dimensionSet(0,0,0,1,0,0,0), partTempAve_);
-    partRelTempField_ = (partTempField_ - aveTemp) / (aveTemp - partRefTemp_);
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

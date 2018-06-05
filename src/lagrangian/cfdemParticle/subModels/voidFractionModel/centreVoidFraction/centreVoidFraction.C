@@ -85,7 +85,7 @@ void centreVoidFraction::setvoidFraction(double** const& mask,double**& voidfrac
     scalar radius(-1);
     scalar volume(0);
     scalar cellVol(0);
-    scalar scaleVol= weight();
+    scalar scaleVol = weight();
 
     for(int index=0; index< particleCloud_.numberOfParticles(); index++)
     {
@@ -99,6 +99,7 @@ void centreVoidFraction::setvoidFraction(double** const& mask,double**& voidfrac
 
             if (cellI >= 0)  // particel centre is in domain
             {
+                if (multiWeights_) scaleVol = weight(index);
                 cellVol = voidfractionNext_.mesh().V()[cellI];
                 radius = particleCloud_.radius(index);
                 volume = constant::mathematical::fourPiByThree*radius*radius*radius*scaleVol;

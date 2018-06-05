@@ -169,6 +169,12 @@ void cfdemCloudEnergy::postFlow()
         energyModel_[i]().postFlow();
 }
 
+void cfdemCloudEnergy::solve()
+{
+    for (int i=0;i<nrEnergyModels();i++)
+        energyModel_[i]().solve();
+}
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam

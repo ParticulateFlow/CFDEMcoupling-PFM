@@ -39,7 +39,7 @@
      ==
         fvOptions(rho, he)
     );
-    
+
 
     EEqn.relax();
 
@@ -53,7 +53,8 @@
 
     Info<< "T max/min : " << max(T).value() << " " << min(T).value() << endl;
 
-    particleCloud.clockM().start(31,"postFlow");
-    particleCloud.postFlow();
-    particleCloud.clockM().stop("postFlow");
+    particleCloud.clockM().start(31,"energySolve");
+    particleCloud.solve();
+    particleCloud.clockM().stop("energySolve");
+
 }

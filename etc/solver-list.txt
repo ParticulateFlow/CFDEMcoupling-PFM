@@ -6,5 +6,7 @@ rtfmSolverSpecies/dir
 cfdemSolverRhoPimple/dir
 cfdemSolverPisoMS/dir
 cfdemSolverPiso/dir
+cfdemSolverRhoPimple/dir
+cfdemSolverRhoSimple/dir
 cfdemSolverIB/dir
 cfdemSolverPisoScalar/dir

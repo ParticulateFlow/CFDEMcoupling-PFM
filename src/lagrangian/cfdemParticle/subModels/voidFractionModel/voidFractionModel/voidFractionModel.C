@@ -57,6 +57,7 @@ voidFractionModel::voidFractionModel
 :
     dict_(dict),
     particleCloud_(sm),
+    multiWeights_(false),
     voidfractionPrev_
     (   IOobject
         (
@@ -89,6 +90,7 @@ voidFractionModel::voidFractionModel
     porosity_(1.)
 {
     particleCloud_.dataExchangeM().allocateArray(cellsPerParticle_,1,1);
+    if (particleCloud_.getParticleEffVolFactors()) multiWeights_ = true;
 }
 
 

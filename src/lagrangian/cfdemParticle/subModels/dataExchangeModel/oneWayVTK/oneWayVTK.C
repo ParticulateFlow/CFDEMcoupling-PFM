@@ -173,10 +173,10 @@ void oneWayVTK::getData
             input >> just_read;                                        // skip text for dataType
             // need to distinguish between file formats from dump custom/vtk and from LPP
             if(just_read.compare("3") == 0)
-	    {
-	        input >> just_read;
-	        input >> just_read;
-	    }
+            {
+                input >> just_read;
+                input >> just_read;
+            }
             for (int index = 0; index<particleCloud_.numberOfParticles(); ++index)
             {
                 input >> field[index][0] >> field[index][1] >> field[index][2];

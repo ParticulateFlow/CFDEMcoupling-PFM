@@ -81,7 +81,7 @@ void averagingModel::undoVectorAverage
 
                     if(weightField[cellI] == weightP)
                     {
-                        fieldNext[cellI] = vector(0,0,0);
+                        fieldNext[cellI] = vector::zero;
                     }else
                     {
                         fieldNext[cellI] = (fieldNext[cellI]*weightField[cellI]-valueVec*weightP)/(weightField[cellI]-weightP);

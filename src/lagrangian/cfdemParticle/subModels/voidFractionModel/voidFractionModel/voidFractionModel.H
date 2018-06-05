@@ -63,6 +63,8 @@ protected:
 
         cfdemCloud& particleCloud_;
 
+        bool multiWeights_;
+
         mutable volScalarField voidfractionPrev_;
 
         mutable volScalarField voidfractionNext_;
@@ -139,6 +141,11 @@ public:
         inline volScalarField& voidFractionNext()const { return voidfractionNext_; }
 
         inline scalar weight()const { return weight_; }
+
+        inline scalar weight(label index) const
+        {
+            return particleCloud_.particleEffVolFactor(index);
+        }
 
         inline scalar porosity()const { return porosity_; }
 
