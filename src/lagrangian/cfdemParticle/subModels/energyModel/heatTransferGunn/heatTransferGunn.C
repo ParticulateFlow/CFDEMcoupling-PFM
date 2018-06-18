@@ -325,6 +325,7 @@ void heatTransferGunn::calcEnergyContribution()
     scalar Pr(0);
     scalar Nup(0);
     scalar Tsum(0.0);
+    scalar Nsum(0.0);
 
 
     interpolationCellPoint<scalar> voidfractionInterpolator_(voidfraction_);
@@ -375,6 +376,7 @@ void heatTransferGunn::calcEnergyContribution()
                 }
                 
                 Tsum += partTemp_[index][0];
+                Nsum += 1.0;
 
                 scalar h = kf0_ * Nup / ds;
                 scalar As = ds * ds * M_PI; // surface area of sphere
@@ -408,20 +410,11 @@ void heatTransferGunn::calcEnergyContribution()
     if(calcPartTempAve_)
     {
         reduce(Tsum, sumOp<scalar>());
-        partTempAve_ = Tsum / particleCloud_.numberOfParticles();
+        reduce(Nsum, sumOp<scalar>());
+        partTempAve_ = Tsum / Nsum;
         Info << "mean particle temperature = " << partTempAve_ << endl;
     }
     
-    if(calcPartTempField_) partTempField();
-
-    // gather particle temperature sums and obtain average
-    if(calcPartTempAve_)
-    {
-        reduce(Tsum, sumOp<scalar>());
-        partTempAve_ = Tsum / particleCloud_.numberOfParticles();
-        Info << "mean particle temperature = " << partTempAve_ << endl;
-    }
-
     if(calcPartTempField_) partTempField();
 
     particleCloud_.averagingM().setScalarSum

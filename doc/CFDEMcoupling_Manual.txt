@@ -256,6 +256,7 @@ listing below of styles within certain commands.
 "dataExchangeModel_twoWayFiles"_dataExchangeModel_twoWayFiles.html,
 "dataExchangeModel_twoWayMPI"_dataExchangeModel_twoWayMPI.html,
 "dataExchangeModel_twoWayMany2Many"_dataExchangeModel_twoWayMany2Many.html,
+"dataExchangeModel_twoWayOne2One"_dataExchangeModel_twoWayOne2One.html,
 "forceModel"_forceModel.html,
 "forceModel_Archimedes"_forceModel_Archimedes.html,
 "forceModel_ArchimedesIB"_forceModel_ArchimedesIB.html,
