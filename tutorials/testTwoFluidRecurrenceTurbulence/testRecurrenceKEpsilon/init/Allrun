@@ -1,0 +1,27 @@
+#!/bin/sh
+cd ${0%/*} || exit 1    # Run from this directory
+
+# Source tutorial run functions
+. $WM_PROJECT_DIR/bin/tools/RunFunctions
+
+# Set application name
+application=`getApplication`
+
+
+rm -rf 0
+
+runApplication blockMesh
+
+runApplication renumberMesh -overwrite
+
+cp -r 0.org 0
+
+tar -xf  ../../initFields.tar.xz
+
+cp initFields/* 0/
+
+runApplication $application
+
+./createDataBase
+
+#------------------------------------------------------------------------------
