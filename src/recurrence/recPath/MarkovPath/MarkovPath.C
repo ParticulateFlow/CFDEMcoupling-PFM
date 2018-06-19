@@ -56,7 +56,9 @@ MarkovPath::MarkovPath
 :
     recPath(dict, base),
     propsDict_(dict.subDict(typeName + "Props")),
+    correlationSteps_(readLabel(propsDict_.lookup("correlationSteps"))),
     meanIntervalSteps_(propsDict_.lookupOrDefault<label>("meanIntervalSteps",-1)),
+    minIntervalSteps_(propsDict_.lookupOrDefault<label>("minIntervalSteps",0)),
     numIntervals_(base.recM().numIntervals()),
     recSteps_(0),
     intervalSizes_(numIntervals_),
@@ -88,6 +90,16 @@ MarkovPath::MarkovPath
             sum1 += intervalSizes_[j];
         }
         intervalSizesCumulative_[i] = sum1;
+    }
+    
+    // check if meanIntervalSteps and correlationSteps are reasonable
+    label critLength = meanIntervalSteps_ + 2 * correlationSteps_;
+    for(int i=0;i<numIntervals_;i++)
+    {
+        if (critLength >= intervalSizes_[i])
+        {
+            FatalError <<"too big mean interval size and correlation time for database " << i << "\n" << abort(FatalError);
+        }
     }
 
     // given a jump probability of P, the probability of finding a chain of length N is
@@ -166,7 +178,7 @@ void MarkovPath::extendPath()
         scalar nextMinimum(GREAT);
         for (label j = startLoop; j <= endLoop; j++)
         {
-            if(abs(j - virtualTimeIndex) < meanIntervalSteps_) continue;
+            if(abs(j - virtualTimeIndex) < correlationSteps_) continue;
             if (recurrenceMatrix[j][virtualTimeIndex] < nextMinimum)
             {
                 nextMinimum = recurrenceMatrix[j][virtualTimeIndex];
@@ -183,15 +195,15 @@ void MarkovPath::extendPath()
     {
         virtualTimeIndex++;
 
-        // interval border?
+        // take another step according to jump probability? only if minIntervalSteps taken
+        scalar randJump = ranGen.scalar01();
+        if (randJump < Pjump_ && virtualTimeIndex - seqStart >= minIntervalSteps_) takeAnotherStep=false;
+
+        // interval border? must jump
         for(int i = 0;i < numIntervals_; i++)
         {
             if (intervalSizesCumulative_[i] - 1 == virtualTimeIndex) takeAnotherStep=false;
         }
-
-        // take another step according to jump probability?
-        scalar randJump = ranGen.scalar01();
-        if (randJump < Pjump_) takeAnotherStep=false;
     }
 
     seqEnd = virtualTimeIndex;

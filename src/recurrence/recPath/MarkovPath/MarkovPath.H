@@ -58,8 +58,13 @@ protected:
     void weightsCumulation();
 
     void weightsNormalization();
+    
+    // correlation steps determine which temporal neighborhood is excluded from nearest-neighbor search
+    label correlationSteps_;
 
     label meanIntervalSteps_;
+    
+    label minIntervalSteps_;
 
     label numIntervals_;
 
