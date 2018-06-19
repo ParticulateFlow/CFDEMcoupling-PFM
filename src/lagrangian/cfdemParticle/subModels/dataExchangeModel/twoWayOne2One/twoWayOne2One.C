@@ -41,10 +41,6 @@ Contributing authors
 #include "force.h"
 #include "forceModel.H"
 
-#include <fix.h>
-#include <fix_property_atom.h>
-
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -85,6 +81,8 @@ twoWayOne2One::twoWayOne2One
     foam2lig_vec_tmp_(nullptr),
     foam2lig_scl_tmp_(nullptr),
     staticProcMap_(propsDict_.lookupOrDefault<Switch>("useStaticProcMap", false)),
+    cellIdComm_(propsDict_.lookupOrDefault<Switch>("useCellIdComm", false)),
+    my_prev_cell_ids_fix_(nullptr),
     verbose_(propsDict_.lookupOrDefault("verbose", false)),
     lmp(nullptr)
 {
@@ -104,16 +102,6 @@ twoWayOne2One::twoWayOne2One
     DEMts_ = lmp->update->dt;
     checkTSsize();
 
-    if(staticProcMap_)
-    {
-        createProcMap();
-    }
-}
-
-void twoWayOne2One::createProcMap() const
-{
-    const cfdemCloud& sm = this->particleCloud_;
-
     // calculate boundingBox of FOAM subdomain
     primitivePatch tmpBoundaryFaces
     (
@@ -131,9 +119,33 @@ void twoWayOne2One::createProcMap() const
         tmpBoundaryFaces.localFaces(),
         tmpBoundaryFaces.localPoints()
     );
+    thisFoamBox_ = treeBoundBox(boundaryFaces.localPoints());
+    if (staticProcMap_)
+    {
+        createProcMap();
+    }
+
+    if (cellIdComm_)
+    {
+        my_prev_cell_ids_fix_ = static_cast<LAMMPS_NS::FixPropertyAtom*>
+        (   lmp->modify->find_fix_property
+            (
+                "prev_cell_ids",
+                "property/atom",
+                "scalar",
+                0,
+                0,
+                "cfd coupling",
+                true
+            )
+        );
+    }
+}
+
+void twoWayOne2One::createProcMap() const
+{
     List<treeBoundBox> foamBoxes(Pstream::nProcs());
-    treeBoundBox thisFoamBox(boundaryFaces.localPoints());
-    foamBoxes[Pstream::myProcNo()] = thisFoamBox;
+    foamBoxes[Pstream::myProcNo()] = thisFoamBox_;
     Pstream::gatherList(foamBoxes);
     Pstream::scatterList(foamBoxes);
 
@@ -156,7 +168,7 @@ void twoWayOne2One::createProcMap() const
     // detect LIG subdomains which this FOAM has to interact with
     forAll(ligBoxes, ligproci)
     {
-        if (thisFoamBox.overlaps(ligBoxes[ligproci]))
+        if (thisFoamBox_.overlaps(ligBoxes[ligproci]))
         {
             thisLigPartner_.append(ligproci);
         }
@@ -173,7 +185,7 @@ void twoWayOne2One::createProcMap() const
 
     if (verbose_)
     {
-        Pout<< "FOAM bounding box: " << thisFoamBox
+        Pout<< "FOAM bounding box: " << thisFoamBox_
             << " LIG bounding box: " << thisLigBox
             << nl
             << "FOAM comm partners: " << thisFoamPartner_
@@ -717,6 +729,15 @@ void twoWayOne2One::locateParticles() const
     lig2foam_->exchange(my_flattened_positions, collected_flattened_positions, 3);
     destroy(my_flattened_positions);
 
+    double* my_prev_cell_ids = nullptr;
+    double* prev_cell_ids = nullptr;
+    if (cellIdComm_)
+    {
+        my_prev_cell_ids = my_prev_cell_ids_fix_->vector_atom;
+        allocateArray(prev_cell_ids, -1, lig2foam_->ncollected_);
+        lig2foam_->exchange(my_prev_cell_ids, prev_cell_ids);
+    }
+
     if (lig2foam_mask_)
     {
         delete [] lig2foam_mask_;
@@ -725,6 +746,8 @@ void twoWayOne2One::locateParticles() const
 
     labelList cellIds(0);
     label n_located(0);
+    label roundedCelli(-1);
+    const label nCells(particleCloud_.mesh().cells().size());
     for (int atomi = 0; atomi < lig2foam_->ncollected_; atomi++)
     {
         const vector position = vector
@@ -733,8 +756,24 @@ void twoWayOne2One::locateParticles() const
             collected_flattened_positions[3*atomi+1],
             collected_flattened_positions[3*atomi+2]
         );
-
-        const label cellI = particleCloud_.locateM().findSingleCell(position, -1);
+        if (!thisFoamBox_.contains(position))
+        {
+            lig2foam_mask_[atomi] = false;
+            continue;
+        }
+        const label cellI = particleCloud_.locateM().findSingleCell
+        (
+            position,
+            cellIdComm_
+            ?   // don't know whether using round is efficient
+                (roundedCelli = round(prev_cell_ids[atomi])) < nCells
+                ?
+                roundedCelli
+                :
+                -1
+            :
+            -1
+        );
 
         lig2foam_mask_[atomi] = false;
         if (cellI >= 0) // in domain
@@ -824,6 +863,18 @@ void twoWayOne2One::setupFoam2LigCommunication() const
         0.,
         foam2lig_->ncollected_
     );
+
+    if (cellIdComm_)
+    {
+        double** dbl_cell_ids = new double*[getNumberOfParticles()];
+        for (int atomi = 0; atomi < getNumberOfParticles(); atomi++)
+        {   // TEMPORARY: if this persists after 19.07.2018, call me.
+            dbl_cell_ids[atomi] = new double[1];
+            dbl_cell_ids[atomi][0] = particleCloud_.cellIDs()[atomi][0];
+        }
+        giveData("prev_cell_ids", "scalar-atom", dbl_cell_ids, "double");
+        delete [] dbl_cell_ids;
+    }
 }
 
 template <typename T>
