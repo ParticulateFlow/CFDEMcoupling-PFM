@@ -783,7 +783,10 @@ void twoWayOne2One::locateParticles() const
             cellIds.append(cellI);
         }
     }
-    delete [] prev_cell_ids;
+    if (cellIdComm_)
+    {
+        destroy(prev_cell_ids);
+    }
 
     setNumberOfParticles(n_located);
     particleCloud_.reAllocArrays();
