@@ -46,6 +46,8 @@ class directedDiffusiveRelaxation
 private:
     dictionary propsDict_;
 
+    bool implicit_;
+
     bool interpolate_;
 
     bool measureDiff_;

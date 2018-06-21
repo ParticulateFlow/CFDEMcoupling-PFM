@@ -56,6 +56,7 @@ directedDiffusiveRelaxation::directedDiffusiveRelaxation
 :
     forceModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
+    implicit_(propsDict_.lookupOrDefault<bool>("implicit", true)),
     interpolate_(propsDict_.lookupOrDefault<bool>("interpolation", false)),
     measureDiff_(propsDict_.lookupOrDefault<bool>("measureDiff", false)),
     recErrorFile_("recurrenceError"),
@@ -219,13 +220,20 @@ void directedDiffusiveRelaxation::relax(scalar D0) const
         else DField_[cellI] = D0;
     }
     
-    solve
-    (
-        fvm::ddt(correctedField_)
-       -fvm::laplacian(DField_, correctedField_)
-       ==
-       -fvc::laplacian(DField_, voidfractionRec_)
-    );
+    if (implicit_)
+    {
+        solve
+        (
+            fvm::ddt(correctedField_)
+           -fvm::laplacian(DField_, correctedField_)
+           ==
+           -fvc::laplacian(DField_, voidfractionRec_)
+        );
+    }
+    else
+    {
+        correctedField_ = voidfraction_;
+    }
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

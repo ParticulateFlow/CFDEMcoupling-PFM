@@ -70,6 +70,8 @@ Contributing authors
 #include <library_cfd_coupling_one2one.h>
 #include <update.h>
 #include <comm.h>
+#include <fix.h>
+#include <fix_property_atom.h>
 //=================================//
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -112,6 +114,11 @@ private:
     mutable double*   foam2lig_scl_tmp_;
 
     mutable Switch    staticProcMap_;
+    mutable Switch    cellIdComm_;
+    mutable LAMMPS_NS::FixPropertyAtom* my_prev_cell_ids_fix_;
+
+    treeBoundBox       thisFoamBox_;
+
     Switch            verbose_;
 
 
