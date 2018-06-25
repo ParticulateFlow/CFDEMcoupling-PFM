@@ -629,7 +629,7 @@ bool cfdemCloud::evolve
         //      IMPLICIT FORCE CONTRIBUTION AND SOLVER USE EXACTLY THE SAME AVERAGED
         //      QUANTITIES AT THE GRID!
         Info << "\n timeStepFraction() = " << dataExchangeM().timeStepFraction() << endl;
-        if(dataExchangeM().timeStepFraction() > 1.0000001)
+        if(dataExchangeM().timeStepFraction() > 1.001)
         {
             FatalError << "cfdemCloud::dataExchangeM().timeStepFraction()>1: Do not do this, since dangerous. This might be due to the fact that you used a adjustable CFD time step. Please use a fixed CFD time step." << abort(FatalError);
         }
