@@ -60,7 +60,8 @@ class phase
         dictionary phaseDict_;
         autoPtr<viscosityModel> nuModel_;
         dimensionedScalar rho_;
-        dimensionedScalar DT_;
+        dimensionedScalar Cp_;
+        dimensionedScalar kT_;
 
 public:
 
@@ -141,10 +142,16 @@ public:
             return rho_;
         }
 
-        //- Return const-access to phase1 thermal diffusivity
-        const dimensionedScalar& DT() const
+        //- Return const-access to phase1 heat capacity
+        const dimensionedScalar& Cp() const
         {
-            return DT_;
+            return Cp_;
+        }
+
+         //- Return const-access to phase1 thermal conductivity
+        const dimensionedScalar& kT() const
+        {
+            return kT_;
         }
 
         //- Correct the phase properties

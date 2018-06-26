@@ -122,11 +122,11 @@ volScalarField T
     mesh
 );
 
-volScalarField Tsource
+volScalarField ETsource
 (
     IOobject
     (
-        "Tsource",
+        "ETsource",
         runTime.timeName(),
         mesh,
         IOobject::MUST_READ,
@@ -135,17 +135,30 @@ volScalarField Tsource
     mesh
 );
 
-volScalarField DT
+volScalarField Cp
 (
     IOobject
     (
-        "DT",
+        "Cp",
         runTime.timeName(),
         mesh,
         IOobject::MUST_READ,
         IOobject::AUTO_WRITE
     ),
-    mixture.DT()
+    mixture.Cp()
+);
+
+volScalarField kT
+(
+    IOobject
+    (
+        "kT",
+        runTime.timeName(),
+        mesh,
+        IOobject::MUST_READ,
+        IOobject::AUTO_WRITE
+    ),
+    mixture.kT()
 );
 
 //========================

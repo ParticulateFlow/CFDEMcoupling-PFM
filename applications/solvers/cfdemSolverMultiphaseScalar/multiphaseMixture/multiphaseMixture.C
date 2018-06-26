@@ -368,37 +368,71 @@ Foam::multiphaseMixture::nuf() const
 }
 
 Foam::tmp<Foam::volScalarField>
-Foam::multiphaseMixture::DT() const
+Foam::multiphaseMixture::Cp() const
 {
     PtrDictionary<phase>::const_iterator iter = phases_.begin();
 
-    tmp<volScalarField> tDT = iter()*iter().DT();
-    volScalarField& DT = tDT.ref();
+    tmp<volScalarField> tCp = iter()*iter().Cp();
+    volScalarField& Cp = tCp.ref();
 
     for (++iter; iter != phases_.end(); ++iter)
     {
-        DT += iter()*iter().DT();
+        Cp += iter()*iter().Cp();
     }
 
-    return tDT;
+    return tCp;
 }
 
-
+/*
 Foam::tmp<Foam::scalarField>
-Foam::multiphaseMixture::DT(const label patchi) const
+Foam::multiphaseMixture::Cp(const label patchi) const
 {
     PtrDictionary<phase>::const_iterator iter = phases_.begin();
 
-    tmp<scalarField> tDT = iter().boundaryField()[patchi]*iter().DT().value();
-    scalarField& DT = tDT.ref();
+    tmp<scalarField> tCp = iter().boundaryField()[patchi]*iter().Cp().value();
+    scalarField& Cp = tCp.ref();
 
     for (++iter; iter != phases_.end(); ++iter)
     {
-        DT += iter().boundaryField()[patchi]*iter().DT().value();
+        Cp += iter().boundaryField()[patchi]*iter().Cp().value();
     }
 
-    return tDT;
+    return tCp;
 }
+*/
+Foam::tmp<Foam::volScalarField>
+Foam::multiphaseMixture::kT() const
+{
+    PtrDictionary<phase>::const_iterator iter = phases_.begin();
+
+    tmp<volScalarField> tkT = iter()*iter().kT();
+    volScalarField& kT = tkT.ref();
+
+    for (++iter; iter != phases_.end(); ++iter)
+    {
+        kT += iter()*iter().kT();
+    }
+
+    return tkT;
+}
+
+/*
+Foam::tmp<Foam::scalarField>
+Foam::multiphaseMixture::kT(const label patchi) const
+{
+    PtrDictionary<phase>::const_iterator iter = phases_.begin();
+
+    tmp<scalarField> tkT = iter().boundaryField()[patchi]*iter().kT().value();
+    scalarField& kT = tkT.ref();
+
+    for (++iter; iter != phases_.end(); ++iter)
+    {
+        kT += iter().boundaryField()[patchi]*iter().kT().value();
+    }
+
+    return tkT;
+}
+*/
 
 void Foam::multiphaseMixture::solve()
 {

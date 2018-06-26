@@ -1,15 +1,28 @@
- // get scalar source from DEM        
-        particleCloud.forceM(1).manipulateScalarField(Tsource);
-        Tsource.correctBoundaryConditions();
+// get scalar source from DEM        
+        particleCloud.forceM(1).manipulateScalarField(ETsource);
+        ETsource.correctBoundaryConditions();
 
-        // solve scalar transport equation
+       // solve scalar transport equation
         fvScalarMatrix TEqn
         (
            fvm::ddt(voidfraction,T) - fvm::Sp(fvc::ddt(voidfraction),T)
          + fvm::div(phi, T) - fvm::Sp(fvc::div(phi),T)
-         - fvm::laplacian(DT*voidfraction, T)
+	   - fvc::div(kT*voidfraction/(rho*Cp)*fvc::grad(T))
          ==
-           Tsource
+           ETsource/(rho*Cp)
         );
+
+       // solve scalar transport equation
+/*        fvScalarMatrix TEqn
+        (
+	   fvm::ddt(voidfraction*rho*Cp,T)
+           + fvm::div(phi*fvc::interpolate(rho*Cp),T)
+	   - fvc::div(kT*voidfraction*fvc::grad(T))
+         ==
+           ETsource
+        );
+*/
+
+
         TEqn.relax();
         TEqn.solve();

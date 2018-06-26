@@ -17,7 +17,7 @@ License
     Copyright (C) 2018- Mathias Vångö, JKU Linz, Austria
 
 Application
-    cfdemSolverMultiphase
+    cfdemSolverMultiphaseScalar
 
 Description
     CFD-DEM solver for n incompressible fluids which captures the interfaces and
@@ -100,7 +100,9 @@ int main(int argc, char *argv[])
 
         particleCloud.clockM().start(26,"Flow");
 
-	#include "TEqn.H"
+	Cp  = mixture.Cp();
+	kT  = mixture.kT();
+        #include "TEqn.H"
 
         if(particleCloud.solveFlow())
         {    

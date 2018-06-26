@@ -16,7 +16,7 @@ EXE_INC = \
 
 EXE_LIBS = \
     -L$(CFDEM_LIB_DIR)\
-    -lcfdemMultiphaseInterFoam \
+    -lcfdemMultiphaseInterFoamScalar \
     -linterfaceProperties \
     -lincompressibleTransportModels \
     -lturbulenceModels \

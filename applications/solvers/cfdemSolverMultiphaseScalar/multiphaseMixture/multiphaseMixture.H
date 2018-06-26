@@ -253,11 +253,17 @@ public:
         //- Return the face-interpolated dynamic laminar viscosity
         tmp<surfaceScalarField> nuf() const;
 
-        //- Return the thermal diffusivity
-        tmp<volScalarField> DT() const;
+        //- Return the heat capacity
+        tmp<volScalarField> Cp() const;
 
-        //- Return the therm diffusivity for patch
-        tmp<scalarField> DT(const label patchi) const;
+        //- Return the heat capacity for patch
+        //tmp<scalarField> Cp(const label patchi) const;
+
+        //- Return the thermal conductivity
+        tmp<volScalarField> kT() const;
+
+        //- Return the thermal conductivity for patch
+        //tmp<scalarField> kT(const label patchi) const;
 
         tmp<surfaceScalarField> surfaceTensionForce() const
         {
