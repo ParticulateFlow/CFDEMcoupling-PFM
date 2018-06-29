@@ -119,7 +119,7 @@ void massTransferCoeff::execute()
     if (particleCloud_.cg() > 1.0)
     {
         scaleDia_ = particleCloud_.cg();
-        Info << "KochHill using scale from liggghts cg = " << scaleDia_ << endl;
+        Info << "Using scale from liggghts cg = " << scaleDia_ << endl;
     }
 
     label  cellI=0;

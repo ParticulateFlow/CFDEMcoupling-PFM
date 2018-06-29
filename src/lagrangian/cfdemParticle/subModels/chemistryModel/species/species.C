@@ -69,7 +69,7 @@ species::species
     // create a list from the Species table in the specified species dictionary
     speciesNames_(specDict_.lookup("species")),
     mod_spec_names_(speciesNames_.size()),
-    X_(speciesNames_.size()),                           //volumeScalarFields created in the ts folders
+    X_(speciesNames_.size()),                           //volumeScalarFields
     molarFractions_(speciesNames_.size(),NULL),         //the value of molar fractions for every species
     changeOfSpeciesMass_(speciesNames_.size(),NULL),    //the values that are received from DEM with the name of Modified_+species name
     changeOfSpeciesMassFields_(speciesNames_.size()),   //the scalar fields generated with the values from Modified_+species names
@@ -163,9 +163,6 @@ void species::reAllocMyArrays() const
 
 void species::init()
 {
-    // look-up of molar fraction fields can't happen in constructor because functionObject
-    // has not been created at that time
-  
     if(verbose_)
     {
         Info << " Read species list from: " << specDict_.name() << endl;
@@ -175,7 +172,7 @@ void species::init()
 
     for (int i=0; i<speciesNames_.size(); i++)
     {
-        // Defining the Species volume scalar fields        
+        // Define the Species volume scalar fields
         volScalarField& X = const_cast<volScalarField&>
                 (mesh_.lookupObject<volScalarField>("X_"+speciesNames_[i]));
         X_.set(i, &X);
@@ -230,8 +227,7 @@ void species::execute()
     // realloc the arrays
     reAllocMyArrays();
 
-    // get X_i, T, rho at particle positions, fill arrays with them and push to LIGGGHTS
-
+    // get X_i, T, rho at particle positions
     label  cellI=0;
     scalar Tfluid(0);
     scalar rhofluid(0);
@@ -239,8 +235,6 @@ void species::execute()
     scalar voidfraction(1);
     Xfluid_.setSize(speciesNames_.size());
     scalar molarConcfluid(0);
-    List<scalar> sumOfMFs;
-    sumOfMFs.setSize(particleCloud_.numberOfParticles());
 
     // defining interpolators for T, rho, voidfraction, molarConc
     interpolationCellPoint <scalar> TInterpolator_(tempField_);
@@ -251,7 +245,6 @@ void species::execute()
 
     for (int index=0; index<particleCloud_.numberOfParticles(); ++index)
     {
-        sumOfMFs[index] = 0.0;
         cellI=particleCloud_.cellIDs()[index][0];
         if (cellI >= 0)
         {
@@ -275,22 +268,16 @@ void species::execute()
                     if(Xfluid_[i] < 0.0) Xfluid_[i] = 0.0;
                 }
             }
-            //fill arrays
+
             partTemp_[index][0] =   Tfluid;
-            // partRho was filled with rhofluid*voidfraction before
-            // probably wrong: need actual gas density, not averaged one
             partRho_[index][0]  =   rhofluid;
             partMolarConc_[index][0]    =   molarConcfluid;
 
             for (int i=0; i<speciesNames_.size();i++)
             {
-            // attention for indices when not communicating all species
-                molarFractions_[i][index][0]=Xfluid_[i] - 1e-8 ;
-                sumOfMFs[index] += Xfluid_[i] - 1e-8 ;
+                // attention for indices when not communicating all species
+                molarFractions_[i][index][0]=Xfluid_[i];
             }
-            if(sumOfMFs[index] > 1.0)
-                Info << "Error bigger than 1.0: " << sumOfMFs[index]-1. << endl;
-
         }
     }
 
@@ -306,7 +293,6 @@ void species::execute()
             Info << "partTemp_[index][0] = " << partTemp_[0][0] << endl;
             Info << "Tfluid = " << Tfluid << endl  ;
             Info << "voidfraction =" << voidfraction << endl;
-            // Info << "molarConc_" << molarConc_ << endl;
         }
     }
 
