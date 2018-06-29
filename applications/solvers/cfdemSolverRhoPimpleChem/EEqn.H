@@ -46,5 +46,6 @@ fvScalarMatrix EEqn
     thermo.correct();
 
     Info<< "T max/min : " << max(T).value() << " " << min(T).value() << endl;
+    Info << "he min/max : " << max(he).value() << "  " << min(he).value() << endl;
 
 }
