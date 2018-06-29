@@ -173,6 +173,7 @@ void diffusionCoefficient::execute()
     scalar molarConcfluid(0);
     scalar Texp(0);
     scalar dBinary_(0);
+    scalar Xnegative(0);
 
     List<scalar> Xfluid_(0);
     Xfluid_.setSize(speciesNames_.size());
@@ -220,6 +221,16 @@ void diffusionCoefficient::execute()
                             XfluidDiffusant_[j] = X_[i][cellI];
                         }
 
+                        // total amount of negative molar fractions in the domain
+                        // check it and then delete it
+                        scalar timestep = mesh_.time().deltaTValue();
+                        if (Xfluid_[i] < 0.0)
+                        {
+                            Xnegative += Xfluid_[i]*timestep;
+                            Info << "total negative molar fractions =" << Xnegative << endl;
+                        }
+
+
                         if (Xfluid_[i] <= 0.) Xfluid_[i] = 0.0;
                         if (XfluidDiffusant_[j] <= 0.) XfluidDiffusant_[j] = 0.0;
 
@@ -234,8 +245,9 @@ void diffusionCoefficient::execute()
 
             partPressure_[index][0] = Pfluid;
             // change fluid pressure to 1 bar instead of Pa
-            Pfluid  =  Pfluid/101325;
+            Pfluid  =  Pfluid/101325.0;
             Texp  = Tfluid*sqrt(sqrt(Tfluid*Tfluid*Tfluid));
+
             if(verbose_)
             {
                 Info << "partPressure_[index][0] = " << partPressure_[index][0] << endl;
@@ -252,7 +264,6 @@ void diffusionCoefficient::execute()
                     // get molecular diffusion coefficients if diffusant gas and reactant gas are not equal
                     if (diffusantGasNames_[i] != speciesNames_[j])
                     {
-
                         if(verbose_)
                         {
                             Info << "molar weights diffuser gases: " << molWeight(speciesNames_[j]) << nl << endl;
