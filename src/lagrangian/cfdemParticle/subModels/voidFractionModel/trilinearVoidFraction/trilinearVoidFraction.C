@@ -29,7 +29,7 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include "error.H"
-
+#include "mathExtra.H"
 #include "trilinearVoidFraction.H"
 #include "addToRunTimeSelectionTable.H"
 
@@ -94,8 +94,7 @@ void trilinearVoidFraction::setvoidFraction(double** const& mask,double**& voidf
 
     scalar radius(-1.);
     scalar volume(0.);
-    const scalar scaleVol = weight();
-    const scalar fourPiByThree = 4.0*constant::mathematical::pi/3.0;
+    scalar scaleVol = weight();
 
     vector partPos(0.,0.,0.);
     vector pt(0.,0.,0.);
@@ -141,7 +140,8 @@ void trilinearVoidFraction::setvoidFraction(double** const& mask,double**& voidf
         if (cellI >= 0)  // particel centre is in domain
         {
             radius = particleCloud_.radius(index);
-            volume = fourPiByThree * radius * radius * radius * scaleVol;
+            if (multiWeights_) scaleVol = weight(index);
+            volume = constant::mathematical::fourPiByThree * radius * radius * radius * scaleVol;
 
             // store volume for each particle
             particleVolumes[index][0] = volume;

@@ -159,11 +159,11 @@ void GidaspowDrag::setForce() const
         //if(mask[index][0])
         //{
             cellI = particleCloud_.cellIDs()[index][0];
-            drag = vector(0,0,0);
-            dragExplicit = vector(0,0,0);
+            drag = vector::zero;
+            dragExplicit = vector::zero;
             betaP = 0;
             Vs = 0;
-            Ufluid = vector(0,0,0);
+            Ufluid = vector::zero;
             voidfraction = 0;
             dragCoefficient = 0;
 

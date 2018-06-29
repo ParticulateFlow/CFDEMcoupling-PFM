@@ -51,7 +51,7 @@ averagingModel dense;
 
 clockModel off;
 
-smoothingModel off;// localPSizeDiffSmoothing;// constDiffSmoothing; //
+smoothingModel off;// constDiffSmoothing; //
 
 forceModels
 (

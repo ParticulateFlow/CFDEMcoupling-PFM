@@ -67,7 +67,7 @@
 
         }
 
-        particleWeights[index][storeInIndex] += 1/static_cast<scalar>(nPoints);
+        particleWeights[index][storeInIndex] += 1.0/nPoints;
         particleVolumes[index][storeInIndex] += particleVolume;
         particleV[index][0] += particleVolume;
         //====================================================//

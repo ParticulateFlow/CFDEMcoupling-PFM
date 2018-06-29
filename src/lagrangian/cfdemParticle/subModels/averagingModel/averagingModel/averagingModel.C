@@ -81,7 +81,7 @@ void averagingModel::undoVectorAverage
 
                     if(weightField[cellI] == weightP)
                     {
-                        fieldNext[cellI] = vector(0,0,0);
+                        fieldNext[cellI] = vector::zero;
                     }else
                     {
                         fieldNext[cellI] = (fieldNext[cellI]*weightField[cellI]-valueVec*weightP)/(weightField[cellI]-weightP);
@@ -353,20 +353,12 @@ void averagingModel::undoWeightFields(double**const& mask) const
 
 tmp<volVectorField> averagingModel::UsInterp() const
 {
-    if (particleCloud_.dataExchangeM().couplingStep() > 1)
-    {
-        return tmp<volVectorField>
-        (
-            new volVectorField("Us_averagingModel", (1. - particleCloud_.dataExchangeM().timeStepFraction()) * UsPrev_ + particleCloud_.dataExchangeM().timeStepFraction() * UsNext_)
-        );
-    }
-    else
-    {
-        return tmp<volVectorField>
-        (
-            new volVectorField("Us_averagingModel", UsNext_)
-        );
-    }
+    const scalar tsf = particleCloud_.dataExchangeM().timeStepFraction();
+
+    return tmp<volVectorField>
+    (
+        new volVectorField("Us_averagingModel", (1. - tsf) * UsPrev_ + tsf * UsNext_)
+    );
 }
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //

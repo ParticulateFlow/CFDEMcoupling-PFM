@@ -22,10 +22,10 @@ solverName="cfdemSolverPiso"
 nrProcs="4"
 machineFileName="none"   # yourMachinefileName | none
 debugMode="off"          # on | off| strict
-reconstuctCase="true"    # true | false
+reconstructCase="true"   # true | false
 testHarnessPath="$CFDEM_TEST_HARNESS_PATH"
 #--------------------------------------------------------------------------------#
 
 #- call function to run a parallel CFD-DEM case
-parCFDDEMrun $logpath $logfileName $casePath $headerText $solverName $nrProcs $machineFileName $debugMode $reconstuctCase
+parCFDDEMrun $logpath $logfileName $casePath $headerText $solverName $nrProcs $machineFileName $debugMode $reconstructCase
 

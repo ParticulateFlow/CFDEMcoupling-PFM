@@ -30,13 +30,9 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include "error.H"
-
-
 #include "engineSearchIB.H"
 #include "addToRunTimeSelectionTable.H"
 #include "mathematicalConstants.H"
-
-#include <mpi.h>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -64,15 +60,19 @@ engineSearchIB::engineSearchIB
     cfdemCloud& sm
 )
 :
-    engineSearch(dict.subDict(typeName + "Props"),sm),
+    engineSearch(dict.subDict(typeName + "Props"), sm),
     propsDict_(dict.subDict(typeName + "Props")),
     zSplit_(readLabel(propsDict_.lookup("zSplit"))),
     xySplit_(readLabel(propsDict_.lookup("xySplit"))),
-    checkPeriodicCells_(false)
+    thetaSize_(180./zSplit_),
+    phiSize_(360./xySplit_),
+    deg2rad_(constant::mathematical::pi/180.),
+    numberOfSatellitePoints_((zSplit_-1)*xySplit_+2)
 {
-
-    if(propsDict_.found("checkPeriodicCells")) checkPeriodicCells_=true;
-
+    for (int countPoints = 0; countPoints < numberOfSatellitePoints_; ++countPoints)
+    {
+        satellitePoints_.push_back(generateSatellitePoint(countPoints));
+    }
 }
 
 
@@ -93,87 +93,91 @@ label engineSearchIB::findCell
     int size
 ) const
 {
+    bool checkPeriodicCells(particleCloud_.checkPeriodicCells());
     const boundBox& globalBb = particleCloud_.mesh().bounds();
 
     vector position;
-    for(int index = 0;index < size; ++index)
+    for (int index = 0; index < size; ++index)
     {
-        cellIDs[index][0]=-1;
-        double radius=particleCloud_.radius(index);
-        //if(mask[index][0] && radius > SMALL)
-        if(radius > SMALL)
+        cellIDs[index][0] = -1;
+        double radius = particleCloud_.radius(index);
+
+        if (radius > SMALL)
         {
             // create pos vector
-            for(int i=0;i<3;i++) position[i] = positions[index][i];
+            for (int i = 0; i < 3; i++) position[i] = positions[index][i];
 
             // find cell
             label oldID = cellIDs[index][0];
-            cellIDs[index][0] = findSingleCell(position,oldID);
-            //cellIDs[index][0] = particleCloud_.mesh().findCell(position);
+            cellIDs[index][0] = findSingleCell(position, oldID);
 
-            //mod by alice upon from here
-            if(cellIDs[index][0] < 0)
+            if (cellIDs[index][0] < 0)
             {
-                vector pos = position;
                 label altStartPos = -1;
-                label numberOfPoints = (zSplit_-1)*xySplit_ + 2; // 1 point at bottom, 1 point at top
-                label thetaLevel = 0;
-                scalar theta, phi;
-                const scalar thetaSize = 180./zSplit_, phiSize = 360./xySplit_;
-                const scalar deg2rad = M_PI/180.;
 
-                for(int countPoints = 0; countPoints < numberOfPoints; ++countPoints)
+                for (int countPoints = 0; countPoints < numberOfSatellitePoints_; ++countPoints)
                 {
-                    pos = position;
-                    if(countPoints == 0)
-                    {
-                        pos[2] += radius;
-                    }
-                    else if(countPoints == 1)
-                    {
-                        pos[2] -= radius;
-                    }
-                    else
-                    {
-                        thetaLevel = (countPoints - 2) / xySplit_;
-                        theta = deg2rad * thetaSize * (thetaLevel+1);
-                        phi = deg2rad * phiSize * (countPoints - 2 - thetaLevel*xySplit_);
-                        pos[0] += radius * sin(theta) * cos(phi);
-                        pos[1] += radius * sin(theta) * sin(phi);
-                        pos[2] += radius * cos(theta);
-                    }
+                    vector pos = getSatellitePoint(index, countPoints);
 
-            		altStartPos=findSingleCell(pos,oldID); //particleCloud_.mesh().findCell(pos);//
+                    altStartPos = findSingleCell(pos,oldID);
+
                     //check for periodic domains
-                    if(checkPeriodicCells_)
+                    if (checkPeriodicCells)
                     {
-                        for(int iDir=0;iDir<3;iDir++)
+                        for (int iDir = 0; iDir < 3; iDir++)
                         {
-                            if( pos[iDir] > globalBb.max()[iDir] )
+                            if (pos[iDir] > globalBb.max()[iDir])
                             {
-                                pos[iDir]-=globalBb.max()[iDir]-globalBb.min()[iDir];
+                                pos[iDir] -= globalBb.max()[iDir] - globalBb.min()[iDir];
                             }
-                            else if( pos[iDir] < globalBb.min()[iDir] )
+                            else if (pos[iDir] < globalBb.min()[iDir])
                             {
-                                pos[iDir]+=globalBb.max()[iDir]-globalBb.min()[iDir];
+                                pos[iDir] += globalBb.max()[iDir] - globalBb.min()[iDir];
                             }
                         }
-                  		altStartPos=findSingleCell(pos,oldID); //particleCloud_.mesh().findCell(pos);//
+
+                        altStartPos = findSingleCell(pos, oldID);
                     }
 
-                    if(altStartPos >= 0) // found position, we're done
+                    if (altStartPos >= 0) // found position, we're done
                     {
                         cellIDs[index][0] = altStartPos;
                         break;
                     }
-            	}
+                }
 
             }
         }
     }
+
     return 1;
 }
 
+vector engineSearchIB::generateSatellitePoint(int countPoints) const
+{
+    // 1 point at bottom, 1 point at top
+    if (countPoints == 0)
+    {
+        return vector(0., 0., 1.);
+    }
+    else if (countPoints == 1)
+    {
+        return vector(0., 0., -1.);
+    }
+    else
+    {
+        const scalar thetaLevel = (countPoints - 2) / xySplit_;
+        const scalar theta = deg2rad_ * thetaSize_ * (thetaLevel + 1);
+        const scalar phi = deg2rad_ * phiSize_ * (countPoints - 2 - thetaLevel * xySplit_);
+        return vector(sin(theta) * cos(phi), sin(theta) * sin(phi), cos(theta));
+    }
+}
+
+vector engineSearchIB::getSatellitePoint(int index, int countPoints) const
+{
+    return particleCloud_.position(index)
+         + particleCloud_.radius(index) * satellitePoints_[countPoints];
+}
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

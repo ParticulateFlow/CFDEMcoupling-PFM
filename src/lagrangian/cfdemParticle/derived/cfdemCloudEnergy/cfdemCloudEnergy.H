@@ -116,6 +116,8 @@ public:
 
        void postFlow();
 
+       void solve();
+
 };
 
 
