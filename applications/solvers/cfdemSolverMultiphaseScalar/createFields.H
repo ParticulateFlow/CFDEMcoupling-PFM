@@ -148,17 +148,17 @@ volScalarField Cp
     mixture.Cp()
 );
 
-volScalarField kT
+volScalarField kf
 (
     IOobject
     (
-        "kT",
+        "kf",
         runTime.timeName(),
         mesh,
         IOobject::MUST_READ,
         IOobject::AUTO_WRITE
     ),
-    mixture.kT()
+    mixture.kf()
 );
 
 //========================

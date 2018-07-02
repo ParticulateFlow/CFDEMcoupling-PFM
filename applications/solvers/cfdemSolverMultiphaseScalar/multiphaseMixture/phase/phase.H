@@ -61,7 +61,7 @@ class phase
         autoPtr<viscosityModel> nuModel_;
         dimensionedScalar rho_;
         dimensionedScalar Cp_;
-        dimensionedScalar kT_;
+        dimensionedScalar kf_;
 
 public:
 
@@ -149,9 +149,9 @@ public:
         }
 
          //- Return const-access to phase1 thermal conductivity
-        const dimensionedScalar& kT() const
+        const dimensionedScalar& kf() const
         {
-            return kT_;
+            return kf_;
         }
 
         //- Correct the phase properties

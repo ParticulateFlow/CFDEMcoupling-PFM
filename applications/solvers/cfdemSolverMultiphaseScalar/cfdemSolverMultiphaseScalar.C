@@ -36,7 +36,7 @@ Description
 #include "fvOptions.H"
 #include "CorrectPhi.H"
 
-#include "cfdemCloud.H"
+#include "cfdemCloudEnergy.H"
 #include "implicitCouple.H"
 #include "clockModel.H"
 #include "smoothingModel.H"
@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
     turbulence->validate();
 
     // create cfdemCloud
-    cfdemCloud particleCloud(mesh);
+    cfdemCloudEnergy particleCloud(mesh);
 
     #include "additionalChecks.H"
 
@@ -100,10 +100,6 @@ int main(int argc, char *argv[])
 
         particleCloud.clockM().start(26,"Flow");
 
-	Cp  = mixture.Cp();
-	kT  = mixture.kT();
-        #include "TEqn.H"
-
         if(particleCloud.solveFlow())
         {    
             mixture.solve();
@@ -131,6 +127,10 @@ int main(int argc, char *argv[])
         {
             Info << "skipping flow solution." << endl;
         }
+
+        Cp  = mixture.Cp();
+	kf  = mixture.kf();
+        #include "TEqn.H"
 
         runTime.write();
 
