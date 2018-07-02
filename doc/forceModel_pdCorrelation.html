@@ -1,0 +1,58 @@
+<HTML>
+<CENTER><A HREF = "http://www.cfdem.com">CFDEMproject WWW Site</A> - <A HREF = "CFDEMcoupling_Manual.html#comm">CFDEM Commands</A> 
+</CENTER>
+
+
+
+
+<HR>
+
+<H3>forceModel_pdCorrelation 
+</H3>
+<P><B>Syntax:</B>
+</P>
+<P>Defined in couplingProperties dictionary.
+</P>
+<PRE>forceModels
+(
+    pdCorrelation
+);
+pdCorrelationProps
+{
+    coarseGrainingFactors
+    (
+        X Y Z
+    );
+    particleDensities
+    (
+        A B C
+    );
+    runOnWriteOnly true;
+}; 
+</PRE>
+<UL><LI><I>coarseGrainingFactors</I> = list of coarse graining factors by type, separated by whitespace, optional 
+
+<LI><I>particleDensities</I> = list of particle densities by type, separated by whitespace, optional 
+
+<LI><I>runOnWriteOnly</I> = switch if this should be executed on write, optional (default: false - execute every coupling step). 
+
+
+</UL>
+<P><B>Description:</B>
+</P>
+<P>This "forceModel" does not influence the particles or the flow - it calculates the particle momentum-diameter correlation 
+</P>
+<CENTER><IMG SRC = "Eqs/pdCorrelation.png">
+</CENTER>
+<P>where delta is the type-specific coarsegraining factor. 
+</P>
+<P>This model is sensitive to additionally pulled particle type info, and can either use the type-specific densities from the dict or those pulled from LIGGGHTS.
+</P>
+<P><B>Restrictions:</B>
+</P>
+<P>none.
+</P>
+<P><B>Related commands:</B>
+</P>
+<P><A HREF = "forceModel.html">forceModel</A></P>
+</HTML>
