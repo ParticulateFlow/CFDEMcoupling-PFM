@@ -26,7 +26,7 @@ License
 #include "dataExchangeModel.H"
 #include "IFstream.H"
 
-#define SMALL 1e-8
+#define VSMALL 1e-15
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -231,8 +231,8 @@ void diffusionCoefficient::execute()
                         }
 
 
-                        if (Xfluid_[i] <= 0.) Xfluid_[i] = 0.0;
-                        if (XfluidDiffusant_[j] <= 0.) XfluidDiffusant_[j] = 0.0;
+                        /*if (Xfluid_[i] <= 0.) Xfluid_[i] = 0.0;
+                        if (XfluidDiffusant_[j] <= 0.) XfluidDiffusant_[j] = 0.0;*/
 
                         if(verbose_)
                         {
@@ -245,7 +245,7 @@ void diffusionCoefficient::execute()
 
             partPressure_[index][0] = Pfluid;
             // change fluid pressure to 1 bar instead of Pa
-            Pfluid  =  Pfluid/101325.0;
+            Pfluid  =  Pfluid/100000.0;
             Texp  = Tfluid*sqrt(sqrt(Tfluid*Tfluid*Tfluid));
 
             if(verbose_)
@@ -291,7 +291,22 @@ void diffusionCoefficient::execute()
                                 Info << "Molar fraction of species (diffusantNames)" << diffusantGasNames_[i] << " : " << XfluidDiffusant_[i] << nl << endl;
                             }
 
-                            if (Xfluid_[j] != 0.0)
+                            TotalFraction_[i] += Xfluid_[j]/dBinary_;
+                            if (TotalFraction_[i] < VSMALL)
+                                MixtureBinaryDiffusion_[i] = VSMALL;
+                            else
+                                MixtureBinaryDiffusion_[i] = (1.0-XfluidDiffusant_[i])/TotalFraction_[i];
+
+                            if(verbose_)
+                            {
+                                Info << "Total fraction calculated (ratio of stag. gas to binary diffusion : " << TotalFraction_[i] << nl << endl;
+                                Info << "Molar fraction of species diffusant gas " << diffusantGasNames_[i] << " : " << XfluidDiffusant_[i] << nl << endl;
+                                Info << "Multicomp. mix diffusion for species " << diffusantGasNames_[i]
+                                     << " is: " << MixtureBinaryDiffusion_[i] << nl << endl;
+                            }
+
+
+                            /*if (!(Xfluid_[j] <= 0.0))
                             {
                                 // sum of all stagnant gases to sum of binary diffusion
                                 TotalFraction_[i]   +=  Xfluid_[j]/dBinary_;
@@ -310,7 +325,7 @@ void diffusionCoefficient::execute()
                             {
                                 Info << "Multicomp. mix diffusion for species " << diffusantGasNames_[i]
                                      << " is: " << MixtureBinaryDiffusion_[i] << nl << endl;
-                            }
+                            }*/
 
                             // pass on dCoeff values to array
                             diffusionCoefficients_[i][index][0]= MixtureBinaryDiffusion_[i];
