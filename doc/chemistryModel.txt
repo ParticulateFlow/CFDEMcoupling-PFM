@@ -28,11 +28,9 @@ chemistryModels
     massTransferCoeff
 ); :pre
 
-Note: This examples list might not be complete - please look for other models (forceModel_XY) in this documentation.
-
 [Description:]
 
-The chemistry model initialized the fields performs calculation of molar fractions and diffusion coefficients of the gaseous reactants at the location of each DEM particle. All models are executed sequentially. These values are used in the DEM calculation of particle reduction models.
+The chemistry model initializes the required fields for the calculation of molar fractions, determines the diffusion coefficients of the gaseous reactants, calculates the necessary coefficients for the calculation of a mass transfer coefficient. All models are executed sequentially. These values are used in the DEM calculation of particle reduction models.
 
 [Restrictions:]
 
