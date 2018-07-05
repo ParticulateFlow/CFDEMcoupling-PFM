@@ -15,6 +15,7 @@ License
     along with this code.  If not, see <http://www.gnu.org/licenses/>.
 
     Copyright (C) 2015- Thomas Lichtenegger, JKU Linz, Austria
+                        M. Efe Kinaci, JKU Linz, Austria
     
     Description
     Chemistry turned off
@@ -58,17 +59,12 @@ public:
 
     // Destructor
 
-        virtual ~noChemistry();
+        ~noChemistry();
 
 
     // Member Functions
 
     void execute();
-
-    tmp<volScalarField> Smi(const label i) const;
-
-    tmp<volScalarField> Sm() const;
-
 
 };
 

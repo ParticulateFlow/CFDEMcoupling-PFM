@@ -15,6 +15,7 @@ License
     along with this code.  If not, see <http://www.gnu.org/licenses/>.
 
     Copyright (C) 2015- Thomas Lichtenegger, JKU Linz, Austria
+                        M. Efe Kinaci, JKU Linz, Austria
 
 \*---------------------------------------------------------------------------*/
 
@@ -32,6 +33,26 @@ defineTypeNameAndDebug(chemistryModel, 0);
 defineRunTimeSelectionTable(chemistryModel, dictionary);
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+tmp<volScalarField> chemistryModel::Smi(label i) const
+{
+    FatalError<<"the solver calls for Smi()\n"
+              <<"please activate 'speciesModel' in 'chemistryModels'"
+              <<abort(FatalError);
+
+    tmp<volScalarField> tsource;
+    return tsource;
+}
+
+tmp<volScalarField> chemistryModel::Sm() const
+{
+    FatalError<<"the solver calls for Smi()\n"
+              <<"please activate 'speciesModel' in 'chemistryModels'"
+              <<abort(FatalError);
+
+    tmp<volScalarField> tsource;
+    return tsource;
+}
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 

@@ -18,7 +18,7 @@ License
                         M. Efe Kinaci, JKU Linz, Austria
     
     Description
-    Model to communicate species concentration and changes due to reactions
+    Model to communicate Sherwood number necessary coefficients
 
 \*---------------------------------------------------------------------------*/
 

@@ -15,6 +15,7 @@ License
     along with this code.  If not, see <http://www.gnu.org/licenses/>.
 
     Copyright (C) 2015- Thomas Lichtenegger, JKU Linz, Austria
+                        M. Efe Kinaci, JKU Linz, Austria
 
 \*---------------------------------------------------------------------------*/
 
@@ -59,50 +60,6 @@ noChemistry::~noChemistry()
 void noChemistry::execute()
 {}
 
-
-tmp<volScalarField> noChemistry ::Smi(const label i) const
-{
-  tmp<volScalarField> smi
-    (
-        new volScalarField
-        (
-            IOobject
-            (
-                "dummy",
-                particleCloud_.mesh().time().timeName(),
-                particleCloud_.mesh(),
-                IOobject::NO_READ,
-                IOobject::NO_WRITE
-            ),
-            particleCloud_.mesh(),
-            dimensionedScalar("zero",dimMass/(dimVol*dimTime),0.0)
-         )
-    );
-
-    return smi;
-}
-
-tmp<volScalarField> noChemistry::Sm() const
-{
-    tmp<volScalarField> sm
-    (
-        new volScalarField
-        (
-            IOobject
-            (
-                "dummy",
-                particleCloud_.mesh().time().timeName(),
-                particleCloud_.mesh(),
-                IOobject::NO_READ,
-                IOobject::NO_WRITE
-            ),
-            particleCloud_.mesh(),
-            dimensionedScalar("zero",dimMass/(dimVol*dimTime), 0.0)
-        )
-    );
-
-    return sm;
-}
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam

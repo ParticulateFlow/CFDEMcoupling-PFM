@@ -15,6 +15,7 @@ License
     along with this code.  If not, see <http://www.gnu.org/licenses/>.
 
     Copyright (C) 2015- Thomas Lichtenegger, JKU Linz, Austria
+                        M. Efe Kinaci, JKU Linz, Austria
 
 \*---------------------------------------------------------------------------*/
 
@@ -95,9 +96,9 @@ public:
 
        virtual void execute() = 0;
        
-       virtual tmp<volScalarField> Smi (const label i) const {}
+       virtual tmp<volScalarField> Smi (const label i) const;
 
-       virtual tmp<volScalarField> Sm () const {}
+       virtual tmp<volScalarField> Sm () const;
 };
 
 
