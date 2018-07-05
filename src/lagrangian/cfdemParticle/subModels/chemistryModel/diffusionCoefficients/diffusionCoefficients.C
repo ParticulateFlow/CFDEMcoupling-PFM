@@ -412,8 +412,8 @@ double diffusionCoefficient::calcMolNum(int i, int j)
 {
     double molNum_ = 0.0;
 
-    double& W1 = molWeight(diffusantGasNames_[i]);
-    double& W2 = molWeight(speciesNames_[j]);
+    double W1 = molWeight(diffusantGasNames_[i]);
+    double W2 = molWeight(speciesNames_[j]);
 
     molNum_   =   (W1 + W2) / (W1 * W2);
     molNum_   =   sqrt(molNum_);
