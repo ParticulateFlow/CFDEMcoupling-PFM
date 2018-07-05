@@ -44,9 +44,9 @@ protected:
         const dictionary& dict_;
 
         cfdemCloudEnergy& particleCloud_;
-	
 
-       
+
+
 public:
 
     //- Runtime type information
@@ -73,7 +73,7 @@ public:
         chemistryModel
         (
             const dictionary& dict,
-            cfdemCloudEnergy& sm            
+            cfdemCloudEnergy& sm
         );
 
 
@@ -94,11 +94,11 @@ public:
 
     // Member Functions
 
-       virtual void execute() = 0;
-       
-       virtual tmp<volScalarField> Smi (const label i) const;
+        virtual void execute() = 0;
 
-       virtual tmp<volScalarField> Sm () const;
+        virtual tmp<volScalarField> Smi(const label i) const;
+
+        virtual tmp<volScalarField> Sm() const;
 };
 
 

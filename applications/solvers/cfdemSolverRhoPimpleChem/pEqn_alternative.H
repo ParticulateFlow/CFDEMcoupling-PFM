@@ -38,7 +38,7 @@ else
     //      + rhorAUf*fvc::ddtCorr(rho, U, phi)
         )
     );
-    
+
     // flux without pressure gradient contribution
     phi = phiHbyA + phiUs;
 

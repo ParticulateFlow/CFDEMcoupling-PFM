@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
     #include "createFieldRefs.H"
     #include "createFvOptions.H"
     #include "initContinuityErrs.H"
-    
+
     // create cfdemCloud
     #include "readGravitationalAcceleration.H"
     cfdemCloudEnergy particleCloud(mesh);
@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
     scalar m(0.0);
     scalar m0(0.0);
     label counter(0);
-    
+
     while (runTime.run())
     {
         #include "readTimeControls.H"
@@ -87,8 +87,8 @@ int main(int argc, char *argv[])
         #include "setDeltaT.H"
 
         runTime++;
-	
-	particleCloud.clockM().start(1,"Global");
+
+        particleCloud.clockM().start(1,"Global");
 
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
@@ -100,7 +100,7 @@ int main(int argc, char *argv[])
         {
             particleCloud.smoothingM().smoothen(particleCloud.forceM(0).impParticleForces());
         }
-    
+
         Info << "update Ksl.internalField()" << endl;
         Ksl = particleCloud.momCoupleM(0).impMomSource();
         Ksl.correctBoundaryConditions();
@@ -116,13 +116,13 @@ int main(int argc, char *argv[])
        particleCloud.clockM().stop("Coupling");
 
        particleCloud.clockM().start(26,"Flow");
-	
+
         if (pimple.nCorrPIMPLE() <= 1)
         {
             #include "rhoEqn.H"
         }
 
-	rhoeps = rho * voidfraction;
+        rhoeps = rho * voidfraction;
         // --- Pressure-velocity PIMPLE corrector loop
         while (pimple.loop())
         {
@@ -133,10 +133,10 @@ int main(int argc, char *argv[])
             // --- Pressure corrector loop
             while (pimple.correct())
             {
-	        #include "molConc.H"
+                #include "molConc.H"
                 #include "pEqn.H"
             }
-           
+
             if (pimple.turbCorr())
             {
                 turbulence->correct();
@@ -144,14 +144,14 @@ int main(int argc, char *argv[])
         }
 
         #include "monitorMass.H"
-        
+
         particleCloud.clockM().start(31,"postFlow");
         particleCloud.postFlow();
         particleCloud.clockM().stop("postFlow");
 
         runTime.write();
 
-       
+
         Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
             << "  ClockTime = " << runTime.elapsedClockTime() << " s"
             << nl << endl;

@@ -1,5 +1,5 @@
     //  thermodynamics, chemistry
-    
+
     Info<< "Creating combustion model\n" << endl;
 
     autoPtr<combustionModels::rhoCombustionModel> combustion
@@ -73,7 +73,7 @@
         ),
         mesh
     );
-    
+
     Info<< "\nReading voidfraction field voidfraction = (Vgas/Vparticle)\n" << endl;
     volScalarField voidfraction
     (
@@ -87,7 +87,7 @@
         ),
         mesh
     );
-    
+
     volScalarField rhoeps
     (
         IOobject
@@ -115,7 +115,7 @@
         mesh,
         dimensionedScalar("zero", dimensionSet(1,-1,-3,0,0,0,0), 0.0)
     );
-    
+
     Info<< "\nCreating fluid-particle heat flux coefficient field\n" << endl;
     volScalarField QCoeff
     (
@@ -130,7 +130,7 @@
         mesh,
         dimensionedScalar("zero", dimensionSet(1,-1,-3,-1,0,0,0), 0.0)
     );
-    
+
     Info<< "\nCreating thermal conductivity field\n" << endl;
     volScalarField thCond
     (
@@ -145,7 +145,7 @@
         mesh,
         dimensionedScalar("zero", dimensionSet(1,1,-3,-1,0,0,0), 0.0)
     );
-    
+
     Info<< "\nCreating heat capacity field\n" << endl;
     volScalarField Cpv
     (
@@ -224,7 +224,7 @@
 
     Info<< "Creating field kinetic energy K\n" << endl;
     volScalarField K("K", 0.5*magSqr(U));
-    
+
     volScalarField dQ
     (
         IOobject
@@ -238,7 +238,7 @@
         mesh,
         dimensionedScalar("dQ", dimEnergy/dimTime, 0.0)
     );
-    
+
     Info<< "\nReading momentum exchange field Ksl\n" << endl;
     volScalarField Ksl
     (

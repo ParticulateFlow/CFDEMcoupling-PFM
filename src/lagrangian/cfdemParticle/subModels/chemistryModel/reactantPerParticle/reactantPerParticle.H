@@ -15,7 +15,7 @@ License
     along with this code.  If not, see <http://www.gnu.org/licenses/>.
 
     Copyright (C) 2015- Thomas Lichtenegger, JKU Linz, Austria
-    
+
     Description
     Model to communicate available reactant per particle
 
@@ -55,17 +55,17 @@ private:
     const fvMesh& mesh_;
 
     mutable double **reactantPerParticle_;
-    
+
     word voidfractionFieldName_;
 
     const volScalarField& voidfraction_;
-    
+
     mutable volScalarField particlesPerCell_;
 
     void allocateMyArrays() const;
 
     label loopCounter_;
-    
+
     label Nevery_;
 
 public:

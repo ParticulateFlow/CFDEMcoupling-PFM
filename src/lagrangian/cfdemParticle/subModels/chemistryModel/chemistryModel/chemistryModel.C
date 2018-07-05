@@ -46,7 +46,7 @@ tmp<volScalarField> chemistryModel::Smi(label i) const
 
 tmp<volScalarField> chemistryModel::Sm() const
 {
-    FatalError<<"the solver calls for Smi()\n"
+    FatalError<<"the solver calls for Sm()\n"
               <<"please activate 'speciesModel' in 'chemistryModels'"
               <<abort(FatalError);
 

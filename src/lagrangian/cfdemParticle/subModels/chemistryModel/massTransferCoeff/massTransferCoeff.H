@@ -16,7 +16,7 @@ License
 
     Copyright (C) 2015- Thomas Lichtenegger, JKU Linz, Austria
                         M. Efe Kinaci, JKU Linz, Austria
-    
+
     Description
     Model to communicate Sherwood number necessary coefficients
 

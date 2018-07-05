@@ -61,7 +61,7 @@ protected:
     autoPtr<energyModel>* energyModel_;
 
     autoPtr<thermCondModel> thermCondModel_;
-    
+
     autoPtr<chemistryModel>* chemistryModel_;
 
     void calcEnergyContributions();
@@ -93,7 +93,7 @@ public:
        const energyModel& energyM(int);
 
        const thermCondModel& thermCondM();
-       
+
        const chemistryModel& chemistryM(int);
 
        label nrEnergyModels() const;
@@ -107,7 +107,7 @@ public:
        inline const wordList& energyModels();
 
        inline const wordList& chemistryModels();
-       
+
        void energyContributions(volScalarField&);
 
        void energyCoefficients(volScalarField&);

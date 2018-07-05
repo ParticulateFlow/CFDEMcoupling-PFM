@@ -175,8 +175,8 @@ public:
             double**const& weight,
             double**const& mask
         ) const;
-	
-	void setScalarSumCentre
+
+        void setScalarSumCentre
         (
             volScalarField& field,
             double**& value,

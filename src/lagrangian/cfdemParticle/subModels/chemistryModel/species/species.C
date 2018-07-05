@@ -205,7 +205,7 @@ void species::init()
                 mesh_,
                 dimensionedScalar("zero",dimMass/(dimVol*dimTime), 0.0)
             )
-         );       
+         );
     }
     initialized_ = true;
 }
@@ -216,9 +216,9 @@ void species::execute()
 {
     if(!initialized_)
     {
-        init();  
+        init();
     }
-    
+
     loopCounter_++;
     if (loopCounter_ % Nevery_ != 0)
     {

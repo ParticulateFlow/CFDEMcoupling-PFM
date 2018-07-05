@@ -32,13 +32,13 @@ else
     //      + rhorAUf*fvc::ddtCorr(rho, U, phi)
         )
     );
-    
+
     // flux without pressure gradient contribution
     phi = phiHbyA + phiUs;
 
     // Update the pressure BCs to ensure flux consistency
     constrainPressure(p, rhoeps, U, phi, rhorAUf);
-    
+
     volScalarField SmbyP(particleCloud.chemistryM(0).Sm() / p);
 
     while (pimple.correctNonOrthogonal())

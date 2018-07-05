@@ -16,7 +16,7 @@ License
 
     Copyright (C) 2015- Thomas Lichtenegger, JKU Linz, Austria
                         M. Efe Kinaci, JKU Linz, Austria
-    
+
     Description
     Model to communicate species concentration and changes due to reactions
 
@@ -56,26 +56,26 @@ private:
     bool interpolation_;
 
     const fvMesh& mesh_;
-    
+
     bool verbose_;
 
     // Species dictionary - To be read where the species are from
     dictionary specDict_;
 
     wordList speciesNames_;
-    
+
     wordList mod_spec_names_;
 
     UPtrList<volScalarField> X_;
 
     mutable List<double**> molarFractions_;
-    
+
     mutable List<double**> changeOfSpeciesMass_;
 
     PtrList<volScalarField> changeOfSpeciesMassFields_;
-    
+
     volScalarField changeOfGasMassField_;
-    
+
     word tempFieldName_;
 
     const volScalarField& tempField_;              // ref to gas temperature field
@@ -89,7 +89,7 @@ private:
     const volScalarField& rho_;
 
     word partRhoName_;
-    
+
     mutable double **partRho_;                     // gas density at particle positions
 
     word voidfractionFieldName_;
@@ -106,17 +106,17 @@ private:
     word partMolarConcName_;
 
     mutable double **partMolarConc_;
-    
+
     label loopCounter_;
-    
+
     label Nevery_;
-    
+
     scalar massSourceCurr_;
-    
+
     scalar massSourceTot_;
-    
+
     bool initialized_;
-    
+
     void init();
 
 public:
