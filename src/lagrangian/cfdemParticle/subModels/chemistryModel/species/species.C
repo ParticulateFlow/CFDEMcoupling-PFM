@@ -265,7 +265,7 @@ void species::execute()
                 for (int i = 0; i<speciesNames_.size();i++)
                 {
                     Xfluid_[i] = X_[i][cellI];
-                    if(Xfluid_[i] < 0.0) Xfluid_[i] = 0.0;
+                   // if(Xfluid_[i] < 0.0) Xfluid_[i] = 0.0;
                 }
             }
 
