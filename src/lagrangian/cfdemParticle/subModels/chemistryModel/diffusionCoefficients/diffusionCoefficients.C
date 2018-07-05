@@ -387,12 +387,8 @@ void diffusionCoefficient::createCoeffs()
 
 double diffusionCoefficient::calcDiffVol(int i, int j)
 {
-    double volDiff_ = 0.0;
-
-    volDiff_  =   coeffs(diffusantGasNames_[i])+coeffs(speciesNames_[j]);
-    volDiff_  *=   volDiff_;
-
-    return volDiff_;
+    double sqrtvolDiff  =   coeffs(diffusantGasNames_[i])+coeffs(speciesNames_[j]);
+    return sqrtvolDiff*sqrtvolDiff;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
