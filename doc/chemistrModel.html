@@ -1,0 +1,51 @@
+<HTML>
+<CENTER><A HREF = "http://www.cfdem.com">CFDEMproject WWW Site</A> - <A HREF = "CFDEMcoupling_Manual.html#comm">CFDEM Commands</A> 
+</CENTER>
+
+
+
+
+<HR>
+
+<H3>chemistryModel command 
+</H3>
+<P><B>Syntax:</B>
+</P>
+<P>Defined in couplingProperties dictionary.
+</P>
+<PRE>chemistryModels
+(
+    model_x
+    model_y
+); 
+</PRE>
+<UL><LI>model = name of chemistry model to be applied 
+</UL>
+<P><B>Examples:</B>
+</P>
+<PRE>chemistryModels
+(
+    species
+    diffusionCoefficients
+    massTransferCoeff
+); 
+</PRE>
+<P>Note: This examples list might not be complete - please look for other models (forceModel_XY) in this documentation.
+</P>
+<P><B>Description:</B>
+</P>
+<P>The chemistry model initialized the fields performs calculation of molar fractions and diffusion coefficients of the gaseous reactants at the location of each DEM particle. All models are executed sequentially. These values are used in the DEM calculation of particle reduction models.
+</P>
+<P><B>Restrictions:</B>
+</P>
+<P>None.
+</P>
+<P><B>Related commands:</B>
+</P>
+<P><A HREF = "chemistryModel_species.html">species</A>, <A HREF = "chemistryModel_diffusionCoefficient.html">diffusionCoefficient</A>, <A HREF = "chemistryModel_massTransferCoeffs.html">massTransferCoeff</A>
+</P>
+<P>Note: This examples list may be incomplete - please look for other models (forceModel_XY) in this documentation.
+</P>
+<P><B>Default:</B> none.
+</P>
+</HTML>

@@ -15,90 +15,82 @@ License
     along with this code.  If not, see <http://www.gnu.org/licenses/>.
 
     Copyright (C) 2015- Thomas Lichtenegger, JKU Linz, Austria
-                        M. Efe Kinaci, JKU Linz, Austria
+
+    Description
+    Model to communicate available reactant per particle
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef chemistryModel_H
-#define chemistryModel_H
+#ifndef reactantPerParticle_H
+#define reactantPerParticle_H
 
 #include "fvCFD.H"
 #include "cfdemCloudEnergy.H"
-#include "probeModel.H"
-#include "interpolationCellPoint.H"
+#include "chemistryModel.H"
+#include "diffusionCoefficients.H"
+
+#include "HashPtrTable.H"
+
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class chemistryModel Declaration
+                           Class reactantPerParticle Declaration
 \*---------------------------------------------------------------------------*/
 
-class chemistryModel
+// for future use:
+// + communicate every N steps
+
+class reactantPerParticle
+:
+    public chemistryModel
 {
+private:
 
-protected:
+    dictionary propsDict_;
 
-    // Protected data
-        const dictionary& dict_;
+    const fvMesh& mesh_;
 
-        cfdemCloudEnergy& particleCloud_;
+    mutable double **reactantPerParticle_;
 
+    word voidfractionFieldName_;
 
+    const volScalarField& voidfraction_;
+
+    mutable volScalarField particlesPerCell_;
+
+    void allocateMyArrays() const;
+
+    label loopCounter_;
+
+    label Nevery_;
 
 public:
 
     //- Runtime type information
-    TypeName("chemistryModel");
-
-    // Declare runtime constructor selection table
-
-        declareRunTimeSelectionTable
-        (
-            autoPtr,
-            chemistryModel,
-            dictionary,
-            (
-                const dictionary& dict,
-                cfdemCloudEnergy& sm
-            ),
-            (dict,sm)
-        );
-
+    TypeName("reactantPerParticle");
 
     // Constructors
 
         //- Construct from components
-        chemistryModel
+        reactantPerParticle
         (
             const dictionary& dict,
             cfdemCloudEnergy& sm
         );
 
-
     // Destructor
 
-        virtual ~chemistryModel();
-
-
-    // Selector
-
-        static autoPtr<chemistryModel> New
-        (
-            const dictionary& dict,
-            cfdemCloudEnergy& sm,
-            word chemistryModelType
-        );
-
+        virtual ~reactantPerParticle();
 
     // Member Functions
+        void execute();
 
-        virtual void execute() = 0;
+        void reAllocMyArrays() const;
 
-        virtual tmp<volScalarField> Smi(const label i) const;
-
-        virtual tmp<volScalarField> Sm() const;
 };
 
 

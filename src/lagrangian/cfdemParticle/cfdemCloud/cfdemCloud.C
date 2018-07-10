@@ -271,6 +271,11 @@ cfdemCloud::cfdemCloud
     else
         Info << "ignoring ddt(voidfraction)" << endl;
 
+    bool adjustTimeStep  = mesh_.time().controlDict().lookupOrDefault("adjustTimeStep", false);
+    if (adjustTimeStep)
+        FatalError << "CFDEMcoupling does not support adjustable time steps."
+                   << abort(FatalError);
+
     momCoupleModel_ = new autoPtr<momCoupleModel>[momCoupleModels_.size()];
     for (int i=0;i<momCoupleModels_.size();i++)
     {
@@ -665,10 +670,12 @@ bool cfdemCloud::evolve
         //CHECK JUST TIME-INTERPOATE ALREADY SMOOTHENED VOIDFRACTIONNEXT AND UsNEXT FIELD
         //      IMPLICIT FORCE CONTRIBUTION AND SOLVER USE EXACTLY THE SAME AVERAGED
         //      QUANTITIES AT THE GRID!
-        Info << "\n timeStepFraction() = " << dataExchangeM().timeStepFraction() << endl;
-        if(dataExchangeM().timeStepFraction() > 1.0000001)
+        scalar timeStepFrac = dataExchangeM().timeStepFraction();
+        Info << "\n timeStepFraction() = " << timeStepFrac << endl;
+        if(timeStepFrac > 1.0000001)
         {
-            FatalError << "cfdemCloud::dataExchangeM().timeStepFraction()>1: Do not do this, since dangerous. This might be due to the fact that you used a adjustable CFD time step. Please use a fixed CFD time step." << abort(FatalError);
+   //         FatalError << "cfdemCloud::dataExchangeM().timeStepFraction()>1: Do not do this, since dangerous. This might be due to the fact that you used a adjustable CFD time step. Please use a fixed CFD time step." << abort(FatalError);
+              Warning << "cfdemCloud::dataExchangeM().timeStepFraction() = " << timeStepFrac << endl;
         }
         clockM().start(24,"interpolateEulerFields");
 

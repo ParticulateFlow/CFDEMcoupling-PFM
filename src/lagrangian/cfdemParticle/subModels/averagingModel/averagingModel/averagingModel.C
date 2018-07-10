@@ -229,6 +229,31 @@ void averagingModel::setScalarSum
     field.correctBoundaryConditions();
 }
 
+void averagingModel::setScalarSumCentre
+(
+    volScalarField& field,
+    double**& value,
+    double**const& weight,
+    double**const& mask
+) const
+{
+    label cellI;
+    scalar valueScal;
+
+    for(int index=0; index< particleCloud_.numberOfParticles(); index++)
+    {
+        cellI = particleCloud_.cellIDs()[index][0];
+        if (cellI >= 0)
+        {
+            valueScal = value[index][0];
+            field[cellI] += valueScal;
+        }
+    }
+
+    // correct cell values to patches
+    field.correctBoundaryConditions();
+}
+
 void averagingModel::setDSauter
 (
     volScalarField& dSauter,

@@ -41,17 +41,10 @@ cfdemCloudEnergy::cfdemCloudEnergy
     cfdemCloud(mesh),
     energyModels_(couplingProperties_.lookup("energyModels")),
     implicitEnergyModel_(false),
+    chemistryModels_(couplingProperties_.lookup("chemistryModels")),
     thermCondModel_
     (
         thermCondModel::New
-        (
-            couplingProperties_,
-            *this
-        )
-    ),
-    chemistryModel_
-    (
-        chemistryModel::New
         (
             couplingProperties_,
             *this
@@ -66,6 +59,16 @@ cfdemCloudEnergy::cfdemCloudEnergy
             couplingProperties_,
             *this,
             energyModels_[i]
+        );
+    }
+    chemistryModel_ = new autoPtr<chemistryModel>[nrChemistryModels()];
+    for (int i=0;i<nrChemistryModels();i++)
+    {
+        chemistryModel_[i] = chemistryModel::New
+        (
+            couplingProperties_,
+            *this,
+            chemistryModels_[i]
         );
     }
 }
@@ -88,13 +91,19 @@ void cfdemCloudEnergy::calcEnergyContributions()
 
 void cfdemCloudEnergy::speciesExecute()
 {
-        chemistryModel_().execute();
+    for (int i=0;i<nrChemistryModels();i++)
+        chemistryModel_[i]().execute();
 }
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 label cfdemCloudEnergy::nrEnergyModels() const
 {
     return energyModels_.size();
+}
+
+int cfdemCloudEnergy::nrChemistryModels()
+{
+    return chemistryModels_.size();
 }
 
 bool cfdemCloudEnergy::implicitEnergyModel() const
@@ -107,9 +116,9 @@ const energyModel& cfdemCloudEnergy::energyM(int i)
     return energyModel_[i];
 }
 
-const chemistryModel& cfdemCloudEnergy::chemistryM()
+const chemistryModel& cfdemCloudEnergy::chemistryM(int i)
 {
-    return chemistryModel_;
+    return chemistryModel_[i];
 }
 
 const thermCondModel& cfdemCloudEnergy::thermCondM()
@@ -157,7 +166,7 @@ bool cfdemCloudEnergy::evolve
         if(verbose_) Info << "speciesExecute done" << endl;
         clockM().stop("speciesExecute");
 
-	return true;
+        return true;
     }
     return false;
 }

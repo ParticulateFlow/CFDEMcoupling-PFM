@@ -30,6 +30,11 @@ inline const wordList& cfdemCloudEnergy::energyModels() const
     return energyModels_;
 }
 
+inline const wordList& cfdemCloudEnergy::chemistryModels()
+{
+    return chemistryModels_;
+}
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

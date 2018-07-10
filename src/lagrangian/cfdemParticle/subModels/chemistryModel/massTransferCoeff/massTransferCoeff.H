@@ -17,88 +17,92 @@ License
     Copyright (C) 2015- Thomas Lichtenegger, JKU Linz, Austria
                         M. Efe Kinaci, JKU Linz, Austria
 
+    Description
+    Model to communicate Sherwood number necessary coefficients
+
 \*---------------------------------------------------------------------------*/
 
-#ifndef chemistryModel_H
-#define chemistryModel_H
+#ifndef massTransferCoeff_H
+#define massTransferCoeff_H
 
 #include "fvCFD.H"
 #include "cfdemCloudEnergy.H"
-#include "probeModel.H"
-#include "interpolationCellPoint.H"
+#include "chemistryModel.H"
+#include "species.H"
+
+#include "HashPtrTable.H"
+#include "HashTable.H"
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class chemistryModel Declaration
+                           Class massTransferCoefficient Declaration
 \*---------------------------------------------------------------------------*/
 
-class chemistryModel
+class massTransferCoeff
+:
+    public chemistryModel
 {
+private:
 
-protected:
+    dictionary propsDict_;
 
-    // Protected data
-        const dictionary& dict_;
+    bool verbose_;
 
-        cfdemCloudEnergy& particleCloud_;
+    bool interpolation_;
 
+    const fvMesh& mesh_;
 
+    word velFieldName_;
+
+    const volVectorField& U_;
+
+    word voidfractionFieldName_;
+
+    const volScalarField& voidfraction_;
+
+    word densityFieldName_;
+
+    const volScalarField& rho_;
+
+    word partNuName_;
+
+    mutable double **partNu_;
+
+    word partReynolds_;
+
+    mutable double **partRe_;
+
+    void allocateMyArrays() const;
+
+    mutable scalar scaleDia_;
 
 public:
 
     //- Runtime type information
-    TypeName("chemistryModel");
-
-    // Declare runtime constructor selection table
-
-        declareRunTimeSelectionTable
-        (
-            autoPtr,
-            chemistryModel,
-            dictionary,
-            (
-                const dictionary& dict,
-                cfdemCloudEnergy& sm
-            ),
-            (dict,sm)
-        );
-
+    TypeName("massTransferCoeff");
 
     // Constructors
 
         //- Construct from components
-        chemistryModel
+        massTransferCoeff
         (
             const dictionary& dict,
             cfdemCloudEnergy& sm
         );
 
-
     // Destructor
 
-        virtual ~chemistryModel();
-
-
-    // Selector
-
-        static autoPtr<chemistryModel> New
-        (
-            const dictionary& dict,
-            cfdemCloudEnergy& sm,
-            word chemistryModelType
-        );
-
+        virtual ~massTransferCoeff();
 
     // Member Functions
+        void execute();
 
-        virtual void execute() = 0;
+        void reAllocMyArrays() const;
 
-        virtual tmp<volScalarField> Smi(const label i) const;
-
-        virtual tmp<volScalarField> Sm() const;
 };
 
 

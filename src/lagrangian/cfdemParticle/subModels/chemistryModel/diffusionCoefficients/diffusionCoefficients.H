@@ -18,20 +18,21 @@ License
                         M. Efe Kinaci, JKU Linz, Austria
 
     Description
-    Model to communicate species concentration and changes due to reactions
+    Model to communicate the diffusion coefficients that are necessary for particle
+    reduction.
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef species_H
-#define species_H
+#ifndef diffusionCoefficients_H
+#define diffusionCoefficients_H
 
 #include "fvCFD.H"
 #include "cfdemCloudEnergy.H"
 #include "chemistryModel.H"
-#include "diffusionCoefficients.H"
+#include "species.H"
 
 #include "HashPtrTable.H"
-
+#include "HashTable.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -39,13 +40,13 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class species Declaration
+                           Class diffusionCoefficient Declaration
 \*---------------------------------------------------------------------------*/
 
 // for future use:
 // + communicate every N steps
 
-class species
+class diffusionCoefficient
 :
     public chemistryModel
 {
@@ -53,82 +54,74 @@ private:
 
     dictionary propsDict_;
 
+    bool verbose_;
+
     bool interpolation_;
 
     const fvMesh& mesh_;
-
-    bool verbose_;
 
     // Species dictionary - To be read where the species are from
     dictionary specDict_;
 
     wordList speciesNames_;
 
-    wordList mod_spec_names_;
-
-    UPtrList<volScalarField> X_;
-
-    mutable List<double**> molarFractions_;
-
-    mutable List<double**> changeOfSpeciesMass_;
-
-    PtrList<volScalarField> changeOfSpeciesMassFields_;
-
-    volScalarField changeOfGasMassField_;
-
     word tempFieldName_;
 
     const volScalarField& tempField_;              // ref to gas temperature field
 
-    word partTempName_;
+    // gas pressure at particle location
+    word pressureFieldName_;
 
-    mutable double **partTemp_;                    // gas temperature at particle positions
+    const volScalarField& P_; 
+
+    word partPressureName_;
+
+    mutable double **partPressure_;
 
     word densityFieldName_;
 
     const volScalarField& rho_;
-
-    word partRhoName_;
-
-    mutable double **partRho_;                     // gas density at particle positions
-
-    word voidfractionFieldName_;
-
-    const volScalarField& voidfraction_;
-
-    void allocateMyArrays() const;
 
     // total mole field
     word molarConcFieldName_;
 
     const volScalarField& molarConc_;
 
-    word partMolarConcName_;
+    UPtrList<volScalarField> X_;
 
-    mutable double **partMolarConc_;
+    wordList diffusantGasNames_;
 
-    label loopCounter_;
+    mutable List<double**> diffusionCoefficients_;
 
-    label Nevery_;
+    HashTable<scalar, word> coeffs;
 
-    scalar massSourceCurr_;
+    HashTable<scalar, word> molWeight;
 
-    scalar massSourceTot_;
+    void createCoeffs();
+
+    void molWeightTable();
+
+    // calculate numerator part molar mass addition
+    double calcMolNum(int, int);
+
+    // calculate denominator part diffusion volume equation
+    double calcDiffVol(int, int);
+
+    void allocateMyArrays() const;
 
     bool initialized_;
 
     void init();
 
-public:
-
+ public:
 
     //- Runtime type information
-    TypeName("species");
+    TypeName("diffusionCoefficients");
 
     // Constructors
 
         //- Construct from components
-        species
+        diffusionCoefficient
         (
             const dictionary& dict,
             cfdemCloudEnergy& sm
@@ -136,17 +129,12 @@ public:
 
     // Destructor
 
-        virtual ~species();
+        virtual ~diffusionCoefficient();
 
     // Member Functions
         void execute();
 
         void reAllocMyArrays() const;
-
-        tmp <volScalarField> Smi(const label i) const;
-
-        tmp <volScalarField> Sm() const;
-
 };
 
 
