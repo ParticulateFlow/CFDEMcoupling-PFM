@@ -79,6 +79,7 @@ diffusionCoefficient::diffusionCoefficient
     X_(speciesNames_.size()),
     diffusantGasNames_(propsDict_.lookup("diffusantGasNames")),
     diffusionCoefficients_(diffusantGasNames_.size(),NULL),
+    Xdiffusant_(diffusantGasNames_.size()),
     initialized_(false)
 {
     if(verbose_)
@@ -148,8 +149,22 @@ void diffusionCoefficient::init()
              Info << " Read species list from: " << specDict_.name() << endl;
              Info << " Reading species list: " << speciesNames_ << endl;
              Info << " Looking up species fields: " << "X_"+speciesNames_[i] << endl;
-             Info << "The molar fraction fields (X_i): " << X_[i].name() << nl << endl;
+             Info << " The molar fraction fields (X_i): " << X_[i].name() << nl << endl;
          }
+    }
+
+    for (int j = 0; j < diffusantGasNames_.size(); j++)
+    {
+        volScalarField& Xdiffusant = const_cast<volScalarField&>
+                (mesh_.lookupObject<volScalarField>("X_"+diffusantGasNames_[j]));
+        Xdiffusant_.set(j, &Xdiffusant);
+
+        if(verbose_)
+        {
+            Info << " Reading diffusing gas species list: " << diffusantGasNames_ << endl;
+            Info << " Looking up diffusin gas species fields: " << "X_"+diffusantGasNames_[j] << endl;
+            Info << " The molar fraction fields (Xdiffusant_i): " << Xdiffusant_[j].name() << nl << endl;
+        }
     }
     initialized_ = true;
 }
@@ -179,9 +194,9 @@ void diffusionCoefficient::execute()
     Xfluid_.setSize(speciesNames_.size());
     List<scalar> XfluidDiffusant_(0);
     XfluidDiffusant_.setSize(diffusantGasNames_.size());
-    List<scalar> MixtureBinaryDiffusion_;
+    List<scalar> MixtureBinaryDiffusion_(0);
     MixtureBinaryDiffusion_.setSize(diffusantGasNames_.size());
-    List<scalar> TotalFraction_;
+    List<scalar> TotalFraction_(0);
     TotalFraction_.setSize(diffusantGasNames_.size());
 
     // defining interpolators for T, rho, voidfraction, N
@@ -214,31 +229,30 @@ void diffusionCoefficient::execute()
                 {
                     Xfluid_[i] = X_[i][cellI];
 
-                    for (int j=0; j<diffusantGasNames_.size();j++)
+                    // total amount of negative molar fractions in the domain
+                    // check it and then delete it
+                    scalar timestep = mesh_.time().deltaTValue();
+                    if (Xfluid_[i] < 0.0)
                     {
-                        if (diffusantGasNames_[j] == speciesNames_[i])
-                        {
-                            XfluidDiffusant_[j] = X_[i][cellI];
-                        }
+                        Xnegative += Xfluid_[i]*timestep;
+                        Info << "total negative molar fractions =" << Xnegative << endl;
+                    }
+                }
 
-                        // total amount of negative molar fractions in the domain
-                        // check it and then delete it
-                        scalar timestep = mesh_.time().deltaTValue();
-                        if (Xfluid_[i] < 0.0)
-                        {
-                            Xnegative += Xfluid_[i]*timestep;
-                            Info << "total negative molar fractions =" << Xnegative << endl;
-                        }
+                for (int j=0; j<diffusantGasNames_.size();j++)
+                {
+                    XfluidDiffusant_[j] = Xdiffusant_[j][cellI];
+                }
+            }
 
-
-                        /*if (Xfluid_[i] <= 0.) Xfluid_[i] = 0.0;
-                        if (XfluidDiffusant_[j] <= 0.) XfluidDiffusant_[j] = 0.0;*/
-
-                        if(verbose_)
-                        {
-                            Info << "X fluid for species " << speciesNames_[i] << " : " << Xfluid_[i] << nl << endl;
-                            Info << "X fluid for diffusant species " << diffusantGasNames_[j] << " : " << XfluidDiffusant_[j] << nl << endl;
-                        }
+            for (int i = 0; i<speciesNames_.size();i++){
+                for (int j=0; j<diffusantGasNames_.size();j++){
+                    if(verbose_)
+                    {
+                        Info << "X_i = " << X_[i].name() << endl;
+                        Info << "Xfluid = " << Xfluid_[i] << endl;
+                        Info << "X_j = " << diffusantGasNames_[j] << endl;
+                        Info << "XfluidDiffusant = " << XfluidDiffusant_[j] << endl;
                     }
                 }
             }
@@ -251,84 +265,68 @@ void diffusionCoefficient::execute()
             if(verbose_)
             {
                 Info << "partPressure_[index][0] = " << partPressure_[index][0] << endl;
-                Info << "pressure field" << Pfluid << nl << endl;
-                Info << "T - exponent calculation" << Texp << nl << endl;
+                Info << "pressure field = " << Pfluid << nl << endl;
+                Info << "size diffusantGasNames = " << diffusantGasNames_.size() << endl;
+                Info << "size speciesNames = " << speciesNames_.size() << endl;
             }
 
-            for (int i=0; i<diffusantGasNames_.size();i++)
+            for (int j=0; j<diffusantGasNames_.size();j++)
             {
-                MixtureBinaryDiffusion_[i]  =   0.0;
-                TotalFraction_[i]   =   0.0;
-                for (int j=0; j < speciesNames_.size();j++)
+                MixtureBinaryDiffusion_[j]  =   0.0;
+                TotalFraction_[j]   =   0.0;
+                dBinary_    =   0.0;
+                for (int i=0; i < speciesNames_.size();i++)
                 {
                     // get molecular diffusion coefficients if diffusant gas and reactant gas are not equal
-                    if (diffusantGasNames_[i] != speciesNames_[j])
+                    if (diffusantGasNames_[j] != speciesNames_[i])
                     {
                         if(verbose_)
                         {
-                            Info << "molar weights diffuser gases: " << molWeight(speciesNames_[j]) << nl << endl;
+                            Info << "X_i = " << X_[i].name() << endl;
+                            Info << "Xfluid = " << Xfluid_[i] << endl;
+                            Info << "X_j = " << diffusantGasNames_[j] << endl;
+                            Info << "XfluidDiffusant = " << XfluidDiffusant_[j] << endl;
+                            Info << "molar weights diffuser gases: " << molWeight(speciesNames_[i]) << nl << endl;
                             Info << "molarConc fluid: " << molarConcfluid << nl << endl;
                             Info << "rho fluid:  " << rhofluid << nl << endl;
-                            Info << "molar weights diffusant gases: " << molWeight(diffusantGasNames_[i]) << nl << endl;
+                            Info << "molar weights diffusant gases: " << molWeight(diffusantGasNames_[j]) << nl << endl;
                             Info << "Pressure: " << Pfluid << nl << endl;
                             Info << "Temperature: " << Tfluid << nl << endl;
                         }
 
-                        if(coeffs.found(diffusantGasNames_[i]) && coeffs.found(speciesNames_[j]))
+                        if(coeffs.found(diffusantGasNames_[j]) && coeffs.found(speciesNames_[i]))
                         {
                             //  Fuller-Schettler-Giddings Equation
                             //  Unit of dBinary is [m^2/s]
                             //  INFO:: Normally unit of dBinary is cm^2/s, but the 1st term in RHS is 10^-3 instead
                             //  So here it is already converted
-                            dBinary_ = 1e-7*Texp*calcMolNum(i,j)/(Pfluid*calcDiffVol(i,j));
+                            dBinary_ = 1e-7*Texp*calcMolNum(j,i)/(Pfluid*calcDiffVol(j,i));
 
                             if(verbose_)
                             {
-                                Info << "Molecular diffusion for species " << diffusantGasNames_[i] << " in "
-                                     << speciesNames_[j] << " is : " << dBinary_ << nl << endl;
+                                Info << "Molecular diffusion for species " << diffusantGasNames_[j] << " in "
+                                     << speciesNames_[i] << " is : " << dBinary_ << nl << endl;
 
-                                Info << "Molar fraction of species (speciesNames)" << speciesNames_[j] << " : " << Xfluid_[j] << nl << endl;
-                                Info << "Molar fraction of species (diffusantNames)" << diffusantGasNames_[i] << " : " << XfluidDiffusant_[i] << nl << endl;
+                                Info << "Molar fraction of species (speciesNames)" << speciesNames_[i] << " : " << Xfluid_[i] << nl << endl;
+                                Info << "Molar fraction of species (diffusantNames)" << diffusantGasNames_[j] << " : " << XfluidDiffusant_[j] << nl << endl;
                             }
 
-                            TotalFraction_[i] += Xfluid_[j]/dBinary_;
-                            if (TotalFraction_[i] < VSMALL)
-                                MixtureBinaryDiffusion_[i] = VSMALL;
+                            TotalFraction_[j] += Xfluid_[i]/dBinary_;
+                            if (TotalFraction_[j] < VSMALL)
+                                MixtureBinaryDiffusion_[j] = VSMALL;
                             else
-                                MixtureBinaryDiffusion_[i] = (1.0-XfluidDiffusant_[i])/TotalFraction_[i];
+                                MixtureBinaryDiffusion_[j] = (1.0-XfluidDiffusant_[j])/TotalFraction_[j];
 
                             if(verbose_)
                             {
-                                Info << "Total fraction calculated (ratio of stag. gas to binary diffusion : " << TotalFraction_[i] << nl << endl;
-                                Info << "Molar fraction of species diffusant gas " << diffusantGasNames_[i] << " : " << XfluidDiffusant_[i] << nl << endl;
-                                Info << "Multicomp. mix diffusion for species " << diffusantGasNames_[i]
-                                     << " is: " << MixtureBinaryDiffusion_[i] << nl << endl;
+                                Info << "Total fraction calculated (ratio of stag. gas to binary diffusion : " << TotalFraction_[j] << nl << endl;
+                                Info << "Molar fraction of species diffusant gas " << diffusantGasNames_[j] << " : " << XfluidDiffusant_[j] << nl << endl;
+                                Info << "Multicomp. mix diffusion for species " << diffusantGasNames_[j]
+                                     << " is: " << MixtureBinaryDiffusion_[j] << nl << endl;
                             }
-
-
-                            /*if (!(Xfluid_[j] <= 0.0))
-                            {
-                                // sum of all stagnant gases to sum of binary diffusion
-                                TotalFraction_[i]   +=  Xfluid_[j]/dBinary_;
-
-                                // dCoeff -- diffusion component of diffusant gas
-                                MixtureBinaryDiffusion_[i]  =   (1.0-XfluidDiffusant_[i])/TotalFraction_[i];                             
-
-                                if(verbose_)
-                                {
-                                    Info << "Total fraction calculated (ratio of stag. gas to binary diffusion : " << TotalFraction_[i] << nl << endl;
-                                    Info << "Molar fraction of species diffusant gas " << diffusantGasNames_[i] << " : " << XfluidDiffusant_[i] << nl << endl;
-                                }
-                            }
-
-                            if(verbose_)
-                            {
-                                Info << "Multicomp. mix diffusion for species " << diffusantGasNames_[i]
-                                     << " is: " << MixtureBinaryDiffusion_[i] << nl << endl;
-                            }*/
 
                             // pass on dCoeff values to array
-                            diffusionCoefficients_[i][index][0]= MixtureBinaryDiffusion_[i];
+                            diffusionCoefficients_[j][index][0]= MixtureBinaryDiffusion_[j];
 
                         }else
                         {
@@ -344,19 +342,19 @@ void diffusionCoefficient::execute()
 
         if(verbose_)
         {
-            for(int i =0; i<diffusantGasNames_.size();i++)
+            for(int j =0; j<diffusantGasNames_.size();j++)
             {
-                Info << "diffusionCoefficient of species " << diffusantGasNames_[i] << " = " << diffusionCoefficients_[i][index][0] << endl;
+                Info << "diffusionCoefficient of species " << diffusantGasNames_[j] << " = " << diffusionCoefficients_[j][index][0] << endl;
             }
         }
     }
 
     particleCloud_.dataExchangeM().giveData(partPressureName_, "scalar-atom",partPressure_);
 
-    for (int i=0; i<diffusantGasNames_.size();i++)
+    for (int j=0; j<diffusantGasNames_.size();j++)
     {
-        word pushName = diffusantGasNames_[i] + "_diffCoeff";
-        particleCloud_.dataExchangeM().giveData(pushName,"scalar-atom",diffusionCoefficients_[i]);
+        word pushName = diffusantGasNames_[j] + "_diffCoeff";
+        particleCloud_.dataExchangeM().giveData(pushName,"scalar-atom",diffusionCoefficients_[j]);
     };
 
     Info << "give data done" << endl;
@@ -385,9 +383,9 @@ void diffusionCoefficient::createCoeffs()
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-double diffusionCoefficient::calcDiffVol(int i, int j)
+double diffusionCoefficient::calcDiffVol(int j, int i)
 {
-    double sqrtvolDiff  =   coeffs(diffusantGasNames_[i])+coeffs(speciesNames_[j]);
+    double sqrtvolDiff  =   coeffs(diffusantGasNames_[j])+coeffs(speciesNames_[i]);
     return sqrtvolDiff*sqrtvolDiff;
 }
 
@@ -408,12 +406,12 @@ void diffusionCoefficient::molWeightTable()
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 // either calculate Molecular Weight addition (eq. D_ij) or consturct hashtable with diffusant and diffuser species
-double diffusionCoefficient::calcMolNum(int i, int j)
+double diffusionCoefficient::calcMolNum(int j, int i)
 {
     double molNum_ = 0.0;
 
-    double W1 = molWeight(diffusantGasNames_[i]);
-    double W2 = molWeight(speciesNames_[j]);
+    double W1 = molWeight(diffusantGasNames_[j]);
+    double W2 = molWeight(speciesNames_[i]);
 
     molNum_   =   (W1 + W2) / (W1 * W2);
     molNum_   =   sqrt(molNum_);

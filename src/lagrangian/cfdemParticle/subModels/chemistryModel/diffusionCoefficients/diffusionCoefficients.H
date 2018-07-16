@@ -93,6 +93,8 @@ private:
 
     mutable List<double**> diffusionCoefficients_;
 
+    UPtrList<volScalarField> Xdiffusant_;
+
     HashTable<scalar, word> coeffs;
 
     HashTable<scalar, word> molWeight;
