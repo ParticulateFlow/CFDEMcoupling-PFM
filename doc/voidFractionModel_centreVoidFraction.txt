@@ -41,5 +41,5 @@ The particle volume occupied in the CFD domain can be adjusted by the parameter 
 
 [Related commands:]
 
-"voidfractionModel"_voidfractionModel.html
+"voidfractionModel"_voidFractionModel.html
 

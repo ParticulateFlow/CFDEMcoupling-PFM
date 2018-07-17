@@ -38,6 +38,6 @@ None.
 
 [Related commands:]
 
-"species"_chemistryModel_species.html, "diffusionCoefficient"_chemistryModel_diffusionCoefficient.html, "massTransferCoeff"_chemistryModel_massTransferCoeffs.html
+"species"_chemistryModel_species.html, "diffusionCoefficient"_chemistryModel_diffusionCoefficients.html, "massTransferCoeff"_chemistryModel_massTransferCoeff.html
 
 [Default:] none.

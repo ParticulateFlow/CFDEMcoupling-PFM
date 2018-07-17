@@ -46,5 +46,5 @@ Code of this sub-model contributed by Alice Hager, JKU.
 
 [Related commands:]
 
-"voidfractionModel"_voidfractionModel.html
+"voidfractionModel"_voidFractionModel.html
 

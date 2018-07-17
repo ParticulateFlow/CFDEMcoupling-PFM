@@ -49,5 +49,5 @@ The void fraction calculation is based on a three-step approach (reset, set and 
 
 [Related commands:]
 
-"voidfractionModel"_voidfractionModel.html
+"voidfractionModel"_voidFractionModel.html
 
