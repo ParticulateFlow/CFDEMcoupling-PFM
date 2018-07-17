@@ -27,7 +27,6 @@ forceModels
     DiFeliceDrag
 ); :pre
 
-Note: This examples list might not be complete - please look for other models (forceModel_XY) in this documentation.
 
 [Description:]
 
@@ -40,7 +39,5 @@ None.
 [Related commands:]
 
 "Archimedes"_forceModel_Archimedes.html, "DiFeliceDrag"_forceModel_DiFeliceDrag.html, "gradPForce"_forceModel_gradPForce.html, "viscForce"_forceModel_viscForce.html,"dSauter"_forceModel_dSauter.html
-
-Note: This examples list may be incomplete - please look for other models (forceModel_XY) in this documentation.
 
 [Default:] none.

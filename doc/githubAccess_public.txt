@@ -7,7 +7,6 @@
 
 :line
 githubAccess_public :h3
-:line
 
 [Description:]
 
