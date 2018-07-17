@@ -1,0 +1,215 @@
+"CFDEMproject Website"_lws - "Main Page"_main :c
+
+:link(lws,http://www.cfdem.com)
+:link(main,CFDEMcoupling_Manual.html)
+
+:line
+
+6. Models :h3,link(1_6),link(comm)
+
+This section lists all CFDEMcoupling sub-models alphabetically, with
+a separate listing below of styles within certain commands.
+
+6.1 I/O models :h4
+
+The "IOModel"_IOModel.html keyword entry specifies the model for writing output
+data.
+
+"basicIO"_IOModel_basicIO.html,
+"noIO"_IOModel_noIO.html,
+"sophIO"_IOModel_sophIO.html,
+"trackIO"_IOModel_trackIO.html :tb(c=2,ea=c)
+
+
+6.2 Averaging models :h4
+
+The "averagingModel"_averagingModel.html keyword entry defines the model used to
+map the Lagrangian data to Eulerian values.
+
+"dense"_averagingModel_dense.html,
+"dilute"_averagingModel_dilute.html :tb(c=2,ea=c)
+
+
+6.3 Chemistry models :h4
+
+The "chemistryModels"_chemistryModel.html keyword is used to specify a list of
+models used for chemical reaction calculations.
+
+"diffusionCoefficients"_chemistryModel_diffusionCoefficients.html,
+"massTransferCoeff"_chemistryModel_massTransferCoeff.html,
+noChemistry,
+reactantPerParticle,
+"species"_chemistryModel_species.html :tb(c=2,ea=c)
+
+
+6.4 Clock models :h4
+
+The "clockModel"_clockModel.html keyword entry specifies the model used to
+examine the CFDEMcoupling code with respect to runtime.
+
+"noClock"_clockModel_noClock.html,
+"standardClock"_clockModel_standardClock.html :tb(c=2,ea=c)
+
+
+6.5 Data exchange models :h4
+
+The "dataExchangeModel"_dataExchangeModel.html keyword entry specifies the model
+that performs the data exchange between the DEM code and the CFD code.
+
+"noDataExchange"_dataExchangeModel_noDataExchange.html,
+"oneWayVTK"_dataExchangeModel_oneWayVTK.html,
+"twoWayFiles"_dataExchangeModel_twoWayFiles.html,
+"twoWayMPI"_dataExchangeModel_twoWayMPI.html,
+"twoWayMany2Many"_dataExchangeModel_twoWayMany2Many.html :tb(c=2,ea=c)
+
+
+6.6 Energy models :h4
+
+The {energyModels} keyword specifies a list of energy models used for e.g.
+compressible, reacting flows.
+
+heatTransferGunn,
+heatTransferGunnImplicit,
+heatTransferGunnPartField,
+reactionHeat :tb(c=2,ea=c)
+
+
+6.7 Force models :h4
+
+The "forceModels"_forceModel.html keyword specifies a list of models that exert
+a force on each DEM particle.
+
+"Archimedes"_forceModel_Archimedes.html,
+"ArchimedesIB"_forceModel_ArchimedesIB.html,
+BeetstraDrag,
+BeetstraDragPoly,
+"DiFeliceDrag"_forceModel_DiFeliceDrag.html,
+"dSauter"_forceModel_dSauter.html,
+Fines,
+"GidaspowDrag"_forceModel_GidaspowDrag.html,
+"KochHillDrag"_forceModel_KochHillDrag.html,
+"LaEuScalarTemp"_forceModel_LaEuScalarTemp.html,
+"MeiLift"_forceModel_MeiLift.html,
+"SchillerNaumannDrag"_forceModel_SchillerNaumannDrag.html,
+"ShirgaonkarIB"_forceModel_ShirgaonkarIB.html,
+"fieldStore"_forceModel_fieldStore.html,
+"fieldTimeAverage"_forceModel_fieldTimeAverage.html,
+"gradPForce"_forceModel_gradPForce.html,
+granKineticEnergy,
+"interface"_forceModel_interface.html,
+"noDrag"_forceModel_noDrag.html,
+"particleCellVolume"_forceModel_particleCellVolume.html,
+"pdCorrelation"_forceModel_pdCorrelation.html,
+"virtualMassForce"_forceModel_virtualMassForce.html,
+"viscForce"_forceModel_viscForce.html,
+"volWeightedAverage"_forceModel_volWeightedAverage.html :tb(c=2,ea=c)
+
+
+6.7.1 Force sub-models :h5
+
+The "forceSubModels"_forceSubModel.html keyword specifies a list
+of models that hold settings for a force model.
+
+"ImEx"_forceSubModel_ImEx.html,
+ScaleForce,
+scaleForceBoundary :tb(c=2,ea=c)
+
+
+6.8 LIGGGHTS command models :h4
+
+The "liggghtsCommandModels"_liggghtsCommandModel.html keyword specifies a list
+of models that execute LIGGGHTS commands within a CFD run.
+
+"execute"_liggghtsCommandModel_execute.html,
+"readLiggghtsData"_liggghtsCommandModel_readLiggghtsData.html,
+"runLiggghts"_liggghtsCommandModel_runLiggghts.html,
+"writeLiggghts"_liggghtsCommandModel_writeLiggghts.html :tb(c=2,ea=c)
+
+
+6.9 Locate models :h4
+
+The "locateModel"_locateModel.html keyword entry specifies the model used to
+search the CFD mesh for the CFD cell corresponding to a given position.
+
+"engineSearch"_locateModel_engineSearch.html,
+"engineSearchIB"_locateModel_engineSearchIB.html,
+"engineSearchMany2Many"_locateModel_engineSearchMany2Many.html,
+"standardSearch"_locateModel_standardSearch.html,
+"turboEngineSearch"_locateModel_turboEngineSearch.html :tb(c=2,ea=c)
+
+
+6.10 Mesh motion models :h4
+
+The "meshMotionModel"_meshMotionModel.html keyword entry specifies the model
+used to manipulate the CFD mesh according to the DEM mesh motion.
+
+"noMeshMotion"_meshMotionModel_noMeshMotion.html :tb(c=2,ea=c)
+
+
+6.11 Momentum coupling models :h4
+
+The "momCoupleModels"_momCoupleModel.html keyword specifies a list of models
+used for momentum exchange between DEM and CFD simulation
+
+"explicitCouple"_momCoupleModel_explicitCouple.html,
+"implicitCouple"_momCoupleModel_implicitCouple.html,
+"noCouple"_momCoupleModel_noCouple.html :tb(c=2,ea=c)
+
+
+6.12 Other force models :h4
+
+The {otherForceModels} keyword specifies a list of models that exert a force on
+each DEM particle.
+
+expParticleForces,
+gravity,
+weightSecondaryPhase :tb(c=2,ea=c)
+
+
+6.13 Probe models :h4
+
+The "probeModel"_probeModel.html keyword entry specifies the probing features in
+CFDEMcoupling simulations.
+
+"noProbe"_probeModel_noProbe.html,
+"particleProbe"_probeModel_particleProbe.html :tb(c=2,ea=c)
+
+
+6.14 Region models :h4
+
+The "regionModel"_regionModel.html keyword entry specifies the model used to
+select a certain region for coupled simulations.
+
+"allRegion"_regionModel_allRegion.html :tb(c=2,ea=c)
+
+
+6.15 Smoothing models :h4
+
+The "smoothingModel"_smoothingModel.html keyword entry specifies the model for
+smoothing the exchange fields.
+
+"constDiffSmoothing"_smoothingModel_constDiffSmoothing.html,
+"noSmoothing"_smoothingModel_noSmoothing.html :tb(c=2,ea=c)
+
+
+6.16 Thermal conductivity models :h4
+
+The {thermCondModel} keyword entry specifies the model for the thermal
+conductivity of the fluid phase in the presence of particles.
+
+SyamlalThermCond,
+ZehnerSchluenderThermCond,
+noTherm :tb(c=2,ea=c)
+
+
+6.17 Void fraction models :h4
+
+The "voidfractionModel"_voidFractionModel.html keyword entry specifies the model
+accounting for the volume of the particles in the CFD domain.
+
+"GaussVoidFraction"_voidFractionModel_GaussVoidFraction.html,
+"IBVoidFraction"_voidFractionModel_IBVoidFraction.html,
+"bigParticleVoidFraction"_voidFractionModel_bigParticleVoidFraction.html,
+"centreVoidFraction"_voidFractionModel_centreVoidFraction.html,
+"dividedVoidFraction"_voidFractionModel_dividedVoidFraction.html :tb(c=2,ea=c)
+

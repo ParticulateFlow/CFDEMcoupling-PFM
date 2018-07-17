@@ -1,0 +1,14 @@
+"CFDEMproject Website"_lws - "Main Page"_main :c
+
+:link(lws,http://www.cfdem.com)
+:link(main,CFDEMcoupling_Manual.html)
+
+:line
+
+2. Installation :link(1_2),h3
+
+Please follow the installation routine provided at www.cfdem.com.
+In order to get the latest code version, please use the git repository at
+http://github.com ("githubAccess"_githubAccess_public.html). 
+
+
