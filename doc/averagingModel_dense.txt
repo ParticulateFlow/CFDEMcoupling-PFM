@@ -5,7 +5,7 @@
 
 :line
 
-averagingModel_dense command :h3
+averagingModel dense command :h3
 
 [Syntax:]
 

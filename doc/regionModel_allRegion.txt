@@ -5,7 +5,7 @@
 
 :line
 
-regionModel_allRegion command :h3
+regionModel allRegion command :h3
 
 [Syntax:]
 

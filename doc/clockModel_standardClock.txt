@@ -5,7 +5,7 @@
 
 :line
 
-clockModel_standardClock command :h3
+clockModel standardClock command :h3
 
 [Syntax:]
 

@@ -5,7 +5,7 @@
 
 :line
 
-liggghtsCommandModel_writeLiggghts command :h3
+liggghtsCommandModel writeLiggghts command :h3
 
 [Syntax:]
 

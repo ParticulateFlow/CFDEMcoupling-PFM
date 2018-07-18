@@ -5,7 +5,7 @@
 
 :line
 
-chemistryModel_diffusionCoefficients command :h3
+chemistryModel diffusionCoefficients command :h3
 
 [Syntax:]
 

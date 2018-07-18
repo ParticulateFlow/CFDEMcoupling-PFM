@@ -5,7 +5,7 @@
 
 :line
 
-forceModel_fieldStore command :h3
+forceModel fieldStore command :h3
 
 [Syntax:]
 

@@ -5,7 +5,7 @@
 
 :line
 
-dataExchangeModel_noDataExchange command :h3
+dataExchangeModel noDataExchange command :h3
 
 [Syntax:]
 

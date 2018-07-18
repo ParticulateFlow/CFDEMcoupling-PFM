@@ -5,7 +5,7 @@
 
 :line
 
-momCoupleModel_noCouple command :h3
+momCoupleModel off command :h3
 
 [Syntax:]
 
@@ -26,7 +26,8 @@ momCoupleModels
 
 [Description:]
 
-The noCouple-model is a dummy momCoupleModel model providing a no momentum source term for the CFD solver.
+The {off} model is a dummy momCoupleModel model providing a no momentum source
+term for the CFD solver.
 
 [Restrictions:]
 

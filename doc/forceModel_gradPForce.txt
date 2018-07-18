@@ -5,7 +5,7 @@
 
 :line
 
-forceModel_gradPForce command :h3
+forceModel gradPForce command :h3
 
 [Syntax:]
 

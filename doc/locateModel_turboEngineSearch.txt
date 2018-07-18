@@ -5,7 +5,7 @@
 
 :line
 
-locateModel_turboEngineSearch command :h3
+locateModel turboEngine command :h3
 
 [Syntax:]
 

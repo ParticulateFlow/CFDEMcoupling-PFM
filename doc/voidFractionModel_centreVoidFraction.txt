@@ -5,7 +5,7 @@
 
 :line
 
-voidfractionModel_centreVoidFraction command :h3
+voidfractionModel centre command :h3
 
 [Syntax:]
 

@@ -5,7 +5,7 @@
 
 :line
 
-forceSubModel_ImEx command :h3
+forceSubModel ImEx command :h3
 
 [Syntax:]
 

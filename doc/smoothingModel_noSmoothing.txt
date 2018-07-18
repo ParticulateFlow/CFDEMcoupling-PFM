@@ -5,7 +5,7 @@
 
 :line
 
-smoothingModel_noSmoothing command :h3
+smoothingModel off command :h3
 
 [Syntax:]
 
@@ -19,7 +19,7 @@ smoothingModel off; :pre
 
 [Description:]
 
-The "noSmoothing" model is a dummy smoothingModel model which does no smoothing.
+The {off} model is a dummy smoothingModel model which performs no smoothing.
 
 [Restrictions:] none.
 

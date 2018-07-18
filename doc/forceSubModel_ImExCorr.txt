@@ -5,7 +5,7 @@
 
 :line
 
-forceSubModel_ImExCorr command :h3
+forceSubModel ImExCorr command :h3
 
 [Syntax:]
 

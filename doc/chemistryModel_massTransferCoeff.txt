@@ -5,7 +5,7 @@
 
 :line
 
-chemistryModel_massTransferCoeff command :h3
+chemistryModel massTransferCoeff command :h3
 
 [Syntax:]
 

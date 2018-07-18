@@ -5,7 +5,7 @@
 
 :line
 
-dataExchangeModel_twoWayMPI command :h3
+dataExchangeModel twoWayMPI command :h3
 
 [Syntax:]
 

@@ -5,7 +5,7 @@
 
 :line
 
-averagingModel_dilute command :h3
+averagingModel dilute command :h3
 
 [Syntax:]
 

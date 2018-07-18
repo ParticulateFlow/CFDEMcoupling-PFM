@@ -5,7 +5,7 @@
 
 :line
 
-forceModel_virtualMassForce command :h3
+forceModel virtualMassForce command :h3
 
 [Syntax:]
 

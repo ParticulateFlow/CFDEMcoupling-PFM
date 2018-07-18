@@ -5,7 +5,7 @@
 
 :line
 
-locateModel_standardSearch command :h3
+locateModel standard command :h3
 
 [Syntax:]
 

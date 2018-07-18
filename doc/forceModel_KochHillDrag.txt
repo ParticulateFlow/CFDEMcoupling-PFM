@@ -5,7 +5,7 @@
 
 :line
 
-forceModel_KochHillDrag command :h3
+forceModel KochHillDrag command :h3
 
 [Syntax:]
 

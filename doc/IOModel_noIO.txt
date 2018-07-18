@@ -5,7 +5,7 @@
 
 :line
 
-IOModel_noIO command :h3
+IOModel off command :h3
 
 [Syntax:]
 

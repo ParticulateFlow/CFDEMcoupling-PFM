@@ -5,7 +5,7 @@
 
 :line
 
-forceModel_ArchimedesIB command :h3
+forceModel ArchimedesIB command :h3
 
 [Syntax:]
 

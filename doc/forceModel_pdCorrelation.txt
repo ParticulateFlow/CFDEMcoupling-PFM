@@ -5,7 +5,7 @@
 
 :line
 
-forceModel_pdCorrelation :h3
+forceModel pdCorrelation :h3
 
 [Syntax:]
 

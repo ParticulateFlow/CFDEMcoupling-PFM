@@ -5,7 +5,7 @@
 
 :line
 
-smoothingModel_constDiffSmoothing command :h3
+smoothingModel constDiffSmoothing command :h3
 
 [Syntax:]
 

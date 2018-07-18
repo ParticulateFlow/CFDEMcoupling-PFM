@@ -5,7 +5,7 @@
 
 :line
 
-probeModel_noProbe command :h3
+probeModel off command :h3
 
 [Syntax:]
 

@@ -5,7 +5,7 @@
 
 :line
 
-forceModel_DiFeliceDrag command :h3
+forceModel DiFeliceDrag command :h3
 
 [Syntax:]
 

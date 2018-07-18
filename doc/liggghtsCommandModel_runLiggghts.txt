@@ -5,7 +5,7 @@
 
 :line
 
-liggghtsCommandModel_runLiggghts command :h3
+liggghtsCommandModel runLiggghts command :h3
 
 [Syntax:]
 

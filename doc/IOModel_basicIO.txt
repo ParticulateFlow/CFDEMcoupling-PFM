@@ -5,7 +5,7 @@
 
 :line
 
-IOModel_basicIO command :h3
+IOModel basicIO command :h3
 
 [Syntax:]
 

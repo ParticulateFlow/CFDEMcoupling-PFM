@@ -5,7 +5,7 @@
 
 :line
 
-dataExchangeModel_twoWayMany2Many command :h3
+dataExchangeModel twoWayMany2Many command :h3
 
 [Syntax:]
 

@@ -5,7 +5,7 @@
 
 :line
 
-voidfractionModel_bigParticleVoidFraction command :h3
+voidfractionModel bigParticle command :h3
 
 [Syntax:]
 

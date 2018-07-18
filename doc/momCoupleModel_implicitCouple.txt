@@ -5,7 +5,7 @@
 
 :line
 
-momCoupleModel_implicitCouple command :h3
+momCoupleModel implicitCouple command :h3
 
 [Syntax:]
 

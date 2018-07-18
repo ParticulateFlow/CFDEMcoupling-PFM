@@ -5,7 +5,7 @@
 
 :line
 
-forceModel_noDrag command :h3
+forceModel noDrag command :h3
 
 [Syntax:]
 

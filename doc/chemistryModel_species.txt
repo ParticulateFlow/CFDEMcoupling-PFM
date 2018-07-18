@@ -5,7 +5,7 @@
 
 :line
 
-chemistryModel_species command :h3
+chemistryModel species command :h3
 
 [Syntax:]
 

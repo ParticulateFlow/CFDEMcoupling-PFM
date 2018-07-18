@@ -5,7 +5,7 @@
 
 :line
 
-dataExchangeModel_oneWayVTK command :h3
+dataExchangeModel oneWayVTK command :h3
 
 [Syntax:]
 

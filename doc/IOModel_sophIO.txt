@@ -5,7 +5,7 @@
 
 :line
 
-IOModel_sophIO command :h3
+IOModel sophIO command :h3
 
 [Syntax:]
 

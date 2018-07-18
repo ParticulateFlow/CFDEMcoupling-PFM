@@ -5,7 +5,7 @@
 
 :line
 
-voidfractionModel_dividedVoidFraction command :h3
+voidfractionModel divided command :h3
 
 [Syntax:]
 

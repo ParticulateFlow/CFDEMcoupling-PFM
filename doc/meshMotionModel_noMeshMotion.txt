@@ -5,7 +5,7 @@
 
 :line
 
-meshMotionModel_noMeshMotion command :h3
+meshMotionModel noMeshMotion command :h3
 
 [Syntax:]
 

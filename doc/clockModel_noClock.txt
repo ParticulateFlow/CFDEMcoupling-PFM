@@ -5,7 +5,7 @@
 
 :line
 
-clockModel_noClock command :h3
+clockModel off command :h3
 
 [Syntax:]
 
@@ -19,7 +19,8 @@ clockModel off; :pre
 
 [Description:]
 
-The "noClock" model is a dummy clockModel model which does not measure/evaluate the run time.
+The {off} model is a dummy clockModel model which does not measure/evaluate the
+run time.
 
 [Restrictions:] none.
 

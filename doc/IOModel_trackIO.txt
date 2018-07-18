@@ -5,7 +5,7 @@
 
 :line
 
-IOModel_trackIO command :h3
+IOModel trackIO command :h3
 
 [Syntax:]
 

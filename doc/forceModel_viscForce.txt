@@ -5,7 +5,7 @@
 
 :line
 
-forceModel_viscForce command :h3
+forceModel viscForce command :h3
 
 [Syntax:]
 

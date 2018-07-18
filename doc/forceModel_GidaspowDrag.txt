@@ -5,7 +5,7 @@
 
 :line
 
-forceModel_GidaspowDrag command :h3
+forceModel GidaspowDrag command :h3
 
 [Syntax:]
 
