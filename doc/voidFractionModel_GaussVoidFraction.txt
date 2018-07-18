@@ -40,11 +40,17 @@ GaussProps
 
 [Description:]
 
-The Gauss voidFraction model is supposed to be used when a particle (or its representation) is bigger than a CFD cell. The voidfraction field is set in those cell whose centres are inside the particle. The volume is here distributed according to a Gaussian distribution.
+The {Gauss} voidFraction model is supposed to be used when a particle (or its
+representation) is bigger than a CFD cell. The voidfraction field is set in
+those cell whose centres are inside the particle. The volume is here distributed
+according to a Gaussian distribution.
 
-The region of influence of a particle can be increased artificially by "porosity", which  blows up the particles, but keeps their volume (for voidfraction calculation) constant.
+The region of influence of a particle can be increased artificially by
+"porosity", which  blows up the particles, but keeps their volume (for
+voidfraction calculation) constant.
 
-The particle volume occupied in the CFD domain can be adjusted by the parameter "weight", using Vparticle=dsphere^3*pi/6*weight.
+The particle volume occupied in the CFD domain can be adjusted by the parameter
+"weight", using Vparticle=dsphere^3*pi/6*weight.
 
 [Restrictions:]
 

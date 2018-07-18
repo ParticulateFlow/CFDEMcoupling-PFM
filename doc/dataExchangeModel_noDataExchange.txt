@@ -20,7 +20,8 @@ dataExchangeModel noDataExchange; :pre
 
 [Description:]
 
-The data exchange model performs the data exchange between the DEM code and the CFD code. The noDataExchange model is a dummy model where no data is exchanged.
+The data exchange model performs the data exchange between the DEM code and the
+CFD code. The {noDataExchange} model is a dummy model where no data is exchanged.
 
 [Restrictions:]
 

@@ -59,11 +59,17 @@ LaEuScalarTempProps
 
 [Description:]
 
-This "forceModel" does not influence the particles or the fluid flow! Using the particles' temperature a scalar field representing "particle-fluid heatflux" is calculated. The solver then uses this source field in the scalar transport equation for the temperature. The model for convective heat transfer is based on Li and Mason (2000), A computational investigation of transient heat transfer in  pneumatic transport of granular particles, Pow.Tech 112
+This "force model" does not influence the particles or the fluid flow! Using the
+particles' temperature a scalar field representing "particle-fluid heatflux" is
+calculated. The solver then uses this source field in the scalar transport
+equation for the temperature. The model for convective heat transfer is based on
+Li and Mason (2000), A computational investigation of transient heat transfer in
+pneumatic transport of granular particles, Pow.Tech 112
 
 [Restrictions:]
 
-Goes only with cfdemSolverScalar. The force model has to be the second (!!!) model in the forces list.
+Goes only with cfdemSolverScalar. The force model has to be the second (!!!)
+model in the forces list.
 
 [Related commands:]
 

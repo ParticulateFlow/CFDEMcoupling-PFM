@@ -25,7 +25,8 @@ models in this documentation.
 
 [Description:]
 
-The clockModel is the base class for models to examine the code/algorithm with respect to run time.
+The clockModel is the base class for models to examine the code/algorithm with
+respect to run time.
 
 Main parts of the clockModel classes are written by Josef Kerbl, JKU.
 

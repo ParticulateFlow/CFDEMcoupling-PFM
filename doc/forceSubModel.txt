@@ -9,7 +9,10 @@ forceSubModel command :h3
 
 [Syntax:]
 
-Defined in couplingProperties sub-dictionary of the force model in use. If no force sub-model is applied ImEx is used as default. If the keyword "forceSubModels" is provided, a choice of sub model is demanded.
+Defined in "couplingProperties"_CFDEMcoupling_dicts.html#couplingProperties
+sub-dictionary of the force model in use. If no force sub-model is applied, ImEx
+is used as default. If the keyword "forceSubModels" is provided, a choice of
+sub-model is demanded.
 
 forceSubModels
 (
@@ -31,7 +34,8 @@ NOTE: This examples list might not be complete - please look for other models
 
 [Description:]
 
-The force sub model is designed to hold the settings a force model can have. For now it handles the treatExplicit, treatDEM and implDEM option. 
+The force sub model is designed to hold the settings a force model can have.
+For now it handles the treatExplicit, treatDEM and implDEM option. 
 
 [Restrictions:]
 

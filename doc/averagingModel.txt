@@ -27,7 +27,8 @@ models in this documentation.
 
 [Description:]
 
-The averaging model performs the Lagrangian->Eulerian mapping of data (e.g. particle velocities).
+The averaging model performs the Lagrangian->Eulerian mapping of data (e.g.
+particle velocities).
 
 [Restrictions:]
 

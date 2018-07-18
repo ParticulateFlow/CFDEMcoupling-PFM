@@ -25,7 +25,8 @@ NOTE: This examples list might not be complete - please look for other models
 
 [Description:]
 
-The voidfractionModel is the base class for models to represent the DEM particle's volume in the CFD domain via a voidfraction field.
+The {voidfractionModel} is the base class for models to represent the DEM
+particle's volume in the CFD domain via a void fraction field.
 
 [Restrictions:]
 

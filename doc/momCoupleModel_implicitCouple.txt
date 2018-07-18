@@ -45,7 +45,8 @@ implicitCoupleProps
 
 [Description:]
 
-The implicitCouple-model is a momCoupleModel model providing an implicit momentum source term for the CFD solver.
+The {implicitCouple} model is a momCoupleModel model providing an implicit
+momentum source term for the CFD solver.
 
 [Restrictions:]
 

@@ -34,9 +34,11 @@ centreProps
 
 [Description:]
 
-The centre voidFraction model calculates the voidfraction in a CFD cell accounting for the volume of the particles whose centres are inside the cell.
+The {centre} voidFraction model calculates the voidfraction in a CFD cell
+accounting for the volume of the particles whose centres are inside the cell.
 
-The particle volume occupied in the CFD domain can be adjusted by the parameter "weight", using Vparticle=dsphere^3*pi/6*weight.
+The particle volume occupied in the CFD domain can be adjusted by the parameter
+"weight", using Vparticle=dsphere^3*pi/6*weight.
 
 [Restrictions:]
 

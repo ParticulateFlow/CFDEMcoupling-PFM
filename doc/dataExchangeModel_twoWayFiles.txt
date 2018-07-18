@@ -34,7 +34,10 @@ twoWayFilesProps
 
 [Description:]
 
-The data exchange model performs the data exchange between the DEM code and the CFD code. The twoWayFiles model is a model that can exchange particle properties from DEM to CFD and from CFD to DEM. Data is exchanged via files that are sequentially written/read by the codes.
+The data exchange model performs the data exchange between the DEM code and the
+CFD code. The {twoWayFiles} model is a model that can exchange particle
+properties from DEM to CFD and from CFD to DEM. Data is exchanged via files that
+are sequentially written/read by the codes.
 
 [Restrictions:]
 

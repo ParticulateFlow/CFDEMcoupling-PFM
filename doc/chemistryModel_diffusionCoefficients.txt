@@ -45,7 +45,10 @@ diffusionCoefficientsProps
 
 [Description:]
 
-The chemistry model performs the calculation of chemical reactional effects acting on each DEM particle. The diffusionCoefficients model activates the binary molecular diffusion calculation of the reacting species using the Fuller-Schettler-Giddings correlation.
+The chemistry model performs the calculation of chemical reactional effects
+acting on each DEM particle. The diffusionCoefficients model activates the
+binary molecular diffusion calculation of the reacting species using the
+Fuller-Schettler-Giddings correlation.
 
 [Restrictions:]
 

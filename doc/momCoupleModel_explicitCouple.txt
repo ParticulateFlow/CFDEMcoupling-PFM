@@ -37,7 +37,8 @@ explicitCoupleProps
 
 [Description:]
 
-The explicitCouple-model is a momCoupleModel model providing an explicit momentum source term for the CFD solver.
+The {explicitCouple} model is a momCoupleModel model providing an explicit
+momentum source term for the CFD solver.
 
 [Restrictions:]
 

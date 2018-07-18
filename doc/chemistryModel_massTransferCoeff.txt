@@ -37,7 +37,10 @@ massTransferCoeffProps
 
 [Description:]
 
-The chemistry model performs the calculation of chemical reactional effects acting on each DEM particle. The coeffs needed to calculate the mass transfer coefficients are transferred to the DEM side, where it is used in the fix_chem_shrink_core module.
+The chemistry model performs the calculation of chemical reactional effects
+acting on each DEM particle. The coefficients needed to calculate the mass
+transfer coefficients are transferred to the DEM side, where it is used in the
+{fix chem/shrink/core} module.
 
 [Restrictions:]
 

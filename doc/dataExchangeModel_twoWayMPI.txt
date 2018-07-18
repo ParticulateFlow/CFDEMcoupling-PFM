@@ -31,7 +31,10 @@ twoWayMPIProps
 
 [Description:]
 
-The data exchange model performs the data exchange between the DEM code and the CFD code. The twoWayMPI model is a model that can exchange particle properties from DEM to CFD and from CFD to DEM. Data is exchanged via MPI technique. The DEM run is executed by the coupling model, via a liggghtsCommandModel object.
+The data exchange model performs the data exchange between the DEM code and the
+CFD code. The {twoWayMPI} model is a model that can exchange particle properties
+from DEM to CFD and from CFD to DEM. Data is exchanged via MPI technique. The
+DEM run is executed by the coupling model, via a {liggghtsCommandModel} object.
 
 [Restrictions:]
 

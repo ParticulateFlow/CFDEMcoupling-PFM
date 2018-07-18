@@ -26,7 +26,8 @@ NOTE: This examples list might not be complete - please look for other models
 
 [Description:]
 
-The data exchange model performs the data exchange between the DEM code and the CFD code.
+The data exchange model performs the data exchange between the DEM code and the
+CFD code.
 
 [Restrictions:]
 

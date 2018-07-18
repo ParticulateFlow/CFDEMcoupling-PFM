@@ -41,7 +41,10 @@ liggghtsCommandModels
 
 [Description:]
 
-The liggghtsCommand models can be used to execute a LIGGGHTS command during a CFD write. The "writeLiggghts" command executes the command "write_restart $name", where $name is the name of the restart file, every write step.
+The liggghtsCommand models can be used to execute a LIGGGHTS command during a
+CFD write. The {writeLiggghts} command executes the command
+"write_restart $name" - where $name is the name of the restart file - every
+write step.
 
 [Restrictions:]
 

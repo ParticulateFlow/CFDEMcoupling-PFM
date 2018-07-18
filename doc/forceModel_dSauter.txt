@@ -30,7 +30,8 @@ whitespace, optional :ulb,l
 
 [Description:]
 
-This "forceModel" does not influence the particles or the flow - it calculates the Sauter diameter
+This "force model" does not influence the particles or the flow - it calculates
+the Sauter diameter
 
 :c,image(Eqs/d32.png)
 .

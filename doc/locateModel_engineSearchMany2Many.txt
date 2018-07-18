@@ -37,7 +37,8 @@ engineSearchMany2ManyProps
 
 [Description:]
 
-The locateModel "engine" locates the CFD cell and cellID corresponding to a given position. This model is a dummy for the "twoWayMany2Many" dataExchangeModel which locates using the specified "engine" during coupling. Using this model with any other dataExchangeModel will cause problems.
+The locateModel "engine" locates the CFD cell and cellID corresponding to a
+given position.
 
 The engineSearchMany2Many locateModel can be used with different settings to use different algorithms:
 

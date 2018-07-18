@@ -40,7 +40,9 @@ oneWayVTKProps
 
 [Description:]
 
-The data exchange model performs the data exchange between the DEM code and the CFD code. The oneWayVTK model is a model that can exchange particle properties from DEM to CFD based on previously stored VTK data.
+The data exchange model performs the data exchange between the DEM code and the
+CFD code. The {oneWayVTK} model is a model that can exchange particle properties
+from DEM to CFD based on previously stored VTK data.
 
 [Restrictions:]
 

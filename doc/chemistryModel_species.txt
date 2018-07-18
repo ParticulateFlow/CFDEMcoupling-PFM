@@ -52,7 +52,11 @@ speciesProps
 
 [Description:]
 
-The chemistry model performs the calculation of chemical reactional effects acting on each DEM particle. The species model is the model, where the specified species fields (from the foam.inp folder) are intialized, and information such as temperature, density, molar concentration and more importantly the molar fractions are transferred to DEM side.
+The chemistry model performs the calculation of chemical reactional effects
+acting on each DEM particle. The species model is the model, where the specified
+species fields (from the foam.inp folder) are intialized, and information such
+as temperature, density, molar concentration and more importantly the molar
+fractions are transferred to DEM side.
 
 [Restrictions:]
 

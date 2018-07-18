@@ -37,7 +37,10 @@ ArchimedesProps
 
 [Description:]
 
-The force model performs the calculation of forces (e.g. fluid-particle interaction forces) acting on each DEM particle. The Archimedes model is a model that calculates the Archimedes' volumetric lift force stemming from density difference of fluid and particle.
+The force model performs the calculation of forces (e.g. fluid-particle
+interaction forces) acting on each DEM particle. The {Archimedes} model is a
+model that calculates the Archimedes' volumetric lift force stemming from
+density difference of fluid and particle.
 
 [Restrictions:]
 

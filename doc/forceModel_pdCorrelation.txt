@@ -38,12 +38,15 @@ pdCorrelationProps
 
 [Description:]
 
-This "forceModel" does not influence the particles or the flow - it calculates the particle momentum-diameter correlation 
+This "forceModel" does not influence the particles or the flow - it calculates
+the particle momentum-diameter correlation
 
 :c,image(Eqs/pdCorrelation.png)
 where delta is the type-specific coarsegraining factor. 
 
-This model is sensitive to additionally pulled particle type info, and can either use the type-specific densities from the dict or those pulled from LIGGGHTS.
+This model is sensitive to additionally pulled particle type info, and can
+either use the type-specific densities from the dictionary or those pulled from
+LIGGGHTS.
 
 [Restrictions:]
 

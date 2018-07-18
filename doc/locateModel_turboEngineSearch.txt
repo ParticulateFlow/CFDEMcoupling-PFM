@@ -31,12 +31,17 @@ turboEngineProps
 
 [Description:]
 
-The locateModel "turboEngine" locates the CFD cell and cellID corresponding to a given position. The algorithm is improved compared to engine search to show better parallel performance.
+The locateModel {turboEngine} locates the CFD cell and cellID corresponding to a
+given position. The algorithm is improved compared to engine search to show
+better parallel performance.
 
-The turboEngineSearch locate Model can be used with different settings to use different algorithms:
+The turboEngineSearch locate Model can be used with different settings to use
+different algorithms:
 
-faceDecomp false; treeSearch false;     will execute some geometric (linear) search using the last known cellID :ulb,l
-faceDecomp false; treeSearch true;      will use a recursive tree structure to find the cell. (recommended):l
+faceDecomp false; treeSearch false;  will execute some geometric (linear) search
+using the last known cellID :ulb,l
+faceDecomp false; treeSearch true;   will use a recursive tree structure to find
+the cell. (recommended) :l
 :ule
 
 [Restrictions:]

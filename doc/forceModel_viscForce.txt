@@ -39,7 +39,11 @@ viscForceProps
 
 [Description:]
 
-The force model performs the calculation of forces (e.g. fluid-particle interaction forces) acting on each DEM particle. The viscForce model calculates the particle based viscous force, -(grad(tau)) * Vparticle (see Zhou et al. (2010): "Discrete particle simulation of particle-fluid flow: model formulations and their applicability", JFM).
+The force model performs the calculation of forces (e.g. fluid-particle
+interaction forces) acting on each DEM particle. The {viscForce} model
+calculates the particle based viscous force, -(grad(tau)) * Vparticle
+(see Zhou et al. (2010): "Discrete particle simulation of particle-fluid flow:
+model formulations and their applicability", J. Fluid Mech.).
 
 [Restrictions:]
 
