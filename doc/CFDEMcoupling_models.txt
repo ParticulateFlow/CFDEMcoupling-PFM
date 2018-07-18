@@ -16,7 +16,7 @@ The "IOModel"_IOModel.html keyword entry specifies the model for writing output
 data.
 
 "basicIO"_IOModel_basicIO.html,
-"noIO"_IOModel_noIO.html,
+"off"_IOModel_noIO.html,
 "sophIO"_IOModel_sophIO.html,
 "trackIO"_IOModel_trackIO.html :tb(c=2,ea=c)
 
@@ -37,7 +37,7 @@ models used for chemical reaction calculations.
 
 "diffusionCoefficients"_chemistryModel_diffusionCoefficients.html,
 "massTransferCoeff"_chemistryModel_massTransferCoeff.html,
-noChemistry,
+"off"_chemistryModel_noChemistry.html,
 reactantPerParticle,
 "species"_chemistryModel_species.html :tb(c=2,ea=c)
 
@@ -47,7 +47,7 @@ reactantPerParticle,
 The "clockModel"_clockModel.html keyword entry specifies the model used to
 examine the CFDEMcoupling code with respect to runtime.
 
-"noClock"_clockModel_noClock.html,
+"off"_clockModel_noClock.html,
 "standardClock"_clockModel_standardClock.html :tb(c=2,ea=c)
 
 
@@ -81,7 +81,7 @@ a force on each DEM particle.
 
 "Archimedes"_forceModel_Archimedes.html,
 "ArchimedesIB"_forceModel_ArchimedesIB.html,
-BeetstraDrag,
+"BeetstraDrag"_forceModel_BeetstraDrag.html,
 BeetstraDragPoly,
 "DiFeliceDrag"_forceModel_DiFeliceDrag.html,
 "dSauter"_forceModel_dSauter.html,
@@ -115,7 +115,7 @@ ScaleForce,
 scaleForceBoundary :tb(c=2,ea=c)
 
 
-6.8 LIGGGHTS command models :h4
+6.8 LIGGGHTS command models :h4,link(lcm)
 
 The "liggghtsCommandModels"_liggghtsCommandModel.html keyword specifies a list
 of models that execute LIGGGHTS commands within a CFD run.
@@ -131,11 +131,11 @@ of models that execute LIGGGHTS commands within a CFD run.
 The "locateModel"_locateModel.html keyword entry specifies the model used to
 search the CFD mesh for the CFD cell corresponding to a given position.
 
-"engineSearch"_locateModel_engineSearch.html,
-"engineSearchIB"_locateModel_engineSearchIB.html,
+"engine"_locateModel_engineSearch.html,
+"engineIB"_locateModel_engineSearchIB.html,
 "engineSearchMany2Many"_locateModel_engineSearchMany2Many.html,
-"standardSearch"_locateModel_standardSearch.html,
-"turboEngineSearch"_locateModel_turboEngineSearch.html :tb(c=2,ea=c)
+"standard"_locateModel_standardSearch.html,
+"turboEngine"_locateModel_turboEngineSearch.html :tb(c=2,ea=c)
 
 
 6.10 Mesh motion models :h4
@@ -153,7 +153,7 @@ used for momentum exchange between DEM and CFD simulation
 
 "explicitCouple"_momCoupleModel_explicitCouple.html,
 "implicitCouple"_momCoupleModel_implicitCouple.html,
-"noCouple"_momCoupleModel_noCouple.html :tb(c=2,ea=c)
+"off"_momCoupleModel_noCouple.html :tb(c=2,ea=c)
 
 
 6.12 Other force models :h4
@@ -171,7 +171,7 @@ weightSecondaryPhase :tb(c=2,ea=c)
 The "probeModel"_probeModel.html keyword entry specifies the probing features in
 CFDEMcoupling simulations.
 
-"noProbe"_probeModel_noProbe.html,
+"off"_probeModel_noProbe.html,
 "particleProbe"_probeModel_particleProbe.html :tb(c=2,ea=c)
 
 
@@ -189,7 +189,7 @@ The "smoothingModel"_smoothingModel.html keyword entry specifies the model for
 smoothing the exchange fields.
 
 "constDiffSmoothing"_smoothingModel_constDiffSmoothing.html,
-"noSmoothing"_smoothingModel_noSmoothing.html :tb(c=2,ea=c)
+"off"_smoothingModel_noSmoothing.html :tb(c=2,ea=c)
 
 
 6.16 Thermal conductivity models :h4
@@ -207,9 +207,9 @@ noTherm :tb(c=2,ea=c)
 The "voidfractionModel"_voidFractionModel.html keyword entry specifies the model
 accounting for the volume of the particles in the CFD domain.
 
-"GaussVoidFraction"_voidFractionModel_GaussVoidFraction.html,
-"IBVoidFraction"_voidFractionModel_IBVoidFraction.html,
-"bigParticleVoidFraction"_voidFractionModel_bigParticleVoidFraction.html,
-"centreVoidFraction"_voidFractionModel_centreVoidFraction.html,
-"dividedVoidFraction"_voidFractionModel_dividedVoidFraction.html :tb(c=2,ea=c)
+"Gauss"_voidFractionModel_GaussVoidFraction.html,
+"IB"_voidFractionModel_IBVoidFraction.html,
+"bigParticle"_voidFractionModel_bigParticleVoidFraction.html,
+"centre"_voidFractionModel_centreVoidFraction.html,
+"divided"_voidFractionModel_dividedVoidFraction.html :tb(c=2,ea=c)
 
