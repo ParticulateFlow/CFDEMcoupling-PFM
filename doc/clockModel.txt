@@ -29,6 +29,10 @@ The clockModel is the base class for models to examine the code/algorithm with r
 
 Main parts of the clockModel classes are written by Josef Kerbl, JKU.
 
-[Restrictions:] none.
+[Restrictions:]
 
-[Default:] none.
+none
+
+[Default:]
+
+none

@@ -38,6 +38,11 @@ Note that the switch "treatVoidCellsAsExplicitForce true;" can be set in the cou
 
 The momCoupleModel is the base class for momentum exchange between DEM and CFD simulation.
 
-[Restrictions:] none.
+[Restrictions:]
 
-[Default:] none.
+none
+
+[Default:]
+
+none
+

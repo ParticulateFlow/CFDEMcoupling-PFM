@@ -48,7 +48,9 @@ The particle volume occupied in the CFD domain can be adjusted by the parameter 
 
 Parts of this sub-model contributed by Alice Hager, JKU.
 
-[Restrictions:] none.
+[Restrictions:]
+
+none
 
 [Related commands:]
 

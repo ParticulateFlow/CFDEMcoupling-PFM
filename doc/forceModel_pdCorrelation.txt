@@ -47,7 +47,7 @@ This model is sensitive to additionally pulled particle type info, and can eithe
 
 [Restrictions:]
 
-none.
+none
 
 [Related commands:]
 

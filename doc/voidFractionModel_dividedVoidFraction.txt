@@ -46,7 +46,9 @@ The particle volume occupied in the CFD domain can be adjusted by the parameter 
 In the basic implementation of solvers, the void fraction is calculated based on all particles. Depending on the solver used, the void fraction calculation is also performed for a certain type of particles.
 The void fraction calculation is based on a three-step approach (reset, set and interpolate), i.e., the void fraction is time interpolated from a previous and a next void fraction field. Appropriate names for these fields have to be specified in the sub-dictionaries voidFracFieldNamesPrev and voidFracFieldNamesNext in the couplingProperties dictionary.
 
-[Restrictions:] none.
+[Restrictions:]
+
+none
 
 [Related commands:]
 

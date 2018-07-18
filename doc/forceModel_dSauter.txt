@@ -38,8 +38,9 @@ This "forceModel" does not influence the particles or the flow - it calculates t
 
 [Restrictions:]
 
-none.
+none
 
 [Related commands:]
 
 "forceModel"_forceModel.html
+

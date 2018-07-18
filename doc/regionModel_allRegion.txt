@@ -24,7 +24,9 @@ regionModel allRegion; :pre
 
 The allRegion-model is a region model including the whole CFD region for the coupling.
 
-[Restrictions:] None.
+[Restrictions:]
+
+none
 
 [Related commands:]
 

@@ -22,7 +22,9 @@ IOModel sophIO; :pre
 
 The sophIO-model is based on basicIO model and additionally writes voidfraction, implicit forces, explicit forces. Data is written every write time of the CFD simulation.
 
-[Restrictions:] None.
+[Restrictions:]
+
+none
 
 [Related commands:]
 

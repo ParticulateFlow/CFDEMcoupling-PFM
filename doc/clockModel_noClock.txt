@@ -23,7 +23,9 @@ clockModel off; :pre
 The {off} model is a dummy clockModel model which does not measure/evaluate the
 run time.
 
-[Restrictions:] none.
+[Restrictions:]
+
+none
 
 [Related commands:]
 

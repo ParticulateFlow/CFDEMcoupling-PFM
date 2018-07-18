@@ -30,7 +30,7 @@ The data exchange model performs the data exchange between the DEM code and the 
 
 [Restrictions:]
 
-None.
+none
 
 [Related commands:]
 
@@ -39,4 +39,6 @@ None.
 "twoWayFiles"_dataExchangeModel_twoWayFiles.html,
 "twoWayMPI"_dataExchangeModel_twoWayMPI.html
 
-[Default:] none
+[Default:]
+
+none

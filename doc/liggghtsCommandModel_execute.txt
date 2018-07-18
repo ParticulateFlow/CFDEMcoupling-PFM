@@ -82,7 +82,9 @@ The execute liggghtsCommand Model can be used to execute a LIGGGHTS command duri
 NOTE: These rather complex execute commands can be replaced by the
 {runLiggghts} and {writeLiggghts} commands!
 
-[Restrictions:] None.
+[Restrictions:]
+
+none
 
 [Related commands:]
 

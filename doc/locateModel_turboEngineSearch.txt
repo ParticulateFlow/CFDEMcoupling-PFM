@@ -39,7 +39,9 @@ faceDecomp false; treeSearch false;     will execute some geometric (linear) sea
 faceDecomp false; treeSearch true;      will use a recursive tree structure to find the cell. (recommended):l
 :ule
 
-[Restrictions:] none.
+[Restrictions:]
+
+none
 
 [Related commands:]
 

@@ -27,10 +27,13 @@ Does not perform any probing.
 
 [Restrictions:]
 
-None.
+none
 
-[Related commands which are currently enabled for particle probing:]
+[Related commands:]
 
 "particleProbe"_probeModel_particleProbe.html
 
-[Default:] none.
+[Default:]
+
+none
+

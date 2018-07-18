@@ -29,12 +29,14 @@ The IO-model is the base class to write data (e.g. particle properties) to files
 
 [Restrictions:]
 
-none.
+none
 
 [Related commands:]
 
 "IOModel basicIO"_IOModel_basicIO.html, "IOModel off"_IOModel_noIO.html,
 "IOModel sophIO"_IOModel_sophIO.html, "IOModel trackIO"_IOModel_trackIO.html
 
+[Default:]
 
-[Default:] none.
+none
+

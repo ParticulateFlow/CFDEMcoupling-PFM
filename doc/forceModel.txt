@@ -37,7 +37,7 @@ The force model performs the calculation of forces (e.g. fluid-particle interact
 
 [Restrictions:]
 
-None.
+none
 
 [Related commands:]
 
@@ -45,4 +45,7 @@ None.
 "gradPForce"_forceModel_gradPForce.html, "viscForce"_forceModel_viscForce.html,
 "dSauter"_forceModel_dSauter.html
 
-[Default:] none.
+[Default:]
+
+none
+

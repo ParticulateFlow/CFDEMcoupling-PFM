@@ -38,7 +38,9 @@ The centre voidFraction model calculates the voidfraction in a CFD cell accounti
 
 The particle volume occupied in the CFD domain can be adjusted by the parameter "weight", using Vparticle=dsphere^3*pi/6*weight.
 
-[Restrictions:] none.
+[Restrictions:]
+
+none
 
 [Related commands:]
 

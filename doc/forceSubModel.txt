@@ -35,11 +35,13 @@ The force sub model is designed to hold the settings a force model can have. For
 
 [Restrictions:]
 
-None.
+none
 
 [Related commands:]
 
 "ImEx"_forceSubModel_ImEx.html
 
+[Default:]
 
-[Default:] none.
+none
+

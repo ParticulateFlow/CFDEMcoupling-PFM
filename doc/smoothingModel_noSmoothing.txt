@@ -22,7 +22,9 @@ smoothingModel off; :pre
 
 The {off} model is a dummy smoothingModel model which performs no smoothing.
 
-[Restrictions:] none.
+[Restrictions:]
+
+none
 
 [Related commands:]
 

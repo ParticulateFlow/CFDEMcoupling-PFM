@@ -35,8 +35,11 @@ NOTE: This examples list might not be complete - please look for other models
 
 The liggghtsCommandModel is the base class to execute DEM commands within a CFD run.
 
-[Restrictions:] 
+[Restrictions:]
 
 Works only with MPI coupling.
 
-[Default:] none.
+[Default:]
+
+none
+

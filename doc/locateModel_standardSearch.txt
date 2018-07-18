@@ -23,7 +23,9 @@ locateModel standard; :pre
 The locateModel "standard" locates the CFD cell and cellID corresponding to a given position. A very straight-forward (robust!) locate algorithm is used.
 
 
-[Restrictions:] none.
+[Restrictions:]
+
+none
 
 [Related commands:]
 

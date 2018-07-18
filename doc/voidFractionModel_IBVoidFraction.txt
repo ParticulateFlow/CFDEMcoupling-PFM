@@ -43,7 +43,9 @@ The region of influence of a particle can be increased artificially by "scaleUpV
 
 Code of this sub-model contributed by Alice Hager, JKU.
 
-[Restrictions:] none.
+[Restrictions:]
+
+none
 
 [Related commands:]
 

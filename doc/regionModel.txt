@@ -29,6 +29,11 @@ NOTE: This examples list might not be complete - please look for other models
 
 The regionModel is the base class for region models to select a certain region for coupled simulation.
 
-[Restrictions:] none.
+[Restrictions:]
 
-[Default:] none.
+none
+
+[Default:]
+
+none
+

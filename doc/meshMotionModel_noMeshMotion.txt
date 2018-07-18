@@ -22,7 +22,9 @@ meshMotionModel noMeshMotion; :pre
 
 The noMeshMotion-model is a dummy meshMotion model.
 
-[Restrictions:] None.
+[Restrictions:]
+
+none
 
 [Related commands:]
 

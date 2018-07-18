@@ -56,7 +56,7 @@ This "forceModel" does not influence the particles or the flow - it is a tool to
 
 [Restrictions:]
 
-none.
+none
 
 [Related commands:]
 

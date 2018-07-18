@@ -24,7 +24,9 @@ The "standardClock" model is a basic clockModel model which measures the run tim
 Since the measurements are stored in an array, it is necessary to put a variable {arrayPos} (type integer) at the start command. Those do not need to be in ascending order and positions may be omitted. The standard size of this array is 30 and can be changed at the initialization of the standardClock class. If {arrayPos} is out of bounds, the array size will be doubled. The stop command does not need {arrayPos}, since the class remembers the positions. The string name is intended for easier evaluation afterwards an may be omitted like ".start(int arrayPos)" and ".stop()". The command ".stop(string name)" is a safety feature, because if the name is not equal to the started name, output will be produced for information.
 After the case ran you may use the matPlot.py script located in $CFDEM_UT_DIR/vizClock/ to produce a graphical output of your measurements. The usage is like 'python < matPlot.py' and you have to be in the directory of the desired time step, where there is a file called "timeEvalFull.txt", which contains averaged and maximum data with respect to the number of processes. There is an alias called "vizClock" to run this python routine for visualizing the data.
 
-[Restrictions:] none.
+[Restrictions:]
+
+none
 
 [Related commands:]
 

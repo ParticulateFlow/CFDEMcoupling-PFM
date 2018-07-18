@@ -35,7 +35,7 @@ The chemistry model initializes the required fields for the calculation of molar
 
 [Restrictions:]
 
-None.
+none
 
 [Related commands:]
 
@@ -43,4 +43,6 @@ None.
 "massTransferCoeff"_chemistryModel_massTransferCoeff.html,
 "species"_chemistryModel_species.html
 
-[Default:] none.
+[Default:]
+
+none

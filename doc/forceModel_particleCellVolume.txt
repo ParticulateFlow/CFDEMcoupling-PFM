@@ -47,7 +47,7 @@ At "writeTime" a field named particleCellVolume , where scalarField is the name 
 
 [Restrictions:]
 
-None.
+none
 
 [Related commands:]
 

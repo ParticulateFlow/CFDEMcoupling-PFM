@@ -35,7 +35,7 @@ The data exchange model performs the data exchange between the DEM code and the 
 
 [Restrictions:]
 
-none.
+none
 
 [Related commands:]
 

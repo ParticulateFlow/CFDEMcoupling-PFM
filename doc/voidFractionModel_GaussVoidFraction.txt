@@ -46,7 +46,9 @@ The region of influence of a particle can be increased artificially by "porosity
 
 The particle volume occupied in the CFD domain can be adjusted by the parameter "weight", using Vparticle=dsphere^3*pi/6*weight.
 
-[Restrictions:] none.
+[Restrictions:]
+
+none
 
 [Related commands:]
 

@@ -22,7 +22,9 @@ IOModel off; :pre
 
 The noIO-model is a dummy IO model.
 
-[Restrictions:] None.
+[Restrictions:]
+
+none
 
 [Related commands:]
 

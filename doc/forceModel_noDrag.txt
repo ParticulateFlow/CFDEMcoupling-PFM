@@ -41,7 +41,7 @@ The force model performs the calculation of forces (e.g. fluid-particle interact
 
 [Restrictions:]
 
-None.
+none
 
 [Related commands:]
 

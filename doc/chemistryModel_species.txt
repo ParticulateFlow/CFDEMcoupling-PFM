@@ -56,7 +56,7 @@ The chemistry model performs the calculation of chemical reactional effects acti
 
 [Restrictions:]
 
-none.
+none
 
 [Related commands:]
 

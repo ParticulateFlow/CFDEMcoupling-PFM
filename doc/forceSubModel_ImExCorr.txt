@@ -35,7 +35,7 @@ treatExplicit true;  // optional for some force models. :pre
 
 [Restrictions:]
 
-none.
+none
 
 [Related commands:]
 

@@ -27,6 +27,11 @@ NOTE: This examples list might not be complete - please look for other models
 
 The locateModel is the base class for models which search for the CFD cell and cellID corresponding to a position. In general it is used to find the cell a particle is located in.
 
-[Restrictions:] none.
+[Restrictions:]
 
-[Default:] none.
+none
+
+[Default:]
+
+none
+

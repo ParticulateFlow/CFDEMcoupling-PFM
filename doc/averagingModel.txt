@@ -31,10 +31,13 @@ The averaging model performs the Lagrangian->Eulerian mapping of data (e.g. part
 
 [Restrictions:]
 
-None.
+none
 
 [Related commands:]
 
 "dense"_averagingModel_dense.html, "dilute"_averagingModel_dilute.html
 
-[Default:] none
+[Default:]
+
+none
+
