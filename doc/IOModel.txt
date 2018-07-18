@@ -25,7 +25,7 @@ in this documentation.
 
 [Description:]
 
-The IO-model is the base class to write data (e.g. particle properties) to files.
+{IOModel} is the base class to write data (e.g. particle properties) to files.
 
 [Restrictions:]
 

@@ -52,7 +52,7 @@ Fuller-Schettler-Giddings correlation.
 
 [Restrictions:]
 
-Species model needs to be active.
+The "species"_chemistryModel_species.html model needs to be active.
 
 [Related commands:]
 

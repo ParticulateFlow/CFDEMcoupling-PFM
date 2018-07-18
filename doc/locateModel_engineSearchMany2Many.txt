@@ -40,7 +40,8 @@ engineSearchMany2ManyProps
 The locateModel "engine" locates the CFD cell and cellID corresponding to a
 given position.
 
-The engineSearchMany2Many locateModel can be used with different settings to use different algorithms:
+The {engineSearchMany2Many} locateModel can be used with different settings to
+use different algorithms:
 
 treeSearch false;  will execute some geometric (linear) search using the last
 known cellID (recommended) :ulb,l

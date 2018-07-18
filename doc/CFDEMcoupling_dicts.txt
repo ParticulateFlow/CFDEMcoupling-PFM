@@ -7,11 +7,11 @@
 
 4. Dictionaries :link(1_4),h3
 
-4.1 "couplingProperties" dictionary :link(couplingProperties),h4
+4.1 couplingProperties dictionary :link(couplingProperties),h4
 
 [General:]
 
-In the "couplingProperties" dictionary the setup of the coupling routines of the
+In the {couplingProperties} dictionary the setup of the coupling routines of the
 CFD-DEM simulation are defined.
 
 [Location:] $caseDir/CFD/constant
@@ -42,7 +42,7 @@ specific parameters.
 
 [Settings:]
 
-Reasonable example settings for the "couplingProperties" dictionary are given in
+Reasonable example settings for the {couplingProperties} dictionary are given in
 the tutorial cases.
 
 modelType :pre
@@ -69,29 +69,31 @@ Choose the CFD timestep in the controlDict. It must be equal to or smaller than
 the coupling time, otherwise you will get the error: "Error - TS bigger than
 coupling interval!". :l,ole
 
-Example: DEMts=0.00001s, couplingInterval=10 exchange data (=couple) will happen
-every 0.0001s.
+[Example:]
+
+Choosing DEMts=0.00001s and couplingInterval=10 means that an exchange of data
+(=coupling) will happen every 0.0001s.
 
 :line
 
-4.2 "liggghtsCommands" dictionary :link(liggghtsCommands),h4
+4.2 liggghtsCommands dictionary :link(liggghtsCommands),h4
 
 [General:]
 
-In the "liggghtsCommands" dictionary liggghts commands being executed during a
-coupled CFD-DEM simulation are specified.
+In the {liggghtsCommands} dictionary LIGGGHTS commands which are to be executed
+during a coupled CFD-DEM simulation are specified.
 
 [Location:] $caseDir/CFD/constant
 
 [Structure:]
 
 The dictionary is divided into two parts, first a list of
-"liggghtsCommandModels" is defined, then the settings for each model must be
-specified.
+"liggghtsCommandModels"_CFDEMcoupling_models.html#lcm is defined, then the
+settings for each model must be specified.
 
 [Settings:]
 
-Reasonable example settings for the "liggghtsCommands" dictionary are given in
+Reasonable example settings for the {liggghtsCommands} dictionary are given in
 the tutorial cases.
 
 

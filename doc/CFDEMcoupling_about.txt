@@ -34,7 +34,7 @@ The file structure:
 {tutorials} directory including basic tutorial cases showing the functionality  :l
 :ule
 
-Details on installation are given on the "CFDEMproject WWW Site"_lig .
+Details on installation are given on the "CFDEMproject Website"_lig .
 The functionality of this CFD-DEM framework is described via "tutorial
 cases"_CFDEMcoupling_tutorials.html showing how to use different solvers and
 models.

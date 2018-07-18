@@ -9,15 +9,15 @@
 
 [General:]
 
-Each solver of the CFDEMcoupling comes with at least one tutorial example,
-showing its functionality and correct usage. Provided that the installation is
-correct, the tutorials can be run via "Allrun.sh" shell scripts. These scripts
-perform all necessary steps (preprocessing, run, postprocessing, visualization).
+Each solver of CFDEMcoupling comes with at least one tutorial example, showing
+its functionality and correct usage. Provided that the installation is correct,
+the tutorials can be run via "Allrun.sh" shell scripts. These scripts perform
+all necessary steps (preprocessing, run, postprocessing, visualization).
 
 [Location:]
 
-The tutorials can be found in the directory $CFDEM_PROJECT_DIR/tutorials, which
-can be reached by typing "cfdemTut"
+The tutorials can be found in the directory $CFDEM_PROJECT_DIR/tutorials,
+which can be reached by typing {cfdemTut} in a CLI terminal.
 
 [Structure:]
 
@@ -46,9 +46,10 @@ fvSchemes, controlDict). You can find more information on that in
 "OpenFOAM(R)(*)"_of documentations.
 
 Settings of the coupling routines are defined in
-$caseDir/CFD/constant/"couplingProperies"_#1_3 (e.g. force models, data exchange
-model, etc.) and $caseDir/CFD/constant/"liggghtsCommands"_#1_3 (allows to
-execute a LIGGGHTS command during a coupled simulation).
+$caseDir/CFD/constant/"couplingProperies"_CFDEMcoupling_dicts.html#couplingProperties
+(e.g. force models, data exchange model, etc.) and
+$caseDir/CFD/constant/"liggghtsCommands"_CFDEMcoupling_dicts.html#liggghtsCommands
+(allows to execute a LIGGGHTS command during a coupled simulation).
 
 NOTE:
 (*) This offering is not approved or endorsed by OpenCFD Limited, producer and

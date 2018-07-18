@@ -20,7 +20,7 @@ meshMotionModel noMeshMotion; :pre
 
 [Description:]
 
-The noMeshMotion-model is a dummy meshMotion model.
+The {noMeshMotion} model is a dummy meshMotion model.
 
 [Restrictions:]
 
