@@ -7,7 +7,7 @@
 
 1. About CFDEMcoupling :link(1_1),h3
 
-CFDEMcoupling provides an open source parallel coupled CFD-DEM framework
+CFDEMcoupling provides an open-source parallel coupled CFD-DEM framework
 combining the strengths of the "LIGGGHTS"_lig DEM code and the Open Source CFD
 package "OpenFOAM(R)(*)"_of. The CFDEMcoupling toolbox allows to expand standard
 CFD solvers of "OpenFOAM(R)(*)"_of to include a coupling to the DEM code
