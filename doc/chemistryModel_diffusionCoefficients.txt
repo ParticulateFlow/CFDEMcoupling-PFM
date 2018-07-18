@@ -23,8 +23,8 @@ diffusionCoefficientsProps
     diffusantGasNames   ( speciesNames );
 \} :pre
 
-{switch1} = (optional, normally off) flag to give information :l
-{ChemistryFile} = path to file, where the reacting species are listed  :ulb,l
+{switch1} = (optional, normally off) flag to give information :ulb,l
+{ChemistryFile} = path to file, where the reacting species are listed :l
 {diffusantGasNames} = list of gas field names that are the reactant gases :l
 :ule
 

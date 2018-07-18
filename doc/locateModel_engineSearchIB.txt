@@ -51,8 +51,8 @@ distributed over several processors.
 The {engineIB} locate Model can be used with different settings to use different
 algorithms:
 
-treeSearch false;     will execute some geometric (linear) search using the last known cellID (recommended) :ulb,l
-treeSearch true;      will use a recursive tree structure to find the cell. :l
+treeSearch false;  will execute some geometric (linear) search using the last known cellID (recommended) :ulb,l
+treeSearch true;   will use a recursive tree structure to find the cell. :l
 :ule
 
 This model is a modification of the {engine} search model. Instead of using the

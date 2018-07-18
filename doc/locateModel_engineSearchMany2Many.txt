@@ -42,8 +42,9 @@ given position.
 
 The engineSearchMany2Many locateModel can be used with different settings to use different algorithms:
 
-treeSearch false;     will execute some geometric (linear) search using the last known cellID (recommended) :ulb,l
-treeSearch true;      will use a recursive tree structure to find the cell. :l
+treeSearch false;  will execute some geometric (linear) search using the last
+known cellID (recommended) :ulb,l
+treeSearch true;   will use a recursive tree structure to find the cell. :l
 :ule
 
 [Restrictions:]

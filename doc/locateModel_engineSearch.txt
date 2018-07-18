@@ -36,8 +36,8 @@ given position.
 The {engine} locate Model can be used with different settings to use different
 algorithms:
 
-treeSearch false;     will execute some geometric (linear) search using the last known cellID :ulb,l
-treeSearch true;      will use a recursive tree structure to find the cell (recommended). :l
+treeSearch false;  will execute some geometric (linear) search using the last known cellID :ulb,l
+treeSearch true;   will use a recursive tree structure to find the cell (recommended). :l
 :ule
 
 [Restrictions:]
