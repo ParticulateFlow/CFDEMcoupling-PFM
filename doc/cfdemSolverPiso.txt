@@ -16,9 +16,10 @@ see:
 GONIVA, C., KLOSS, C., HAGER,A. and PIRKER, S. (2010): "An Open Source CFD-DEM Perspective", Proc. of OpenFOAM Workshop, Göteborg, June 22.-24.
 
 
+NOTE:
+(*) This offering is not approved or endorsed by OpenCFD Limited, producer and
+distributor of the OpenFOAM software via www.openfoam.com, and owner of the
+OPENFOAM(R) and OpenCFD(R) trade marks.
+OPENFOAM(R) is a registered trade mark of OpenCFD Limited, producer and
+distributor of the OpenFOAM software via www.openfoam.com.
 
-
-:line
-(*) This offering is not approved or endorsed by OpenCFD Limited, the producer of the OpenFOAM software and owner of the OPENFOAM®  and OpenCFD®  trade marks. OPENFOAM® is a registered trade mark of OpenCFD Limited, a wholly owned subsidiary of the ESI Group.
-
-:line

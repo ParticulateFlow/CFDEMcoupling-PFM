@@ -37,8 +37,10 @@ GONIVA, C., KLOSS, C., HAGER,A., WIERINK, G. and PIRKER, S. (2011): "A MULTI-PUR
 and
 
 HAGER, A., KLOSS, C. and GONIVA, C. (2011): "TOWARDS AN EFFICIENT IMMERSED BOUNDARY METHOD WITHIN AN OPEN SOURCE FRAMEWORK", Proc. of the 8th Int. Conf. on CFD in Oil and Gas, Metallurgical and Process Industries, Trondheim, Norway
+NOTE:
+(*) This offering is not approved or endorsed by OpenCFD Limited, producer and
+distributor of the OpenFOAM software via www.openfoam.com, and owner of the
+OPENFOAM(R) and OpenCFD(R) trade marks.
+OPENFOAM(R) is a registered trade mark of OpenCFD Limited, producer and
+distributor of the OpenFOAM software via www.openfoam.com.
 
-:line
-(*) "OpenFOAM(R)"_of is a registered trade mark of Silicon Graphics International Corp. This offering is not affiliated, approved or endorsed by Silicon Graphics International Corp., the producer of the OpenFOAM(R) software and owner of the OpenFOAM(R) trademark.
-
-:line

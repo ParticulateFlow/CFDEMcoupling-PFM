@@ -43,10 +43,17 @@ please have a look at the "LIGGGHTS"_lig manual.
 Standard CFD settings are defined in $caseDir/CFD/constant (e.g.
 transportProperties, RASproperties, etc.) and $caseDir/CFD/system (e.g.
 fvSchemes, controlDict). You can find more information on that in
-"OpenFOAM(R)(*)"_of documentations (www.openFoam.com)(*).
+"OpenFOAM(R)(*)"_of documentations.
 
 Settings of the coupling routines are defined in
 $caseDir/CFD/constant/"couplingProperies"_#1_3 (e.g. force models, data exchange
 model, etc.) and $caseDir/CFD/constant/"liggghtsCommands"_#1_3 (allows to
 execute a LIGGGHTS command during a coupled simulation).
+
+NOTE:
+(*) This offering is not approved or endorsed by OpenCFD Limited, producer and
+distributor of the OpenFOAM software via www.openfoam.com, and owner of the
+OPENFOAM(R) and OpenCFD(R) trade marks.
+OPENFOAM(R) is a registered trade mark of OpenCFD Limited, producer and
+distributor of the OpenFOAM software via www.openfoam.com.
 

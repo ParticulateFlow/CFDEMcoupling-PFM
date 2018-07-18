@@ -19,7 +19,10 @@ The heat transfer equation is implemented according to Nield & Bejan (2013), Con
 
 
 
-:line
-(*) This offering is not approved or endorsed by OpenCFD Limited, the producer of the OpenFOAM software and owner of the OPENFOAM®  and OpenCFD®  trade marks. OPENFOAM® is a registered trade mark of OpenCFD Limited, a wholly owned subsidiary of the ESI Group.
+NOTE:
+(*) This offering is not approved or endorsed by OpenCFD Limited, producer and
+distributor of the OpenFOAM software via www.openfoam.com, and owner of the
+OPENFOAM(R) and OpenCFD(R) trade marks.
+OPENFOAM(R) is a registered trade mark of OpenCFD Limited, producer and
+distributor of the OpenFOAM software via www.openfoam.com.
 
-:line

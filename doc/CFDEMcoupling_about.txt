@@ -53,10 +53,11 @@ This documentation was written by Christoph Goniva, DCS Computing GmbH, 2012
 :line
 
 NOTE:
-(*) This offering is not approved or endorsed by OpenCFD Limited, the producer
-of the OpenFOAM software and owner of the OPENFOAM(R) and OpenCFD(R) trade marks.
-OPENFOAM(R) is a registered trade mark of OpenCFD Limited, a wholly owned
-subsidiary of the ESI Group.
+(*) This offering is not approved or endorsed by OpenCFD Limited, producer and
+distributor of the OpenFOAM software via www.openfoam.com, and owner of the
+OPENFOAM(R) and OpenCFD(R) trade marks.
+OPENFOAM(R) is a registered trade mark of OpenCFD Limited, producer and
+distributor of the OpenFOAM software via www.openfoam.com.
 
 :link(of,http://www.openfoam.org)
 :link(lig,http://www.cfdem.com)
