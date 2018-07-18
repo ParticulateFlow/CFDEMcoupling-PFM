@@ -35,7 +35,8 @@ readLiggghtsDataProps0
 
 [Description:]
 
-The readLiggghtsData liggghtsCommand Model can be used to ???
+The {readLiggghtsData} liggghtsCommandModel can be used to read LIGGGHTS data
+files into LIGGGHTS during runtime of a coupled simulation.
 
 IMPORTANT NOTE: Model is outdated.
 
