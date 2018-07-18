@@ -39,9 +39,7 @@ virtualMassForceProps
 
 The force model performs the calculation of forces (e.g. fluid-particle interaction forces) acting on each DEM particle. The virtualMassForce model calculates the virtual mass force for each particle.
 
-[Restrictions:]
-
-Model not validated!
+IMPORTANT NOTE: Model not validated!
 
 [Related commands:]
 

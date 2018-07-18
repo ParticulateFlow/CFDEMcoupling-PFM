@@ -28,6 +28,8 @@ forceModels
     DiFeliceDrag
 ); :pre
 
+NOTE: This examples list might not be complete - please look for other models
+(forceModel XY) in this documentation.
 
 [Description:]
 

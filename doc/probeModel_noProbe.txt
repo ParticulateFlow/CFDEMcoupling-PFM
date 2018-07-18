@@ -18,7 +18,8 @@ probeModel off; :pre
 
 probeModel off; :pre
 
-Note: This examples list might not be complete - please check below for the list of force models that can perform particle probing.
+NOTE: This examples list might not be complete - please check below for the list
+of models that can perform particle probing.
 
 [Description:]
 

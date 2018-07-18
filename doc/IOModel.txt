@@ -20,7 +20,8 @@ model = name of IO-model to be applied :ul
 
 IOModel off; :pre
 
-Note: This examples list might not be complete - please look for other models (IOModel_XY) in this documentation.
+NOTE: This examples list might not be complete - please look for other IO models
+in this documentation.
 
 [Description:]
 

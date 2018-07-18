@@ -26,7 +26,8 @@ forceSubModels
     ImEx
 ); :pre
 
-Note: This examples list might not be complete - please look for other models (forceSubModel_XY) in this documentation.
+NOTE: This examples list might not be complete - please look for other models
+(forceSubModel XY) in this documentation.
 
 [Description:]
 
@@ -40,6 +41,5 @@ None.
 
 "ImEx"_forceSubModel_ImEx.html
 
-Note: This examples list may be incomplete - please look for other models (forceSubModel_XY) in this documentation.
 
 [Default:] none.

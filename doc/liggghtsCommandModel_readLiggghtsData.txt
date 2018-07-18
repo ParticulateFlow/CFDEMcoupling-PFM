@@ -37,10 +37,7 @@ readLiggghtsDataProps0
 
 The readLiggghtsData liggghtsCommand Model can be used to ???
 
-
-[Restrictions:]
-
-Note: Model is not up to date.
+IMPORTANT NOTE: Model is outdated.
 
 [Related commands:]
 

@@ -22,7 +22,8 @@ model = name of the regionModel to be applied :ul
 
 regionModel allRegion; :pre
 
-Note: This examples list might not be complete - please look for other models (regionModel_XY) in this documentation.
+NOTE: This examples list might not be complete - please look for other models
+(regionModel XY) in this documentation.
 
 [Description:]
 

@@ -79,7 +79,8 @@ executeProps1
 
 The execute liggghtsCommand Model can be used to execute a LIGGGHTS command during a CFD run. In above example execute_0 for instance executes "run $couplingInterval" every coupling step. $couplingInterval is automatically replaced by the correct number of DEM steps. Additionally execute_1 executes "write_restart ../DEM/liggghts.restart_$timeStamp" every writing step, where $timeStamp is automatically set.
 
-These rather complex execute commands can be replaced by the "readLiggghts" and "writeLiggghts" commands! :h4
+NOTE: These rather complex execute commands can be replaced by the
+{runLiggghts} and {writeLiggghts} commands!
 
 [Restrictions:] None.
 
