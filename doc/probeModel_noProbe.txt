@@ -23,7 +23,7 @@ of models that can perform particle probing.
 
 [Description:]
 
-Does not perform any probing.
+This model does not perform any probing.
 
 [Restrictions:]
 

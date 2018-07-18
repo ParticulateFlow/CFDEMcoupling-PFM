@@ -20,7 +20,7 @@ IOModel off; :pre
 
 [Description:]
 
-The noIO-model is a dummy IO model.
+This IOModel produces no output.
 
 [Restrictions:]
 

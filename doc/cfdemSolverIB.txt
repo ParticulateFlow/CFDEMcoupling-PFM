@@ -18,7 +18,7 @@ the governing equations of the fluid are computed and the corrections of
 velocity and pressure field with respect to the body-movement information,
 gained from LIGGGHTS, are incorporated.
 
-Code of this solver contributions by Alice Hager, JKU.
+The code of this solver was contributed by Alice Hager, JKU.
 
 [Algorithm:]
 
@@ -55,7 +55,6 @@ designed for the present case:
 
 GONIVA, C., KLOSS, C., HAGER,A., WIERINK, G. and PIRKER, S. (2011): "A MULTI-PURPOSE OPEN SOURCE CFD-DEM APPROACH", Proc. of the 8th Int. Conf. on CFD in Oil and Gas, Metallurgical and Process Industries, Trondheim, Norway
 
-and
 
 HAGER, A., KLOSS, C. and GONIVA, C. (2011): "TOWARDS AN EFFICIENT IMMERSED BOUNDARY METHOD WITHIN AN OPEN SOURCE FRAMEWORK", Proc. of the 8th Int. Conf. on CFD in Oil and Gas, Metallurgical and Process Industries, Trondheim, Norway
 NOTE:

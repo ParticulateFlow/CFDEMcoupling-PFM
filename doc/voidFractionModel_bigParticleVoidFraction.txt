@@ -54,7 +54,7 @@ voidfraction calculation) constant.
 The particle volume occupied in the CFD domain can be adjusted by the parameter
 "weight", using Vparticle=dsphere^3*pi/6*weight.
 
-Parts of this sub-model contributed by Alice Hager, JKU.
+Parts of this sub-model were contributed by Alice Hager, JKU.
 
 [Restrictions:]
 
