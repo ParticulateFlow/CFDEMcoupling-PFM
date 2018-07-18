@@ -18,13 +18,13 @@ forceModels
 );
 GidaspowDragProps
 \{
-    velFieldName "U";
+    velFieldName          "U";
     voidfractionFieldName "voidfraction";
-    granVelFieldName "Us";
-    phi "scalar";
-    interpolation switch1;
-    implForceDEM switch2;
-\}; :pre
+    granVelFieldName      "Us";
+    phi                   scalar;
+    interpolation         switch1;
+    implForceDEM          switch2;
+\} :pre
 
 {U} = name of the finite volume fluid velocity field :ulb,l
 {voidfraction} = name of the finite volume voidfraction field :l
@@ -42,9 +42,9 @@ forceModels
 );
 GidaspowDragProps
 \{
-    velFieldName "U";
+    velFieldName          "U";
     voidfractionFieldName "voidfraction";
-    granVelFieldName "Us";
+    granVelFieldName      "Us";
 \} :pre
 
 [Description:]

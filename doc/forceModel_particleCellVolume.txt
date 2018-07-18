@@ -21,7 +21,7 @@ particleCellVolumeProps
     upperThreshold value;
     lowerThreshold value2;
     verbose;
-\}; :pre
+\} :pre
 
 {value} = only cells with a field value (magnitude) lower than this upper threshold are considered :l
 {value2} = only cells with a field value (magnitude) greater than this lower threshold are considered :l

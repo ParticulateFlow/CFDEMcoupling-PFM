@@ -18,9 +18,9 @@ forceModels
 );
 DiFeliceDragProps
 \{
-    velFieldName "U";
+    velFieldName  "U";
     interpolation switch1;
-\}; :pre
+\} :pre
 
 {U} = name of the finite volume fluid velocity field :ulb,l
 {switch1} = flag to use interpolated voidfraction and velocity values (normally off) :l
@@ -34,7 +34,7 @@ forceModels
 );
 DiFeliceDragProps
 \{
-    velFieldName "U";
+    velFieldName  "U";
     interpolation true;
 \} :pre
 

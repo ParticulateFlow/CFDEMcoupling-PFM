@@ -12,12 +12,7 @@ probeModel off command :h3
 Defined in "couplingProperties"_CFDEMcoupling_dicts.html#couplingProperties
 dictionary.
 
-forceModels
-\{
-    myForceModel1
-    myForceModel2
-    myForceModel3
-\}; :pre
+probeModel off; :pre
 
 [Examples:]
 

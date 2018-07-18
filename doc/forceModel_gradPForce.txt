@@ -18,10 +18,10 @@ forceModels
 );
 gradPForceProps
 \{
-    pFieldName "pressure";
+    pFieldName        "pressure";
     velocityFieldName "U";
-    interpolation switch1;
-\}; :pre
+    interpolation     switch1;
+\} :pre
 
 {pressure} = name of the finite volume fluid pressure field :ulb,l
 {U} = name of the finite volume fluid velocity field :l
@@ -36,9 +36,9 @@ forceModels
 );
 gradPForceProps
 \{
-    pFieldName "p";
+    pFieldName        "p";
     velocityFieldName "U";
-    interpolation true;
+    interpolation     true;
 \} :pre
 
 [Description:]

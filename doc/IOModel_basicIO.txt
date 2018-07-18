@@ -12,11 +12,12 @@ IOModel basicIO command :h3
 Defined in "couplingProperties"_CFDEMcoupling_dicts.html#couplingProperties
 dictionary.
 
-IOModel "basicIO"; :pre
+IOModel basicIO; :pre
 
 [Examples:]
 
-IOModel "basicIO"; :pre
+IOModel basicIO;
+serialOutput; :pre
 
 [Description:]
 

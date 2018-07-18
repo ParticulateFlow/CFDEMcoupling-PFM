@@ -20,7 +20,7 @@ ShirgaonkarIBProps
 \{
     velFieldName "U";
     pressureFieldName "pressure";
-\}; :pre
+\} :pre
 
 {U} = name of the finite volume fluid velocity field :ulb,l
 {pressure} = name of the finite volume pressure field :l

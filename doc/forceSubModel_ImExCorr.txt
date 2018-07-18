@@ -16,11 +16,10 @@ forceSubModels
 (
     ImExCorr;
 );
-
 treatExplicit true;  // optional for some force models.
 treatDEM true;       // optional for some force models.
 implDEM true;        // optional for some force models.
-explicitInterpCorr true; // optional for some force models.
+explicitInterpCorr true; // optional for some force models. :pre
 
 [Examples:]
 
@@ -28,7 +27,7 @@ forceSubModels
 (
     ImExCorr;
 );
-treatExplicit true;  // optional for some force models.
+treatExplicit true;  // optional for some force models. :pre
 
 [Description:]
 

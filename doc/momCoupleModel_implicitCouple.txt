@@ -18,10 +18,10 @@ momCoupleModels
 );
 implicitCoupleProps
 \{
-    velFieldName "U";
-    granVelFieldName "Us";
+    velFieldName          "U";
+    granVelFieldName      "Us";
     voidfractionFieldName "voidfraction";
-    minAlphaP number;
+    minAlphaP             number;
 \} :pre
 
 {U} = name of the finite volume fluid velocity field :ulb,l
@@ -38,8 +38,8 @@ momCoupleModels
 );
 implicitCoupleProps
 \{
-    velFieldName "U";
-    granVelFieldName "Us";
+    velFieldName          "U";
+    granVelFieldName      "Us";
     voidfractionFieldName "voidfraction";
 \} :pre
 

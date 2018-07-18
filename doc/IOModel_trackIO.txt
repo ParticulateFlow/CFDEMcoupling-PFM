@@ -12,11 +12,11 @@ IOModel trackIO command :h3
 Defined in "couplingProperties"_CFDEMcoupling_dicts.html#couplingProperties
 dictionary.
 
-IOModel "trackIO"; :pre
+IOModel trackIO; :pre
 
 [Examples:]
 
-IOModel "trackIO"; :pre
+IOModel trackIO; :pre
 
 [Description:]
 

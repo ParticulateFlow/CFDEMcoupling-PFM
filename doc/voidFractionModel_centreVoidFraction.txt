@@ -16,7 +16,7 @@ voidfractionModel centre;
 centreProps
 \{
     alphaMin number1;
-    weight number2;
+    weight   number2;
 \} :pre
 
 {number1} = minimum limit for voidfraction :ulb,l
@@ -29,7 +29,7 @@ voidfractionModel centre;
 centreProps
 \{
     alphaMin 0.1;
-    weight 1.;
+    weight   1.0;
 \} :pre
 
 [Description:]

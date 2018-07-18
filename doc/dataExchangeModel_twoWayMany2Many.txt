@@ -16,7 +16,7 @@ dataExchangeModel twoWayMany2Many;
 twoWayMany2ManyProps
 \{
     liggghtsPath "path";
-\}; :pre
+\} :pre
 
 {path} = path to the DEM simulation input file :ulb,l
 :ule

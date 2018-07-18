@@ -15,9 +15,9 @@ dictionary.
 dataExchangeModel twoWayFiles;
 twoWayFilesProps
 \{
-    couplingFilename "filename";
-    maxNumberOfParticles number;
-\}; :pre
+    couplingFilename        "filename";
+    maxNumberOfParticles    number;
+\} :pre
 
 {filename} = filename of the VTK file series :ulb,l
 {number} = maximum number of particles in DEM simulation :l
@@ -28,8 +28,8 @@ twoWayFilesProps
 dataExchangeModel twoWayFiles;
 twoWayFilesProps
 \{
-    couplingFilename "vtk_out%4.4d.vtk";
-    maxNumberOfParticles 30000;
+    couplingFilename        "vtk_out%4.4d.vtk";
+    maxNumberOfParticles    30000;
 \} :pre
 
 [Description:]

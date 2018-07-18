@@ -19,7 +19,7 @@ forceModels
 ArchimedesProps
 \{
     gravityFieldName "gravity";
-\}; :pre
+\} :pre
 
 {gravity} = name of the finite volume gravity field :ulb,l
 :ule

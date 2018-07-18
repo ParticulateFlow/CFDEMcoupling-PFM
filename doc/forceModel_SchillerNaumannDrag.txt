@@ -19,7 +19,7 @@ forceModels
 SchillerNaumannDragProps
 \{
     velFieldName "U";
-\}; :pre
+\} :pre
 
 {U} = name of the finite volume fluid velocity field :ulb,l
 :ule

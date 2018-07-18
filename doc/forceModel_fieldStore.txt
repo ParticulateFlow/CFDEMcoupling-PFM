@@ -26,7 +26,7 @@ fieldStoreProps
     (
         "vectorField"
     );
-\}; :pre
+\} :pre
 
 {scalarField} = names of the finite volume scalar fields to be stored :ulb,l
 {vectorField} = names of the finite volume vector fields to be stored :l

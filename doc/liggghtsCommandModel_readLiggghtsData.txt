@@ -27,7 +27,6 @@ readLiggghtsDataProps0
 liggghtsCommandModels
 (
    readLiggghtsData
-   readLiggghtsData
 );
 readLiggghtsDataProps0
 \{

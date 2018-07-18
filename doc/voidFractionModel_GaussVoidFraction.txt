@@ -16,9 +16,9 @@ voidfractionModel Gauss;
 GaussProps
 \{
     maxCellsPerParticle number1;
-    alphaMin number2;
-    weight number3;
-    porosity number4;
+    alphaMin            number2;
+    weight              number3;
+    porosity            number4;
 \} :pre
 
 {number1} = maximum number of cells covered by a particle (search will fail when more than {number1} cells are covered by the particle) :ulb,l
@@ -33,9 +33,9 @@ voidfractionModel Gauss;
 GaussProps
 \{
     maxCellsPerParticle 1000;
-    alphaMin 0.10;
-    weight 1.;
-    porosity 1.;
+    alphaMin            0.10;
+    weight              1.0;
+    porosity            1.0;
 \} :pre
 
 [Description:]

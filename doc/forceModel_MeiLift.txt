@@ -18,11 +18,11 @@ forceModels
 );
 MeiLiftProps
 \{
-    velFieldName "U";
+    velFieldName        "U";
     useSecondOrderTerms;
-    interpolation "switch1";
-    verbose "switch2";
-\}; :pre
+    interpolation       switch1;
+    verbose             switch2;
+\} :pre
 
 {U} = name of the finite volume fluid velocity field :ulb,l
 {useSecondOrderTerms} = switch to activate second order terms in the lift force model :l
@@ -38,10 +38,10 @@ forceModels
 );
 MeiLiftProps
 \{
-    velFieldName "U";
+    velFieldName        "U";
     useSecondOrderTerms;
-    interpolation true;
-    verbose true;
+    interpolation       true;
+    verbose             true;
 \} :pre
 
 [Description:]

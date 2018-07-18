@@ -15,11 +15,11 @@ sub-dictionary of the force model in use.
 forceSubModels
 (
     ImEx;
-);
+); :pre
 
 treatExplicit true;  // optional for some force models.
 treatDEM true;       // optional for some force models.
-implDEM true;        // optional for some force models.
+implDEM true;        // optional for some force models. :pre
 
 [Examples:]
 
@@ -27,7 +27,7 @@ forceSubModels
 (
     ImEx;
 );
-treatExplicit true;  // optional for some force models.
+treatExplicit true;  // optional for some force models. :pre
 
 [Description:]
 

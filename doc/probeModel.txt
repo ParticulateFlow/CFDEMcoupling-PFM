@@ -9,21 +9,19 @@ probeModel command :h3
 
 [Syntax:]
 
-To be activated via couplingProperties dictionary.
+Defined in "couplingProperties"_CFDEMcoupling_dicts.html#couplingProperties
+dictionary.
 
-probeModel myProbeModel; :pre
+probeModel model;
+modelProps
+\{
+\} :pre
 
-Use probe model "off" to disable this feature.
-
-myProbeModelProps :pre
-\{ :pre
-
-\}; :pre
-
+model = name of the probeModel to be applied :ul
 
 [Examples:]
 
-See "particleProbe"_probeModel_particleProbe.html
+probeModel off; :pre
 
 Note: This examples list might not be complete - please check below for the list of force models that can perform particle probing.
 

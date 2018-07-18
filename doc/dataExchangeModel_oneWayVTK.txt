@@ -15,11 +15,11 @@ dictionary.
 dataExchangeModel oneWayVTK;
 oneWayVTKProps
 \{
-    DEMts timeStep;
-    relativePath "path";
-    couplingFilename "filename";
-    maxNumberOfParticles number;
-\}; :pre
+    DEMts                   timeStep;
+    relativePath            "path";
+    couplingFilename        "filename";
+    maxNumberOfParticles    number;
+\} :pre
 
 {timeStep} = time step size of stored DEM data :ulb,l
 {path} = path to the VTK data files relative do simulation directory :l
@@ -32,10 +32,10 @@ oneWayVTKProps
 dataExchangeModel oneWayVTK;
 oneWayVTKProps
 \{
-    DEMts 0.0001;
-    relativePath "../DEM/post";
-    couplingFilename "vtk_out%4.4d.vtk";
-    maxNumberOfParticles 30000;
+    DEMts                   0.0001;
+    relativePath            "../DEM/post";
+    couplingFilename        "vtk_out%4.4d.vtk";
+    maxNumberOfParticles    30000;
 \} :pre
 
 [Description:]

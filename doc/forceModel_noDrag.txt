@@ -16,18 +16,24 @@ forceModels
 (
     noDrag
 ); :pre
+noDragProps (optional)
+\{
+    noDEMForce;   (optional)
+    keepCFDForce; (optional)
+\} :pre
+
 
 [Examples:]
 
 forceModels
 (
     noDrag
-); :pre
-
-noDragProps (optional)
+)
+noDragProps
 \{
-    noDEMForce; (optional)
-\}; :pre
+    noDEMForce;
+\} :pre
+
 
 [Description:]
 

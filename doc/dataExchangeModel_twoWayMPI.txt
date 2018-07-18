@@ -16,7 +16,7 @@ dataExchangeModel twoWayMPI;
 twoWayMPIProps
 \{
     liggghtsPath "path";
-\}; :pre
+\} :pre
 
 {path} = path to the DEM simulation input file :ulb,l
 :ule

@@ -15,10 +15,10 @@ dictionary.
 voidfractionModel divided;
 dividedProps
 \{
-    alphaMin number1;
+    alphaMin       number1;
     interpolation;
-    weight number2;
-    porosity number3;
+    weight         number2;
+    porosity       number3;
 \} :pre
 
 {number1} = minimum limit for voidfraction :ulb,l

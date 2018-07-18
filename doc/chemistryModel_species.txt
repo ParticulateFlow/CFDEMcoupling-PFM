@@ -18,15 +18,15 @@ chemistryModels
 );
 speciesProps
 \{
-    ChemistryFile 		"$casePath/CFD/constant/foam.inp";
-    verbose			switch1;
-    tempFieldName		"T";
-    densityFieldName		"rho"
-    voidfractionFieldName	"voidfraction"
-    totalMoleFieldName		"molarConc"
-    partTempName		"partTemp"
-    partRhoName			"partRho"
-\}; :pre
+    ChemistryFile           "$casePath/CFD/constant/foam.inp";
+    tempFieldName           "T";
+    densityFieldName        "rho";
+    voidfractionFieldName   "voidfraction";
+    totalMoleFieldName      "molarConc";
+    partTempName            "partTemp";
+    partRhoName             "partRho";
+    verbose                 switch1;
+\} :pre
 
 {ChemistryFile} = path to file, where the reacting species are listed  :ulb,l
 {T} = name of the finite volume temperature field, it is already added in default and doesn't need to be specified if name is the same :l
@@ -40,14 +40,14 @@ speciesProps
 
 [Examples:]
 
-chemistryModels	
+chemistryModels
 (
     species
 );
 speciesProps
 \{
-     ChemistryFile 		"$casePath/CFD/constant/foam.inp";
-     verbose			false;
+     ChemistryFile     "$casePath/CFD/constant/foam.inp";
+     verbose           false;
 \} :pre
 
 [Description:]

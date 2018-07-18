@@ -19,8 +19,8 @@ forceModels
 viscForceProps
 \{
     velocityFieldName "U";
-    interpolation "switch";
-\}; :pre
+    interpolation     switch;
+\} :pre
 
 {U} = name of the finite volume fluid velocity field :ulb,l
 {switch} = flag to use interpolated stress values (normally off) :l

@@ -15,9 +15,9 @@ dictionary.
 smoothingModel constDiffSmoothing;
 constDiffSmoothingProps
 \{
-    lowerLimit number1;
-    upperLimit number2;
-    smoothingLength lengthScale;
+    lowerLimit                    number1;
+    upperLimit                    number2;
+    smoothingLength               lengthScale;
     smoothingLengthReferenceField lengthScaleRefField;
 \} :pre
 
@@ -31,9 +31,9 @@ constDiffSmoothingProps
 
 constDiffSmoothingProps
 \{
-    lowerLimit 0.1;
-    upperLimit 1e10;
-    smoothingLength 1500e-6;
+    lowerLimit                    0.1;
+    upperLimit                    1e10;
+    smoothingLength               1500e-6;
     smoothingLengthReferenceField 9000e-6;
 \} :pre
 

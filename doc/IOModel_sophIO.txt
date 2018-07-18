@@ -12,11 +12,11 @@ IOModel sophIO command :h3
 Defined in "couplingProperties"_CFDEMcoupling_dicts.html#couplingProperties
 dictionary.
 
-IOModel "sophIO"; :pre
+IOModel sophIO; :pre
 
 [Examples:]
 
-IOModel "sophIO"; :pre
+IOModel sophIO; :pre
 
 [Description:]
 

@@ -16,8 +16,8 @@ voidfractionModel IB;
 IBProps
 \{
     maxCellsPerParticle number1;
-    alphaMin number2;
-    scaleUpVol number3;
+    alphaMin            number2;
+    scaleUpVol          number3;
 \} :pre
 
 {number1} = maximum number of cells covered by a particle (search will fail when more than {number1} cells are covered by the particle) :ulb,l
@@ -31,8 +31,8 @@ voidfractionModel IB;
 IBProps
 \{
     maxCellsPerParticle 1000;
-    alphaMin 0.10;
-    scaleUpVol 5.0;
+    alphaMin            0.10;
+    scaleUpVol          5.0;
 \} :pre
 
 [Description:]

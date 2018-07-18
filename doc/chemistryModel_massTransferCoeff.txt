@@ -16,23 +16,23 @@ chemistryModels
 (
     massTransferCoeff
 );
-diffusionCoefficientsProps
+massTransferCoeffProps
 \{
-    verbose			switch1;        
-\}; :pre
+    verbose         switch1;
+\} :pre
 
 {switch1} = (optional, normally off) flag to give information :l
 :ule
 
 [Examples:]
 
-chemistryModels	
+chemistryModels
 (
     massTransferCoeff
 );
 massTransferCoeffProps
 \{
-     verbose 			false;	
+     verbose        false;
 \} :pre
 
 [Description:]

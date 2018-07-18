@@ -18,16 +18,16 @@ forceModels
 );
 LaEuScalarTempProps
 \{
-    velFieldName "U";
-    tempFieldName "T";
+    velFieldName          "U";
+    tempFieldName         "T";
     voidfractionFieldName "voidfraction";
-    partTempName "Temp";
-    partHeatFluxName "convectiveHeatFlux";
-    lambda value;
-    Cp value1;
-    interpolation "switch1";
-    verbose "switch2";
-\}; :pre
+    partTempName          "Temp";
+    partHeatFluxName      "convectiveHeatFlux";
+    lambda                value;
+    Cp                    value1;
+    interpolation         "switch1";
+    verbose               "switch2";
+\} :pre
 
 {U} = name of the finite volume fluid velocity field :ulb,l
 {T} = name of the finite volume scalar temperature field :l
@@ -48,13 +48,13 @@ forceModels
 );
 LaEuScalarTempProps
 \{
-    velFieldName "U";
-    tempFieldName "T";
+    velFieldName          "U";
+    tempFieldName         "T";
     voidfractionFieldName "voidfraction";
-    partTempName "Temp";
-    partHeatFluxName "convectiveHeatFlux";
-    lambda 0.0256;
-    Cp 1007;
+    partTempName          "Temp";
+    partHeatFluxName      "convectiveHeatFlux";
+    lambda                0.0256;
+    Cp                    1007;
 \} :pre
 
 [Description:]

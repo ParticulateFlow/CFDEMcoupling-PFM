@@ -18,10 +18,10 @@ chemistryModels
 );
 diffusionCoefficientsProps
 \{
-    verbose			switch1;        
-    ChemistryFile 		"$casePath/CFD/constant/foam.inp";
-     diffusantGasNames          ( speciesNames ); 
-\}; :pre
+    verbose             switch1;
+    ChemistryFile       "$casePath/CFD/constant/foam.inp";
+    diffusantGasNames   ( speciesNames );
+\} :pre
 
 {switch1} = (optional, normally off) flag to give information :l
 {ChemistryFile} = path to file, where the reacting species are listed  :ulb,l
@@ -30,17 +30,17 @@ diffusionCoefficientsProps
 
 [Examples:]
 
-chemistryModels	
+chemistryModels
 (
     diffusionCoefficients
 );
-speciesProps
+diffusionCoefficientsProps
 \{
-    verbose			false;        
-    ChemistryFile 		"$casePath/CFD/constant/foam.inp";
-    diffusantGasNames       (    CO
-                                 H2
-                            ); 
+    verbose             false;
+    ChemistryFile       "$casePath/CFD/constant/foam.inp";
+    diffusantGasNames   (    CO
+                             H2
+                        );
 \} :pre
 
 [Description:]

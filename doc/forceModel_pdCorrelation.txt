@@ -27,7 +27,7 @@ pdCorrelationProps
         A B C
     );
     runOnWriteOnly true;
-\}; :pre
+\} :pre
 
 {coarseGrainingFactors} = list of coarse graining factors by type, separated by whitespace, optional :ulb,l
 {particleDensities} = list of particle densities by type, separated by whitespace, optional :l

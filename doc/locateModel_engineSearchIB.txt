@@ -19,7 +19,7 @@ engineIBProps
     \{
         treeSearch switch1;
     \}
-    zSplit value1;
+    zSplit  value1;
     xySplit value2;
 \}  :pre
 
@@ -37,7 +37,7 @@ engineIBProps
     \{
         treeSearch false;
     \}
-    zSplit 8;
+    zSplit  8;
     xySplit 16;
 \} :pre
 

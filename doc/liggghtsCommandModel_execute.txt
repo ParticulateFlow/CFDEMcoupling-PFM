@@ -23,10 +23,10 @@ executeProps0
         run
         $couplingInterval
     );
-    runFirst switch1; 
-    runLast switch2;
+    runFirst             switch1; 
+    runLast              switch2;
     runEveryCouplingStep switch3;
-    runEveryWriteStep switch4;
+    runEveryWriteStep    switch4;
     verbose;
 \} :pre
 
@@ -52,8 +52,8 @@ executeProps0
         run
         $couplingInterval
     );
-    runFirst off;
-    runLast off;
+    runFirst             off;
+    runLast              off;
     runEveryCouplingStep on;
 \}
 executeProps1
@@ -69,10 +69,10 @@ executeProps1
         liggghts.restart_
         timeStamp
     );
-    runFirst off;
-    runLast off;
+    runFirst             off;
+    runLast              off;
     runEveryCouplingStep off;
-    runEveryWriteStep on;
+    runEveryWriteStep    on;
 \} :pre
 
 [Description:]

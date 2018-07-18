@@ -22,10 +22,10 @@ dSauterProps
     (
         X Y Z
     );
-\}; :pre
+\} :pre
 
-{coarseGrainingFactors} = list of coarse graining factors by type, separated by whitespace, optional :ulb,l
-
+{coarseGrainingFactors} = list of coarse graining factors by type, separated by
+whitespace, optional :ulb,l
 :ule
 
 [Description:]

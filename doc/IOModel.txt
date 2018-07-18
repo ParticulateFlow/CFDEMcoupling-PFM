@@ -12,13 +12,13 @@ IOModel command :h3
 Defined in "couplingProperties"_CFDEMcoupling_dicts.html#couplingProperties
 dictionary.
 
-IOModel "model"; :pre
+IOModel model; :pre
 
 model = name of IO-model to be applied :ul
 
 [Examples:]
 
-IOModel "off";
+IOModel off; :pre
 
 Note: This examples list might not be complete - please look for other models (IOModel_XY) in this documentation.
 
