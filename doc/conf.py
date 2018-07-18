@@ -68,9 +68,7 @@ def get_cfdemcoupling_version():
     with open(os.path.join(script_dir, '../etc/bashrc'), 'r') as f:
         versionline = [line for line in f if line.startswith('export CFDEM_VERSION=')][0]
         return versionline.strip('export CFDEM_VERSION=')
-#        return "1.0"
-#line = f.readline()
-#return line
+
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
 # built documents.
