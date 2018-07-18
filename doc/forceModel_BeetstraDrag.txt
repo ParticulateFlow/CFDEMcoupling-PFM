@@ -89,15 +89,29 @@ BeetstraDragProps
 The force model performs the calculation of forces (e.g. fluid-particle
 interaction forces) acting on each DEM particle. The {BeetstraDrag} model is a
 model that calculates the particle based drag force following the correlation of
-Beetstra et al., AIChE J., 53(2) (2007).
-The filtered drag model is based on S. Radl, S. Sundaresan, Chem. Eng. Sci., 117 (2014).
+"Beetstra et al. (2007)"_#Beetstra2007.
+The filtered drag model is based on "Radl and Sundaresan (2014)"_#Radl2014.
 
 [Restrictions:]
 
 This model is strictly valid only for monodisperse gas-particle flows.
-For the polydisperse model of Beetstra et al. (2007) use {BeetstraDragPoly}.
+For the polydisperse model of "Beetstra et al. (2007)"_#Beetstra2007 use
+{BeetstraDragPoly}.
 
 [Related commands:]
 
 "forceModel"_forceModel.html, BeetstraDragPoly
+
+:line
+
+:link(Beetstra2007)
+[(Beetstra, 2007)] 
+Beetstra, R., van der Hoef, M. A. and Kuipers J. A. M.,
+"Drag force of intermediate Reynolds number flow past mono- and bidisperse arrays of spheres",
+AIChE J., 53(2) (2007)
+
+:link(Radl2014)
+[(Radl, 2014)] Radl, S. and Sundaresan, S.,
+"A drag model for filtered Euler-Lagrange simulations of clustered gas-particle suspensions",
+Chem. Eng. Sci., 117, pp. 416-425 (2014)
 

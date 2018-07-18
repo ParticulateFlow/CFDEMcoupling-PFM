@@ -23,13 +23,21 @@ The scalar transport equation is coupled to scalar properties of the particle
 phase, thus convective heat transfer in a fluid granular system can be modeled
 with "cfdemSolverPisoScalar".
 
-see:
+For more details, see "Goniva et al. (2010)"_#Goniva2010. The heat transfer
+equation is implemented according to "Nield and Bejan (2013)"_#Nield2013.
 
-GONIVA, C., KLOSS, C., HAGER,A. and PIRKER, S. (2010): "An Open Source CFD-DEM Perspective", Proc. of OpenFOAM Workshop, Göteborg, June 22.-24.
+:line
 
-The heat transfer equation is implemented according to Nield & Bejan (2013), Convection in Porous Media, DOI 10.1007/978-1-4614-5541-7_2, Springer
+:link(Goniva2010)
+[(Goniva, 2010)] Goniva, C., Kloss, C., Hager, A. and Pirker, S. (2010):
+"An Open Source CFD-DEM Perspective",
+Proc. of OpenFOAM Workshop, Göteborg, June 22.-24.
 
+:link(Nield2013)
+[(Nield, 2013)] Nield, D. A. and Bejan, A. (2013):
+"Convection in Porous Media", DOI 10.1007/978-1-4614-5541-7_2, Springer
 
+:line
 
 NOTE:
 (*) This offering is not approved or endorsed by OpenCFD Limited, producer and

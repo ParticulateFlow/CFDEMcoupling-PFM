@@ -18,7 +18,8 @@ the governing equations of the fluid are computed and the corrections of
 velocity and pressure field with respect to the body-movement information,
 gained from LIGGGHTS, are incorporated.
 
-The code of this solver was contributed by Alice Hager, JKU.
+The code of this solver was contributed by A. Hager, JKU. For more details, see
+"Goniva et al. (2011)"_#Goniva2011 and "Hager et al. (2011)"_#Hager2011
 
 [Algorithm:]
 
@@ -39,7 +40,7 @@ place, using the information about the location of the spheres and their
 
 [Use:]
 
-The solver is realized within the Open Source framework CFDEMcoupling. Just as
+The solver is realized within the open-source framework CFDEMcoupling. Just as
 for the unresolved CFD-DEM solver cfdemSolverPiso the file
 CFD/constant/couplingProperties contains information about the settings for the
 different models. While IOmodel, DataExchangeModel etc. are applicable for all
@@ -51,12 +52,22 @@ designed for the present case:
 "ShirgaonkarIB"_forceModel_ShirgaonkarIB.html,
 "IBVoidfraction"_voidFractionModel_IBVoidFraction.html
 
-[References:]
+:line
 
-GONIVA, C., KLOSS, C., HAGER,A., WIERINK, G. and PIRKER, S. (2011): "A MULTI-PURPOSE OPEN SOURCE CFD-DEM APPROACH", Proc. of the 8th Int. Conf. on CFD in Oil and Gas, Metallurgical and Process Industries, Trondheim, Norway
+:link(Goniva2011)
+[(Goniva, 2011)] Goniva, C., Kloss, C., Hager, A., Wierink, G. and Pirker, S.,
+"A multi-purpose open source CFD-DEM approach",
+Proc. of the 8th Int. Conf. on CFD in Oil and Gas, Metallurgical and Process Industries,
+Trondheim, Norway (2011)
 
+:link(Hager2011)
+[(Hager, 2011)] Hager, A., Kloss, C. and Goniva, C.,
+"Towards an efficient immersed boundary method within an open source framework",
+Proc. of the 8th Int. Conf. on CFD in Oil and Gas, Metallurgical and Process Industries,
+Trondheim, Norway (2011)
 
-HAGER, A., KLOSS, C. and GONIVA, C. (2011): "TOWARDS AN EFFICIENT IMMERSED BOUNDARY METHOD WITHIN AN OPEN SOURCE FRAMEWORK", Proc. of the 8th Int. Conf. on CFD in Oil and Gas, Metallurgical and Process Industries, Trondheim, Norway
+:line
+
 NOTE:
 (*) This offering is not approved or endorsed by OpenCFD Limited, producer and
 distributor of the OpenFOAM software via www.openfoam.com, and owner of the

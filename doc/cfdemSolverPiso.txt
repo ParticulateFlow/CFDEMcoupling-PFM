@@ -19,10 +19,16 @@ The volume averaged Navier-Stokes Equations are solved accounting for momentum
 exchange and volume displacement of discrete particles whose trajectories are
 calculated in the DEM code LIGGGHTS.
 
-see:
+For more details, see "Goniva et al. (2010)"_#Goniva2010.
 
-GONIVA, C., KLOSS, C., HAGER,A. and PIRKER, S. (2010): "An Open Source CFD-DEM Perspective", Proc. of OpenFOAM Workshop, Göteborg, June 22.-24.
+:line
 
+:link(Goniva2010)
+[(Goniva, 2010)] Goniva, C., Kloss, C., Hager, A. and Pirker, S. (2010):
+"An Open Source CFD-DEM Perspective",
+Proc. of OpenFOAM Workshop, Göteborg, June 22.-24.
+
+:line
 
 NOTE:
 (*) This offering is not approved or endorsed by OpenCFD Limited, producer and
