@@ -9,7 +9,8 @@ chemistryModel massTransferCoeff command :h3
 
 [Syntax:]
 
-Defined in couplingProperties dictionary.
+Defined in "couplingProperties"_CFDEMcoupling_dicts.html#couplingProperties
+dictionary.
 
 chemistryModels
 (
@@ -40,9 +41,10 @@ The chemistry model performs the calculation of chemical reactional effects acti
 
 [Restrictions:]
 
-Species model needs to be active.
+The "species"_chemistryModel_species.html model needs to be active.
 
 [Related commands:]
 
-"chemistryModel"_chemistryModel.html
+"chemistryModel"_chemistryModel.html,
+"chemistryModel species"_chemistryModel_species.html
 

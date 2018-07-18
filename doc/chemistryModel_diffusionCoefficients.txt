@@ -9,7 +9,8 @@ chemistryModel diffusionCoefficients command :h3
 
 [Syntax:]
 
-Defined in couplingProperties dictionary.
+Defined in "couplingProperties"_CFDEMcoupling_dicts.html#couplingProperties
+dictionary.
 
 chemistryModels
 (
@@ -52,5 +53,6 @@ Species model needs to be active.
 
 [Related commands:]
 
-"chemistryModel"_chemistryModel.html
+"chemistryModel"_chemistryModel.html,
+"chemistryModel species"_chemistryModel_species.html
 

@@ -9,7 +9,8 @@ dataExchangeModel twoWayMany2Many command :h3
 
 [Syntax:]
 
-Defined in couplingProperties dictionary.
+Defined in "couplingProperties"_CFDEMcoupling_dicts.html#couplingProperties
+dictionary.
 
 dataExchangeModel twoWayMany2Many;
 twoWayMany2ManyProps
@@ -34,7 +35,8 @@ The data exchange model performs the data exchange between the DEM code and the 
 
 [Restrictions:]
 
-Must be used in combination with the engineSearchMany2Many locate model!
+Must be used in combination with the
+"engineSearchMany2Many"_locateModel_engineSearchMany2Many.html locate model!
 
 [Related commands:]
 

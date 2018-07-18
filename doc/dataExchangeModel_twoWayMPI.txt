@@ -9,7 +9,8 @@ dataExchangeModel twoWayMPI command :h3
 
 [Syntax:]
 
-Defined in couplingProperties dictionary.
+Defined in "couplingProperties"_CFDEMcoupling_dicts.html#couplingProperties
+dictionary.
 
 dataExchangeModel twoWayMPI;
 twoWayMPIProps

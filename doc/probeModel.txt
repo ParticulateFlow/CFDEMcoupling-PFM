@@ -35,4 +35,9 @@ The probeModel feature allows to implement various probing features in CFDEM. Cu
 
 None.
 
+[Related commands:]
+
+"probeModel off"_probeModel_noProbe.html,
+"probeModel particleProbe"_probeModel_particleProbe.html
+
 [Default:] none.

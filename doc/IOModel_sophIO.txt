@@ -9,7 +9,8 @@ IOModel sophIO command :h3
 
 [Syntax:]
 
-Defined in couplingProperties dictionary.
+Defined in "couplingProperties"_CFDEMcoupling_dicts.html#couplingProperties
+dictionary.
 
 IOModel "sophIO"; :pre
 
@@ -25,5 +26,5 @@ The sophIO-model is based on basicIO model and additionally writes voidfraction,
 
 [Related commands:]
 
-"IOModel"_IOModel.html
+"IOModel"_IOModel.html, "IOModel basicIO"_IOModel_basicIO.html
 

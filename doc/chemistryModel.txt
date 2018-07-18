@@ -9,7 +9,8 @@ chemistryModel command :h3
 
 [Syntax:]
 
-Defined in couplingProperties dictionary.
+Defined in "couplingProperties"_CFDEMcoupling_dicts.html#couplingProperties
+dictionary.
 
 chemistryModels
 (
@@ -38,6 +39,8 @@ None.
 
 [Related commands:]
 
-"species"_chemistryModel_species.html, "diffusionCoefficient"_chemistryModel_diffusionCoefficients.html, "massTransferCoeff"_chemistryModel_massTransferCoeff.html
+"diffusionCoefficient"_chemistryModel_diffusionCoefficients.html,
+"massTransferCoeff"_chemistryModel_massTransferCoeff.html,
+"species"_chemistryModel_species.html
 
 [Default:] none.

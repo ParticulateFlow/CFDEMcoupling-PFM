@@ -9,7 +9,8 @@ IOModel trackIO command :h3
 
 [Syntax:]
 
-Defined in couplingProperties dictionary.
+Defined in "couplingProperties"_CFDEMcoupling_dicts.html#couplingProperties
+dictionary.
 
 IOModel "trackIO"; :pre
 
@@ -25,5 +26,5 @@ The trackIO-model is based on sophIO model and additionally writes fields necess
 
 [Related commands:]
 
-"IOModel"_IOModel.html
+"IOModel"_IOModel.html, "IOModel sophIO"_IOModel_sophIO.html
 

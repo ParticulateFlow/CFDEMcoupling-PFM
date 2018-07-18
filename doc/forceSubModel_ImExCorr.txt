@@ -9,7 +9,8 @@ forceSubModel ImExCorr command :h3
 
 [Syntax:]
 
-Defined in couplingProperties sub-dictionary of the force model in use.
+Defined in "couplingProperties"_CFDEMcoupling_dicts.html#couplingProperties
+sub-dictionary of the force model in use.
 
 forceSubModels
 (

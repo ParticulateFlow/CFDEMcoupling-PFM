@@ -9,7 +9,8 @@ liggghtsCommandModel writeLiggghts command :h3
 
 [Syntax:]
 
-Defined in liggghtsCommmands dictionary.
+Defined in "liggghtsCommmands"_CFDEMcoupling_dicts.html#liggghtsCommands
+dictionary.
 
 liggghtsCommandModels
 (

@@ -9,7 +9,8 @@ probeModel off command :h3
 
 [Syntax:]
 
-To be activated via couplingProperties dictionary.
+Defined in "couplingProperties"_CFDEMcoupling_dicts.html#couplingProperties
+dictionary.
 
 forceModels
 \{

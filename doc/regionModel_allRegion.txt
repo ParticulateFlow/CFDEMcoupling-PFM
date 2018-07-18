@@ -9,7 +9,10 @@ regionModel allRegion command :h3
 
 [Syntax:]
 
-Note: In the current CFDEMcoupling version, this model is no longer used. Defined in couplingProperties dictionary.
+NOTE: In the current CFDEMcoupling version, this model is no longer used.
+
+Defined in "couplingProperties"_CFDEMcoupling_dicts.html#couplingProperties
+dictionary.
 
 regionModel allRegion; :pre
 

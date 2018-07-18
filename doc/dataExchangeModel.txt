@@ -9,7 +9,8 @@ dataExchangeModel command :h3
 
 [Syntax:]
 
-Defined in couplingProperties dictionary.
+Defined in "couplingProperties"_CFDEMcoupling_dicts.html#couplingProperties
+dictionary.
 
 dataExchangeModel model; :pre
 
@@ -32,6 +33,9 @@ None.
 
 [Related commands:]
 
-"noDataExchange"_dataExchangeModel_noDataExchange.html, "oneWayVTK"_dataExchangeModel_oneWayVTK.html, "twoWayFiles"_dataExchangeModel_twoWayFiles.html, "twoWayMPI"_dataExchangeModel_twoWayMPI.html
+"noDataExchange"_dataExchangeModel_noDataExchange.html,
+"oneWayVTK"_dataExchangeModel_oneWayVTK.html,
+"twoWayFiles"_dataExchangeModel_twoWayFiles.html,
+"twoWayMPI"_dataExchangeModel_twoWayMPI.html
 
 [Default:] none

@@ -9,7 +9,8 @@ forceModel command :h3
 
 [Syntax:]
 
-Defined in couplingProperties dictionary.
+Defined in "couplingProperties"_CFDEMcoupling_dicts.html#couplingProperties
+dictionary.
 
 forceModels
 (
@@ -38,6 +39,8 @@ None.
 
 [Related commands:]
 
-"Archimedes"_forceModel_Archimedes.html, "DiFeliceDrag"_forceModel_DiFeliceDrag.html, "gradPForce"_forceModel_gradPForce.html, "viscForce"_forceModel_viscForce.html,"dSauter"_forceModel_dSauter.html
+"Archimedes"_forceModel_Archimedes.html, "DiFeliceDrag"_forceModel_DiFeliceDrag.html,
+"gradPForce"_forceModel_gradPForce.html, "viscForce"_forceModel_viscForce.html,
+"dSauter"_forceModel_dSauter.html
 
 [Default:] none.
