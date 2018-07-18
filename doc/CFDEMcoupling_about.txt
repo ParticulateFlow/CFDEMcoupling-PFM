@@ -43,7 +43,7 @@ CFDEMcoupling stands for Computational Fluid Dynamics (CFD) - Discrete Element
 Method (DEM) coupling.
 
 CFDEMcoupling is an open-source code, distributed freely under the terms of the
-GNU Public License (GPL).
+"GNU Public License (GPL)"_https://www.gnu.org/licenses/gpl-3.0.en.html.
 
 Core development of CFDEMcoupling is done by Christoph Goniva and Christoph
 Kloss, both at DCS Computing GmbH, 2012
