@@ -7,11 +7,32 @@
 
 1. About CFDEMcoupling :link(1_1),h3
 
+<!-- HTML_ONLY -->
 CFDEMcoupling provides an open-source parallel coupled CFD-DEM framework
-combining the strengths of the "LIGGGHTS"_lig DEM code and the Open Source CFD
-package "OpenFOAM(R)(*)"_of. The CFDEMcoupling toolbox allows to expand standard
-CFD solvers of "OpenFOAM(R)(*)"_of to include a coupling to the DEM code
-"LIGGGHTS"_lig. In this toolbox the particle representation within the CFD
+combining the strengths of the "LIGGGHTS"_lig DEM code and the open-source CFD
+package "OpenFOAM&reg;"_of (*). The CFDEMcoupling toolbox allows to expand standard
+CFD solvers of "OpenFOAM&reg;"_of (*) to include a coupling to the DEM code
+"LIGGGHTS"_lig.
+
+:link(of,http://www.openfoam.org)
+:link(lig,http://www.cfdem.com)
+
+<!-- END_HTML_ONLY -->
+
+<!-- RST
+
+CFDEMcoupling provides an open-source parallel coupled CFD-DEM framework
+combining the strengths of the `LIGGGHTS <http://www.cfdem.com>`_ DEM code and
+the open-source CFD package OpenFOAM\ |reg|\ (*).
+The CFDEMcoupling toolbox allows to expand standard CFD solvers of
+OpenFOAM\ |reg|\ (*) to include a coupling to the DEM code
+`LIGGGHTS <http://www.cfdem.com>`_.
+
+.. |reg|    unicode:: U+000AE .. REGISTERED SIGN
+
+END_RST -->
+
+In this toolbox the particle representation within the CFD
 solver is organized by "cloud" classes. Key functionalities are organised in
 sub-models (e.g. force models, data exchange models, etc.) which can easily be
 selected and combined by dictionary settings.
@@ -53,14 +74,26 @@ Computing GmbH, 2012.
 
 :line
 
+<!-- HTML_ONLY -->
 NOTE:
 (*) This offering is not approved or endorsed by OpenCFD Limited, producer and
 distributor of the OpenFOAM software via www.openfoam.com, and owner of the
-OPENFOAM(R) and OpenCFD(R) trade marks.
-OPENFOAM(R) is a registered trade mark of OpenCFD Limited, producer and
+OPENFOAM&reg; and OpenCFD&reg; trade marks.
+OPENFOAM&reg; is a registered trade mark of OpenCFD Limited, producer and
 distributor of the OpenFOAM software via www.openfoam.com.
+<!-- END_HTML_ONLY -->
 
-:link(of,http://www.openfoam.org)
-:link(lig,http://www.cfdem.com)
+<!-- RST
 
+.. note::
+
+   (*) This offering is not approved or endorsed by OpenCFD Limited, producer
+   and distributor of the OpenFOAM software via www.openfoam.com, and owner of
+   the OPENFOAM\ |reg| and OpenCFD\ |reg| trade marks.
+   OPENFOAM\ |reg| is a registered trade mark of OpenCFD Limited, producer and
+   distributor of the OpenFOAM software via www.openfoam.com.
+
+.. |reg|    unicode:: U+000AE .. REGISTERED SIGN
+
+END_RST -->
 

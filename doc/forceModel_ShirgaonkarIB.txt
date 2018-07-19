@@ -59,7 +59,7 @@ Only for immersed boundary solvers.
 
 :link(Shirgaonkar2009)
 [(Shirgaonkar, 2009)] Shirgaonkar, A. A., MacIver, M. A. and Patankar, N. A., (2009),
-“A new mathematical formulation and fast algorithm for fully resolved simulation
-of self-propulsion”, J. Comput. Phys., 228, pp. 2366-2390.
+"A new mathematical formulation and fast algorithm for fully resolved simulation
+of self-propulsion", J. Comput. Phys., 228, pp. 2366-2390.
 
 

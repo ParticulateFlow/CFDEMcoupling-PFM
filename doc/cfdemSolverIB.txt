@@ -9,14 +9,27 @@ cfdemSolverIB command :h3
 
 [Description:]
 
-"cfdemSolverIB" is a coupled CFD-DEM solver using CFDEMcoupling, an open source
+"cfdemSolverIB" is a coupled CFD-DEM solver using CFDEMcoupling, an open-source
 parallel coupled CFD-DEM framework, for calculating the dynamics between
 immersed bodies and the surrounding fluid. Being an implementation of an
 immersed boundary method it allows tackling problems where the body diameter
-exceeds the maximal size of a fluid cell. Using the toolbox of OpenFOAM(R)(*)
-the governing equations of the fluid are computed and the corrections of
-velocity and pressure field with respect to the body-movement information,
-gained from LIGGGHTS, are incorporated.
+exceeds the maximal size of a fluid cell.
+
+<!-- HTML_ONLY -->
+Using the toolbox of OpenFOAM&reg;(*) the governing equations of the fluid are
+computed and the corrections of velocity and pressure field with respect to the
+body-movement information, gained from LIGGGHTS, are incorporated.
+<!-- END_HTML_ONLY -->
+
+<!-- RST
+
+Using the toolbox of OpenFOAM\ |reg|\ (*) the governing equations of the fluid are
+computed and the corrections of velocity and pressure field with respect to the
+body-movement information, gained from LIGGGHTS, are incorporated.
+
+.. |reg|    unicode:: U+000AE .. REGISTERED SIGN
+
+END_RST -->
 
 The code of this solver was contributed by A. Hager, JKU. For more details, see
 "Goniva et al. (2011)"_#Goniva2011 and "Hager et al. (2011)"_#Hager2011
@@ -68,10 +81,26 @@ Trondheim, Norway (2011)
 
 :line
 
+<!-- HTML_ONLY -->
 NOTE:
 (*) This offering is not approved or endorsed by OpenCFD Limited, producer and
 distributor of the OpenFOAM software via www.openfoam.com, and owner of the
-OPENFOAM(R) and OpenCFD(R) trade marks.
-OPENFOAM(R) is a registered trade mark of OpenCFD Limited, producer and
+OPENFOAM&reg; and OpenCFD&reg; trade marks.
+OPENFOAM&reg; is a registered trade mark of OpenCFD Limited, producer and
 distributor of the OpenFOAM software via www.openfoam.com.
+<!-- END_HTML_ONLY -->
+
+<!-- RST
+
+.. note::
+
+   (*) This offering is not approved or endorsed by OpenCFD Limited, producer
+   and distributor of the OpenFOAM software via www.openfoam.com, and owner of
+   the OPENFOAM\ |reg| and OpenCFD\ |reg| trade marks.
+   OPENFOAM\ |reg| is a registered trade mark of OpenCFD Limited, producer and
+   distributor of the OpenFOAM software via www.openfoam.com.
+
+.. |reg|    unicode:: U+000AE .. REGISTERED SIGN
+
+END_RST -->
 
