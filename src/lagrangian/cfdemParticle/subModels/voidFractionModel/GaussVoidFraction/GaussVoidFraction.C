@@ -73,7 +73,7 @@ GaussVoidFraction::GaussVoidFraction
     //reading maxCellsPerParticle from dictionary
     maxCellsPerParticle_=readLabel(propsDict_.lookup("maxCellsPerParticle"));
 
-    if(alphaMin_ > 1 || alphaMin_ < 0.01){ FatalError<< "alphaMin shloud be > 1 and < 0.01." << abort(FatalError); }
+    if(alphaMin_ > 1 || alphaMin_ < 0.01) { FatalError << "alphaMin must have a value between 0.01 and 1.0." << abort(FatalError); }
 
     checkWeightNporosity(propsDict_);
 }
