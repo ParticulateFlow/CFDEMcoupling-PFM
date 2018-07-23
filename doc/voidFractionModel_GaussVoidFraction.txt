@@ -23,8 +23,8 @@ GaussProps
 
 {number1} = maximum number of cells covered by a particle (search will fail when more than {number1} cells are covered by the particle) :ulb,l
 {number2} = minimum limit for voidfraction :l
-{number3} = (optional) scaling of the particle volume to account for porosity or agglomerations. :l
-{number4} = (optional) diameter of the particle's representation is artificially increased according to {number2} * Vparticle, volume remains unaltered! :l
+{number3} = (optional, default 1.0) scaling of the particle volume to account for porosity or agglomerations. :l
+{number4} = (optional, default 1.0) diameter of the particle's representation is artificially increased according to {number2} * Vparticle, volume remains unaltered! :l
 :ule
 
 [Examples:]

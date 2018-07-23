@@ -23,18 +23,18 @@ executeProps0
         run
         $couplingInterval
     );
-    runFirst             switch1; 
+    runFirst             switch1;
     runLast              switch2;
     runEveryCouplingStep switch3;
     runEveryWriteStep    switch4;
     verbose;
 \} :pre
 
-{command} = LIGGGHTS command to be executed. Each word in a new line, numbers and symbols need special treatment (e.g. $couplingInterval will be replaced by correct coupling interval in the simulation)  :ulb,l
-{switch1} = switch (choose on/off) if the command is executed only at first time step :l
-{switch2} = switch (choose on/off) if the command is executed only at last time step :l
-{switch3} = switch (choose on/off) if the command is executed at every coupling step :l
-{switch4} = switch (choose on/off) if the command is executed at every writing step :l
+{command} = LIGGGHTS command to be executed. Each word in a new line, numbers and symbols need special treatment (e.g. $couplingInterval will be replaced by correct coupling interval in the simulation) :ulb,l
+{switch1} = (optional, default off) if the command is executed only at first time step :l
+{switch2} = (optional, default off) if the command is executed only at last time step (requires {switch1} to be off) :l
+{switch3} = (optional, default off) if the command is executed at every coupling step (requires {switch1} and {switch2} to be off) :l
+{switch4} = (optional, default off) if the command is executed at every writing step (requires {switch1} to {switch3} to be off) :l
 {verbose} = (normally off) for verbose run :l
 :ule
 

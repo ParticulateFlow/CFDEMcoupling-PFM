@@ -16,11 +16,13 @@ dataExchangeModel twoWayFiles;
 twoWayFilesProps
 \{
     couplingFilename        "filename";
-    maxNumberOfParticles    number;
+    maxNumberOfParticles    scalar1;
+    DEMts                   scalar2;
 \} :pre
 
 {filename} = filename of the VTK file series :ulb,l
-{number} = maximum number of particles in DEM simulation :l
+{scalar1} = maximum number of particles in DEM simulation :l
+{scalar2} = DEM time step width :l
 :ule
 
 [Examples:]

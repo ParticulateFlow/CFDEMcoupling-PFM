@@ -21,13 +21,15 @@ implicitCoupleProps
     velFieldName          "U";
     granVelFieldName      "Us";
     voidfractionFieldName "voidfraction";
-    minAlphaP             number;
+    KslLimit              scalar1;
+    minAlphaP             scalar2;
 \} :pre
 
 {U} = name of the finite volume fluid velocity field :ulb,l
 {Us} = name of the finite volume granular velocity field :l
 {voidfraction} = name of the finite volume voidfraction field :l
-{number} = minimum value for local particle volume fraction to calculate the exchange filed (default SMALL) :l
+{scalar1} = (optional, default 1e10) limit implicit momentum exchange field :l
+{scalar2} = (optional, default SMALL) minimum value for local particle volume fraction to calculate the exchange field :l
 :ule
 
 [Examples:]
