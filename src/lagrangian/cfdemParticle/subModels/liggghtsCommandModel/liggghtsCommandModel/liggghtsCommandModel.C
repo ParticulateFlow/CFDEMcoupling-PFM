@@ -288,7 +288,7 @@ void liggghtsCommandModel::parseCommandList(wordList& commandList,labelList& lab
         {
             add = "";
             timeStamp=true;
-        }else if (add=="number") // next command will be a number read from labelList
+        }else if (add=="number") // next command will be a number read from scalarList
         {
             /*if (!propsDict.found("scalars"))
             {
