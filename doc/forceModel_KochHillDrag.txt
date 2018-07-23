@@ -18,16 +18,26 @@ forceModels
 );
 KochHillDragProps
 \{
-    velFieldName          "U";
-    voidfractionFieldName "voidfraction";
-    interpolation         switch1;
-    implForceDEM          switch2;
+    velFieldName            "U";
+    voidfractionFieldName   "voidfraction";
+    granVelFieldName        "Us"
+    treatForceExplicit      switch1;
+    implForceDEM            switch2;
+    verbose                 switch3;
+    interpolation           switch4;
+    implForceDEMaccumulated switch5;
+    scalarViscosity         switch6;
 \} :pre
 
 {U} = name of the finite volume fluid velocity field :ulb,l
 {voidfraction} = name of the finite volume voidfraction field :l
-{switch1} = (optional, normally off) flag to use interpolated voidfraction and fluid velocity values :l
-{switch2} = (optional, normally off) flag to use implicit formulation of drag on DEM side :l
+{Us} = (optional, default "Us") name of finite volume granular velocity field :l
+{switch1} = (optional, default false) sub model switch, see "forceSubModel"_forceSubModel.html for details :l
+{switch2} = (optional, default false) flag to use implicit formulation of drag on DEM side :l
+{switch3} = (optional, default false) sub model switch, see "forceSubModel"_forceSubModel.html for details :l
+{switch4} = (optional, default false) flag to use interpolated voidfraction and fluid velocity values :l
+{switch5} = (optional, default false) sub model switch, see "forceSubModel"_forceSubModel.html for details :l
+{switch6} = (optional, default false) sub model switch, see "forceSubModel"_forceSubModel.html for details :l
 :ule
 
 [Examples:]

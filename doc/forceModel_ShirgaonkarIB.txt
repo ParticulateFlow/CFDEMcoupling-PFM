@@ -18,12 +18,16 @@ forceModels
 );
 ShirgaonkarIBProps
 \{
-    velFieldName "U";
+    velFieldName      "U";
     pressureFieldName "pressure";
+    twoDimensional;
+    treatForceExplicit switch1;
 \} :pre
 
 {U} = name of the finite volume fluid velocity field :ulb,l
 {pressure} = name of the finite volume pressure field :l
+{twoDimensional} = optional keyword for conducting a two dimensional calculation :l
+{switch1} = (optional, default false) sub model switch, see "forceSubModel"_forceSubModel.html for details :l
 :ule
 
 [Examples:]

@@ -29,10 +29,7 @@ volWeightedAverageProps
     );
     upperThreshold     scalar1;
     lowerThreshold     scalar2;
-    useVolumeFraction  switch0;
-    volumeFractionName word1;
     verbose;
-    writeToFile        switch1;
 \} :pre
 
 {time} = (optional, default 0.) time to start the averaging :ulb,l
@@ -40,10 +37,7 @@ volWeightedAverageProps
 {vectorField} = names of the finite volume vector fields to be temporally averaged :l
 {scalar1} = only cells with a field value (magnitude) lower than this upper threshold are considered :l
 {scalar2} = only cells with a field value (magnitude) greater than this lower threshold are considered :l
-{switch0} = (optional, default false) consider a volume fraction for the calculation :l
-{word1} = (optional, default "voidfraction") name of the volume fraction, only used if useVolumeFraction is true :l
 {verbose} = (optional, default false) keyword only (mostly used for debugging) :l
-{switch1} = (optional, default false) switch for the output. :l
 :ule
 
 [Examples:]

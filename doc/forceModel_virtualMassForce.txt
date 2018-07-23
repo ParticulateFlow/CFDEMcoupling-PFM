@@ -19,9 +19,19 @@ forceModels
 virtualMassForceProps
 \{
     velFieldName "U";
+    phiFieldName "phi";
+    splitUrelCalculation switch1;
+    Cadd scalar1;
+    treatForceExplicit switch2;
+    interpolation switch3;
 \} :pre
 
 {U} = name of the finite volume fluid velocity field :ulb,l
+{phi} = name of the finite volume flux field :l
+{switch1} = (optional, default false) indicator to split calculation of Urel between CFDEM and LIGGGHTS :l
+{scalar1} = (optional, default 0.5) virtual mass coefficient :l
+{switch2} = (optional, default true) sub model switch, see "forceSubModel"_forceSubModel.html for details :l
+{switch3} = (optional, default false) sub model switch, see "forceSubModel"_forceSubModel.html for details :l
 :ule
 
 [Examples:]
@@ -33,6 +43,7 @@ forceModels
 virtualMassForceProps
 \{
     velFieldName "U";
+    phiFieldName "phi";
 \} :pre
 
 [Description:]

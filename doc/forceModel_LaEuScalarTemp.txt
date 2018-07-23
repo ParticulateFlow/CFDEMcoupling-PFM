@@ -23,10 +23,12 @@ LaEuScalarTempProps
     voidfractionFieldName "voidfraction";
     partTempName          "Temp";
     partHeatFluxName      "convectiveHeatFlux";
-    lambda                value;
-    Cp                    value1;
-    interpolation         "switch1";
-    verbose               "switch2";
+    lambda                scalar1;
+    Cp                    scalar2;
+    maxSource             scalar3;
+    verbose               switch1;
+    interpolation         switch2;
+    scalarViscosity       switch3;
 \} :pre
 
 {U} = name of the finite volume fluid velocity field :ulb,l
@@ -34,10 +36,12 @@ LaEuScalarTempProps
 {voidfraction} = name of the finite volume voidfraction field :l
 {Temp} = name of the DEM data representing the particles temperature :l
 {convectiveHeatFlux} = name of the DEM data representing the particle-fluid convective heat flux :l
-{value} = fluid thermal conductivity \[W/(m*K)\] :l
-{value1} = fluid specific heat capacity \[W*s/(kg*K)\] :l
-{switch1} = (optional, normally off) flag to use interpolated voidfraction and fluid velocity values :l
-{switch2} = (normally off) for verbose run :l
+{scalar1} = fluid thermal conductivity \[W/(m*K)\] :l
+{scalar2} = fluid specific heat capacity \[W*s/(kg*K)\] :l
+{scalar3} = (optional, default 1e30) limit maximal turbulence :l
+{switch1} = (optional, default false) for verbose run :l
+{switch2} = (optional, default false) flag to use interpolated voidfraction and fluid velocity values :l
+{switch3} = (optional, default false) sub model switch, see "forceSubModel"_forceSubModel.html for details :l
 :ule
 
 [Examples:]

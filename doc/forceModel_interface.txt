@@ -19,15 +19,25 @@ forceModels
 interfaceProps
 \{
     VOFvoidfractionFieldName "alpha";
-    alphaThreshold           value1;
-    sigma                    value2;
-    theta                    value3;
+    gradAlphaName            "gradAlpha";
+    alphaThreshold           scalar1;
+    sigma                    scalar2;
+    theta                    scalar3;
+    deltaAlphaIn             scalar4;
+    deltaAlphaOut            scalar5;
+    C                        scalar6;
+    treatForceExplicit       switch1;
 \} :pre
 
 {alpha} = name of the finite volume fluid volume fraction field in a VOF simulation :ulb,l
-{value1} = parameter used to define the distance of influence of the model :l
-{value2} = fluid gas surface tension :l
-{value3} = Three-phase contact angle for interface force :l
+{gradAlpha} = name of gradient fluid volume fraction field :l
+{scalar1} = parameter used to define the distance of influence of the model :l
+{scalar2} = fluid gas surface tension :l
+{scalar3} = Three-phase contact angle for interface force :l
+{scalar4} = delta value subtracted from alphaThreshold :l
+{scalar5} = delta value added to alphaThreshold :l
+{scalar6} = (optional, default 1.0) factor to scale interfacial force :l
+{switch1} = (optional, default false) sub model switch, see "forceSubModel"_forceSubModel.html for details :l
 :ule
 
 [Examples:]
@@ -39,9 +49,12 @@ forceModels
 interfaceProps
 \{
     VOFvoidfractionFieldName "alpha";
-    alphaThreshold           0.54;
+    gradAlphaName            "gradAlpha";
+    alphaThreshold           0.55;
     sigma                    0.07;
     theta                    1.12;
+    deltaAlphaIn             0.05;
+    deltaAlphaOut            0.05;
 \} :pre
 
 [Description:]

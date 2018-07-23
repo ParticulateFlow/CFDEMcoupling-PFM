@@ -18,10 +18,15 @@ forceModels
 ); :pre
 noDragProps (optional)
 \{
-    noDEMForce;   (optional)
-    keepCFDForce; (optional)
+    noDEMForce;
+    keepCFDForce;
+    treatForceExplicit switch1;
 \} :pre
 
+{noDEMForce} = (optional, default false) do not apply the previously calculated forces in DEM integration :ulb,l
+{keepCFDForce} = (optional, default false) do not delete the previously calculated forces and use them in CFD source terms :l
+{switch1} = (optional, default false) sub model switch, see "forceSubModel"_forceSubModel.html for details :l
+:ule
 
 [Examples:]
 

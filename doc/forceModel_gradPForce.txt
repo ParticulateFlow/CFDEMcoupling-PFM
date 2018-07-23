@@ -18,14 +18,20 @@ forceModels
 );
 gradPForceProps
 \{
-    pFieldName        "pressure";
-    velocityFieldName "U";
-    interpolation     switch1;
+    pFieldName         "pressure";
+    velocityFieldName  "U";
+    useAddedMass       scalar1;
+    treatForceExplicit switch1;
+    treatForceDEM      switch2;
+    interpolation      switch3;
 \} :pre
 
 {pressure} = name of the finite volume fluid pressure field :ulb,l
 {U} = name of the finite volume fluid velocity field :l
-{switch1} = flag to use interpolated pressure values (normally off) :l
+{scalar1} = (optional, default 0) coefficient of added mass accounted for :l
+{switch1} = (optional, default false) sub model switch, see "forceSubModel"_forceSubModel.html for details :l
+{switch2} = (optional, default false) sub model switch, see "forceSubModel"_forceSubModel.html for details :l
+{switch3} = (optional, default false) flag to use interpolated pressure values :l
 :ule
 
 [Examples:]

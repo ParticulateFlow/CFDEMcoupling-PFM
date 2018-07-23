@@ -18,10 +18,14 @@ forceModels
 );
 ArchimedesProps
 \{
-    gravityFieldName "gravity";
+    gravityFieldName   "gravity";
+    treatForceExplicit switch1;
+    treatForceDEM      switch2;
 \} :pre
 
 {gravity} = name of the finite volume gravity field :ulb,l
+{switch1} = (optional, default false) sub model switch, see "forceSubModel"_forceSubModel.html for details :l
+{switch2} = (optional, default false) sub model switch, see "forceSubModel"_forceSubModel.html for details :l
 :ule
 
 [Examples:]

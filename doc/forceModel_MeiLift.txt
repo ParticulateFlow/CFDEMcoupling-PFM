@@ -20,14 +20,18 @@ MeiLiftProps
 \{
     velFieldName        "U";
     useSecondOrderTerms;
-    interpolation       switch1;
+    treatForceExplicit  switch1;
     verbose             switch2;
+    interpolation       switch3;
+    scalarViscosity     switch4;
 \} :pre
 
 {U} = name of the finite volume fluid velocity field :ulb,l
-{useSecondOrderTerms} = switch to activate second order terms in the lift force model :l
-{switch1} = switch to activate tri-linear interpolation of the flow quantities at the particle position :l
-{switch2} = switch to activate the report of per-particle quantities to the screen :l
+{useSecondOrderTerms} = (optional, default false) switch to activate second order terms in the lift force model :l
+{switch1} = (optional, default false) sub model switch, see "forceSubModel"_forceSubModel.html for details :l
+{switch2} = (optional, default false) switch to activate the report of per-particle quantities to the screen :l
+{switch3} = (optional, default false) switch to activate tri-linear interpolation of the flow quantities at the particle position :l
+{switch4} = (optional, default false) sub model switch, see "forceSubModel"_forceSubModel.html for details :l
 :ule
 
 [Examples:]

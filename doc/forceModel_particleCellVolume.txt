@@ -18,13 +18,15 @@ forceModels
 );
 particleCellVolumeProps
 \{
-    upperThreshold value;
-    lowerThreshold value2;
+    upperThreshold scalar1;
+    lowerThreshold scalar2;
+    startTime      scalar3;
     verbose;
 \} :pre
 
-{value} = only cells with a field value (magnitude) lower than this upper threshold are considered :l
-{value2} = only cells with a field value (magnitude) greater than this lower threshold are considered :l
+{scalar1} = only cells with a field value (magnitude) lower than this upper threshold are considered :l
+{scalar2} = only cells with a field value (magnitude) greater than this lower threshold are considered :l
+{scalar3} = (optional, default 0) start time of volume calculation and output :l
 :ule
 
 [Examples:]

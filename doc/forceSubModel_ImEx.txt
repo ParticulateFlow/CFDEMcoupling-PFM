@@ -17,9 +17,17 @@ forceSubModels
     ImEx;
 ); :pre
 
-treatExplicit true;  // optional for some force models.
-treatDEM true;       // optional for some force models.
-implDEM true;        // optional for some force models. :pre
+Optional for some force models:
+
+treatForceExplicit                 true;
+treatForceDEM                      true;
+implForceDEM                       true;
+verbose                            true;
+interpolation                      true;
+useFilteredDragModel               true;
+useParcelSizeDependentFilteredDrag true;
+implForceDEMaccumulated            true;
+scalarViscosity                    true; :pre
 
 [Examples:]
 
@@ -27,7 +35,7 @@ forceSubModels
 (
     ImEx;
 );
-treatExplicit true;  // optional for some force models. :pre
+treatForceExplicit true;  // optional for some force models. :pre
 
 [Description:]
 

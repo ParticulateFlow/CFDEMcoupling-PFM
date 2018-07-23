@@ -18,12 +18,20 @@ forceModels
 );
 viscForceProps
 \{
-    velocityFieldName "U";
-    interpolation     switch;
+    velocityFieldName  "U";
+    useAddedMass       scalar1;
+    treatForceExplicit switch1;
+    treatForceDEM      switch2;
+    interpolation      switch3;
+    scalarViscosity    switch4;
 \} :pre
 
 {U} = name of the finite volume fluid velocity field :ulb,l
-{switch} = flag to use interpolated stress values (normally off) :l
+{scalar1} = (optional, default 0) coefficient of added mass accounted for :l
+{switch1} = (optional, default false) sub model switch, see "forceSubModel"_forceSubModel.html for details :l
+{switch2} = (optional, default false) sub model switch, see "forceSubModel"_forceSubModel.html for details :l
+{switch3} = (optional, default false) flag to use interpolated stress values :l
+{switch4} =  (optional, default false) sub model switch, see "forceSubModel"_forceSubModel.html for details :l
 :ule
 
 [Examples:]

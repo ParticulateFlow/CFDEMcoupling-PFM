@@ -19,9 +19,11 @@ forceModels
 SchillerNaumannDragProps
 \{
     velFieldName "U";
+    treatForceExplicit switch1;
 \} :pre
 
 {U} = name of the finite volume fluid velocity field :ulb,l
+{switch1} = (optional, default false) sub model switch, see "forceSubModel"_forceSubModel.html for details :l
 :ule
 
 [Examples:]
