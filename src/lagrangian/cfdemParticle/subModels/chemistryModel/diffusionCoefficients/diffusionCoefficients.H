@@ -78,15 +78,6 @@ private:
 
     mutable double **partPressure_;
 
-    word densityFieldName_;
-
-    const volScalarField& rho_;
-
-    // total mole field
-    word molarConcFieldName_;
-
-    const volScalarField& molarConc_;
-
     UPtrList<volScalarField> X_;
 
     wordList diffusantGasNames_;
