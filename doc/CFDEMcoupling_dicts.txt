@@ -59,12 +59,12 @@ exchanges.
 
 A useful procedure would be:
 
-Set the DEM timestep in the LIGGGHTS input file according to the needs of the
+Set the DEM time step in the LIGGGHTS input file according to the needs of the
 pure DEM problem. :olb,l
-Set the {couplingInterval}, which refers to the DEM timesteps. Depending on the
+Set the {couplingInterval}, which refers to the DEM time steps. Depending on the
 problem you will need to have a close (small couplingInterval) or loose
 coupling. :l
-Choose the CFD timestep in the controlDict. It must be equal to or smaller than
+Choose the CFD time step in the controlDict. It must be equal to or smaller than
 the coupling time, otherwise you will get the error: "Error - TS bigger than
 coupling interval!". :l,ole
 

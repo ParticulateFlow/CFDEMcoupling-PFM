@@ -5,14 +5,14 @@
 
 :line
 
-voidfractionModel divided command :h3
+voidFractionModel divided command :h3
 
 [Syntax:]
 
 Defined in "couplingProperties"_CFDEMcoupling_dicts.html#couplingProperties
 dictionary.
 
-voidfractionModel divided;
+voidFractionModel divided;
 dividedProps
 \{
     alphaMin       number1;
@@ -23,8 +23,8 @@ dividedProps
     verbose;
 \} :pre
 
-{number1} = minimum limit for voidfraction :ulb,l
-{interpolation} = flag to interpolate voidfraction to particle positions (normally off) :l
+{number1} = minimum limit for void fraction :ulb,l
+{interpolation} = flag to interpolate void fraction to particle positions (normally off) :l
 {number2} = (optional) scaling of the particle volume to account for porosity or agglomerations. :l
 {number3} = (optional) diameter of the particle's representation is artificially increased according to {number2} * Vparticle, volume remains unaltered! :l
 {switch1} = (optional, default false) allow for correction at processor boundaries. This requires the use of engineIB and vice versa. :l
@@ -33,7 +33,7 @@ dividedProps
 
 [Examples:]
 
-voidfractionModel divided;
+voidFractionModel divided;
 dividedProps
 \{
     alphaMin 0.2;
@@ -41,7 +41,7 @@ dividedProps
 
 [Description:]
 
-The {divided} voidFraction model is supposed to be used when a particle (or its
+The {divided} void fraction model is supposed to be used when a particle (or its
 representation) is in the size range of a CFD cell. Satellite points are used to
 divide the particle's volume to the touched cells.
 
@@ -93,5 +93,5 @@ none
 
 [Related commands:]
 
-"voidfractionModel"_voidFractionModel.html
+"voidFractionModel"_voidFractionModel.html
 

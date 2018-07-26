@@ -27,7 +27,7 @@ implicitCoupleProps
 
 {U} = name of the finite volume fluid velocity field :ulb,l
 {Us} = name of the finite volume granular velocity field :l
-{voidfraction} = name of the finite volume voidfraction field :l
+{voidfraction} = name of the finite volume void fraction field :l
 {scalar1} = (optional, default 1e10) limit implicit momentum exchange field :l
 {scalar2} = (optional, default SMALL) minimum value for local particle volume fraction to calculate the exchange field :l
 :ule

@@ -5,7 +5,7 @@
 
 :line
 
-liggghtsCommandModel command :h3
+liggghtsCommandModels command :h3
 
 [Syntax:]
 

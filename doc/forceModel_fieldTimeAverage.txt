@@ -55,7 +55,7 @@ fieldTimeAverageProps
 [Description:]
 
 This "force model" does not influence the particles or the simulation - it is a
-postprocessing tool! Starting at start time the specified fields are temporally
+post-processing tool! Starting at start time the specified fields are temporally
 averaged and written at "writeTime". They can then be probed using standard
 function object probes. The output name is timeAverage_scalarField, where
 scalarField is the name of the original field.

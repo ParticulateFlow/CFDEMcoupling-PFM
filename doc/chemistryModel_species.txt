@@ -31,7 +31,7 @@ speciesProps
 {ChemistryFile} = path to file, where the reacting species are listed  :ulb,l
 {T} = name of the finite volume temperature field, it is already added in default and doesn't need to be specified if name is the same :l
 {rho} = name of the finite volume density field, it is already added in default and doesn't need to be specified if name is the same :l
-{voidfraction} = name of the finite volume voidfraction field, it is already added in default and doesn't need to be specified if name is the same :l
+{voidfraction} = name of the finite volume void fraction field, it is already added in default and doesn't need to be specified if name is the same :l
 {molarConc} = name of the finite volume molar concentration field, it is already added in default and doesn't need to be specified if name is the same :l
 {partTemp} = name of the finite volume cell averaged particle temperature field, it is already added in default and doesn't need to be specified if name is the same :l
 {partRho} = name of the finite volume cell averaged density temperature field, it is already added in default and doesn't need to be specified if name is the same :l
@@ -54,7 +54,7 @@ speciesProps
 
 The chemistry model performs the calculation of chemical reactional effects
 acting on each DEM particle. The species model is the model, where the specified
-species fields (from the foam.inp folder) are intialized, and information such
+species fields (from the foam.inp folder) are initialized, and information such
 as temperature, density, molar concentration and more importantly the molar
 fractions are transferred to DEM side.
 

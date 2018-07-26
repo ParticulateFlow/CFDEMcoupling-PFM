@@ -21,7 +21,7 @@ IOModel sophIO; :pre
 [Description:]
 
 The {sophIO} model is based on the "basicIO"_IOModel_basicIO.html model and
-additionally writes voidfraction, implicit forces and explicit forces.
+additionally writes void fraction, implicit forces and explicit forces.
 
 Data is written every write time of the CFD simulation.
 

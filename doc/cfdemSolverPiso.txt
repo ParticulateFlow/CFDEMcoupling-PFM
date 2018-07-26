@@ -15,7 +15,7 @@ cfdemSolverPiso command :h3
 [Description:]
 
 <!-- HTML_ONLY -->
-"cfdemSolverPiso" is a coupled CFD-DEM solver using CFDEMcoupling, an open
+"cfdemSolverPiso" is a coupled CFD-DEM solver using CFDEMcoupling, an open-\
 source parallel coupled CFD-DEM framework. Based on pisoFoam&reg;(*), a finite
 volume based solver for turbulent Navier-Stokes equations applying the PISO
 algorithm, "cfdemSolverPiso" has additional functionality for a coupling to the
@@ -24,7 +24,7 @@ DEM code "LIGGGHTS".
 
 <!-- RST
 
-"cfdemSolverPiso" is a coupled CFD-DEM solver using CFDEMcoupling, an open
+"cfdemSolverPiso" is a coupled CFD-DEM solver using CFDEMcoupling, an open-\
 source parallel coupled CFD-DEM framework. Based on pisoFoam\ |reg|\ (*), a finite
 volume based solver for turbulent Navier-Stokes equations applying the PISO
 algorithm, "cfdemSolverPiso" has additional functionality for a coupling to the

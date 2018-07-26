@@ -12,7 +12,7 @@
 Each solver of CFDEMcoupling comes with at least one tutorial example, showing
 its functionality and correct usage. Provided that the installation is correct,
 the tutorials can be run via "Allrun.sh" shell scripts. These scripts perform
-all necessary steps (preprocessing, run, postprocessing, visualization).
+all necessary steps (pre-processing, run, post-processing, visualization).
 
 [Location:]
 
@@ -22,7 +22,7 @@ which can be reached by typing {cfdemTut} in a CLI terminal.
 [Structure:]
 
 Each case is structured in a directory called "CFD" covering the CFD relevant
-settings and data, and a dirctory called "DEM" covering the DEM relevant
+settings and data, and a directory called "DEM" covering the DEM relevant
 settings and data. This allows to easily expand a pure CFD or DEM simulation
 case to a coupled case.
 

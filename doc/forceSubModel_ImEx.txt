@@ -41,7 +41,7 @@ treatForceExplicit true;  // optional for some force models. :pre
 
 If no force sub-model is applied {ImEx} is used as default. If the keyword
 "forceSubModels" is provided, a choice of sub model is demanded. Depending on
-the force model different keywords are read and can therefrore be set
+the force model different keywords are read and can therefore be set
 (see the log file). If the keyword is provided, its value is used.
 
 [Restrictions:]

@@ -7,7 +7,7 @@
 
 :line
 
-githubAccess_public :h3
+Github access :h3
 
 [Description:]
 
@@ -125,7 +125,7 @@ Changes in $CFDEM_TUT_DIR will be lost after every {git stash}!
 
 [Additional Installations:]
 
-Optionally you can install lpp which will help you convert the DEM (dump) data to VTK format. For standard CFD-DEM runs this will not be necessary. To get the DEM postprocessing tool "lpp" you need python-numpy package installed:
+Optionally you can install lpp which will help you convert the DEM (dump) data to VTK format. For standard CFD-DEM runs this will not be necessary. To get the DEM post-processing tool "lpp" you need python-numpy package installed:
 
 sudo apt-get install python-numpy :pre
 

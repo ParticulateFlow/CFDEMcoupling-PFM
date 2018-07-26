@@ -5,7 +5,7 @@
 
 :line
 
-forceSubModel command :h3
+forceSubModels command :h3
 
 [Syntax:]
 
@@ -46,7 +46,7 @@ semi-implicitly; default off) :ulb,l
 {implForceDEM} - If true, the fluid velocity and drag coefficient are communicated
 to the DEM calculation at each coupling time step and the drag force is
 calculated at each DEM time step, using the current particle velocity.
-If false, a force term is communiated to the DEM calculation at each coupling
+If false, a force term is communicated to the DEM calculation at each coupling
 time step, the term is constant for one coupling interval.
 (on -> DEM forces are updated every DEM step; default off) :l
 {verbose} - switch for debug output to screen (on -> enable debug output; default
@@ -64,7 +64,7 @@ switch, drag force values of each DEM time step are accumulated and passed on to
 the CFD-calculation. (default off) :l
 {scalarViscosity} - switch for the usage of a user-defined viscosity nu for the
 calculation of the drag force; The CFD calculation always uses the value of the
-transport model. (off -> use tranportProperties nu; default off) :l
+transport model. (off -> use transportProperties nu; default off) :l
 :ule
 
 [Restrictions:]

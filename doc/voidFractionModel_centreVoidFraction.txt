@@ -5,27 +5,27 @@
 
 :line
 
-voidfractionModel centre command :h3
+voidFractionModel centre command :h3
 
 [Syntax:]
 
 Defined in "couplingProperties"_CFDEMcoupling_dicts.html#couplingProperties
 dictionary.
 
-voidfractionModel centre;
+voidFractionModel centre;
 centreProps
 \{
     alphaMin number1;
     weight   number2;
 \} :pre
 
-{number1} = minimum limit for voidfraction :ulb,l
+{number1} = minimum limit for void fraction :ulb,l
 {number2} = (optional) scaling of the particle volume to account for porosity or agglomerations. :l
 :ule
 
 [Examples:]
 
-voidfractionModel centre;
+voidFractionModel centre;
 centreProps
 \{
     alphaMin 0.1;
@@ -34,7 +34,7 @@ centreProps
 
 [Description:]
 
-The {centre} voidFraction model calculates the voidfraction in a CFD cell
+The {centre} void fraction model calculates the void fraction in a CFD cell
 accounting for the volume of the particles whose centres are inside the cell.
 
 The particle volume occupied in the CFD domain can be adjusted by the parameter
@@ -46,5 +46,5 @@ none
 
 [Related commands:]
 
-"voidfractionModel"_voidFractionModel.html
+"voidFractionModel"_voidFractionModel.html
 

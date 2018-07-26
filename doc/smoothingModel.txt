@@ -33,7 +33,7 @@ an error.
 [Description:]
 
 The {smoothingModel} is the base class for models that smoothen the exchange
-fields (i.e., voidfraction and the Ksl field in case of implicit force coupling).
+fields (i.e., void fraction and the Ksl field in case of implicit force coupling).
 This is relevant in case one uses a small grid resolution compared to the local
 particle diameter (or parcel diameter in case one uses a parcel approach).
 

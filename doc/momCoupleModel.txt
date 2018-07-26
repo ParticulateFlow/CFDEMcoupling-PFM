@@ -50,7 +50,7 @@ in an explicit fashion.
 Note that the switch {treatVoidCellsAsExplicitForce true;} can be set in the
 couplingProperties in order to change the treatment of cells which are void of
 particles. This is only relevant if (i) smoothing is used, and (ii) implicit
-force coupling is performed. By default, the particle veloctiy field (Us) will
+force coupling is performed. By default, the particle velocity field (Us) will
 be smoothed to obtain a meaningful reference quantity for the implicit force
 coupling. In case {treatVoidCellsAsExplicitForce true;} is set, however, Us will
 not be smoothed and implicit forces (after the smoothing has been performed) in

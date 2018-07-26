@@ -54,7 +54,7 @@ fieldStoreProps
 
 This "force model" does not influence the particles or the flow - it is a tool
 to store a scalar/vector field! This is especially useful if you use a boundary
-condition which cannot interpreted correctly in your postporcessor (e.g. paraview).
+condition which cannot interpreted correctly in your post-processor (e.g. paraview).
 
 [Restrictions:]
 

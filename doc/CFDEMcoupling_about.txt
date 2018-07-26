@@ -33,7 +33,7 @@ OpenFOAM\ |reg|\ (*) to include a coupling to the DEM code
 END_RST -->
 
 In this toolbox the particle representation within the CFD
-solver is organized by "cloud" classes. Key functionalities are organised in
+solver is organized by "cloud" classes. Key functionalities are organized in
 sub-models (e.g. force models, data exchange models, etc.) which can easily be
 selected and combined by dictionary settings.
 

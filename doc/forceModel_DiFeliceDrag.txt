@@ -31,7 +31,7 @@ DiFeliceDragProps
 \} :pre
 
 {U} = name of the finite volume fluid velocity field :ulb,l
-{voidfraction} = name of the finite volume voidfraction field :l
+{voidfraction} = name of the finite volume void fraction field :l
 {Us} = name of the finite volume granular velocity field :l
 {scalar1} = (optional) scaling of particle diameter: d_sim=scale*d_real. d_sim=(potentially coarse-grained) particle diameter.
 scale=coarse-graining factor. d_real= particle diameter as it is measured. :l
@@ -39,7 +39,7 @@ scale=coarse-graining factor. d_real= particle diameter as it is measured. :l
 {switch1} = (optional, default false) sub model switch, see "forceSubModel"_forceSubModel.html for details :l
 {switch2} = (optional, default false) sub model switch, see "forceSubModel"_forceSubModel.html for details :l
 {switch3} = (optional, default false) sub model switch, see "forceSubModel"_forceSubModel.html for details :l
-{switch4} = (optional, default false) flag to use interpolated voidfraction and velocity values :l
+{switch4} = (optional, default false) flag to use interpolated void fraction and velocity values :l
 {switch5} = (optional, default false) sub model switch, see "forceSubModel"_forceSubModel.html for details :l
 :ule
 

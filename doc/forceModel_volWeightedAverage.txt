@@ -63,7 +63,7 @@ volWeightedAverageProps
 [Description:]
 
 This "forceModel" does not influence the particles or the simulation - it is a
-postprocessing tool! Starting at start time the volume weighted averages of
+post-processing tool! Starting at start time the volume weighted averages of
 those cells of the fields within the threshold are calculated.
 
 At "writeTime" a field named volAverage_field, where scalarField is the name of

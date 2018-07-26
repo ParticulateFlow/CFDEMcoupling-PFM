@@ -5,27 +5,27 @@
 
 :line
 
-voidfractionModel command :h3
+voidFractionModel command :h3
 
 [Syntax:]
 
 Defined in "couplingProperties"_CFDEMcoupling_dicts.html#couplingProperties
 dictionary.
 
-voidfractionModel model; :pre
+voidFractionModel model; :pre
 
-model = name of the voidfractionModel to be applied :ul
+model = name of the voidFractionModel to be applied :ul
 
 [Examples:]
 
-voidfractionModel centre; :pre
+voidFractionModel centre; :pre
 
 NOTE: This examples list might not be complete - please look for other models
-(voidfractionModel XY) in this documentation.
+(voidFractionModel XY) in this documentation.
 
 [Description:]
 
-The {voidfractionModel} is the base class for models to represent the DEM
+The {voidFractionModel} is the base class for models to represent the DEM
 particle's volume in the CFD domain via a void fraction field.
 
 [Restrictions:]

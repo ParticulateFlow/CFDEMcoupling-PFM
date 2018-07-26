@@ -43,7 +43,7 @@ constDiffSmoothingProps
 
 The {constDiffSmoothing} model is a basic smoothingModel model which reads a
 smoothing length scale being used for smoothing the exchange fields
-(voidfraction, Ksl, f if present). This model can be used for smoothing explicit
+(void fraction, Ksl, f if present). This model can be used for smoothing explicit
 force coupling fields, as well as implicit force coupling algorithms.
 Smoothing for reference fields is performed to "fill in" values in cells in
 which these reference fields are not specified. Values calculated in the cells
