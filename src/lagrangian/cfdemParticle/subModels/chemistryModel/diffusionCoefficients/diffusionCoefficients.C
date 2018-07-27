@@ -111,14 +111,11 @@ diffusionCoefficient::~diffusionCoefficient()
 
 void diffusionCoefficient::reAllocMyArrays() const
 {
-    if (particleCloud_.numberOfParticlesChanged())
+    double initVal=0.0;
+    particleCloud_.dataExchangeM().allocateArray(partPressure_,initVal,1,"nparticles");
+    for (int i=0; i<diffusantGasNames_.size(); i++)
     {
-        double initVal=0.0;
-        particleCloud_.dataExchangeM().allocateArray(partPressure_,initVal,1,"nparticles");
-        for (int i=0; i<diffusantGasNames_.size(); i++)
-        {
-            particleCloud_.dataExchangeM().allocateArray(diffusionCoefficients_[i],initVal,1);
-        }
+        particleCloud_.dataExchangeM().allocateArray(diffusionCoefficients_[i],initVal,1);
     }
 }
 

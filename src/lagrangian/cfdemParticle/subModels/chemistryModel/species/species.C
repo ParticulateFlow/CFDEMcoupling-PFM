@@ -69,7 +69,7 @@ species::species
     // create a list from the Species table in the specified species dictionary
     speciesNames_(specDict_.lookup("species")),
     mod_spec_names_(speciesNames_.size()),
-    X_(speciesNames_.size()),                           //volumeScalarFields
+    X_(speciesNames_.size()),                           //volumeScalarFields of molarFractions
     molarFractions_(speciesNames_.size(),NULL),         //the value of molar fractions for every species
     changeOfSpeciesMass_(speciesNames_.size(),NULL),    //the values that are received from DEM with the name of Modified_+species name
     changeOfSpeciesMassFields_(speciesNames_.size()),   //the scalar fields generated with the values from Modified_+species names
@@ -146,18 +146,15 @@ void species::allocateMyArrays() const
 
 void species::reAllocMyArrays() const
 {
-    if (particleCloud_.numberOfParticlesChanged())
-    {
-        double initVal=0.0;
-        particleCloud_.dataExchangeM().allocateArray(partRho_,initVal,1);
-        particleCloud_.dataExchangeM().allocateArray(partTemp_,initVal,1);
-        particleCloud_.dataExchangeM().allocateArray(partMolarConc_,initVal,1);
+    double initVal=0.0;
+    particleCloud_.dataExchangeM().allocateArray(partRho_,initVal,1);
+    particleCloud_.dataExchangeM().allocateArray(partTemp_,initVal,1);
+    particleCloud_.dataExchangeM().allocateArray(partMolarConc_,initVal,1);
 
-        for (int i=0; i<speciesNames_.size(); i++)
-        {
-            particleCloud_.dataExchangeM().allocateArray(molarFractions_[i],initVal,1);
-            particleCloud_.dataExchangeM().allocateArray(changeOfSpeciesMass_[i],initVal,1);
-        }
+    for (int i=0; i<speciesNames_.size(); i++)
+    {
+        particleCloud_.dataExchangeM().allocateArray(molarFractions_[i],initVal,1);
+        particleCloud_.dataExchangeM().allocateArray(changeOfSpeciesMass_[i],initVal,1);
     }
 }
 

@@ -98,11 +98,8 @@ void reactantPerParticle::allocateMyArrays() const
 
 void reactantPerParticle::reAllocMyArrays() const
 {
-    if (particleCloud_.numberOfParticlesChanged())
-    {
-        double initVal=0.0;
-        particleCloud_.dataExchangeM().allocateArray(reactantPerParticle_,initVal,1);
-    }
+    double initVal=0.0;
+    particleCloud_.dataExchangeM().allocateArray(reactantPerParticle_,initVal,1);
 }
 
 // * * * * * * * * * * * * * * * * Member Fct  * * * * * * * * * * * * * * * //

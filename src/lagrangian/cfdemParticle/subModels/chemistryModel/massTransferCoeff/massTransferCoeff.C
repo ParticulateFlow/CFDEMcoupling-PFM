@@ -69,6 +69,7 @@ massTransferCoeff::massTransferCoeff
     scaleDia_(1)
 {
     particleCloud_.checkCG(true);
+    allocateMyArrays();
 }
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
@@ -95,12 +96,9 @@ void massTransferCoeff::allocateMyArrays() const
 
 void massTransferCoeff::reAllocMyArrays() const
 {
-    if (particleCloud_.numberOfParticlesChanged())
-    {
-        double initVal=0.0;
-        particleCloud_.dataExchangeM().allocateArray(partNu_,initVal,1);
-        particleCloud_.dataExchangeM().allocateArray(partRe_,initVal,1);
-    }
+    double initVal=0.0;
+    particleCloud_.dataExchangeM().allocateArray(partNu_,initVal,1);
+    particleCloud_.dataExchangeM().allocateArray(partRe_,initVal,1);
 }
 
 // * * * * * * * * * * * * * * * * Member Fct  * * * * * * * * * * * * * * * //
@@ -188,10 +186,10 @@ void massTransferCoeff::execute()
             partRe_[index][0]   =   Rep;
         }
 
-        if (verbose_ && index >=0 && index < 2)
+        if (verbose_)
         {
-            Info << "Nufield = " << nuf << endl;
-            Info << "Rep = "     << Rep << endl;
+            Pout << "Nufield = " << nuf << endl;
+            Pout << "Rep = "     << Rep << endl;
         }
     }
 
