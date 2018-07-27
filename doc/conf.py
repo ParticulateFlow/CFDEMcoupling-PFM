@@ -225,7 +225,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  ('Manual', 'CFDEMcoupling.tex', 'CFDEMcoupling Documentation',
+  ('CFDEMcoupling_Manual', 'CFDEMcoupling.tex', 'CFDEMcoupling Documentation',
    ' ', 'manual'),
 ]
 
@@ -255,7 +255,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('Manual', 'cfdemcoupling', 'CFDEMcoupling Documentation',
+    ('CFDEMcoupling_Manual', 'cfdemcoupling', 'CFDEMcoupling Documentation',
      [' '], 1)
 ]
 
