@@ -4,6 +4,7 @@ fvVectorMatrix UEqn
   + fvm::div(phi,U) - fvm::Sp(fvc::div(phi),U)
   + particleCloud.divVoidfractionTau(U, voidfraction)
   ==
+    fvOptions(U)
   - fvm::Sp(Ksl/rho,U)
 );
 
