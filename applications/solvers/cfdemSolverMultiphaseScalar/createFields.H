@@ -122,17 +122,32 @@ volScalarField T
     mesh
 );
 
-volScalarField ETsource
+volScalarField Qsource
 (
     IOobject
     (
-        "ETsource",
+        "Qsource",
         runTime.timeName(),
         mesh,
-        IOobject::MUST_READ,
+        IOobject::NO_READ,
         IOobject::AUTO_WRITE
     ),
-    mesh
+    mesh,
+    dimensionedScalar("zero", dimensionSet(1,-1,-3,0,0,0,0), 0.0)
+);
+
+volScalarField QCoeff
+(
+    IOobject
+    (
+        "Qsource",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::AUTO_WRITE
+    ),
+    mesh,
+    dimensionedScalar("zero", dimensionSet(1,-1,-3,-1,0,0,0), 0.0)
 );
 
 volScalarField Cp
@@ -142,7 +157,7 @@ volScalarField Cp
         "Cp",
         runTime.timeName(),
         mesh,
-        IOobject::MUST_READ,
+        IOobject::READ_IF_PRESENT,
         IOobject::AUTO_WRITE
     ),
     mixture.Cp()
@@ -155,11 +170,26 @@ volScalarField kf
         "kf",
         runTime.timeName(),
         mesh,
-        IOobject::MUST_READ,
+        IOobject::READ_IF_PRESENT,
         IOobject::AUTO_WRITE
     ),
     mixture.kf()
 );
+
+volScalarField keff
+(
+    IOobject
+    (
+        "keff",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::AUTO_WRITE
+    ),
+    mesh,
+    dimensionedScalar("zero", dimensionSet(1,1,-3,-1,0,0,0), 0.0)
+);
+
 
 //========================
 

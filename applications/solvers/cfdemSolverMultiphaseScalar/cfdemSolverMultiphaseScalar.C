@@ -41,6 +41,10 @@ Description
 #include "clockModel.H"
 #include "smoothingModel.H"
 #include "forceModel.H"
+#include "thermCondModel.H"
+#include "energyModel.H"
+
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 int main(int argc, char *argv[])
@@ -105,6 +109,8 @@ int main(int argc, char *argv[])
             mixture.solve();
             rho = mixture.rho();
             rhoEps = rho * voidfraction;
+
+	    #include "EEqn.H"
             
              // --- Pressure-velocity PIMPLE corrector loop
             while (pimple.loop())
@@ -127,10 +133,6 @@ int main(int argc, char *argv[])
         {
             Info << "skipping flow solution." << endl;
         }
-
-        Cp  = mixture.Cp();
-	kf  = mixture.kf();
-        #include "TEqn.H"
 
         runTime.write();
 

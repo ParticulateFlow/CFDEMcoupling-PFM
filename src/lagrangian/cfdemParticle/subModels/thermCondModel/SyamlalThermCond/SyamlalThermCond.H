@@ -68,6 +68,16 @@ private:
     
     bool hasWallQFactor_;
 
+    bool multiphase_;
+
+    word kfFieldName_;
+
+    const volScalarField& kfField_;
+
+    word CpFieldName_;
+
+    const volScalarField& CpField_;
+
 public:
 
     //- Runtime type information
