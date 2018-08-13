@@ -631,7 +631,7 @@ bool cfdemCloud::evolve
         Info << "\n timeStepFraction() = " << dataExchangeM().timeStepFraction() << endl;
         if(dataExchangeM().timeStepFraction() > 1.0000001)
         {
-            Warning << "cfdemCloud::dataExchangeM().timeStepFraction()>1: Do not do this, since dangerous. This might be due to the fact that you used a adjustable CFD time step. Please use a fixed CFD time step." << abort(FatalError);
+            Warning << "cfdemCloud::dataExchangeM().timeStepFraction()>1: Do not do this, since dangerous. This might be due to the fact that you used a adjustable CFD time step. Please use a fixed CFD time step." << endl;
         }
         clockM().start(24,"interpolateEulerFields");
 
