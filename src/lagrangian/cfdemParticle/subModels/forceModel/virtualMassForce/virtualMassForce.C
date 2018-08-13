@@ -114,7 +114,6 @@ virtualMassForce::virtualMassForce
         Info << "Virtual mass model: using Cadd correlation by Felderhof \n";
         Info << "WARNING: ignoring user-set Cadd \n";
 
-        bool getParticleDensities_ =  dict.lookupOrDefault<bool>("getParticleDensities",false);
 	    if(!dict.lookupOrDefault<bool>("getParticleDensities",false))
 	    	FatalError << "Virtual mass model: useFelderhof=true requires getParticleDensities=true in couplingProperties" << abort(FatalError);
     }
@@ -144,7 +143,8 @@ virtualMassForce::~virtualMassForce()
 
 void virtualMassForce::setForce() const
 {
-    reAllocArrays();
+	if (!useUs_ || !splitUrelCalculation_ )
+		reAllocArrays();
 
     scalar dt = U_.mesh().time().deltaT().value();
 
