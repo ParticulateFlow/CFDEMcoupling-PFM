@@ -314,12 +314,7 @@ void species::execute()
 
             particleCloud_.dataExchangeM().getData(mod_spec_names_[i],"scalar-atom",changeOfSpeciesMass_[i],particleCloud_.dataExchangeM().couplingInterval());
 
-            for (int index=0; index<particleCloud_.numberOfParticles(); ++index)
-            {
-                changeOfSpeciesMass_[i][index][0] *= particleCloud_.dataExchangeM().DEMts()/timestep;
-            }
-
-            Info << "changeOfSpeciesMass received from DEM = " << changeOfSpeciesMass_[i][0][0] << endl;
+            if (verbose_) Info << "changeOfSpeciesMass received from DEM = " << changeOfSpeciesMass_[i][0][0] << endl;
 
             particleCloud_.averagingM().setScalarSumCentre
             (
