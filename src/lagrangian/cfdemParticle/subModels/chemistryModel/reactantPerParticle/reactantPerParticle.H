@@ -54,6 +54,8 @@ private:
 
     const fvMesh& mesh_;
 
+    bool verbose_;
+
     mutable double **reactantPerParticle_;
 
     word voidfractionFieldName_;
