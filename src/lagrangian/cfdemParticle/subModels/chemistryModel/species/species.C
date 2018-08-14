@@ -166,7 +166,6 @@ void species::init()
         Info << " Reading species list: " << speciesNames_ << endl;
     }
 
-
     for (int i=0; i<speciesNames_.size(); i++)
     {
         // Define the Species volume scalar fields
@@ -179,13 +178,12 @@ void species::init()
 
         if(verbose_)
         {
-            Info << " Looking up species fields \n " << "X_"+speciesNames_[i] << endl;
             Info << "The molar fraction fields (X_i): \n" << X_[i].name() << endl;
             // Check if mod species are correct
             Info << "Modified species names are: \n" << mod_spec_names_[i] << endl;
         }
 
-        // Create new volScalarFields for the changed values of the species mass fields
+        // Create new volScalarFields for the changed values of the species mass fields -- gas species source term
         changeOfSpeciesMassFields_.set
         (
             i,
@@ -193,7 +191,7 @@ void species::init()
             (
                 IOobject
                 (
-                "ModSpeciesMassField_"+X_[i].name(),
+                "TotalChangeOfMassField_"+speciesNames_[i],
                 mesh_.time().timeName(),
                 mesh_,
                 IOobject::NO_READ,
@@ -311,9 +309,18 @@ void species::execute()
         changeOfGasMassField_.boundaryFieldRef() = 0.0;
         for (int i=0; i<speciesNames_.size();i++)
         {
-            particleCloud_.dataExchangeM().getData(mod_spec_names_[i],"scalar-atom",changeOfSpeciesMass_[i]);
             changeOfSpeciesMassFields_[i].primitiveFieldRef() = 0.0;
             changeOfSpeciesMassFields_[i].boundaryFieldRef() = 0.0;
+
+            particleCloud_.dataExchangeM().getData(mod_spec_names_[i],"scalar-atom",changeOfSpeciesMass_[i],particleCloud_.dataExchangeM().couplingInterval());
+
+            for (int index=0; index<particleCloud_.numberOfParticles(); ++index)
+            {
+                changeOfSpeciesMass_[i][index][0] *= particleCloud_.dataExchangeM().DEMts()/timestep;
+            }
+
+            Info << "changeOfSpeciesMass received from DEM = " << changeOfSpeciesMass_[i][0][0] << endl;
+
             particleCloud_.averagingM().setScalarSumCentre
             (
                 changeOfSpeciesMassFields_[i],
