@@ -58,8 +58,18 @@ diffNorm::diffNorm
     propsDict_(dict.subDict(type + "Props")),
     normConstant_(propsDict_.lookupOrDefault<scalar>("normConstant",-1.0)),
     fieldType_(propsDict_.lookup("fieldType")),
-    fieldName_(propsDict_.lookup("fieldName"))
-{}
+    fieldName_(propsDict_.lookup("fieldName")),
+    integrationDomainName_(propsDict_.lookupOrDefault<word>("integrationDomainName","all")),
+    integrationDomain_(),
+    existIntegrationDomain_(false)
+{
+    if(integrationDomainName_ != "all")
+    {
+       integrationDomain_.set(new cellSet(base_.mesh(),integrationDomainName_));
+       existIntegrationDomain_ = true;
+       Info << "diffNorm: restricting comparison to cellSet " << integrationDomain_().name() << endl;
+    }
+}
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
@@ -203,6 +213,32 @@ void diffNorm::computeRecMatrix()
     }
 
     Info << "\nComputing recurrence matrix done\n" << endl;
+}
+
+void diffNorm::restrictToIntegrationDomain(volScalarField &vsf)
+{
+    if (!existIntegrationDomain_) return;
+
+    forAll(vsf, cellI)
+    {
+        if (!integrationDomain_()[cellI])
+        {
+            vsf[cellI] *= 0.0;
+        }
+    }
+}
+
+void diffNorm::restrictToIntegrationDomain(volVectorField &vvf)
+{
+    if (!existIntegrationDomain_) return;
+
+    forAll(vvf, cellI)
+    {
+        if (!integrationDomain_()[cellI])
+        {
+            vvf[cellI] *= 0.0;
+        }
+    }
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -69,6 +69,8 @@ scalar maxNorm::normVSF(label ti, label tj)
     const volScalarField& t2( base_.recM().exportVolScalarField(fieldName_,tj) );
     volScalarField diff = mag(t1 - t2);
 
+    restrictToIntegrationDomain(diff);
+
     return max(diff).value();
 }
 
@@ -77,6 +79,8 @@ scalar maxNorm::normVVF(label ti, label tj)
     const volVectorField& t1( base_.recM().exportVolVectorField(fieldName_,ti) );
     const volVectorField& t2( base_.recM().exportVolVectorField(fieldName_,tj) );
     volScalarField diff = mag(t1 - t2);
+
+    restrictToIntegrationDomain(diff);
 
     return max(diff).value();
 }
@@ -87,6 +91,8 @@ scalar maxNorm::normSSF(label ti, label tj)
     const surfaceScalarField& t2( base_.recM().exportSurfaceScalarField(fieldName_,tj) );
     volVectorField t12 (fvc::reconstruct( t1-t2 ) );
     volScalarField diff = mag(t12);
+
+    restrictToIntegrationDomain(diff);
 
     return max(diff).value();
 }
