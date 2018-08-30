@@ -81,6 +81,10 @@ standardRecModel::standardRecModel
         Foam::Time recTime(fileName(dataBaseNames_[i]), "", "../system", "../constant", false);
 
         instantList timeDirs(recTime.times());
+        if (timeDirs.size() == 0)
+        {
+            FatalError <<"database " << dataBaseNames_[i] << " does not exist or is empty\n" << abort(FatalError);
+        }
         timeDirs_.append(timeDirs);
 
         numRecFields_.append(label(timeDirs_[i].size()));
