@@ -69,6 +69,7 @@ standardRecModel::standardRecModel
     timeIndexList_(),
     timeValueList_(),
     contTimeIndex(0),
+    recTimeDilationFactor_(propsDict_.lookupOrDefault<scalar>("timeDilationFactor", 1.0)),
     volScalarFieldList_(volScalarFieldNames_.size()),
     volVectorFieldList_(volVectorFieldNames_.size()),
     surfaceScalarFieldList_(surfaceScalarFieldNames_.size()),
@@ -179,7 +180,7 @@ scalar standardRecModel::checkTimeStep()
         Info << "Actual runTime.deltaT = " << timeStep_ << endl;
     }
 
-    return dtCur;
+    return dtCur*recTimeDilationFactor_;
 }
 
 
@@ -482,6 +483,8 @@ void standardRecModel::readTimeSeries()
                 Info << "contTimeIndex " << contTimeIndex << endl;
             }
         }
+
+        recEndTime_ = recStartTime_ + (recEndTime_ - recStartTime_) * recTimeDilationFactor_;
 
         if (verbose_)
         {

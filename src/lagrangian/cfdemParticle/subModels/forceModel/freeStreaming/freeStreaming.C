@@ -61,6 +61,7 @@ freeStreaming::freeStreaming
     voidfractionRecFieldName_(propsDict_.lookupOrDefault<word>("voidfractionRecFieldName","voidfractionRec")),
     voidfractionRec_(sm.mesh().lookupObject<volScalarField> (voidfractionRecFieldName_)),
     critVoidfraction_(propsDict_.lookupOrDefault<scalar>("critVoidfraction", 1.0)),
+    scalingFactor_(propsDict_.lookupOrDefault<scalar>("scalingFactor", 1.0)),
     particleDensity_(propsDict_.lookupOrDefault<scalar>("particleDensity",0.0)),
     gravAcc_(propsDict_.lookupOrDefault<vector>("g",vector(0.0,0.0,-9.81)))
 {
@@ -120,6 +121,7 @@ void freeStreaming::setForce() const
                     {
                         UNew = UsRec_[cellI];
                     }
+                    UNew /= scalingFactor_;
                 }
                 else
                 {

@@ -83,6 +83,8 @@ protected:
     
     label lowerSeqLim_;
     label upperSeqLim_;
+
+    scalar recTimeDilationFactor_;
     
     scalar checkTimeStep();
     

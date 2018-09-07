@@ -55,6 +55,9 @@ private:
     const volScalarField& voidfractionRec_;
     
     scalar critVoidfraction_;
+
+    // dilation or speed-up
+    scalar scalingFactor_;
     
     scalar particleDensity_;
     
