@@ -26,6 +26,7 @@ License
 #define diffNorm_H
 
 #include "recNorm.H"
+#include "cellSet.H"
 
 namespace Foam
 {
@@ -50,7 +51,19 @@ protected:
 
     word fieldName_;
 
+    word integrationDomainName_;
+
+    autoPtr<cellSet> integrationDomain_;
+
+    bool existIntegrationDomain_;
+
     void computeRecMatrix();
+
+    void restrictToIntegrationDomain(volScalarField &vsf);
+
+    void restrictToIntegrationDomain(volVectorField &vvf);
+
+    void restrictToIntegrationDomain(surfaceScalarField &ssf);
 
     virtual scalar normVSF(label, label) {return 0.0;}
 

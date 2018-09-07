@@ -68,7 +68,10 @@ scalar sqrDiffNorm::normVSF(label ti, label tj)
 {
     const volScalarField& t1( base_.recM().exportVolScalarField(fieldName_,ti) );
     const volScalarField& t2( base_.recM().exportVolScalarField(fieldName_,tj) );
-    dimensionedScalar tNorm( fvc::domainIntegrate( sqr( t1 - t2 ) ) );
+    volScalarField t12(t1-t2);
+    restrictToIntegrationDomain(t12);
+
+    dimensionedScalar tNorm( fvc::domainIntegrate( sqr( t12 ) ) );
 
     return tNorm.value();
 }
@@ -77,7 +80,10 @@ scalar sqrDiffNorm::normVVF(label ti, label tj)
 {
     const volVectorField& t1( base_.recM().exportVolVectorField(fieldName_,ti) );
     const volVectorField& t2( base_.recM().exportVolVectorField(fieldName_,tj) );
-    dimensionedScalar tNorm( fvc::domainIntegrate( magSqr( t1 - t2 ) ) );
+    volVectorField t12(t1-t2);
+    restrictToIntegrationDomain(t12);
+
+    dimensionedScalar tNorm( fvc::domainIntegrate( magSqr( t12 ) ) );
 
     return tNorm.value();
 }
@@ -86,7 +92,9 @@ scalar sqrDiffNorm::normSSF(label ti, label tj)
 {
     const surfaceScalarField& t1( base_.recM().exportSurfaceScalarField(fieldName_,ti) );
     const surfaceScalarField& t2( base_.recM().exportSurfaceScalarField(fieldName_,tj) );
-    volVectorField t12 (fvc::reconstruct( t1-t2 ) );
+    volVectorField t12(fvc::reconstruct( t1-t2 ) );
+    restrictToIntegrationDomain(t12);
+
     dimensionedScalar tNorm( fvc::domainIntegrate( magSqr( t12 ) ) );
 
     return tNorm.value();

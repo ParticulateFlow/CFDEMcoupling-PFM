@@ -71,8 +71,12 @@ void readNorm::computeRecMatrix()
 {
     Info << nl << type() << ": reading recurrence matrix " << recMatName_ << nl << endl;
     SymmetricSquareMatrix<scalar>& recurrenceMatrix( base_.recM().recurrenceMatrix() );
-    IFstream matrixFile(recMatName_);
-    matrixFile >> recurrenceMatrix;
+    if (Pstream::master())
+    {
+        IFstream matrixFile(recMatName_);
+        matrixFile >> recurrenceMatrix;
+    }
+    Pstream::scatter(recurrenceMatrix);
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
