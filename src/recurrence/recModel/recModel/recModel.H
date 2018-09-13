@@ -78,6 +78,8 @@ protected:
     labelPairList virtualTimeIndexList_;
     label virtualTimeIndexListPos_;
 
+    bool writeRecMat_;
+    word recMatName_;
     OFstream pathFile_;
 
     virtual void readFieldSeries() = 0;

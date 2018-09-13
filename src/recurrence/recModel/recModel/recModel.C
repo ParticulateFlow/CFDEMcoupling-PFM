@@ -93,6 +93,8 @@ recModel::recModel
     virtualTimeIndexNext(1),
     virtualTimeIndexList_(0),
     virtualTimeIndexListPos_(0),
+    writeRecMat_(propsDict_.lookupOrDefault<Switch>("writeRecMat", true)),
+    recMatName_(propsDict_.lookupOrDefault<word>("recMatName", "recurrenceMatrix")),
     pathFile_("recurrencePath")
 {
     recTimeStep_ = -1.0;
