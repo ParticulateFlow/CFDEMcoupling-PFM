@@ -76,7 +76,7 @@ protected:
 
         wordList forceSubModels_;
 
-        autoPtr<forceSubModel>* forceSubModel_;
+        mutable PtrList<forceSubModel> forceSubModel_;
 
 public:
 
@@ -157,7 +157,7 @@ public:
 
         inline const wordList& forceSubModels() { return forceSubModels_; }
 
-        inline forceSubModel& forceSubM(int i) const { return forceSubModel_[i](); }
+        inline forceSubModel& forceSubM(int i) const { return forceSubModel_[i]; }
 
         inline int nrForceSubModels() const { return forceSubModels_.size(); }
 

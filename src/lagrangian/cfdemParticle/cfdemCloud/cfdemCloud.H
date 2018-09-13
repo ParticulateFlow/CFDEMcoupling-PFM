@@ -180,11 +180,11 @@ protected:
 
     const turbulenceModel& turbulence_;
 
-    autoPtr<forceModel>* forceModel_;
+    PtrList<forceModel> forceModel_;
 
     autoPtr<locateModel> locateModel_;
 
-    autoPtr<momCoupleModel>* momCoupleModel_;
+    PtrList<momCoupleModel> momCoupleModel_;
 
     autoPtr<dataExchangeModel> dataExchangeModel_;
 
@@ -202,9 +202,9 @@ protected:
 
     autoPtr<meshMotionModel> meshMotionModel_;
 
-    autoPtr<liggghtsCommandModel>* liggghtsCommand_;
+    mutable PtrList<liggghtsCommandModel> liggghtsCommand_;
 
-    autoPtr<otherForceModel>* otherForceModel_;
+    PtrList<otherForceModel> otherForceModel_;
 
 // Protected member functions
     virtual void getDEMdata();
@@ -272,7 +272,7 @@ public:
 
        scalar voidfraction(int) const;
 
-       label liggghtsCommandModelIndex(word) const;
+       label liggghtsCommandModelIndex(const word&) const;
 
        inline void setCG(double);
 
@@ -395,7 +395,7 @@ public:
 
        inline const wordList& liggghtsCommandModelList() const;
 
-       inline autoPtr<liggghtsCommandModel>* liggghtsCommand() const;
+       inline liggghtsCommandModel& liggghtsCommand(const label) const;
 
        inline const turbulenceModel& turbulence() const;
 

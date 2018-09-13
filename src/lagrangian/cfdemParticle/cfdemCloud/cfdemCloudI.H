@@ -349,9 +349,9 @@ inline const wordList& cfdemCloud::liggghtsCommandModelList() const
     return liggghtsCommandModelList_;
 }
 
-inline autoPtr<liggghtsCommandModel>* cfdemCloud::liggghtsCommand() const
+inline liggghtsCommandModel& cfdemCloud::liggghtsCommand(const label modeli) const
 {
-    return liggghtsCommand_;
+    return liggghtsCommand_[modeli];
 }
 
 inline const turbulenceModel& cfdemCloud::turbulence() const
