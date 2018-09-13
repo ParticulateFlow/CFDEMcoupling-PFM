@@ -58,11 +58,11 @@ protected:
 
     const wordList chemistryModels_;
 
-    autoPtr<energyModel>* energyModel_;
+    PtrList<energyModel> energyModel_;
 
     autoPtr<thermCondModel> thermCondModel_;
 
-    autoPtr<chemistryModel>* chemistryModel_;
+    PtrList<chemistryModel> chemistryModel_;
 
     void calcEnergyContributions();
 
