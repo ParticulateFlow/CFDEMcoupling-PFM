@@ -257,17 +257,16 @@ void species::execute()
                 rhofluid        =   rho_[cellI];
                 voidfraction    =   voidfraction_[cellI];
                 molarConcfluid	=   molarConc_[cellI];
+
                 for (int i = 0; i<speciesNames_.size();i++)
                 {
                     Xfluid_[i] = X_[i][cellI];
-                   // if(Xfluid_[i] < 0.0) Xfluid_[i] = 0.0;
                 }
             }
 
             partTemp_[index][0] =   Tfluid;
             partRho_[index][0]  =   rhofluid;
             partMolarConc_[index][0]    =   molarConcfluid;
-
             for (int i=0; i<speciesNames_.size();i++)
             {
                 // attention for indices when not communicating all species
