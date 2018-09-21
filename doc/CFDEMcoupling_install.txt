@@ -8,8 +8,7 @@
 2. Installation :link(1_2),h3
 
 In order to get the latest code version, please use the git repository at
-"http://github.com"_https://github.com/ParticulateFlow
-(see also "Github access"_githubAccess_public.html).
+"http://github.com"_https://github.com/ParticulateFlow.
 
 
 2.1 Installing OpenFOAM :h4
