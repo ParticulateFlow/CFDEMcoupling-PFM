@@ -62,12 +62,22 @@ readLiggghtsData::readLiggghtsData
 )
 :
     liggghtsCommandModel(dict,sm,i),
-    propsDict_(dict.subOrEmptyDict(typeName + "Props")),
     nrModel_(i),
-    insertionNr_(readLabel(propsDict_.lookup("startIndex"))),
+    propsDict_(),
+    insertionNr_(),
     command_("read_data"),
     filePathList_(0)
 {
+    // read propsDict
+    OStringStream oStrStream;
+    oStrStream << nrModel_;
+
+    propsDict_ = dict.subOrEmptyDict(typeName + "Props" + oStrStream.str());
+
+    // read insertion nr
+    insertionNr_ = readLabel(propsDict_.lookup("startIndex"));
+
+
     if (propsDict_.found("exactTiming"))
     {
         exactTiming_ = propsDict_.lookup("exactTiming");
@@ -76,7 +86,7 @@ readLiggghtsData::readLiggghtsData
 
     if (propsDict_.found("verbose"))
     {
-        verbose_ = propsDict_.lookup("verbose");
+        verbose_ = true;
     }
 
     // read command from dict

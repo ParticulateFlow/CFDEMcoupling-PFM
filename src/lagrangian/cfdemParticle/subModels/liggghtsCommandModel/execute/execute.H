@@ -57,9 +57,9 @@ class execute
 {
 private:
 
-    dictionary propsDict_;
-
     int nrModel_;
+
+    dictionary propsDict_;
 
     wordList commandList_;
 

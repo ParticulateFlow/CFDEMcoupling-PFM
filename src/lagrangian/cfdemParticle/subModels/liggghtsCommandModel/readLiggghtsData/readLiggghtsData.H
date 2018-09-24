@@ -56,9 +56,9 @@ class readLiggghtsData
 {
 private:
 
-    dictionary propsDict_;
-    
     int nrModel_;
+
+    dictionary propsDict_;
 
     int insertionNr_;
 

@@ -62,14 +62,23 @@ execute::execute
 )
 :
     liggghtsCommandModel(dict,sm,i),
-    propsDict_(dict.subOrEmptyDict(typeName + "Props")),
     nrModel_(i),
-    commandList_(wordList(propsDict_.lookup("command"))),
+    propsDict_(),
+    commandList_(),
     command_(""),
     scalarList_(0),
     labelList_(0),
     timeStamp_(false)
 {
+    // read propsDict
+    OStringStream oStrStream;
+    oStrStream << nrModel_;
+
+    propsDict_ = dict.subOrEmptyDict(typeName + "Props" + oStrStream.str());
+
+    // read command list
+    commandList_ = wordList(propsDict_.lookup("command"));
+
     // read list of scalars
     if (propsDict_.found("scalars"))
     {
@@ -85,7 +94,7 @@ execute::execute
     // check if verbose
     if (propsDict_.found("verbose"))
     {
-        verbose_ = propsDict_.lookup("verbose");
+        verbose_ = true;
     }
 
     parseCommandList(commandList_, labelList_, scalarList_, command_, propsDict_, timeStamp_);
