@@ -157,12 +157,12 @@ void KochHillDrag::setForce() const
     for (int index = 0; index<particleCloud_.numberOfParticles(); ++index)
     {
             cellI = particleCloud_.cellIDs()[index][0];
-            drag = vector(0,0,0);
-            dragExplicit = vector(0,0,0);
+            drag = vector::zero;
+            dragExplicit = vector::zero;
             dragCoefficient = 0;
             betaP = 0;
             Vs = 0;
-            Ufluid = vector(0,0,0);
+            Ufluid = vector::zero;
             voidfraction = 0;
 
             if (cellI > -1) // particle Found

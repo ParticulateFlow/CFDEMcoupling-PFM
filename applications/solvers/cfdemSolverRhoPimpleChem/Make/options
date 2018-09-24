@@ -1,0 +1,60 @@
+include $(CFDEM_ADD_LIBS_DIR)/additionalLibs
+
+PFLAGS+= -Dcompre
+
+EXE_INC = \
+     $(PFLAGS) \
+    -I../. \
+    -I$(CFDEM_OFVERSION_DIR) \
+    -I$(LIB_SRC)/finiteVolume/cfdTools \
+    -I$(LIB_SRC)/finiteVolume/lnInclude \
+    -I$(LIB_SRC)/TurbulenceModels/turbulenceModels/lnInclude \
+    -I$(LIB_SRC)/TurbulenceModels/compressible/lnInclude \
+    -I$(LIB_SRC)/thermophysicalModels/basic/lnInclude \
+    -I$(LIB_SRC)/meshTools/lnInclude \
+    -I$(LIB_SRC)/sampling/lnInclude \
+    -I$(LIB_SRC)/fvOptions/lnInclude \
+    -I$(CFDEM_SRC_DIR)/lagrangian/cfdemParticle/lnInclude \
+    -I$(CFDEM_SRC_DIR)/lagrangian/cfdemParticle/cfdTools \
+    -I$(LIB_SRC)/thermophysicalModels/specie/lnInclude \
+    -I$(LIB_SRC)/transportModels/compressible/lnInclude \
+    -I$(LIB_SRC)/thermophysicalModels/basic/lnInclude \
+    -I$(LIB_SRC)/thermophysicalModels/properties/liquidProperties/lnInclude \
+    -I$(LIB_SRC)/thermophysicalModels/properties/liquidMixtureProperties/lnInclude \
+    -I$(LIB_SRC)/thermophysicalModels/thermophysicalFunctions/lnInclude \
+    -I$(LIB_SRC)/thermophysicalModels/reactionThermo/lnInclude \
+    -I$(LIB_SRC)/thermophysicalModels/chemistryModel/lnInclude \
+    -I$(LIB_SRC)/thermophysicalModels/radiationModels/lnInclude \
+    -I$(LIB_SRC)/regionModels/regionModel/lnInclude \
+    -I$(LIB_SRC)/regionModels/surfaceFilmModels/lnInclude \
+    -I$(LIB_SRC)/ODE/lnInclude \
+    -I$(LIB_SRC)/combustionModels/lnInclude \
+    -I$(FOAM_SOLVERS)/combustion/reactingFoam \
+
+
+
+
+EXE_LIBS = \
+    -L$(CFDEM_LIB_DIR)  \
+    -lfiniteVolume \
+    -lmeshTools \
+    -lturbulenceModels \
+    -lcompressibleTurbulenceModels \
+    -lcompressibleTransportModels \
+    -lfluidThermophysicalModels \
+    -lspecie \
+    -lsampling \
+    -lfvOptions \
+    -l$(CFDEM_LIB_COMP_NAME) \
+     $(CFDEM_ADD_LIB_PATHS) \
+     $(CFDEM_ADD_LIBS) \
+    -lliquidProperties \
+    -lliquidMixtureProperties \
+    -lthermophysicalFunctions \
+    -lreactionThermophysicalModels \
+    -lchemistryModel \
+    -lradiationModels \
+    -lregionModels \
+    -lsurfaceFilmModels \
+    -lODE \
+    -lcombustionModels

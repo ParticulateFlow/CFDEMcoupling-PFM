@@ -73,7 +73,7 @@ explicitCouple::explicitCouple
             IOobject::NO_WRITE
         ),
         sm.mesh(),
-        dimensionedVector("zero", dimensionSet(1,-2,-2,0,0), vector(0,0,0)), // N/m3
+        dimensionedVector("zero", dimensionSet(1,-2,-2,0,0), vector::zero), // N/m3
         "zeroGradient"
     ),
     fNext_
@@ -86,7 +86,7 @@ explicitCouple::explicitCouple
             IOobject::NO_WRITE
         ),
         sm.mesh(),
-        dimensionedVector("zero", dimensionSet(1,-2,-2,0,0), vector(0,0,0)), // N/m3
+        dimensionedVector("zero", dimensionSet(1,-2,-2,0,0), vector::zero), // N/m3
         "zeroGradient"
     ),
     fLimit_(1e10,1e10,1e10)

@@ -196,12 +196,12 @@ void KochHillRWDrag::setForce() const
         //if (mask[index][0])
         //{
             cellI = particleCloud_.cellIDs()[index][0];
-            drag = vector(0,0,0);
-            dragExplicit = vector(0,0,0);
+            drag = vector::zero;
+            dragExplicit = vector::zero;
             dragCoefficient = 0;
             betaP = 0;
             Vs = 0;
-            Ufluid = vector(0,0,0);
+            Ufluid = vector::zero;
 
             // Pout << "RW-TEST: cellI = " << cellI << endl; // TEST-Output
             if (cellI > -1) // particle Found
