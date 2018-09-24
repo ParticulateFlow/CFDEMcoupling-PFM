@@ -78,10 +78,8 @@ readLiggghtsData::readLiggghtsData
     insertionNr_ = readLabel(propsDict_.lookup("startIndex"));
 
 
-    if (propsDict_.found("exactTiming"))
-    {
-        exactTiming_ = propsDict_.lookup("exactTiming");
-    }
+    exactTiming_ = propsDict_.found("exactTiming");
+
     Info << "exactTiming==" << exactTiming_ << endl;
 
     if (propsDict_.found("verbose"))

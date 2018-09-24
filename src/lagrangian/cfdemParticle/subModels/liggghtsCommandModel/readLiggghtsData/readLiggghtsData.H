@@ -89,7 +89,7 @@ public:
 
     // Member Functions
 
-        word name(){return "readLiggghtsData";};
+        word name(){return propsDict_.dictName();};
 
         const char* command(int);
 
