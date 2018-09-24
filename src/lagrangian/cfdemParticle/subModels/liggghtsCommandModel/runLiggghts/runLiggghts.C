@@ -66,10 +66,7 @@ runLiggghts::runLiggghts
     command_("run"),
     preNo_(propsDict_.lookupOrDefault<bool>("preNo", true))
 {
-    if (propsDict_.found("verbose"))
-    {
-        verbose_ = propsDict_.lookup("verbose");
-    }
+    verbose_ = propsDict_.found("verbose");
 
     runEveryCouplingStep_ = true;
 
@@ -94,11 +91,10 @@ const char* runLiggghts::command(int commandLine)
 
 string runLiggghts::createCommand( word command, int interval, word appendix, word appendix2, word appendix3, word appendix4)
 {
-    fileName add;
-    char h[50];
-    sprintf(h, "%d", interval);
-    add = h;
-    command += " " + add + " " + appendix + " " + appendix2 + " " + appendix3 + " " + appendix4;
+    OStringStream oStrStream;
+    oStrStream << interval;
+
+    command += " " + oStrStream.str() + " " + appendix + " " + appendix2 + " " + appendix3 + " " + appendix4;
 
     return string(command);
 }

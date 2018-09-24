@@ -70,10 +70,7 @@ writeLiggghts::writeLiggghts
     overwrite_(false)
 {
     // check if verbose
-    if (propsDict_.found("verbose"))
-    {
-        verbose_ = propsDict_.lookup("verbose");
-    }
+    verbose_ = propsDict_.found("verbose");
 
     if (propsDict_.found("path"))
     {

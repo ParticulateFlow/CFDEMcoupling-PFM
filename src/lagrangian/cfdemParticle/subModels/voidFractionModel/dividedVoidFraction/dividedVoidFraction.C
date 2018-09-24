@@ -64,12 +64,12 @@ dividedVoidFraction::dividedVoidFraction
 :
     voidFractionModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
-    verbose_(propsDict_.lookupOrDefault<bool>("verbose", false)),
+    verbose_(propsDict_.found("verbose")),
     procBoundaryCorrection_(propsDict_.lookupOrDefault<Switch>("procBoundaryCorrection", false)),
     alphaMin_(readScalar(propsDict_.lookup("alphaMin"))),
     alphaLimited_(0),
     tooMuch_(0.0),
-    interpolation_(propsDict_.lookupOrDefault<bool>("interpolation", false)),
+    interpolation_(propsDict_.found("interpolation")),
     cfdemUseOnly_(propsDict_.lookupOrDefault<bool>("cfdemUseOnly", false))
 {
     maxCellsPerParticle_ = numberOfMarkerPoints;

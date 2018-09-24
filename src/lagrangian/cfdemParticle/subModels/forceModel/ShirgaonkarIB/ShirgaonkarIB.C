@@ -63,8 +63,8 @@ ShirgaonkarIB::ShirgaonkarIB
 :
     forceModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
-    verbose_(propsDict_.lookupOrDefault<bool>("verbose", false)),
-    twoDimensional_(propsDict_.lookupOrDefault<bool>("twoDimensional", false)),
+    verbose_(propsDict_.found("verbose")),
+    twoDimensional_(propsDict_.found("twoDimensional")),
     depth_(1),
     velFieldName_(propsDict_.lookup("velFieldName")),
     U_(sm.mesh().lookupObject<volVectorField> (velFieldName_)),

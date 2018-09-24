@@ -78,11 +78,11 @@ cfdemCloud::cfdemCloud
             IOobject::NO_WRITE
         )
     ),
-    solveFlow_(couplingProperties_.lookupOrDefault<bool>("solveFlow", true)),
-    verbose_(couplingProperties_.lookupOrDefault<bool>("verbose", false)),
-    ignore_(couplingProperties_.lookupOrDefault<bool>("ignore", false)),
+    solveFlow_(couplingProperties_.found("solveFlow")),
+    verbose_(couplingProperties_.found("verbose")),
+    ignore_(couplingProperties_.found("ignore")),
     allowCFDsubTimestep_(true),
-    limitDEMForces_(couplingProperties_.lookupOrDefault<bool>("limitDEMForces",false)),
+    limitDEMForces_(couplingProperties_.found("limitDEMForces")),
     maxDEMForce_(0.),
     modelType_(couplingProperties_.lookup("modelType")),
     positions_(NULL),
@@ -224,8 +224,7 @@ cfdemCloud::cfdemCloud
     buildInfo.info();
 
     Info << "If BC are important, please provide volScalarFields -imp/expParticleForces-" << endl;
-    /*if (couplingProperties_.found("solveFlow"))
-        solveFlow_=Switch(couplingProperties_.lookup("solveFlow"));*/
+
     if (couplingProperties_.found("imExSplitFactor"))
         imExSplitFactor_ = readScalar(couplingProperties_.lookup("imExSplitFactor"));
 

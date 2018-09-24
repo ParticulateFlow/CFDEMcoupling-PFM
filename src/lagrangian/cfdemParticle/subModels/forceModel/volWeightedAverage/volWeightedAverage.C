@@ -69,7 +69,7 @@ volWeightedAverage::volWeightedAverage
     vectorFieldNames_(propsDict_.lookup("vectorFieldNames")),
     upperThreshold_(readScalar(propsDict_.lookup("upperThreshold"))),
     lowerThreshold_(readScalar(propsDict_.lookup("lowerThreshold"))),
-    verbose_(propsDict_.lookupOrDefault<bool>("verbose", false))
+    verbose_(propsDict_.found("verbose"))
 {
     // create vol weighted average scalar fields
     scalarFields_.setSize(scalarFieldNames_.size());

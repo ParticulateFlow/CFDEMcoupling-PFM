@@ -68,7 +68,7 @@ constDiffSmoothing::constDiffSmoothing
     smoothingLength_(dimensionedScalar("smoothingLength", dimLength, readScalar(propsDict_.lookup("smoothingLength")))),
     smoothingLengthReferenceField_(dimensionedScalar("smoothingLengthReferenceField", dimLength, readScalar(propsDict_.lookup("smoothingLength")))),
     DT_("DT", dimensionSet(0,2,-1,0,0), 0.),
-    verbose_(propsDict_.lookupOrDefault<bool>("verbose", false))
+    verbose_(propsDict_.found("verbose"))
 {
     if(propsDict_.found("smoothingLengthReferenceField"))
     {

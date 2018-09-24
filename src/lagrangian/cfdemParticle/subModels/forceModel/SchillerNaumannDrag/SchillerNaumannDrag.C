@@ -64,7 +64,7 @@ SchillerNaumannDrag::SchillerNaumannDrag
 :
     forceModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
-    verbose_(propsDict_.lookupOrDefault<bool>("verbose", false)),
+    verbose_(propsDict_.found("verbose")),
     velFieldName_(propsDict_.lookup("velFieldName")),
     U_(sm.mesh().lookupObject<volVectorField> (velFieldName_))
 {

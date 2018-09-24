@@ -94,7 +94,7 @@ particleCellVolume::particleCellVolume
     ),
     upperThreshold_(readScalar(propsDict_.lookup("upperThreshold"))),
     lowerThreshold_(readScalar(propsDict_.lookup("lowerThreshold"))),
-    verbose_(propsDict_.lookupOrDefault<bool>("verbose", false))
+    verbose_(propsDict_.found("verbose"))
 {
 }
 

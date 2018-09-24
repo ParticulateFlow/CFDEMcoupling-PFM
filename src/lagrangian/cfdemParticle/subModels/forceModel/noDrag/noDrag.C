@@ -62,9 +62,9 @@ noDrag::noDrag
 :
     forceModel(dict,sm),
     propsDict_(dict),
-    verbose_(propsDict_.lookupOrDefault<bool>("verbose", false)),
-    noDEMForce_(propsDict_.lookupOrDefault<bool>("noDEMForce", false)),
-    keepCFDForce_(propsDict_.lookupOrDefault<bool>("keepCFDForce", false))
+    verbose_(propsDict_.found("verbose")),
+    noDEMForce_(propsDict_.found("noDEMForce")),
+    keepCFDForce_(propsDict_.found("keepCFDForce"))
 {
     if(dict.found(word(typeName + "Props")))
         propsDict_=dictionary(dict.subDict(typeName + "Props"));
