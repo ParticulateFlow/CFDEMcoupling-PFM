@@ -154,6 +154,7 @@ cfdemCloud::cfdemCloud
             turbulenceModelType_
         )
     ),
+    forceModel_(nrForceModels()),
     locateModel_
     (
         locateModel::New
@@ -162,14 +163,7 @@ cfdemCloud::cfdemCloud
             *this
         )
     ),
-    /*momCoupleModel_
-    (
-        momCoupleModel::New
-        (
-            couplingProperties_,
-            *this
-        )
-    ),*/
+    momCoupleModel_(nrMomCoupleModels()),
     dataExchangeModel_
     (
         dataExchangeModel::New
@@ -235,7 +229,9 @@ cfdemCloud::cfdemCloud
             couplingProperties_,
             *this
         )
-    )
+    ),
+    liggghtsCommand_(liggghtsCommandModelList_.size()),
+    otherForceModel_(otherForceModels_.size())
 {
     #include "versionInfo.H"
     global buildInfo(couplingProperties_,*this);
@@ -276,57 +272,70 @@ cfdemCloud::cfdemCloud
         FatalError << "CFDEMcoupling does not support adjustable time steps."
                    << abort(FatalError);
 
-    momCoupleModel_ = new autoPtr<momCoupleModel>[momCoupleModels_.size()];
-    for (int i=0;i<momCoupleModels_.size();i++)
+    forAll(momCoupleModel_, modeli)
     {
-        momCoupleModel_[i] = momCoupleModel::New
+        momCoupleModel_.set
         (
-            couplingProperties_,
-            *this,
-            momCoupleModels_[i]
+            modeli,
+            momCoupleModel::New
+            (
+                couplingProperties_,
+                *this,
+                momCoupleModels_[modeli]
+            )
         );
     }
 
-    forceModel_ = new autoPtr<forceModel>[nrForceModels()];
-    for (int i=0;i<nrForceModels();i++)
+    forAll(forceModels_, modeli)
     {
-        forceModel_[i] = forceModel::New
+        forceModel_.set
         (
-            couplingProperties_,
-            *this,
-            forceModels_[i]
+            modeli,
+            forceModel::New
+            (
+                couplingProperties_,
+                *this,
+                forceModels_[modeli]
+            )
         );
     }
 
     // run liggghts commands from cfdem
-    liggghtsCommand_ = new autoPtr<liggghtsCommandModel>[liggghtsCommandModelList_.size()];
-    for (int i=0;i<liggghtsCommandModelList_.size();i++)
+    forAll(liggghtsCommand_, modeli)
     {
-        liggghtsCommand_[i] = liggghtsCommandModel::New
+        liggghtsCommand_.set
         (
-            liggghtsCommandDict_,
-            *this,
-            liggghtsCommandModelList_[i],
-            i
+            modeli,
+            liggghtsCommandModel::New
+            (
+                liggghtsCommandDict_,
+                *this,
+                liggghtsCommandModelList_[modeli],
+                modeli
+            )
         );
     }
 
-    otherForceModel_ = new autoPtr<otherForceModel>[otherForceModels_.size()];
+    forAll(otherForceModel_, modeli)
     for (int i=0;i<otherForceModels_.size();i++)
     {
-        otherForceModel_[i] = otherForceModel::New
+        otherForceModel_.set
         (
-            couplingProperties_,
-            *this,
-            otherForceModels_[i]
+            modeli,
+            otherForceModel::New
+            (
+                couplingProperties_,
+                *this,
+                otherForceModels_[modeli]
+            )
         );
     }
 
     dataExchangeM().setCG();
-    Switch cgWarnOnly_(couplingProperties_.lookupOrDefault<Switch>("cgWarnOnly", true));
+    Switch cgWarnOnly(couplingProperties_.lookupOrDefault<Switch>("cgWarnOnly", true));
     if (!cgOK_ && cg_ > 1)
     {
-        if (cgWarnOnly_)
+        if (cgWarnOnly)
             Warning << "at least one of your models is not fit for cg !!!" << endl;
         else
             FatalError << "at least one of your models is not fit for cg !!!" << abort(FatalError);
@@ -575,16 +584,9 @@ scalar cfdemCloud::voidfraction(int index) const
     return voidfractions()[index][0];
 }
 
-label cfdemCloud::liggghtsCommandModelIndex(word name) const
+label cfdemCloud::liggghtsCommandModelIndex(const word& name) const
 {
-    forAll(liggghtsCommandModelList_,i)
-    {
-        if(liggghtsCommand()[i]().name() == name)
-        {
-            return i;
-        }
-    }
-    return -1;
+    return findIndex(liggghtsCommandModelList_, name);
 }
 
 // * * * * * * * * * * * * * * * WRITE  * * * * * * * * * * * * * //
@@ -841,7 +843,7 @@ void cfdemCloud::otherForces(volVectorField& forcefield)
   forcefield.primitiveFieldRef() = vector::zero;
   forcefield.boundaryFieldRef() = vector::zero;
   for (int i=0;i<otherForceModels_.size();i++)
-      forcefield += otherForceModel_[i]().exportForceField();
+      forcefield += otherForceModel_[i].exportForceField();
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
