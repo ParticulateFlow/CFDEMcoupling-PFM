@@ -317,7 +317,6 @@ cfdemCloud::cfdemCloud
     }
 
     forAll(otherForceModel_, modeli)
-    for (int i=0;i<otherForceModels_.size();i++)
     {
         otherForceModel_.set
         (
