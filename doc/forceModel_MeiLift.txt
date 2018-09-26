@@ -1,15 +1,16 @@
-"CFDEMproject WWW Site"_lws - "CFDEM Commands"_lc :c
+"CFDEMproject Website"_lws - "Main Page"_main :c
 
 :link(lws,http://www.cfdem.com)
-:link(lc,CFDEMcoupling_Manual.html#comm)
+:link(main,CFDEMcoupling_Manual.html)
 
 :line
 
-forceModel_MeiLift command :h3
+forceModel MeiLift command :h3
 
 [Syntax:]
 
-Defined in couplingProperties dictionary.
+Defined in "couplingProperties"_CFDEMcoupling_dicts.html#couplingProperties
+dictionary.
 
 forceModels
 (
@@ -17,16 +18,20 @@ forceModels
 );
 MeiLiftProps
 \{
-    velFieldName "U";
+    velFieldName        "U";
     useSecondOrderTerms;
-    interpolation "switch1";
-    verbose "switch2";
-\}; :pre
+    treatForceExplicit  switch1;
+    verbose             switch2;
+    interpolation       switch3;
+    scalarViscosity     switch4;
+\} :pre
 
 {U} = name of the finite volume fluid velocity field :ulb,l
-{useSecondOrderTerms} = switch to activate second order terms in the lift force model :l
-{switch1} = switch to activate tri-linear interpolation of the flow quantities at the particle position :l
-{switch2} = switch to activate the report of per-particle quantities to the screen :l
+{useSecondOrderTerms} = (optional, default false) switch to activate second order terms in the lift force model :l
+{switch1} = (optional, default false) sub model switch, see "forceSubModel"_forceSubModel.html for details :l
+{switch2} = (optional, default false) switch to activate the report of per-particle quantities to the screen :l
+{switch3} = (optional, default false) switch to activate tri-linear interpolation of the flow quantities at the particle position :l
+{switch4} = (optional, default false) sub model switch, see "forceSubModel"_forceSubModel.html for details :l
 :ule
 
 [Examples:]
@@ -37,19 +42,23 @@ forceModels
 );
 MeiLiftProps
 \{
-    velFieldName "U";
+    velFieldName        "U";
     useSecondOrderTerms;
-    interpolation true;
-    verbose true;
+    interpolation       true;
+    verbose             true;
 \} :pre
 
 [Description:]
 
-The force model performs the calculation of forces (e.g. fluid-particle interaction forces) acting on each DEM particle. The MeiLift model calculates the lift force for each particle based on Loth and Dorgan (2009). In case the keyword "useSecondOrderTerms" is not specified, this lift force model uses the expression of McLaughlin (1991, Journal of Fluid Mechanics 224:261-274).
+The force model performs the calculation of forces (e.g. fluid-particle
+interaction forces) acting on each DEM particle. The {MeiLift} model calculates
+the lift force for each particle based on Loth and Dorgan (2009). In case the
+keyword "useSecondOrderTerms" is not specified, this lift force model uses the
+expression of McLaughlin (1991, J. Fluid Mech. 224:261-274).
 
 [Restrictions:]
 
-None.
+none
 
 [Related commands:]
 

@@ -1,0 +1,95 @@
+"CFDEMproject Website"_lws - "Main Page"_main :c
+
+:link(lws,http://www.cfdem.com)
+:link(main,CFDEMcoupling_Manual.html)
+
+:line
+
+3. Tutorials :link(1_3),h3
+
+[General:]
+
+Each solver of CFDEMcoupling comes with at least one tutorial example, showing
+its functionality and correct usage. Provided that the installation is correct,
+the tutorials can be run via "Allrun.sh" shell scripts. These scripts perform
+all necessary steps (pre-processing, run, post-processing, visualization).
+
+[Location:]
+
+The tutorials can be found in the directory $CFDEM_PROJECT_DIR/tutorials,
+which can be reached by typing {cfdemTut} in a CLI terminal.
+
+[Structure:]
+
+Each case is structured in a directory called "CFD" covering the CFD relevant
+settings and data, and a directory called "DEM" covering the DEM relevant
+settings and data. This allows to easily expand a pure CFD or DEM simulation
+case to a coupled case.
+
+[Usage:]
+
+Provided that the installation is correct, the tutorials can be run via
+"Allrun.sh" shell script, executed by typing "./Allrun.sh". The successful run
+of the script might need some third party software (e.g. octave, evince, etc.).
+
+[Settings:]
+
+The main settings of a simulation are done via dictionaries:
+
+The DEM setup of each case is defined by a "LIGGGHTS"_lig input file located in
+$caseDir/DEM (e.g. in.liggghts_init). For details on the LIGGGHTS setup,
+please have a look at the LIGGGHTS manual.
+
+<!-- HTML_ONLY -->
+Standard CFD settings are defined in $caseDir/CFD/constant (e.g.
+transportProperties, RASproperties, etc.) and $caseDir/CFD/system (e.g.
+fvSchemes, controlDict). You can find more information on that in
+"OpenFOAM&reg;"_of (*) documentations.
+
+:link(of,http://www.openfoam.org)
+
+<!-- END_HTML_ONLY -->
+
+<!-- RST
+
+Standard CFD settings are defined in $caseDir/CFD/constant (e.g.
+transportProperties, RASproperties, etc.) and $caseDir/CFD/system (e.g.
+fvSchemes, controlDict). You can find more information on that in
+OpenFOAM\ |reg|\ (*) documentations.
+
+.. |reg|    unicode:: U+000AE .. REGISTERED SIGN
+
+END_RST -->.
+
+Settings of the coupling routines are defined in
+$caseDir/CFD/constant/"couplingProperies"_CFDEMcoupling_dicts.html#couplingProperties
+(e.g. force models, data exchange model, etc.) and
+$caseDir/CFD/constant/"liggghtsCommands"_CFDEMcoupling_dicts.html#liggghtsCommands
+(allows to execute a LIGGGHTS command during a coupled simulation).
+
+<!-- HTML_ONLY -->
+NOTE:
+(*) This offering is not approved or endorsed by OpenCFD Limited, producer and
+distributor of the OpenFOAM software via www.openfoam.com, and owner of the
+OPENFOAM&reg; and OpenCFD&reg; trade marks.
+OPENFOAM&reg; is a registered trade mark of OpenCFD Limited, producer and
+distributor of the OpenFOAM software via www.openfoam.com.
+<!-- END_HTML_ONLY -->
+
+<!-- RST
+
+.. note::
+
+   (*) This offering is not approved or endorsed by OpenCFD Limited, producer
+   and distributor of the OpenFOAM software via www.openfoam.com, and owner of
+   the OPENFOAM\ |reg| and OpenCFD\ |reg| trade marks.
+   OPENFOAM\ |reg| is a registered trade mark of OpenCFD Limited, producer and
+   distributor of the OpenFOAM software via www.openfoam.com.
+
+.. |reg|    unicode:: U+000AE .. REGISTERED SIGN
+
+END_RST -->
+
+:link(lig,http://www.cfdem.com)
+
+

@@ -1,0 +1,80 @@
+"CFDEMproject Website"_lws - "Main Page"_main :c
+
+:link(lws,http://www.cfdem.com)
+:link(main,CFDEMcoupling_Manual.html)
+
+:line
+
+forceModel volWeightedAverage command :h3
+
+[Syntax:]
+
+Defined in "couplingProperties"_CFDEMcoupling_dicts.html#couplingProperties
+dictionary.
+
+forceModels
+(
+    volWeightedAverage
+);
+volWeightedAverageProps
+\{
+    startTime time;
+    scalarFieldNames
+    (
+        scalarField
+    );
+    vectorFieldNames
+    (
+        vectorField
+    );
+    upperThreshold     scalar1;
+    lowerThreshold     scalar2;
+    verbose;
+\} :pre
+
+{time} = (optional, default 0.) time to start the averaging :ulb,l
+{scalarField} = names of the finite volume scalar fields to be temporally averaged :l
+{vectorField} = names of the finite volume vector fields to be temporally averaged :l
+{scalar1} = only cells with a field value (magnitude) lower than this upper threshold are considered :l
+{scalar2} = only cells with a field value (magnitude) greater than this lower threshold are considered :l
+{verbose} = (optional, default false) keyword only (mostly used for debugging) :l
+:ule
+
+[Examples:]
+
+forceModels
+(
+    volWeightedAverage
+);
+volWeightedAverageProps
+\{
+    startTime 0.1;
+    scalarFieldNames
+    (
+        voidfraction
+    );
+    vectorFieldNames
+    (
+    );
+    upperThreshold 0.999;
+    lowerThreshold 0;
+\} :pre
+
+[Description:]
+
+This "forceModel" does not influence the particles or the simulation - it is a
+post-processing tool! Starting at start time the volume weighted averages of
+those cells of the fields within the threshold are calculated.
+
+At "writeTime" a field named volAverage_field, where scalarField is the name of
+the original field, is written. This can then be probed using standard function
+object probes.
+
+[Restrictions:]
+
+Currently all fields have the same threshold value!
+
+[Related commands:]
+
+"forceModel"_forceModel.html
+

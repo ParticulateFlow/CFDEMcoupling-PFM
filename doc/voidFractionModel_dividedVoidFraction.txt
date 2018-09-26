@@ -1,34 +1,39 @@
-"CFDEMproject WWW Site"_lws - "CFDEM Commands"_lc :c
+"CFDEMproject Website"_lws - "Main Page"_main :c
 
 :link(lws,http://www.cfdem.com)
-:link(lc,CFDEMcoupling_Manual.html#comm)
+:link(main,CFDEMcoupling_Manual.html)
 
 :line
 
-voidfractionModel_dividedVoidFraction command :h3
+voidFractionModel divided command :h3
 
 [Syntax:]
 
-Defined in couplingProperties dictionary.
+Defined in "couplingProperties"_CFDEMcoupling_dicts.html#couplingProperties
+dictionary.
 
-voidfractionModel divided;
+voidFractionModel divided;
 dividedProps
 \{
-    alphaMin number1;
+    alphaMin       number1;
     interpolation;
-    weight number2;
-    porosity number3;
+    weight         number2;
+    porosity       number3;
+    procBoundaryCorrection switch1;
+    verbose;
 \} :pre
 
-{number1} = minimum limit for voidfraction :ulb,l
-{interpolation} = flag to interpolate voidfraction to particle positions (normally off) :l
+{number1} = minimum limit for void fraction :ulb,l
+{interpolation} = flag to interpolate void fraction to particle positions (normally off) :l
 {number2} = (optional) scaling of the particle volume to account for porosity or agglomerations. :l
 {number3} = (optional) diameter of the particle's representation is artificially increased according to {number2} * Vparticle, volume remains unaltered! :l
+{switch1} = (optional, default false) allow for correction at processor boundaries. This requires the use of engineIB and vice versa. :l
+{verbose} = (optional, default false) flag for debugging output :l
 :ule
 
 [Examples:]
 
-voidfractionModel divided;
+voidFractionModel divided;
 dividedProps
 \{
     alphaMin 0.2;
@@ -36,18 +41,57 @@ dividedProps
 
 [Description:]
 
-The divided voidFraction model is supposed to be used when a particle (or its representation) is in the size range of a CFD cell. Satellite points are used to divide the particle's volume to the touched cells.
+The {divided} void fraction model is supposed to be used when a particle (or its
+representation) is in the size range of a CFD cell. Satellite points are used to
+divide the particle's volume to the touched cells.
 
-The region of influence of a particle can be increased artificially by "porosity", which  blows up the particles, but keeps their volume (for voidfraction calculation) constant.
+The particle has radius R and its volume is divided into 29 non-overlapping
+regions of equal volume. The centroids of these volumes are then used to
+reproduce each volume. The first volume is a sphere with the center coinciding
+with the particle center. The radius of this subsphere can be found as follows: 
 
-The particle volume occupied in the CFD domain can be adjusted by the parameter "weight", using Vparticle=dsphere^3*pi/6*weight.
+:c,image(Eqs/voidfractionModel_divided_pic2.png)
 
-In the basic implementation of solvers, the void fraction is calculated based on all particles. Depending on the solver used, the void fraction calculation is also performed for a certain type of particles.
-The void fraction calculation is based on a three-step approach (reset, set and interpolate), i.e., the void fraction is time interpolated from a previous and a next void fraction field. Appropriate names for these fields have to be specified in the sub-dictionaries voidFracFieldNamesPrev and voidFracFieldNamesNext in the couplingProperties dictionary.
+The rest of the volume is a spherical layer that is divided into 2 layers of
+equal volume. Position of the border between these two spherical layers in
+radial direction can be easily obtained:
 
-[Restrictions:] none.
+:c,image(Eqs/voidfractionModel_divided_pic3.png)
+
+Each of these spherical layers is later divided into 14 elements of equal volume.
+Position of the centroid point in radial direction of each volume in the first
+spherical layer is as follows
+
+:c,image(Eqs/voidfractionModel_divided_pic4.png)
+
+Similarly, for the second spherical layer remembering that the external radius
+is the particle radius:
+
+:c,image(Eqs/voidfractionModel_divided_pic5.png)
+
+The region of influence of a particle can be increased artificially by
+{porosity}, which blows up the particles, but keeps their volume (for
+void fraction calculation) constant.
+
+The particle volume occupied in the CFD domain can be adjusted by the parameter
+{weight}, using
+
+:c,image(Eqs/voidfractionModel_divided_pic6.png).
+
+In the basic implementation of solvers, the void fraction is calculated based on
+all particles. Depending on the solver used, the void fraction calculation is
+also performed for a certain type of particles.
+The void fraction calculation is based on a three-step approach (reset, set and
+interpolate), i.e. the void fraction is time interpolated from a previous and a
+next void fraction field. Appropriate names for these fields have to be
+specified in the sub-dictionaries voidFracFieldNamesPrev and
+voidFracFieldNamesNext in the couplingProperties dictionary.
+
+[Restrictions:]
+
+none
 
 [Related commands:]
 
-"voidfractionModel"_voidfractionModel.html
+"voidFractionModel"_voidFractionModel.html
 
