@@ -59,14 +59,14 @@ bool IOModel::dumpNow() const
     return time_.outputTime();
 }
 
-fileName IOModel::createTimeDir(fileName path) const
+fileName IOModel::createTimeDir(const fileName& path) const
 {
     fileName timeDirPath(path/time_.timeName());
     mkDir(timeDirPath,0777);
     return timeDirPath;
 }
 
-fileName IOModel::createLagrangianDir(fileName path) const
+fileName IOModel::createLagrangianDir(const fileName& path) const
 {
     fileName lagrangianDirPath(path/"lagrangian");
     mkDir(lagrangianDirPath,0777);
@@ -75,7 +75,7 @@ fileName IOModel::createLagrangianDir(fileName path) const
     return cfdemCloudDirPath;
 }
 
-fileName IOModel::buildFilePath(word dirName) const
+fileName IOModel::buildFilePath(const word& dirName) const
 {
     // create file structure
     fileName path("");
@@ -94,7 +94,7 @@ fileName IOModel::buildFilePath(word dirName) const
     return path;
 }
 
-void IOModel::streamDataToPath(fileName path, double** array,int nPProc,word name,word type,word className) const
+void IOModel::streamDataToPath(const fileName& path, const double* const* array,int nPProc,const word& name,const word& type,const word& className) const
 {
     OFstream fileStream(path/name);
 
@@ -107,7 +107,7 @@ void IOModel::streamDataToPath(fileName path, double** array,int nPProc,word nam
         << "    object      " << name << ";\n"
         << "}" << nl;
 
-    fileStream << nPProc <<"\n";
+    fileStream << nPProc << "\n";
 
     if (type == "origProcId")
     {
@@ -118,7 +118,7 @@ void IOModel::streamDataToPath(fileName path, double** array,int nPProc,word nam
 
     fileStream << token::BEGIN_LIST << nl;
 
-    int ** cellIDs = particleCloud_.cellIDs();
+    const int * const* cellIDs = particleCloud_.cellIDs();
     for (int index = 0; index < particleCloud_.numberOfParticles(); ++index)
     {
         if (cellIDs[index][0] > -1) // particle Found
