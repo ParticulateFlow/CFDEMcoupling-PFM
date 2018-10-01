@@ -94,13 +94,13 @@ protected:
 
     bool allowCFDsubTimestep_;
 
-    bool limitDEMForces_;
+    const bool limitDEMForces_;
 
-    bool getParticleDensities_;
+    const bool getParticleDensities_;
 
-    bool getParticleEffVolFactors_;
+    const bool getParticleEffVolFactors_;
 
-    bool getParticleTypes_;
+    const bool getParticleTypes_;
 
     scalar maxDEMForce_;
 
