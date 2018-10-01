@@ -57,6 +57,7 @@ species::species
     propsDict_(dict.subDict(typeName + "Props")),
     interpolation_(propsDict_.lookupOrDefault<bool>("interpolation",false)),
     mesh_(sm.mesh()),
+    verbose_(propsDict_.lookupOrDefault<bool>("verbose",false)),
     // define a file name in the coupling properties that contains the species
     specDict_
     (
@@ -68,12 +69,11 @@ species::species
     // create a list from the Species table in the specified species dictionary
     speciesNames_(specDict_.lookup("species")),
     mod_spec_names_(speciesNames_.size()),
-    Y_(speciesNames_.size()),                           //volumeScalarFields created in the ts folders
-    concentrations_(speciesNames_.size(),NULL),         //the value of species concentration for every species
+    X_(speciesNames_.size()),                           //volumeScalarFields
+    molarFractions_(speciesNames_.size(),NULL),         //the value of molar fractions for every species
     changeOfSpeciesMass_(speciesNames_.size(),NULL),    //the values that are received from DEM with the name of Modified_+species name
     changeOfSpeciesMassFields_(speciesNames_.size()),   //the scalar fields generated with the values from Modified_+species names
     changeOfGasMassField_                               //the total change of Gas Mass field (when the Modified species
-
     (
         IOobject
         (
@@ -93,53 +93,21 @@ species::species
     densityFieldName_(propsDict_.lookupOrDefault<word>("densityFieldName","rho")),
     rho_(sm.mesh().lookupObject<volScalarField> (densityFieldName_)),
     partRhoName_(propsDict_.lookupOrDefault<word>("partRhoName","partRho")),
-    partRho_(NULL)
-  // voidfraction and velocity fields can be included by wish
-  /*  voidfractionFieldName_(propsDict_.lookup("voidfractionFieldName")),
-      voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
-      velFieldName_(propsDict_.lookup("velFieldName")),
-      U_(sm.mesh().lookup<volVectorField> (velFieldName_)),*/
-
+    partRho_(NULL),
+    voidfractionFieldName_(propsDict_.lookupOrDefault<word>("voidfractionFieldName","voidfraction")),
+    voidfraction_(sm.mesh().lookupObject<volScalarField>(voidfractionFieldName_)),
+    // total mole field
+    molarConcFieldName_(propsDict_.lookupOrDefault<word>("totalMoleFieldName","molarConc")),
+    molarConc_(sm.mesh().lookupObject<volScalarField>(molarConcFieldName_)),
+    partMolarConcName_(propsDict_.lookupOrDefault<word>("partMoleName","partMolarConc")),
+    partMolarConc_(NULL),
+    loopCounter_(-1),
+    Nevery_(propsDict_.lookupOrDefault<label>("Nevery",1)),
+    massSourceCurr_(0.0),
+    massSourceTot_(0.0),
+    initialized_(false)
 {
-    Info << " Read species list from: " << specDict_.name() << endl;
-    Info << " Reading species list: " << speciesNames_ << endl;
-
-    for (int i=0; i<speciesNames_.size(); i++)
-    {
-        // Defining the Species volume scalar fields
-        Info << " Looking up species fields " << speciesNames_[i] << endl;
-        volScalarField& Y = const_cast<volScalarField&>
-                (sm.mesh().lookupObject<volScalarField>(speciesNames_[i]));
-        Y_.set(i, &Y);
-
-        // define the modified species names
-        mod_spec_names_[i] = "Modified_" + speciesNames_[i];
-
-        // Check if mod species are correct
-        Info << "Modified species names are: " << mod_spec_names_[i] << endl;
-
-        // Create new volScalarFields for the changed values of the species mass fields
-        changeOfSpeciesMassFields_.set
-        (
-            i,
-            new volScalarField
-            (
-                IOobject
-                (
-                "ModSpeciesMassField_"+Y_[i].name(),
-                mesh_.time().timeName(),
-                mesh_,
-                IOobject::NO_READ,
-                IOobject::AUTO_WRITE
-                ),
-                mesh_,
-                dimensionedScalar("0",dimMass/(dimVol*dimTime), 0)
-            )
-         );
-
-        Info << "what are the concentration names (Y_i): " << Y_[i].name() << endl;
-
-    }
+    particleCloud_.checkCG(false);
     allocateMyArrays();
 }
 
@@ -149,49 +117,133 @@ species::~species()
 {
     particleCloud_.dataExchangeM().destroy(partTemp_,1);
     particleCloud_.dataExchangeM().destroy(partRho_,1);
+    particleCloud_.dataExchangeM().destroy(partMolarConc_,1);
 
-    for (int i=0; i<speciesNames_.size();i++) particleCloud_.dataExchangeM().destroy(concentrations_[i],1);
+
+    for (int i=0; i<speciesNames_.size();i++) particleCloud_.dataExchangeM().destroy(molarFractions_[i],1);
     for (int i=0; i<speciesNames_.size();i++) particleCloud_.dataExchangeM().destroy(changeOfSpeciesMass_[i],1);
-
 }
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
 void species::allocateMyArrays() const
 {
-  // could be implemented similarly as forcemodel LaEuScalarTemp
-
-    // get memory for 2d arrays
     double initVal=0.0;
-    particleCloud_.dataExchangeM().allocateArray(partRho_,initVal,1);
-    particleCloud_.dataExchangeM().allocateArray(partTemp_,initVal,1);
+    if (particleCloud_.dataExchangeM().maxNumberOfParticles() > 0)
+    {
+        // get memory for 2d arrays
+        particleCloud_.dataExchangeM().allocateArray(partRho_,initVal,1,"nparticles");
+        particleCloud_.dataExchangeM().allocateArray(partTemp_,initVal,1,"nparticles");
+        particleCloud_.dataExchangeM().allocateArray(partMolarConc_,initVal,1,"nparticles");
+
+        for (int i=0; i<speciesNames_.size(); i++)
+        {
+            particleCloud_.dataExchangeM().allocateArray(molarFractions_[i],initVal,1,"nparticles");
+            particleCloud_.dataExchangeM().allocateArray(changeOfSpeciesMass_[i],initVal,1,"nparticles");
+
+        }
+    }
+}
+
+void species::reAllocMyArrays() const
+{
+    if (particleCloud_.numberOfParticlesChanged())
+    {
+        double initVal=0.0;
+        particleCloud_.dataExchangeM().allocateArray(partRho_,initVal,1);
+        particleCloud_.dataExchangeM().allocateArray(partTemp_,initVal,1);
+        particleCloud_.dataExchangeM().allocateArray(partMolarConc_,initVal,1);
+
+        for (int i=0; i<speciesNames_.size(); i++)
+        {
+            particleCloud_.dataExchangeM().allocateArray(molarFractions_[i],initVal,1);
+            particleCloud_.dataExchangeM().allocateArray(changeOfSpeciesMass_[i],initVal,1);
+        }
+    }
+}
+
+void species::init()
+{
+    if(verbose_)
+    {
+        Info << " Read species list from: " << specDict_.name() << endl;
+        Info << " Reading species list: " << speciesNames_ << endl;
+    }
+
 
     for (int i=0; i<speciesNames_.size(); i++)
     {
-        particleCloud_.dataExchangeM().allocateArray(concentrations_[i],initVal,1);
-        particleCloud_.dataExchangeM().allocateArray(changeOfSpeciesMass_[i],initVal,1);
+        // Define the Species volume scalar fields
+        volScalarField& X = const_cast<volScalarField&>
+                (mesh_.lookupObject<volScalarField>("X_"+speciesNames_[i]));
+        X_.set(i, &X);
+
+        // define the modified species names
+        mod_spec_names_[i] = "Modified_" + speciesNames_[i];
+
+        if(verbose_)
+        {
+            Info << " Looking up species fields \n " << "X_"+speciesNames_[i] << endl;
+            Info << "The molar fraction fields (X_i): \n" << X_[i].name() << endl;
+            // Check if mod species are correct
+            Info << "Modified species names are: \n" << mod_spec_names_[i] << endl;
+        }
+
+        // Create new volScalarFields for the changed values of the species mass fields
+        changeOfSpeciesMassFields_.set
+        (
+            i,
+            new volScalarField
+            (
+                IOobject
+                (
+                "ModSpeciesMassField_"+X_[i].name(),
+                mesh_.time().timeName(),
+                mesh_,
+                IOobject::NO_READ,
+                IOobject::AUTO_WRITE
+                ),
+                mesh_,
+                dimensionedScalar("zero",dimMass/(dimVol*dimTime), 0.0)
+            )
+         );
     }
+    initialized_ = true;
 }
 
 // * * * * * * * * * * * * * * * * Member Fct  * * * * * * * * * * * * * * * //
 
 void species::execute()
 {
+    if(!initialized_)
+    {
+        init();
+    }
+
+    loopCounter_++;
+    if (loopCounter_ % Nevery_ != 0)
+    {
+        return;
+    }
     // realloc the arrays
-    allocateMyArrays();
+    reAllocMyArrays();
 
-    // get Y_i, T, rho at particle positions, fill arrays with them and push to LIGGGHTS
-
+    // get X_i, T, rho at particle positions
     label  cellI=0;
     scalar Tfluid(0);
     scalar rhofluid(0);
-    List<scalar> Yfluid_;
-    Yfluid_.setSize(speciesNames_.size());
+    List<scalar> Xfluid_;
+    scalar voidfraction(1);
+    Xfluid_.setSize(speciesNames_.size());
+    scalar molarConcfluid(0);
 
-    // defining interpolators for T, rho
+    // defining interpolators for T, rho, voidfraction, molarConc
     interpolationCellPoint <scalar> TInterpolator_(tempField_);
     interpolationCellPoint <scalar> rhoInterpolator_(rho_);
+    interpolationCellPoint <scalar> voidfractionInterpolator_(voidfraction_);
+    interpolationCellPoint <scalar> molarConcInterpolator_(molarConc_);
 
-    for (int index=0; index<particleCloud_.numberOfParticles(); index++)
+
+    for (int index=0; index<particleCloud_.numberOfParticles(); ++index)
     {
         cellI=particleCloud_.cellIDs()[index][0];
         if (cellI >= 0)
@@ -201,51 +253,63 @@ void species::execute()
                 vector position     =   particleCloud_.position(index);
                 Tfluid              =   TInterpolator_.interpolate(position,cellI);
                 rhofluid            =   rhoInterpolator_.interpolate(position,cellI);
+                voidfraction        =   voidfractionInterpolator_.interpolate(position,cellI);
+                molarConcfluid      =   molarConcInterpolator_.interpolate(position,cellI);
             }
             else
             {
-                Tfluid = tempField_[cellI];
-                rhofluid=rho_[cellI];
+                Tfluid          =   tempField_[cellI];
+                rhofluid        =   rho_[cellI];
+                voidfraction    =   voidfraction_[cellI];
+                molarConcfluid	=   molarConc_[cellI];
+                for (int i = 0; i<speciesNames_.size();i++)
+                {
+                    Xfluid_[i] = X_[i][cellI];
+                   // if(Xfluid_[i] < 0.0) Xfluid_[i] = 0.0;
+                }
             }
 
-            //fill arrays
-            partTemp_[index][0]=Tfluid;
-            partRho_[index][0]=rhofluid;
+            partTemp_[index][0] =   Tfluid;
+            partRho_[index][0]  =   rhofluid;
+            partMolarConc_[index][0]    =   molarConcfluid;
+
             for (int i=0; i<speciesNames_.size();i++)
             {
-                Yfluid_[i] = Y_[i][cellI];
-                concentrations_[i][index][0] = Yfluid_[i];
+                // attention for indices when not communicating all species
+                molarFractions_[i][index][0]=Xfluid_[i];
             }
         }
+    }
 
-        if(particleCloud_.verbose() && index >= 0 && index < 2)
+    if(verbose_)
+    {
+        for(int i =0; i<speciesNames_.size();i++)
         {
-            /*for(int i =0; i<speciesNames_.size();i++)
-            {
-                Info << "Y_i = " << Y_[i].name() << endl;
-                Info << "concentrations = " << concentrations_[i][index][0] << endl;
-                Info << "partRho_[index][0] = " << partRho_[index][0] << endl;
-                Info << "rhofluid =" << rhofluid << endl;
-                Info << "Yfluid = " << Yfluid_[i] << endl;
-                Info << "partTemp_[index][0] = " << partTemp_[index][0] << endl;
-                Info << "Tfluid = " << Tfluid << endl  ;
-            }*/
+            Info << "X_i = " << X_[i].name() << endl;
+            Info << "molarFractions_= " << molarFractions_[i][0][0] << endl;
+            Info << "partRho_[index][0] = " << partRho_[0][0] << endl;
+            Info << "rhofluid =" << rhofluid << endl;
+            Info << "Xfluid = " << Xfluid_[i] << endl;
+            Info << "partTemp_[index][0] = " << partTemp_[0][0] << endl;
+            Info << "Tfluid = " << Tfluid << endl  ;
+            Info << "voidfraction =" << voidfraction << endl;
         }
     }
 
         // give DEM data
         particleCloud_.dataExchangeM().giveData(partTempName_, "scalar-atom", partTemp_);
-        particleCloud_.dataExchangeM().giveData(partRhoName_, "scalar-atom", partRho_);
+        particleCloud_.dataExchangeM().giveData(partRhoName_,  "scalar-atom", partRho_);
+        particleCloud_.dataExchangeM().giveData(partMolarConcName_, "scalar-atom", partMolarConc_);
+
         for (int i=0; i<speciesNames_.size();i++)
         {
-            particleCloud_.dataExchangeM().giveData(Y_[i].name(),"scalar-atom",concentrations_[i]);
+            particleCloud_.dataExchangeM().giveData("X_"+speciesNames_[i],"scalar-atom",molarFractions_[i]);
         };
 
         Info << "give data done" << endl;
 
-
-
         // pull changeOfSpeciesMass_, transform onto fields changeOfSpeciesMassFields_, add them up on changeOfGasMassField_
+        scalar timestep = mesh_.time().deltaTValue();
         changeOfGasMassField_.primitiveFieldRef() = 0.0;
         changeOfGasMassField_.boundaryFieldRef() = 0.0;
         for (int i=0; i<speciesNames_.size();i++)
@@ -253,7 +317,7 @@ void species::execute()
             particleCloud_.dataExchangeM().getData(mod_spec_names_[i],"scalar-atom",changeOfSpeciesMass_[i]);
             changeOfSpeciesMassFields_[i].primitiveFieldRef() = 0.0;
             changeOfSpeciesMassFields_[i].boundaryFieldRef() = 0.0;
-            particleCloud_.averagingM().setScalarSum
+            particleCloud_.averagingM().setScalarSumCentre
             (
                 changeOfSpeciesMassFields_[i],
                 changeOfSpeciesMass_[i],
@@ -262,25 +326,33 @@ void species::execute()
             );
 
             // take care for implementation in LIGGGHTS: species produced from particles defined positive
-            changeOfSpeciesMassFields_[i].primitiveFieldRef() /= changeOfSpeciesMassFields_[i].mesh().V();
+            // changeOf...Fields need to be mass per volume per timestep
+            changeOfSpeciesMassFields_[i].primitiveFieldRef() /= (changeOfSpeciesMassFields_[i].mesh().V() * Nevery_ * timestep);
             changeOfSpeciesMassFields_[i].correctBoundaryConditions();
             changeOfGasMassField_ += changeOfSpeciesMassFields_[i];
-            Info << "total conversion of species" << speciesNames_[i] << " = " << gSum(changeOfSpeciesMassFields_[i]*1.0*changeOfSpeciesMassFields_[i].mesh().V()) << endl;
+            if (verbose_)
+            {
+                Info << "total conversion of species" << speciesNames_[i] << " = " << gSum(changeOfSpeciesMassFields_[i]*1.0*changeOfSpeciesMassFields_[i].mesh().V() * Nevery_ * timestep) << endl;
+            }
         }
-        Info << "get data done" << endl;
-
+        massSourceCurr_ = gSum(changeOfGasMassField_*1.0*changeOfGasMassField_.mesh().V() * Nevery_ * timestep);
+        massSourceTot_ += massSourceCurr_;
+        if (verbose_)
+        {
+            Info << "total conversion of mass:\n\tcurrent source = " << massSourceCurr_ << "\n\ttotal source = " << massSourceTot_ << "\n" << endl;
+            Info << "get data done" << endl;
+        }
 }
 
-/*tmp<Foam::fvScalarMatrix> species::Smi(const label i) const
+tmp<volScalarField> species::Smi (const label i) const
 {
-    return tmp<fvScalarMatrix>(new fvScalarMatrix(changeOfSpeciesMassFields_[i], dimMass/dimTime));
+    return tmp<volScalarField> (changeOfSpeciesMassFields_[i]);
 }
 
-tmp<Foam::fvScalarMatrix> species::Sm() const
+tmp<volScalarField> species::Sm () const
 {
-    return tmp<fvScalarMatrix>(new fvScalarMatrix(changeOfGasMassField_, dimMass/dimTime));
-}*/
-
+    return tmp<volScalarField> (changeOfGasMassField_);
+}
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

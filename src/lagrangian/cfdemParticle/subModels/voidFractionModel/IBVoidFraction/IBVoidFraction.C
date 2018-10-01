@@ -75,7 +75,7 @@ IBVoidFraction::IBVoidFraction
     if (scaleUpVol_ < 1.0)
         FatalError << "scaleUpVol shloud be > 1." << abort(FatalError);
     if (alphaMin_ > 1.0 || alphaMin_ < 0.01)
-        FatalError << "alphaMin shloud be > 1 and < 0.01." << abort(FatalError);
+        FatalError << "alphaMin must have a value between 0.01 and 1.0." << abort(FatalError);
 }
 
 

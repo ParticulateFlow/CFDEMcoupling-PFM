@@ -19,7 +19,6 @@ model = name of the smoothingModel to be applied :ul
 
 smoothingModel off; :pre
 smoothingModel  constDiffSmoothing; :pre
-smoothingModel  localPSizeDiffSmoothing; :pre
 
 Note: This examples list might not be complete - please look for other models (smoothingModel_XY) in this documentation.
 

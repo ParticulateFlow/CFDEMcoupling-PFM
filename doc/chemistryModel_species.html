@@ -1,0 +1,74 @@
+<HTML>
+<CENTER><A HREF = "http://www.cfdem.com">CFDEMproject WWW Site</A> - <A HREF = "CFDEMcoupling_Manual.html#comm">CFDEM Commands</A> 
+</CENTER>
+
+
+
+
+<HR>
+
+<H3>chemistryModel_species command 
+</H3>
+<P><B>Syntax:</B>
+</P>
+<P>Defined in couplingProperties dictionary.
+</P>
+<PRE>chemistryModels
+(
+    species
+);
+speciesProps
+{
+    ChemistryFile 		"$casePath/CFD/constant/foam.inp";
+    verbose			switch1;
+    tempFieldName		"T";
+    densityFieldName		"rho"
+    voidfractionFieldName	"voidfraction"
+    totalMoleFieldName		"molarConc"
+    partTempName		"partTemp"
+    partRhoName			"partRho"
+}; 
+</PRE>
+<UL><LI><I>ChemistryFile</I> = path to file, where the reacting species are listed  
+
+<LI><I>T</I> = name of the finite volume temperature field, it is already added in default and doesn't need to be specified if name is the same 
+
+<LI><I>rho</I> = name of the finite volume density field, it is already added in default and doesn't need to be specified if name is the same 
+
+<LI><I>voidfraction</I> = name of the finite volume voidfraction field, it is already added in default and doesn't need to be specified if name is the same 
+
+<LI><I>molarConc</I> = name of the finite volume molar concentration field, it is already added in default and doesn't need to be specified if name is the same 
+
+<LI><I>partTemp</I> = name of the finite volume cell averaged particle temperature field, it is already added in default and doesn't need to be specified if name is the same 
+
+<LI><I>partRho</I> = name of the finite volume cell averaged density temperature field, it is already added in default and doesn't need to be specified if name is the same 
+
+<LI><I>switch1</I> = (optional, normally off) flag to give information 
+
+
+</UL>
+<P><B>Examples:</B>
+</P>
+<PRE>chemistryModels	
+(
+    species
+);
+speciesProps
+{
+     ChemistryFile 		"$casePath/CFD/constant/foam.inp";
+     verbose			false;
+} 
+</PRE>
+<P><B>Description:</B>
+</P>
+<P>The chemistry model performs the calculation of chemical reactional effects acting on each DEM particle. The species model is the model, where the specified species fields (from the foam.inp folder) are intialized, and information such as temperature, density, molar concentration and more importantly the molar fractions are transferred to DEM side.
+</P>
+<P><B>Restrictions:</B>
+</P>
+<P>none.
+</P>
+<P><B>Related commands:</B>
+</P>
+<P><A HREF = "chemistryModel.html">chemistryModel</A>
+</P>
+</HTML>

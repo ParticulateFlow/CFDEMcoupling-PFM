@@ -43,13 +43,13 @@ private:
 
     dictionary propsDict_;
 
+    bool multiTypes_;
+
     mutable double **d2_;
     
     mutable double **d3_;
 
-    mutable scalar scaleDia_;      // scaling due to coarse graining
-
-    mutable scalar scaleDiaDist_;  // scaling due to modified particle size distribution
+    scalarList typeCG_;
     
     mutable volScalarField d2Field_;
     

@@ -1,0 +1,56 @@
+"CFDEMproject WWW Site"_lws - "CFDEM Commands"_lc :c
+
+:link(lws,http://www.cfdem.com)
+:link(lc,CFDEMcoupling_Manual.html#comm)
+
+:line
+
+chemistryModel_diffusionCoefficients command :h3
+
+[Syntax:]
+
+Defined in couplingProperties dictionary.
+
+chemistryModels
+(
+    diffusionCoefficients
+);
+diffusionCoefficientsProps
+\{
+    verbose			switch1;        
+    ChemistryFile 		"$casePath/CFD/constant/foam.inp";
+     diffusantGasNames          ( speciesNames ); 
+\}; :pre
+
+{switch1} = (optional, normally off) flag to give information :l
+{ChemistryFile} = path to file, where the reacting species are listed  :ulb,l
+{diffusantGasNames} = list of gas field names that are the reactant gases :l
+:ule
+
+[Examples:]
+
+chemistryModels	
+(
+    diffusionCoefficients
+);
+speciesProps
+\{
+    verbose			false;        
+    ChemistryFile 		"$casePath/CFD/constant/foam.inp";
+    diffusantGasNames       (    CO
+                                 H2
+                            ); 
+\} :pre
+
+[Description:]
+
+The chemistry model performs the calculation of chemical reactional effects acting on each DEM particle. The diffusionCoefficients model activates the binary molecular diffusion calculation of the reacting species using the Fuller-Schettler-Giddings correlation.
+
+[Restrictions:]
+
+Species model needs to be active.
+
+[Related commands:]
+
+"chemistryModel"_chemistryModel.html
+

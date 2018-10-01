@@ -83,6 +83,9 @@ cfdemCloud::cfdemCloud
     ignore_(couplingProperties_.found("ignore")),
     allowCFDsubTimestep_(true),
     limitDEMForces_(couplingProperties_.found("limitDEMForces")),
+    getParticleDensities_(couplingProperties_.lookupOrDefault<bool>("getParticleDensities",false)),
+    getParticleEffVolFactors_(couplingProperties_.lookupOrDefault<bool>("getParticleEffVolFactors",false)),
+    getParticleTypes_(couplingProperties_.lookupOrDefault<bool>("getParticleTypes",false)),
     maxDEMForce_(0.),
     modelType_(couplingProperties_.lookup("modelType")),
     positions_(NULL),
@@ -96,6 +99,9 @@ cfdemCloud::cfdemCloud
     radii_(NULL),
     voidfractions_(NULL),
     cellIDs_(NULL),
+    particleDensities_(NULL),
+    particleEffVolFactors_(NULL),
+    particleTypes_(NULL),
     particleWeights_(NULL),
     particleVolumes_(NULL),
     particleV_(NULL),
@@ -127,6 +133,19 @@ cfdemCloud::cfdemCloud
         ),
         mesh,
         dimensionedScalar("zero", dimensionSet(0,0,-1,0,0), 0)  // 1/s
+    ),
+    particleDensityField_
+    (
+        IOobject
+        (
+            "partRho",
+            mesh.time().timeName(),
+            mesh,
+            IOobject::READ_IF_PRESENT,
+            IOobject::NO_WRITE
+        ),
+        mesh,
+        dimensionedScalar("zero", dimensionSet(1,-3,0,0,0), 0.0)
     ),
     checkPeriodicCells_(false),
     turbulence_
@@ -250,6 +269,11 @@ cfdemCloud::cfdemCloud
     else
         Info << "ignoring ddt(voidfraction)" << endl;
 
+    bool adjustTimeStep  = mesh_.time().controlDict().lookupOrDefault("adjustTimeStep", false);
+    if (adjustTimeStep)
+        FatalError << "CFDEMcoupling does not support adjustable time steps."
+                   << abort(FatalError);
+
     momCoupleModel_ = new autoPtr<momCoupleModel>[momCoupleModels_.size()];
     for (int i=0;i<momCoupleModels_.size();i++)
     {
@@ -356,6 +380,9 @@ cfdemCloud::~cfdemCloud()
     dataExchangeM().destroy(particleWeights_,1);
     dataExchangeM().destroy(particleVolumes_,1);
     dataExchangeM().destroy(particleV_,1);
+    if(getParticleDensities_) dataExchangeM().destroy(particleDensities_,1);
+    if(getParticleEffVolFactors_) dataExchangeM().destroy(particleEffVolFactors_,1);
+    if(getParticleTypes_) dataExchangeM().destroy(particleTypes_,1);
 }
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
@@ -367,6 +394,10 @@ void cfdemCloud::getDEMdata()
 
     if(impDEMdragAcc_)
         dataExchangeM().getData("dragAcc","vector-atom",fAcc_); // array is used twice - might be necessary to clean it first
+
+    if(getParticleDensities_) dataExchangeM().getData("density","scalar-atom",particleDensities_);
+    if(getParticleEffVolFactors_) dataExchangeM().getData("effvolfactor","scalar-atom",particleEffVolFactors_);
+    if(getParticleTypes_) dataExchangeM().getData("type","scalar-atom",particleTypes_);
 }
 
 void cfdemCloud::giveDEMdata()
@@ -442,6 +473,25 @@ void cfdemCloud::setParticleForceField()
         particleWeights_,
         NULL //mask
     );
+}
+
+void cfdemCloud::setScalarAverages()
+{
+    if(!getParticleDensities_) return;
+    if(verbose_) Info << "- setScalarAverage" << endl;
+
+    particleDensityField_.primitiveFieldRef() = 0.0;
+    averagingM().resetWeightFields();
+    averagingM().setScalarAverage
+    (
+        particleDensityField_,
+        particleDensities_,
+        particleWeights_,
+        averagingM().UsWeightField(),
+        NULL
+    );
+
+    if(verbose_) Info << "setScalarAverage done." << endl;
 }
 
 void cfdemCloud::setVectorAverages()
@@ -597,7 +647,8 @@ bool cfdemCloud::evolve
             clockM().stop("setvoidFraction");
 
             // set average particles velocity field
-            clockM().start(20,"setVectorAverage");
+            clockM().start(20,"setAverages");
+            setScalarAverages();
             setVectorAverages();
 
 
@@ -611,17 +662,19 @@ bool cfdemCloud::evolve
             if(!treatVoidCellsAsExplicitForce())
                 smoothingM().smoothenReferenceField(averagingM().UsNext());
 
-            clockM().stop("setVectorAverage");
+            clockM().stop("setAverages");
         }
 
         //============================================
         //CHECK JUST TIME-INTERPOATE ALREADY SMOOTHENED VOIDFRACTIONNEXT AND UsNEXT FIELD
         //      IMPLICIT FORCE CONTRIBUTION AND SOLVER USE EXACTLY THE SAME AVERAGED
         //      QUANTITIES AT THE GRID!
-        Info << "\n timeStepFraction() = " << dataExchangeM().timeStepFraction() << endl;
-        if(dataExchangeM().timeStepFraction() > 1.0000001)
+        scalar timeStepFrac = dataExchangeM().timeStepFraction();
+        Info << "\n timeStepFraction() = " << timeStepFrac << endl;
+        if(timeStepFrac > 1.0000001)
         {
-            FatalError << "cfdemCloud::dataExchangeM().timeStepFraction()>1: Do not do this, since dangerous. This might be due to the fact that you used a adjustable CFD time step. Please use a fixed CFD time step." << abort(FatalError);
+   //         FatalError << "cfdemCloud::dataExchangeM().timeStepFraction()>1: Do not do this, since dangerous. This might be due to the fact that you used a adjustable CFD time step. Please use a fixed CFD time step." << abort(FatalError);
+              Warning << "cfdemCloud::dataExchangeM().timeStepFraction() = " << timeStepFrac << endl;
         }
         clockM().start(24,"interpolateEulerFields");
 
@@ -702,6 +755,9 @@ bool cfdemCloud::reAllocArrays()
         dataExchangeM().allocateArray(particleWeights_,0.,voidFractionM().maxCellsPerParticle());
         dataExchangeM().allocateArray(particleVolumes_,0.,voidFractionM().maxCellsPerParticle());
         dataExchangeM().allocateArray(particleV_,0.,1);
+        if(getParticleDensities_) dataExchangeM().allocateArray(particleDensities_,0.,1);
+        if(getParticleEffVolFactors_) dataExchangeM().allocateArray(particleEffVolFactors_,0.,1);
+        if(getParticleTypes_) dataExchangeM().allocateArray(particleTypes_,0,1);
         arraysReallocated_ = true;
         return true;
     }

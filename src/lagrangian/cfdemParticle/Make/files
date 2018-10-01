@@ -29,15 +29,24 @@ derived/cfdemCloudEnergy/cfdemCloudEnergy.C
 $(cfdTools)/global.C
 $(cfdTools)/newGlobal.C
 
+$(chemistryModels)/chemistryModel/chemistryModel.C
+$(chemistryModels)/chemistryModel/newChemistryModel.C
+$(chemistryModels)/species/species.C
+$(chemistryModels)/noChemistry/noChemistry.C
+$(chemistryModels)/diffusionCoefficients/diffusionCoefficients.C
+$(chemistryModels)/massTransferCoeff/massTransferCoeff.C
+$(chemistryModels)/reactantPerParticle/reactantPerParticle.C
+
 $(energyModels)/energyModel/energyModel.C
 $(energyModels)/energyModel/newEnergyModel.C
 $(energyModels)/heatTransferGunn/heatTransferGunn.C
-$(energyModels)/heatTransferGunnImplicit/heatTransferGunnImplicit.C
+$(energyModels)/heatTransferGunnPartField/heatTransferGunnPartField.C
 $(energyModels)/reactionHeat/reactionHeat.C
 
 $(thermCondModels)/thermCondModel/thermCondModel.C
 $(thermCondModels)/thermCondModel/newThermCondModel.C
 $(thermCondModels)/SyamlalThermCond/SyamlalThermCond.C
+$(thermCondModels)/ZehnerSchluenderThermCond/ZehnerSchluenderThermCond.C
 $(thermCondModels)/noTherm/noThermCond.C
 
 $(forceModels)/forceModel/forceModel.C
@@ -63,12 +72,14 @@ $(forceModels)/particleCellVolume/particleCellVolume.C
 $(forceModels)/fieldTimeAverage/fieldTimeAverage.C
 $(forceModels)/volWeightedAverage/volWeightedAverage.C
 $(forceModels)/BeetstraDrag/BeetstraDrag.C
+$(forceModels)/BeetstraDragPoly/BeetstraDragPoly.C
 $(forceModels)/dSauter/dSauter.C
 $(forceModels)/Fines/Fines.C
 $(forceModels)/Fines/FinesFields.C
 $(forceModels)/Fines/FanningDynFines.C
 $(forceModels)/Fines/ErgunStatFines.C
 $(forceModels)/granKineticEnergy/granKineticEnergy.C
+$(forceModels)/pdCorrelation/pdCorrelation.C
 
 $(forceModelsMS)/forceModelMS/forceModelMS.C
 $(forceModelsMS)/forceModelMS/newForceModelMS.C
@@ -85,11 +96,6 @@ $(otherForceModels)/otherForceModel/newOtherForceModel.C
 $(otherForceModels)/gravity/gravity.C
 $(otherForceModels)/weightSecondaryPhase/weightSecondaryPhase.C
 $(otherForceModels)/expParticleForces/expParticleForces.C
-
-$(chemistryModels)/chemistryModel/chemistryModel.C
-$(chemistryModels)/chemistryModel/newChemistryModel.C
-$(chemistryModels)/species/species.C
-$(chemistryModels)/noChemistry/noChemistry.C
 
 $(probeModels)/probeModel/probeModel.C
 $(probeModels)/probeModel/newProbeModel.C

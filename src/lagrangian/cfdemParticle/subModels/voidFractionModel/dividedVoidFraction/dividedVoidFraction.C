@@ -191,6 +191,7 @@ void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfra
             position = particleCloud_.position(index);
             cellID = particleCloud_.cellIDs()[index][0];
             radius = particleCloud_.radius(index);
+            if (multiWeights_) scaleVol = weight(index);
             volume = Vp(index,radius,scaleVol);
             radius *= scaleRadius;
             cellVol = 0;

@@ -48,14 +48,13 @@ protected:
         word voidfractionFieldName_;
 
         const volScalarField& voidfraction_;
-    
+
         word rhoGFieldName_;
 
         const volScalarField& rhoG_;
 
         const dimensionedVector g_;
 
-    
 public:
 
     //- Runtime type information
