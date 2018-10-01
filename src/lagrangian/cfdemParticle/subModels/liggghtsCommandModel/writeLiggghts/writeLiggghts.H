@@ -97,7 +97,7 @@ public:
 
         bool runCommand(int);
 
-        word name(){return "writeLiggghts";};
+        word name() const {return "writeLiggghts";}
 };
 
 

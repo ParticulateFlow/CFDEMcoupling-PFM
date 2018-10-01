@@ -92,7 +92,7 @@ public:
 
         bool runCommand(int);
 
-        word name(){return "runLiggghts";};
+        word name() const {return "runLiggghts";}
 
         void set(int);
 };

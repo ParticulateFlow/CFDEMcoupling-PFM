@@ -94,7 +94,7 @@ public:
 
     // Member Functions
 
-        word name(){return propsDict_.dictName();};
+        word name() const {return propsDict_.dictName();}
 
         const char* command(int);
 
