@@ -87,7 +87,7 @@ inline const fvMesh& cfdemCloud::mesh() const
 
 inline bool cfdemCloud::solveFlow() const
 {
-    return bool(solveFlow_);
+    return solveFlow_;
 }
 
 inline bool cfdemCloud::verbose() const
