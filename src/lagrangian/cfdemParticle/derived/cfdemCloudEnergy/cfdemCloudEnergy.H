@@ -58,11 +58,11 @@ protected:
 
     const wordList chemistryModels_;
 
-    autoPtr<energyModel>* energyModel_;
+    PtrList<energyModel> energyModel_;
 
     autoPtr<thermCondModel> thermCondModel_;
 
-    autoPtr<chemistryModel> chemistryModel_;
+    PtrList<chemistryModel> chemistryModel_;
 
     void calcEnergyContributions();
 
@@ -71,6 +71,8 @@ protected:
 public:
 
     friend class energyModel;
+
+    friend class chemistryModel;
 
     // Constructors
 
@@ -92,13 +94,19 @@ public:
 
        const thermCondModel& thermCondM();
 
-       const chemistryModel& chemistryM();
+       const chemistryModel& chemistryM(int);
 
        label nrEnergyModels() const;
 
        inline const wordList& energyModels() const;
 
        bool implicitEnergyModel() const;
+
+       int nrChemistryModels();
+
+       inline const wordList& energyModels();
+
+       inline const wordList& chemistryModels();
 
        void energyContributions(volScalarField&);
 
@@ -107,6 +115,8 @@ public:
        bool evolve(volScalarField&,volVectorField&,volVectorField&);
 
        void postFlow();
+
+       void solve();
 
 };
 

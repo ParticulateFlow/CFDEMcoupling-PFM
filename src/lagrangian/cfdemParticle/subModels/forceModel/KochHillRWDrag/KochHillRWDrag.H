@@ -65,7 +65,7 @@ class KochHillRWDrag
 private:
     dictionary propsDict_;
 
-    bool verbose_;
+    const bool verbose_;
 
     word velFieldName_;
 
@@ -79,7 +79,7 @@ private:
 
     const volVectorField& UsField_;  // the average particle velocity field
 
-    bool interpolation_; // use interpolated field values
+    const bool interpolation_; // use interpolated field values
 
     mutable scalar scale_;
 
@@ -87,7 +87,7 @@ private:
 
     scalar rhoP_;
 
-    bool randomTauE_;
+    const bool randomTauE_;
 
     mutable double **partTime_;                // Lagrangian array
 

@@ -45,7 +45,6 @@ protected:
     // Protected data
     //    dictionary propsDict_;
 
-    
 public:
 
     //- Runtime type information

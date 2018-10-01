@@ -69,7 +69,7 @@ private:
 
     mutable double **UrelOld_;
 
-    mutable bool splitUrelCalculation_;    //indicator to split calculation of Urel between CFDEM and LIGGGHTS
+    const bool splitUrelCalculation_;    //indicator to split calculation of Urel between CFDEM and LIGGGHTS
                                            //requires the integration fix to take dv/dt into account!
 
     mutable double Cadd_;                  //indicator to split calculation of Urel between CFDEM and LIGGGHTS

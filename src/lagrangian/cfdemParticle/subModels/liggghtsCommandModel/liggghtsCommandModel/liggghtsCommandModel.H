@@ -91,6 +91,7 @@ protected:
 
     label commandLines_;
 
+    // verbose_ can/will be overwritten by the constructors of the derived classes
     bool verbose_;
 
 public:

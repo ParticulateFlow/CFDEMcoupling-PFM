@@ -216,6 +216,58 @@ inline double cfdemCloud::d32(bool recalc)
     return d32_;
 }
 
+inline bool cfdemCloud::getParticleDensities() const
+{
+    return getParticleDensities_;
+}
+
+inline double ** cfdemCloud::particleDensities() const
+{
+    return particleDensities_;
+}
+
+inline double cfdemCloud::particleDensity(label index) const
+{
+    if(!getParticleDensities_) return -1.0;
+    else
+    {
+        return particleDensities_[index][0];
+    }
+}
+
+inline bool cfdemCloud::getParticleEffVolFactors() const
+{
+    return getParticleEffVolFactors_;
+}
+
+inline double cfdemCloud::particleEffVolFactor(label index) const
+{
+    if(!getParticleEffVolFactors_) return -1.0;
+    else
+    {
+        return particleEffVolFactors_[index][0];
+    }
+}
+
+inline bool cfdemCloud::getParticleTypes() const
+{
+    return getParticleTypes_;
+}
+
+inline int ** cfdemCloud::particleTypes() const
+{
+    return particleTypes_;
+}
+
+inline label cfdemCloud::particleType(label index) const
+{
+    if(!getParticleDensities_) return -1;
+    else
+    {
+        return particleTypes_[index][0];
+    }
+}
+
 inline int cfdemCloud::numberOfParticles() const
 {
     return numberOfParticles_;
@@ -297,9 +349,9 @@ inline const wordList& cfdemCloud::liggghtsCommandModelList() const
     return liggghtsCommandModelList_;
 }
 
-inline autoPtr<liggghtsCommandModel>* cfdemCloud::liggghtsCommand() const
+inline liggghtsCommandModel& cfdemCloud::liggghtsCommand(const label modeli) const
 {
-    return liggghtsCommand_;
+    return liggghtsCommand_[modeli];
 }
 
 inline const turbulenceModel& cfdemCloud::turbulence() const

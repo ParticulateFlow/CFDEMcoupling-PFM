@@ -401,12 +401,12 @@ bool twoWayMany2Many::couple(int i) const
             forAll(particleCloud_.liggghtsCommandModelList(),i)
             {
 
-                if (particleCloud_.liggghtsCommand()[i]().runCommand(couplingStep()))
+                if (particleCloud_.liggghtsCommand(i).runCommand(couplingStep()))
                 {
-                    label commandLines = particleCloud_.liggghtsCommand()[i]().commandLines();
+                    label commandLines = particleCloud_.liggghtsCommand(i).commandLines();
                     for (int j=0; j<commandLines; j++)
                     {
-                        const char* command = particleCloud_.liggghtsCommand()[i]().command(j);
+                        const char* command = particleCloud_.liggghtsCommand(i).command(j);
                         Info << "Executing command: '" << command << "'" << endl;
                         lmp->input->one(command);
                     }

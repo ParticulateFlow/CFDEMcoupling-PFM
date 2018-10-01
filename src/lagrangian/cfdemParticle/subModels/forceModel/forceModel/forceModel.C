@@ -69,7 +69,7 @@ forceModel::forceModel
             IOobject::AUTO_WRITE
         ),
         sm.mesh(),
-        dimensionedVector("zero", dimensionSet(1,1,-2,0,0), vector(0,0,0)) // N
+        dimensionedVector("zero", dimensionSet(1,1,-2,0,0), vector::zero) // N
     ),
     expParticleForces_
     (   IOobject
@@ -81,23 +81,21 @@ forceModel::forceModel
             IOobject::AUTO_WRITE
         ),
         sm.mesh(),
-        dimensionedVector("zero", dimensionSet(1,1,-2,0,0), vector(0,0,0)) // N
+        dimensionedVector("zero", dimensionSet(1,1,-2,0,0), vector::zero) // N
     ),
     coupleForce_(true),
     modelType_(sm.modelType()),
     probeIt_(sm.probeM().active()),
     requiresEx_(false),
     forceSubModels_(0),
-    forceSubModel_(NULL)
+    forceSubModel_(0)
 {}
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 forceModel::~forceModel()
-{
-  delete [] forceSubModel_;
-}
+{}
 
 // * * * * * * * * * * * * * * * * Member Fct  * * * * * * * * * * * * * * * //
 /*tmp<volScalarField> forceModel::provideScalarField()
@@ -180,17 +178,21 @@ void forceModel::setForceSubModels(dictionary& dict)
         forceSubModels_.setSize(1, "ImEx");
     }
 
-    delete[] forceSubModel_;
-    forceSubModel_ = new autoPtr<forceSubModel>[nrForceSubModels()];
+    forceSubModel_.clear();
+    forceSubModel_.setSize(nrForceSubModels());
     Info << "nrForceSubModels()=" << nrForceSubModels() << endl;
-    for (int i=0;i<nrForceSubModels();i++)
+    forAll(forceSubModels_, modeli)
     {
-        forceSubModel_[i] = forceSubModel::New
+        forceSubModel_.set
         (
-            dict,
-            particleCloud_,
-            *this,
-            forceSubModels_[i]
+            modeli,
+            forceSubModel::New
+            (
+                dict,
+                particleCloud_,
+                *this,
+                forceSubModels_[modeli]
+            )
         );
     }
 }

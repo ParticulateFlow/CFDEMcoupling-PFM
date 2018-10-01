@@ -6,8 +6,8 @@
     particleCloud.energyContributions(Qsource);
     particleCloud.energyCoefficients(QCoeff);
 
-    //thDiff=particleCloud.thermCondM().thermDiff();   
-    thCond=particleCloud.thermCondM().thermCond(); 
+    //thDiff=particleCloud.thermCondM().thermDiff();
+    thCond=particleCloud.thermCondM().thermCond();
 
     addSource = fvc::ddt(rhoeps, K) + fvc::div(phi, K)
       + (
@@ -39,7 +39,7 @@
      ==
         fvOptions(rho, he)
     );
-    
+
 
     EEqn.relax();
 
@@ -53,7 +53,7 @@
 
     Info<< "T max/min : " << max(T).value() << " " << min(T).value() << endl;
 
-    particleCloud.clockM().start(31,"postFlow");
-    particleCloud.postFlow();
-    particleCloud.clockM().stop("postFlow");
+    particleCloud.clockM().start(31,"energySolve");
+    particleCloud.solve();
+    particleCloud.clockM().stop("energySolve");
 }

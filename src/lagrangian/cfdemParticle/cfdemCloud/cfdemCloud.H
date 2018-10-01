@@ -86,15 +86,21 @@ protected:
 
     IOdictionary liggghtsCommandDict_;
 
-    Switch solveFlow_;
+    const bool solveFlow_;
 
-    bool verbose_;
+    const bool verbose_;
 
-    bool ignore_;
+    const bool ignore_;
 
     bool allowCFDsubTimestep_;
 
-    bool limitDEMForces_;
+    const bool limitDEMForces_;
+
+    const bool getParticleDensities_;
+
+    const bool getParticleEffVolFactors_;
+
+    const bool getParticleTypes_;
 
     scalar maxDEMForce_;
 
@@ -121,6 +127,12 @@ protected:
     mutable double **voidfractions_;
 
     mutable int **cellIDs_;
+
+    mutable double **particleDensities_;
+
+    mutable double **particleEffVolFactors_;
+
+    mutable int **particleTypes_;
 
     mutable double **particleWeights_;
 
@@ -154,23 +166,25 @@ protected:
 
     bool impDEMdragAcc_;
 
-    mutable scalar imExSplitFactor_;
+    const scalar imExSplitFactor_;
 
-    mutable bool treatVoidCellsAsExplicitForce_; //will treat the coupling force in cells with no Us data explicitly
+    const bool treatVoidCellsAsExplicitForce_; //will treat the coupling force in cells with no Us data explicitly
 
-    bool useDDTvoidfraction_;
+    const bool useDDTvoidfraction_;
 
     mutable volScalarField ddtVoidfraction_;
+
+    mutable volScalarField particleDensityField_;
 
     mutable Switch checkPeriodicCells_;
 
     const turbulenceModel& turbulence_;
 
-    autoPtr<forceModel>* forceModel_;
+    PtrList<forceModel> forceModel_;
 
     autoPtr<locateModel> locateModel_;
 
-    autoPtr<momCoupleModel>* momCoupleModel_;
+    PtrList<momCoupleModel> momCoupleModel_;
 
     autoPtr<dataExchangeModel> dataExchangeModel_;
 
@@ -188,9 +202,9 @@ protected:
 
     autoPtr<meshMotionModel> meshMotionModel_;
 
-    autoPtr<liggghtsCommandModel>* liggghtsCommand_;
+    mutable PtrList<liggghtsCommandModel> liggghtsCommand_;
 
-    autoPtr<otherForceModel>* otherForceModel_;
+    PtrList<otherForceModel> otherForceModel_;
 
 // Protected member functions
     virtual void getDEMdata();
@@ -204,6 +218,8 @@ protected:
     virtual void setForces();
 
     virtual void setParticleForceField();
+
+    virtual void setScalarAverages();
 
     virtual void setVectorAverages();
 
@@ -256,7 +272,7 @@ public:
 
        scalar voidfraction(int) const;
 
-       label liggghtsCommandModelIndex(word) const;
+       label liggghtsCommandModelIndex(const word&) const;
 
        inline void setCG(double);
 
@@ -323,18 +339,26 @@ public:
        virtual inline int maxType() {return -1;}
        virtual inline bool multipleTypesDMax() {return false;}
        virtual inline bool multipleTypesDMin() {return false;}
-       virtual inline double ** particleDensity() const {return NULL;}
-       virtual inline int ** particleTypes() const {return NULL;}
-       virtual label particleType(label index) const {return -1;}
+
+       inline bool getParticleDensities() const;
+       virtual inline double ** particleDensities() const;
+       virtual inline double particleDensity(label index) const;
+
+       inline bool getParticleEffVolFactors() const;
+       virtual inline double particleEffVolFactor(label index) const;
+
+       inline bool getParticleTypes() const;
+       virtual inline int ** particleTypes() const;
+       virtual inline label particleType(label index) const;
 
        //access to the particle's rotation and torque data
        virtual inline double ** DEMTorques() const {return NULL;}
        virtual inline double ** omegaArray() const {return NULL;}
-       virtual vector omega(int) const {return vector(0,0,0);}
+       virtual vector omega(int) const {return vector::zero;}
 
        //access to the particles' orientation information
        virtual inline double ** exArray() const {return NULL;}
-       virtual vector ex(int) const {return vector(0,0,0);}
+       virtual vector ex(int) const {return vector::zero;}
 
        //Detector if SRF module is enable or not
        virtual inline bool SRFOn(){return false;}
@@ -371,7 +395,7 @@ public:
 
        inline const wordList& liggghtsCommandModelList() const;
 
-       inline autoPtr<liggghtsCommandModel>* liggghtsCommand() const;
+       inline liggghtsCommandModel& liggghtsCommand(const label) const;
 
        inline const turbulenceModel& turbulence() const;
 
