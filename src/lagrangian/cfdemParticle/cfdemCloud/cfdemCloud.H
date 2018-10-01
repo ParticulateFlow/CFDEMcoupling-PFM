@@ -166,7 +166,7 @@ protected:
 
     bool impDEMdragAcc_;
 
-    mutable scalar imExSplitFactor_;
+    const scalar imExSplitFactor_;
 
     const bool treatVoidCellsAsExplicitForce_; //will treat the coupling force in cells with no Us data explicitly
 

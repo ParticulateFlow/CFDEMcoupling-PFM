@@ -118,8 +118,8 @@ cfdemCloud::cfdemCloud
     cgOK_(true),
     impDEMdrag_(false),
     impDEMdragAcc_(false),
-    imExSplitFactor_(1.0),
-    treatVoidCellsAsExplicitForce_(couplingProperties_.lookupOrDefault<bool>("treatVoidCellsAsExplicitForce", false)),
+    imExSplitFactor_(couplingProperties_.lookupOrDefault<scalar>("imExSplitFactor",1.0)),
+    treatVoidCellsAsExplicitForce_(couplingProperties_.lookupOrDefault<bool>("treatVoidCellsAsExplicitForce",false)),
     useDDTvoidfraction_(couplingProperties_.found("useDDTvoidfraction")),
     ddtVoidfraction_
     (
@@ -244,16 +244,12 @@ cfdemCloud::cfdemCloud
 
     Info << "If BC are important, please provide volScalarFields -imp/expParticleForces-" << endl;
 
-    if (couplingProperties_.found("imExSplitFactor"))
-        imExSplitFactor_ = readScalar(couplingProperties_.lookup("imExSplitFactor"));
-
     if(imExSplitFactor_ > 1.0)
         FatalError << "You have set imExSplitFactor > 1 in your couplingProperties. Must be <= 1."
                    << abort(FatalError);
     if(imExSplitFactor_ < 0.0)
         FatalError << "You have set imExSplitFactor < 0 in your couplingProperties. Must be >= 0."
                    << abort(FatalError);
-
 
     if (limitDEMForces_)
     {
@@ -270,7 +266,7 @@ cfdemCloud::cfdemCloud
         Info << "ignoring ddt(voidfraction)" << endl;
     }
 
-    bool adjustTimeStep  = mesh_.time().controlDict().lookupOrDefault("adjustTimeStep", false);
+    const bool adjustTimeStep  = mesh_.time().controlDict().lookupOrDefault("adjustTimeStep", false);
     if (adjustTimeStep)
         FatalError << "CFDEMcoupling does not support adjustable time steps."
                    << abort(FatalError);
