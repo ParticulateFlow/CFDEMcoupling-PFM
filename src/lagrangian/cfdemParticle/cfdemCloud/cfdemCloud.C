@@ -119,8 +119,8 @@ cfdemCloud::cfdemCloud
     impDEMdrag_(false),
     impDEMdragAcc_(false),
     imExSplitFactor_(1.0),
-    treatVoidCellsAsExplicitForce_(false),
-    useDDTvoidfraction_(false),
+    treatVoidCellsAsExplicitForce_(couplingProperties_.lookupOrDefault<bool>("treatVoidCellsAsExplicitForce", false)),
+    useDDTvoidfraction_(couplingProperties_.found("useDDTvoidfraction")),
     ddtVoidfraction_
     (
         IOobject
@@ -254,20 +254,21 @@ cfdemCloud::cfdemCloud
         FatalError << "You have set imExSplitFactor < 0 in your couplingProperties. Must be >= 0."
                    << abort(FatalError);
 
-    if (couplingProperties_.found("treatVoidCellsAsExplicitForce"))
-        treatVoidCellsAsExplicitForce_ = readBool(couplingProperties_.lookup("treatVoidCellsAsExplicitForce"));
 
     if (limitDEMForces_)
     {
         maxDEMForce_ = readScalar(couplingProperties_.lookup("limitDEMForces"));
     }
-    if (turbulenceModelType_=="LESProperties")
-        Info << "WARNING - LES functionality not yet tested!" << endl;
 
-    if (couplingProperties_.found("useDDTvoidfraction"))
-        useDDTvoidfraction_=true;
-    else
+    if (turbulenceModelType_=="LESProperties")
+    {
+        Info << "WARNING - LES functionality not yet tested!" << endl;
+    }
+
+    if (!useDDTvoidfraction_)
+    {
         Info << "ignoring ddt(voidfraction)" << endl;
+    }
 
     bool adjustTimeStep  = mesh_.time().controlDict().lookupOrDefault("adjustTimeStep", false);
     if (adjustTimeStep)

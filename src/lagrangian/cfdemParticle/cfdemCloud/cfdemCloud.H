@@ -168,9 +168,9 @@ protected:
 
     mutable scalar imExSplitFactor_;
 
-    mutable bool treatVoidCellsAsExplicitForce_; //will treat the coupling force in cells with no Us data explicitly
+    const bool treatVoidCellsAsExplicitForce_; //will treat the coupling force in cells with no Us data explicitly
 
-    bool useDDTvoidfraction_;
+    const bool useDDTvoidfraction_;
 
     mutable volScalarField ddtVoidfraction_;
 
