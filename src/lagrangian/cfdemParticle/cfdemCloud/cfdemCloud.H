@@ -106,39 +106,39 @@ protected:
 
     const word modelType_;
 
-    mutable double **positions_;
+    double **positions_;
 
-    mutable double **velocities_;
+    double **velocities_;
 
-    mutable double **fluidVel_;
+    double **fluidVel_;
 
-    mutable double **fAcc_;
+    double **fAcc_;
 
-    mutable double **impForces_;
+    double **impForces_;
 
-    mutable double **expForces_;
+    double **expForces_;
 
-    mutable double **DEMForces_;
+    double **DEMForces_;
 
-    mutable double **Cds_;
+    double **Cds_;
 
-    mutable double **radii_;
+    double **radii_;
 
-    mutable double **voidfractions_;
+    double **voidfractions_;
 
-    mutable int **cellIDs_;
+    int **cellIDs_;
 
-    mutable double **particleDensities_;
+    double **particleDensities_;
 
-    mutable double **particleEffVolFactors_;
+    double **particleEffVolFactors_;
 
-    mutable int **particleTypes_;
+    int **particleTypes_;
 
-    mutable double **particleWeights_;
+    double **particleWeights_;
 
-    mutable double **particleVolumes_;
+    double **particleVolumes_;
 
-    mutable double **particleV_;
+    double **particleV_;
 
     int numberOfParticles_;
 
@@ -146,7 +146,7 @@ protected:
 
     bool numberOfParticlesChanged_;
 
-    mutable bool arraysReallocated_;
+    bool arraysReallocated_;
 
     const wordList forceModels_;
 
@@ -158,7 +158,7 @@ protected:
 
     const word turbulenceModelType_;
 
-    mutable scalar cg_;
+    scalar cg_;
 
     bool cgOK_;
 
@@ -176,7 +176,7 @@ protected:
 
     mutable volScalarField particleDensityField_;
 
-    mutable Switch checkPeriodicCells_;
+    Switch checkPeriodicCells_;
 
     const turbulenceModel& turbulence_;
 
