@@ -61,14 +61,11 @@ noDrag::noDrag
 )
 :
     forceModel(dict,sm),
-    propsDict_(dict),
+    propsDict_(dict.subDict(word(typeName + "Props"))),
     verbose_(propsDict_.found("verbose")),
     noDEMForce_(propsDict_.found("noDEMForce")),
     keepCFDForce_(propsDict_.found("keepCFDForce"))
 {
-    if(dict.found(word(typeName + "Props")))
-        propsDict_=dictionary(dict.subDict(typeName + "Props"));
-
     // init force sub model
     setForceSubModels(propsDict_);
 
