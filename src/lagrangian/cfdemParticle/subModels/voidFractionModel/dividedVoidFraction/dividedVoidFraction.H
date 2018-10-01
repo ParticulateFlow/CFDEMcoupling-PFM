@@ -68,9 +68,9 @@ private:
 
         const scalar alphaMin_;          // min value of voidFraction
 
-        mutable bool alphaLimited_;
+        bool alphaLimited_;
 
-        mutable scalar tooMuch_;         // particle volume which is lost due to voidFraction limitation
+        scalar tooMuch_;         // particle volume which is lost due to voidFraction limitation
 
         const bool interpolation_;
 
@@ -104,7 +104,7 @@ public:
 
 
     // Member Functions
-        void setvoidFraction(double** const& ,double**&, double**&, double**&, double**&) const;
+        void setvoidFraction(double** const& ,double**&, double**&, double**&, double**&);
 };
 
 

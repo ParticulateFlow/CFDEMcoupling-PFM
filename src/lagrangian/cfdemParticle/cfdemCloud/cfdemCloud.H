@@ -373,6 +373,7 @@ public:
 
        inline const wordList& forceModels() const;
 
+       inline voidFractionModel& voidFractionM();
        inline const voidFractionModel& voidFractionM() const;
 
        inline const locateModel& locateM() const;

@@ -319,9 +319,15 @@ inline probeModel& cfdemCloud::probeM()
     return probeModel_();
 }
 
+inline voidFractionModel& cfdemCloud::voidFractionM()
+{
+    return voidFractionModel_();
+}
+
 inline const voidFractionModel& cfdemCloud::voidFractionM() const
 {
-    return voidFractionModel_;
+    return voidFractionModel_();
+}
 
 inline averagingModel& cfdemCloud::averagingM()
 {

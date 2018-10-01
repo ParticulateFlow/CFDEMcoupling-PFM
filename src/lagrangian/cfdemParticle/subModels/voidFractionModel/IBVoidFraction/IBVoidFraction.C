@@ -87,7 +87,7 @@ IBVoidFraction::~IBVoidFraction()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void IBVoidFraction::setvoidFraction(double** const& mask,double**& voidfractions,double**& particleWeights,double**& particleVolumes,double**& particleV) const
+void IBVoidFraction::setvoidFraction(double** const& mask,double**& voidfractions,double**& particleWeights,double**& particleVolumes,double**& particleV)
 {
     const boundBox& globalBb = particleCloud_.mesh().bounds();
 
@@ -306,7 +306,7 @@ void IBVoidFraction::buildLabelHashSet
     const label cellID,
     labelHashSet& hashSett,
     bool initialInsert //initial insertion of own cell
-)const
+)
 {
     if(initialInsert)
         hashSett.insert(cellID);
