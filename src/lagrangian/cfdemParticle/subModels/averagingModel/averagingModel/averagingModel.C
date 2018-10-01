@@ -332,13 +332,13 @@ void averagingModel::resetVectorAverage(volVectorField& prev,volVectorField& nex
     next.primitiveFieldRef() = vector::zero;
 }
 
-void averagingModel::resetWeightFields() const
+void averagingModel::resetWeightFields()
 {
     UsWeightField_.ref() = 0;
 }
 
 
-void averagingModel::undoWeightFields(double**const& mask) const
+void averagingModel::undoWeightFields(double**const& mask)
 {
     for(int index=0; index< particleCloud_.numberOfParticles(); index++)
     {

@@ -61,11 +61,11 @@ protected:
 
         cfdemCloud& particleCloud_;
 
-        mutable volScalarField UsWeightField_;
+        volScalarField UsWeightField_;
 
-        mutable volVectorField UsPrev_;
+        volVectorField UsPrev_;
 
-        mutable volVectorField UsNext_;
+        volVectorField UsNext_;
 
     // Protected member functions
 
@@ -194,23 +194,25 @@ public:
 
         void resetVectorAverage(volVectorField& prev,volVectorField& next,bool single=false) const;
 
-        void resetWeightFields() const;
+        void resetWeightFields();
 
-        void undoWeightFields(double**const&) const;
+        void undoWeightFields(double**const&);
 
         tmp<volVectorField> UsInterp() const;
 
-        virtual void setParticleType(label type) const {};
+        virtual void setParticleType(label type) const {}
 
-        virtual bool checkParticleType(label) const {return true;};  //consider all particles by default
+        virtual bool checkParticleType(label) const {return true;}  //consider all particles by default
 
     // Access
-        inline volVectorField& UsPrev() const {return UsPrev_;};
+        inline volVectorField& UsPrev() {return UsPrev_;}
+        inline const volVectorField& UsPrev() const {return UsPrev_;}
 
-        inline volVectorField& UsNext() const {return UsNext_;};
+        inline volVectorField& UsNext() {return UsNext_;}
+        inline const volVectorField& UsNext() const {return UsNext_;}
 
-        inline volScalarField& UsWeightField() const {return UsWeightField_;};
-
+        inline volScalarField& UsWeightField() {return UsWeightField_;}
+        inline const volScalarField& UsWeightField() const {return UsWeightField_;}
 };
 
 

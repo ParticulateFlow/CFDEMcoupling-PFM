@@ -385,6 +385,7 @@ public:
 
        inline probeModel& probeM();
 
+       inline averagingModel& averagingM();
        inline const averagingModel& averagingM() const;
 
        inline const clockModel& clockM() const;
