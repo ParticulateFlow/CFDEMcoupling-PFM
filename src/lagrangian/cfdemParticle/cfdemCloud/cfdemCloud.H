@@ -172,9 +172,9 @@ protected:
 
     const bool useDDTvoidfraction_;
 
-    mutable volScalarField ddtVoidfraction_;
+    volScalarField ddtVoidfraction_;
 
-    mutable volScalarField particleDensityField_;
+    volScalarField particleDensityField_;
 
     Switch checkPeriodicCells_;
 
@@ -202,7 +202,7 @@ protected:
 
     autoPtr<meshMotionModel> meshMotionModel_;
 
-    mutable PtrList<liggghtsCommandModel> liggghtsCommand_;
+    PtrList<liggghtsCommandModel> liggghtsCommand_;
 
     PtrList<otherForceModel> otherForceModel_;
 
@@ -395,7 +395,7 @@ public:
 
        inline const wordList& liggghtsCommandModelList() const;
 
-       inline liggghtsCommandModel& liggghtsCommand(const label) const;
+       inline liggghtsCommandModel& liggghtsCommand(const label);
 
        inline const turbulenceModel& turbulence() const;
 
@@ -418,7 +418,7 @@ public:
 
         tmp<volScalarField> ddtVoidfraction() const;
 
-        void calcDdtVoidfraction(volScalarField& voidfraction) const;
+        void calcDdtVoidfraction(volScalarField& voidfraction);
 
         //tmp<fvVectorMatrix> ddtVoidfractionU(volVectorField& ,volScalarField&) const;
 

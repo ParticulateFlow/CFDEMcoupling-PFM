@@ -349,7 +349,7 @@ inline const wordList& cfdemCloud::liggghtsCommandModelList() const
     return liggghtsCommandModelList_;
 }
 
-inline liggghtsCommandModel& cfdemCloud::liggghtsCommand(const label modeli) const
+inline liggghtsCommandModel& cfdemCloud::liggghtsCommand(const label modeli)
 {
     return liggghtsCommand_[modeli];
 }
