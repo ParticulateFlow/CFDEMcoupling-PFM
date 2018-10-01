@@ -61,13 +61,11 @@ noDrag::noDrag
 )
 :
     forceModel(dict,sm),
-    propsDict_(dict),
-    verbose_(false),
-    noDEMForce_(false)
+    propsDict_(dict.subDict(word(typeName + "Props"))),
+    verbose_(propsDict_.found("verbose")),
+    noDEMForce_(propsDict_.found("noDEMForce")),
+    keepCFDForce_(propsDict_.found("keepCFDForce"))
 {
-    if(dict.found(word(typeName + "Props")))
-        propsDict_=dictionary(dict.subDict(typeName + "Props"));
-
     // init force sub model
     setForceSubModels(propsDict_);
 
@@ -76,10 +74,6 @@ noDrag::noDrag
 
     // read those switches defined above, if provided in dict
     forceSubM(0).readSwitches();
-
-    if (propsDict_.found("noDEMForce")) noDEMForce_=true;
-
-    if (propsDict_.found("keepCFDForce")) keepCFDForce_=true;
 
     coupleForce_=false;
 }

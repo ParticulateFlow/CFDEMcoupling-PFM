@@ -86,21 +86,21 @@ protected:
 
     IOdictionary liggghtsCommandDict_;
 
-    Switch solveFlow_;
+    const bool solveFlow_;
 
-    bool verbose_;
+    const bool verbose_;
 
-    bool ignore_;
+    const bool ignore_;
 
     bool allowCFDsubTimestep_;
 
-    bool limitDEMForces_;
+    const bool limitDEMForces_;
 
-    bool getParticleDensities_;
+    const bool getParticleDensities_;
 
-    bool getParticleEffVolFactors_;
+    const bool getParticleEffVolFactors_;
 
-    bool getParticleTypes_;
+    const bool getParticleTypes_;
 
     scalar maxDEMForce_;
 
@@ -166,11 +166,11 @@ protected:
 
     bool impDEMdragAcc_;
 
-    mutable scalar imExSplitFactor_;
+    const scalar imExSplitFactor_;
 
-    mutable bool treatVoidCellsAsExplicitForce_; //will treat the coupling force in cells with no Us data explicitly
+    const bool treatVoidCellsAsExplicitForce_; //will treat the coupling force in cells with no Us data explicitly
 
-    bool useDDTvoidfraction_;
+    const bool useDDTvoidfraction_;
 
     mutable volScalarField ddtVoidfraction_;
 

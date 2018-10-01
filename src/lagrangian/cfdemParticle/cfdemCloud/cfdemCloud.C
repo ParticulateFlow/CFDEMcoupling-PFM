@@ -78,14 +78,15 @@ cfdemCloud::cfdemCloud
             IOobject::NO_WRITE
         )
     ),
-    solveFlow_(true),
-    verbose_(false),
-    ignore_(false),
+    solveFlow_(couplingProperties_.found("solveFlow")),
+    verbose_(couplingProperties_.found("verbose")),
+    ignore_(couplingProperties_.found("ignore")),
     allowCFDsubTimestep_(true),
-    limitDEMForces_(false),
+    limitDEMForces_(couplingProperties_.found("limitDEMForces")),
     getParticleDensities_(couplingProperties_.lookupOrDefault<bool>("getParticleDensities",false)),
     getParticleEffVolFactors_(couplingProperties_.lookupOrDefault<bool>("getParticleEffVolFactors",false)),
     getParticleTypes_(couplingProperties_.lookupOrDefault<bool>("getParticleTypes",false)),
+    maxDEMForce_(0.),
     modelType_(couplingProperties_.lookup("modelType")),
     positions_(NULL),
     velocities_(NULL),
@@ -117,9 +118,9 @@ cfdemCloud::cfdemCloud
     cgOK_(true),
     impDEMdrag_(false),
     impDEMdragAcc_(false),
-    imExSplitFactor_(1.0),
-    treatVoidCellsAsExplicitForce_(false),
-    useDDTvoidfraction_(false),
+    imExSplitFactor_(couplingProperties_.lookupOrDefault<scalar>("imExSplitFactor",1.0)),
+    treatVoidCellsAsExplicitForce_(couplingProperties_.lookupOrDefault<bool>("treatVoidCellsAsExplicitForce",false)),
+    useDDTvoidfraction_(couplingProperties_.found("useDDTvoidfraction")),
     ddtVoidfraction_
     (
         IOobject
@@ -238,10 +239,6 @@ cfdemCloud::cfdemCloud
     buildInfo.info();
 
     Info << "If BC are important, please provide volScalarFields -imp/expParticleForces-" << endl;
-    if (couplingProperties_.found("solveFlow"))
-        solveFlow_=Switch(couplingProperties_.lookup("solveFlow"));
-    if (couplingProperties_.found("imExSplitFactor"))
-        imExSplitFactor_ = readScalar(couplingProperties_.lookup("imExSplitFactor"));
 
     if(imExSplitFactor_ > 1.0)
         FatalError << "You have set imExSplitFactor > 1 in your couplingProperties. Must be <= 1."
@@ -250,24 +247,22 @@ cfdemCloud::cfdemCloud
         FatalError << "You have set imExSplitFactor < 0 in your couplingProperties. Must be >= 0."
                    << abort(FatalError);
 
-    if (couplingProperties_.found("treatVoidCellsAsExplicitForce"))
-        treatVoidCellsAsExplicitForce_ = readBool(couplingProperties_.lookup("treatVoidCellsAsExplicitForce"));
-    if (couplingProperties_.found("verbose")) verbose_=true;
-    if (couplingProperties_.found("ignore")) ignore_=true;
-    if (couplingProperties_.found("limitDEMForces"))
+    if (limitDEMForces_)
     {
-        limitDEMForces_=true;
         maxDEMForce_ = readScalar(couplingProperties_.lookup("limitDEMForces"));
     }
+
     if (turbulenceModelType_=="LESProperties")
+    {
         Info << "WARNING - LES functionality not yet tested!" << endl;
+    }
 
-    if (couplingProperties_.found("useDDTvoidfraction"))
-        useDDTvoidfraction_=true;
-    else
+    if (!useDDTvoidfraction_)
+    {
         Info << "ignoring ddt(voidfraction)" << endl;
+    }
 
-    bool adjustTimeStep  = mesh_.time().controlDict().lookupOrDefault("adjustTimeStep", false);
+    const bool adjustTimeStep  = mesh_.time().controlDict().lookupOrDefault("adjustTimeStep", false);
     if (adjustTimeStep)
         FatalError << "CFDEMcoupling does not support adjustable time steps."
                    << abort(FatalError);
@@ -528,9 +523,10 @@ void cfdemCloud::checkCG(bool ok)
 
 void cfdemCloud::setPos(double**& pos)
 {
-    for(int index = 0;index <  numberOfParticles(); ++index)
+    for(int index = 0; index <  numberOfParticles(); ++index)
     {
-        for(int i=0;i<3;i++){
+        for(int i=0; i<3; i++)
+        {
             positions_[index][i] = pos[index][i];
         }
     }
