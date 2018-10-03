@@ -384,7 +384,7 @@ void inline twoWayMany2Many::destroy(int* array) const
 //==============
 
 
-bool twoWayMany2Many::couple(int i) const
+bool twoWayMany2Many::couple(int i)
 {
     bool coupleNow = false;
     if (i==0)

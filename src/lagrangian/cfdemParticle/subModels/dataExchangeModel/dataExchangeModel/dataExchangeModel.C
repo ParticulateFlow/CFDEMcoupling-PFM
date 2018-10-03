@@ -195,7 +195,7 @@ void dataExchangeModel::destroy(double* array) const
 //====
 
 
-bool dataExchangeModel::couple(int i) const
+bool dataExchangeModel::couple(int i)
 {
     bool coupleNow = false;
     if (doCoupleNow())

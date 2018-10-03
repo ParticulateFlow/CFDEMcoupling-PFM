@@ -151,7 +151,7 @@ public:
         void destroy(int*) const;
         //==============
 
-        bool couple(int) const;
+        bool couple(int);
 
         int getNumberOfParticles() const;
         int getNumberOfClumps() const;
