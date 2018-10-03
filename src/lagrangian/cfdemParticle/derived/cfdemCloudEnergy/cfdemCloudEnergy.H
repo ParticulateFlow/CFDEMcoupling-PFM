@@ -98,15 +98,13 @@ public:
 
        label nrEnergyModels() const;
 
-       inline const wordList& energyModels() const;
-
        bool implicitEnergyModel() const;
 
        int nrChemistryModels();
 
-       inline const wordList& energyModels();
+       inline const wordList& energyModels() const;
 
-       inline const wordList& chemistryModels();
+       inline const wordList& chemistryModels() const;
 
        void energyContributions(volScalarField&);
 
