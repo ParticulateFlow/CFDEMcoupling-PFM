@@ -146,7 +146,10 @@ void ShirgaonkarIB::setForce() const
             // write particle based data to global array
             forceSubM(0).partToArray(index,drag,vector::zero);
 
-            if(verbose_) Info << "impForces = " << impForces()[index][0]<<","<<impForces()[index][1]<<","<<impForces()[index][2] << endl;
+            if(verbose_) Info << "impForces = " << particleCloud_.impForces()[index][0]
+                              << ","            << particleCloud_.impForces()[index][1]
+                              << ","            << particleCloud_.impForces()[index][2]
+                              << endl;
         //}
     }
 }

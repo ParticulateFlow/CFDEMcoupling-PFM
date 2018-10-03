@@ -325,8 +325,9 @@ cfdemCloud::cfdemCloud
         );
     }
 
-    dataExchangeM().setCG();
+    setCG(dataExchangeM().getCG());
     Switch cgWarnOnly(couplingProperties_.lookupOrDefault<Switch>("cgWarnOnly", true));
+
     if (!cgOK_ && cg_ > 1)
     {
         if (cgWarnOnly)

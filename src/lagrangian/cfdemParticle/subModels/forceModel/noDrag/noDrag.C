@@ -106,16 +106,16 @@ void noDrag::setForce() const
             // set force on particle (old code)
             if(!keepCFDForce_)
             {
-                if(treatExplicit) for(int j=0;j<3;j++) expForces()[index][j] = 0.;
-                else  for(int j=0;j<3;j++) impForces()[index][j] = 0.;
+                if(treatExplicit) for(int j=0;j<3;j++) particleCloud_.expForces()[index][j] = 0.;
+                else  for(int j=0;j<3;j++) particleCloud_.impForces()[index][j] = 0.;
             }
             if(noDEMForce_)
             {
-                for(int j=0;j<3;j++) DEMForces()[index][j] = 0.;
+                for(int j=0;j<3;j++) particleCloud_.DEMForces()[index][j] = 0.;
                 if(particleCloud_.impDEMdrag())
                 {
-                    Cds()[index][0] = 0.;
-                    for(int j=0;j<3;j++) fluidVel()[index][j] = 0.;
+                    particleCloud_.Cds()[index][0] = 0.;
+                    for(int j=0;j<3;j++) particleCloud_.fluidVels()[index][j] = 0.;
                 }
             }
             //==========================
