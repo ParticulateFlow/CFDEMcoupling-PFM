@@ -16,7 +16,7 @@ forceModels
 (
     noDrag
 ); :pre
-noDragProps (optional)
+noDragProps
 \{
     noDEMForce;
     keepCFDForce;
