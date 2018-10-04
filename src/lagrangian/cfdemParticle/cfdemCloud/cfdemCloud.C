@@ -782,7 +782,7 @@ tmp<volScalarField> cfdemCloud::ddtVoidfraction() const
     return tmp<volScalarField> (ddtVoidfraction_ * 1.) ;
 }
 
-void cfdemCloud::calcDdtVoidfraction(volScalarField& voidfraction) const
+void cfdemCloud::calcDdtVoidfraction(volScalarField& voidfraction)
 {
     // version if ddt is calculated only at coupling time
     //Info << "calculating ddt(voidfraction) based on couplingTime" << endl;

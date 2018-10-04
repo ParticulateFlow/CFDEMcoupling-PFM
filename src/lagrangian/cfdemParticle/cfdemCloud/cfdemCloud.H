@@ -106,39 +106,39 @@ protected:
 
     const word modelType_;
 
-    mutable double **positions_;
+    double **positions_;
 
-    mutable double **velocities_;
+    double **velocities_;
 
-    mutable double **fluidVel_;
+    double **fluidVel_;
 
-    mutable double **fAcc_;
+    double **fAcc_;
 
-    mutable double **impForces_;
+    double **impForces_;
 
-    mutable double **expForces_;
+    double **expForces_;
 
-    mutable double **DEMForces_;
+    double **DEMForces_;
 
-    mutable double **Cds_;
+    double **Cds_;
 
-    mutable double **radii_;
+    double **radii_;
 
-    mutable double **voidfractions_;
+    double **voidfractions_;
 
-    mutable int **cellIDs_;
+    int **cellIDs_;
 
-    mutable double **particleDensities_;
+    double **particleDensities_;
 
-    mutable double **particleEffVolFactors_;
+    double **particleEffVolFactors_;
 
-    mutable int **particleTypes_;
+    int **particleTypes_;
 
-    mutable double **particleWeights_;
+    double **particleWeights_;
 
-    mutable double **particleVolumes_;
+    double **particleVolumes_;
 
-    mutable double **particleV_;
+    double **particleV_;
 
     int numberOfParticles_;
 
@@ -146,7 +146,7 @@ protected:
 
     bool numberOfParticlesChanged_;
 
-    mutable bool arraysReallocated_;
+    bool arraysReallocated_;
 
     const wordList forceModels_;
 
@@ -158,7 +158,7 @@ protected:
 
     const word turbulenceModelType_;
 
-    mutable scalar cg_;
+    scalar cg_;
 
     bool cgOK_;
 
@@ -172,11 +172,11 @@ protected:
 
     const bool useDDTvoidfraction_;
 
-    mutable volScalarField ddtVoidfraction_;
+    volScalarField ddtVoidfraction_;
 
-    mutable volScalarField particleDensityField_;
+    volScalarField particleDensityField_;
 
-    mutable Switch checkPeriodicCells_;
+    Switch checkPeriodicCells_;
 
     const turbulenceModel& turbulence_;
 
@@ -202,7 +202,7 @@ protected:
 
     autoPtr<meshMotionModel> meshMotionModel_;
 
-    mutable PtrList<liggghtsCommandModel> liggghtsCommand_;
+    PtrList<liggghtsCommandModel> liggghtsCommand_;
 
     PtrList<otherForceModel> otherForceModel_;
 
@@ -373,10 +373,12 @@ public:
 
        inline const wordList& forceModels() const;
 
+       inline voidFractionModel& voidFractionM();
        inline const voidFractionModel& voidFractionM() const;
 
        inline const locateModel& locateM() const;
 
+       inline momCoupleModel& momCoupleM(int);
        inline const momCoupleModel& momCoupleM(int) const;
 
        inline dataExchangeModel& dataExchangeM();
@@ -385,6 +387,7 @@ public:
 
        inline probeModel& probeM();
 
+       inline averagingModel& averagingM();
        inline const averagingModel& averagingM() const;
 
        inline const clockModel& clockM() const;
@@ -395,7 +398,7 @@ public:
 
        inline const wordList& liggghtsCommandModelList() const;
 
-       inline liggghtsCommandModel& liggghtsCommand(const label) const;
+       inline liggghtsCommandModel& liggghtsCommand(const label);
 
        inline const turbulenceModel& turbulence() const;
 
@@ -418,7 +421,7 @@ public:
 
         tmp<volScalarField> ddtVoidfraction() const;
 
-        void calcDdtVoidfraction(volScalarField& voidfraction) const;
+        void calcDdtVoidfraction(volScalarField& voidfraction);
 
         //tmp<fvVectorMatrix> ddtVoidfractionU(volVectorField& ,volScalarField&) const;
 

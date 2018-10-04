@@ -78,7 +78,7 @@ public:
 
 
     // Member Functions
-        void resetMomSourceField() const;
+        void resetMomSourceField();
 };
 
 

@@ -62,7 +62,7 @@ protected:
 
         int maxNumberOfParticles_;
 
-        mutable int couplingStep_;
+        int couplingStep_;
 
         scalar DEMts_;
 
@@ -176,7 +176,7 @@ public:
         virtual void destroy(double*) const;
         //====
 
-        virtual bool couple(int) const;
+        virtual bool couple(int);
 
         virtual scalar timeStepFraction() const;
 

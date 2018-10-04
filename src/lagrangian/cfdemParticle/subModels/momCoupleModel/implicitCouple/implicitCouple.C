@@ -120,7 +120,7 @@ implicitCouple::~implicitCouple()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-tmp<volScalarField> implicitCouple::impMomSource() const
+tmp<volScalarField> implicitCouple::impMomSource()
 {
     const scalar tsf = particleCloud_.dataExchangeM().timeStepFraction();
 
@@ -157,7 +157,7 @@ tmp<volScalarField> implicitCouple::impMomSource() const
     );
 }
 
-void implicitCouple::resetMomSourceField() const
+void implicitCouple::resetMomSourceField()
 {
     KslPrev_.ref() = KslNext_.ref();
     KslNext_.primitiveFieldRef() = 0;

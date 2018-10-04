@@ -204,7 +204,7 @@ void twoWayMPI::destroy(double* array) const
 }
 //============
 
-bool twoWayMPI::couple(int i) const
+bool twoWayMPI::couple(int i)
 {
     bool coupleNow = false;
     if (i==0)
