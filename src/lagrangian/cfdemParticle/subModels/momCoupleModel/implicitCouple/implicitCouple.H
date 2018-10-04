@@ -73,9 +73,9 @@ private:
 
     scalar KslLimit_;     // limit for for exchange field
 
-    mutable volScalarField KslPrev_;
+    volScalarField KslPrev_;
 
-    mutable volScalarField KslNext_;
+    volScalarField KslNext_;
 
 public:
 
@@ -98,9 +98,9 @@ public:
 
 
     // Member Functions
-        tmp<volScalarField> impMomSource() const;
+        tmp<volScalarField> impMomSource();
 
-        void resetMomSourceField() const;
+        void resetMomSourceField();
 };
 
 

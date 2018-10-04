@@ -378,6 +378,7 @@ public:
 
        inline const locateModel& locateM() const;
 
+       inline momCoupleModel& momCoupleM(int);
        inline const momCoupleModel& momCoupleM(int) const;
 
        inline dataExchangeModel& dataExchangeM();

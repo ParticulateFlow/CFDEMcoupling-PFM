@@ -299,6 +299,11 @@ inline const locateModel& cfdemCloud::locateM() const
     return locateModel_;
 }
 
+inline momCoupleModel& cfdemCloud::momCoupleM(int i)
+{
+    return momCoupleModel_[i];
+}
+
 inline const momCoupleModel& cfdemCloud::momCoupleM(int i) const
 {
     return momCoupleModel_[i];
