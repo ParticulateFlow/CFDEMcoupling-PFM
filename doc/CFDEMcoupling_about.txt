@@ -14,9 +14,6 @@ package "OpenFOAM&reg;"_of (*). The CFDEMcoupling toolbox allows to expand stand
 CFD solvers of "OpenFOAM&reg;"_of (*) to include a coupling to the DEM code
 "LIGGGHTS"_lig.
 
-:link(of,http://www.openfoam.org)
-:link(lig,http://www.cfdem.com)
-
 <!-- END_HTML_ONLY -->
 
 <!-- RST
@@ -96,4 +93,7 @@ distributor of the OpenFOAM software via www.openfoam.com.
 .. |reg|    unicode:: U+000AE .. REGISTERED SIGN
 
 END_RST -->
+
+:link(of,http://www.openfoam.org)
+:link(lig,http://www.cfdem.com)
 
