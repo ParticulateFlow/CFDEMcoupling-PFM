@@ -66,6 +66,8 @@ private:
 
     bool depth_;
 
+    bool multisphere_;
+
     word velFieldName_;
 
     const volVectorField& U_;
@@ -96,6 +98,7 @@ public:
 
     // Member Functions
         void setForce() const;
+        void calcForce() const;
 };
 
 

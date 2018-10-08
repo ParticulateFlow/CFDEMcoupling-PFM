@@ -192,6 +192,7 @@ void cfdemCloudIB::calcVelocityCorrection
                     // impose field velocity
                     U[cellI]=(1-voidfractions_[index][subCell])*uParticle+voidfractions_[index][subCell]*U[cellI];
                 }
+
             }
         //}
     }

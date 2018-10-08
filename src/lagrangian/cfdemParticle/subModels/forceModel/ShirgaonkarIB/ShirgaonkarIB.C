@@ -65,6 +65,7 @@ ShirgaonkarIB::ShirgaonkarIB
     propsDict_(dict.subDict(typeName + "Props")),
     verbose_(false),
     twoDimensional_(false),
+    multisphere_(false), //  drag for a multisphere particle
     depth_(1),
     velFieldName_(propsDict_.lookup("velFieldName")),
     U_(sm.mesh().lookupObject<volVectorField> (velFieldName_)),
@@ -84,6 +85,9 @@ ShirgaonkarIB::ShirgaonkarIB
         Info << "2-dimensional simulation - make sure DEM side is 2D" << endl;
         Info << "depth of domain is assumed to be :" << depth_ << endl;
     }
+
+    // Switch to initiate the multisphere calculation
+    if(propsDict_.found("multisphere")) multisphere_=true;
 
     // init force sub model
     setForceSubModels(propsDict_);
@@ -151,7 +155,57 @@ void ShirgaonkarIB::setForce() const
             if(verbose_) Info << "impForces = " << impForces()[index][0]<<","<<impForces()[index][1]<<","<<impForces()[index][2] << endl;
         //}
     }
+
+    // Calculate the force if the particle is multisphere template
+    if(multisphere_) calcForce();
 }
+
+void ShirgaonkarIB::calcForce() const
+{
+    label cellID;
+    vector dragMS;
+
+    volVectorField h=forceSubM(0).IBDragPerV(U_,p_);
+
+    dragMS = vector::zero;
+
+    for(int index=0; index< particleCloud_.numberOfParticles(); index++)
+    {
+        int prev;
+
+        for(int subCell=0;subCell<particleCloud_.voidFractionM().cellsPerParticle()[index][0];subCell++)
+        {
+            cellID = particleCloud_.cellIDs()[index][subCell];
+
+            prev = 0;
+
+            if (cellID > -1 && index == 0) // Force on 1st particle
+            {
+                dragMS += h[cellID]*h.mesh().V()[cellID];
+
+            }
+
+            else if(cellID > -1 && index > 0)
+            {
+
+                // Check for cellID in previous particles
+                for(int i=index-1; i>= 0; i--)
+                {
+                    for(int j=0; j< particleCloud_.voidFractionM().cellsPerParticle()[i][0];j++)
+                    {
+                        label cell = particleCloud_.cellIDs()[i][j];
+                        if(cellID == cell){prev++;}
+                    }
+                }
+                if(prev == 0){ dragMS += h[cellID]*h.mesh().V()[cellID];}
+            }
+        }
+    }
+
+    Info << "Drag force on particle clump = " << dragMS[0]<<","<<dragMS[1]<<","<<dragMS[2] << endl;
+}
+
+
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

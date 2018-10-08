@@ -53,6 +53,8 @@ Contributions
 
 #include "cellSet.H"
 
+#include "fvOptions.H"      // added fvOptions
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 int main(int argc, char *argv[])

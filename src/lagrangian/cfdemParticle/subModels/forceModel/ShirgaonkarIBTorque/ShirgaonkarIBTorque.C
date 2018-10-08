@@ -157,7 +157,7 @@ void ShirgaonkarIBTorque::setForce() const
             if(verbose_) Info << "impForces = " << impForces()[index][0]<<","<<impForces()[index][1]<<","<<impForces()[index][2] << endl;
             if(useTorque_)
             {
-                    for(int j=0;j<3;j++) particleCloud_.DEMTorques()[index][j] = torque[j]; // or is it particleCloud_.DEMTorques()[index][j] += torque[j];
+                    for(int j=0;j<3;j++) particleCloud_.DEMTorques()[index][j] = torque[j]; // Adding to the particle torque;
                     Info << "DEMTorques = " << particleCloud_.DEMTorques()[index][0] << "," << particleCloud_.DEMTorques()[index][1] << "," << particleCloud_.DEMTorques()[index][2] << endl;
             }
     }

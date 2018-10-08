@@ -62,6 +62,7 @@ protected:
     label pRefCell_;
     scalar pRefValue_;
 
+    // Modifications
     mutable double **DEMTorques_;
 
     mutable bool haveEvolvedOnce_;
@@ -89,6 +90,7 @@ public:
 
         bool reAllocArrays();
 
+    // Modification
         inline double ** DEMTorques() const;
 
         bool evolve();
@@ -102,7 +104,6 @@ public:
         {
             return angularVelocities_;
         }
-
 };
 
 
