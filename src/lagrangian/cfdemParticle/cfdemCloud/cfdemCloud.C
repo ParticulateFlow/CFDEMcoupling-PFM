@@ -78,7 +78,7 @@ cfdemCloud::cfdemCloud
             IOobject::NO_WRITE
         )
     ),
-    solveFlow_(couplingProperties_.found("solveFlow")),
+    solveFlow_(couplingProperties_.lookupOrDefault<bool>("solveFlow", true)),
     verbose_(couplingProperties_.found("verbose")),
     ignore_(couplingProperties_.found("ignore")),
     allowCFDsubTimestep_(true),
