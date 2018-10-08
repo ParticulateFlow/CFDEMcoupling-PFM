@@ -155,6 +155,14 @@ cfdemCloud::cfdemCloud
             turbulenceModelType_
         )
     ),
+    dataExchangeModel_
+    (
+        dataExchangeModel::New
+        (
+            couplingProperties_,
+            *this
+        )
+    ),
     forceModel_(nrForceModels()),
     locateModel_
     (
@@ -165,14 +173,6 @@ cfdemCloud::cfdemCloud
         )
     ),
     momCoupleModel_(nrMomCoupleModels()),
-    dataExchangeModel_
-    (
-        dataExchangeModel::New
-        (
-            couplingProperties_,
-            *this
-        )
-    ),
     IOModel_
     (
         IOModel::New
