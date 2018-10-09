@@ -72,7 +72,10 @@ energyModels
     heatTransferGunn
 );
 
-chemistryModel off;
+chemistryModels
+(
+    off
+);
 
 thermCondModel SyamlalThermCond;
 

@@ -5,7 +5,7 @@
 
 :line
 
-chemistryModel command :h3
+chemistryModels command :h3
 
 [Syntax:]
 

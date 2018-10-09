@@ -70,7 +70,7 @@ virtualMassForce::virtualMassForce
     phiFieldName_(propsDict_.lookup("phiFieldName")),
     phi_(sm.mesh().lookupObject<surfaceScalarField> (phiFieldName_)),
     UrelOld_(NULL),
-    splitUrelCalculation_(propsDict_.found("splitUrelCalculation")),
+    splitUrelCalculation_(propsDict_.lookupOrDefault<bool>("splitUrelCalculation",false)),
     Cadd_(0.5)
 {
 

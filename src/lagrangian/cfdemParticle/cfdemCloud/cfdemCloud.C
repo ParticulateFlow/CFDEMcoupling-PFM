@@ -78,7 +78,7 @@ cfdemCloud::cfdemCloud
             IOobject::NO_WRITE
         )
     ),
-    solveFlow_(couplingProperties_.found("solveFlow")),
+    solveFlow_(couplingProperties_.lookupOrDefault<bool>("solveFlow", true)),
     verbose_(couplingProperties_.found("verbose")),
     ignore_(couplingProperties_.found("ignore")),
     allowCFDsubTimestep_(true),
@@ -155,6 +155,14 @@ cfdemCloud::cfdemCloud
             turbulenceModelType_
         )
     ),
+    dataExchangeModel_
+    (
+        dataExchangeModel::New
+        (
+            couplingProperties_,
+            *this
+        )
+    ),
     forceModel_(nrForceModels()),
     locateModel_
     (
@@ -165,14 +173,6 @@ cfdemCloud::cfdemCloud
         )
     ),
     momCoupleModel_(nrMomCoupleModels()),
-    dataExchangeModel_
-    (
-        dataExchangeModel::New
-        (
-            couplingProperties_,
-            *this
-        )
-    ),
     IOModel_
     (
         IOModel::New

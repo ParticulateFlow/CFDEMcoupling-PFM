@@ -180,13 +180,13 @@ protected:
 
     const turbulenceModel& turbulence_;
 
+    autoPtr<dataExchangeModel> dataExchangeModel_;
+
     PtrList<forceModel> forceModel_;
 
     autoPtr<locateModel> locateModel_;
 
     PtrList<momCoupleModel> momCoupleModel_;
-
-    autoPtr<dataExchangeModel> dataExchangeModel_;
 
     autoPtr<IOModel> IOModel_;
 

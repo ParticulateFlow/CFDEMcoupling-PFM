@@ -12,11 +12,17 @@ chemistryModel off command :h3
 Defined in "couplingProperties"_CFDEMcoupling_dicts.html#couplingProperties
 dictionary.
 
-chemistryModel off; :pre
+chemistryModels
+(
+    off
+); :pre
 
 [Examples:]
 
-chemistryModel off; :pre
+chemistryModels
+(
+    off
+); :pre
 
 [Description:]
 
