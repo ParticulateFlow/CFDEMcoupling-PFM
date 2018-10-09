@@ -73,6 +73,8 @@ int main(int argc, char *argv[])
 
     #include "initContinuityErrs.H"
 
+    #include "createFvOptions.H"
+
     // create cfdemCloud
     #include "readGravitationalAcceleration.H"
     cfdemCloudIB particleCloud(mesh);
@@ -106,9 +108,12 @@ int main(int argc, char *argv[])
                 fvm::ddt(voidfraction,U)
               + fvm::div(phi, U)
               + turbulence->divDevReff(U)
+                        == fvOptions(U)
             );
 
             UEqn.relax();
+
+            fvOptions.constrain(UEqn);
 
             if (piso.momentumPredictor())
             {
@@ -127,6 +132,7 @@ int main(int argc, char *argv[])
                     + rUAf*fvc::ddtCorr(U, phi);
 
                 adjustPhi(phi, U, p);
+
 
                 while (piso.correctNonOrthogonal())
                 {
@@ -159,6 +165,8 @@ int main(int argc, char *argv[])
         Info << "particleCloud.calcVelocityCorrection() " << endl;
         volScalarField voidfractionNext=mesh.lookupObject<volScalarField>("voidfractionNext");
         particleCloud.calcVelocityCorrection(p,U,phiIB,voidfractionNext);
+
+        fvOptions.correct(U);
 
         runTime.write();
 
