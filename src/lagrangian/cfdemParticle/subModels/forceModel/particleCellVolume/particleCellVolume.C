@@ -64,10 +64,10 @@ particleCellVolume::particleCellVolume
     forceModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
     mesh_(particleCloud_.mesh()),
-    startTime_(propsDict_.found("startTime") ? readScalar(propsDict_.lookup("startTime")) : 0.),
+    startTime_(propsDict_.lookupOrDefault<scalar>("startTime",0.0)),
     scalarFieldName_("voidfraction"),
     scalarField_
-    (   
+    (
         IOobject
         (
             "particleCellVolume",
@@ -80,7 +80,7 @@ particleCellVolume::particleCellVolume
         dimensionedScalar("zero", dimensionSet(0,0,0,0,0), 0)
     ),
     scalarField2_
-    (   
+    (
         IOobject
         (
             "cellVolume",
