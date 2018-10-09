@@ -1,0 +1,58 @@
+"CFDEMproject Website"_lws - "Main Page"_main :c
+
+:link(lws,http://www.cfdem.com)
+:link(main,CFDEMcoupling_Manual.html)
+
+:line
+
+forceModel pdCorrelation :h3
+
+[Syntax:]
+
+Defined in "couplingProperties"_CFDEMcoupling_dicts.html#couplingProperties
+dictionary.
+
+forceModels
+(
+    pdCorrelation
+);
+pdCorrelationProps
+\{
+    coarseGrainingFactors
+    (
+        X Y Z
+    );
+    particleDensities
+    (
+        A B C
+    );
+    runOnWriteOnly true;
+\} :pre
+
+{coarseGrainingFactors} = list of coarse graining factors by type, separated by whitespace, optional :ulb,l
+{particleDensities} = list of particle densities by type, separated by whitespace, optional :l
+{runOnWriteOnly} = switch if this should be executed on write, optional (default: false - execute every coupling step). :l
+
+
+:ule
+
+[Description:]
+
+This "forceModel" does not influence the particles or the flow - it calculates
+the particle momentum-diameter correlation
+
+:c,image(Eqs/pdCorrelation.png)
+where delta is the type-specific coarse-graining factor.
+
+This model is sensitive to additionally pulled particle type info, and can
+either use the type-specific densities from the dictionary or those pulled from
+LIGGGHTS.
+
+[Restrictions:]
+
+none
+
+[Related commands:]
+
+"forceModel"_forceModel.html
+

@@ -1,0 +1,52 @@
+"CFDEMproject Website"_lws - "Main Page"_main :c
+
+:link(lws,http://www.cfdem.com)
+:link(main,CFDEMcoupling_Manual.html)
+
+:line
+
+chemistryModels command :h3
+
+[Syntax:]
+
+Defined in "couplingProperties"_CFDEMcoupling_dicts.html#couplingProperties
+dictionary.
+
+chemistryModels
+(
+    model_x
+    model_y
+); :pre
+
+model = name of chemistry model to be applied :ul
+
+[Examples:]
+
+chemistryModels
+(
+    species
+    diffusionCoefficients
+    massTransferCoeff
+); :pre
+
+[Description:]
+
+The chemistry model initializes the required fields for the calculation of molar
+fractions, determines the diffusion coefficients of the gaseous reactants,
+calculates the necessary coefficients for the calculation of a mass transfer
+coefficient. All models are executed sequentially. These values are used in the
+DEM calculation of particle reduction models.
+
+[Restrictions:]
+
+none
+
+[Related commands:]
+
+"diffusionCoefficient"_chemistryModel_diffusionCoefficients.html,
+"massTransferCoeff"_chemistryModel_massTransferCoeff.html,
+"species"_chemistryModel_species.html
+
+[Default:]
+
+none

@@ -33,7 +33,7 @@ couplingInterval 100;
 
 voidFractionModel divided;//centre;//
 
-locateModel engine;//turboEngine;//
+locateModel engine;//turboEngineM2M;//
 
 meshMotionModel noMeshMotion;
 
@@ -49,7 +49,7 @@ averagingModel dense;//dilute;//
 
 clockModel off;//standardClock;//
 
-smoothingModel off;// constDiffSmoothing; //
+smoothingModel off;// localPSizeDiffSmoothing;// constDiffSmoothing; //
 
 forceModels
 (
@@ -61,6 +61,7 @@ forceModels
     GidaspowDrag
     //Archimedes
     //volWeightedAverage
+    //totalMomentumExchange
     particleCellVolume
 );
 
@@ -73,6 +74,14 @@ turbulenceModelType "turbulenceProperties";
 
 //===========================================================================//
 // sub-model properties
+
+localPSizeDiffSmoothingProps
+{
+    lowerLimit 0.1;
+    upperLimit 1e10;
+    dSmoothingLength 1.5e-3;
+    Csmoothing    1.0; 
+}
 
 constDiffSmoothingProps
 {
@@ -123,7 +132,13 @@ volWeightedAverageProps
     lowerThreshold 0;
     verbose true;
 }
-
+totalMomentumExchangeProps
+{
+    implicitMomExFieldName "Ksl";
+    explicitMomExFieldName "none";
+    fluidVelFieldName "U";
+    granVelFieldName "Us";
+}
 GidaspowDragProps
 {
     verbose true;
@@ -147,12 +162,15 @@ KochHillDragProps
 BeetstraDragProps
 {
     velFieldName "U";
-    gravityFieldName "g";
-    rhoParticle     2000.;
     voidfractionFieldName "voidfraction";
+    granVelFieldName "Us";
     interpolation true;
-    useFilteredDragModel ;
-    useParcelSizeDependentFilteredDrag ;
+//    useFilteredDragModel;
+//    useParcelSizeDependentFilteredDrag;
+    g       9.81;
+    rhoP    7000.;
+    rho     10.;
+    nuf     1.5e-4;
     k       0.05;
     aLimit  0.0;
 //    verbose true;

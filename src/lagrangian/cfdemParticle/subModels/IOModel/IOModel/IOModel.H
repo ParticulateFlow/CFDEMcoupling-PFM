@@ -115,13 +115,13 @@ public:
 
     bool dumpNow() const;
 
-    fileName createTimeDir(fileName) const;
+    fileName createTimeDir(const fileName&) const;
 
-    fileName createLagrangianDir(fileName) const;
+    fileName createLagrangianDir(const fileName&) const;
 
-    fileName buildFilePath(word) const;
+    fileName buildFilePath(const word&) const;
 
-    void streamDataToPath(fileName,double**,int,word,word type,word className) const;
+    void streamDataToPath(const fileName&,const double* const*,int,const word&,const word& type,const word& className) const;
 };
 
 

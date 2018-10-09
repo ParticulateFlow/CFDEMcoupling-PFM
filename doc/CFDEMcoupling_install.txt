@@ -1,0 +1,220 @@
+"CFDEMproject Website"_lws - "Main Page"_main :c
+
+:link(lws,http://www.cfdem.com)
+:link(main,CFDEMcoupling_Manual.html)
+
+:line
+
+2. Installation :link(1_2),h3
+
+In order to get the latest code version, please use the git repository at
+"http://github.com"_https://github.com/ParticulateFlow.
+
+
+2.1 Installing OpenFOAM :h4
+
+2.1.1 Obtain a copy of the source code :h5
+
+In the CFDEMcoupling repository take a look at the file
+
+src/lagrangian/cfdemParticle/cfdTools/versionInfo.H :pre
+
+to find out the latest tested version of LIGGGHTS and OpenFOAM that work with
+CFDEMcoupling. As of this writing the version of OpenFOAM to be used is 4.x.
+
+You can then basically follow the instructions at
+"openfoam.org"_https://openfoam.org/download/source/, cloning OpenFOAM from the
+git repository.
+
+cd $HOME
+mkdir OpenFOAM
+cd OpenFOAM
+git clone https://github.com/OpenFOAM/OpenFOAM-4.x.git :pre
+
+Clone the corresponding third party packages to the OpenFOAM folder.
+
+git clone https://github.com/OpenFOAM/ThirdParty-4.x.git :pre
+
+Switch to root user with sudo
+
+sudo su - :pre
+
+Install dependent packages required for OpenFOAM on Ubuntu by executing the
+following commands:
+
+apt-get install build-essential flex bison cmake zlib1g-dev libboost-system-dev libboost-thread-dev libopenmpi-dev openmpi-bin gnuplot libreadline-dev libncurses-dev libxt-dev
+apt-get install qt4-dev-tools libqt4-dev libqt4-opengl-dev freeglut3-dev libqtwebkit-dev
+apt-get install libcgal-dev :pre
+
+2.1.2 Setup the environment :h5
+
+Open your bash startup file
+
+NOTE: Don't forget the dot before the file name of {.bashrc}
+
+gedit ~/.bashrc :pre
+
+and add the following lines:
+
+source $HOME/OpenFOAM/OpenFOAM-4.x/etc/bashrc
+export WM_NCOMPPROCS=4 :pre
+
+Save the file and reload it:
+
+source ~/.bashrc :pre
+
+:line
+
+[Additional check]
+
+Open ~/OpenFOAM/OpenFOAM-4.x/etc/bashrc and make sure that {WM_MPLIB} is set
+correctly:
+
+export WM_MPLIB=SYSTEMOPENMPI :pre
+
+This should be the default setting but if you encounter some problems regarding
+MPI you might have to download the openmpi-1.10.2 source package to the third
+party folder and change the setting to {OPENMPI}
+
+:line
+
+
+2.1.3 Compile ThirdParty packages :h5
+
+cd $WM_THIRD_PARTY_DIR
+./Allwmake :pre
+
+
+[Compiling Paraview and the Paraview Reader Module]
+
+Paraview is a third-party software provided for graphical post-processing in
+OpenFOAM. Its compilation is automated using a script called makeParaView in the
+ThirdParty-4.x directory.
+
+Before installing Paraview, check the version of cmake that is installed on the
+system. This can be done by typing
+
+cmake --version :pre
+
+If the system cmake is older than version 2.8.8, clone a newer version to the
+Third Party folder and compile it by executing the following:
+
+cd $WM_THIRD_PARTY_DIR
+git clone https://github.com/Kitware/CMake.git cmake-3.2.1
+cd cmake-3.2.1
+git checkout tags/v3.2.1
+cd ..
+./makeCmake :pre
+
+In makeParaView set the path to cmake:
+
+CMAKE_PATH="$WM_THIRD_PARTY_DIR/platforms/linux64Gcc/cmake-3.2.1/bin" :pre
+
+To install Paraview, execute the following
+
+cd $WM_THIRD_PARTY_DIR
+./makeParaView :pre
+
+If you get the following error
+
+
+VTK/ThirdParty/hdf5/vtkhdf5/src/H5detect.c:158:1: error: unknown type name ‘sigjmp_buf’
+static H5JMP_BUF jbuf_g; :pre
+
+in VTK/ThirdParty/hdf5/vtkhdf5/config/cmake/ConfigureChecks.cmake around line 445 change
+
+set (HDF5_EXTRA_FLAGS -D_DEFAULT_SOURCE -D_BSD_SOURCE) :pre
+
+to
+
+set (HDF5_EXTRA_FLAGS -D_GNU_SOURCE -D_DEFAULT_SOURCE -D_BSD_SOURCE) :pre
+
+
+2.1.4 Compile OpenFOAM :h5
+
+[Compiling the source code]
+
+cd $WM_PROJECT_DIR
+./Allwmake :pre
+
+
+[Testing the installation]
+
+Create a project directory within the $HOME/OpenFOAM directory
+
+mkdir -p $FOAM_RUN :pre
+
+Copy the tutorial examples directory in the OpenFOAM distribution to the run
+directory. If the OpenFOAM environment variables are set correctly, then the
+following command will be correct:
+
+cp -r $FOAM_TUTORIALS $FOAM_RUN :pre
+
+Run the first example case of incompressible laminar flow in a cavity:
+
+cd $FOAM_RUN/tutorials/incompressible/icoFoam/cavity/cavity
+blockMesh
+icoFoam
+paraFoam :pre
+
+
+2.2 Installing CFDEMcoupling :h4
+
+Make sure OpenFOAM is set up correctly and LIGGGHTS is installed as well. Clone
+the CFDEMcoupling source from the repository:
+
+cd $HOME
+mkdir CFDEM
+cd CFDEM
+git clone https://github.com/ParticulateFlow/CFDEMcoupling.git :pre
+
+Open the bashrc file of CFDEMcoupling
+
+gedit ~/CFDEM/CFDEMcoupling/etc/bashrc & :pre
+
+Edit the lines marked as {USER EDITABLE PART} to reflect your installation paths
+correctly. Save the bashrc file and reload it:
+
+source ~/CFDEM/CFDEMcoupling/etc/bashrc :pre
+
+Entering $CFDEM_PROJECT_DIR in a the terminal should now give "... is a directory"
+
+Check if everything is set up correctly:
+
+cfdemSysTest :pre
+
+Compile LIGGGHTS (as a library)
+
+cfdemCompLIG :pre
+
+If the compilation fails with a message like
+
+No rule to make target `/usr/lib/libpython2.7.so' :pre
+
+you probably need to create a symbolic link to the library in question.
+
+Compile CFDEMcoupling (library, solvers and utilities) in one go
+
+cfdemCompCFDEM :pre
+
+or alternatively step by step
+
+cfdemCompCFDEMsrc
+cfdemCompCFDEMsol
+cfdemCompCFDEMuti :pre
+
+Find the log files of the compile process
+
+cd ~/CFDEM/CFDEMcoupling/etc/log
+ls :pre
+
+If the file [log_compile_results_success] is present, compilation was successful.
+
+Install Octave for post-processing some of the tutorial output.
+
+sudo apt-get install octave :pre
+
+To run all tutorial cases type in a terminal:
+
+cfdemTestTUT :pre
+

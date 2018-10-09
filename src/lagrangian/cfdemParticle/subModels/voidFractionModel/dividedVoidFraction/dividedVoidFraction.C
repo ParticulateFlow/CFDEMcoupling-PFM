@@ -64,35 +64,26 @@ dividedVoidFraction::dividedVoidFraction
 :
     voidFractionModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
-    verbose_(false),
+    verbose_(propsDict_.found("verbose")),
     procBoundaryCorrection_(propsDict_.lookupOrDefault<Switch>("procBoundaryCorrection", false)),
     alphaMin_(readScalar(propsDict_.lookup("alphaMin"))),
     alphaLimited_(0),
     tooMuch_(0.0),
-    interpolation_(false),
-    cfdemUseOnly_(false)
+    interpolation_(propsDict_.found("interpolation")),
+    cfdemUseOnly_(propsDict_.lookupOrDefault<bool>("cfdemUseOnly", false))
 {
     maxCellsPerParticle_ = numberOfMarkerPoints;
 
     if (alphaMin_ > 1.0 || alphaMin_ < 0.01)
         Warning << "alphaMin should be < 1 and > 0.01 !!!" << endl;
 
-    if (propsDict_.found("interpolation"))
+    if (interpolation_)
     {
-        interpolation_ = true;
         Warning << "interpolation for dividedVoidFraction does not yet work correctly!" << endl;
         Info << "Using interpolated voidfraction field - do not use this in combination with interpolation in drag model!" << endl;
     }
 
     checkWeightNporosity(propsDict_);
-
-    if (propsDict_.found("verbose"))
-        verbose_ = true;
-
-    if (propsDict_.found("cfdemUseOnly"))
-    {
-        cfdemUseOnly_ = readBool(propsDict_.lookup("cfdemUseOnly"));
-    }
 
     if (procBoundaryCorrection_)
     {
@@ -165,7 +156,7 @@ dividedVoidFraction::~dividedVoidFraction()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfractions,double**& particleWeights,double**& particleVolumes, double**& particleV) const
+void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfractions,double**& particleWeights,double**& particleVolumes, double**& particleV)
 {
     if (cfdemUseOnly_)
         reAllocArrays(particleCloud_.numberOfParticles());
@@ -200,6 +191,7 @@ void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfra
             position = particleCloud_.position(index);
             cellID = particleCloud_.cellIDs()[index][0];
             radius = particleCloud_.radius(index);
+            if (multiWeights_) scaleVol = weight(index);
             volume = Vp(index,radius,scaleVol);
             radius *= scaleRadius;
             cellVol = 0;

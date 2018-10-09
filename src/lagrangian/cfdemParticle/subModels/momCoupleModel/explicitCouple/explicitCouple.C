@@ -106,7 +106,7 @@ explicitCouple::~explicitCouple()
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-tmp<volVectorField> explicitCouple::expMomSource() const
+tmp<volVectorField> explicitCouple::expMomSource()
 {
     const scalar tsf = particleCloud_.dataExchangeM().timeStepFraction();
 
@@ -136,7 +136,7 @@ tmp<volVectorField> explicitCouple::expMomSource() const
     );
 }
 
-void explicitCouple::resetMomSourceField() const
+void explicitCouple::resetMomSourceField()
 {
     fPrev_.ref() = fNext_.ref();
     fNext_.primitiveFieldRef() = vector::zero;

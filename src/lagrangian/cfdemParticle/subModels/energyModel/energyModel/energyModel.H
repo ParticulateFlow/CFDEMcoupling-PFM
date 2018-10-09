@@ -104,6 +104,8 @@ public:
 	virtual void calcEnergyContribution() = 0;
 	
 	virtual void postFlow() {}
+
+	virtual void solve() {}
 	
 	scalar Cp() const;
 

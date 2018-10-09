@@ -41,6 +41,8 @@ cfdemCloudEnergy::cfdemCloudEnergy
     cfdemCloud(mesh),
     energyModels_(couplingProperties_.lookup("energyModels")),
     implicitEnergyModel_(false),
+    chemistryModels_(couplingProperties_.lookup("chemistryModels")),
+    energyModel_(nrEnergyModels()),
     thermCondModel_
     (
         thermCondModel::New
@@ -49,23 +51,33 @@ cfdemCloudEnergy::cfdemCloudEnergy
             *this
         )
     ),
-    chemistryModel_
-    (
-        chemistryModel::New
-        (
-            couplingProperties_,
-            *this
-        )
-    )
+    chemistryModel_(nrChemistryModels())
 {
-    energyModel_ = new autoPtr<energyModel>[nrEnergyModels()];
-    for (int i=0;i<nrEnergyModels();i++)
+    forAll(energyModels_, modeli)
     {
-        energyModel_[i] = energyModel::New
+        energyModel_.set
         (
-            couplingProperties_,
-            *this,
-            energyModels_[i]
+            modeli,
+            energyModel::New
+            (
+                couplingProperties_,
+                *this,
+                energyModels_[modeli]
+            )
+        );
+    }
+
+    forAll(chemistryModels_, modeli)
+    {
+        chemistryModel_.set
+        (
+            modeli,
+            chemistryModel::New
+            (
+                couplingProperties_,
+                *this,
+                chemistryModels_[modeli]
+            )
         );
     }
 }
@@ -82,19 +94,29 @@ cfdemCloudEnergy::~cfdemCloudEnergy()
 
 void cfdemCloudEnergy::calcEnergyContributions()
 {
-    for (int i=0;i<nrEnergyModels();i++)
-        energyModel_[i]().calcEnergyContribution();
+    forAll(energyModel_, modeli)
+    {
+        energyModel_[modeli].calcEnergyContribution();
+    }
 }
 
 void cfdemCloudEnergy::speciesExecute()
 {
-        chemistryModel_().execute();
+    forAll(chemistryModel_, modeli)
+    {
+        chemistryModel_[modeli].execute();
+    }
 }
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 label cfdemCloudEnergy::nrEnergyModels() const
 {
     return energyModels_.size();
+}
+
+int cfdemCloudEnergy::nrChemistryModels()
+{
+    return chemistryModels_.size();
 }
 
 bool cfdemCloudEnergy::implicitEnergyModel() const
@@ -107,9 +129,9 @@ const energyModel& cfdemCloudEnergy::energyM(int i)
     return energyModel_[i];
 }
 
-const chemistryModel& cfdemCloudEnergy::chemistryM()
+const chemistryModel& cfdemCloudEnergy::chemistryM(int i)
 {
-    return chemistryModel_;
+    return chemistryModel_[i];
 }
 
 const thermCondModel& cfdemCloudEnergy::thermCondM()
@@ -121,16 +143,20 @@ void cfdemCloudEnergy::energyContributions(volScalarField& Qsource)
 {
     Qsource.primitiveFieldRef()=0.0;
     Qsource.boundaryFieldRef()=0.0;
-    for (int i=0;i<nrEnergyModels();i++)
-        energyM(i).addEnergyContribution(Qsource);
+    forAll(energyModel_, modeli)
+    {
+        energyM(modeli).addEnergyContribution(Qsource);
+    }
 }
 
 void cfdemCloudEnergy::energyCoefficients(volScalarField& Qcoeff)
 {
     Qcoeff.primitiveFieldRef()=0.0;
     Qcoeff.boundaryFieldRef()=0.0;
-    for (int i=0;i<nrEnergyModels();i++)
-        energyM(i).addEnergyCoefficient(Qcoeff);
+    forAll(energyModel_, modeli)
+    {
+        energyM(modeli).addEnergyCoefficient(Qcoeff);
+    }
 }
 
 bool cfdemCloudEnergy::evolve
@@ -157,7 +183,7 @@ bool cfdemCloudEnergy::evolve
         if(verbose_) Info << "speciesExecute done" << endl;
         clockM().stop("speciesExecute");
 
-	return true;
+        return true;
     }
     return false;
 }
@@ -165,8 +191,18 @@ bool cfdemCloudEnergy::evolve
 void cfdemCloudEnergy::postFlow()
 {
     cfdemCloud::postFlow();
-    for (int i=0;i<nrEnergyModels();i++)
-        energyModel_[i]().postFlow();
+    forAll(energyModel_, modeli)
+    {
+        energyModel_[modeli].postFlow();
+    }
+}
+
+void cfdemCloudEnergy::solve()
+{
+    forAll(energyModel_, modeli)
+    {
+        energyModel_[modeli].solve();
+    }
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

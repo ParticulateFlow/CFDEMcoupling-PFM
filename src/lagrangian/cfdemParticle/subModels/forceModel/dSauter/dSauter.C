@@ -53,10 +53,10 @@ dSauter::dSauter
 :
     forceModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
+    multiTypes_(false),
     d2_(NULL),
     d3_(NULL),
-    scaleDia_(1.0),
-    scaleDiaDist_(1.0),
+    typeCG_(propsDict_.lookupOrDefault<scalarList>("coarseGrainingFactors",scalarList(1,1.0))),
     d2Field_
     (   IOobject
         (
@@ -95,17 +95,13 @@ dSauter::dSauter
         "zeroGradient"
     )
 {
+    if (typeCG_.size()>1) multiTypes_ = true;
     allocateMyArrays();
     dSauter_.write();
 
 
     // init force sub model
     setForceSubModels(propsDict_);
-
-    if (propsDict_.found("scaleCG"))
-        scaleDia_ = scalar(readScalar(propsDict_.lookup("scaleCG")));
-    if (propsDict_.found("scaleDist"))
-        scaleDiaDist_ = scalar(readScalar(propsDict_.lookup("scaleDist")));
 }
 
 
@@ -131,30 +127,37 @@ void dSauter::allocateMyArrays() const
 
 void dSauter::setForce() const
 {
-    if (scaleDia_ > 1)
+    if (typeCG_.size()>1 || typeCG_[0] > 1.0)
     {
-        Info << "dSauter using scaleCG = " << scaleDia_ << endl;
-    }
-    else if (particleCloud_.cg() > 1)
-    {
-        scaleDia_ = particleCloud_.cg();
-        Info << "dSauter using scaleCG from liggghts cg = " << scaleDia_ << endl;
+        Info << "dSauter using CG factor(s) = " << typeCG_ << endl;
     }
 
     allocateMyArrays();
 
-    label cellI=0;
-    scalar ds(0);
-    scalar scale = scaleDiaDist_/scaleDia_;
+    label cellI = 0;
+    label partType = 1;
+    scalar cg = typeCG_[0];
+    scalar ds = 0.0;
+    scalar effVolFac = 1.0;
+
 
     for(int index = 0; index < particleCloud_.numberOfParticles(); ++index)
     {
         cellI = particleCloud_.cellIDs()[index][0];
         if (cellI >= 0)
         {
+            if (particleCloud_.getParticleEffVolFactors()) 
+            {
+                effVolFac = particleCloud_.particleEffVolFactor(index);
+            }
+            if (multiTypes_) 
+            {
+                partType = particleCloud_.particleType(index);
+                cg = typeCG_[partType - 1];
+            }
             ds = particleCloud_.d(index);
-            d2_[index][0] = ds*ds;
-            d3_[index][0] = ds*ds*ds;
+            d2_[index][0] = ds*ds*effVolFac*cg;
+            d3_[index][0] = ds*ds*ds*effVolFac;
         }
     }
 
@@ -181,7 +184,7 @@ void dSauter::setForce() const
     {
         if (d2Field_[cellI] > ROOTVSMALL)
         {
-            dSauter_[cellI] = d3Field_[cellI] / d2Field_[cellI] * scale;
+            dSauter_[cellI] = d3Field_[cellI] / d2Field_[cellI];
         }
         else
         {

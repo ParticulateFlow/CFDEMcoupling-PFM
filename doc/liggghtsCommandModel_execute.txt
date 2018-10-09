@@ -1,15 +1,16 @@
-"CFDEMproject WWW Site"_lws - "CFDEM Commands"_lc :c
+"CFDEMproject Website"_lws - "Main Page"_main :c
 
 :link(lws,http://www.cfdem.com)
-:link(lc,CFDEMcoupling_Manual.html#comm)
+:link(main,CFDEMcoupling_Manual.html)
 
 :line
 
-liggghtsCommandModel_execute command :h3
+liggghtsCommandModel execute command :h3
 
 [Syntax:]
 
-Defined in liggghtsCommmands dictionary.
+Defined in "liggghtsCommmands"_CFDEMcoupling_dicts.html#liggghtsCommands
+dictionary.
 
 liggghtsCommandModels
 (
@@ -22,18 +23,18 @@ executeProps0
         run
         $couplingInterval
     );
-    runFirst switch1; 
-    runLast switch2;
+    runFirst             switch1;
+    runLast              switch2;
     runEveryCouplingStep switch3;
-    runEveryWriteStep switch4;
+    runEveryWriteStep    switch4;
     verbose;
 \} :pre
 
-{command} = LIGGGHTS command to be executed. Each word in a new line, numbers and symbols need special treatment (e.g. $couplingInterval will be replaced by correct coupling interval in the simulation)  :ulb,l
-{switch1} = switch (choose on/off) if the command is executed only at first time step :l
-{switch2} = switch (choose on/off) if the command is executed only at last time step :l
-{switch3} = switch (choose on/off) if the command is executed at every coupling step :l
-{switch4} = switch (choose on/off) if the command is executed at every writing step :l
+{command} = LIGGGHTS command to be executed. Each word in a new line, numbers and symbols need special treatment (e.g. $couplingInterval will be replaced by correct coupling interval in the simulation) :ulb,l
+{switch1} = (optional, default off) if the command is executed only at first time step :l
+{switch2} = (optional, default off) if the command is executed only at last time step (requires {switch1} to be off) :l
+{switch3} = (optional, default off) if the command is executed at every coupling step (requires {switch1} and {switch2} to be off) :l
+{switch4} = (optional, default off) if the command is executed at every writing step (requires {switch1} to {switch3} to be off) :l
 {verbose} = (normally off) for verbose run :l
 :ule
 
@@ -51,8 +52,8 @@ executeProps0
         run
         $couplingInterval
     );
-    runFirst off;
-    runLast off;
+    runFirst             off;
+    runLast              off;
     runEveryCouplingStep on;
 \}
 executeProps1
@@ -68,19 +69,27 @@ executeProps1
         liggghts.restart_
         timeStamp
     );
-    runFirst off;
-    runLast off;
+    runFirst             off;
+    runLast              off;
     runEveryCouplingStep off;
-    runEveryWriteStep on;
+    runEveryWriteStep    on;
 \} :pre
 
 [Description:]
 
-The execute liggghtsCommand Model can be used to execute a LIGGGHTS command during a CFD run. In above example execute_0 for instance executes "run $couplingInterval" every coupling step. $couplingInterval is automatically replaced by the correct number of DEM steps. Additionally execute_1 executes "write_restart ../DEM/liggghts.restart_$timeStamp" every writing step, where $timeStamp is automatically set.
+The {execute} liggghtsCommandModel can be used to execute a LIGGGHTS command
+during a CFD run. In above example {execute_0} for instance executes
+"run $couplingInterval" every coupling step. {$couplingInterval} is automatically
+replaced by the correct number of DEM steps. Additionally, {execute_1} executes
+"write_restart ../DEM/liggghts.restart_$timeStamp" every writing step, where
+{$timeStamp} is automatically set.
 
-These rather complex execute commands can be replaced by the "readLiggghts" and "writeLiggghts" commands! :h4
+NOTE: These rather complex execute commands can be replaced by the
+{runLiggghts} and {writeLiggghts} commands!
 
-[Restrictions:] None.
+[Restrictions:]
+
+none
 
 [Related commands:]
 

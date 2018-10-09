@@ -58,9 +58,9 @@ private:
 
     dictionary propsDict_;
 
-    mutable volVectorField fPrev_;
+    volVectorField fPrev_;
 
-    mutable volVectorField fNext_;
+    volVectorField fNext_;
 
     vector fLimit_;     // limit for for exchange field
 
@@ -87,9 +87,9 @@ public:
 
 
     // Member Functions
-        tmp<volVectorField> expMomSource() const;
+        tmp<volVectorField> expMomSource();
 
-        void resetMomSourceField() const;
+        void resetMomSourceField();
 
 };
 

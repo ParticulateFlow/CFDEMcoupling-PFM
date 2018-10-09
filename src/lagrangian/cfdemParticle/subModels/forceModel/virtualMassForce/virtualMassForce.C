@@ -70,7 +70,7 @@ virtualMassForce::virtualMassForce
     phiFieldName_(propsDict_.lookup("phiFieldName")),
     phi_(sm.mesh().lookupObject<surfaceScalarField> (phiFieldName_)),
     UrelOld_(NULL),
-    splitUrelCalculation_(false),
+    splitUrelCalculation_(propsDict_.lookupOrDefault<bool>("splitUrelCalculation",false)),
     Cadd_(0.5)
 {
 
@@ -88,14 +88,10 @@ virtualMassForce::virtualMassForce
     forceSubM(0).readSwitches();
 
     //Extra switches/settings
-    if(propsDict_.found("splitUrelCalculation"))
+    if(splitUrelCalculation_)
     {
-        splitUrelCalculation_ = readBool(propsDict_.lookup("splitUrelCalculation"));
-        if(splitUrelCalculation_)
-        {
-            Info << "Virtual mass model: will split the Urel calculation\n";
-            Info << "WARNING: be sure that LIGGGHTS integration takes ddtv_p implicitly into account! \n";
-        }
+        Info << "Virtual mass model: will split the Urel calculation\n";
+        Info << "WARNING: be sure that LIGGGHTS integration takes ddtv_p implicitly into account! \n";
     }
     if(propsDict_.found("Cadd"))
     {
