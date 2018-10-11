@@ -45,7 +45,7 @@ defineRunTimeSelectionTable(momCoupleModel, dictionary);
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-tmp<volScalarField> momCoupleModel::impMomSource() const
+tmp<volScalarField> momCoupleModel::impMomSource()
 {
     FatalError<<"the solver calls for impMomSource()\n"
               <<", please set 'momCoupleModel' to type 'implicitCouple'\n"
@@ -55,7 +55,7 @@ tmp<volScalarField> momCoupleModel::impMomSource() const
     return tsource;
 }
 
-tmp<volVectorField> momCoupleModel::expMomSource() const
+tmp<volVectorField> momCoupleModel::expMomSource()
 {
     FatalError<<"the solver calls for expMomSource()\n"
               <<", please set 'momCoupleModel' to type 'explicitCouple'\n"

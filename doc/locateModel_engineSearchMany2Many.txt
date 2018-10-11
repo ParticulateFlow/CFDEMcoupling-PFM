@@ -1,0 +1,63 @@
+"CFDEMproject Website"_lws - "Main Page"_main :c
+
+:link(lws,http://www.cfdem.com)
+:link(main,CFDEMcoupling_Manual.html)
+
+:line
+
+locateModel engineSearchMany2Many command :h3
+
+[Syntax:]
+
+Defined in "couplingProperties"_CFDEMcoupling_dicts.html#couplingProperties
+dictionary.
+
+locateModel engineSearchMany2Many;
+engineSearchMany2ManyProps
+\{
+    engineProps
+    \{
+        treeSearch switch1;
+    \}
+\}  :pre
+
+{switch1} = switch to use tree search algorithm
+:ule
+
+[Examples:]
+
+locateModel engineSearchMany2Many;
+engineSearchMany2ManyProps
+\{
+    engineProps
+    \{
+        treeSearch true;
+    \}
+\} :pre
+
+[Description:]
+
+The locateModel "engine" locates the CFD cell and cellID corresponding to a
+given position.
+This model is a dummy for the
+"twoWayMany2Many dataExchangeModel"_dataExchangeModel_twoWayMany2Many.html which
+locates using the specified "engine" during coupling.
+
+NOTE: Using this model with any other dataExchangeModel will cause problems.
+
+The {engineSearchMany2Many} locateModel can be used with different settings to
+use different algorithms:
+
+treeSearch false;  will execute some geometric (linear) search using the last
+known cellID (recommended) :ulb,l
+treeSearch true;   will use a recursive tree structure to find the cell. :l
+:ule
+
+[Restrictions:]
+
+Use only with the twoWayMany2Many dataExchangeModel!
+
+[Related commands:]
+
+"locateModel"_locateModel.html
+

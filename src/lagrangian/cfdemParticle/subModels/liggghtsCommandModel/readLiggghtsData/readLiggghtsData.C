@@ -63,26 +63,29 @@ readLiggghtsData::readLiggghtsData
 :
     liggghtsCommandModel(dict,sm,i),
     nrModel_(i),
-    insertionNr_(0.),
+    propsDict_(),
+    insertionNr_(),
     command_("read_data"),
-    myName_("notYetGiven"),
-    propsDict_(dict),
     filePathList_(0)
 {
-    // define dictionary
-    char h[80];
-    sprintf(h,"%d",nrModel_);
-    myName_=word(typeName + "Props" + h);
-    propsDict_=dictionary(dict.subDict(myName_));
+    // read propsDict
+    OStringStream oStrStream;
+    oStrStream << nrModel_;
 
-    if (propsDict_.found("exactTiming"))
-        exactTiming_=true;
+    propsDict_ = dict.subOrEmptyDict(typeName + "Props" + oStrStream.str());
+
+    // read insertion nr
+    insertionNr_ = readLabel(propsDict_.lookup("startIndex"));
+
+
+    exactTiming_ = propsDict_.found("exactTiming");
+
     Info << "exactTiming==" << exactTiming_ << endl;
 
-    if (propsDict_.found("verbose")) verbose_=true;
-
-    // read first index of data file to be injected
-    insertionNr_=readScalar(propsDict_.lookup("startIndex"));
+    if (propsDict_.found("verbose"))
+    {
+        verbose_ = true;
+    }
 
     // read command from dict
     filePathList_ = wordList(propsDict_.lookup("filePath"));
@@ -115,10 +118,10 @@ readLiggghtsData::~readLiggghtsData()
 const char* readLiggghtsData::command(int commandLine)
 {
     char h[50];
-    sprintf(h,"_%d",insertionNr_);
+    sprintf(h, "_%d", insertionNr_);
     word add = h;
     insertionNr_++;
-    strCommand_=string(command_ + add + " add");
+    strCommand_ = string(command_ + add + " add");
 
     return strCommand_.c_str();
 }

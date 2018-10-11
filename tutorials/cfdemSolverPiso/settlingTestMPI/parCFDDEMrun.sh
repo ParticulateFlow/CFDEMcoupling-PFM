@@ -22,6 +22,7 @@ solverName="cfdemSolverPiso"
 nrProcs="2"
 machineFileName="none"   # yourMachinefileName | none
 debugMode="off"          # on | off| strict
+reconstructCase="true"   # true | false
 testHarnessPath="$CFDEM_TEST_HARNESS_PATH"
 runOctave="true"
 cleanUp="true"
@@ -29,7 +30,7 @@ postproc="false"
 #--------------------------------------------------------------------------------#
 
 #- call function to run a parallel CFD-DEM case
-parCFDDEMrun $logpath $logfileName $casePath $headerText $solverName $nrProcs $machineFileName $debugMode "true"
+parCFDDEMrun $logpath $logfileName $casePath $headerText $solverName $nrProcs $machineFileName $debugMode $reconstructCase
 
 if [ $runOctave == "true" ]
     then

@@ -72,7 +72,7 @@ bigParticleVoidFraction::bigParticleVoidFraction
     Info << "\n\n W A R N I N G - this model does not yet work properly! \n\n" << endl;
     //reading maxCellsPerParticle from dictionary
     maxCellsPerParticle_=readLabel(propsDict_.lookup("maxCellsPerParticle"));
-    if(alphaMin_ > 1 || alphaMin_ < 0.01){ FatalError<< "alphaMin shloud be > 1 and < 0.01." << abort(FatalError); }
+    if(alphaMin_ > 1 || alphaMin_ < 0.01) { FatalError << "alphaMin must have a value between 0.01 and 1.0." << abort(FatalError); }
 
     checkWeightNporosity(propsDict_);
 }
@@ -86,7 +86,7 @@ bigParticleVoidFraction::~bigParticleVoidFraction()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void bigParticleVoidFraction::setvoidFraction(double** const& mask,double**& voidfractions,double**& particleWeights,double**& particleVolumes,double**& particleV) const
+void bigParticleVoidFraction::setvoidFraction(double** const& mask,double**& voidfractions,double**& particleWeights,double**& particleVolumes,double**& particleV)
 {
     reAllocArrays();
 
@@ -94,7 +94,7 @@ void bigParticleVoidFraction::setvoidFraction(double** const& mask,double**& voi
 
     scalar radius(-1);
     scalar volume(0);
-    scalar scaleVol= weight();
+    scalar scaleVol = weight();
     scalar scaleRadius = pow(porosity(),1./3.);
 
     for(int index=0; index< particleCloud_.numberOfParticles(); index++)
@@ -113,6 +113,7 @@ void bigParticleVoidFraction::setvoidFraction(double** const& mask,double**& voi
             //collecting data
             label particleCenterCellID=particleCloud_.cellIDs()[index][0];
             radius =  particleCloud_.radius(index);
+            if (multiWeights_) scaleVol = weight(index);
             volume = constant::mathematical::fourPiByThree*radius*radius*radius*scaleVol;
             radius *= scaleRadius;
             vector positionCenter=particleCloud_.position(index);

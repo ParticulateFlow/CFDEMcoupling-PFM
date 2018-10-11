@@ -60,7 +60,7 @@ private:
 
         const scalar alphaMin_;          // min value of voidFraction
 
-        mutable bool alphaLimited_;
+        bool alphaLimited_;
 
 public:
 
@@ -83,7 +83,7 @@ public:
 
 
     // Member Functions
-        void setvoidFraction(double** const& ,double**&, double**&, double**&, double**&) const;
+        void setvoidFraction(double** const& ,double**&, double**&, double**&, double**&);
 
         void buildLabelHashSet
         (

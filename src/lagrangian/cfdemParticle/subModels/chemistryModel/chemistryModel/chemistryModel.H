@@ -15,6 +15,7 @@ License
     along with this code.  If not, see <http://www.gnu.org/licenses/>.
 
     Copyright (C) 2015- Thomas Lichtenegger, JKU Linz, Austria
+                        M. Efe Kinaci, JKU Linz, Austria
 
 \*---------------------------------------------------------------------------*/
 
@@ -43,9 +44,9 @@ protected:
         const dictionary& dict_;
 
         cfdemCloudEnergy& particleCloud_;
-	
 
-       
+
+
 public:
 
     //- Runtime type information
@@ -72,7 +73,7 @@ public:
         chemistryModel
         (
             const dictionary& dict,
-            cfdemCloudEnergy& sm            
+            cfdemCloudEnergy& sm
         );
 
 
@@ -86,19 +87,18 @@ public:
         static autoPtr<chemistryModel> New
         (
             const dictionary& dict,
-            cfdemCloudEnergy& sm
+            cfdemCloudEnergy& sm,
+            word chemistryModelType
         );
 
 
     // Member Functions
 
-       virtual void execute() = 0;
-       
-//        virtual tmp<fvScalarMatrix> Smi (const label i) const = 0;
-//        
-//        virtual tmp<fvScalarMatrix> Sm () const = 0;
+        virtual void execute() = 0;
 
+        virtual tmp<volScalarField> Smi(const label i) const;
 
+        virtual tmp<volScalarField> Sm() const;
 };
 
 

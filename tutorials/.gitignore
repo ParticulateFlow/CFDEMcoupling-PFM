@@ -6,3 +6,16 @@
 log_*
 log.*
 *~
+**/DEM/post/*
+**/CFD/processor*/
+**/CFD/0*/
+**/CFD/1*/
+**/CFD/2*/
+**/CFD/3*/
+**/CFD/4*/
+**/CFD/5*/
+**/CFD/6*/
+**/CFD/7*/
+**/CFD/8*/
+**/CFD/9*/
+!**/CFD/0/

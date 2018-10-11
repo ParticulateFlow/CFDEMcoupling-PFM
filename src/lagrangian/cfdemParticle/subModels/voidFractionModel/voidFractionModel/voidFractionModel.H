@@ -63,17 +63,19 @@ protected:
 
         cfdemCloud& particleCloud_;
 
-        mutable volScalarField voidfractionPrev_;
+        bool multiWeights_;
 
-        mutable volScalarField voidfractionNext_;
+        volScalarField voidfractionPrev_;
 
-        mutable int ** cellsPerParticle_;
+        volScalarField voidfractionNext_;
+
+        int ** cellsPerParticle_;
 
         int maxCellsPerParticle_;
 
-        mutable scalar weight_;
+        scalar weight_;
 
-        mutable scalar porosity_;
+        scalar porosity_;
 
     // Protected member functions
 
@@ -122,25 +124,32 @@ public:
 
 
     // public member functions
-        virtual void setvoidFraction(double** const&,double**&,double**&,double**&,double**&) const = 0;
+        virtual void setvoidFraction(double** const&,double**&,double**&,double**&,double**&) = 0;
 
         tmp<volScalarField> voidFractionInterp() const;
 
-        inline volScalarField& voidFractionPrev()const { return voidfractionPrev_; }
+        volScalarField& voidFractionPrev() { return voidfractionPrev_; }
+        const volScalarField& voidFractionPrev() const { return voidfractionPrev_; }
 
-        inline volScalarField& voidFractionNext()const { return voidfractionNext_; }
+        volScalarField& voidFractionNext() { return voidfractionNext_; }
+        const volScalarField& voidFractionNext() const { return voidfractionNext_; }
 
-        inline scalar weight()const { return weight_; }
+        scalar weight() const { return weight_; }
 
-        inline scalar porosity()const { return porosity_; }
+        scalar weight(label index) const
+        {
+            return particleCloud_.particleEffVolFactor(index);
+        }
 
-        inline void checkWeightNporosity(dictionary& propsDict) const
+        scalar porosity() const { return porosity_; }
+
+        void checkWeightNporosity(dictionary& propsDict)
         {
             if (propsDict.found("weight")) weight_ = readScalar(propsDict.lookup("weight"));
             if (propsDict.found("porosity")) porosity_ = readScalar(propsDict.lookup("porosity"));
         }
 
-        void resetVoidFractions() const;
+        void resetVoidFractions();
 
         //void undoVoidFractions(double**const&) const;
 
@@ -148,9 +157,9 @@ public:
 
         int maxCellsPerParticle() const;
 
-        void reAllocArrays() const;
+        void reAllocArrays();
 
-        void reAllocArrays(int nP) const;  //force number of particles during reallocation, for CFD offline-use
+        void reAllocArrays(int nP);  //force number of particles during reallocation, for CFD offline-use
 
         virtual void setParticleType(label type) const {}
 

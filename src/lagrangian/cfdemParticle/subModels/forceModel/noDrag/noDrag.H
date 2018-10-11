@@ -57,11 +57,11 @@ class noDrag
 private:
     dictionary propsDict_;
 
-    bool verbose_;
+    const bool verbose_;
 
-    bool noDEMForce_;
+    const bool noDEMForce_;
 
-    bool keepCFDForce_;
+    const bool keepCFDForce_;
 
 public:
 

@@ -143,14 +143,14 @@ void forceSubModel::partToArray
         if(switches_[SW_TREAT_FORCE_EXPLICIT]) // treatExplicit
         {
             for(int j=0;j<3;j++)
-                myForceM().expForces()[index][j] += dragTot[j];
+                particleCloud_.expForces()[index][j] += dragTot[j];
         }
         else   //implicit treatment, taking explicit force contribution into account
         {
             for(int j=0;j<3;j++)
             {
-                myForceM().impForces()[index][j] += dragTot[j] - dragEx[j]; //only consider implicit part!
-                myForceM().expForces()[index][j] += dragEx[j];
+                particleCloud_.impForces()[index][j] += dragTot[j] - dragEx[j]; //only consider implicit part!
+                particleCloud_.expForces()[index][j] += dragEx[j];
             }
         }
     }
@@ -159,14 +159,14 @@ void forceSubModel::partToArray
     if(switches_[SW_IMPL_FORCE_DEM]) // implForceDEM
     {
         for(int j=0;j<3;j++)
-            myForceM().fluidVel()[index][j]=Ufluid[j];
+            particleCloud_.fluidVels()[index][j] = Ufluid[j];
 
-        myForceM().Cds()[index][0] = Cd;
+        particleCloud_.Cds()[index][0] = Cd;
     }
     else
     {
         for(int j=0;j<3;j++)
-            myForceM().DEMForces()[index][j] += dragTot[j];
+            particleCloud_.DEMForces()[index][j] += dragTot[j];
     }
 }
 

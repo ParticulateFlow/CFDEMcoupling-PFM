@@ -67,11 +67,11 @@ private:
 
     cfdemCloud& particleCloud_;
 
-    bool verbose_;
+    const bool verbose_;
 
-    bool verboseToFile_;
+    const bool verboseToFile_;
 
-    int writePrecision_;
+    const int writePrecision_;
 
     word dirName_;
 
@@ -79,13 +79,13 @@ private:
 
     mutable OFstream* sPtr;
 
-    int printEvery_;
+    const int printEvery_;
 
-    bool sampleAll_;
+    const bool sampleAll_;
 
-    bool probeDebug_;
+    const bool probeDebug_;
 
-    bool includePosition_;
+    const bool includePosition_;
 
     const labelList particleIDsToSample_;
 

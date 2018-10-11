@@ -64,24 +64,20 @@ KochHillRWDrag::KochHillRWDrag
 :
     forceModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
-    verbose_(false),
+    verbose_(propsDict_.found("verbose")),
     velFieldName_(propsDict_.lookup("velFieldName")),
     U_(sm.mesh().lookupObject<volVectorField> (velFieldName_)),
     voidfractionFieldName_(propsDict_.lookup("voidfractionFieldName")),
     voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
     UsFieldName_(propsDict_.lookupOrDefault("granVelFieldName",word("Us"))),
     UsField_(sm.mesh().lookupObject<volVectorField> (UsFieldName_)),
-    interpolation_(false),
+    interpolation_(propsDict_.found("interpolation")),
     scale_(1.),
-    randomTauE_(false),
+    randomTauE_(propsDict_.found("randomTauE")),
     partTime_(NULL),
     partUfluct_(NULL),
     RanGen_(label(0))
 {
-
-    if (propsDict_.found("verbose")) verbose_ = true;
-    if (propsDict_.found("interpolation")) interpolation_ = true;
-    if (propsDict_.found("randomTauE")) randomTauE_ = true;
 
     // init force sub model
     setForceSubModels(propsDict_);
@@ -200,12 +196,12 @@ void KochHillRWDrag::setForce() const
         //if (mask[index][0])
         //{
             cellI = particleCloud_.cellIDs()[index][0];
-            drag = vector(0,0,0);
-            dragExplicit = vector(0,0,0);
+            drag = vector::zero;
+            dragExplicit = vector::zero;
             dragCoefficient = 0;
             betaP = 0;
             Vs = 0;
-            Ufluid = vector(0,0,0);
+            Ufluid = vector::zero;
 
             // Pout << "RW-TEST: cellI = " << cellI << endl; // TEST-Output
             if (cellI > -1) // particle Found

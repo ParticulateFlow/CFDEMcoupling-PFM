@@ -93,11 +93,11 @@ public:
 
     // Member Functions
 
-    const char* command(int);
+        const char* command(int);
 
-    bool runCommand(int);
+        bool runCommand(int);
 
-    word name(){return "writeLiggghts";};
+        word name() const {return "writeLiggghts";}
 };
 
 

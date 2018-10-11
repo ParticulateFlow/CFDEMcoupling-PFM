@@ -60,7 +60,7 @@ class SchillerNaumannDrag
 private:
     dictionary propsDict_;
 
-    bool verbose_;
+    const bool verbose_;
 
     word velFieldName_;
 

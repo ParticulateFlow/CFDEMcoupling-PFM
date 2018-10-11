@@ -1,15 +1,16 @@
-"CFDEMproject WWW Site"_lws - "CFDEM Commands"_lc :c
+"CFDEMproject Website"_lws - "Main Page"_main :c
 
 :link(lws,http://www.cfdem.com)
-:link(lc,CFDEMcoupling_Manual.html#comm)
+:link(main,CFDEMcoupling_Manual.html)
 
 :line
 
-averagingModel_dilute command :h3
+averagingModel dilute command :h3
 
 [Syntax:]
 
-Defined in couplingProperties dictionary.
+Defined in "couplingProperties"_CFDEMcoupling_dicts.html#couplingProperties
+dictionary.
 
 averagingModel dilute; :pre
 
@@ -19,12 +20,18 @@ averagingModel dilute; :pre
 
 [Description:]
 
-The averaging model performs the Lagrangian->Eulerian mapping of data (e.g. particle velocities).
-In the "cfdemParticle cloud" this averaging model is used to calculate the average particle velocity inside a CFD cell. The "dilute" model is supposed to be applied to cases where the granular regime is rather dilute. The particle velocity inside a CFD cell is evaluated from a single particle in a cell (no averaging).
+The averaging model performs the Lagrangian->Eulerian mapping of data (e.g.
+particle velocities).
+In the "cfdemParticle cloud" this averaging model is used to calculate the
+average particle velocity inside a CFD cell. The {dilute} model is supposed to
+be applied to cases where the granular regime is rather dilute. The particle
+velocity inside a CFD cell is evaluated from a single particle in a cell (no
+averaging).
 
 [Restrictions:]
 
-This model is computationally efficient, but should only be used when only one particle is inside one CFD cell.
+This model is computationally efficient but should only be used when only one
+particle is inside one CFD cell.
 
 [Related commands:]
 
