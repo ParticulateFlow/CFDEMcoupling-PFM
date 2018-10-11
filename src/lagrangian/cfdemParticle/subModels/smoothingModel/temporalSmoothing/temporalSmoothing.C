@@ -54,7 +54,7 @@ temporalSmoothing::temporalSmoothing
     upperLimit_(readScalar(propsDict_.lookup("upperLimit"))),
     verbose_(false),
     refFieldName_(propsDict_.lookup("refField")),
-    gamma_(readScalar(propsDict_.lookup("smoothingStrength")))
+    gamma_(readScalar(propsDict_.lookup("gamma")))
 {
 
     if(propsDict_.found("verbose"))  
