@@ -304,8 +304,8 @@ gradPForceSmoothProps
     {
         lowerLimit 0.1;
         upperLimit 1e10;
-		referenceField "p_rgh";
-		alpha 0.01;
+		refField "p_rgh";
+		gamma 0.01;
 	}
 
 }
