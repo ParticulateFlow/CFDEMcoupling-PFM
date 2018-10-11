@@ -1,0 +1,75 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.3.0                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      topoSetDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// General m4 macros
+
+  
+
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// User-defined parameters
+
+
+
+
+
+ //degrees from x-axis
+
+
+
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+// Derived parameters
+
+
+
+actions
+(
+	{
+		name    c_out;
+		type    cellSet;
+		action  new;
+		source  boxToCell;
+		sourceInfo
+		{
+		   box (0.0899048221581858 -0.0056380612634664 0.04)(0.109904822158186 0.0143619387365336 0.06);
+		}
+ 	}
+
+ 	{
+		name    outlet;
+		type    faceSet;
+		action  new;
+		source  patchToFace;
+		sourceInfo
+		{
+		   name "wall";
+		}
+  	}
+
+ 	{
+		name    outlet;
+		type    faceSet;
+		action  subset;
+		source  cellToFace;
+		sourceInfo
+		{
+		   set c_out;
+		   option all;
+		}
+ 	}
+);
+// ************************************************************************* //
