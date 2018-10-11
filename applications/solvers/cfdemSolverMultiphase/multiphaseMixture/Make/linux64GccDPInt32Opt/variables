@@ -1,1 +1,0 @@
-LIB = $(CFDEM_LIB_DIR)/libcfdemMultiphaseInterFoam
