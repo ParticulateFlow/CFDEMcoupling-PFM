@@ -1,15 +1,16 @@
-"CFDEMproject WWW Site"_lws - "CFDEM Commands"_lc :c
+"CFDEMproject Website"_lws - "Main Page"_main :c
 
 :link(lws,http://www.cfdem.com)
-:link(lc,CFDEMcoupling_Manual.html#comm)
+:link(main,CFDEMcoupling_Manual.html)
 
 :line
 
-forceModel_gradPForceSmooth command :h3
+forceModel gradPForceSmooth command :h3
 
 [Syntax:]
 
-Defined in couplingProperties dictionary.
+Defined in "couplingProperties"_CFDEMcoupling_dicts.html#couplingProperties
+dictionary.
 
 forceModels
 (
@@ -17,15 +18,21 @@ forceModels
 );
 gradPForceSmoothProps
 \{
-    pFieldName "pressure";
-    velocityFieldName "U";
-    interpolation switch1;
-    smoothingModel "smoothingModel";
-\}; :pre
+    pFieldName         "pressure";
+    velocityFieldName  "U";
+    useAddedMass       scalar1;
+    treatForceExplicit switch1;
+    treatForceDEM      switch2;
+    interpolation      switch3;
+    smoothingModel     "smoothingModel";
+\} :pre
 
 {pressure} = name of the finite volume fluid pressure field :ulb,l
 {U} = name of the finite volume fluid velocity field :l
-{switch1} = flag to use interpolated pressure values (normally off) :l
+{scalar1} = (optional, default 0) coefficient of added mass accounted for :l
+{switch1} = (optional, default false) sub model switch, see "forceSubModel"_forceSubModel.html for details :l
+{switch2} = (optional, default false) sub model switch, see "forceSubModel"_forceSubModel.html for details :l
+{switch3} = (optional, default false) flag to use interpolated pressure values :l
 {smoothingModel} = name of smoothing model :l
 :ule
 
@@ -37,27 +44,26 @@ forceModels
 );
 gradPForceSmoothProps
 \{
-    pFieldName "p_rgh";
+    pFieldName        "p_rgh";
     velocityFieldName "U";
-    interpolation false;
-    smoothingModel "temporalSmoothing";
+    interpolation     false;
+    smoothingModel    "temporalSmoothing";
     temporalSmoothingProps
     \{
         lowerLimit 0.1;
         upperLimit 1e10;
-        refField "p_rgh";
-        smoothingStrength 1;
+        refField   "p_rgh";
+        gamma      1.0;
     \} :pre
 
 \} :pre
-
 [Description:]
 
-The gradPForceSmooth model calculates the particle based pressure gradient force identically as the gradPForce model but allows smoothing of the pressure prior to the force calculation (without altering the original pressure). Any smoothing model can be used and does not have to be the same as specified in couplingProperties. Properties for the smoothing model has to be specified in a sub-dictionary within gradPForceSmoothProps.
+The gradPForceSmooth model calculates the particle based pressure gradient force identically as the gradPForce model but allows smoothing of the pressure prior to the force calculation (without altering the original pressure field). Any smoothing model can be used and does not have to be the same as specified in couplingProperties. Properties for the smoothing model has to be specified in a sub-dictionary within gradPForceSmoothProps.
 
 [Restrictions:]
 
-A volScalarField "pSmooth" MUST be specified in the initial time directory with appropriate boundary conditions!
+A volScalarField "pSmooth" MUST be specified in the initial time directory!
 
 [Related commands:]
 
