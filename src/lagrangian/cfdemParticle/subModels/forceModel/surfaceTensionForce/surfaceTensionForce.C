@@ -62,7 +62,8 @@ surfaceTensionForce::surfaceTensionForce
 :
     forceModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
-    stf_(sm.mesh().lookupObject<surfaceScalarField> ("surfaceTensionForce"))
+    stfFieldName_(propsDict_.lookupOrDefault<word>("stfFieldName", "surfaceTensionForce")),
+    stf_(sm.mesh().lookupObject<surfaceScalarField> (stfFieldName_))
 {
 
 

@@ -59,6 +59,7 @@ class surfaceTensionForce
 private:
     dictionary propsDict_;
 
+    word stfFieldName_;
     
     const surfaceScalarField& stf_;
 
