@@ -418,11 +418,11 @@ void heatTransferGunn::addEnergyContribution(volScalarField& Qsource) const
     Qsource += QPartFluid_;
 }
 
-void heatTransferGunn::addEnergyCoefficient(volScalarField& Qsource) const
+void heatTransferGunn::addEnergyCoefficient(volScalarField& Qcoeff) const
 {
     if(implicit_)
     {
-        Qsource += QPartFluidCoeff_;
+        Qcoeff += QPartFluidCoeff_;
     }
 }
 
