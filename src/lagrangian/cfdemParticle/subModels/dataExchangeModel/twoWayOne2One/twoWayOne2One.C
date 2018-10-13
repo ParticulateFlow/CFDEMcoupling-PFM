@@ -744,7 +744,8 @@ void twoWayOne2One::locateParticles() const
     }
     lig2foam_mask_ = new bool[lig2foam_->ncollected_];
 
-    labelList cellIds(0);
+    DynamicList<label> cellIds;
+    cellIds.setCapacity(lig2foam_->ncollected_);
     label n_located(0);
     label roundedCelli(-1);
     const label nCells(particleCloud_.mesh().cells().size());
