@@ -1,9 +1,8 @@
 #!/bin/bash
 
 #===================================================================#
-# allrun script for testcase as part of test routine 
-# run settlingTest
-# Christoph Goniva - Sept. 2010
+# allrun script for testcase as part of test routine
+# run tankDrainage
 #===================================================================#
 
 #- define variables
@@ -34,7 +33,7 @@ fi
 bash $casePath/parCFDDEMrun.sh
 
 if [ "$postProcessing" = true ]; then
-	cd $casePath 
-    bash $casePath/postRun.sh
-	octave $casePath/volFlow.m
+    cd $casePath
+    bash $casePath/postrun.sh
+    octave $casePath/volFlow.m
 fi

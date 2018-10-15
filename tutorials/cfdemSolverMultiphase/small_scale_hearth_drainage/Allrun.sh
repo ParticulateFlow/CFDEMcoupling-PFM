@@ -25,4 +25,4 @@ cp -r ./CFD/1.org ./CFD/1
 
 # generate files for post processing
 cd $casePath
-./postRun.sh
+./postrun.sh

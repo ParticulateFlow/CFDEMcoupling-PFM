@@ -12,4 +12,4 @@ cd $casePath/CFD
 reconstructPar -noLagrangian
 foamToVTK
 
-#rm -r $casePath/CFD/processor*     
+#rm -r $casePath/CFD/processor*

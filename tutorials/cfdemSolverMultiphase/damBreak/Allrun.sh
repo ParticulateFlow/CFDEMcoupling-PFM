@@ -31,5 +31,5 @@ fi
 bash $casePath/parCFDDEMrun.sh
 
 if [ "$postProcessing" = true ]; then
-    source $casePath/postRun.sh 
+    bash $casePath/postrun.sh
 fi
