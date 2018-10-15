@@ -94,11 +94,13 @@ Fines,
 "fieldStore"_forceModel_fieldStore.html,
 "fieldTimeAverage"_forceModel_fieldTimeAverage.html,
 "gradPForce"_forceModel_gradPForce.html,
+"gradPForceSmooth"_forceModel_gradPForceSmooth.html,
 granKineticEnergy,
 "interface"_forceModel_interface.html,
 "noDrag"_forceModel_noDrag.html,
 "particleCellVolume"_forceModel_particleCellVolume.html,
 "pdCorrelation"_forceModel_pdCorrelation.html,
+"surfaceTensionForce"_forceModel_surfaceTensionForce.html,
 "virtualMassForce"_forceModel_virtualMassForce.html,
 "viscForce"_forceModel_viscForce.html,
 "volWeightedAverage"_forceModel_volWeightedAverage.html :tb(c=2,ea=c)
@@ -188,7 +190,8 @@ The "smoothingModel"_smoothingModel.html keyword entry specifies the model for
 smoothing the exchange fields.
 
 "constDiffSmoothing"_smoothingModel_constDiffSmoothing.html,
-"off"_smoothingModel_noSmoothing.html :tb(c=2,ea=c)
+"off"_smoothingModel_noSmoothing.html,
+"temporalSmoothing"_smoothingModel_temporalSmoothing.html :tb(c=2,ea=c)
 
 
 6.16 Thermal conductivity models :h4

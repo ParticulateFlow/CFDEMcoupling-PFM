@@ -38,11 +38,23 @@ temporalSmoothingProps
 
 [Description:]
 
-The "temporalSmoothing" model is a smoothing model that utilizes temporal relaxation of a desired quantity. This model can be used to filter out high-frequency fluctuations (e.g. numerical noise) controlled via the control parameter gamma. Note that this model does NOT smooth the calculated fields, instead smoothing is performed on a separate (smooth) field which uses the calculated (un-smooth) field as a reference. Thus its usage is limited and CANNOT be used to smooth the exchange fields similar to the other smoothing models. For further information see Vångö et al., "Unresolved CFD–DEM modeling of multiphase flow in densely packed particle beds", Appl. Math. Model. (2018).
+The {temporalSmoothing} model is a smoothing model that utilizes temporal
+relaxation of a desired quantity. This model can be used to filter out
+high-frequency fluctuations (e.g. numerical noise) controlled via the control
+parameter gamma.
+Note that this model does NOT smooth the calculated fields, instead smoothing is
+performed on a separate (smooth) field which uses the calculated (un-smooth)
+field as a reference.
+Thus its usage is limited and CANNOT be used to smooth the exchange fields
+similar to other smoothing models.
+For further information see Vångö et al., "Unresolved CFD–DEM modeling of
+multiphase flow in densely packed particle beds", Appl. Math. Model. (2018).
 
 [Restrictions:]
 
-This model does NOT smooth the calculated fields and can therefore NOT be used as a general smoothing model to smoothen the exhchange fields. Attempting this will generate an error.
+This model does NOT smooth the calculated fields and can therefore NOT be used
+as a general smoothing model to smoothen the exchange fields.
+Attempting this will generate an error.
 
 [Related commands:]
 

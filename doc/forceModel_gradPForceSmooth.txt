@@ -59,7 +59,13 @@ gradPForceSmoothProps
 \} :pre
 [Description:]
 
-The gradPForceSmooth model calculates the particle based pressure gradient force identically as the gradPForce model but allows smoothing of the pressure prior to the force calculation (without altering the original pressure field). Any smoothing model can be used and does not have to be the same as specified in couplingProperties. Properties for the smoothing model has to be specified in a sub-dictionary within gradPForceSmoothProps.
+The {gradPForceSmooth} model calculates the particle based pressure gradient
+force identically to the "gradPForce"_forceModel_gradPForce.html model but
+allows smoothing of the pressure prior to the force calculation (without
+altering the original pressure field).
+Any smoothing model can be used and does not have to be the same as specified in
+couplingProperties. Properties for the smoothing model have to be specified in a
+sub-dictionary within {gradPForceSmoothProps}.
 
 [Restrictions:]
 
@@ -67,5 +73,5 @@ A volScalarField "pSmooth" MUST be specified in the initial time directory!
 
 [Related commands:]
 
-"forceModel"_forceModel.html
+"forceModel"_forceModel.html, "gradPForce"_forceModel_gradPForce.html
 
