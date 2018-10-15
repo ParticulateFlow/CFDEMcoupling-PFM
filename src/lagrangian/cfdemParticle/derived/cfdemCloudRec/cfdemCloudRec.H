@@ -61,7 +61,9 @@ protected:
     void setParticleForceField();
     
     void setVectorAverages();
-    
+
+    bool coupleRecFluc_;
+
     bool coupleRecForce_;
     
 public:

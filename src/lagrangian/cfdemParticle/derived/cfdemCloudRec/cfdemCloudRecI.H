@@ -39,8 +39,19 @@ cfdemCloudRec<baseCloud>::cfdemCloudRec
 )
 :
     baseCloud(mesh),
+    coupleRecFluc_(true),
     coupleRecForce_(true)
-{}
+{
+    if (baseCloud::couplingProperties().found("coupleRecFluc"))
+    {
+        coupleRecFluc_ = readBool(baseCloud::couplingProperties().lookup("coupleRecFluc"));
+    }
+
+    if (baseCloud::couplingProperties().found("coupleRecForce"))
+    {
+        coupleRecForce_ = readBool(baseCloud::couplingProperties().lookup("coupleRecForce"));
+    }
+}
 
 // * * * * * * * * * * * * * * * * Destructors  * * * * * * * * * * * * * * //
 template <class baseCloud>
@@ -51,11 +62,15 @@ cfdemCloudRec<baseCloud>::~cfdemCloudRec()
 template <class baseCloud>
 void cfdemCloudRec<baseCloud>::giveDEMdata()
 {
-    // ab use fluidVel_ as difference between recurrence velocity and mean particle velocity
     baseCloud::dataExchangeM().giveData("vrec","vector-atom",baseCloud::particleConvVel_);
-    baseCloud::dataExchangeM().giveData("vfluc","vector-atom",baseCloud::particleFlucVel_);
+    if(coupleRecFluc_)
+    {
+        baseCloud::dataExchangeM().giveData("vfluc","vector-atom",baseCloud::particleFlucVel_);
+    }
     if(coupleRecForce_)
+    {
         baseCloud::dataExchangeM().giveData("dragforce","vector-atom",baseCloud::DEMForces_);
+    }
     if(baseCloud::verbose_) Info << "giveDEMdata done." << endl;
 }
 
@@ -64,7 +79,6 @@ void cfdemCloudRec<baseCloud>::setForces()
 {
     baseCloud::resetArray(baseCloud::particleConvVel_,baseCloud::numberOfParticles(),3);
     baseCloud::resetArray(baseCloud::particleFlucVel_,baseCloud::numberOfParticles(),3);
-//    baseCloud::resetArray(baseCloud::fluidVel_,baseCloud::numberOfParticles(),3);
     baseCloud::resetArray(baseCloud::DEMForces_,baseCloud::numberOfParticles(),3);
     for (int i=0;i<baseCloud::nrForceModels();i++) baseCloud::forceM(i).setForce();
 }
