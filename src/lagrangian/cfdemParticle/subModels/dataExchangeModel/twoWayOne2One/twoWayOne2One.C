@@ -646,6 +646,7 @@ bool twoWayOne2One::couple(int i) const
         particleCloud_.clockM().stop("LIGGGHTS");
         Info<< "LIGGGHTS finished" << endl;
 
+        particleCloud_.clockM().start(4,"One2One_setup");
         if (!staticProcMap_)
         {
             createProcMap();
@@ -656,6 +657,7 @@ bool twoWayOne2One::couple(int i) const
         locateParticles();
 
         setupFoam2LigCommunication();
+        particleCloud_.clockM().stop("One2One_setup");
 
         if (verbose_)
         {
