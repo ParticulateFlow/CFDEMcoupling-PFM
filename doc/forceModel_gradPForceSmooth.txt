@@ -1,0 +1,77 @@
+"CFDEMproject Website"_lws - "Main Page"_main :c
+
+:link(lws,http://www.cfdem.com)
+:link(main,CFDEMcoupling_Manual.html)
+
+:line
+
+forceModel gradPForceSmooth command :h3
+
+[Syntax:]
+
+Defined in "couplingProperties"_CFDEMcoupling_dicts.html#couplingProperties
+dictionary.
+
+forceModels
+(
+    gradPForceSmooth;
+);
+gradPForceSmoothProps
+\{
+    pFieldName         "pressure";
+    velocityFieldName  "U";
+    useAddedMass       scalar1;
+    treatForceExplicit switch1;
+    treatForceDEM      switch2;
+    interpolation      switch3;
+    smoothingModel     "smoothingModel";
+\} :pre
+
+{pressure} = name of the finite volume fluid pressure field :ulb,l
+{U} = name of the finite volume fluid velocity field :l
+{scalar1} = (optional, default 0) coefficient of added mass accounted for :l
+{switch1} = (optional, default false) sub model switch, see "forceSubModel"_forceSubModel.html for details :l
+{switch2} = (optional, default false) sub model switch, see "forceSubModel"_forceSubModel.html for details :l
+{switch3} = (optional, default false) flag to use interpolated pressure values :l
+{smoothingModel} = name of smoothing model :l
+:ule
+
+[Examples:]
+
+forceModels
+(
+    gradPForceSmooth;
+);
+gradPForceSmoothProps
+\{
+    pFieldName        "p_rgh";
+    velocityFieldName "U";
+    interpolation     false;
+    smoothingModel    "temporalSmoothing";
+    temporalSmoothingProps
+    \{
+        lowerLimit 0.1;
+        upperLimit 1e10;
+        refField   "p_rgh";
+        gamma      1.0;
+    \} :pre
+
+\} :pre
+[Description:]
+
+The {gradPForceSmooth} model calculates the particle based pressure gradient
+force identically to the "gradPForce"_forceModel_gradPForce.html model but
+allows smoothing of the pressure prior to the force calculation (without
+altering the original pressure field).
+Any smoothing model can be used and does not have to be the same as specified in
+couplingProperties. Properties for the smoothing model have to be specified in a
+sub-dictionary within {gradPForceSmoothProps}.
+
+[Restrictions:]
+
+A volScalarField "pSmooth" MUST be specified in the initial time directory!
+
+[Related commands:]
+
+"forceModel"_forceModel.html, "gradPForce"_forceModel_gradPForce.html
+
