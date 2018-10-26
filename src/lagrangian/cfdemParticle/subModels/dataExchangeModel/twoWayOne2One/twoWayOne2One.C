@@ -838,7 +838,7 @@ void twoWayOne2One::locateParticles() const
         3
     );
     setPositions(getNumberOfParticles(), extracted_flattened_positions);
-    destroy(extracted_flattened_positions);
+    delete [] extracted_flattened_positions;
     destroy(collected_flattened_positions);
 
     setCellIDs(cellIds);
