@@ -83,6 +83,7 @@ twoWayOne2One::twoWayOne2One
     staticProcMap_(propsDict_.lookupOrDefault<Switch>("useStaticProcMap", false)),
     cellIdComm_(propsDict_.lookupOrDefault<Switch>("useCellIdComm", false)),
     my_prev_cell_ids_fix_(nullptr),
+    boundBoxScalingFactor_(propsDict_.lookupOrDefault("boundingBoxScalingFactor", 1.)),
     verbose_(propsDict_.lookupOrDefault("verbose", false)),
     lmp(nullptr)
 {
@@ -120,6 +121,20 @@ twoWayOne2One::twoWayOne2One
         tmpBoundaryFaces.localPoints()
     );
     thisFoamBox_ = treeBoundBox(boundaryFaces.localPoints());
+    if (boundBoxScalingFactor_ > 1.)
+    {
+        thisFoamBox_.inflate(boundBoxScalingFactor_);
+        Info<< "twoWayOne2One: Inflating bounding boxes by "
+            << boundBoxScalingFactor_ << "."
+            << endl;
+    }
+    else if (boundBoxScalingFactor_ < 1.)
+    {
+        FatalError
+        << "twoWayOne2One: Bound box scaling factor cannot be smaller than 0."
+        << abort(FatalError);
+    }
+
     if (staticProcMap_)
     {
         createProcMap();
@@ -158,6 +173,10 @@ void twoWayOne2One::createProcMap() const
         point(ligbb[0][0], ligbb[0][1], ligbb[0][2]),
         point(ligbb[1][0], ligbb[1][1], ligbb[1][2])
     );
+    if (boundBoxScalingFactor_ > 1.)
+    {
+        thisLigBox.inflate(boundBoxScalingFactor_);
+    }
     ligBoxes[Pstream::myProcNo()] = thisLigBox;
     Pstream::gatherList(ligBoxes);
     Pstream::scatterList(ligBoxes);
@@ -819,7 +838,7 @@ void twoWayOne2One::locateParticles() const
         3
     );
     setPositions(getNumberOfParticles(), extracted_flattened_positions);
-    destroy(extracted_flattened_positions);
+    delete [] extracted_flattened_positions;
     destroy(collected_flattened_positions);
 
     setCellIDs(cellIds);

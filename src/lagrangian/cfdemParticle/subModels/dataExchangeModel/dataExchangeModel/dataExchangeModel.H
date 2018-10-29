@@ -257,7 +257,8 @@ public:
             for (int i=0;i<n;i++)
                 particleCloud_.cellIDs_[i][0]=ID[i];
         }
-        inline void setCellIDs(labelList ids) const
+
+        inline void setCellIDs(DynamicList<label> const& ids) const
         {
             for (int i = 0; i < ids.size(); i++)
             {

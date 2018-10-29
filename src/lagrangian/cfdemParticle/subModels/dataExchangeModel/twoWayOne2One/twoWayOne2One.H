@@ -117,7 +117,9 @@ private:
     mutable Switch    cellIdComm_;
     mutable LAMMPS_NS::FixPropertyAtom* my_prev_cell_ids_fix_;
 
-    treeBoundBox       thisFoamBox_;
+    const scalar      boundBoxScalingFactor_;
+
+    treeBoundBox      thisFoamBox_;
 
     Switch            verbose_;
 
