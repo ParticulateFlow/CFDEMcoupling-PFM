@@ -85,7 +85,7 @@ twoWayOne2One::twoWayOne2One
     prev_cell_ids_(nullptr),
     dbl_cell_ids_(nullptr),
     my_prev_cell_ids_fix_(nullptr),
-    boundBoxScalingFactor_(propsDict_.lookupOrDefault("boundingBoxScalingFactor", 1.)),
+    boundBoxMargin_(propsDict_.lookupOrDefault("boundingBoxMargin", 0.)),
     verbose_(propsDict_.lookupOrDefault("verbose", false)),
     lmp(nullptr)
 {
@@ -123,17 +123,19 @@ twoWayOne2One::twoWayOne2One
         tmpBoundaryFaces.localPoints()
     );
     thisFoamBox_ = treeBoundBox(boundaryFaces.localPoints());
-    if (boundBoxScalingFactor_ > 1.)
+    if (boundBoxMargin_ > 0.)
     {
-        thisFoamBox_.inflate(boundBoxScalingFactor_);
+        thisFoamBox_.max() = thisFoamBox_.max() + boundBoxMargin_ * vector::one;
+        thisFoamBox_.min() = thisFoamBox_.min() - boundBoxMargin_ * vector::one;
+
         Info<< "twoWayOne2One: Inflating bounding boxes by "
-            << boundBoxScalingFactor_ << "."
+            << boundBoxMargin_ << "."
             << endl;
     }
-    else if (boundBoxScalingFactor_ < 1.)
+    else if (boundBoxMargin_ < 0.)
     {
         FatalError
-        << "twoWayOne2One: Bound box scaling factor cannot be smaller than 0."
+        << "twoWayOne2One: Bound box margin cannot be smaller than 0."
         << abort(FatalError);
     }
 
@@ -175,9 +177,10 @@ void twoWayOne2One::createProcMap() const
         point(ligbb[0][0], ligbb[0][1], ligbb[0][2]),
         point(ligbb[1][0], ligbb[1][1], ligbb[1][2])
     );
-    if (boundBoxScalingFactor_ > 1.)
+    if (boundBoxMargin_ > 0.)
     {
-        thisLigBox.inflate(boundBoxScalingFactor_);
+        thisLigBox.max() = thisLigBox.max() + boundBoxMargin_ * vector::one;
+        thisLigBox.min() = thisLigBox.min() - boundBoxMargin_ * vector::one;
     }
     ligBoxes[Pstream::myProcNo()] = thisLigBox;
     Pstream::gatherList(ligBoxes);
