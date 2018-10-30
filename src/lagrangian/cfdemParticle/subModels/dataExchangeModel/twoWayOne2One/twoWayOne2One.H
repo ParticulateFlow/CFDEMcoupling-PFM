@@ -115,6 +115,8 @@ private:
 
     mutable Switch    staticProcMap_;
     mutable Switch    cellIdComm_;
+    mutable double*   prev_cell_ids_;
+    mutable double**  dbl_cell_ids_;
     mutable LAMMPS_NS::FixPropertyAtom* my_prev_cell_ids_fix_;
 
     const scalar      boundBoxScalingFactor_;

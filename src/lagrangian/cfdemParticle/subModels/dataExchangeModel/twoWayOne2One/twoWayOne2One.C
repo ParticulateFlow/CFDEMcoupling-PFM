@@ -82,6 +82,8 @@ twoWayOne2One::twoWayOne2One
     foam2lig_scl_tmp_(nullptr),
     staticProcMap_(propsDict_.lookupOrDefault<Switch>("useStaticProcMap", false)),
     cellIdComm_(propsDict_.lookupOrDefault<Switch>("useCellIdComm", false)),
+    prev_cell_ids_(nullptr),
+    dbl_cell_ids_(nullptr),
     my_prev_cell_ids_fix_(nullptr),
     boundBoxScalingFactor_(propsDict_.lookupOrDefault("boundingBoxScalingFactor", 1.)),
     verbose_(propsDict_.lookupOrDefault("verbose", false)),
@@ -227,6 +229,9 @@ twoWayOne2One::~twoWayOne2One()
     destroy(lig2foam_scl_tmp_);
     destroy(foam2lig_vec_tmp_);
     destroy(foam2lig_scl_tmp_);
+
+    destroy(prev_cell_ids_);
+    destroy(dbl_cell_ids_);
 
     delete lmp;
 }
@@ -751,12 +756,11 @@ void twoWayOne2One::locateParticles() const
     destroy(my_flattened_positions);
 
     double* my_prev_cell_ids = nullptr;
-    double* prev_cell_ids = nullptr;
     if (cellIdComm_)
     {
         my_prev_cell_ids = my_prev_cell_ids_fix_->vector_atom;
-        allocateArray(prev_cell_ids, -1, lig2foam_->ncollected_);
-        lig2foam_->exchange(my_prev_cell_ids, prev_cell_ids);
+        allocateArray(prev_cell_ids_, -1, lig2foam_->ncollected_);
+        lig2foam_->exchange(my_prev_cell_ids, prev_cell_ids_);
     }
 
     if (lig2foam_mask_)
@@ -788,7 +792,7 @@ void twoWayOne2One::locateParticles() const
             position,
             cellIdComm_
             ?   // don't know whether using round is efficient
-                (roundedCelli = round(prev_cell_ids[atomi])) < nCells
+                (roundedCelli = round(prev_cell_ids_[atomi])) < nCells
                 ?
                 roundedCelli
                 :
@@ -804,10 +808,6 @@ void twoWayOne2One::locateParticles() const
             n_located++;
             cellIds.append(cellI);
         }
-    }
-    if (cellIdComm_)
-    {
-        destroy(prev_cell_ids);
     }
 
     setNumberOfParticles(n_located);
@@ -892,14 +892,12 @@ void twoWayOne2One::setupFoam2LigCommunication() const
 
     if (cellIdComm_)
     {
-        double** dbl_cell_ids = new double*[getNumberOfParticles()];
+        allocateArray(dbl_cell_ids_, -1, 1);
         for (int atomi = 0; atomi < getNumberOfParticles(); atomi++)
-        {   // TEMPORARY: if this persists after 19.07.2018, call me.
-            dbl_cell_ids[atomi] = new double[1];
-            dbl_cell_ids[atomi][0] = particleCloud_.cellIDs()[atomi][0];
+        {
+            dbl_cell_ids_[atomi][0] = particleCloud_.cellIDs()[atomi][0];
         }
-        giveData("prev_cell_ids", "scalar-atom", dbl_cell_ids, "double");
-        delete [] dbl_cell_ids;
+        giveData("prev_cell_ids", "scalar-atom", dbl_cell_ids_, "double");
     }
 }
 
