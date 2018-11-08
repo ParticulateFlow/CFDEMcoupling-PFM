@@ -61,7 +61,7 @@ int main(int argc, char *argv[])
     #include "createRDeltaT.H"
 
     #include "createFields.H"
-    #include "createFieldRefs.H"
+    //#include "createFieldRefs.H"
     #include "createFvOptions.H"
     #include "initContinuityErrs.H"
 

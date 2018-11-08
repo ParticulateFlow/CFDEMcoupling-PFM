@@ -8,13 +8,13 @@
     );
 
     rhoReactionThermo& thermo = combustion->thermo();
-
     thermo.validate(args.executable(), "h", "e");
 
     basicSpecieMixture& composition = thermo.composition();
     PtrList<volScalarField>& Y = composition.Y();
 
     // read molecular weight
+    //const volScalarField& W = composition.W();
     volScalarField W(composition.W());
 
     bool propagateInertSpecie = true;
@@ -34,6 +34,8 @@
     }
 
     volScalarField& p = thermo.p();
+    const volScalarField& T = thermo.T();
+    const volScalarField& psi = thermo.psi();
 
     multivariateSurfaceInterpolationScheme<scalar>::fieldTable fields;
 
@@ -57,9 +59,6 @@
     );
 
     //  kinematic fields
-
-
-
     Info<< "Reading field U\n" << endl;
     volVectorField U
     (
@@ -88,18 +87,8 @@
         mesh
     );
 
-    volScalarField rhoeps
-    (
-        IOobject
-        (
-            "rhoeps",
-            runTime.timeName(),
-            mesh,
-            IOobject::MUST_READ,
-            IOobject::AUTO_WRITE
-        ),
-        rho*voidfraction
-    );
+    volScalarField rhoeps ("rhoeps", rho*voidfraction);
+
 
     Info<< "\nCreating fluid-particle heat flux field\n" << endl;
     volScalarField Qsource
@@ -283,8 +272,3 @@
         dimensionedScalar("zero",dimensionSet(0, -3, 0, 0, 1),0)
     );
 //===============================
-
-
-
- //   singlePhaseTransportModel laminarTransport(U, phi);
-
