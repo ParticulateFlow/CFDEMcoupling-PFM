@@ -411,6 +411,13 @@ void heatTransferGunn::calcEnergyContribution()
     }
 
     QPartFluid_.correctBoundaryConditions();
+
+    volScalarField minParticleWeights = particleCloud_.averagingM().UsWeightField();
+    Info << "Minimum Particle Weight " << gMin(minParticleWeights) << endl;
+    Info << "Minimum Particle Temperature: " << gMin(partTempField_) << endl;
+    Info << "Maximum Particle Temperature: " << gMax(partTempField_) << endl;
+    Info << "Minimum Fluid Temperature: " << gMin(tempField_) << endl;
+    Info << "Maximum Fluid Temperature: " << gMax(tempField_) << endl;
 }
 
 void heatTransferGunn::addEnergyContribution(volScalarField& Qsource) const
@@ -437,6 +444,9 @@ scalar heatTransferGunn::Nusselt(scalar voidfraction, scalar Rep, scalar Pr) con
 void heatTransferGunn::heatFlux(label index, scalar h, scalar As, scalar Tfluid)
 {
     scalar hAs = h * As;
+    //Info << "partTemp from HTGunn.C = " << partTemp_[100][0] << endl;
+    //Info << "partTemp = " << partTemp_[index][0] << endl;
+    //Info << "Tfluid =  " << Tfluid << endl;
     partHeatFlux_[index][0] = - hAs * partTemp_[index][0];
     if(!implicit_)
     {
