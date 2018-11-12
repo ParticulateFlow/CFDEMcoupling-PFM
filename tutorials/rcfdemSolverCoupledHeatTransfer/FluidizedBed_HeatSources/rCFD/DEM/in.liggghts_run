@@ -92,6 +92,7 @@ fix walls all wall/reflect xlo EDGE xhi EDGE ylo EDGE yhi EDGE zlo EDGE zhi EDGE
 
 
 #cfd coupling
+fix 		cellids all property/atom prev_cell_ids scalar yes yes no -1
 fix		cfd all couple/cfd couple_every 1 one2one
 fix		cfd2 all couple/cfd/recurrence transfer_force yes transfer_fluctuations yes
 
