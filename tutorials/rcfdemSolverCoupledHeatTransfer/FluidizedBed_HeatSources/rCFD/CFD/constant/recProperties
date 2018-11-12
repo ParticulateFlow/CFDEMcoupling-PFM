@@ -1,0 +1,92 @@
+/*---------------------------------------------------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.4                                   |
+|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+
+    root            "";
+    case            "";
+    instance        "";
+    local           "";
+
+    class           dictionary;
+    object          recProperties;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+//===========================================================================//
+// sub-models & settings
+
+
+recModel standardRecModel;
+
+recNorm EuclideanNorm;
+
+//recPath predefinedPath;
+recPath MarkovPath;
+
+volScalarFields
+(
+    voidfraction
+//    rho
+    p
+    NuField
+);
+
+volVectorFields
+(
+ //   U
+    Us
+);
+
+surfaceScalarFields
+(
+    phi
+);
+
+//verbose true;
+
+couplingSubStep 3;
+
+initialRecSteps 150;
+
+
+//===========================================================================//
+// sub-model properties
+
+standardRecModelProps
+{
+    dataBases (dataBase1 dataBase2);
+    storeAveragedFields true;
+}
+
+EuclideanNormProps
+{
+    fieldType "volScalarField";
+    fieldName "voidfraction";
+}
+
+MarkovPathProps
+{
+    correlationSteps 50;
+    meanIntervalSteps 200;
+    minIntervalSteps 75;
+    intervalWeights (1.0 0.0);
+}
+
+predefinedPathProps
+{
+    recPathName "predefRecurrencePath";
+}
+
+
+// ************************************************************************* //

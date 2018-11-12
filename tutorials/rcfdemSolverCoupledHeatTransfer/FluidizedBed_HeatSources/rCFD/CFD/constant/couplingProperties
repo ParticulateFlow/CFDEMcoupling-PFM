@@ -1,0 +1,177 @@
+/*---------------------------------------------------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.4                                   |
+|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+
+    root            "";
+    case            "";
+    instance        "";
+    local           "";
+
+    class           dictionary;
+    object          couplingProperties;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+//===========================================================================//
+// sub-models & settings
+
+modelType "A"; // A or B
+
+couplingInterval 1;
+
+voidFractionModel centre;
+
+locateModel turboEngine;
+
+meshMotionModel noMeshMotion;
+
+regionModel allRegion;
+
+IOModel "off";
+
+dataExchangeModel twoWayOne2One;
+
+averagingModel dense;
+
+clockModel standardClock;
+
+smoothingModel off;
+
+probeModel off;
+
+forceModels
+(
+    freeStreaming
+    isotropicFluctuations   
+    evaluateFluctuations  
+    directedDiffusiveRelaxation
+);
+
+energyModels
+(
+    heatTransferGunn
+);
+
+// in current branch, only one chem model can be chosen
+/*
+chemistryModels
+(
+    off
+);
+*/
+chemistryModel off;
+
+thermCondModel SyamlalThermCond;
+
+momCoupleModels
+(
+    deactivateCouple
+);
+
+// recU needs to know density field name
+densityFieldName "rhoRec";
+
+turbulenceModelType "turbulenceProperties";
+
+
+//===========================================================================//
+// sub-model properties
+
+freeStreamingProps
+{
+    critVoidfraction 0.98;
+    // density can be chosen arbitrarily
+    particleDensity 667;
+    ballisticVelLimit 1.0;
+}
+
+
+isotropicFluctuationsProps
+{
+    critVoidfraction 0.98;
+    D0 1e-4;
+    measureDiff true;
+}
+
+evaluateFluctuationsProps
+{
+    critVoidfraction 0.98;
+    activeCellsName "bottomRegion";
+}
+
+directedDiffusiveRelaxationProps
+{
+    D0 1.0;
+    measureDiff false;
+    maxDisplacement 0.0025;
+    relaxForT 0.05;
+    ignoreCellsName "bottomRegion";
+}
+
+
+heatTransferGunnProps
+{
+    partTempName "Temp";
+    partHeatFluxName "convectiveHeatFlux";
+    calcPartTempField true;
+    partRefTemp 380;
+    tempFieldName "T";
+    voidfractionFieldName "voidfractionRec";
+// with explicit Nu, no velocity field is necessary but solver still tries to look one up - use existing solid velocity field
+    velFieldName "UsRec";
+    densityFieldName "rhoRec";
+    maxSource 1e10;
+    expNusselt true;
+}
+
+
+
+SyamlalThermCondProps
+{
+    rhoFieldName "rhoRec";
+    voidfractionFieldName "voidfractionRec";
+}
+
+
+centreProps
+{
+    alphaMin -10.0;
+}
+
+
+turboEngineProps
+{
+    treeSearch true;
+}
+
+
+engineSearchMany2ManyProps
+{
+    treeSearch true;
+    engineProps
+    {
+        treeSearch true;
+    }
+}
+
+twoWayOne2OneProps
+{
+    useCellIdComm true;
+    useStaticProcMap true;
+    liggghtsPath "../DEM/in.liggghts_run";
+    boundingBoxScalingFactor 1.00001;
+}
+
+
+// ************************************************************************* //
