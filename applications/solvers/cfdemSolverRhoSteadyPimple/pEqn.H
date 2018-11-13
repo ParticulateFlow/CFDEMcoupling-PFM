@@ -14,7 +14,7 @@ volVectorField HbyA(constrainHbyA(rAU*UEqn.H(), U, p));
 surfaceScalarField phiUs("phiUs", fvc::interpolate(rhoeps*rAU*Ksl*Us)& mesh.Sf());
 
 
-if (simple.transonic())
+if (pimple.transonic())
 {
 //  transonic version not implemented yet
 }
@@ -34,7 +34,7 @@ else
     // Update the pressure BCs to ensure flux consistency
     constrainPressure(p, rhoeps, U, phi, rhorAUf);
 
-    while (simple.correctNonOrthogonal())
+    while (pimple.correctNonOrthogonal())
     {
         // Pressure corrector
         fvScalarMatrix pEqn
@@ -49,7 +49,7 @@ else
 
         pEqn.solve();
 
-        if (simple.finalNonOrthogonalIter())
+        if (pimple.finalNonOrthogonalIter())
         {
             phi += pEqn.flux();
         }

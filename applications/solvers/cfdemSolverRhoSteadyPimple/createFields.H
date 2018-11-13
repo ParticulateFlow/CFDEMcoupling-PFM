@@ -158,7 +158,7 @@ Info<< "Reading thermophysical properties\n" << endl;
         dimensionedScalar::lookupOrDefault
         (
             "rhoMax",
-            simple.dict(),
+            pimple.dict(),
             dimDensity,
             GREAT
         )
@@ -169,7 +169,7 @@ Info<< "Reading thermophysical properties\n" << endl;
         dimensionedScalar::lookupOrDefault
         (
             "rhoMin",
-            simple.dict(),
+            pimple.dict(),
             dimDensity,
             0
         )
@@ -189,7 +189,7 @@ Info<< "Reading thermophysical properties\n" << endl;
 
     label pRefCell = 0;
     scalar pRefValue = 0.0;
-    setRefCell(p, simple.dict(), pRefCell, pRefValue);
+    setRefCell(p, pimple.dict(), pRefCell, pRefValue);
 
     mesh.setFluxRequired(p.name());
 

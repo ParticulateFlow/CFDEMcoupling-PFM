@@ -31,10 +31,11 @@ Description
 #include "psiThermo.H"
 #include "turbulentFluidThermoModel.H"
 #include "bound.H"
-#include "simpleControl.H"
+#include "pimpleControl.H"
 #include "fvOptions.H"
 #include "localEulerDdtScheme.H"
 #include "fvcSmooth.H"
+
 
 #include "cfdemCloudEnergy.H"
 #include "implicitCouple.H"
@@ -68,13 +69,21 @@ int main(int argc, char *argv[])
     #include "checkModelType.H"
 
     turbulence->validate();
+  //        #include "compressibleCourantNo.H"
+  //  #include "setInitialDeltaT.H"
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
     Info<< "\nStarting time loop\n" << endl;
 
-    while (simple.loop())
+    while (runTime.run())
     {
+        #include "readTimeControls.H"
+        #include "compressibleCourantNo.H"
+        #include "setDeltaT.H"
+
+        runTime++;
+
         particleCloud.clockM().start(1,"Global");
 
         Info<< "Time = " << runTime.timeName() << nl << endl;
@@ -103,23 +112,38 @@ int main(int argc, char *argv[])
         particleCloud.clockM().stop("Coupling");
 
         particleCloud.clockM().start(26,"Flow");
-
         volScalarField rhoeps("rhoeps",rho*voidfraction);
-        // Pressure-velocity SIMPLE corrector
+        while (pimple.loop())
+        {
+            // if needed, perform drag update here
+            if (pimple.nCorrPIMPLE() <= 1)
+            {
+                #include "rhoEqn.H"
+            }
 
-        #include "UEqn.H"
 
+            // --- Pressure-velocity PIMPLE corrector loop
 
-        // besides this pEqn, OF offers a "simple consistent"-option
-        #include "pEqn.H"
-        rhoeps=rho*voidfraction;
+            #include "UEqn.H"
+            #include "EEqn.H"
 
-        #include "EEqn.H"
+            // --- Pressure corrector loop
+            while (pimple.correct())
+            {
+                // besides this pEqn, OF offers a "pimple consistent"-option
+                #include "pEqn.H"
+                rhoeps=rho*voidfraction;
+            }
 
-        turbulence->correct();
+            if (pimple.turbCorr())
+            {
+                turbulence->correct();
+            }
+        }
+        particleCloud.clockM().stop("Flow");
 
-        particleCloud.clockM().start(32,"postFlow");
-        if(hasEvolved) particleCloud.postFlow();
+        particleCloud.clockM().start(31,"postFlow");
+        particleCloud.postFlow();
         particleCloud.clockM().stop("postFlow");
 
         runTime.write();
@@ -129,7 +153,7 @@ int main(int argc, char *argv[])
             << "  ClockTime = " << runTime.elapsedClockTime() << " s"
             << nl << endl;
 
-        particleCloud.clockM().stop("Flow");
+
         particleCloud.clockM().stop("Global");
     }
 
