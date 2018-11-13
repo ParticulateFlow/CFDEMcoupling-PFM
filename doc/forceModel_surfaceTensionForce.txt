@@ -1,0 +1,55 @@
+"CFDEMproject Website"_lws - "Main Page"_main :c
+
+:link(lws,http://www.cfdem.com)
+:link(main,CFDEMcoupling_Manual.html)
+
+:line
+
+forceModel surfaceTensionForce command :h3
+
+[Syntax:]
+
+Defined in "couplingProperties"_CFDEMcoupling_dicts.html#couplingProperties
+dictionary.
+
+forceModels
+(
+    surfaceTensionForce;
+);
+surfaceTensionForceProps
+\{
+    stfFieldName "surfaceTensionField";
+\} :pre
+
+{surfaceTensionField} = name of the surface tension force field :ulb,l
+:ule
+
+[Examples:]
+
+forceModels
+(
+    surfaceTensionForce;
+);
+surfaceTensionForceProps
+\{
+    stfFieldName "surfaceTensionForce";
+\} :pre
+
+[Description:]
+
+The force model calculates the surface tension force acting on each DEM particle
+based on a pre-calculated surface tension force as V_particle * F^sigma. When
+used in conjunction with the "cfdemSolverMultiphase"_cfdemSolverMultiphase.html
+solver, the surface tension force is calculated with the CSF (continuum surface
+force) model (see Brackbill et al. (1992): "A continuum method for modeling
+surface tension", J. Comput. Phys.).
+
+[Restrictions:]
+
+Has to be used with a multiphase solver that calculates the surface tension
+force, e.g. {cfdemSolverMultiphase}.
+
+[Related commands:]
+
+"forceModel"_forceModel.html, "cfdemSolverMultiphase"_cfdemSolverMultiphase.html
+

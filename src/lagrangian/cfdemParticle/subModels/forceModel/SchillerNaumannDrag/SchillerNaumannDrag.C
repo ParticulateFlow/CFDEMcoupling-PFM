@@ -64,7 +64,7 @@ SchillerNaumannDrag::SchillerNaumannDrag
 :
     forceModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
-    verbose_(false),
+    verbose_(propsDict_.found("verbose")),
     velFieldName_(propsDict_.lookup("velFieldName")),
     U_(sm.mesh().lookupObject<volVectorField> (velFieldName_))
 {
@@ -75,8 +75,6 @@ SchillerNaumannDrag::SchillerNaumannDrag
     particleCloud_.probeM().scalarFields_.append("Rep");          //other are debug
     particleCloud_.probeM().scalarFields_.append("Cd");                 //other are debug
     particleCloud_.probeM().writeHeader();
-
-    if (propsDict_.found("verbose")) verbose_=true;
 
     // init force sub model
     setForceSubModels(propsDict_);

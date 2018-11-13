@@ -65,17 +65,15 @@ constDiffSmoothing::constDiffSmoothing
     propsDict_(dict.subDict(typeName + "Props")),
     lowerLimit_(readScalar(propsDict_.lookup("lowerLimit"))),
     upperLimit_(readScalar(propsDict_.lookup("upperLimit"))),
-    smoothingLength_(dimensionedScalar("smoothingLength",dimensionSet(0,1,0,0,0,0,0), readScalar(propsDict_.lookup("smoothingLength")))),
-    smoothingLengthReferenceField_(dimensionedScalar("smoothingLengthReferenceField",dimensionSet(0,1,0,0,0,0,0), readScalar(propsDict_.lookup("smoothingLength")))),
+    smoothingLength_(dimensionedScalar("smoothingLength", dimLength, readScalar(propsDict_.lookup("smoothingLength")))),
+    smoothingLengthReferenceField_(dimensionedScalar("smoothingLengthReferenceField", dimLength, readScalar(propsDict_.lookup("smoothingLength")))),
     DT_("DT", dimensionSet(0,2,-1,0,0), 0.),
-    verbose_(false)
+    verbose_(propsDict_.found("verbose"))
 {
-
-    if(propsDict_.found("verbose"))
-        verbose_ = true;
-
     if(propsDict_.found("smoothingLengthReferenceField"))
+    {
        smoothingLengthReferenceField_.value() = double(readScalar(propsDict_.lookup("smoothingLengthReferenceField")));
+    }
 
     checkFields(sSmoothField_);
     checkFields(vSmoothField_);

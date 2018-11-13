@@ -1,15 +1,16 @@
-"CFDEMproject WWW Site"_lws - "CFDEM Commands"_lc :c
+"CFDEMproject Website"_lws - "Main Page"_main :c
 
 :link(lws,http://www.cfdem.com)
-:link(lc,CFDEMcoupling_Manual.html#comm)
+:link(main,CFDEMcoupling_Manual.html)
 
 :line
 
-locateModel_engineSearch command :h3
+locateModel engine command :h3
 
 [Syntax:]
 
-Defined in couplingProperties dictionary.
+Defined in "couplingProperties"_CFDEMcoupling_dicts.html#couplingProperties
+dictionary.
 
 locateModel engine;
 engineProps
@@ -30,14 +31,18 @@ engineProps
 
 [Description:]
 
-The locateModel "engine" locates the CFD cell and cellID corresponding to a given position.
-The engineSearch locate Model can be used with different settings to use different algorithms:
+The locateModel {engine} locates the CFD cell and cellID corresponding to a
+given position.
+The {engine} locate Model can be used with different settings to use different
+algorithms:
 
-treeSearch false;     will execute some geometric (linear) search using the last known cellID :ulb,l
-treeSearch true;      will use a recursive tree structure to find the cell (recommended). :l
+treeSearch false;  will execute some geometric (linear) search using the last known cellID :ulb,l
+treeSearch true;   will use a recursive tree structure to find the cell (recommended). :l
 :ule
 
-[Restrictions:] none.
+[Restrictions:]
+
+none
 
 [Related commands:]
 

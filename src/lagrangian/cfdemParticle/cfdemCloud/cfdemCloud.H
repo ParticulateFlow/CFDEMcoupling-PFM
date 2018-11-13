@@ -86,63 +86,63 @@ protected:
 
     IOdictionary liggghtsCommandDict_;
 
-    Switch solveFlow_;
+    const bool solveFlow_;
 
-    bool verbose_;
+    const bool verbose_;
 
-    bool ignore_;
+    const bool ignore_;
 
     bool allowCFDsubTimestep_;
 
-    bool limitDEMForces_;
+    const bool limitDEMForces_;
 
-    bool getParticleDensities_;
+    const bool getParticleDensities_;
 
-    bool getParticleEffVolFactors_;
+    const bool getParticleEffVolFactors_;
 
-    bool getParticleTypes_;
+    const bool getParticleTypes_;
 
     scalar maxDEMForce_;
 
     const word modelType_;
 
-    mutable double **positions_;
+    double **positions_;
 
-    mutable double **velocities_;
+    double **velocities_;
 
-    mutable double **fluidVel_;
+    double **fluidVel_;
 
-    mutable double **fAcc_;
+    double **fAcc_;
 
-    mutable double **impForces_;
+    double **impForces_;
 
-    mutable double **expForces_;
+    double **expForces_;
 
-    mutable double **DEMForces_;
+    double **DEMForces_;
 
-    mutable double **Cds_;
+    double **Cds_;
 
-    mutable double **radii_;
+    double **radii_;
 
-    mutable double **voidfractions_;
+    double **voidfractions_;
 
-    mutable int **cellIDs_;
+    int **cellIDs_;
 
-    mutable double **particleDensities_;
+    double **particleDensities_;
 
-    mutable double **particleEffVolFactors_;
+    double **particleEffVolFactors_;
 
-    mutable int **particleTypes_;
+    int **particleTypes_;
 
-    mutable double **particleWeights_;
+    double **particleWeights_;
 
-    mutable double **particleVolumes_;
+    double **particleVolumes_;
 
-    mutable double **particleV_;
+    double **particleV_;
     
-    mutable double **particleConvVel_;
+    double **particleConvVel_;
 
-    mutable double **particleFlucVel_;
+    double **particleFlucVel_;
 
     int numberOfParticles_;
 
@@ -150,7 +150,7 @@ protected:
 
     bool numberOfParticlesChanged_;
 
-    mutable bool arraysReallocated_;
+    bool arraysReallocated_;
 
     const wordList forceModels_;
 
@@ -162,7 +162,7 @@ protected:
 
     const word turbulenceModelType_;
 
-    mutable scalar cg_;
+    scalar cg_;
 
     bool cgOK_;
 
@@ -170,27 +170,27 @@ protected:
 
     bool impDEMdragAcc_;
 
-    mutable scalar imExSplitFactor_;
+    const scalar imExSplitFactor_;
 
-    mutable bool treatVoidCellsAsExplicitForce_; //will treat the coupling force in cells with no Us data explicitly
+    const bool treatVoidCellsAsExplicitForce_; //will treat the coupling force in cells with no Us data explicitly
 
-    bool useDDTvoidfraction_;
+    const bool useDDTvoidfraction_;
 
-    mutable volScalarField ddtVoidfraction_;
+    volScalarField ddtVoidfraction_;
 
-    mutable volScalarField particleDensityField_;
+    volScalarField particleDensityField_;
 
-    mutable Switch checkPeriodicCells_;
+    Switch checkPeriodicCells_;
 
     const turbulenceModel& turbulence_;
 
-    autoPtr<forceModel>* forceModel_;
+    autoPtr<dataExchangeModel> dataExchangeModel_;
+
+    PtrList<forceModel> forceModel_;
 
     autoPtr<locateModel> locateModel_;
 
-    autoPtr<momCoupleModel>* momCoupleModel_;
-
-    autoPtr<dataExchangeModel> dataExchangeModel_;
+    PtrList<momCoupleModel> momCoupleModel_;
 
     autoPtr<IOModel> IOModel_;
 
@@ -206,9 +206,9 @@ protected:
 
     autoPtr<meshMotionModel> meshMotionModel_;
 
-    autoPtr<liggghtsCommandModel>* liggghtsCommand_;
+    PtrList<liggghtsCommandModel> liggghtsCommand_;
 
-    autoPtr<otherForceModel>* otherForceModel_;
+    PtrList<otherForceModel> otherForceModel_;
 
 // Protected member functions
     virtual void getDEMdata();
@@ -248,7 +248,7 @@ public:
 // public Member Functions
 
     // Access
-       bool allowCFDsubTimestep() { return allowCFDsubTimestep_; }
+       bool allowCFDsubTimestep() const { return allowCFDsubTimestep_; }
 
        void setAllowCFDsubTimestep(bool b) { allowCFDsubTimestep_ = b; }
 
@@ -276,7 +276,7 @@ public:
 
        scalar voidfraction(int) const;
 
-       label liggghtsCommandModelIndex(word) const;
+       label liggghtsCommandModelIndex(const word&) const;
 
        inline void setCG(double);
 
@@ -381,10 +381,12 @@ public:
 
        inline const wordList& forceModels() const;
 
+       inline voidFractionModel& voidFractionM();
        inline const voidFractionModel& voidFractionM() const;
 
        inline const locateModel& locateM() const;
 
+       inline momCoupleModel& momCoupleM(int);
        inline const momCoupleModel& momCoupleM(int) const;
 
        inline dataExchangeModel& dataExchangeM();
@@ -393,6 +395,7 @@ public:
 
        inline probeModel& probeM();
 
+       inline averagingModel& averagingM();
        inline const averagingModel& averagingM() const;
 
        inline const clockModel& clockM() const;
@@ -403,7 +406,7 @@ public:
 
        inline const wordList& liggghtsCommandModelList() const;
 
-       inline autoPtr<liggghtsCommandModel>* liggghtsCommand() const;
+       inline liggghtsCommandModel& liggghtsCommand(const label);
 
        inline const turbulenceModel& turbulence() const;
 
@@ -426,7 +429,7 @@ public:
 
         tmp<volScalarField> ddtVoidfraction() const;
 
-        void calcDdtVoidfraction(volScalarField& voidfraction) const;
+        void calcDdtVoidfraction(volScalarField& voidfraction);
 
         //tmp<fvVectorMatrix> ddtVoidfractionU(volVectorField& ,volScalarField&) const;
 
@@ -436,7 +439,7 @@ public:
 
         void otherForces(volVectorField&);
 
-        bool checkPeriodicCells() { return checkPeriodicCells_; }
+        bool checkPeriodicCells() const { return checkPeriodicCells_; }
 };
 
 

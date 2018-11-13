@@ -64,7 +64,7 @@ private:
 
         const scalar alphaMin_;          //NP min value of voidFraction
 
-        mutable bool alphaLimited_;
+        bool alphaLimited_;
 
         const scalar scaleUpVol_;        //NP scaling radius, keeping volume of particle
 
@@ -91,7 +91,7 @@ public:
 
 
     // Member Functions
-        void setvoidFraction(double** const& ,double**&, double**&, double**&, double**&) const;
+        void setvoidFraction(double** const& ,double**&, double**&, double**&, double**&);
 
         void buildLabelHashSet
         (
@@ -100,7 +100,7 @@ public:
             const label cellID,
             labelHashSet& hashSett,
             bool          initialInsert
-        ) const;
+        );
 
         virtual double segmentParticleIntersection(int index, vector positionCenter, vector pointInside, vector pointOutside) const;
 };

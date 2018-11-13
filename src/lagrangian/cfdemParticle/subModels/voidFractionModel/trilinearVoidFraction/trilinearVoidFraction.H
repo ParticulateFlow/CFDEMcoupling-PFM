@@ -88,7 +88,7 @@ public:
 
 
     // Member Functions
-        void setvoidFraction(double** const& ,double**&, double**&, double**&, double**&) const;
+        void setvoidFraction(double** const& ,double**&, double**&, double**&, double**&);
 };
 
 

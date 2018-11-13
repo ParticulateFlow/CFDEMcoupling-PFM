@@ -64,10 +64,10 @@ particleCellVolume::particleCellVolume
     forceModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
     mesh_(particleCloud_.mesh()),
-    startTime_(0.),
+    startTime_(propsDict_.lookupOrDefault<scalar>("startTime",0.0)),
     scalarFieldName_("voidfraction"),
     scalarField_
-    (   
+    (
         IOobject
         (
             "particleCellVolume",
@@ -80,7 +80,7 @@ particleCellVolume::particleCellVolume
         dimensionedScalar("zero", dimensionSet(0,0,0,0,0), 0)
     ),
     scalarField2_
-    (   
+    (
         IOobject
         (
             "cellVolume",
@@ -94,15 +94,8 @@ particleCellVolume::particleCellVolume
     ),
     upperThreshold_(readScalar(propsDict_.lookup("upperThreshold"))),
     lowerThreshold_(readScalar(propsDict_.lookup("lowerThreshold"))),
-    verbose_(false)
+    verbose_(propsDict_.found("verbose"))
 {
-    if (propsDict_.found("startTime")){
-        startTime_=readScalar(propsDict_.lookup("startTime"));
-    }
-
-    if (propsDict_.found("verbose")){
-        verbose_ = true;
-    }
 }
 
 

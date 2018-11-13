@@ -15,12 +15,15 @@ License
     along with this code.  If not, see <http://www.gnu.org/licenses/>.
 
     Copyright (C) 2015- Thomas Lichtenegger, JKU Linz, Austria
+                        M. Efe Kinaci, JKU Linz, Austria
 
 \*---------------------------------------------------------------------------*/
 
 #include "error.H"
 #include "noChemistry.H"
 #include "addToRunTimeSelectionTable.H"
+
+#include "IFstream.H"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -56,17 +59,6 @@ noChemistry::~noChemistry()
 
 void noChemistry::execute()
 {}
-
-//tmp<Foam::fvScalarMatrix> noChemistry::Smi(const label i) const
-//{
-//    return tmp<fvScalarMatrix>(new fvScalarMatrix(0, dimMass/dimTime)); 
-//}
-
-//tmp<Foam::fvScalarMatrix> noChemistry::Sm() const
-//{
-//    return tmp<fvScalarMatrix>(new fvScalarMatrix(0, dimMass/dimTime)); 
-//}
-
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

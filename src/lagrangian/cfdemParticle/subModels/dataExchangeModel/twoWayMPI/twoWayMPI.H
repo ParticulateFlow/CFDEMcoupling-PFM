@@ -151,16 +151,15 @@ public:
         void destroy(int*) const;
         //==============
 
-        bool couple(int) const;
+        bool couple(int);
 
         int getNumberOfParticles() const;
         int getNumberOfClumps() const;
         int getNumberOfTypes() const;
         double* getTypeVol() const;
 
-        word myType() const { return typeName; }
 
-        void setCG() { particleCloud_.setCG(lmp->force->cg()); }
+        scalar getCG() const { return lmp->force->cg(); }
 };
 
 

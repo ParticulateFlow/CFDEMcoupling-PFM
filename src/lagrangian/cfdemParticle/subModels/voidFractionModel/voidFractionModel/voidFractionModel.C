@@ -154,7 +154,7 @@ tmp<volScalarField> voidFractionModel::voidFractionInterp() const
     );
 }
 
-void voidFractionModel::resetVoidFractions() const
+void voidFractionModel::resetVoidFractions()
 {
     voidfractionPrev_.ref() = voidfractionNext_.ref();
     voidfractionNext_.ref() = 1.;
@@ -170,7 +170,7 @@ int voidFractionModel::maxCellsPerParticle() const
     return maxCellsPerParticle_;
 }
 
-void voidFractionModel::reAllocArrays() const
+void voidFractionModel::reAllocArrays()
 {
     if(particleCloud_.numberOfParticlesChanged())
     {
@@ -179,7 +179,7 @@ void voidFractionModel::reAllocArrays() const
     }
 }
 
-void voidFractionModel::reAllocArrays(int nP) const
+void voidFractionModel::reAllocArrays(int nP)
 {
     if(particleCloud_.numberOfParticlesChanged())
     {
