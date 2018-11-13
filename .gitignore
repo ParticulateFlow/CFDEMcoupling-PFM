@@ -5,8 +5,8 @@
 log_*
 log.*
 *~
+
 **/linux*Gcc*/
 **/.vscode
 
 lnInclude
-

@@ -4,3 +4,5 @@ cfdemSolverRhoPimple/dir
 cfdemSolverRhoSimple/dir
 cfdemSolverIB/dir
 cfdemSolverPisoScalar/dir
+cfdemSolverRhoPimpleChem/dir
+cfdemSolverMultiphase/dir

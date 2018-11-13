@@ -62,24 +62,15 @@ runLiggghts::runLiggghts
 )
 :
     liggghtsCommandModel(dict,sm,i),
-    propsDict_(dict),
+    propsDict_(dict.subOrEmptyDict(typeName + "Props")),
     command_("run"),
-    preNo_(true),
-    stdInterval_(0)
+    preNo_(propsDict_.lookupOrDefault<bool>("preNo", true))
 {
-    word myName=word(typeName + "Props");
-    if (dict.found(myName))    
-    {
-        propsDict_=dictionary(dict.subDict(myName));
-        preNo_=Switch(propsDict_.lookup("preNo"));
+    verbose_ = propsDict_.found("verbose");
 
-        // check if verbose
-        if (propsDict_.found("verbose")) verbose_=true;
-    }
+    runEveryCouplingStep_ = true;
 
-    runEveryCouplingStep_=true;
-
-    strCommand_=createCommand(command_);
+    strCommand_ = createCommand(command_);
 
     checkTimeSettings(dict_);
 }
@@ -100,11 +91,10 @@ const char* runLiggghts::command(int commandLine)
 
 string runLiggghts::createCommand( word command, int interval, word appendix, word appendix2, word appendix3, word appendix4)
 {
-    fileName add;
-    char h[50];
-    sprintf(h,"%d",interval);
-    add = h;
-    command += " " + add + " " + appendix + " " + appendix2 + " " + appendix3 + " " + appendix4;
+    OStringStream oStrStream;
+    oStrStream << interval;
+
+    command += " " + oStrStream.str() + " " + appendix + " " + appendix2 + " " + appendix3 + " " + appendix4;
 
     return string(command);
 }
@@ -113,9 +103,13 @@ bool runLiggghts::runCommand(int couplingStep)
 {
     //change command to  "run xxx pre no"
     if (preNo_ && (couplingStep > firstCouplingStep_))
-        strCommand_=createCommand(command_, particleCloud_.dataExchangeM().couplingInterval(),"pre","no","post","no");
+    {
+        strCommand_ = createCommand(command_, particleCloud_.dataExchangeM().couplingInterval(),"pre","no","post","no");
+    }
     else
-        strCommand_=createCommand(command_, particleCloud_.dataExchangeM().couplingInterval());
+    {
+        strCommand_ = createCommand(command_, particleCloud_.dataExchangeM().couplingInterval());
+    }
 
     return runThisCommand(couplingStep);
 }
@@ -123,9 +117,13 @@ bool runLiggghts::runCommand(int couplingStep)
 void runLiggghts::set(int interval)
 {
     if (preNo_)
+    {
         strCommand_ = createCommand(command_, interval,"pre","no","post","no");
+    }
     else
+    {
         strCommand_ = createCommand(command_, interval);
+    }
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

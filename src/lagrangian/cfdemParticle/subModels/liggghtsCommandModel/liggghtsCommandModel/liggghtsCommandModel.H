@@ -91,6 +91,7 @@ protected:
 
     label commandLines_;
 
+    // verbose_ can/will be overwritten by the constructors of the derived classes
     bool verbose_;
 
 public:
@@ -164,15 +165,15 @@ public:
 
     // Access
 
-        int nextRun(){return nextRun_;}
+        int nextRun() const {return nextRun_;}
 
-        int lastRun(){return lastRun_;}
+        int lastRun() const {return lastRun_;}
 
-        virtual word name()=0;
+        virtual word name() const=0;
 
-        bool exactTiming(){return exactTiming_;}
+        bool exactTiming() const {return exactTiming_;}
 
-        label commandLines(){return commandLines_;}
+        label commandLines() const {return commandLines_;}
 
         void parseCommandList(wordList&, labelList&, scalarList&, word&, dictionary&, bool&);
 };

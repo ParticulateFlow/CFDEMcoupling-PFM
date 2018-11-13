@@ -1,0 +1,52 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.3.0                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      transportProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+//Properties from https://www.jstage.jst.go.jp/article/tetsutohagane/100/8/100_925/_pdf
+phases
+(
+     iron
+     {
+         transportModel Newtonian;
+         nu nu [ 0 2 -1 0 0 0 0 ] 1.5e-07;  
+         rho rho [ 1 -3 0 0 0 0 0 ] 6700; 
+     }
+
+     slag
+     {
+         transportModel Newtonian;
+         nu nu [ 0 2 -1 0 0 0 0 ] 1.5e-04;
+         rho rho [ 1 -3 0 0 0 0 0 ] 2600; 
+     }
+
+     air
+     {
+         transportModel Newtonian;
+         nu nu [ 0 2 -1 0 0 0 0 ] 1.3e-05;
+         rho rho [ 1 -3 0 0 0 0 0 ] 1.5; 
+     }
+);
+
+sigmas
+(
+    (iron slag) 0.07 //??
+    (iron air) 0.07  //??
+    (slag air) 0.07  //??
+
+);
+
+
+// ************************************************************************* //

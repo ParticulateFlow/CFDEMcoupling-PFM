@@ -1,15 +1,16 @@
-"CFDEMproject WWW Site"_lws - "CFDEM Commands"_lc :c
+"CFDEMproject Website"_lws - "Main Page"_main :c
 
 :link(lws,http://www.cfdem.com)
-:link(lc,CFDEMcoupling_Manual.html#comm)
+:link(main,CFDEMcoupling_Manual.html)
 
 :line
 
-momCoupleModel_implicitCouple command :h3
+momCoupleModel implicitCouple command :h3
 
 [Syntax:]
 
-Defined in couplingProperties dictionary.
+Defined in "couplingProperties"_CFDEMcoupling_dicts.html#couplingProperties
+dictionary.
 
 momCoupleModels
 (
@@ -17,16 +18,18 @@ momCoupleModels
 );
 implicitCoupleProps
 \{
-    velFieldName "U";
-    granVelFieldName "Us";
+    velFieldName          "U";
+    granVelFieldName      "Us";
     voidfractionFieldName "voidfraction";
-    minAlphaP number;
+    KslLimit              scalar1;
+    minAlphaP             scalar2;
 \} :pre
 
 {U} = name of the finite volume fluid velocity field :ulb,l
 {Us} = name of the finite volume granular velocity field :l
-{voidfraction} = name of the finite volume voidfraction field :l
-{number} = minimum value for local particle volume fraction to calculate the exchange filed (default SMALL):l
+{voidfraction} = name of the finite volume void fraction field :l
+{scalar1} = (optional, default 1e10) limit implicit momentum exchange field :l
+{scalar2} = (optional, default SMALL) minimum value for local particle volume fraction to calculate the exchange field :l
 :ule
 
 [Examples:]
@@ -37,14 +40,15 @@ momCoupleModels
 );
 implicitCoupleProps
 \{
-    velFieldName "U";
-    granVelFieldName "Us";
+    velFieldName          "U";
+    granVelFieldName      "Us";
     voidfractionFieldName "voidfraction";
 \} :pre
 
 [Description:]
 
-The implicitCouple-model is a momCoupleModel model providing an implicit momentum source term for the CFD solver.
+The {implicitCouple} model is a momCoupleModel model providing an implicit
+momentum source term for the CFD solver.
 
 [Restrictions:]
 

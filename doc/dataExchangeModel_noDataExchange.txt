@@ -1,15 +1,16 @@
-"CFDEMproject WWW Site"_lws - "CFDEM Commands"_lc :c
+"CFDEMproject Website"_lws - "Main Page"_main :c
 
 :link(lws,http://www.cfdem.com)
-:link(lc,CFDEMcoupling_Manual.html#comm)
+:link(main,CFDEMcoupling_Manual.html)
 
 :line
 
-dataExchangeModel_noDataExchange command :h3
+dataExchangeModel noDataExchange command :h3
 
 [Syntax:]
 
-Defined in couplingProperties dictionary.
+Defined in "couplingProperties"_CFDEMcoupling_dicts.html#couplingProperties
+dictionary.
 
 dataExchangeModel noDataExchange; :pre
 
@@ -19,11 +20,12 @@ dataExchangeModel noDataExchange; :pre
 
 [Description:]
 
-The data exchange model performs the data exchange between the DEM code and the CFD code. The noDataExchange model is a dummy model where no data is exchanged.
+The data exchange model performs the data exchange between the DEM code and the
+CFD code. The {noDataExchange} model is a dummy model where no data is exchanged.
 
 [Restrictions:]
 
-None.
+none
 
 [Related commands:]
 

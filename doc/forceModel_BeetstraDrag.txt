@@ -1,0 +1,117 @@
+"CFDEMproject Website"_lws - "Main Page"_main :c
+
+:link(lws,http://www.cfdem.com)
+:link(main,CFDEMcoupling_Manual.html)
+
+:line
+
+forceModel BeetstraDrag  command :h3
+
+[Syntax:]
+
+Defined in "couplingProperties"_CFDEMcoupling_dicts.html#couplingProperties
+dictionary.
+
+forceModels
+(
+    BeetstraDrag
+);
+BeetstraDragProps
+\{
+    velFieldName          "U";
+    voidfractionFieldName "voidfraction";
+    minVoidfraction       scalar1;
+    granVelFieldName      "Us";
+\
+    useFilteredDragModel;
+    g                     gravity;
+    dPrim                 dPrimValue;
+    rhoP                  rhoPValue;
+    rho                   rhoValue;
+    nuf                   nufValue;
+\
+    useParcelSizeDependentFilteredDrag;
+    k                     kValue;
+\
+    treatForceExplicit;
+    implForceDEM;
+    verbose;
+    interpolation;
+\} :pre
+
+{U} = name of the finite volume fluid velocity field :ulb,l
+{voidfraction} = name of the finite volume void fraction field :l
+{minVoidfraction} = minimum void fraction value to ensure meaningful interpolated void fraction (default = 0.1) :l
+{Us} = name of the finite volume cell averaged particle velocity field :l
+
+{useFilteredDragModel} = switch for using a coarsening correction for the Beetstra drag model (takes grid-size effects into account; default = off) :l
+
+{gravity} = gravity value (default = 9.81) :l
+{dPrimValue} = diameter of primary particle :l
+{rhoPValue} = particle density :l
+{rhoValue} = finite volume density :l
+{nufValue} = kinematic viscosity :l
+
+{useParcelSizeDependentFilteredDrag} = switch for using a coarsening correction for the Beetstra drag model (only used if {useFilteredDragModel} is on; default = off) :l
+
+{kValue}  = factor for parcels size effect (default = 0.05; must be defined if useParcelSizeDependentFilteredDrag is used) :l
+
+{interpolation} = flag to use interpolated void fraction and fluid velocity values (normally off) :l
+{treatForceExplicit} = switch to force explicit treatment of force (normally off) :l
+{implForceDEM} = flag to use implicit formulation of drag on DEM side (normally off, if on, this switch will force {treatForceExplicit} to be off) :l
+{verbose} = switch to force display of data on screen (default: off; typically used for debug purposes) :l
+:ule
+
+[Examples:]
+
+forceModels
+(
+    BeetstraDrag
+);
+BeetstraDragProps
+\{
+    velFieldName          "U";
+    voidfractionFieldName "voidfraction";
+    granVelFieldName      "Us";
+    interpolation true;
+    useFilteredDragModel;
+    g       9.81;
+    dPrim   100e-6;
+    rhoP    7000.;
+    rho     10.;
+    nuf     1.5e-4;
+    useParcelSizeDependentFilteredDrag;
+    k       0.05;
+\} :pre
+
+[Description:]
+
+The force model performs the calculation of forces (e.g. fluid-particle
+interaction forces) acting on each DEM particle. The {BeetstraDrag} model is a
+model that calculates the particle based drag force following the correlation of
+"Beetstra et al. (2007)"_#Beetstra2007.
+The filtered drag model is based on "Radl and Sundaresan (2014)"_#Radl2014.
+
+[Restrictions:]
+
+This model is strictly valid only for monodisperse gas-particle flows.
+For the polydisperse model of "Beetstra et al. (2007)"_#Beetstra2007 use
+{BeetstraDragPoly}.
+
+[Related commands:]
+
+"forceModel"_forceModel.html, BeetstraDragPoly
+
+:line
+
+:link(Beetstra2007)
+[(Beetstra, 2007)] 
+Beetstra, R., van der Hoef, M. A. and Kuipers J. A. M.,
+"Drag force of intermediate Reynolds number flow past mono- and bidisperse arrays of spheres",
+AIChE J., 53(2) (2007)
+
+:link(Radl2014)
+[(Radl, 2014)] Radl, S. and Sundaresan, S.,
+"A drag model for filtered Euler-Lagrange simulations of clustered gas-particle suspensions",
+Chem. Eng. Sci., 117, pp. 416-425 (2014)
+

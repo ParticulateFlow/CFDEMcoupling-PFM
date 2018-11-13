@@ -63,8 +63,8 @@ ShirgaonkarIB::ShirgaonkarIB
 :
     forceModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
-    verbose_(false),
-    twoDimensional_(false),
+    verbose_(propsDict_.found("verbose")),
+    twoDimensional_(propsDict_.found("twoDimensional")),
     depth_(1),
     velFieldName_(propsDict_.lookup("velFieldName")),
     U_(sm.mesh().lookupObject<volVectorField> (velFieldName_)),
@@ -76,10 +76,8 @@ ShirgaonkarIB::ShirgaonkarIB
     particleCloud_.probeM().vectorFields_.append("dragForce"); //first entry must the be the force
     particleCloud_.probeM().writeHeader();
 
-    if (propsDict_.found("verbose")) verbose_=true;
-    if (propsDict_.found("twoDimensional"))
+    if (twoDimensional_)
     {
-        twoDimensional_=true;
         depth_ = propsDict_.lookup("depth");
         Info << "2-dimensional simulation - make sure DEM side is 2D" << endl;
         Info << "depth of domain is assumed to be :" << depth_ << endl;
@@ -148,7 +146,10 @@ void ShirgaonkarIB::setForce() const
             // write particle based data to global array
             forceSubM(0).partToArray(index,drag,vector::zero);
 
-            if(verbose_) Info << "impForces = " << impForces()[index][0]<<","<<impForces()[index][1]<<","<<impForces()[index][2] << endl;
+            if(verbose_) Info << "impForces = " << particleCloud_.impForces()[index][0]
+                              << ","            << particleCloud_.impForces()[index][1]
+                              << ","            << particleCloud_.impForces()[index][2]
+                              << endl;
         //}
     }
 }

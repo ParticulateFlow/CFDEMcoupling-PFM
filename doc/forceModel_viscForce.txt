@@ -1,15 +1,16 @@
-"CFDEMproject WWW Site"_lws - "CFDEM Commands"_lc :c
+"CFDEMproject Website"_lws - "Main Page"_main :c
 
 :link(lws,http://www.cfdem.com)
-:link(lc,CFDEMcoupling_Manual.html#comm)
+:link(main,CFDEMcoupling_Manual.html)
 
 :line
 
-forceModel_viscForce command :h3
+forceModel viscForce command :h3
 
 [Syntax:]
 
-Defined in couplingProperties dictionary.
+Defined in "couplingProperties"_CFDEMcoupling_dicts.html#couplingProperties
+dictionary.
 
 forceModels
 (
@@ -17,12 +18,20 @@ forceModels
 );
 viscForceProps
 \{
-    velocityFieldName "U";
-    interpolation "switch";
-\}; :pre
+    velocityFieldName  "U";
+    useAddedMass       scalar1;
+    treatForceExplicit switch1;
+    treatForceDEM      switch2;
+    interpolation      switch3;
+    scalarViscosity    switch4;
+\} :pre
 
 {U} = name of the finite volume fluid velocity field :ulb,l
-{switch} = flag to use interpolated stress values (normally off) :l
+{scalar1} = (optional, default 0) coefficient of added mass accounted for :l
+{switch1} = (optional, default false) sub model switch, see "forceSubModel"_forceSubModel.html for details :l
+{switch2} = (optional, default false) sub model switch, see "forceSubModel"_forceSubModel.html for details :l
+{switch3} = (optional, default false) flag to use interpolated stress values :l
+{switch4} =  (optional, default false) sub model switch, see "forceSubModel"_forceSubModel.html for details :l
 :ule
 
 [Examples:]
@@ -38,11 +47,15 @@ viscForceProps
 
 [Description:]
 
-The force model performs the calculation of forces (e.g. fluid-particle interaction forces) acting on each DEM particle. The viscForce model calculates the particle based viscous force, -(grad(tau)) * Vparticle (see Zhou et al. (2010): "Discrete particle simulation of particle-fluid flow: model formulations and their applicability", JFM).
+The force model performs the calculation of forces (e.g. fluid-particle
+interaction forces) acting on each DEM particle. The {viscForce} model
+calculates the particle based viscous force, -(grad(tau)) * Vparticle
+(see Zhou et al. (2010): "Discrete particle simulation of particle-fluid flow:
+model formulations and their applicability", J. Fluid Mech.).
 
 [Restrictions:]
 
-none.
+none
 
 [Related commands:]
 

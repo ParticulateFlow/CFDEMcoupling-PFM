@@ -1,45 +1,50 @@
-"CFDEMproject WWW Site"_lws - "CFDEM Commands"_lc :c
+"CFDEMproject Website"_lws - "Main Page"_main :c
 
 :link(lws,http://www.cfdem.com)
-:link(lc,CFDEMcoupling_Manual.html#comm)
+:link(main,CFDEMcoupling_Manual.html)
 
 :line
 
-voidfractionModel_centreVoidFraction command :h3
+voidFractionModel centre command :h3
 
 [Syntax:]
 
-Defined in couplingProperties dictionary.
+Defined in "couplingProperties"_CFDEMcoupling_dicts.html#couplingProperties
+dictionary.
 
-voidfractionModel centre;
+voidFractionModel centre;
 centreProps
 \{
     alphaMin number1;
-    weight number2;
+    weight   number2;
 \} :pre
 
-{number1} = minimum limit for voidfraction :ulb,l
+{number1} = minimum limit for void fraction :ulb,l
 {number2} = (optional) scaling of the particle volume to account for porosity or agglomerations. :l
 :ule
 
 [Examples:]
 
-voidfractionModel centre;
+voidFractionModel centre;
 centreProps
 \{
     alphaMin 0.1;
-    weight 1.;
+    weight   1.0;
 \} :pre
 
 [Description:]
 
-The centre voidFraction model calculates the voidfraction in a CFD cell accounting for the volume of the particles whose centres are inside the cell.
+The {centre} void fraction model calculates the void fraction in a CFD cell
+accounting for the volume of the particles whose centres are inside the cell.
 
-The particle volume occupied in the CFD domain can be adjusted by the parameter "weight", using Vparticle=dsphere^3*pi/6*weight.
+The particle volume occupied in the CFD domain can be adjusted by the parameter
+"weight", using Vparticle=dsphere^3*pi/6*weight.
 
-[Restrictions:] none.
+[Restrictions:]
+
+none
 
 [Related commands:]
 
-"voidfractionModel"_voidfractionModel.html
+"voidFractionModel"_voidFractionModel.html
 
