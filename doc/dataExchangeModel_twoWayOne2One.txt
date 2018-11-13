@@ -14,10 +14,12 @@ Defined in couplingProperties dictionary.
 dataExchangeModel twoWayOne2One;
 twoWayOne2OneProps
 \{
-    liggghtsPath "path";
+    liggghtsPath     "path";
+    useStaticProcMap useMap;
 \}; :pre
 
-{path} = path to the DEM simulation input file :ulb,l
+{path}   = path to the DEM simulation input file :ulb,l
+{useMap} = yes or no, determines if the map is build once (yes) or every coupling step (no) (default: no):l
 :ule
 
 [Examples:]
@@ -25,12 +27,13 @@ twoWayOne2OneProps
 dataExchangeModel twoWayOne2One;
 twoWayOne2OneProps
 \{
-    liggghtsPath "../DEM/in.liggghts_init";
+    liggghtsPath     "../DEM/in.liggghts_init";
+    useStaticProcMap yes;
 \} :pre
 
 [Description:]
 
-The data exchange model performs the data exchange between the DEM code and the CFD code. The twoWayOne2One model is a model that can exchange particle properties from DEM to CFD and from CFD to DEM. Data is exchanged via MPI technique using a more sophisticated mapping scheme than twoWayMPI / all2all and scales much better for large systems and many cores. The DEM run is executed by the coupling model, via a liggghtsCommandModel object.
+The data exchange model performs the data exchange between the DEM code and the CFD code. The twoWayOne2One model is a model that can exchange particle properties from DEM to CFD and from CFD to DEM. Data is exchanged via MPI technique using a more sophisticated mapping scheme than twoWayMPI / all2all and scales much better for large systems and many cores. The DEM run is executed by the coupling model, via a liggghtsCommandModel object. Only use staticProcMap yes if no load balancing is employed.
 
 [Restrictions:]
 
