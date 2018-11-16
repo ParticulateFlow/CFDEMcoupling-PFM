@@ -206,7 +206,7 @@ public:
         void inline destroy(int*) const;
         //==============
 
-        bool couple(int) const;
+        bool couple(int);
 
         //- extractCollected takes the collected data from Lig
         //  present in this Foam domain and applies the mask.
