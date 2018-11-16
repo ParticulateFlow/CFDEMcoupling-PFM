@@ -39,6 +39,8 @@ The data exchange model performs the data exchange between the DEM code and the 
 
 Must be used in combination with the engineSearchMany2Many locate model! Use the "one2one" cfd datacoupling option in fix couple/cfd in LIGGGHTS!
 
+Some warnings may be given for particles that have not been located - this is due to LIGGGHTS' treatment of domain crossers. 
+
 [Related commands:]
 
 "dataExchangeModel"_dataExchangeModel.html
