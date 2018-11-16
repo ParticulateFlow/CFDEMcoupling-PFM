@@ -125,16 +125,16 @@ private:
   // private member functions
 
     //- creates a geometric mapping between FOAM and LIG domains
-    void createProcMap() const;
+    void createProcMap();
 
     //- create a One2One communicator which transfers from LIG to FOAM
-    void setupLig2FoamCommunication() const;
+    void setupLig2FoamCommunication();
 
     //- locates particles received from Lig
-    void locateParticles() const;
+    void locateParticles();
 
     //- create a One2One communicator which transfers from FOAM to LIG
-    void setupFoam2LigCommunication() const;
+    void setupFoam2LigCommunication();
 
 protected:
     LAMMPS_NS::LAMMPS *lmp;

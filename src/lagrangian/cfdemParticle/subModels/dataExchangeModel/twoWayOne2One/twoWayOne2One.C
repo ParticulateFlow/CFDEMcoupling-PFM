@@ -142,7 +142,7 @@ twoWayOne2One::twoWayOne2One
     }
 }
 
-void twoWayOne2One::createProcMap() const
+void twoWayOne2One::createProcMap()
 {
     List<treeBoundBox> foamBoxes(Pstream::nProcs());
     foamBoxes[Pstream::myProcNo()] = thisFoamBox_;
@@ -671,7 +671,7 @@ bool twoWayOne2One::couple(int i)
     return coupleNow;
 }
 
-void twoWayOne2One::setupLig2FoamCommunication() const
+void twoWayOne2One::setupLig2FoamCommunication()
 {
     int* src_procs = new int[thisLigPartner_.size()];
     for (int proci = 0; proci < thisLigPartner_.size(); proci++)
@@ -709,7 +709,7 @@ void twoWayOne2One::setupLig2FoamCommunication() const
 }
 
 
-void twoWayOne2One::locateParticles() const
+void twoWayOne2One::locateParticles()
 {
     // get positions for locate
     double** my_positions = static_cast<double**>(lmp->atom->x);
@@ -823,7 +823,7 @@ void twoWayOne2One::locateParticles() const
     setCellIDs(cellIds);
 }
 
-void twoWayOne2One::setupFoam2LigCommunication() const
+void twoWayOne2One::setupFoam2LigCommunication()
 {
     int* src_procs = new int[thisFoamPartner_.size()];
     for (int proci = 0; proci < thisFoamPartner_.size(); proci++)
