@@ -67,7 +67,7 @@ Contributing authors
 #include <atom.h>
 #include <memory.h>
 #include <library.h>
-#include <library_cfd_coupling_one2one.h>
+#include <library_cfd_coupling.h>
 #include <update.h>
 #include <comm.h>
 #include <fix.h>
