@@ -1,3 +1,4 @@
+rcfdemSolverRhoSteadyPimple/dir
 rcfdemSolverHeattransfer/dir
 rcfdemSolverCoupledHeattransfer/dir
 rStatAnalysis/dir
@@ -7,7 +8,6 @@ cfdemSolverRhoPimple/dir
 cfdemSolverPisoMS/dir
 cfdemSolverPiso/dir
 cfdemSolverRhoPimple/dir
-cfdemSolverRhoSteadyPimple/dir
 cfdemSolverIB/dir
 cfdemSolverPisoScalar/dir
 cfdemSolverRhoPimpleChem/dir
