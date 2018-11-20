@@ -7,11 +7,12 @@ volScalarField rAU(1.0/UEqn.A());
 surfaceScalarField rhorAUf("rhorAUf", fvc::interpolate(rhoeps*rAU));
 if (modelType=="A")
 {
-    rhorAUf *= fvc::interpolate(voidfraction);
+    rhorAUf *= fvc::interpolate(voidfractionRec);
 }
 volVectorField HbyA(constrainHbyA(rAU*UEqn.H(), U, p));
+//tUEqn.clear();
 
-surfaceScalarField phiUs("phiUs", fvc::interpolate(rhoeps*rAU*Ksl*Us)& mesh.Sf());
+surfaceScalarField phiUs("phiUs", fvc::interpolate(rhoeps*rAU*Ksl*UsRec)& mesh.Sf());
 
 
 if (pimple.transonic())
@@ -69,11 +70,11 @@ Info<< "rho max/min : " << max(rho).value()
 
 if (modelType=="A")
 {
-    U = HbyA - rAU*(voidfraction*fvc::grad(p)-Ksl*Us);
+    U = HbyA - rAU*(voidfractionRec*fvc::grad(p)-Ksl*UsRec);
 }
 else
 {
-    U = HbyA - rAU*(fvc::grad(p)-Ksl*Us);
+    U = HbyA - rAU*(fvc::grad(p)-Ksl*UsRec);
 }
 
 U.correctBoundaryConditions();

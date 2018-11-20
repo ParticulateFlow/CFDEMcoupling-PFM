@@ -65,6 +65,8 @@ protected:
     bool coupleRecFluc_;
 
     bool coupleRecForce_;
+
+    bool setForceField_;
     
 public:
 

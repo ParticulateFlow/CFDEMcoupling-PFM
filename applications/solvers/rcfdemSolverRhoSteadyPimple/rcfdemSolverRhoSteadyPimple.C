@@ -17,11 +17,12 @@ License
     Copyright (C) 2015- Thomas Lichtenegger, JKU Linz, Austria
 
 Application
-    cfdemSolverRhoPimple
+    rcfdemSolverRhoSteadyPimple
 
 Description
-    Transient solver for compressible flow using the flexible PIMPLE (PISO-SIMPLE)
-    algorithm.
+    Transient (DEM) + steady-state (CFD) solver for compressible flow using the
+    flexible PIMPLE (PISO-SIMPLE) algorithm. Particle-motion is obtained from
+    a recurrence process.
     Turbulence modelling is generic, i.e. laminar, RAS or LES may be selected.
     The code is an evolution of the solver rhoPimpleFoam in OpenFOAM(R) 4.x,
     where additional functionality for CFD-DEM coupling is added.
@@ -36,6 +37,10 @@ Description
 #include "localEulerDdtScheme.H"
 #include "fvcSmooth.H"
 
+#include "cfdemCloudRec.H"
+#include "recBase.H"
+#include "recModel.H"
+#include "recPath.H"
 
 #include "cfdemCloudEnergy.H"
 #include "implicitCouple.H"
@@ -64,15 +69,21 @@ int main(int argc, char *argv[])
     #include "createFvOptions.H"
 
     // create cfdemCloud
-    #include "readGravitationalAcceleration.H"
-    cfdemCloudEnergy particleCloud(mesh);
+  //  #include "readGravitationalAcceleration.H"
+    cfdemCloudRec<cfdemCloudEnergy> particleCloud(mesh);
     #include "checkModelType.H"
+    recBase recurrenceBase(mesh);
+    #include "updateFields.H"
 
     turbulence->validate();
   //        #include "compressibleCourantNo.H"
   //  #include "setInitialDeltaT.H"
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+    label recTimeIndex = 0;
+    scalar recTimeStep = recurrenceBase.recM().recTimeStep();
+    scalar startTime = runTime.startTime().value();
 
     Info<< "\nStarting time loop\n" << endl;
 
@@ -91,6 +102,9 @@ int main(int argc, char *argv[])
         // do particle stuff
         particleCloud.clockM().start(2,"Coupling");
         bool hasEvolved = particleCloud.evolve(voidfraction,Us,U);
+
+//voidfraction = voidfractionRec;
+//Us = UsRec;
 
         if(hasEvolved)
         {
@@ -112,7 +126,7 @@ int main(int argc, char *argv[])
         particleCloud.clockM().stop("Coupling");
 
         particleCloud.clockM().start(26,"Flow");
-        volScalarField rhoeps("rhoeps",rho*voidfraction);
+        volScalarField rhoeps("rhoeps",rho*voidfractionRec);
         while (pimple.loop())
         {
             // if needed, perform drag update here
@@ -132,7 +146,7 @@ int main(int argc, char *argv[])
             {
                 // besides this pEqn, OF offers a "pimple consistent"-option
                 #include "pEqn.H"
-                rhoeps=rho*voidfraction;
+                rhoeps=rho*voidfractionRec;
             }
 
             if (pimple.turbCorr())
@@ -145,6 +159,15 @@ int main(int argc, char *argv[])
         particleCloud.clockM().start(31,"postFlow");
         particleCloud.postFlow();
         particleCloud.clockM().stop("postFlow");
+
+        particleCloud.clockM().start(32,"ReadFields");
+        if ( runTime.timeOutputValue() - startTime - (recTimeIndex+1)*recTimeStep + 1.0e-5 > 0.0 )
+        {
+            recurrenceBase.updateRecFields();
+            #include "updateFields.H"
+            recTimeIndex++;
+        }
+        particleCloud.clockM().stop("ReadFields");
 
         runTime.write();
 

@@ -40,7 +40,8 @@ cfdemCloudRec<baseCloud>::cfdemCloudRec
 :
     baseCloud(mesh),
     coupleRecFluc_(true),
-    coupleRecForce_(true)
+    coupleRecForce_(true),
+    setForceField_(false)
 {
     if (baseCloud::couplingProperties().found("coupleRecFluc"))
     {
@@ -50,6 +51,11 @@ cfdemCloudRec<baseCloud>::cfdemCloudRec
     if (baseCloud::couplingProperties().found("coupleRecForce"))
     {
         coupleRecForce_ = readBool(baseCloud::couplingProperties().lookup("coupleRecForce"));
+    }
+
+    if (baseCloud::couplingProperties().found("setForceField"))
+    {
+        setForceField_ = readBool(baseCloud::couplingProperties().lookup("setForceField"));
     }
 }
 
@@ -79,13 +85,22 @@ void cfdemCloudRec<baseCloud>::setForces()
 {
     baseCloud::resetArray(baseCloud::particleConvVel_,baseCloud::numberOfParticles(),3);
     baseCloud::resetArray(baseCloud::particleFlucVel_,baseCloud::numberOfParticles(),3);
+
+    baseCloud::resetArray(baseCloud::impForces_,baseCloud::numberOfParticles(),3);
+    baseCloud::resetArray(baseCloud::expForces_,baseCloud::numberOfParticles(),3);
+
     baseCloud::resetArray(baseCloud::DEMForces_,baseCloud::numberOfParticles(),3);
     for (int i=0;i<baseCloud::nrForceModels();i++) baseCloud::forceM(i).setForce();
 }
 
 template <class baseCloud>
 void cfdemCloudRec<baseCloud>::setParticleForceField()
-{}
+{
+    if (setForceField_)
+    {
+        baseCloud::setParticleForceField();
+    }
+}
 
 template <class baseCloud>
 void cfdemCloudRec<baseCloud>::setVectorAverages()
