@@ -51,6 +51,19 @@ Info<< "Reading thermophysical properties\n" << endl;
         mesh
     );
 
+    volScalarField voidfractionRec
+    (
+        IOobject
+        (
+            "voidfractionRec",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        voidfraction
+    );
+
     volScalarField addSource
     (
         IOobject
@@ -58,10 +71,11 @@ Info<< "Reading thermophysical properties\n" << endl;
            "addSource",
            runTime.timeName(),
            mesh,
-           IOobject::MUST_READ,
+           IOobject::READ_IF_PRESENT,
            IOobject::AUTO_WRITE
         ),
-        mesh
+        mesh,
+        dimensionedScalar("zero", dimensionSet(1,-1,-3,0,0,0,0), 0.0)
     );
 
     Info<< "\nCreating fluid-particle heat flux field\n" << endl;
@@ -217,11 +231,11 @@ Info<< "Reading thermophysical properties\n" << endl;
             "Ksl",
             runTime.timeName(),
             mesh,
-            IOobject::MUST_READ,
+            IOobject::READ_IF_PRESENT,
             IOobject::AUTO_WRITE
         ),
-        mesh
-        //dimensionedScalar("0", dimensionSet(1, -3, -1, 0, 0), 1.0)
+        mesh,
+        dimensionedScalar("0", dimensionSet(1, -3, -1, 0, 0), 0.0)
     );
 
 
@@ -239,4 +253,16 @@ Info<< "Reading thermophysical properties\n" << endl;
         mesh
     );
 
+    volVectorField UsRec
+    (
+        IOobject
+        (
+            "UsRec",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        Us
+    );
 //===============================

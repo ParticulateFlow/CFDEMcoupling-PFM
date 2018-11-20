@@ -16,7 +16,7 @@
             fvc::div(phi, K) +
             fvc::div
             (
-                fvc::absolute(phi/fvc::interpolate(rho), voidfraction*U),
+                fvc::absolute(phi/fvc::interpolate(rho), voidfractionRec*U),
                 p,
                 "div(phiv,p)"
             )
@@ -32,7 +32,7 @@
       + addSource
       - Qsource
       - fvm::Sp(QCoeff/Cpv, he)
-      - fvm::laplacian(voidfraction*thCond/Cpv,he)
+      - fvm::laplacian(voidfractionRec*thCond/Cpv,he)
      ==
         fvOptions(rho, he)
     );

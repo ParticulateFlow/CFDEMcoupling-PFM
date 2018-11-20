@@ -4,7 +4,7 @@ particleCloud.otherForces(fOther);
 tmp<fvVectorMatrix> tUEqn
 (
     fvm::div(phi, U)
-  + particleCloud.divVoidfractionTau(U, voidfraction)
+  + particleCloud.divVoidfractionTau(U, voidfractionRec)
   + fvm::Sp(Ksl,U)
   - fOther
  ==
@@ -18,12 +18,14 @@ fvOptions.constrain(UEqn);
 
 if (modelType=="B" || modelType=="Bfull")
 {
-    solve(UEqn == -fvc::grad(p)+ Ksl*Us);
+    solve(UEqn == -fvc::grad(p)+ Ksl*UsRec);
 }
 else
 {
-    solve(UEqn == -voidfraction*fvc::grad(p)+ Ksl*Us);
+    solve(UEqn == -voidfractionRec*fvc::grad(p)+ Ksl*UsRec);
 }
+
+//U.relax();
 
 fvOptions.correct(U);
 
