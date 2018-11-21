@@ -224,8 +224,6 @@ public:
 
         int getNumberOfParticles() const;
 
-        word myType() const { return typeName; }
-
         void setCG() { particleCloud_.setCG(lmp->force->cg()); }
 };
 

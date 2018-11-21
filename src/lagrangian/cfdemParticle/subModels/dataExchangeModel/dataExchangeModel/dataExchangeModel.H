@@ -266,8 +266,6 @@ public:
             }
         }
 
-        virtual word myType() const=0;
-
         virtual scalar getCG() const { Warning << "getCG() not executed correctly!" << endl; return 1.; }
 };
 

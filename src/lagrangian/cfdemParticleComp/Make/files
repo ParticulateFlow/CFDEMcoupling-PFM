@@ -93,11 +93,6 @@ $(otherForceModels)/gravity/gravity.C
 $(otherForceModels)/weightSecondaryPhase/weightSecondaryPhase.C
 $(otherForceModels)/expParticleForces/expParticleForces.C
 
-$(chemistryModels)/chemistryModel/chemistryModel.C
-$(chemistryModels)/chemistryModel/newChemistryModel.C
-$(chemistryModels)/species/species.C
-$(chemistryModels)/noChemistry/noChemistry.C
-
 $(probeModels)/probeModel/probeModel.C
 $(probeModels)/probeModel/newProbeModel.C
 $(probeModels)/noProbe/noProbe.C

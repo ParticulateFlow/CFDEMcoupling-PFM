@@ -65,7 +65,7 @@ deactivateCouple::~deactivateCouple()
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-void Foam::deactivateCouple::resetMomSourceField() const
+void Foam::deactivateCouple::resetMomSourceField()
 {}
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
