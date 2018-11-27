@@ -109,6 +109,8 @@ protected:
 
     mutable double **partNu_;
 
+    mutable scalar scaleDia_;
+
     void allocateMyArrays() const;
 
     void partTempField();
