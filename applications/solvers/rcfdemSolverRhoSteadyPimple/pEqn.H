@@ -60,6 +60,8 @@ else
 // Explicitly relax pressure for momentum corrector
 p.relax();
 
+#include "limitP.H"
+
 // Recalculate density from the relaxed pressure
 rho = thermo.rho();
 rho = max(rho, rhoMin);
@@ -76,6 +78,8 @@ else
 {
     U = HbyA - rAU*(fvc::grad(p)-Ksl*UsRec);
 }
+
+#include "limitU.H"
 
 U.correctBoundaryConditions();
 fvOptions.correct(U);
