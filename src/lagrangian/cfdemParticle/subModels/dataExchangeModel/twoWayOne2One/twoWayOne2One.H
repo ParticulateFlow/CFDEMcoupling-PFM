@@ -218,7 +218,7 @@ public:
         template <typename T>
         void extractCollected(T*&, T**&, int width=1) const;
 
-        void setCG() { particleCloud_.setCG(lmp->force->cg()); }
+        scalar getCG() const { return lmp->force->cg(); }
 };
 
 
