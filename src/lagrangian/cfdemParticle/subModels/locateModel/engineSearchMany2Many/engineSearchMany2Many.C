@@ -95,7 +95,16 @@ label engineSearchMany2Many::intersection
     return face;
 }
 
-
+label engineSearchMany2Many::findCell
+(
+    double** const& mask,
+    double**& positions,
+    int**& cellIDs,
+    int size
+) const
+{
+    return 1; // locate is provided by many2may / one2one
+}
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam

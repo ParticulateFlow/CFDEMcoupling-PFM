@@ -87,6 +87,13 @@ public:
                 const point& pEnd
         ) const;
 
+        label findCell
+        (
+            double** const& mask,
+            double**& positions,
+            int**& cellIDs,
+            int size
+        ) const;
 };
 
 
