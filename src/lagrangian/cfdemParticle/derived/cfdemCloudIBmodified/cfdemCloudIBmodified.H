@@ -59,11 +59,13 @@ class cfdemCloudIBmodified
 protected:
 
     mutable double **angularVelocities_;
+    mutable double **xmol_;
+    mutable double **vmol_;
     label pRefCell_;
     scalar pRefValue_;
 
-    // Modifications
-    mutable double **DEMTorques_;
+    // Mod by A.N.
+    mutable double **DEMTorques_;   // particle torque
 
     mutable bool haveEvolvedOnce_;
     mutable bool skipLagrangeToEulerMapping_;
@@ -103,6 +105,16 @@ public:
         inline double ** angularVelocities() const
         {
             return angularVelocities_;
+        }
+
+        inline double ** moleculeCOM() const
+        {
+            return xmol_;
+        }
+
+        inline double ** moleculeVel() const
+        {
+            return vmol_;
         }
 };
 

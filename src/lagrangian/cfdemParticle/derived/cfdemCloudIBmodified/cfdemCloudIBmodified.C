@@ -56,9 +56,11 @@ cfdemCloudIBmodified::cfdemCloudIBmodified
 :
     cfdemCloud(mesh),
     angularVelocities_(NULL),
-    DEMTorques_(NULL),
+    xmol_(NULL),
+    vmol_(NULL),
     pRefCell_(readLabel(mesh.solutionDict().subDict("PISO").lookup("pRefCell"))),
     pRefValue_(readScalar(mesh.solutionDict().subDict("PISO").lookup("pRefValue"))),
+    DEMTorques_(NULL),
     haveEvolvedOnce_(false),
     skipLagrangeToEulerMapping_(false)
 
@@ -78,6 +80,8 @@ cfdemCloudIBmodified::~cfdemCloudIBmodified()
 {
     dataExchangeM().destroy(angularVelocities_,3);
     dataExchangeM().destroy(DEMTorques_,3);
+    dataExchangeM().destroy(xmol_,3);
+    dataExchangeM().destroy(vmol_,3);
 }
 
 
@@ -86,6 +90,8 @@ void cfdemCloudIBmodified::getDEMdata()
 {
     cfdemCloud::getDEMdata();
     dataExchangeM().getData("omega","vector-atom",angularVelocities_);
+    dataExchangeM().getData("x_mol","vector-atom",xmol_);
+    dataExchangeM().getData("v_mol","vector-atom",vmol_);
 }
 
 bool cfdemCloudIBmodified::reAllocArrays()
@@ -95,6 +101,8 @@ bool cfdemCloudIBmodified::reAllocArrays()
         // get arrays of new length
         dataExchangeM().allocateArray(angularVelocities_,0.,3);
         dataExchangeM().allocateArray(DEMTorques_,0.,3);
+        dataExchangeM().allocateArray(xmol_,0.,3);
+        dataExchangeM().allocateArray(vmol_,0.,3);
         return true;
     }
     return false;
@@ -186,6 +194,12 @@ void cfdemCloudIBmodified::calcVelocityCorrection
     vector velRot(0,0,0);
     vector angVel(0,0,0);
 
+    vector rRel(0,0,0);
+    vector vRel(0,0,0);
+    vector angRel(0,0,0);
+    vector rCell(0,0,0);
+    vector vCell(0,0,0);
+
     for(int index=0; index< numberOfParticles(); index++)
     {
         //if(regionM().inRegion()[index][0])
@@ -201,7 +215,15 @@ void cfdemCloudIBmodified::calcVelocityCorrection
                     for(int i=0;i<3;i++) rVec[i]=U.mesh().C()[cellI][i]-position(index)[i];
                     for(int i=0;i<3;i++) angVel[i]=angularVelocities()[index][i];
                     velRot=angVel^rVec;
-                    for(int i=0;i<3;i++) uParticle[i] = velocities()[index][i]+velRot[i];
+
+                    for(int i=0;i<3;i++) rRel[i]=position(index)[i]-moleculeCOM()[index][i];
+                    for(int i=0;i<3;i++) vRel[i]=velocities()[index][i]-moleculeVel()[index][i];
+                    double r = magSqr(rRel);
+                    angRel = (rRel^vRel)/r;
+                    for(int i=0;i<3;i++) rCell[i]=U.mesh().C()[cellI][i]-moleculeCOM()[index][i];
+                    vCell=angRel^rCell;
+
+                    for(int i=0;i<3;i++) uParticle[i] = velocities()[index][i]+velRot[i]+vCell[i];
 
                     // impose field velocity
                     U[cellI]=(1-voidfractions_[index][subCell])*uParticle+voidfractions_[index][subCell]*U[cellI];
@@ -242,6 +264,7 @@ vector cfdemCloudIBmodified::angularVelocity(int index) const
 {
     return vector(angularVelocities_[index][0],angularVelocities_[index][1],angularVelocities_[index][2]);
 }
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

@@ -53,26 +53,19 @@ Contributions
 
 #include "cellSet.H"
 
-#include "fvOptions.H"      // added fvOptions
+#include "fvOptions.H"  // added the fvOptions library
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 int main(int argc, char *argv[])
 {
     #include "setRootCase.H"
-
     #include "createTime.H"
-
     #include "createDynamicFvMesh.H"
-
     #include "createControl.H"
-
     #include "createTimeControls.H"
-
     #include "createFields.H"
-
     #include "initContinuityErrs.H"
-
     #include "createFvOptions.H"
 
     // create cfdemCloud
@@ -101,6 +94,7 @@ int main(int argc, char *argv[])
 
         // Pressure-velocity PISO corrector
         {
+
             // Momentum predictor
 
             fvVectorMatrix UEqn
@@ -108,10 +102,13 @@ int main(int argc, char *argv[])
                 fvm::ddt(voidfraction,U)
               + fvm::div(phi, U)
               + turbulence->divDevReff(U)
-                        == fvOptions(U)
+             ==
+                fvOptions(U)
             );
 
             UEqn.relax();
+
+            fvOptions.constrain(UEqn);
 
             if (piso.momentumPredictor())
             {
@@ -130,6 +127,7 @@ int main(int argc, char *argv[])
                     + rUAf*fvc::ddtCorr(U, phi);
 
                 adjustPhi(phi, U, p);
+
 
                 while (piso.correctNonOrthogonal())
                 {
@@ -157,7 +155,7 @@ int main(int argc, char *argv[])
             }
         }
 
-	laminarTransport.correct();
+        laminarTransport.correct();
         turbulence->correct();
 
         Info << "particleCloud.calcVelocityCorrection() " << endl;
