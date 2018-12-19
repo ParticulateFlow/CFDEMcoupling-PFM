@@ -223,7 +223,7 @@ void cfdemCloudIBmodified::calcVelocityCorrection
                     for(int i=0;i<3;i++) rCell[i]=U.mesh().C()[cellI][i]-moleculeCOM()[index][i];
                     vCell=angRel^rCell;
 
-                    for(int i=0;i<3;i++) uParticle[i] = velocities()[index][i]+velRot[i]+vCell[i];
+                    for(int i=0;i<3;i++) uParticle[i] = moleculeVel()[index][i]+velRot[i]+vCell[i];
 
                     // impose field velocity
                     U[cellI]=(1-voidfractions_[index][subCell])*uParticle+voidfractions_[index][subCell]*U[cellI];
