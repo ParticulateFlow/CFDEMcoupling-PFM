@@ -201,11 +201,11 @@
     (
         IOobject
         (
-            "addSource",
-            runTime.timeName(),
-            mesh,
-            IOobject::NO_READ,
-            IOobject::AUTO_WRITE
+           "addSource",
+           runTime.timeName(),
+           mesh,
+           IOobject::READ_IF_PRESENT,
+           IOobject::AUTO_WRITE
         ),
         mesh,
         dimensionedScalar("zero", dimensionSet(1,-1,-3,0,0,0,0), 0.0)
