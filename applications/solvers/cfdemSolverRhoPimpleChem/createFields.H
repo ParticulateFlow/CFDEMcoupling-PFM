@@ -271,4 +271,17 @@
         mesh,
         dimensionedScalar("zero",dimensionSet(0, -3, 0, 0, 1),0)
     );
+
+    volScalarField dSauter
+    (
+        IOobject
+        (
+            "dSauter",
+            runTime.timeName(),
+            mesh,
+            IOobject::MUST_READ,
+            IOobject::AUTO_WRITE
+        ),
+        mesh
+    );
 //===============================
