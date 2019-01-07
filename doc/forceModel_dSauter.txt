@@ -1,15 +1,16 @@
-"CFDEMproject WWW Site"_lws - "CFDEM Commands"_lc :c
+"CFDEMproject Website"_lws - "Main Page"_main :c
 
 :link(lws,http://www.cfdem.com)
-:link(lc,CFDEMcoupling_Manual.html#comm)
+:link(main,CFDEMcoupling_Manual.html)
 
 :line
 
-forceModel_dSauter command :h3
+forceModel dSauter command :h3
 
 [Syntax:]
 
-Defined in couplingProperties dictionary.
+Defined in "couplingProperties"_CFDEMcoupling_dicts.html#couplingProperties
+dictionary.
 
 forceModels
 (
@@ -21,15 +22,16 @@ dSauterProps
     (
         X Y Z
     );
-\}; :pre
+\} :pre
 
-{coarseGrainingFactors} = list of coarse graining factors by type, separated by whitespace, optional :ulb,l
-
+{coarseGrainingFactors} = list of coarse graining factors by type, separated by
+whitespace, optional :ulb,l
 :ule
 
 [Description:]
 
-This "forceModel" does not influence the particles or the flow - it calculates the Sauter diameter
+This "force model" does not influence the particles or the flow - it calculates
+the Sauter diameter
 
 :c,image(Eqs/d32.png)
 .
@@ -37,8 +39,9 @@ This "forceModel" does not influence the particles or the flow - it calculates t
 
 [Restrictions:]
 
-none.
+none
 
 [Related commands:]
 
 "forceModel"_forceModel.html
+

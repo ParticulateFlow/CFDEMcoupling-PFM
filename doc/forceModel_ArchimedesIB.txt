@@ -1,15 +1,16 @@
-"CFDEMproject WWW Site"_lws - "CFDEM Commands"_lc :c
+"CFDEMproject Website"_lws - "Main Page"_main :c
 
 :link(lws,http://www.cfdem.com)
-:link(lc,CFDEMcoupling_Manual.html#comm)
+:link(main,CFDEMcoupling_Manual.html)
 
 :line
 
-forceModel_ArchimedesIB command :h3
+forceModel ArchimedesIB command :h3
 
 [Syntax:]
 
-Defined in couplingProperties dictionary.
+Defined in "couplingProperties"_CFDEMcoupling_dicts.html#couplingProperties
+dictionary.
 
 forceModels
 (
@@ -17,12 +18,16 @@ forceModels
 );
 ArchimedesIBProps
 \{
-    gravityFieldName "gravity";
+    gravityFieldName      "gravity";
     voidfractionFieldName "voidfraction";
-\}; :pre
+    twoDimensional;
+    treatForceExplicit    switch1;
+\} :pre
 
 {gravity} = name of the finite volume gravity field :ulb,l
-{voidfraction} = name of the finite volume voidfraction field :l
+{voidfraction} = name of the finite volume void fraction field :l
+{twoDimensional} = optional keyword for conducting a two dimensional calculation :l
+{switch1} = (optional, default false) sub model switch, see "forceSubModel"_forceSubModel.html for details :l
 :ule
 
 [Examples:]
@@ -33,13 +38,18 @@ forceModels
 );
 ArchimedesIBProps
 \{
-    gravityFieldName "g";
+    gravityFieldName      "g";
     voidfractionFieldName "voidfractionNext";
 \} :pre
 
 [Description:]
 
-The force model performs the calculation of forces (e.g. fluid-particle interaction forces) acting on each DEM particle. The ArchimedesIB model is a model that calculates the ArchimedesIB' volumetric lift force stemming from density difference of fluid and particle. This model is especially suited for resolved CFD-DEM simulations where the particle is represented by immersed boundary method.
+The force model performs the calculation of forces (e.g. fluid-particle
+interaction forces) acting on each DEM particle. The {ArchimedesIB} model is a
+model that calculates the ArchimedesIB' volumetric lift force stemming from
+density difference of fluid and particle. This model is especially suited for
+resolved CFD-DEM simulations where the particle is represented by immersed
+boundary method.
 
 [Restrictions:]
 

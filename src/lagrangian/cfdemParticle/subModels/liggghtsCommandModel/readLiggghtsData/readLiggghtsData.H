@@ -58,13 +58,11 @@ private:
 
     int nrModel_;
 
+    dictionary propsDict_;
+
     int insertionNr_;
 
     word command_;
-
-    word myName_;
-
-    dictionary propsDict_;
 
     wordList filePathList_;
 
@@ -91,11 +89,11 @@ public:
 
     // Member Functions
 
-    word name(){return myName_;};
+        word name() const {return propsDict_.dictName();}
 
-    const char* command(int);
+        const char* command(int);
 
-    bool runCommand(int);
+        bool runCommand(int);
 
 };
 

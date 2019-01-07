@@ -58,11 +58,11 @@ protected:
 
     const wordList chemistryModels_;
 
-    autoPtr<energyModel>* energyModel_;
+    PtrList<energyModel> energyModel_;
 
     autoPtr<thermCondModel> thermCondModel_;
 
-    autoPtr<chemistryModel>* chemistryModel_;
+    PtrList<chemistryModel> chemistryModel_;
 
     void calcEnergyContributions();
 
@@ -98,15 +98,13 @@ public:
 
        label nrEnergyModels() const;
 
-       inline const wordList& energyModels() const;
-
        bool implicitEnergyModel() const;
 
        int nrChemistryModels();
 
-       inline const wordList& energyModels();
+       inline const wordList& energyModels() const;
 
-       inline const wordList& chemistryModels();
+       inline const wordList& chemistryModels() const;
 
        void energyContributions(volScalarField&);
 

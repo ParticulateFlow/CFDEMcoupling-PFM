@@ -87,7 +87,7 @@ inline const fvMesh& cfdemCloud::mesh() const
 
 inline bool cfdemCloud::solveFlow() const
 {
-    return bool(solveFlow_);
+    return solveFlow_;
 }
 
 inline bool cfdemCloud::verbose() const
@@ -299,6 +299,11 @@ inline const locateModel& cfdemCloud::locateM() const
     return locateModel_;
 }
 
+inline momCoupleModel& cfdemCloud::momCoupleM(int i)
+{
+    return momCoupleModel_[i];
+}
+
 inline const momCoupleModel& cfdemCloud::momCoupleM(int i) const
 {
     return momCoupleModel_[i];
@@ -319,14 +324,24 @@ inline probeModel& cfdemCloud::probeM()
     return probeModel_();
 }
 
+inline voidFractionModel& cfdemCloud::voidFractionM()
+{
+    return voidFractionModel_();
+}
+
 inline const voidFractionModel& cfdemCloud::voidFractionM() const
 {
-    return voidFractionModel_;
+    return voidFractionModel_();
+}
+
+inline averagingModel& cfdemCloud::averagingM()
+{
+    return averagingModel_();
 }
 
 inline const averagingModel& cfdemCloud::averagingM() const
 {
-    return averagingModel_;
+    return averagingModel_();
 }
 
 inline const clockModel& cfdemCloud::clockM() const
@@ -349,9 +364,9 @@ inline const wordList& cfdemCloud::liggghtsCommandModelList() const
     return liggghtsCommandModelList_;
 }
 
-inline autoPtr<liggghtsCommandModel>* cfdemCloud::liggghtsCommand() const
+inline liggghtsCommandModel& cfdemCloud::liggghtsCommand(const label modeli)
 {
-    return liggghtsCommand_;
+    return liggghtsCommand_[modeli];
 }
 
 inline const turbulenceModel& cfdemCloud::turbulence() const

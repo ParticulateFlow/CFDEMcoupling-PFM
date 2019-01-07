@@ -30,7 +30,7 @@ inline const wordList& cfdemCloudEnergy::energyModels() const
     return energyModels_;
 }
 
-inline const wordList& cfdemCloudEnergy::chemistryModels()
+inline const wordList& cfdemCloudEnergy::chemistryModels() const
 {
     return chemistryModels_;
 }

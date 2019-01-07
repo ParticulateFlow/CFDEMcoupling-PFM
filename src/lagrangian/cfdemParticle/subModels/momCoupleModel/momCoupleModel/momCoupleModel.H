@@ -111,12 +111,12 @@ public:
     // Member Functions
 
         // implicit momentum source field
-        virtual tmp<volScalarField> impMomSource() const;
+        virtual tmp<volScalarField> impMomSource();
 
         // explicit momentum source field
-        virtual tmp<volVectorField> expMomSource() const;
+        virtual tmp<volVectorField> expMomSource();
 
-        virtual void resetMomSourceField() const=0;
+        virtual void resetMomSourceField() = 0;
 
         virtual void setSourceField(volVectorField &) const;
 };

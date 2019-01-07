@@ -1,7 +1,12 @@
-*.o
-*.d
-*.a
-*.dep
-log_*
-log.*
+# ignore generated files and folders
+*.html
+*.rst
+*.inv
 *~
+searchindex.js
+
+_build
+_sources
+_static
+_images
+

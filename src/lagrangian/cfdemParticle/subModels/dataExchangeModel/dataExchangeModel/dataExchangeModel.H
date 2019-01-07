@@ -62,7 +62,7 @@ protected:
 
         int maxNumberOfParticles_;
 
-        mutable int couplingStep_;
+        int couplingStep_;
 
         scalar DEMts_;
 
@@ -176,7 +176,7 @@ public:
         virtual void destroy(double*) const;
         //====
 
-        virtual bool couple(int) const;
+        virtual bool couple(int);
 
         virtual scalar timeStepFraction() const;
 
@@ -257,9 +257,8 @@ public:
                 particleCloud_.cellIDs_[i][0]=ID[i];
         }
 
-        virtual word myType() const=0;
 
-        virtual void setCG() { Warning << "setCG() not executed correctly!" << endl; }
+        virtual scalar getCG() const { Warning << "getCG() not executed correctly!" << endl; return 1.; }
 };
 
 

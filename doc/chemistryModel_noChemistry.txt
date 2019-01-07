@@ -1,0 +1,39 @@
+"CFDEMproject Website"_lws - "Main Page"_main :c
+
+:link(lws,http://www.cfdem.com)
+:link(main,CFDEMcoupling_Manual.html)
+
+:line
+
+chemistryModel off command :h3
+
+[Syntax:]
+
+Defined in "couplingProperties"_CFDEMcoupling_dicts.html#couplingProperties
+dictionary.
+
+chemistryModels
+(
+    off
+); :pre
+
+[Examples:]
+
+chemistryModels
+(
+    off
+); :pre
+
+[Description:]
+
+The {off} model is a dummy chemistryModel model which does not perform any
+chemical reaction calculations.
+
+[Restrictions:]
+
+none
+
+[Related commands:]
+
+"chemistryModel"_chemistryModel.html
+

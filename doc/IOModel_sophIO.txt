@@ -1,29 +1,35 @@
-"CFDEMproject WWW Site"_lws - "CFDEM Commands"_lc :c
+"CFDEMproject Website"_lws - "Main Page"_main :c
 
 :link(lws,http://www.cfdem.com)
-:link(lc,CFDEMcoupling_Manual.html#comm)
+:link(main,CFDEMcoupling_Manual.html)
 
 :line
 
-IOModel_sophIO command :h3
+IOModel sophIO command :h3
 
 [Syntax:]
 
-Defined in couplingProperties dictionary.
+Defined in "couplingProperties"_CFDEMcoupling_dicts.html#couplingProperties
+dictionary.
 
-IOModel "sophIO"; :pre
+IOModel sophIO; :pre
 
 [Examples:]
 
-IOModel "sophIO"; :pre
+IOModel sophIO; :pre
 
 [Description:]
 
-The sophIO-model is based on basicIO model and additionally writes voidfraction, implicit forces, explicit forces. Data is written every write time of the CFD simulation.
+The {sophIO} model is based on the "basicIO"_IOModel_basicIO.html model and
+additionally writes void fraction, implicit forces and explicit forces.
 
-[Restrictions:] None.
+Data is written every write time of the CFD simulation.
+
+[Restrictions:]
+
+none
 
 [Related commands:]
 
-"IOModel"_IOModel.html
+"IOModel"_IOModel.html, "IOModel basicIO"_IOModel_basicIO.html
 
