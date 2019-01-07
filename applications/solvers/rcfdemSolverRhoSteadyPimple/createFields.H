@@ -189,6 +189,39 @@ Info<< "Reading thermophysical properties\n" << endl;
         )
     );
 
+    dimensionedScalar pMax
+    (
+        dimensionedScalar::lookupOrDefault
+        (
+            "pMax",
+            pimple.dict(),
+            dimPressure,
+            GREAT
+        )
+    );
+
+    dimensionedScalar pMin
+    (
+        dimensionedScalar::lookupOrDefault
+        (
+            "pMin",
+            pimple.dict(),
+            dimPressure,
+            -GREAT
+        )
+    );
+
+    dimensionedScalar UMax
+    (
+        dimensionedScalar::lookupOrDefault
+        (
+            "UMax",
+            pimple.dict(),
+            dimVelocity,
+            -1.0
+        )
+    );
+
     Info<< "Creating turbulence model\n" << endl;
     autoPtr<compressible::turbulenceModel> turbulence
     (
@@ -265,4 +298,6 @@ Info<< "Reading thermophysical properties\n" << endl;
         ),
         Us
     );
+
+
 //===============================

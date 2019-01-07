@@ -85,6 +85,11 @@ int main(int argc, char *argv[])
     scalar recTimeStep = recurrenceBase.recM().recTimeStep();
     scalar startTime = runTime.startTime().value();
 
+    const IOdictionary& couplingProps = particleCloud.couplingProperties();
+    label nEveryFlow(couplingProps.lookupOrDefault<label>("nEveryFlow",1));
+    Info << "Solving flow equations every " << nEveryFlow << " steps.\n" << endl;
+    label stepcounter = 0;
+
     Info<< "\nStarting time loop\n" << endl;
 
     while (runTime.run())
@@ -127,33 +132,36 @@ int main(int argc, char *argv[])
 
         particleCloud.clockM().start(26,"Flow");
         volScalarField rhoeps("rhoeps",rho*voidfractionRec);
-        while (pimple.loop())
+        if (stepcounter%nEveryFlow==0)
         {
-            // if needed, perform drag update here
-            if (pimple.nCorrPIMPLE() <= 1)
+            while (pimple.loop())
             {
-                #include "rhoEqn.H"
-            }
+                // if needed, perform drag update here
+                if (pimple.nCorrPIMPLE() <= 1)
+                {
+                    #include "rhoEqn.H"
+                }
 
+                // --- Pressure-velocity PIMPLE corrector loop
 
-            // --- Pressure-velocity PIMPLE corrector loop
+                #include "UEqn.H"
+                #include "EEqn.H"
 
-            #include "UEqn.H"
-            #include "EEqn.H"
+                // --- Pressure corrector loop
+                while (pimple.correct())
+                {
+                    // besides this pEqn, OF offers a "pimple consistent"-option
+                    #include "pEqn.H"
+                    rhoeps=rho*voidfractionRec;
+                }
 
-            // --- Pressure corrector loop
-            while (pimple.correct())
-            {
-                // besides this pEqn, OF offers a "pimple consistent"-option
-                #include "pEqn.H"
-                rhoeps=rho*voidfractionRec;
-            }
-
-            if (pimple.turbCorr())
-            {
-                turbulence->correct();
+                if (pimple.turbCorr())
+                {
+                    turbulence->correct();
+                }
             }
         }
+        stepcounter++;
         particleCloud.clockM().stop("Flow");
 
         particleCloud.clockM().start(31,"postFlow");

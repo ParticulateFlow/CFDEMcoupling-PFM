@@ -17,13 +17,14 @@ License
     Copyright (C) 2015- Thomas Lichtenegger, JKU Linz, Austria
 
     Description
-    Correlation for Nusselt number according to
-    Gunn, D. J. International Journal of Heat and Mass Transfer 21.4 (1978)
+    heat transfer from granular conduction according to the
+    Effective Medium Theory discussed e.g. by
+    Carson et al. Int. J. Heat Mass Transfer 48 (2005)
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef heatTransferGunn_H
-#define heatTransferGunn_H
+#ifndef heatTransferGranConduction_H
+#define heatTransferGranConduction_H
 
 #include "fvCFD.H"
 #include "cfdemCloudEnergy.H"
@@ -34,10 +35,10 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class heatTransferGunn Declaration
+                           Class heatTransferGranConduction Declaration
 \*---------------------------------------------------------------------------*/
 
-class heatTransferGunn
+class heatTransferGranConduction
 :
     public energyModel
 {
@@ -47,93 +48,51 @@ protected:
 
     bool multiTypes_;
 
-    bool expNusselt_;
-
-    bool interpolation_;
-
     bool verbose_;
 
-    bool implicit_;
+    word QPartPartName_;
 
-    word QPartFluidName_;
+    volScalarField QPartPart_;
 
-    volScalarField QPartFluid_;
+    const volScalarField& partTempField_;
 
-    word QPartFluidCoeffName_;
+    volScalarField partEffThermCondField_;
 
-    volScalarField QPartFluidCoeff_;
-
-    mutable volScalarField partTempField_;
-
-    volScalarField partRelTempField_;
-
-    volScalarField ReField_;
-
-    volScalarField NuField_;
-
-    dimensionedScalar partRefTemp_;
-
-    bool calcPartTempField_;
-
-    bool calcPartTempAve_;
-
-    scalar partTempAve_;
-
-    word tempFieldName_;
-
-    const volScalarField& tempField_;            // ref to temperature field
+    volScalarField partThermCondField_;
 
     word voidfractionFieldName_;
 
-    const volScalarField& voidfraction_;    // ref to voidfraction field
-
-    scalar maxSource_;                           // max (limited) value of src field
-
-    word velFieldName_;
-
-    const volVectorField& U_;
-
-    word densityFieldName_;
-
-    const volScalarField& rho_;
-
-    word partTempName_;
-
-    mutable double **partTemp_;
-
+    const volScalarField& voidfraction_;
+  
     word partHeatFluxName_;
 
     mutable double **partHeatFlux_;
 
-    mutable double **partHeatFluxCoeff_;
+    scalarList typePartThermCond_;
 
-    mutable double **partRe_;
-
-    mutable double **partNu_;
-
-    mutable scalar scaleDia_;
-
-    scalarList typeCG_;
+    mutable double **partThermCond_;
 
     void allocateMyArrays() const;
 
-    void partTempField();
+    void calcPartEffThermCond();
 
-    scalar Nusselt(scalar, scalar, scalar) const;
-
+    void calcPartThermCond();
+   
     virtual void giveData();
 
-    virtual void heatFlux(label, scalar, scalar, scalar, scalar cg3 = 1.0);
+    virtual void heatFlux(label, scalar, scalar, scalar);
+
+
 
 public:
 
     //- Runtime type information
-    TypeName("heatTransferGunn");
+    TypeName("heatTransferGranConduction");
 
     // Constructors
 
         //- Construct from components
-        heatTransferGunn
+        heatTransferGranConduction
         (
             const dictionary& dict,
             cfdemCloudEnergy& sm
@@ -142,20 +101,19 @@ public:
 
     // Destructor
 
-        virtual ~heatTransferGunn();
+        virtual ~heatTransferGranConduction();
 
 
     // Member Functions
 
-        void addEnergyContribution(volScalarField&) const;
+        void addEnergyContribution(volScalarField&) const {}
 
-	void addEnergyCoefficient(volScalarField&) const;
+        void addEnergyCoefficient(volScalarField&) const {}
 
 	void calcEnergyContribution();
 
 	void postFlow();
 
-        scalar aveTpart() const;
 };
 
 
