@@ -45,6 +45,8 @@ protected:
 
     dictionary propsDict_;
 
+    bool multiTypes_;
+
     bool expNusselt_;
 
     bool interpolation_;
@@ -111,6 +113,8 @@ protected:
 
     mutable scalar scaleDia_;
 
+    scalarList typeCG_;
+
     void allocateMyArrays() const;
 
     void partTempField();
@@ -119,7 +123,7 @@ protected:
 
     virtual void giveData();
 
-    virtual void heatFlux(label, scalar, scalar, scalar);
+    virtual void heatFlux(label, scalar, scalar, scalar, scalar cg3 = 1.0);
 
 public:
 

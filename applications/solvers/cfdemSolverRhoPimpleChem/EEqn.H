@@ -9,6 +9,9 @@ particleCloud.energyCoefficients(QCoeff);
 thCond=particleCloud.thermCondM().thermCond();
 Cpv = he.name() == "e" ? thermo.Cv() : thermo.Cp();
 
+// correct source for the thermodynamic reference temperature
+dimensionedScalar Tref("Tref", dimTemperature, T[0]-he[0]/(Cpv[0]+SMALL));
+Qsource += QCoeff*Tref;
 
 fvScalarMatrix EEqn
 (
