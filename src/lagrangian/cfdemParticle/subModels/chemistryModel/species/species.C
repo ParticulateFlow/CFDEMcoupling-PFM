@@ -264,8 +264,8 @@ void species::execute()
                 }
             }
 
-            partTemp_[index][0] =   Tfluid;
-            partRho_[index][0]  =   rhofluid;
+            partTemp_[index][0] = Tfluid;
+            partRho_[index][0]  = rhofluid;
             partMolarConc_[index][0]    =   molarConcfluid;
             for (int i=0; i<speciesNames_.size();i++)
             {
@@ -289,6 +289,8 @@ void species::execute()
             Info << "voidfraction =" << voidfraction << endl;
         }
     }
+
+    //Info << "partTemp from species.C = " << partTemp_[100][0] << endl;
 
         // give DEM data
         particleCloud_.dataExchangeM().giveData(partTempName_, "scalar-atom", partTemp_);
