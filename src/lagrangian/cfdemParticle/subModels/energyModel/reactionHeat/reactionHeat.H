@@ -47,6 +47,8 @@ protected:
 
     bool interpolation_;
 
+    bool verbose_;
+
     const fvMesh& mesh_;
 
     scalar maxSource_;
