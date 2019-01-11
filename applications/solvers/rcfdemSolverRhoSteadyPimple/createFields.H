@@ -116,7 +116,7 @@ Info<< "Reading thermophysical properties\n" << endl;
             "thCond",
             runTime.timeName(),
             mesh,
-            IOobject::NO_READ,
+            IOobject::READ_IF_PRESENT,
             IOobject::AUTO_WRITE
         ),
         mesh,
@@ -299,5 +299,7 @@ Info<< "Reading thermophysical properties\n" << endl;
         Us
     );
 
+    
+    dimensionedScalar kf("0", dimensionSet(1, 1, -3, -1, 0, 0, 0), 0.026);
 
 //===============================

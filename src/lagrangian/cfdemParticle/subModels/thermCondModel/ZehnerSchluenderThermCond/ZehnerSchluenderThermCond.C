@@ -50,20 +50,8 @@ ZehnerSchluenderThermCond::ZehnerSchluenderThermCond
 :
     thermCondModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
-    partKsField_
-    (
-        IOobject
-        (
-            "partKs",
-            sm.mesh().time().timeName(),
-            sm.mesh(),
-            IOobject::READ_IF_PRESENT,
-            IOobject::NO_WRITE
-        ),
-        sm.mesh(),
-        dimensionedScalar("one", dimensionSet(1, 1, -3, -1,0,0,0), 1.0),
-	"zeroGradient"
-    ),
+    partKsFieldName_(propsDict_.lookupOrDefault<word>("partKsFieldName","partKs")),
+    partKsField_(const_cast<volScalarField&>(sm.mesh().lookupObject<volScalarField> (partKsFieldName_))),
     voidfractionFieldName_(propsDict_.lookupOrDefault<word>("voidfractionFieldName","voidfraction")),
     voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
     typeKs_(propsDict_.lookupOrDefault<scalarList>("thermalConductivities",scalarList(1,-1.0))),
@@ -118,28 +106,8 @@ void ZehnerSchluenderThermCond::allocateMyArrays() const
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-tmp<volScalarField> ZehnerSchluenderThermCond::thermCond() const
+void ZehnerSchluenderThermCond::calcThermCond()
 {
-    tmp<volScalarField> tvf
-    (
-        new volScalarField
-        (
-            IOobject
-            (
-                "tmpThCond",
-                voidfraction_.instance(),
-                voidfraction_.mesh(),
-                IOobject::NO_READ,
-                IOobject::NO_WRITE
-            ),
-            voidfraction_.mesh(),
-            dimensionedScalar("zero", dimensionSet(1,1,-3,-1,0,0,0), 0.0),
-            "zeroGradient"
-        )
-    );
-
-    volScalarField& svf = tvf.ref();
-
     calcPartKsField();
     scalar A = 0.0;
     scalar B = 0.0;
@@ -149,10 +117,10 @@ tmp<volScalarField> ZehnerSchluenderThermCond::thermCond() const
     scalar voidfraction = 0.0;
     scalar w = 7.26e-3;
 
-    forAll(svf, cellI)
+    forAll(partKsField_, cellI)
     {
         voidfraction = voidfraction_[cellI];
-        if(voidfraction > 1.0 - SMALL || partKsField_[cellI] < SMALL) svf[cellI] = 0.0;
+        if(voidfraction > 1.0 - SMALL || partKsField_[cellI] < SMALL) partKsField_[cellI] = 0.0;
         else
         {
             A = partKsField_[cellI]/kf0_.value();
@@ -161,27 +129,19 @@ tmp<volScalarField> ZehnerSchluenderThermCond::thermCond() const
             C = (A - 1) * InvOnemBoA * InvOnemBoA * B/A * log(A/B) - (B - 1) * InvOnemBoA - 0.5 * (B + 1);
             C *= 2.0 * InvOnemBoA;
             k = Foam::sqrt(1 - voidfraction) * (w * A + (1 - w) * C) * kf0_.value();
-            svf[cellI] = k / (1 - voidfraction);
+            partKsField_[cellI] = k / (1 - voidfraction);
         }
     }
 
-    svf.correctBoundaryConditions();
+    partKsField_.correctBoundaryConditions();
 
     // if a wallQFactor field is present, use it to scale heat transport through a patch
     if (hasWallQFactor_)
     {
         wallQFactor_.correctBoundaryConditions();
         forAll(wallQFactor_.boundaryField(), patchi)
-            svf.boundaryFieldRef()[patchi] *= wallQFactor_.boundaryField()[patchi];
+            partKsField_.boundaryFieldRef()[patchi] *= wallQFactor_.boundaryField()[patchi];
     }
-
-    return tvf;
-}
-
-tmp<volScalarField> ZehnerSchluenderThermCond::thermDiff() const
-{
-    FatalError << "ZehnerSchluenderThermCond does not provide thermal diffusivity." << abort(FatalError);
-    return tmp<volScalarField>(NULL);
 }
 
 void ZehnerSchluenderThermCond::calcPartKsField() const

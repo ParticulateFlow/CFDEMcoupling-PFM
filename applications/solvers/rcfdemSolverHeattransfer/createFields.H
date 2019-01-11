@@ -184,6 +184,8 @@
         incompressible::turbulenceModel::New(URec, phiRec, laminarTransport)
     );
 
+    const IOdictionary& transportProps = mesh.lookupObject<IOdictionary>("transportProperties");
+    dimensionedScalar Cv(transportProps.lookup("Cv"));
 
     volScalarField addSource
     (

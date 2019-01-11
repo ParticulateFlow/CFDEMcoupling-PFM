@@ -87,6 +87,8 @@ heatTransferGranConduction::heatTransferGranConduction
 	"zeroGradient"
     ),
     partTempField_(sm.mesh().lookupObject<volScalarField>("partTemp")),
+    prescribedVoidfractionFieldName_(propsDict_.lookupOrDefault<word>("prescribedVoidfractionFieldName","voidfraction")),
+    prescribedVoidfraction_(sm.mesh().lookupObject<volScalarField> (prescribedVoidfractionFieldName_)),
     voidfractionFieldName_(propsDict_.lookupOrDefault<word>("voidfractionFieldName","voidfraction")),
     voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
     partHeatFluxName_(propsDict_.lookupOrDefault<word>("partHeatFluxName","conductiveHeatFlux")),
@@ -176,7 +178,7 @@ void heatTransferGranConduction::calcPartEffThermCond()
 
     forAll(partEffThermCondField_, cellI)
     {
-        volFrac = 1.0 - voidfraction_[cellI];
+        volFrac = 1.0 - prescribedVoidfraction_[cellI];
         if (volFrac < 0.334)
         {
             partEffThermCondField_[cellI] = 0.0;
@@ -220,7 +222,7 @@ void heatTransferGranConduction::calcPartThermCond()
 
 void heatTransferGranConduction::heatFlux(label index, scalar vol, scalar voidfraction, scalar QPartPart)
 {
-        partHeatFlux_[index][0] = vol / (1.0 - voidfraction) * QPartPart;
+        partHeatFlux_[index][0] = vol * QPartPart / (1.0 - voidfraction) ;
 }
 
 void heatTransferGranConduction::giveData()

@@ -60,10 +60,14 @@ protected:
 
     volScalarField partThermCondField_;
 
+    word prescribedVoidfractionFieldName_;
+
+    const volScalarField& prescribedVoidfraction_;
+
     word voidfractionFieldName_;
 
     const volScalarField& voidfraction_;
-  
+
     word partHeatFluxName_;
 
     mutable double **partHeatFlux_;
@@ -77,7 +81,7 @@ protected:
     void calcPartEffThermCond();
 
     void calcPartThermCond();
-   
+
     virtual void giveData();
 
     virtual void heatFlux(label, scalar, scalar, scalar);

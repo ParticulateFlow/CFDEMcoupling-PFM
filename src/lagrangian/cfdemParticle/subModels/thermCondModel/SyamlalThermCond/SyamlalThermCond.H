@@ -52,15 +52,15 @@ class SyamlalThermCond
 private:
   
     dictionary propsDict_;
+
+    word thermCondFieldName_;
+
+    volScalarField& thermCondField_;
   
     word voidfractionFieldName_;
   
     const volScalarField& voidfraction_;
-    
-    word rhoFieldName_;
-    
-    const volScalarField& rho_;
-    
+
     word wallQFactorName_;
     
     // ratio of half-cell-size and near-wall film
@@ -89,12 +89,8 @@ public:
 
 
     // Member Functions
-	
-	tmp<volScalarField> thermCond() const;
-	
-	tmp<volScalarField> thermDiff() const;
-       
-       
+
+        void calcThermCond();
 };
 
 

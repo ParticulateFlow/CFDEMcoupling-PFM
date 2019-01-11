@@ -5,10 +5,7 @@
     volScalarField& he = thermo.he();
     particleCloud.energyContributions(Qsource);
     particleCloud.energyCoefficients(QCoeff);
-
-    //thDiff=particleCloud.thermCondM().thermDiff();   
-    thCond=particleCloud.thermCondM().thermCond(); 
-
+ 
     addSource = 
         (
             he.name() == "e"
@@ -32,11 +29,11 @@
       + addSource
       - Qsource
       - fvm::Sp(QCoeff/Cpv, he)
+ //     - fvm::laplacian(voidfractionRec*kf/Cpv,he)
       - fvm::laplacian(voidfractionRec*thCond/Cpv,he)
      ==
         fvOptions(rho, he)
     );
-
 
     EEqn.relax();
 

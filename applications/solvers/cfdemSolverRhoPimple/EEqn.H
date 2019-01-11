@@ -6,9 +6,6 @@
     particleCloud.energyContributions(Qsource);
     particleCloud.energyCoefficients(QCoeff);
 
-    //thDiff=particleCloud.thermCondM().thermDiff();
-    thCond=particleCloud.thermCondM().thermCond();
-
     addSource = fvc::ddt(rhoeps, K) + fvc::div(phi, K)
       + (
             he.name() == "e"
@@ -32,7 +29,6 @@
       - Qsource
       - fvm::Sp(QCoeff/Cpv, he)
      // thermal conduction of the fluid with effective conductivity
-     // - fvm::laplacian(rhoeps*thDiff,he)
       - fvm::laplacian(voidfraction*thCond/Cpv,he)
       // + particle-fluid energy transfer due to work
       // + fluid energy dissipation due to shearing

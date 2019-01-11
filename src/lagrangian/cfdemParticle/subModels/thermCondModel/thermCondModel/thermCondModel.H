@@ -55,10 +55,6 @@ protected:
 	IOdictionary transportProperties_;
 	
 	dimensionedScalar kf0_;
-	
-	dimensionedScalar Cp_;
-	
-	dimensionedScalar Cv_;
 
 public:
 
@@ -105,15 +101,9 @@ public:
 
 
     // Member Functions
-	
-	virtual tmp<volScalarField> thermCond() const = 0;
-	
-	virtual tmp<volScalarField> thermDiff() const = 0;
-	
-	dimensionedScalar Cp() const;
-	
-	dimensionedScalar Cv() const;
-       
+
+        virtual void calcThermCond() {}
+     
 };
 
 
