@@ -54,6 +54,7 @@ $(forceModels)/ShirgaonkarIB/ShirgaonkarIB.C
 $(forceModels)/KochHillDrag/KochHillDrag.C
 $(forceModels)/LaEuScalarTemp/LaEuScalarTemp.C
 $(forceModels)/virtualMassForce/virtualMassForce.C
+$(forceModels)/ParmarBassetForce/ParmarBassetForce.C
 $(forceModels)/gradPForce/gradPForce.C
 $(forceModels)/viscForce/viscForce.C
 $(forceModels)/MeiLift/MeiLift.C

@@ -121,13 +121,13 @@ MeiLift::MeiLift
     particleCloud_.probeM().vectorFields_.append("liftForce"); //first entry must the be the force
     particleCloud_.probeM().vectorFields_.append("Urel");      //other are debug
     particleCloud_.probeM().vectorFields_.append("vorticity");
-    particleCloud_.probeM().vectorFields_.append("Ang velocity");
+    particleCloud_.probeM().vectorFields_.append("Ang_velocity");
     particleCloud_.probeM().scalarFields_.append("Rep");
     particleCloud_.probeM().scalarFields_.append("Rew");
     particleCloud_.probeM().scalarFields_.append("J*");
     particleCloud_.probeM().scalarFields_.append("Cl(shear)");
     particleCloud_.probeM().scalarFields_.append("Cl*(spin)");
-    particleCloud_.probeM().scalarFields_.append("Omega eq");
+    particleCloud_.probeM().scalarFields_.append("Omega_eq");
     particleCloud_.probeM().scalarFields_.append("Cl(combined)");
     particleCloud_.probeM().writeHeader();
 }
