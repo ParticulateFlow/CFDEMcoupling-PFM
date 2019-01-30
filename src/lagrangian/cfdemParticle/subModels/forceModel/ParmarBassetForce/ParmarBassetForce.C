@@ -268,14 +268,14 @@ void ParmarBassetForce::setForce() const
                 		scalar tScale = tRef_[index][0]/tRef;
                 		scalar mScale = mRef_[index][0]/mRef;
                 		scalar lScale = lRef_[index][0]/rs;
-                		scalar rScale = gH0_[index][0]/gH;
+                		scalar rScale =  gH0_[index][0]/gH;
 
                 		r = 1;
 
                         rescaleHist(tScale, mScale, lScale, rScale, index);
                 	}
 
-                	gH0_[index][0]  = gH;
+                	 gH0_[index][0] = gH;
                 	tRef_[index][0] = tRef;
                 	mRef_[index][0] = mRef;
                 	lRef_[index][0] = rs;
@@ -364,7 +364,7 @@ void ParmarBassetForce::setForce() const
             		{
             			//calculate coefficients
             			double C[4];
-            			calculateCoeffs(k,t0,rHist_[nHist_-2*discOrder_][index][0],c,chi,C);
+            			calculateCoeffs(k,t0,rHist_[nInt_][index][0],c,chi,C);
 
             			// solve Eq. 3.20
             			solveFlongODE(k,C,dt,index);
@@ -455,12 +455,20 @@ scalar Foam::ParmarBassetForce::calculateK0(scalar r, scalar dt) const
 {
 	scalar gamma = pow(r,0.333)*pow(dt,0.25);
 
+	/*
 	scalar K0 = 2./(9.*pow(r,0.666)) *
 			(
 					6.*gamma*gamma/(gamma*gamma*gamma+1)
 					+ 2.*sqrt(3.)*atan(sqrt(3.)*gamma/(2.-gamma))
 					+ log((gamma*gamma-gamma+1.)/(gamma+1.)/(gamma+1.))
 			); // int_0^dt K(r,xi) dxi
+	*/
+	scalar K0 = 2./(9.*pow(r,0.666)) *
+			(
+			  -   .37224 * gamma
+			  + 12.1587  * gamma*gamma
+			  -  6.4884  * gamma*gamma*gamma
+			); // third order approximation to the eq. above
 
 	return K0;
 }
@@ -560,7 +568,7 @@ void Foam::ParmarBassetForce::rescaleHist(scalar tScale, scalar mScale, scalar l
     	// rescale ddtU history
     	for (int j=0; j<nHist_; j++) // loop over past times
     		if (ddtUrelHist_[j][index][i] != NOTONCPU)
-    			ddtUrelHist_[j][index][i] *= lScale*(tScale*tScale);
+    			ddtUrelHist_[j][index][i] *= lScale/(tScale*tScale);
 
     	// rescale F1, F2 history
     	for (int k=0; k<2; k++) // loop over F1, F2
