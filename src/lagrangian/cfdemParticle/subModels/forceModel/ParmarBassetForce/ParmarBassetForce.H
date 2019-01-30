@@ -137,7 +137,7 @@ public:
 
         void calculateCoeffs(int k, scalar t0, scalar r, double c[2][4][3], double chi[2][4][2], double C[4]) const;
 
-        void solveFlongODE(int k, double C[4], scalar dt, int index, int discOrder_) const;
+        void solveFlongODE(int k, double C[4], scalar dt, int index) const;
 
         void rescaleHist(scalar tScale, scalar mScale, scalar lScale, scalar rScale, int index) const;
 

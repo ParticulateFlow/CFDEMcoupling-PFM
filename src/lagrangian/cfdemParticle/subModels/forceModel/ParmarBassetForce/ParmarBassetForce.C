@@ -72,11 +72,11 @@ ParmarBassetForce::ParmarBassetForce
 	UsFieldName_(propsDict_.lookup("granVelFieldName")),
 	Us_(sm.mesh().lookupObject<volVectorField> (UsFieldName_)),
 	nInt_(readScalar(propsDict_.lookup("nIntegral"))),
-	discOrder_(1),
-	nHist_(nInt_+2*discOrder_),
+	discOrder_(readScalar(propsDict_.lookup("discretisationOrder"))),
+	nHist_(nInt_+discOrder_+1),
 	ddtUrelHist_(nHist_,NULL), 		               // UrelHist_[ndt in past][particle ID][dim]
 	rHist_(nHist_,NULL),                           // rHist_[ndt in past][particle ID][0]
-	FHist_(2,List<double**>(3,NULL)),              // FHist_[k={1,2}-1][ndt in past][particle ID][dim]
+	FHist_(2,List<double**>(2*discOrder_+1,NULL)), // FHist_[k={1,2}-1][ndt in past][particle ID][dim]
 	gH0_(NULL),
 	tRef_(NULL),
 	mRef_(NULL),
@@ -125,8 +125,8 @@ ParmarBassetForce::ParmarBassetForce
     //Extra switches/settings
     particleCloud_.checkCG(true);
 
-    if (discOrder_!=1)
-    	FatalError << "Parmar Basset Force: Discretisation order > 1 not implemented!" << endl;
+    if (discOrder_!=1 || discOrder_!=2)
+    	FatalError << "Parmar Basset Force: Discretisation order > 2 not implemented!" << endl;
 
     //Append the field names to be probed
     particleCloud_.probeM().initialize(typeName, typeName+".logDat");
@@ -183,7 +183,7 @@ void ParmarBassetForce::setForce() const
     vector Urel(0,0,0);
     vector ddtUrel(0,0,0);
 
-    scalar t0min    = 0.001;
+    scalar t0min    = 0.01;
 
     const volScalarField& nufField = forceSubM(0).nuField();
     const volScalarField& rhoField = forceSubM(0).rhoField();
@@ -270,6 +270,8 @@ void ParmarBassetForce::setForce() const
                 		scalar lScale = lRef_[index][0]/rs;
                 		scalar rScale = gH0_[index][0]/gH;
 
+                		r = 1;
+
                         rescaleHist(tScale, mScale, lScale, rScale, index);
                 	}
 
@@ -291,13 +293,17 @@ void ParmarBassetForce::setForce() const
             	Urel    /= mps;
             	ddtUrel /= mpss;
 
-            	// warning for too small t0
-            	if (t0<t0min)
-            		Pout << "ParmarBassetForce WARNING: t0 = " << t0 << " at ID = " << index <<  endl;
-
             	// update ddtUrel  and r history
             	update_ddtUrelHist(ddtUrel,index); // add current dim.less ddtUrel to history
             	update_rHist(r,index); // add current r to history
+
+            	// warning and reset for too small t0
+            	if (t0<t0min)
+            	{
+            		Pout << "ParmarBassetForce WARNING: t0 = " << t0 << " at ID = " << index <<  endl;
+                	gH0_[index][0]            = NOTONCPU; //reset reference
+                	ddtUrelHist_[0][index][0] = NOTONCPU; //reset ddtU history (only component used for checking nKnown)
+            	}
 
             	// check length of known history
             	int nKnown = 0;
@@ -340,9 +346,9 @@ void ParmarBassetForce::setForce() const
             	update_FHist(vector(0., 0., 0.),vector(0., 0., 0.),index);
 
             	// initialise ddtUrel(t0) as 0 and r(t0) as 1
-            	if (nKnown == nHist_-2*discOrder_)
+            	if (nKnown == nInt_)
             	{
-            		for (int j=nHist_-2*discOrder_; j<nHist_; j++) // loop over past times
+            		for (int j=nInt_; j<nHist_; j++) // loop over past times
             		{
             			rHist_[j][index][0] = 1.;
             			for (int i=0; i<3; i++) // loop over dimensions
@@ -361,7 +367,7 @@ void ParmarBassetForce::setForce() const
             			calculateCoeffs(k,t0,rHist_[nHist_-2*discOrder_][index][0],c,chi,C);
 
             			// solve Eq. 3.20
-            			solveFlongODE(k,C,dt,index,discOrder_);
+            			solveFlongODE(k,C,dt,index);
             		}
             	}
 
@@ -513,7 +519,7 @@ void Foam::ParmarBassetForce::calculateCoeffs(int k, scalar t0, scalar r, double
 	}
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-void Foam::ParmarBassetForce::solveFlongODE(int k, double C[4], scalar dt, int index, int discOrder_) const
+void Foam::ParmarBassetForce::solveFlongODE(int k, double C[4], scalar dt, int index) const
 {
 	if (discOrder_==1)
 	{
@@ -521,11 +527,28 @@ void Foam::ParmarBassetForce::solveFlongODE(int k, double C[4], scalar dt, int i
 		{
 			FHist_[k][0][index][i] =
 					(
-						(     C[1]/dt+2/dt/dt) * FHist_[k][1][index][i]
-					  - (             1/dt/dt) * FHist_[k][2][index][i]
-		              - (C[2]+C[3]/dt        ) * ddtUrelHist_[nHist_-2][index][i]
-					  + (     C[3]/dt        ) * ddtUrelHist_[nHist_-1][index][i]
-					) / (C[0]+C[1]/dt+1/dt/dt); // Eq. 3.20 using first order temporal discretisation
+						(     C[1]/dt+2/(dt*dt)) * FHist_[k][1][index][i]
+					  - (             1/(dt*dt)) * FHist_[k][2][index][i]
+		              - (C[2]+C[3]/dt        ) * ddtUrelHist_[nInt_  ][index][i]
+					  + (     C[3]/dt        ) * ddtUrelHist_[nInt_+1][index][i]
+					) / (C[0]+C[1]/dt+1/(dt*dt)); // Eq. 3.20 using first order temporal discretisation
+		}
+	}
+	if (discOrder_==2)
+	{
+		for (int i=0; i<3; i++) // loop over dimensions
+		{
+			FHist_[k][0][index][i] =
+					(
+						(       4*C[1]/(2*dt) + 24/(4*dt*dt)) * FHist_[k][1][index][i]
+					  - (         C[1]/(2*dt) + 22/(4*dt*dt)) * FHist_[k][2][index][i]
+					  + (                        8/(4*dt*dt)) * FHist_[k][3][index][i]
+					  - (                        1/(4*dt*dt)) * FHist_[k][4][index][i]
+
+		              - (C[2] + 3*C[3]/(2*dt)               ) * ddtUrelHist_[nInt_  ][index][i]
+					  + (       4*C[3]/(2*dt)               ) * ddtUrelHist_[nInt_+1][index][i]
+					  - (         C[3]/(2*dt)               ) * ddtUrelHist_[nInt_+2][index][i]
+					) / (C[0] + 3*C[1]/(2*dt) +  9/(4*dt*dt)); // Eq. 3.20 using second order temporal discretisation
 		}
 	}
 }
@@ -541,7 +564,7 @@ void Foam::ParmarBassetForce::rescaleHist(scalar tScale, scalar mScale, scalar l
 
     	// rescale F1, F2 history
     	for (int k=0; k<2; k++) // loop over F1, F2
-    		for (int j=0; j<2; j++) // loop over past times
+    		for (int j=0; j<(2*discOrder_+1); j++) // loop over past times
     			FHist_[k][j][index][i] *= mScale*lScale/(tScale*tScale);
     }
     // rescale r history
