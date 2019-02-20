@@ -15,7 +15,7 @@ fvOptions.constrain(UEqn);
 if (piso.momentumPredictor() && (modelType=="B" || modelType=="Bfull"))
 {
     solve(UEqn == - fvc::grad(p) + Ksl/rho*Us);
-    fvOptions.correct(U);		    
+    fvOptions.correct(U);
 }
 else if (piso.momentumPredictor())
 {

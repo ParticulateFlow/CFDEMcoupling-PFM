@@ -6,13 +6,13 @@
     particleCloud.energyContributions(Qsource);
     particleCloud.energyCoefficients(QCoeff);
 
-    //thDiff=particleCloud.thermCondM().thermDiff();   
-    thCond=particleCloud.thermCondM().thermCond(); 
+    //thDiff=particleCloud.thermCondM().thermDiff();
+    thCond=particleCloud.thermCondM().thermCond();
 
-    addSource = 
+    addSource =
         (
             he.name() == "e"
-          ? 
+          ?
             fvc::div(phi, K) +
             fvc::div
             (
