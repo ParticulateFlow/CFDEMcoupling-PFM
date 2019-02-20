@@ -37,9 +37,9 @@ if (pimple.momentumPredictor() && (modelType=="B" || modelType=="Bfull"))
         ) * voidfraction
      + Ksl*Us
     );
-    
+
     fvOptions.correct(U);
-}        
+}
 else if (pimple.momentumPredictor())
 {
     solve

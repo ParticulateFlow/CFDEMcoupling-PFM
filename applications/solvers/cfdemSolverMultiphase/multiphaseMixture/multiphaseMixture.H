@@ -159,8 +159,8 @@ private:
     // Private member functions
 
         void calcAlphas();
-        
-        tmp<volScalarField> calcNu() const;        
+
+        tmp<volScalarField> calcNu() const;
 
         void solveAlphas(const scalar cAlpha);
 
@@ -257,7 +257,7 @@ public:
         {
             return surfaceTensionForce_;
         }
-        
+
         //- Indicator of the proximity of the interface
         //  Field values are 1 near and 0 away for the interface.
         tmp<volScalarField> nearInterface() const;
