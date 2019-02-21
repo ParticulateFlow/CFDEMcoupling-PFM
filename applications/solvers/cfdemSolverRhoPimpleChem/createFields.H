@@ -279,9 +279,10 @@
             "dSauter",
             runTime.timeName(),
             mesh,
-            IOobject::MUST_READ,
+            IOobject::READ_IF_PRESENT,
             IOobject::AUTO_WRITE
         ),
-        mesh
+        mesh,
+        dimensionedScalar("zero",dimensionSet(0, 1, 0, 0, 0,0,0),0)
     );
 //===============================
