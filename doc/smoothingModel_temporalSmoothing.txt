@@ -47,7 +47,7 @@ performed on a separate (smooth) field which uses the calculated (un-smooth)
 field as a reference.
 Thus its usage is limited and CANNOT be used to smooth the exchange fields
 similar to other smoothing models.
-For further information see Vångö et al., "Unresolved CFD–DEM modeling of
+For further information see Vångö et al., "Unresolved CFD-DEM modeling of
 multiphase flow in densely packed particle beds", Appl. Math. Model. (2018).
 
 [Restrictions:]

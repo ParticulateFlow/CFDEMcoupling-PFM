@@ -33,7 +33,7 @@ For more details, see "Vångö et al. (2018)"_#Vångö2018.
 
 :link(Vångö2018)
 [(Vångö2018)] M. Vångö, S. Pirker, T. Lichtenegger. (2018):
-"Unresolved CFD–DEM modeling of multiphase flow in densely packed particle beds",
+"Unresolved CFD-DEM modeling of multiphase flow in densely packed particle beds",
 Applied Mathematical Modelling
 
 :line
