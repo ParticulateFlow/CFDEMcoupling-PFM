@@ -18,6 +18,7 @@ License
 #include "error.H"
 #include "otherForceModel.H"
 #include "mathExtra.H"
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam

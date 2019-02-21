@@ -79,7 +79,7 @@ public:
         bool doSmoothing() const;
 
         //void dSmoothing(volScalarField&) const;
-        
+
         void smoothen(volScalarField&) const;
 
         void smoothen(volVectorField&) const;
