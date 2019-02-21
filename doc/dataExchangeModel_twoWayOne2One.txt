@@ -15,11 +15,11 @@ dataExchangeModel twoWayOne2One;
 twoWayOne2OneProps
 \{
     liggghtsPath     "path";
-    useStaticProcMap useMap;
+    useStaticProcMap switch1;
 \}; :pre
 
 {path}   = path to the DEM simulation input file :ulb,l
-{useMap} = yes or no, determines if the map is build once (yes) or every coupling step (no) (default: no) :l
+{switch1} = (optional, default no) switch to determine if the map is built once (yes) or every coupling step (no) :l
 :ule
 
 [Examples:]
