@@ -75,7 +75,6 @@ public:
         virtual ~weightSecondaryPhase();
 
 
-
     // Member Functions
 
 

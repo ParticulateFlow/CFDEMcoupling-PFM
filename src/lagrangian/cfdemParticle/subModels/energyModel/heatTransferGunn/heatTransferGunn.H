@@ -28,6 +28,7 @@ License
 #include "fvCFD.H"
 #include "cfdemCloudEnergy.H"
 #include "energyModel.H"
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -81,13 +82,13 @@ protected:
 
     word tempFieldName_;
 
-    const volScalarField& tempField_;            // ref to temperature field
+    const volScalarField& tempField_;           // ref to temperature field
 
     word voidfractionFieldName_;
 
-    const volScalarField& voidfraction_;    // ref to voidfraction field
+    const volScalarField& voidfraction_;        // ref to voidfraction field
 
-    scalar maxSource_;                           // max (limited) value of src field
+    scalar maxSource_;                          // max (limited) value of src field
 
     word velFieldName_;
 
@@ -149,11 +150,11 @@ public:
 
         void addEnergyContribution(volScalarField&) const;
 
-	void addEnergyCoefficient(volScalarField&) const;
+        void addEnergyCoefficient(volScalarField&) const;
 
-	void calcEnergyContribution();
+        void calcEnergyContribution();
 
-	void postFlow();
+        void postFlow();
 
         scalar aveTpart() const;
 };

@@ -45,7 +45,7 @@ heatTransferGunnPartField::heatTransferGunnPartField
 :
     heatTransferGunn(dict,sm),
     partCpField_
-    (   
+    (
         IOobject
         (
             "partCp",
@@ -82,15 +82,15 @@ heatTransferGunnPartField::heatTransferGunnPartField
     {
         FatalError << "heatTransferGunnPartField: provide list of specific heat capacities." << abort(FatalError);
     }
-    
+
     if (propsDict_.found("pTMax"))
     {
-        pTMax_.value()=scalar(readScalar(propsDict_.lookup("pTMax"))); 
+        pTMax_.value()=scalar(readScalar(propsDict_.lookup("pTMax")));
     }
-    
+
     if (propsDict_.found("pTMin"))
     {
-        pTMin_.value()=scalar(readScalar(propsDict_.lookup("pTMin"))); 
+        pTMin_.value()=scalar(readScalar(propsDict_.lookup("pTMin")));
     }
 
     partTempField_.writeOpt() = IOobject::AUTO_WRITE;
