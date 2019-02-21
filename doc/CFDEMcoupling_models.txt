@@ -38,7 +38,7 @@ models used for chemical reaction calculations.
 "diffusionCoefficients"_chemistryModel_diffusionCoefficients.html,
 "massTransferCoeff"_chemistryModel_massTransferCoeff.html,
 "off"_chemistryModel_noChemistry.html,
-reactantPerParticle,
+"reactantPerParticle"_chemistryModel_reactantPerParticle.html,
 "species"_chemistryModel_species.html :tb(c=2,ea=c)
 
 
