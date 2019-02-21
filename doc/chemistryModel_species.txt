@@ -26,16 +26,18 @@ speciesProps
     partTempName            "partTemp";
     partRhoName             "partRho";
     verbose                 switch1;
+    Nevery                  number1;
 \} :pre
 
 {ChemistryFile} = path to file, where the reacting species are listed  :ulb,l
-{T} = name of the finite volume temperature field, it is already added in default and doesn't need to be specified if name is the same :l
-{rho} = name of the finite volume density field, it is already added in default and doesn't need to be specified if name is the same :l
-{voidfraction} = name of the finite volume void fraction field, it is already added in default and doesn't need to be specified if name is the same :l
-{molarConc} = name of the finite volume molar concentration field, it is already added in default and doesn't need to be specified if name is the same :l
-{partTemp} = name of the finite volume cell averaged particle temperature field, it is already added in default and doesn't need to be specified if name is the same :l
-{partRho} = name of the finite volume cell averaged density temperature field, it is already added in default and doesn't need to be specified if name is the same :l
-{switch1} = (optional, normally off) flag to give information :l
+{T} = (optional, default "T") name of the finite volume temperature field :l
+{rho} = (optional, default "rho") name of the finite volume density field :l
+{voidfraction} = (optional, default "voidfraction") name of the finite volume void fraction field :l
+{molarConc} = (optional, default "molarConc") name of the finite volume molar concentration field :l
+{partTemp} = (optional, default "partTemp") name of the finite volume cell averaged particle temperature field :l
+{partRho} = (optional, default "partRho") name of the finite volume cell averaged density temperature field :l
+{switch1} = (optional, default false) flag to output verbose information :l
+{number1} = (optional, default 1) number to adjust execution interval :l
 :ule
 
 [Examples:]

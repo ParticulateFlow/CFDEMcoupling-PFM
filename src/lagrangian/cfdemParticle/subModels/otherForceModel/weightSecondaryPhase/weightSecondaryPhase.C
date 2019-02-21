@@ -19,6 +19,7 @@ License
 #include "weightSecondaryPhase.H"
 #include "mathExtra.H"
 #include "addToRunTimeSelectionTable.H"
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -82,11 +83,11 @@ tmp<volVectorField> weightSecondaryPhase::exportForceField()
             )
         )
     );
-    
+
     volVectorField& source = tsource.ref();
-    
+
     source = rho_ * alpha_ * g_;
-    
+
     return tsource;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

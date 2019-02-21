@@ -43,13 +43,13 @@ protected:
         const dictionary& dict_;
 
         cfdemCloudEnergy& particleCloud_;
-	
-	IOdictionary transportProperties_;
-	
-	scalar kf0_;                              // fluid thermal conductivity [W/(m*K)]
 
-        scalar Cp_;                                  // specific heat capacity [W*s/(kg*K)]
-       
+        IOdictionary transportProperties_;
+
+        scalar kf0_;                                // fluid thermal conductivity [W/(m*K)]
+
+        scalar Cp_;                                 // specific heat capacity [W*s/(kg*K)]
+
 public:
 
     //- Runtime type information
@@ -76,7 +76,7 @@ public:
         energyModel
         (
             const dictionary& dict,
-            cfdemCloudEnergy& sm            
+            cfdemCloudEnergy& sm
         );
 
 
@@ -98,16 +98,16 @@ public:
     // Member Functions
 
         virtual void addEnergyContribution(volScalarField&) const = 0;
-	
-	virtual void addEnergyCoefficient(volScalarField&) const = 0;
-	
-	virtual void calcEnergyContribution() = 0;
-	
-	virtual void postFlow() {}
 
-	virtual void solve() {}
-	
-	scalar Cp() const;
+        virtual void addEnergyCoefficient(volScalarField&) const = 0;
+
+        virtual void calcEnergyContribution() = 0;
+
+        virtual void postFlow() {}
+
+        virtual void solve() {}
+
+        scalar Cp() const;
 
 
 };

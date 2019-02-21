@@ -72,7 +72,7 @@ private:
     // gas pressure at particle location
     word pressureFieldName_;
 
-    const volScalarField& P_; 
+    const volScalarField& P_;
 
     word partPressureName_;
 

@@ -1,7 +1,7 @@
 include $(CFDEM_ADD_LIBS_DIR)/additionalLibs
 
 EXE_INC = \
-	-I$(CFDEM_OFVERSION_DIR) \
+    -I$(CFDEM_OFVERSION_DIR) \
     -ImultiphaseMixture/lnInclude \
     -I$(LIB_SRC)/transportModels \
     -I$(LIB_SRC)/transportModels/incompressible/lnInclude \

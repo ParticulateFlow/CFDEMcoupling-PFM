@@ -530,7 +530,7 @@ bool twoWayOne2One::couple(int i)
             if(particleCloud_.liggghtsCommand(i).exactTiming())
             {
                 exactTiming = true;
-                DynamicList<scalar> h 
+                DynamicList<scalar> h
                   = particleCloud_.liggghtsCommand(i).executionsWithinPeriod
                 (
                     TSstart(),
@@ -799,7 +799,7 @@ void twoWayOne2One::locateParticles()
                 << " ouf of " << returnReduce(lmp->atom->nlocal, sumOp<label>())
                 << " particles in FOAM. "
                 << endl;
-    } 
+    }
 
     // copy positions/cellids/ids of located particles into arrays
     allocateArray(lig2foam_ids_, 0, getNumberOfParticles());

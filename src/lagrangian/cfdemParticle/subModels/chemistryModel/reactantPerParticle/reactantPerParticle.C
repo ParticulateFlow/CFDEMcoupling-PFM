@@ -107,8 +107,6 @@ void reactantPerParticle::reAllocMyArrays() const
 
 void reactantPerParticle::execute()
 {
-   
-    
     loopCounter_++;
     if (loopCounter_ % Nevery_ != 0)
     {
@@ -119,7 +117,7 @@ void reactantPerParticle::execute()
 
     particlesPerCell_ *= 0.0;
 
-    label  cellI=0; 
+    label  cellI=0;
     scalar voidfraction(1);
     scalar cellvolume(0.0);
     scalar particlesPerCell(1.0);
@@ -131,7 +129,7 @@ void reactantPerParticle::execute()
         if (cellI >= 0)
         {
             particlesPerCell_[cellI] += 1.0;
-	}
+        }
     }
 
     // no fill array and communicate it
@@ -151,7 +149,7 @@ void reactantPerParticle::execute()
 
         // give DEM data
         particleCloud_.dataExchangeM().giveData("reactantPerParticle", "scalar-atom", reactantPerParticle_);
-       
+
         Info << "give data done" << endl;
 }
 

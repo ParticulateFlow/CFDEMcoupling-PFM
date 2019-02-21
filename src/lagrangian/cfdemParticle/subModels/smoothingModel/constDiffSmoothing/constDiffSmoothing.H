@@ -6,7 +6,7 @@
                                 Christoph Goniva, christoph.goniva@cfdem.com
                                 Copyright 2009-2012 JKU Linz
                                 Copyright 2012-     DCS Computing GmbH, Linz
-                                Copyright (C) 2013-     Graz University of  
+                                Copyright (C) 2013-     Graz University of
                                                         Technology, IPPT
 -------------------------------------------------------------------------------
 License
@@ -91,7 +91,7 @@ public:
         bool doSmoothing() const;
 
         //void dSmoothing(volScalarField&) const;
-        
+
         void smoothen(volScalarField&) const;
 
         void smoothen(volVectorField&) const;

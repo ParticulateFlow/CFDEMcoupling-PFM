@@ -189,7 +189,7 @@ cfdemCompLIG :pre
 
 If the compilation fails with a message like
 
-No rule to make target `/usr/lib/libpython2.7.so' :pre
+No rule to make target '/usr/lib/libpython2.7.so' :pre
 
 you probably need to create a symbolic link to the library in question.
 

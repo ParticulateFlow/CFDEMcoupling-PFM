@@ -21,6 +21,7 @@ License
 #include "error.H"
 #include "heatTransferGunn.H"
 #include "addToRunTimeSelectionTable.H"
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -493,7 +494,7 @@ void heatTransferGunn::heatFlux(label index, scalar h, scalar As, scalar Tfluid,
     //Info << "Tfluid =  " << Tfluid << endl;
     scalar hAs = h * As * cg3;
 
-    if (particleCloud_.getParticleEffVolFactors()) 
+    if (particleCloud_.getParticleEffVolFactors())
     {
         scalar effVolFac = particleCloud_.particleEffVolFactor(index);
         hAs *= effVolFac;

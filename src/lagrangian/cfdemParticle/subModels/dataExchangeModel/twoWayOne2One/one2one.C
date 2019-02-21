@@ -213,7 +213,7 @@ void One2One::exchange(T *&src, T *&dst, int data_length)
   if (offset_local > -1)
   {
     const int max_locali = nlocal_ * data_length;
-    for 
+    for
     (
       int locali = 0;
       locali < max_locali;

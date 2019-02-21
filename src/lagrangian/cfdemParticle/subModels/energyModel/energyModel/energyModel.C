@@ -74,7 +74,7 @@ energyModel::~energyModel()
 
 scalar energyModel::Cp() const
 {
-    return Cp_; 
+    return Cp_;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

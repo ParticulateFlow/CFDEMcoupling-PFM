@@ -28,8 +28,8 @@ Description
     enhanced two way DEM-CFD coupling via MPI.
 
     Compared to twoWayMPI, no Allreduces are used for communication.
-    Instead, a geomatric map between FOAM and LIG domains is created and
-    subsequently used for communication. 
+    Instead, a geometric map between FOAM and LIG domains is created and
+    subsequently used for communication.
 
 Class
     twoWayOne2One
@@ -210,7 +210,7 @@ public:
 
         //- extractCollected takes the collected data from Lig
         //  present in this Foam domain and applies the mask.
-        //  the width parameter can be used for reshaping. 
+        //  the width parameter can be used for reshaping.
         template <typename T>
         void extractCollected(T**&, T**&, int width=1) const;
         template <typename T>
