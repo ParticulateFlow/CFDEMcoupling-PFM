@@ -19,7 +19,7 @@ twoWayOne2OneProps
 \}; :pre
 
 {path}   = path to the DEM simulation input file :ulb,l
-{useMap} = yes or no, determines if the map is build once (yes) or every coupling step (no) (default: no):l
+{useMap} = yes or no, determines if the map is build once (yes) or every coupling step (no) (default: no) :l
 :ule
 
 [Examples:]
