@@ -62,7 +62,7 @@ ZehnerSchluenderThermCond::ZehnerSchluenderThermCond
         ),
         sm.mesh(),
         dimensionedScalar("one", dimensionSet(1, 1, -3, -1,0,0,0), 1.0),
-	"zeroGradient"
+        "zeroGradient"
     ),
     voidfractionFieldName_(propsDict_.lookupOrDefault<word>("voidfractionFieldName","voidfraction")),
     voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),

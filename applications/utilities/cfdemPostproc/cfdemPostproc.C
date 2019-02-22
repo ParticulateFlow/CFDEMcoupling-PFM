@@ -84,7 +84,7 @@ int main(int argc, char *argv[])
     particleCloud.dataExchangeM().allocateArray(particleV_,0.,1);
     particleCloud.get_cellIDs(cellIDs_);  // get ref to cellIDs
     //particleCloud.dataExchangeM().allocateArray(cellIDs_,0.,1);
-    
+
 
     while (runTime.loop())
     {

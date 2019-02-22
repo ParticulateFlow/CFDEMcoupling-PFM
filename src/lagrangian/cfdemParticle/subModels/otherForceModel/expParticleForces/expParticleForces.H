@@ -26,6 +26,7 @@ SourceFiles
 #define expParticleForces_H
 
 #include "otherForceModel.H"
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam

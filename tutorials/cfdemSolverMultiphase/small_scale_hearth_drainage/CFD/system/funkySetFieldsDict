@@ -1,0 +1,52 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.3.0                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+	version 2.0;
+	format ascii;
+	class dictionary;
+	location "system";
+	object funkySetFieldsDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+initVariables
+(
+	"initIronLevel=0.04;"
+	"initSlagLevel=0.07;"
+);
+expressions
+(
+	initAir
+	{
+		variables $initVariables;
+		field alpha.air;
+		expression "1";
+		condition "pos().z > initSlagLevel"; 
+		keepPatches 1; //keep boundary conditions
+	}
+
+	initIron
+	{
+		variables $initVariables;
+		field alpha.iron;
+		expression "1";
+		condition "pos().z <= initIronLevel"; 
+		keepPatches 1; //keep boundary conditions
+	}
+
+	initSlag
+	{
+		variables $initVariables;
+		field alpha.slag;
+		expression "1";
+		condition "pos().z > initIronLevel && pos().z <= initSlagLevel"; 
+		keepPatches 1; //keep boundary conditions
+	}
+);
+
+// ************************************************** *********************** //

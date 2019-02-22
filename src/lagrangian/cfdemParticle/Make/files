@@ -80,6 +80,8 @@ $(forceModels)/Fines/FanningDynFines.C
 $(forceModels)/Fines/ErgunStatFines.C
 $(forceModels)/granKineticEnergy/granKineticEnergy.C
 $(forceModels)/pdCorrelation/pdCorrelation.C
+$(forceModels)/surfaceTensionForce/surfaceTensionForce.C
+$(forceModels)/gradPForceSmooth/gradPForceSmooth.C
 
 $(forceModelsMS)/forceModelMS/forceModelMS.C
 $(forceModelsMS)/forceModelMS/newForceModelMS.C
@@ -147,6 +149,8 @@ $(dataExchangeModels)/oneWayVTK/oneWayVTK.C
 $(dataExchangeModels)/twoWayFiles/twoWayFiles.C
 $(dataExchangeModels)/noDataExchange/noDataExchange.C
 $(dataExchangeModels)/twoWayMPI/twoWayMPI.C
+$(dataExchangeModels)/twoWayOne2One/twoWayOne2One.C
+$(dataExchangeModels)/twoWayOne2One/one2one.C
 
 $(averagingModels)/averagingModel/averagingModel.C
 $(averagingModels)/averagingModel/newAveragingModel.C
@@ -169,5 +173,6 @@ $(smoothingModels)/smoothingModel/smoothingModel.C
 $(smoothingModels)/smoothingModel/newSmoothingModel.C
 $(smoothingModels)/noSmoothing/noSmoothing.C
 $(smoothingModels)/constDiffSmoothing/constDiffSmoothing.C
+$(smoothingModels)/temporalSmoothing/temporalSmoothing.C
 
 LIB = $(CFDEM_LIB_DIR)/lib$(CFDEM_LIB_NAME)

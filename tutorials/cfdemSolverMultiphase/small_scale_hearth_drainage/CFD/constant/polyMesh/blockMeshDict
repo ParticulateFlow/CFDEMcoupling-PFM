@@ -1,0 +1,146 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.3.0                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      blockMeshDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// General m4 macros
+
+  
+
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+// User-defined parameters
+convertToMeters 1;
+
+
+
+
+
+
+ //degrees from x-axis
+
+
+
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+// Derived parameters
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+vertices
+(
+	(-0.05 0.05 0)					//Square 11 o'clock,bottom		//0
+	(0.05 0.05 0)					//Square 1 o'clock,bottom		//1
+	(0.05 -0.05 0)					//Square 5 o'clock,bottom		//2
+	(-0.05 -0.05 0)					//Square 7 o'clock,bottom		//3
+	(-0.0707106781186548 0.0707106781186548 0)					//Cyl 11 o'clock,bottom			//4
+	(0.0707106781186548 0.0707106781186548 0)						//Cyl 1 o'clock,bottom			//5
+	(0.0707106781186548 -0.0707106781186548 0)						//Cyl 5 o'clock,bottom			//6
+	(-0.0707106781186548 -0.0707106781186548 0)						//Cyl 7 o'clock,bottom			//7
+
+	(-0.05 0.05 0.08)			//Square 11 o'clock,top			//8
+	(0.05 0.05 0.08)			//Square 1 o'clock,top			//9
+	(0.05 -0.05 0.08)			//Square 5 o'clock,top			//10
+	(-0.05 -0.05 0.08)			//Square 7 o'clock,top			//11
+	(-0.0707106781186548 0.0707106781186548 0.08)			//Cyl 11 o'clock,top			//12
+	(0.0707106781186548 0.0707106781186548 0.08)				//Cyl 1 o'clock,top				//13
+	(0.0707106781186548 -0.0707106781186548 0.08)				//Cyl 5 o'clock,top				//14
+	(-0.0707106781186548 -0.0707106781186548 0.08)				//Cyl 7 o'clock,top				//15
+
+);
+
+blocks
+(
+    hex (3 2 1 0 11 10 9 8) (8 8 6) simpleGrading (1 1 1) 				//Mid-block	
+    hex (7 3 0 4 15 11 8 12) (3 8 6) simpleGrading (1 1 1) 		//west-block 	
+    hex (0 1 5 4 8 9 13 12) (8 3 6) simpleGrading (1 1 1) 		//north-block
+    hex (2 6 5 1 10 14 13 9) (3 8 6) simpleGrading (1 1 1) 		//east-block
+    hex (7 6 2 3 15 14 10 11) (8 3 6) simpleGrading (1 1 1) 		//south-block						
+);
+
+edges
+(
+	arc 7 4 (-0.1 0 0)					//west,bottom
+	arc 4 5 (0 0.1 0)					//north,bottom
+	arc 5 6 (0.1 0 0)					//east,bottom
+	arc 6 7 (0 -0.1 0)					//south,bottom
+	arc 15 12 (-0.1 0 0.08)		//west,top
+	arc 12 13 (0 0.1 0.08)		//north,top
+	arc 13 14 (0.1 0 0.08)		//east,top
+	arc 14 15 (0 -0.1 0.08)		//south,top
+);
+
+boundary
+(
+    atmosphere
+    {
+		type patch;
+		faces
+        (
+			(8 11 10 9)
+			(8 12 15 11)
+			(8 9 13 12)
+			(9 10 14 13)
+			(10 11 15 14)
+        );
+    }
+    walls
+    {
+		type wall;
+		faces
+		(
+		    //Bottom
+			(0 1 2 3)	
+			(0 3 7 4)
+			(4 5 1 0)
+			(2 1 5 6)
+			(2 6 7 3)
+			
+			//West
+			(15 12 4 7)
+			
+			//North
+			(12 13 5 4)
+			
+			//East
+			(13 14 6 5)
+
+			//South
+			(14 15 7 6)
+		);
+    }  
+);
+
+// ************************************************************************* //

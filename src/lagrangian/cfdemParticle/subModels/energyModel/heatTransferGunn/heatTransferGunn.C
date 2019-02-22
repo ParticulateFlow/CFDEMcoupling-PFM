@@ -21,6 +21,7 @@ License
 #include "error.H"
 #include "heatTransferGunn.H"
 #include "addToRunTimeSelectionTable.H"
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -43,6 +44,7 @@ heatTransferGunn::heatTransferGunn
 :
     energyModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
+    multiTypes_(false),
     expNusselt_(propsDict_.lookupOrDefault<bool>("expNusselt",false)),
     interpolation_(propsDict_.lookupOrDefault<bool>("interpolation",false)),
     verbose_(propsDict_.lookupOrDefault<bool>("verbose",false)),
@@ -141,7 +143,9 @@ heatTransferGunn::heatTransferGunn
     partHeatFlux_(NULL),
     partHeatFluxCoeff_(NULL),
     partRe_(NULL),
-    partNu_(NULL)
+    partNu_(NULL),
+    scaleDia_(1.),
+    typeCG_(propsDict_.lookupOrDefault<scalarList>("coarseGrainingFactors",scalarList(1,1.0)))
 {
     allocateMyArrays();
 
@@ -181,6 +185,14 @@ heatTransferGunn::heatTransferGunn
           FatalError <<"Cannot read and create NuField at the same time!\n" << abort(FatalError);
         }
     }
+
+    if (propsDict_.found("scale") && typeCG_.size()==1)
+    {
+        // if "scale" is specified and there's only one single type, use "scale"
+        scaleDia_=scalar(readScalar(propsDict_.lookup("scale")));
+        typeCG_[0] = scaleDia_;
+    }
+    else if (typeCG_.size()>1) multiTypes_ = true;
 }
 
 
@@ -255,6 +267,15 @@ void heatTransferGunn::calcEnergyContribution()
        const volScalarField mufField = particleCloud_.turbulence().nu()*rho_;
     #endif
 
+    if (typeCG_.size()>1 || typeCG_[0] > 1)
+    {
+        Info << "heatTransferGunn using scale = " << typeCG_ << endl;
+    }
+    else if (particleCloud_.cg() > 1)
+    {
+        scaleDia_=particleCloud_.cg();
+        Info << "heatTransferGunn using scale from liggghts cg = " << scaleDia_ << endl;
+    }
 
     // calc La based heat flux
     scalar voidfraction(1);
@@ -263,6 +284,8 @@ void heatTransferGunn::calcEnergyContribution()
     label cellI=0;
     vector Us(0,0,0);
     scalar ds(0);
+    scalar ds_scaled(0);
+    scalar scaleDia3 = typeCG_[0]*typeCG_[0]*typeCG_[0];
     scalar muf(0);
     scalar magUr(0);
     scalar Rep(0);
@@ -270,6 +293,8 @@ void heatTransferGunn::calcEnergyContribution()
     scalar Nup(0);
     scalar Tsum(0.0);
 
+    scalar cg = typeCG_[0];
+    label partType = 1;
 
     interpolationCellPoint<scalar> voidfractionInterpolator_(voidfraction_);
     interpolationCellPoint<vector> UInterpolator_(U_);
@@ -297,22 +322,30 @@ void heatTransferGunn::calcEnergyContribution()
                 if (voidfraction < 0.01)
                     voidfraction = 0.01;
 
+                if (multiTypes_)
+                {
+                    partType = particleCloud_.particleType(index);
+                    cg = typeCG_[partType - 1];
+                    scaleDia3 = cg*cg*cg;
+                }
+
                 // calc relative velocity
                 Us = particleCloud_.velocity(index);
                 magUr = mag(Ufluid - Us);
                 ds = 2.*particleCloud_.radius(index);
+                ds_scaled = ds/cg;
                 muf = mufField[cellI];
-                Rep = ds * magUr * voidfraction * rho_[cellI]/ muf;
+                Rep = ds_scaled * magUr * voidfraction * rho_[cellI]/ muf;
                 Pr = max(SMALL, Cp_ * muf / kf0_);
 
                 Nup = Nusselt(voidfraction, Rep, Pr);
 
                 Tsum += partTemp_[index][0];
-                scalar h = kf0_ * Nup / ds;
-                scalar As = ds * ds * M_PI; // surface area of sphere
+                scalar h = kf0_ * Nup / ds_scaled;
+                scalar As = ds_scaled * ds_scaled * M_PI; // surface area of sphere
 
                 // calc convective heat flux [W]
-                heatFlux(index, h, As, Tfluid);
+                heatFlux(index, h, As, Tfluid, scaleDia3);
 
                 if(verbose_)
                 {
@@ -434,9 +467,16 @@ scalar heatTransferGunn::Nusselt(scalar voidfraction, scalar Rep, scalar Pr) con
                         Foam::pow(Rep,0.7) * Foam::pow(Pr,0.33);
 }
 
-void heatTransferGunn::heatFlux(label index, scalar h, scalar As, scalar Tfluid)
+void heatTransferGunn::heatFlux(label index, scalar h, scalar As, scalar Tfluid, scalar cg3)
 {
-    scalar hAs = h * As;
+    scalar hAs = h * As * cg3;
+
+    if (particleCloud_.getParticleEffVolFactors())
+    {
+        scalar effVolFac = particleCloud_.particleEffVolFactor(index);
+        hAs *= effVolFac;
+    }
+
     partHeatFlux_[index][0] = - hAs * partTemp_[index][0];
     if(!implicit_)
     {

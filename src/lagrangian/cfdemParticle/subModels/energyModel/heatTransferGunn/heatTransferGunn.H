@@ -28,6 +28,7 @@ License
 #include "fvCFD.H"
 #include "cfdemCloudEnergy.H"
 #include "energyModel.H"
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -44,6 +45,8 @@ class heatTransferGunn
 protected:
 
     dictionary propsDict_;
+
+    bool multiTypes_;
 
     bool expNusselt_;
 
@@ -79,13 +82,13 @@ protected:
 
     word tempFieldName_;
 
-    const volScalarField& tempField_;            // ref to temperature field
+    const volScalarField& tempField_;           // ref to temperature field
 
     word voidfractionFieldName_;
 
-    const volScalarField& voidfraction_;    // ref to voidfraction field
+    const volScalarField& voidfraction_;        // ref to voidfraction field
 
-    scalar maxSource_;                           // max (limited) value of src field
+    scalar maxSource_;                          // max (limited) value of src field
 
     word velFieldName_;
 
@@ -109,6 +112,10 @@ protected:
 
     mutable double **partNu_;
 
+    mutable scalar scaleDia_;
+
+    scalarList typeCG_;
+
     void allocateMyArrays() const;
 
     void partTempField();
@@ -117,7 +124,7 @@ protected:
 
     virtual void giveData();
 
-    virtual void heatFlux(label, scalar, scalar, scalar);
+    virtual void heatFlux(label, scalar, scalar, scalar, scalar cg3 = 1.0);
 
 public:
 
@@ -143,11 +150,11 @@ public:
 
         void addEnergyContribution(volScalarField&) const;
 
-	void addEnergyCoefficient(volScalarField&) const;
+        void addEnergyCoefficient(volScalarField&) const;
 
-	void calcEnergyContribution();
+        void calcEnergyContribution();
 
-	void postFlow();
+        void postFlow();
 
         scalar aveTpart() const;
 };

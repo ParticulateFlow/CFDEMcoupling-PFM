@@ -33,6 +33,7 @@ SourceFiles
 
 #include "fvCFD.H"
 #include "cfdemCloud.H"
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -51,13 +52,13 @@ protected:
         const dictionary& dict_;
 
         cfdemCloud& particleCloud_;
-	
-	IOdictionary transportProperties_;
-	
-	dimensionedScalar kf0_;
-	
-	dimensionedScalar Cp_;
-	
+
+        IOdictionary transportProperties_;
+
+        dimensionedScalar kf0_;
+
+        dimensionedScalar Cp_;
+
 
 public:
 
@@ -104,11 +105,11 @@ public:
 
 
     // Member Functions
-	
-	virtual tmp<volScalarField> thermCond() const = 0;
-	
-	virtual tmp<volScalarField> thermDiff() const = 0;
-       
+
+        virtual tmp<volScalarField> thermCond() const = 0;
+
+        virtual tmp<volScalarField> thermDiff() const = 0;
+
 };
 
 

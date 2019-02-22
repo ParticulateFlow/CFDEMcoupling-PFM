@@ -6,13 +6,13 @@
     particleCloud.energyContributions(Qsource);
     particleCloud.energyCoefficients(QCoeff);
 
-    //thDiff=particleCloud.thermCondM().thermDiff();   
-    thCond=particleCloud.thermCondM().thermCond(); 
+    //thDiff=particleCloud.thermCondM().thermDiff();
+    thCond=particleCloud.thermCondM().thermCond();
 
-    addSource = 
+    addSource =
         (
             he.name() == "e"
-          ? 
+          ?
             fvc::div(phi, K) +
             fvc::div
             (
@@ -25,6 +25,9 @@
 
     Cpv = he.name() == "e" ? thermo.Cv() : thermo.Cp();
 
+    // correct source for the thermodynamic reference temperature
+    dimensionedScalar Tref("Tref", dimTemperature, T[0]-he[0]/(Cpv[0]+SMALL));
+    Qsource += QCoeff*Tref;
 
     fvScalarMatrix EEqn
     (

@@ -28,7 +28,7 @@ Application
     writeUfluidwriteUfluid
 
 Description
-    Writes the the cell center fluid velocity to particles in the lagrangian 
+    Writes the the cell center fluid velocity to particles in the lagrangian
     time directory.
 \*---------------------------------------------------------------------------*/
 
@@ -76,13 +76,13 @@ int nParticle=0;
     {
         volVectorField U(UHeader,mesh);
         passiveParticleCloud myCloud(mesh, cloudName);
-		myCloud.write();
+        myCloud.write();
         nParticle = myCloud.size();
-	    IOField<vector> Ufluid(myCloud.fieldIOobject("Ufluid",IOobject::NO_READ),nParticle);
+        IOField<vector> Ufluid(myCloud.fieldIOobject("Ufluid",IOobject::NO_READ),nParticle);
         label i = 0;
         forAllConstIter(passiveParticleCloud, myCloud, iter)
         {
-		    Ufluid[i]=U[iter().cell()];
+            Ufluid[i]=U[iter().cell()];
             i++;
         }
         Ufluid.write();

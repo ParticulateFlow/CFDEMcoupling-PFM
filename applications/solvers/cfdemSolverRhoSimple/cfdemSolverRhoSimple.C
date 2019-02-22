@@ -17,14 +17,12 @@ License
     Copyright (C) 2015- Thomas Lichtenegger, JKU Linz, Austria
 
 Application
-    cfdemSolverRhoPimple
+    cfdemSolverRhoSimple
 
 Description
-    Transient solver for compressible flow using the flexible PIMPLE (PISO-SIMPLE)
-    algorithm.
-    Turbulence modelling is generic, i.e. laminar, RAS or LES may be selected.
-    The code is an evolution of the solver rhoPimpleFoam in OpenFOAM(R) 4.x,
-    where additional functionality for CFD-DEM coupling is added.
+    Steady-state solver for turbulent flow of compressible fluids based on
+    rhoSimpleFoam where functionality for CFD-DEM coupling has been added.
+
 \*---------------------------------------------------------------------------*/
 
 #include "fvCFD.H"
