@@ -291,7 +291,7 @@ void KochHillRWDrag::setForce() const
                     // modify current fluid velocity
                     for (int dim=0; dim<3; dim++)
                     {
-                        partUfluct_[index][dim] = RanGen_.GaussNormal()*sqrt(2.*k/3.);
+                        partUfluct_[index][dim] = RanGen_.scalarNormal()*sqrt(2.*k/3.);
                         //Pout << "RW-TEST: Ufluid[" << dim << "] = " << Ufluid[dim] << " Ufluct = " << partUfluct_[index][dim] << " k = " << k << endl; // TEST-Output
                         Ufluid[dim] = Ufluid[dim] + partUfluct_[index][dim];
                     }
