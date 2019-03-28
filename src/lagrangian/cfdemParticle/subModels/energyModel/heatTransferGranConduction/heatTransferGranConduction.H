@@ -50,6 +50,10 @@ protected:
 
     bool verbose_;
 
+    bool calcTotalHeatFlux_;
+
+    scalar totalHeatFlux_;
+
     word QPartPartName_;
 
     volScalarField QPartPart_;

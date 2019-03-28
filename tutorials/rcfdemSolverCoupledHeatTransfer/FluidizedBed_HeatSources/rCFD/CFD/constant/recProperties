@@ -31,20 +31,17 @@ recModel standardRecModel;
 
 recNorm EuclideanNorm;
 
-//recPath predefinedPath;
 recPath MarkovPath;
 
 volScalarFields
 (
     voidfraction
-//    rho
     p
     NuField
 );
 
 volVectorFields
 (
- //   U
     Us
 );
 

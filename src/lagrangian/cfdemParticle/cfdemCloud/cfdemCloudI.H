@@ -271,7 +271,7 @@ inline int ** cfdemCloud::particleTypes() const
 
 inline label cfdemCloud::particleType(label index) const
 {
-    if(!getParticleDensities_) return -1;
+    if(!getParticleTypes_) return -1;
     else
     {
         return particleTypes_[index][0];

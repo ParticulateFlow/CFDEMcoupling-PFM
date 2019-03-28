@@ -56,6 +56,9 @@ freeStreaming::freeStreaming
     forceModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
     interpolate_(propsDict_.lookupOrDefault<bool>("interpolation", false)),
+    ignoreCellsName_(propsDict_.lookupOrDefault<word>("ignoreCellsName","none")),
+    ignoreCells_(),
+    existIgnoreCells_(true),
     UsRecFieldName_(propsDict_.lookupOrDefault<word>("granVelRecFieldName","UsRec")),
     UsRec_(sm.mesh().lookupObject<volVectorField> (UsRecFieldName_)),
     voidfractionRecFieldName_(propsDict_.lookupOrDefault<word>("voidfractionRecFieldName","voidfractionRec")),
@@ -65,21 +68,13 @@ freeStreaming::freeStreaming
     particleDensity_(propsDict_.lookupOrDefault<scalar>("particleDensity",0.0)),
     gravAcc_(propsDict_.lookupOrDefault<vector>("g",vector(0.0,0.0,-9.81)))
 {
-//     forceSubModels_.setSize(1, "recU");
-//     forceSubModels_.append("recF");
-//     delete[] forceSubModel_;
-//     forceSubModel_ = new autoPtr<forceSubModel>[nrForceSubModels()];
-//     Info << "nrForceSubModels()=" << nrForceSubModels() << endl;
-//     for (int i=0;i<nrForceSubModels();i++)
-//     {
-//         forceSubModel_[i] = forceSubModel::New
-//         (
-//             dict,
-//             particleCloud_,
-//             *this,
-//             forceSubModels_[i]
-//         );
-//     }
+    if(ignoreCellsName_ != "none")
+    {
+       ignoreCells_.set(new cellSet(particleCloud_.mesh(),ignoreCellsName_));
+       Info << "isotropicFluctuations: ignoring fluctuations in cellSet " << ignoreCells_().name() <<
+        " with " << ignoreCells_().size() << " cells." << endl;
+    }
+    else existIgnoreCells_ = false;
   
 }
 
@@ -89,6 +84,13 @@ freeStreaming::freeStreaming
 freeStreaming::~freeStreaming()
 {}
 
+// * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
+
+bool freeStreaming::ignoreCell(label cell) const
+{
+    if (!existIgnoreCells_) return false;
+    else return ignoreCells_()[cell];
+}
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
@@ -107,7 +109,7 @@ void freeStreaming::setForce() const
     {
             cellI = particleCloud_.cellIDs()[index][0];
             UNew =vector(0,0,0);
-            if (cellI > -1) // particle found
+            if (cellI > -1 && !ignoreCell(cellI)) // particle found
             {
                 // let particles in empty regions follow trajectories subject to gravity, otherwise stream
                 if(voidfractionRec_[cellI] < critVoidfraction_)
@@ -129,7 +131,6 @@ void freeStreaming::setForce() const
                     radius = particleCloud_.radius(index);
                     mass = 4.188790205*radius*radius*radius * particleDensity_;
                     grav = mass*gravAcc_;
-              //      forceSubM(1).partToArray(index,grav,vector::zero);
                     for(int j=0;j<3;j++)
                     {
                         particleCloud_.DEMForces()[index][j] += grav[j];
@@ -141,7 +142,6 @@ void freeStreaming::setForce() const
                 {
                     particleCloud_.particleConvVels()[index][j] += UNew[j];
                 }
-          //      forceSubM(0).partToArray(index,UNew,vector::zero);
 	    }
     }
    

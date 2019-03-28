@@ -39,6 +39,7 @@ $(chemistryModels)/reactantPerParticle/reactantPerParticle.C
 $(energyModels)/energyModel/energyModel.C
 $(energyModels)/energyModel/newEnergyModel.C
 $(energyModels)/heatTransferGunn/heatTransferGunn.C
+$(energyModels)/heatTransferRanzMarshall/heatTransferRanzMarshall.C
 $(energyModels)/heatTransferGranConduction/heatTransferGranConduction.C
 $(energyModels)/reactionHeat/reactionHeat.C
 

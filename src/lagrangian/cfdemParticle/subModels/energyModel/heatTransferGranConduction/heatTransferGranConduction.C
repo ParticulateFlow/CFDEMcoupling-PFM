@@ -45,6 +45,8 @@ heatTransferGranConduction::heatTransferGranConduction
     propsDict_(dict.subDict(typeName + "Props")),
     multiTypes_(false),
     verbose_(propsDict_.lookupOrDefault<bool>("verbose",false)),
+    calcTotalHeatFlux_(propsDict_.lookupOrDefault<bool>("calcTotalHeatFlux",false)),
+    totalHeatFlux_(0.0),
     QPartPartName_(propsDict_.lookupOrDefault<word>("QPartPartName","QPartPart")),
     QPartPart_
     (   IOobject
@@ -108,7 +110,7 @@ heatTransferGranConduction::heatTransferGranConduction
         multiTypes_ = true;
     }
 
-    if (multiTypes_ = true && !particleCloud_.getParticleTypes())
+    if (multiTypes_ && !particleCloud_.getParticleTypes())
     {
         FatalError << "heatTransferGranConduction needs data for more than one type, but types are not communicated." << abort(FatalError);
     }
@@ -153,6 +155,8 @@ void heatTransferGranConduction::calcEnergyContribution()
     scalar QPartPart(0);
     scalar voidfraction(1);
 
+    totalHeatFlux_ = 0.0;
+
     for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)
     {
         cellI = particleCloud_.cellIDs()[index][0];
@@ -166,6 +170,7 @@ void heatTransferGranConduction::calcEnergyContribution()
             QPartPart = QPartPart_[cellI];
 
             heatFlux(index, partVolume, voidfraction, QPartPart);
+            if (calcTotalHeatFlux_) totalHeatFlux_ += partHeatFlux_[index][0];
         }
     }
 }
@@ -227,7 +232,11 @@ void heatTransferGranConduction::heatFlux(label index, scalar vol, scalar voidfr
 
 void heatTransferGranConduction::giveData()
 {
-    Info << "total conductive particle-particle heat flux [W] (Eulerian) = " << gSum(QPartPart_*1.0*QPartPart_.mesh().V()) << endl;
+    if (calcTotalHeatFlux_)
+    {
+        reduce(totalHeatFlux_, sumOp<scalar>());
+        Info << "total conductive particle-particle heat flux [W] (Eulerian) = " << totalHeatFlux_ << endl;
+    }
 
     particleCloud_.dataExchangeM().giveData(partHeatFluxName_,"scalar-atom", partHeatFlux_);
 }

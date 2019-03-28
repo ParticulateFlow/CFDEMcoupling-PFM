@@ -1,2 +1,3 @@
 cd CFD
-foamJob mpirun -np 4 rcfdemSolverCoupledHeattransfer -parallel
+rm -r dynamicCode
+mpirun -np 4 rcfdemSolverCoupledHeattransfer -parallel | tee run.log

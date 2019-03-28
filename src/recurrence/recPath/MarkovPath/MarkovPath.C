@@ -61,6 +61,7 @@ MarkovPath::MarkovPath
     minIntervalSteps_(propsDict_.lookupOrDefault<label>("minIntervalSteps",0)),
     numIntervals_(base.recM().numIntervals()),
     recSteps_(0),
+    startIndex_(propsDict_.lookupOrDefault<label>("startIndex",0)),
     intervalSizes_(numIntervals_),
     intervalSizesCumulative_(numIntervals_),
     Pjump_(0.0),
@@ -187,6 +188,10 @@ void MarkovPath::extendPath()
         }
 
         virtualTimeIndex = seqStart;
+    }
+    else
+    {
+        seqStart=startIndex_;
     }
 
     // take a series of consecutive steps

@@ -153,9 +153,6 @@ void directedDiffusiveRelaxation::setForce() const
 
     relaxStream_ = DField_ * fvc::grad(correctedField_ - voidfractionRec_);
 
-   // explicit evaluation?
-   // relaxStream_ = DField_ * fvc::grad(voidfraction_ - voidfractionRec_);
-
     vector position(0,0,0);
     scalar voidfraction(0.0);
     vector flucU(0,0,0);
@@ -169,10 +166,10 @@ void directedDiffusiveRelaxation::setForce() const
     for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
     {
             cellI = particleCloud_.cellIDs()[index][0];
-            if (cellI > -1 && !ignoreCell(cellI)) // particle found
+            if (cellI > -1 && !ignoreCell(cellI))
             {
                 {
-                    if( interpolate_ )
+                    if (interpolate_)
                     {
                         position = particleCloud_.position(index);
                         voidfraction = voidfractionInterpolator_.interpolate(position,cellI);

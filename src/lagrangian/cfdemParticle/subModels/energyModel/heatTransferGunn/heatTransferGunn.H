@@ -55,6 +55,12 @@ protected:
 
     bool implicit_;
 
+    bool calcTotalHeatFlux_;
+
+    scalar totalHeatFlux_;
+
+    scalar NusseltScalingFactor_;
+
     word QPartFluidName_;
 
     volScalarField QPartFluid_;
@@ -75,9 +81,7 @@ protected:
 
     bool calcPartTempField_;
 
-    bool calcPartTempAve_;
-
-    scalar partTempAve_;
+    dimensionedScalar partTempAve_;
 
     word tempFieldName_;
 
@@ -154,8 +158,6 @@ public:
 	void calcEnergyContribution();
 
 	void postFlow();
-
-        scalar aveTpart() const;
 };
 
 

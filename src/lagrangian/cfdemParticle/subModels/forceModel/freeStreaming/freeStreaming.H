@@ -27,6 +27,7 @@ License
 
 #include "forceModel.H"
 #include "interpolationCellPoint.H"
+#include "cellSet.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -45,6 +46,13 @@ private:
     dictionary propsDict_;
     
     bool interpolate_;
+
+    // ignore streaming velocity in region
+    word ignoreCellsName_;
+
+    autoPtr<cellSet> ignoreCells_;
+    
+    bool existIgnoreCells_;
     
     word UsRecFieldName_;
     
@@ -62,6 +70,8 @@ private:
     scalar particleDensity_;
     
     const vector gravAcc_;
+
+    bool ignoreCell(label) const;
 
 public:
 
