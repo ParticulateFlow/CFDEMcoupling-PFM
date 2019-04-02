@@ -133,16 +133,16 @@ void isotropicFluctuations::setForce() const
             voidfractionRec=0.0;
             deltaVoidfrac=0.0;
 
-            if (cellI > -1 && !ignoreCell(cellI)) // particle found
+            if (cellI > -1 && !ignoreCell(cellI))
             {
                 // particles in empty regions follow trajectories subject to gravity
                 if(voidfractionRec_[cellI] < critVoidfraction_)
                 {
                     if( interpolate_ )
                     {
-                      position = particleCloud_.position(index);
-                      voidfraction = voidfractionInterpolator_.interpolate(position,cellI);
-                      voidfractionRec = voidfractionRecInterpolator_.interpolate(position,cellI);
+                        position = particleCloud_.position(index);
+                        voidfraction = voidfractionInterpolator_.interpolate(position,cellI);
+                        voidfractionRec = voidfractionRecInterpolator_.interpolate(position,cellI);
                     }
                     else
                     {

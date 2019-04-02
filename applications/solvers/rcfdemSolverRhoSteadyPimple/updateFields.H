@@ -5,4 +5,4 @@ if(recurrenceBase.recM().endOfPath())
 }
 
 recurrenceBase.recM().exportVolScalarField("voidfraction",voidfractionRec);
-recurrenceBase.recM().exportVolVectorField("UsMean",UsRec);
+recurrenceBase.recM().exportVolVectorField("Us",UsRec);
