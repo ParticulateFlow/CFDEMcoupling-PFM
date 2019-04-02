@@ -9,15 +9,15 @@ FoamFile
 {
     version     2.0;
     format      ascii;
-    class       volScalarField;
+    class       volVectorField;
     location    "0";
-    object      T;
+    object      UsMean;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [0 0 0 1 0 0 0];
+dimensions      [0 1 -1 0 0 0 0];
 
-internalField   uniform 330;
+internalField   uniform (0 0 0);
 
 boundaryField
 {
@@ -27,9 +27,7 @@ boundaryField
     }
     inlet
     {
-        type            uniformFixedValue;
-        uniformValue    constant 324;
-        value           uniform 324;
+        type            zeroGradient;
     }
     outlet
     {

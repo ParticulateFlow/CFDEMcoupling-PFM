@@ -63,8 +63,6 @@ standardRecModel::standardRecModel
     cumulativeNumRecFields_(),
     totNumRecFields_(0),
     storeAveragedFields_(propsDict_.lookupOrDefault<bool>("storeAveragedFields",false)),
-    writeRecMat_(propsDict_.lookupOrDefault<Switch>("writeRecMat", true)),
-    recMatName_(propsDict_.lookupOrDefault<word>("recMatName", "recurrenceMatrix")),
     recurrenceMatrix_(1,scalar(-1.0)),
     timeIndexList_(),
     timeValueList_(),

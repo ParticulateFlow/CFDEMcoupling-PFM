@@ -40,7 +40,7 @@ regionModel allRegion;
 
 IOModel "off";
 
-dataExchangeModel twoWayOne2One;
+dataExchangeModel twoWayMPI;
 
 averagingModel dense;
 
@@ -64,13 +64,13 @@ energyModels
 );
 
 // in current branch, only one chem model can be chosen
-/*
+
 chemistryModels
 (
     off
 );
-*/
-chemistryModel off;
+
+//chemistryModel off;
 
 thermCondModel SyamlalThermCond;
 
@@ -165,12 +165,9 @@ engineSearchMany2ManyProps
     }
 }
 
-twoWayOne2OneProps
+twoWayMPIProps
 {
-    useCellIdComm true;
-    useStaticProcMap true;
     liggghtsPath "../DEM/in.liggghts_run";
-    boundingBoxScalingFactor 1.00001;
 }
 
 

@@ -70,6 +70,8 @@ protected:
 
     label recSteps_;
 
+    label startIndex_;
+
     labelList intervalSizes_;
 
     labelList intervalSizesCumulative_;

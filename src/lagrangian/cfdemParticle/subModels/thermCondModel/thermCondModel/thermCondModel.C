@@ -58,9 +58,7 @@ thermCondModel::thermCondModel
             IOobject::NO_WRITE
         )
     ),
-    kf0_(transportProperties_.lookup("kf")),
-    Cp_(transportProperties_.lookup("Cp")),
-    Cv_(transportProperties_.lookup("Cv"))
+    kf0_(transportProperties_.lookup("kf"))
 {}
 
 
@@ -69,15 +67,6 @@ thermCondModel::thermCondModel
 thermCondModel::~thermCondModel()
 {}
 
-dimensionedScalar thermCondModel::Cp() const
-{
-    return Cp_; 
-}
-
-dimensionedScalar thermCondModel::Cv() const
-{
-    return Cv_; 
-}
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam

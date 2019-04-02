@@ -38,7 +38,7 @@ boundaryField
 (-9.9 (0 0 0.4))
 )
 ;
-        value           uniform (0 0 0);
+        value           uniform (0 0 0.4);
     }
     outlet
     {

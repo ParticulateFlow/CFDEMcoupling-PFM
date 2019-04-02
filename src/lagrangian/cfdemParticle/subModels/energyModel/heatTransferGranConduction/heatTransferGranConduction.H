@@ -16,90 +16,111 @@ License
 
     Copyright (C) 2015- Thomas Lichtenegger, JKU Linz, Austria
 
-
-Description
-    thermal conductivity of PARTICLE phase in presence of a fluid according to
-    Zehner and Schluender (1970)
-
-Class
-    ZehnerSchluenderThermCond
-
-SourceFiles
-    ZehnerSchluenderThermCond.C
+    Description
+    heat transfer from granular conduction according to the
+    Effective Medium Theory discussed e.g. by
+    Carson et al. Int. J. Heat Mass Transfer 48 (2005)
 
 \*---------------------------------------------------------------------------*/
 
+#ifndef heatTransferGranConduction_H
+#define heatTransferGranConduction_H
 
-#ifndef ZehnerSchluenderThermCond_H
-#define ZehnerSchluenderThermCond_H
-
-#include "thermCondModel.H"
-#include "scalarList.H"
-
+#include "fvCFD.H"
+#include "cfdemCloudEnergy.H"
+#include "energyModel.H"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class ZehnerSchluenderThermCond Declaration
+                           Class heatTransferGranConduction Declaration
 \*---------------------------------------------------------------------------*/
 
-class ZehnerSchluenderThermCond
+class heatTransferGranConduction
 :
-    public thermCondModel
+    public energyModel
 {
-  
-private:
-  
+protected:
+
     dictionary propsDict_;
 
-    word partKsFieldName_;
+    bool multiTypes_;
 
-    volScalarField& partKsField_;
+    bool verbose_;
+
+    bool calcTotalHeatFlux_;
+
+    scalar totalHeatFlux_;
+
+    word QPartPartName_;
+
+    volScalarField QPartPart_;
+
+    const volScalarField& partTempField_;
+
+    volScalarField partEffThermCondField_;
+
+    volScalarField partThermCondField_;
+
+    word prescribedVoidfractionFieldName_;
+
+    const volScalarField& prescribedVoidfraction_;
 
     word voidfractionFieldName_;
-  
-    const volScalarField& voidfraction_;
-    
-    scalarList typeKs_;
 
-    mutable double **partKs_;
-    
-    word wallQFactorName_;
-    
-    // ratio of half-cell-size and near-wall film
-    mutable volScalarField wallQFactor_;
-    
-    bool hasWallQFactor_;
+    const volScalarField& voidfraction_;
+
+    word partHeatFluxName_;
+
+    mutable double **partHeatFlux_;
+
+    scalarList typePartThermCond_;
+
+    mutable double **partThermCond_;
 
     void allocateMyArrays() const;
 
-    void calcPartKsField() const;
+    void calcPartEffThermCond();
+
+    void calcPartThermCond();
+
+    virtual void giveData();
+
+    virtual void heatFlux(label, scalar, scalar, scalar);
+
+
 
 public:
 
     //- Runtime type information
-    TypeName("ZehnerSchluenderThermCond");
-
+    TypeName("heatTransferGranConduction");
 
     // Constructors
 
         //- Construct from components
-        ZehnerSchluenderThermCond
+        heatTransferGranConduction
         (
             const dictionary& dict,
-            cfdemCloud& sm
+            cfdemCloudEnergy& sm
         );
+
 
     // Destructor
 
-        ~ZehnerSchluenderThermCond();
+        virtual ~heatTransferGranConduction();
 
 
     // Member Functions
 
-        void calcThermCond();
+        void addEnergyContribution(volScalarField&) const {}
+
+        void addEnergyCoefficient(volScalarField&) const {}
+
+	void calcEnergyContribution();
+
+	void postFlow();
 
 };
 
@@ -113,3 +134,4 @@ public:
 #endif
 
 // ************************************************************************* //
+

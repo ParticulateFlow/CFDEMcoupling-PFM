@@ -104,6 +104,12 @@ gerhardsRecModel::gerhardsRecModel
             << abort(FatalError);
     }
 
+    if (numRecFields_ == 0)
+    {
+        FatalError << "No snapshots in dataBase! The dataBase is empty."
+            << abort(FatalError);
+    }
+
     if (upperSeqLim_ == 0)
     {
         FatalError << "Bad sequence limits! The dataBase is most probably too small."
@@ -488,7 +494,7 @@ void gerhardsRecModel::readTimeSeries()
         // skip constant
         if (recTime.timeName() == "constant")
         {
-                continue;
+            continue;
         }
 
         // skip zero
@@ -901,13 +907,15 @@ void gerhardsRecModel::updateRecFields()
 
 void gerhardsRecModel::writeRecMatrix() const
 {
-    Info << nl << "Writing recurrence matrix to disk." << nl
-        << "Nr. of reads from disk : " << nrOfReadsFromDisk_
-        << "; compared to a theoretical minimum of "
-        << numRecFields() << " reads." << endl;
+    if (writeRecMat_)
+    {
+        OFstream matrixFile(recMatName_);
+        matrixFile << recurrenceMatrix_;
 
-    OFstream matrixFile("recurrenceMatrix");
-    matrixFile << recurrenceMatrix_;
+        Info << nl << "Nr. of reads from disk : " << nrOfReadsFromDisk_
+            << "; compared to a theoretical minimum of "
+            << numRecFields() << " reads." << endl;
+    }
 }
 
 

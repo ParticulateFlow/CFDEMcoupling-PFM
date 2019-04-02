@@ -196,6 +196,8 @@
     dimensionedScalar R("R",dimensionSet(0,2,-2,-1,0,0,0),Foam::constant::thermodynamic::RR / (1e3*molMass.value()));
     Info << "specific gas constant R = " << R << endl;
 
+    dimensionedScalar Cv(transportProps.lookup("Cv"));
+
 
     volScalarField addSource
     (

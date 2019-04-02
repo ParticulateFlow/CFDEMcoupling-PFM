@@ -4,10 +4,6 @@
 
     particleCloud.energyCoefficients(QCoeff);
 
-    thCond = particleCloud.thermCondM().thermCond();
-
-    dimensionedScalar Cv = particleCloud.thermCondM().Cv();
-
     //K = 0.5*magSqr(URec);
 
     addSource = fvc::div(phiRec/fvc::interpolate(rhoRec), pRec);

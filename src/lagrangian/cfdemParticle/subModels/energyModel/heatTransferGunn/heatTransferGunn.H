@@ -45,6 +45,8 @@ protected:
 
     dictionary propsDict_;
 
+    bool multiTypes_;
+
     bool expNusselt_;
 
     bool interpolation_;
@@ -52,6 +54,12 @@ protected:
     bool verbose_;
 
     bool implicit_;
+
+    bool calcTotalHeatFlux_;
+
+    scalar totalHeatFlux_;
+
+    scalar NusseltScalingFactor_;
 
     word QPartFluidName_;
 
@@ -67,17 +75,13 @@ protected:
 
     volScalarField ReField_;
 
-    word NusseltFieldName_;
-
     volScalarField NuField_;
 
     dimensionedScalar partRefTemp_;
 
     bool calcPartTempField_;
-    
-    bool calcPartTempAve_;
-    
-    scalar partTempAve_;
+
+    dimensionedScalar partTempAve_;
 
     word tempFieldName_;
 
@@ -111,6 +115,10 @@ protected:
 
     mutable double **partNu_;
 
+    mutable scalar scaleDia_;
+
+    scalarList typeCG_;
+
     void allocateMyArrays() const;
 
     void partTempField();
@@ -119,7 +127,7 @@ protected:
 
     virtual void giveData();
 
-    virtual void heatFlux(label, scalar, scalar, scalar);
+    virtual void heatFlux(label, scalar, scalar, scalar, scalar cg3 = 1.0);
 
 public:
 
@@ -150,8 +158,6 @@ public:
 	void calcEnergyContribution();
 
 	void postFlow();
-
-        scalar aveTpart() const;
 };
 
 

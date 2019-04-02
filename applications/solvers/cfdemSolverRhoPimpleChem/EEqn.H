@@ -6,7 +6,6 @@ volScalarField& he = thermo.he();
 particleCloud.energyContributions(Qsource);
 particleCloud.energyCoefficients(QCoeff);
 
-thCond=particleCloud.thermCondM().thermCond();
 Cpv = he.name() == "e" ? thermo.Cv() : thermo.Cp();
 
 fvScalarMatrix EEqn

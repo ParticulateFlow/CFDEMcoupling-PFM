@@ -1,3 +1,5 @@
+shell mkdir ../DEM/post
+
 # variables
 
 # material parameters
@@ -92,8 +94,12 @@ fix walls all wall/reflect xlo EDGE xhi EDGE ylo EDGE yhi EDGE zlo EDGE zhi EDGE
 
 
 #cfd coupling
-fix 		cellids all property/atom prev_cell_ids scalar yes yes no -1
-fix		cfd all couple/cfd couple_every 1 one2one
+# couping fixes for one-2-one communication
+#fix 		cellids all property/atom prev_cell_ids scalar yes yes no -1
+#fix		cfd all couple/cfd couple_every 1 one2one
+# couping fixes for all-2-all communication
+fix		cfd all couple/cfd couple_every 1 mpi
+
 fix		cfd2 all couple/cfd/recurrence transfer_force yes transfer_fluctuations yes
 
 # this one invokes heat transfer calculation, transfers per-particle temperature and adds convective heat flux to particles
@@ -129,4 +135,6 @@ dump		dmp all custom/vtk 10000 ../DEM/post/dump*.liggghts_coupled.vtk id type x 
 
 run	1
 set         region total property/atom Temp ${Tpart}
-neigh_modify delay 0 no_build yes
+
+# for one-2-one communication
+#neigh_modify delay 0 no_build yes

@@ -18,10 +18,8 @@ if(recurrenceBase.recM().endOfPath())
 }
 
 recurrenceBase.recM().exportVolScalarField("voidfraction",voidfractionRec);
-//recurrenceBase.recM().exportVolScalarFieldAve("rho",rhoRec);
 recurrenceBase.recM().exportVolScalarField("p",pRec);
 recurrenceBase.recM().exportVolVectorField("Us",UsRec);
-//recurrenceBase.recM().exportVolVectorField("U",URec);
 recurrenceBase.recM().exportSurfaceScalarField("phi",phiRec);
 
 Info << "current database weights: = " << wList << endl;

@@ -85,6 +85,12 @@ void diffNorm::computeRecMatrix()
     label totNumRecSteps = base_.recM().numRecFields();
     SymmetricSquareMatrix<scalar>& recurrenceMatrix( base_.recM().recurrenceMatrix() );
 
+    if (totNumRecSteps == 1)
+    {
+        recurrenceMatrix[0][0]=0.0;
+        return;
+    }
+
     scalar normIJ(0.0);
     scalar maxNormIJ(0.0);
 
@@ -192,7 +198,12 @@ void diffNorm::computeRecMatrix()
 
 
     // normalize matrix and copy lower to upper half
-    if(normConstant_ > 0.0) maxNormIJ = normConstant_;
+    if (normConstant_ > 0.0) maxNormIJ = normConstant_;
+    if (maxNormIJ < SMALL)
+    {
+        Info << "Small normalization constant detected. Setting maxNormIJ = 1.0." << endl;
+        maxNormIJ = 1.0;
+    }
 
     for(label ti=0;ti<totNumRecSteps;ti++)
     {
