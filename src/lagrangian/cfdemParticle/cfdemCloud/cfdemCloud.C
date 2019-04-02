@@ -421,7 +421,12 @@ void cfdemCloud::setForces()
     resetArray(expForces_,numberOfParticles(),3);
     resetArray(DEMForces_,numberOfParticles(),3);
     resetArray(Cds_,numberOfParticles(),1);
-    for (int i=0;i<cfdemCloud::nrForceModels();i++) cfdemCloud::forceM(i).setForce();
+    for (int i=0;i<cfdemCloud::nrForceModels();i++)
+    {
+        clockM().start(30+i,forceModels_[i]);
+        cfdemCloud::forceM(i).setForce();
+        clockM().stop(forceModels_[i]);
+    }
 
     if (limitDEMForces_)
     {
