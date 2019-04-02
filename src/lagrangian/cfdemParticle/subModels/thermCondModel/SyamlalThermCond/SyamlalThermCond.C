@@ -93,7 +93,7 @@ void SyamlalThermCond::calcThermCond()
         else thermCondField_[cellI] = (1-sqrt(1-voidfraction_[cellI]+SMALL)) / (voidfraction_[cellI]) * kf0_.value();
     }
 
-//    thermCondField_.correctBoundaryConditions();
+    thermCondField_.correctBoundaryConditions();
 
     // if a wallQFactor field is present, use it to scale heat transport through a patch
     if (hasWallQFactor_)

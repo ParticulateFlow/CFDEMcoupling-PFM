@@ -107,11 +107,12 @@
             "thCond",
             runTime.timeName(),
             mesh,
-            IOobject::NO_READ,
+            IOobject::READ_IF_PRESENT,
             IOobject::AUTO_WRITE
         ),
         mesh,
-        dimensionedScalar("zero", dimensionSet(1,1,-3,-1,0,0,0), 0.0)
+        dimensionedScalar("zero", dimensionSet(1,1,-3,-1,0,0,0), 0.0),
+        "zeroGradient"
     );
 
     volScalarField T

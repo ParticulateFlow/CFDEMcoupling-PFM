@@ -19,7 +19,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "error.H"
-#include "heatTransferGunn.H"
+#include "heatTransferRanzMarshall.H"
 #include "addToRunTimeSelectionTable.H"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -28,14 +28,14 @@ namespace Foam
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-defineTypeNameAndDebug(heatTransferGunn, 0);
+defineTypeNameAndDebug(heatTransferRanzMarshall, 0);
 
-addToRunTimeSelectionTable(energyModel, heatTransferGunn, dictionary);
+addToRunTimeSelectionTable(energyModel, heatTransferRanzMarshall, dictionary);
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 // Construct from components
-heatTransferGunn::heatTransferGunn
+heatTransferRanzMarshall::heatTransferRanzMarshall
 (
     const dictionary& dict,
     cfdemCloudEnergy& sm
@@ -211,7 +211,7 @@ heatTransferGunn::heatTransferGunn
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-heatTransferGunn::~heatTransferGunn()
+heatTransferRanzMarshall::~heatTransferRanzMarshall()
 {
     particleCloud_.dataExchangeM().destroy(partTemp_,1);
     particleCloud_.dataExchangeM().destroy(partHeatFlux_,1);
@@ -224,7 +224,7 @@ heatTransferGunn::~heatTransferGunn()
 }
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
-void heatTransferGunn::allocateMyArrays() const
+void heatTransferRanzMarshall::allocateMyArrays() const
 {
     // get memory for 2d arrays
     double initVal=0.0;
@@ -244,7 +244,7 @@ void heatTransferGunn::allocateMyArrays() const
 
 // * * * * * * * * * * * * * * * * Member Fct  * * * * * * * * * * * * * * * //
 
-void heatTransferGunn::calcEnergyContribution()
+void heatTransferRanzMarshall::calcEnergyContribution()
 {
    // realloc the arrays
     allocateMyArrays();
@@ -263,12 +263,12 @@ void heatTransferGunn::calcEnergyContribution()
 
     if (typeCG_.size()>1 || typeCG_[0] > 1)
     {
-        Info << "heatTransferGunn using scale = " << typeCG_ << endl;
+        Info << "heatTransferRanzMarshall using scale = " << typeCG_ << endl;
     }
     else if (particleCloud_.cg() > 1)
     {
         scaleDia_=particleCloud_.cg();
-        Info << "heatTransferGunn using scale from liggghts cg = " << scaleDia_ << endl;
+        Info << "heatTransferRanzMarshall using scale from liggghts cg = " << scaleDia_ << endl;
     }
 
     // calc La based heat flux
@@ -456,12 +456,12 @@ void heatTransferGunn::calcEnergyContribution()
     QPartFluid_.correctBoundaryConditions();
 }
 
-void heatTransferGunn::addEnergyContribution(volScalarField& Qsource) const
+void heatTransferRanzMarshall::addEnergyContribution(volScalarField& Qsource) const
 {
     Qsource += QPartFluid_;
 }
 
-void heatTransferGunn::addEnergyCoefficient(volScalarField& Qsource) const
+void heatTransferRanzMarshall::addEnergyCoefficient(volScalarField& Qsource) const
 {
     if(implicit_)
     {
@@ -469,15 +469,12 @@ void heatTransferGunn::addEnergyCoefficient(volScalarField& Qsource) const
     }
 }
 
-scalar heatTransferGunn::Nusselt(scalar voidfraction, scalar Rep, scalar Pr) const
+scalar heatTransferRanzMarshall::Nusselt(scalar voidfraction, scalar Rep, scalar Pr) const
 {
-    return (7 - 10 * voidfraction + 5 * voidfraction * voidfraction) *
-                        (1 + 0.7 * Foam::pow(Rep,0.2) * Foam::pow(Pr,0.33)) +
-                        (1.33 - 2.4 * voidfraction + 1.2 * voidfraction * voidfraction) *
-                        Foam::pow(Rep,0.7) * Foam::pow(Pr,0.33);
+    return (2 + 0.6 * Foam::pow(Rep,0.5) * Foam::pow(Pr,0.33));
 }
 
-void heatTransferGunn::heatFlux(label index, scalar h, scalar As, scalar Tfluid, scalar cg3)
+void heatTransferRanzMarshall::heatFlux(label index, scalar h, scalar As, scalar Tfluid, scalar cg3)
 {
     scalar hAs = h * As * cg3;
 
@@ -498,7 +495,7 @@ void heatTransferGunn::heatFlux(label index, scalar h, scalar As, scalar Tfluid,
     }
 }
 
-void heatTransferGunn::giveData()
+void heatTransferRanzMarshall::giveData()
 {
    // Info << "total convective particle-fluid heat flux [W] (Eulerian) = " << gSum(QPartFluid_*1.0*QPartFluid_.mesh().V()) << endl;
     if (calcTotalHeatFlux_)
@@ -509,7 +506,7 @@ void heatTransferGunn::giveData()
     particleCloud_.dataExchangeM().giveData(partHeatFluxName_,"scalar-atom", partHeatFlux_);
 }
 
-void heatTransferGunn::postFlow()
+void heatTransferRanzMarshall::postFlow()
 {
     if(implicit_)
     {
@@ -548,7 +545,7 @@ void heatTransferGunn::postFlow()
 }
 
 
-void heatTransferGunn::partTempField()
+void heatTransferRanzMarshall::partTempField()
 {
         partTempField_.primitiveFieldRef() = 0.0;
         particleCloud_.averagingM().resetWeightFields();
@@ -565,7 +562,7 @@ void heatTransferGunn::partTempField()
         if (denom.value() < SMALL && denom.value() > -SMALL) denom.value() = SMALL;
         partRelTempField_ = (partTempField_ - partTempAve_) / denom;
 
-        Info << "heatTransferGunn: average part. temp = " << partTempAve_.value() << endl;
+        Info << "heatTransferRanzMarshall: average part. temp = " << partTempAve_.value() << endl;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

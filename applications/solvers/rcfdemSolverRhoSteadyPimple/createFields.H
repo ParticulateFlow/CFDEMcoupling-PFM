@@ -120,7 +120,8 @@ Info<< "Reading thermophysical properties\n" << endl;
             IOobject::AUTO_WRITE
         ),
         mesh,
-        dimensionedScalar("zero", dimensionSet(1,1,-3,-1,0,0,0), 0.0)
+        dimensionedScalar("zero", dimensionSet(1,1,-3,-1,0,0,0), 0.0),
+        "zeroGradient"
     );
 
     Info<< "\nCreating heat capacity field\n" << endl;

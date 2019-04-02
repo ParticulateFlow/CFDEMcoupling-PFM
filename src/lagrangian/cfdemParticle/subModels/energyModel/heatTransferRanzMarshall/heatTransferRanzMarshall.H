@@ -17,14 +17,13 @@ License
     Copyright (C) 2015- Thomas Lichtenegger, JKU Linz, Austria
 
     Description
-    heat transfer from granular conduction according to the
-    Effective Medium Theory discussed e.g. by
-    Carson et al. Int. J. Heat Mass Transfer 48 (2005)
+    Correlation for Nusselt number according to
+    Ranz and Marshall, Chem. Eng. Prog. 48.3 (1952)
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef heatTransferGranConduction_H
-#define heatTransferGranConduction_H
+#ifndef heatTransferRanzMarshall_H
+#define heatTransferRanzMarshall_H
 
 #include "fvCFD.H"
 #include "cfdemCloudEnergy.H"
@@ -35,10 +34,10 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class heatTransferGranConduction Declaration
+                           Class heatTransferRanzMarshall Declaration
 \*---------------------------------------------------------------------------*/
 
-class heatTransferGranConduction
+class heatTransferRanzMarshall
 :
     public energyModel
 {
@@ -48,59 +47,97 @@ protected:
 
     bool multiTypes_;
 
+    bool expNusselt_;
+
+    bool interpolation_;
+
     bool verbose_;
+
+    bool implicit_;
 
     bool calcTotalHeatFlux_;
 
     scalar totalHeatFlux_;
 
-    word QPartPartName_;
+    scalar NusseltScalingFactor_;
 
-    volScalarField QPartPart_;
+    word QPartFluidName_;
 
-    volScalarField partEffThermCondField_;
+    volScalarField QPartFluid_;
 
-    volScalarField partThermCondField_;
+    word QPartFluidCoeffName_;
 
-    const volScalarField& partTempField_;
+    volScalarField QPartFluidCoeff_;
 
-    word prescribedVoidfractionFieldName_;
+    mutable volScalarField partTempField_;
 
-    const volScalarField& prescribedVoidfraction_;
+    volScalarField partRelTempField_;
+
+    volScalarField ReField_;
+
+    volScalarField NuField_;
+
+    dimensionedScalar partRefTemp_;
+
+    bool calcPartTempField_;
+
+    dimensionedScalar partTempAve_;
+
+    word tempFieldName_;
+
+    const volScalarField& tempField_;            // ref to temperature field
 
     word voidfractionFieldName_;
 
-    const volScalarField& voidfraction_;
+    const volScalarField& voidfraction_;    // ref to voidfraction field
+
+    scalar maxSource_;                           // max (limited) value of src field
+
+    word velFieldName_;
+
+    const volVectorField& U_;
+
+    word densityFieldName_;
+
+    const volScalarField& rho_;
+
+    word partTempName_;
+
+    mutable double **partTemp_;
 
     word partHeatFluxName_;
 
     mutable double **partHeatFlux_;
 
-    scalarList typePartThermCond_;
+    mutable double **partHeatFluxCoeff_;
 
-    mutable double **partThermCond_;
+    mutable double **partRe_;
+
+    mutable double **partNu_;
+
+    mutable scalar scaleDia_;
+
+    scalarList typeCG_;
 
     void allocateMyArrays() const;
 
-    void calcPartEffThermCond();
+    void partTempField();
 
-    void calcPartThermCond();
+    scalar Nusselt(scalar, scalar, scalar) const;
 
     virtual void giveData();
 
-    virtual void heatFlux(label, scalar, scalar, scalar);
-
-
+    virtual void heatFlux(label, scalar, scalar, scalar, scalar cg3 = 1.0);
 
 public:
 
     //- Runtime type information
-    TypeName("heatTransferGranConduction");
+    TypeName("heatTransferRanzMarshall");
 
     // Constructors
 
         //- Construct from components
-        heatTransferGranConduction
+        heatTransferRanzMarshall
         (
             const dictionary& dict,
             cfdemCloudEnergy& sm
@@ -109,19 +146,18 @@ public:
 
     // Destructor
 
-        virtual ~heatTransferGranConduction();
+        virtual ~heatTransferRanzMarshall();
 
 
     // Member Functions
 
-        void addEnergyContribution(volScalarField&) const {}
+        void addEnergyContribution(volScalarField&) const;
 
-        void addEnergyCoefficient(volScalarField&) const {}
+	void addEnergyCoefficient(volScalarField&) const;
 
 	void calcEnergyContribution();
 
 	void postFlow();
-
 };
 
 
