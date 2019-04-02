@@ -133,6 +133,10 @@ ParmarBassetForce::ParmarBassetForce
     particleCloud_.probeM().vectorFields_.append("ParmarBassetForce"); //first entry must the be the force
     particleCloud_.probeM().vectorFields_.append("Urel");
     particleCloud_.probeM().vectorFields_.append("ddtUrel");
+    //
+    particleCloud_.probeM().vectorFields_.append("UrelNoSmooth");
+    particleCloud_.probeM().vectorFields_.append("ddtUrelNoSmooth");
+    //
     particleCloud_.probeM().vectorFields_.append("Fshort");
     particleCloud_.probeM().vectorFields_.append("Flong1");
     particleCloud_.probeM().vectorFields_.append("Flong2");
@@ -183,7 +187,7 @@ void ParmarBassetForce::setForce() const
     vector Urel(0,0,0);
     vector ddtUrel(0,0,0);
 
-    scalar t0min    = 0.01;
+    scalar t0min    = 0.00;
 
     const volScalarField& nufField = forceSubM(0).nuField();
     const volScalarField& rhoField = forceSubM(0).rhoField();
@@ -215,11 +219,21 @@ void ParmarBassetForce::setForce() const
     Urel_ = Us_ - U_;
     ddtUrel_ = fvc::ddt(Us_) - fvc::ddt(U_) - (Us_ & fvc::grad(U_));
 
+    //
+    volVectorField UrelNoSmooth_ = Urel_;
+    volVectorField ddtUrelNoSmooth_ = ddtUrel_;
+    //
+
     smoothingM().smoothen(Urel_);
     smoothingM().smoothen(ddtUrel_);
 
     interpolationCellPoint<vector> UrelInterpolator_(Urel_);
     interpolationCellPoint<vector> ddtUrelInterpolator_(ddtUrel_);
+
+    //
+    interpolationCellPoint<vector> UrelNoSmoothInterpolator_(UrelNoSmooth_);
+    interpolationCellPoint<vector> ddtUrelNoSmoothInterpolator_(ddtUrelNoSmooth_);
+    //
 
     for(int index = 0;index <  particleCloud_.numberOfParticles(); index++)
     {
@@ -249,36 +263,32 @@ void ParmarBassetForce::setForce() const
                 scalar rs = particleCloud_.radius(index);
                 scalar Re = 2.*rs*mag(Urel)/nufField[cellI];
                 scalar gH = (0.75 + 0.105*Re)/(Re+SMALL); // Eq. 3.3
-                scalar r  = 1;
+                scalar r;
 
                 if (gH0_[index][0]!=NOTONCPU)
+				{
                 	r = pow(gH0_[index][0]/gH,1.5); // Eq. 3.4
 
-                if (gH0_[index][0]==NOTONCPU || r<.25 || r>2.)
+					if (r<.25 || r>2.)
+					{
+						gH0_[index][0]            = NOTONCPU; //reset reference
+            			ddtUrelHist_[0][index][0] = NOTONCPU; //reset ddtU history (only component used for checking nKnown)
+					}
+
+				}
+
+                if (gH0_[index][0]==NOTONCPU)
                 {
                 	// calculate new reference values
                 	scalar tRef = (rs*rs) / nufField[cellI] * (gH*gH) * 4.3354; // (256/pi)^(1/3) = 4.3354 (Eq 3.1)
                 	scalar Vs   = rs*rs*rs*M_PI*4/3;
                 	scalar mRef = Vs*rhoField[cellI] * gH * 5.2863;             // 9/(2*sqrt(pi))*(256/pi)^(1/6) = 5.2863 (Eq. 3.2)
 
-                	// rescale history to new reference point
-                	if (r<.25 || r>2.)
-                	{
-                        // old/new
-                		scalar tScale = tRef_[index][0]/tRef;
-                		scalar mScale = mRef_[index][0]/mRef;
-                		scalar lScale = lRef_[index][0]/rs;
-                		scalar rScale =  gH0_[index][0]/gH;
-
-                		r = 1;
-
-                        rescaleHist(tScale, mScale, lScale, rScale, index);
-                	}
-
                 	 gH0_[index][0] = gH;
                 	tRef_[index][0] = tRef;
                 	mRef_[index][0] = mRef;
                 	lRef_[index][0] = rs;
+					r = 1;
                 }
 
             	scalar mps    = lRef_[index][0]/tRef_[index][0]; // m/s
@@ -345,7 +355,7 @@ void ParmarBassetForce::setForce() const
             	// update F1, F2 history
             	update_FHist(vector(0., 0., 0.),vector(0., 0., 0.),index);
 
-            	// initialise ddtUrel(t0) as 0 and r(t0) as 1
+            	// initialise ddtUrel(t0) and Flong(:) as 0 and r(t0) as 1
             	if (nKnown == nInt_)
             	{
             		for (int j=nInt_; j<nHist_; j++) // loop over past times
@@ -354,6 +364,11 @@ void ParmarBassetForce::setForce() const
             			for (int i=0; i<3; i++) // loop over dimensions
             				ddtUrelHist_[j][index][i] = 0.0;
             		}
+
+					for (int j=0; j<2*discOrder_+1; j++) // loop over past times
+						for (int i=0; i<3; i++) // loop over dimensions
+							for (int k=0; k<2; k++) // loop over F1, F2				
+								FHist_[k][j][index][i] = 0.0;
             		nKnown = nHist_;
             	}
 
@@ -400,10 +415,34 @@ void ParmarBassetForce::setForce() const
                     	Flong2[i] = FHist_[1][0][index][i];
                     }
 
+            		//
+                	// relative velocity (m/s)
+                	vector UrelNoSmooth;
+                	vector ddtUrelNoSmooth;
+
+            		if(forceSubM(0).interpolation())
+                		UrelNoSmooth = UrelNoSmoothInterpolator_.interpolate(position,cellI);
+                	else
+                		UrelNoSmooth = UrelNoSmooth_[cellI];
+
+                	// acceleration (m/s2)
+                	if(forceSubM(0).interpolation())
+                		ddtUrelNoSmooth = ddtUrelNoSmoothInterpolator_.interpolate(position,cellI);
+                	else
+                		ddtUrelNoSmooth = ddtUrelNoSmooth_[cellI];
+
+                	UrelNoSmooth /= mps;
+                	ddtUrelNoSmooth /= mpss;
+            		//
+
                     #include "setupProbeModelfields.H"
                     vValues.append(ParmarBassetForce);           //first entry must the be the force
                     vValues.append(Urel);
                     vValues.append(ddtUrel);
+                    //
+                    vValues.append(UrelNoSmooth);
+                    vValues.append(ddtUrelNoSmooth);
+                    //
                     vValues.append(Fshort);
                     vValues.append(Flong1);
                     vValues.append(Flong2);
@@ -476,7 +515,7 @@ scalar Foam::ParmarBassetForce::calculateK0(scalar r, scalar dt) const
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 scalar Foam::ParmarBassetForce::trapWeight(int i, int n) const
 {
-	if ( (i==1) | (i==n-1) )
+	if ( (i==1) | (i==(n-1)) )
 		return 0.5;
 	else
 		return 1.0;
