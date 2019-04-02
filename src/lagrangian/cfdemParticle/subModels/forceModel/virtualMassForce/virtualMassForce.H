@@ -86,6 +86,10 @@ private:
 
     mutable double Cadd_;                  //custom Cadd value
 
+    mutable volVectorField DDtUrel_;
+
+    autoPtr<smoothingModel> smoothingModel_;
+
 
 
 public:
@@ -112,6 +116,11 @@ public:
         void setForce() const;
 
         void reAllocArrays() const;
+
+        inline const smoothingModel& smoothingM() const
+        {
+            return smoothingModel_;
+        }
 };
 
 

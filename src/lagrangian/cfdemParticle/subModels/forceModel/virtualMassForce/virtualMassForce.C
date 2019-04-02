@@ -77,7 +77,27 @@ virtualMassForce::virtualMassForce
 	splitUrelCalculation_(propsDict_.lookupOrDefault<bool>("splitUrelCalculation",false)),
 	useUs_(propsDict_.lookupOrDefault<bool>("useUs",false)),
 	useFelderhof_(propsDict_.lookupOrDefault<bool>("useFelderhof",false)),
-    Cadd_(0.5)
+    Cadd_(0.5),
+    DDtUrel_
+    (   IOobject
+        (
+            "DDtUrel",
+            sm.mesh().time().timeName(),
+            sm.mesh(),
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        sm.mesh(),
+        dimensionedVector("zero", dimensionSet(0,1,-2,0,0,0,0), vector(0,0,0))
+    ),
+    smoothingModel_
+    (
+        smoothingModel::New
+        (
+            propsDict_,
+            sm
+        )
+    )
 {
 
     if (particleCloud_.dataExchangeM().maxNumberOfParticles() > 0)
@@ -108,6 +128,11 @@ virtualMassForce::virtualMassForce
     {
         Info << "Virtual mass model: using averaged Us \n";
         Info << "WARNING: ignoring virtual mass of relative particle motion/collisions \n";
+        
+        if(splitUrelCalculation_)
+        {
+            FatalError << "Virtual mass model: useUs=true requires splitUrelCalculation_=false" << abort(FatalError);
+        }
     }
     if(useFelderhof_)
     {
@@ -124,9 +149,14 @@ virtualMassForce::virtualMassForce
     particleCloud_.probeM().initialize(typeName, typeName+".logDat");
     particleCloud_.probeM().vectorFields_.append("virtualMassForce"); //first entry must the be the force
     particleCloud_.probeM().vectorFields_.append("acceleration");
+    //
+    particleCloud_.probeM().vectorFields_.append("accelerationNoSmooth");
+    //
     particleCloud_.probeM().scalarFields_.append("Cadd");
     particleCloud_.probeM().scalarFields_.append("Vs");
     particleCloud_.probeM().scalarFields_.append("rho");
+    particleCloud_.probeM().scalarFields_.append("voidfraction");
+    particleCloud_.probeM().scalarFields_.append("specificGravity");
     particleCloud_.probeM().writeHeader();
 }
 
@@ -148,34 +178,22 @@ void virtualMassForce::setForce() const
 
     scalar dt = U_.mesh().time().deltaT().value();
 
-    vector position(0,0,0);
-    vector Ufluid(0,0,0);
-    vector Urel(0,0,0);
-    vector DDtU(0,0,0);
-    vector ddtUs(0,0,0);
-    vector Us(0,0,0);
-    vector UrelOld(0,0,0);
-    vector ddtUrel(0,0,0);
-    vector accel(0,0,0);
+    //acceleration field
+    if(splitUrelCalculation_)
+        DDtUrel_ = fvc::ddt(U_) + fvc::div(phi_, U_); //Total Derivative of fluid velocity
+    else if(useUs_)
+        DDtUrel_ = fvc::ddt(U_) + fvc::div(phi_, U_) - fvc::ddt(Us_); //Total Derivative of fluid velocity minus average particle velocity
 
-    scalar voidfraction(1);
-    scalar epsilons(0);
-    scalar sg(1);
-    scalar logsg(0);
+    //
+        volVectorField DDtUrelNoSmooth_ = DDtUrel_;
+        interpolationCellPoint<vector> DDtUrelNoSmoothInterpolator_(DDtUrelNoSmooth_);
+    //
+    
+    // smoothen
+    smoothingM().smoothen(DDtUrel_);
 
-    //DDtU
-    volVectorField DDtU_(0.0*U_/U_.mesh().time().deltaT());
-    if(splitUrelCalculation_ || useUs_ )
-        DDtU_ = fvc::ddt(U_) + fvc::div(phi_, U_); //Total Derivative of fluid velocity
-
-    //ddtUs
-    volVectorField ddtUs_(0.0*U_/U_.mesh().time().deltaT());
-    if (useUs_)
-    	ddtUs_ = fvc::ddt(Us_);
-
-    interpolationCellPoint<vector> UInterpolator_(   U_);
-    interpolationCellPoint<vector> ddtUsInterpolator_(ddtUs_);
-    interpolationCellPoint<vector> DDtUInterpolator_(DDtU_);
+    interpolationCellPoint<vector> UInterpolator_(U_);
+    interpolationCellPoint<vector> DDtUrelInterpolator_(DDtUrel_);
     interpolationCellPoint<scalar> voidfractionInterpolator_(voidfraction_);
 
     #include "setupProbeModel.H"
@@ -185,79 +203,72 @@ void virtualMassForce::setForce() const
     for(int index = 0;index <  particleCloud_.numberOfParticles(); index++)
     {
             vector virtualMassForce(0,0,0);
+            vector position(0,0,0);
+            vector DDtUrel(0,0,0);
+
+            scalar voidfraction(1);
+            scalar sg(1);
+
             label cellI = particleCloud_.cellIDs()[index][0];
 
             if (cellI > -1) // particle Found
             {
-            	// particle position and fluid velocity
+                // particle position
                 if(forceSubM(0).interpolation())
-                {
-                    position    = particleCloud_.position(index);
-                    Ufluid      = UInterpolator_.interpolate(position,cellI);
-                }
-                else
-                {
-                    Ufluid = U_[cellI];
-                }
+                    position = particleCloud_.position(index);
 
-                // DDtU / relative velocity
+                //********* acceleration value *********//
                 if(splitUrelCalculation_ || useUs_ )
                 {
-                	if(forceSubM(0).interpolation())
-                		DDtU = DDtUInterpolator_.interpolate(position,cellI);
+                    // DDtUrel from acceleration field 
+                    if(forceSubM(0).interpolation())
+                		DDtUrel = DDtUrelInterpolator_.interpolate(position,cellI);
                 	else
-                		DDtU = DDtU_[cellI];
+                		DDtUrel = DDtUrel_[cellI];
                 }
                 else
                 {
-                    Us   = particleCloud_.velocity(index);
-                    Urel = Ufluid - Us;
-                }
+                    // DDtUrel from UrelOld
+                    vector Ufluid(0,0,0);
 
-                // averaged Us
-                if(useUs_ && !splitUrelCalculation_ )
-                {
-                	if(forceSubM(0).interpolation())
-                		ddtUs = ddtUsInterpolator_.interpolate(position,cellI);
-                	else
-                		ddtUs = ddtUs_[cellI];
-                }
+                    // relative velocity
+                    if(forceSubM(0).interpolation())
+                        Ufluid      = UInterpolator_.interpolate(position,cellI);
+                    else
+                        Ufluid = U_[cellI];
 
-                // ddtUrel from UrelOld
-                if (!useUs_ || !splitUrelCalculation_ )
-                {
-                	//Check of particle was on this CPU the last step
+                    vector Us   = particleCloud_.velocity(index);
+                    vector Urel = Ufluid - Us;
+
+                    //Check of particle was on this CPU the last step
                 	if(UrelOld_[index][0]==NOTONCPU) //use 1. element to indicate that particle was on this CPU the last time step
                 		haveUrelOld_ = false;
                 	else
                 		haveUrelOld_ = true;
 
-                	vector UrelOld(0.,0.,0.);
-                	vector ddtUrel(0.,0.,0.);
+                	vector UrelOld(0,0,0);
+
                 	for(int j=0;j<3;j++)
                 	{
                 		UrelOld[j]         = UrelOld_[index][j];
                 		UrelOld_[index][j] = Urel[j];
                 	}
                 	if(haveUrelOld_ ) //only compute force if we have old (relative) velocity
-                		ddtUrel = (Urel-UrelOld)/dt;
+                		DDtUrel = (Urel-UrelOld)/dt;
                 }
 
-                // take right expression for the acceleration term
-                if(splitUrelCalculation_)
-                    accel = DDtU;
-                else if (useUs_)
-                	accel = DDtU - ddtUs;
-                else
-                	accel = ddtUrel;
-
-                // take right expression for Cadd
+                //********* Cadd value *********//
                 scalar rho  = forceSubM(0).rhoField()[cellI];
                 scalar ds = 2*particleCloud_.radius(index);
                 scalar Vs = ds*ds*ds*M_PI/6;
-
+                
+                scalar Cadd;
+                
                 if (useFelderhof_)
-                {
+                {                    
+                    scalar epsilons(0);
+                    scalar logsg(0);
+
                 	if(forceSubM(0).interpolation())
 		                voidfraction = voidfractionInterpolator_.interpolate(position,cellI);
 		            else
@@ -267,14 +278,19 @@ void virtualMassForce::setForce() const
                     logsg    = log(sg);
                     epsilons = 1-voidfraction;
 
-                    Cadd_ = 0.5
+                    Cadd = 0.5
                     		+ ( 0.047*logsg + 0.13)*epsilons
 							+ (-0.066*logsg - 0.58)*epsilons*epsilons
 							+ (               1.42)*epsilons*epsilons*epsilons;
                 }
+                else
+                {
+                    // use predefined value
+                    Cadd = Cadd_;
+                }
 
-                // calculate force
-                virtualMassForce = Cadd_ * rho * Vs * accel;
+                //********* calculate force *********//
+                virtualMassForce = Cadd_ * rho * Vs * DDtUrel;
 
                 if( forceSubM(0).verbose() ) //&& index>100 && index < 105)
                 {
@@ -285,17 +301,30 @@ void virtualMassForce::setForce() const
                 // Set value fields and write the probe
                 if(probeIt_)
                 {
+                    //
+                    vector DDtUrelNoSmooth(0,0,0);
+                    if(forceSubM(0).interpolation())
+                		DDtUrelNoSmooth = DDtUrelInterpolator_.interpolate(position,cellI);
+                	else
+                		DDtUrelNoSmooth = DDtUrelNoSmooth_[cellI];
+                    //
                     #include "setupProbeModelfields.H"
                     vValues.append(virtualMassForce);           //first entry must the be the force
-                    vValues.append(accel);
-                    sValues.append(Cadd_);
+                    vValues.append(DDtUrel);
+                    //
+                    vValues.append(DDtUrelNoSmooth);
+                    //
+                    sValues.append(Cadd);
                     sValues.append(Vs);
                     sValues.append(rho);
+                    sValues.append(voidfraction);
+                    sValues.append(sg);
                     particleCloud_.probeM().writeProbe(index, sValues, vValues);
                 }
             }
             else    //particle not on this CPU
-                UrelOld_[index][0]=NOTONCPU;
+                if (!useUs_ || !splitUrelCalculation_ )
+                    UrelOld_[index][0] = NOTONCPU;
 
             // write particle based data to global array
             forceSubM(0).partToArray(index,virtualMassForce,vector::zero);
