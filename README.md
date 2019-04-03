@@ -1,3 +1,4 @@
+```
 /*---------------------------------------------------------------------------*\
     CFDEMcoupling - Open Source CFD-DEM coupling
 
@@ -78,3 +79,4 @@ Christoph Goniva and Christoph Kloss, both at DCS Computing GmbH, 2012
 (*) "OpenFOAM(R)" is a registered trade mark of OpenCFD Limited, a wholly owned subsidiary of the ESI Group.
 This offering is not approved or endorsed by OpenCFD Limited, the producer of the OpenFOAM software and owner of the OPENFOAM® and OpenCFD® trade marks.
 \*---------------------------------------------------------------------------*/
+```
