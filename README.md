@@ -1,82 +1,33 @@
-```
-/*---------------------------------------------------------------------------*\
-    CFDEMcoupling - Open Source CFD-DEM coupling
+# CFDEMcoupling
 
-    CFDEMcoupling is part of the CFDEMproject
-    www.cfdem.com
-                                Christoph Goniva, christoph.goniva@cfdem.com
-                                Copyright 2009-2012 JKU Linz
-                                Copyright 2012-2015 DCS Computing GmbH, Linz
-                                Copyright 2015-     JKU Linz
--------------------------------------------------------------------------------
-License
-    This file is part of CFDEMcoupling.
+CFDEM®coupling stands for Computational Fluid Dynamics (CFD) - Discrete Element Method (DEM) coupling. It combines the open source packages OpenFOAM® (CFD) and LIGGGHTS® (DEM) to simulate particle-laden flows. CFDEM®coupling is part of the [CFDEM®project](www.cfdem.com).
 
-    CFDEMcoupling is free software; you can redistribute it and/or modify it
-    under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 3 of the License, or (at your
-    option) any later version.
+[![CircleCI](https://circleci.com/gh/ParticulateFlow/CFDEMcoupling.svg?style=shield&circle-token=e4b6af30d3aa7aee109d206116f01600bf9ee9c6)](https://circleci.com/gh/ParticulateFlow/CFDEMcoupling)
+[![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.html)
 
-    CFDEMcoupling is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+## Disclaimer
 
-    You should have received a copy of the GNU General Public License
-    along with CFDEMcoupling; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+> This is an academic adaptation of the CFDEM®coupling software package, released by the
+[Department of Particulate Flow Modelling at Johannes Kepler University in Linz, Austria.](www.jku.at/pfm)
+> LIGGGHTS® and CFDEM® are registered trademarks, and this offering is not approved or
+endorsed by DCS Computing GmbH, the official producer of the LIGGGHTS® and CFDEM®coupling software.
+> This offering is not approved or endorsed by OpenCFD Limited, producer and distributor of the OpenFOAM software via www.openfoam.com, and owner of the OPENFOAM®  and OpenCFD®  trade marks.
 
-Description
-    This code provides models and solvers to realize coupled CFD-DEM simulations
-    using LIGGGHTS and OpenFOAM.
-    Note: this code is not part of OpenFOAM (see DISCLAIMER).
-\*---------------------------------------------------------------------------*/
+## Features
 
+- Documentation and tutorials to get started
+- A modular approach that allows for easy implementation of new models
+- MPI parallelization for large scale problems
 
-CFDEM(R) coupling provides an open source parallel coupled CFD-DEM framework 
-combining the strengths of the LIGGGHTS(R) DEM code and the Open Source 
-CFD package OpenFOAM(R)(*). The CFDEM(R)coupling toolbox allows to expand 
-standard CFD solvers of OpenFOAM(R)(*) to include a coupling to the DEM 
-code LIGGGHTS(R). In this toolbox the particle representation within the 
-CFD solver is organized by "cloud" classes. Key functionalities are organised 
-in sub-models (e.g. force models, data exchange models, etc.) which can easily 
-be selected and combined by dictionary settings.
+## License
 
-The coupled solvers run fully parallel on distributed-memory clusters. 
+[![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.html)
 
-Features are:
-
-- its modular approach allows users to easily implement new models
-- its MPI parallelization enables to use it for large scale problems
-- the use of GIT allows to easily update to the latest version
-- basic documentation is provided
-
-The file structure:
-
-- "src" directory including the source files of the coupling toolbox and models
-- "applications" directory including the solver files for coupled CFD-DEM simulations
-- "doc" directory including the documentation of CFDEM(R)coupling
-- "tutorials" directory including basic tutorial cases showing the functionality
-
-
-
-Details on installation are given on the "www.cfdem.com"
-
-The functionality of this CFD-DEM framwork is described via "tutorial cases" showing 
-how to use different solvers and models.
-
-CFDEM(R)coupling stands for Computational Fluid Dynamics (CFD) -
-Discrete Element Method (DEM) coupling.
-
-CFDEM(R)coupling is an open-source code, distributed freely under the terms of the 
-GNU Public License (GPL).
-
-Core development of CFDEM(R)coupling is done by 
-Christoph Goniva and Christoph Kloss, both at DCS Computing GmbH, 2012
-
-
-/*---------------------------------------------------------------------------*\
-(*) "OpenFOAM(R)" is a registered trade mark of OpenCFD Limited, a wholly owned subsidiary of the ESI Group.
-This offering is not approved or endorsed by OpenCFD Limited, the producer of the OpenFOAM software and owner of the OPENFOAM® and OpenCFD® trade marks.
-\*---------------------------------------------------------------------------*/
-```
+- This software is distributed under the [GNU General Public License](https://opensource.org/licenses/GPL-3.0).
+- Copyright © 2009-     JKU Linz
+- Copyright © 2012-2015 DCS Computing GmbH, Linz
+- Some parts of CFDEM®coupling are based on OpenFOAM® and Copyright on these
+  parts is held by the OpenFOAM® Foundation (www.openfoam.org)
+  and potentially other parties.
+- Some parts of CFDEM®coupling are contributied by other parties, which are
+  holding the Copyright. This is listed in each file of the distribution.
