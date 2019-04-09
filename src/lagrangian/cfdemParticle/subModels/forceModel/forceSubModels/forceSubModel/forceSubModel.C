@@ -209,7 +209,7 @@ void forceSubModel::readSwitches()
     if(switches_[SW_IMPL_FORCE_DEM]) // implForceDEM=true
     {
         // communicate implForceDEM to particleCloud
-        particleCloud_.impDEMdrag_ = true;
+        particleCloud_.setImpDEMdrag(true);
 
         // do sanity check
         // This can work if the accumulator is used, but is explicitely applied on the CFD side
@@ -232,7 +232,7 @@ void forceSubModel::readSwitches()
             switches_[SW_VERBOSE] = false;
         }else
         {
-            particleCloud_.impDEMdragAcc_ = true;
+            particleCloud_.setImpDEMdragAcc(true);
         }
     }
 

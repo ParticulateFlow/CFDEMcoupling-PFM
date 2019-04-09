@@ -223,11 +223,6 @@ protected:
 
 public:
 
-    friend class dataExchangeModel;
-    friend class voidFractionModel;
-    friend class forceModel;
-    friend class forceSubModel;
-
 // Constructors
 
     //- Construct from mesh and a list of particles
@@ -406,6 +401,8 @@ public:
         inline void setPositions(label n,double* pos);
         inline void setCellIDs(label n,int* ID);
         inline void setCellIDs(labelList const& IDs);
+        inline void setImpDEMdrag(bool flag) { impDEMdrag_ = flag; }
+        inline void setImpDEMdragAcc(bool flag) { impDEMdragAcc_ = flag; }
 
         virtual bool evolve(volScalarField&,volVectorField&,volVectorField&);
 
