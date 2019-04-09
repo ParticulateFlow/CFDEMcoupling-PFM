@@ -245,7 +245,7 @@ public:
 
        void checkCG(bool);
 
-       void setPos(double **&);
+       void setPos(const double *const *);
 
        const word& modelType() const { return modelType_; }
 
@@ -411,9 +411,9 @@ public:
         virtual bool reAllocArrays();
 
     // IO
-        void writeScalarFieldToTerminal(double**&) const;
+        void writeScalarFieldToTerminal(const double *const *) const;
 
-        void writeVectorFieldToTerminal(double**&) const;
+        void writeVectorFieldToTerminal(const double *const *) const;
 
     // functions
         tmp<fvVectorMatrix> divVoidfractionTau(volVectorField& ,volScalarField&) const;

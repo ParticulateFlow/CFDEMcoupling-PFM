@@ -522,7 +522,7 @@ void cfdemCloud::checkCG(bool ok)
     if(!ok) cgOK_ = ok;
 }
 
-void cfdemCloud::setPos(double**& pos)
+void cfdemCloud::setPos(const double *const * pos)
 {
     for(int index = 0; index <  numberOfParticles(); ++index)
     {
