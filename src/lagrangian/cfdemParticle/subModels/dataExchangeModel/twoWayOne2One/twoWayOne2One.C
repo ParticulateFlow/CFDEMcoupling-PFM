@@ -816,11 +816,11 @@ void twoWayOne2One::locateParticles()
         extracted_flattened_positions,
         3
     );
-    setPositions(getNumberOfParticles(), extracted_flattened_positions);
+    particleCloud_.setPositions(getNumberOfParticles(), extracted_flattened_positions);
     destroy(extracted_flattened_positions);
     destroy(collected_flattened_positions);
 
-    setCellIDs(cellIds);
+    particleCloud_.setCellIDs(cellIds);
 }
 
 void twoWayOne2One::setupFoam2LigCommunication()

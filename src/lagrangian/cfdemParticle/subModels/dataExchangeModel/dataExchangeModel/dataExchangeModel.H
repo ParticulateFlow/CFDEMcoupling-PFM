@@ -244,27 +244,6 @@ public:
         virtual int getNumberOfTypes() const;
         virtual double* getTypeVol() const;
 
-        inline void setPositions(label n,double* pos)
-        {
-            for (int i=0;i<n;i++)
-                for (int j=0;j<3;j++)
-                    particleCloud_.positions_[i][j]=pos[i*3+j];
-        }
-
-        inline void setCellIDs(label n,int* ID)
-        {
-            for (int i=0;i<n;i++)
-                particleCloud_.cellIDs_[i][0]=ID[i];
-        }
-        inline void setCellIDs(labelList const& ids)
-        {
-            for (int i = 0; i < ids.size(); i++)
-            {
-                particleCloud_.cellIDs_[i][0] = ids[i];
-            }
-        }
-
-
         virtual scalar getCG() const { Warning << "getCG() not executed correctly!" << endl; return 1.; }
 };
 

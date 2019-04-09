@@ -435,8 +435,8 @@ bool twoWayMany2Many::couple(int i)
         // re-allocate arrays of cloud
         particleCloud_.reAllocArrays();
 
-        setPositions(nlocal_foam_,pos_foam_);
-        setCellIDs(nlocal_foam_,cellID_foam_);
+        particleCloud_.setPositions(nlocal_foam_,pos_foam_);
+        particleCloud_.setCellIDs(nlocal_foam_,cellID_foam_);
 
         Info <<"Foam::twoWayMany2Many::couple(i) done." << endl;
     }

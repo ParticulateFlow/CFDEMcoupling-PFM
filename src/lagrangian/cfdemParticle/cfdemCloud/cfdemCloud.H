@@ -403,6 +403,10 @@ public:
     // Write
 
       // write cfdemCloud internal data
+        inline void setPositions(label n,double* pos);
+        inline void setCellIDs(label n,int* ID);
+        inline void setCellIDs(labelList const& IDs);
+
         virtual bool evolve(volScalarField&,volVectorField&,volVectorField&);
 
         virtual void postFlow() {}
