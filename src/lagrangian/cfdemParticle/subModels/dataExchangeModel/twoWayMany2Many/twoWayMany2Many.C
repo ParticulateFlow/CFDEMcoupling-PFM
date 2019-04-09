@@ -417,7 +417,7 @@ bool twoWayMany2Many::couple(int i)
         }
 
         double newNpart = liggghts_get_maxtag(lmp);
-        setNumberOfParticles(newNpart);
+        particleCloud_.setNumberOfParticles(newNpart);
 
         if (Npart_ != newNpart)
         {
@@ -430,7 +430,7 @@ bool twoWayMany2Many::couple(int i)
         firstRun_=false;
         particleCloud_.clockM().stop("CoupleSyncIDs()");
 
-        setNumberOfParticles(nlocal_foam_);
+        particleCloud_.setNumberOfParticles(nlocal_foam_);
 
         // re-allocate arrays of cloud
         particleCloud_.reAllocArrays();

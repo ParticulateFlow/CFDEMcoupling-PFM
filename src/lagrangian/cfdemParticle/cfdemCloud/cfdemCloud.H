@@ -211,8 +211,6 @@ protected:
 
     virtual void giveDEMdata();
 
-    virtual void setNumberOfParticles(int);
-
     virtual void findCells();
 
     virtual void setForces();
@@ -247,6 +245,8 @@ public:
        bool allowCFDsubTimestep() const { return allowCFDsubTimestep_; }
 
        void setAllowCFDsubTimestep(bool b) { allowCFDsubTimestep_ = b; }
+
+       virtual void setNumberOfParticles(int numberOfParticles);
 
        void checkCG(bool);
 

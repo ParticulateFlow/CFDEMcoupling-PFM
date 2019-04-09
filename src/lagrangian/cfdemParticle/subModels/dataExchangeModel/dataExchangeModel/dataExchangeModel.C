@@ -43,13 +43,6 @@ defineTypeNameAndDebug(dataExchangeModel, 0);
 
 defineRunTimeSelectionTable(dataExchangeModel, dictionary);
 
-// * * * * * * * * * * * * * * protected Member Functions  * * * * * * * * * * * * * //
-
-void dataExchangeModel::setNumberOfParticles(int numberOfParticles) const
-{
-    particleCloud_.setNumberOfParticles(numberOfParticles);
-}
-
 // * * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * * //
 
 //====

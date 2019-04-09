@@ -115,7 +115,6 @@ public:
 
 
     // Member Function
-        void setNumberOfParticles(int) const;
 
         inline const int& maxNumberOfParticles() const { return maxNumberOfParticles_; }
 

@@ -789,7 +789,7 @@ void twoWayOne2One::locateParticles()
         destroy(prev_cell_ids);
     }
 
-    setNumberOfParticles(n_located);
+    particleCloud_.setNumberOfParticles(n_located);
     particleCloud_.reAllocArrays();
 
     reduce(n_located, sumOp<label>());
