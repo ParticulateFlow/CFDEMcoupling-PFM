@@ -262,8 +262,6 @@ public:
 
        vector expForce(int) const;
 
-       vector fluidVel(int) const;
-
        virtual const forceModel& forceM(int);
 
        virtual label nrForceModels() const;

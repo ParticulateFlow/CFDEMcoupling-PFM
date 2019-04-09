@@ -555,11 +555,6 @@ vector cfdemCloud::expForce(int index) const
     return vector(DEMForces()[index][0],DEMForces()[index][1],DEMForces()[index][2]);
 }
 
-vector cfdemCloud::fluidVel(int index) const
-{
-    return vector(fluidVels()[index][0],fluidVels()[index][1],fluidVels()[index][2]);
-}
-
 const forceModel& cfdemCloud::forceM(int i)
 {
     return forceModel_[i];
