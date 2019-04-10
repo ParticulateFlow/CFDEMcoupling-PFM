@@ -13,7 +13,7 @@ tmp<fv::convectionScheme<scalar> > mvConvection
 
 {
     combustion->correct();
-    dQ = combustion->dQ();
+    dQ = combustion->Qdot();
     label inertIndex = -1;
     volScalarField Yt(0.0*Y[0]);
 

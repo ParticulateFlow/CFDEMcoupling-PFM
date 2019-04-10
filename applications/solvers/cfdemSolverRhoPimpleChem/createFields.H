@@ -1,21 +1,15 @@
     //  thermodynamics, chemistry
 
-    Info<< "Creating combustion model\n" << endl;
-
-    autoPtr<combustionModels::rhoCombustionModel> combustion
-    (
-        combustionModels::rhoCombustionModel::New(mesh)
-    );
-
-    rhoReactionThermo& thermo = combustion->thermo();
-
+    Info<< "Reading thermophysical properties\n" << endl;
+    autoPtr<rhoReactionThermo> pThermo(rhoReactionThermo::New(mesh));
+    rhoReactionThermo& thermo = pThermo();
     thermo.validate(args.executable(), "h", "e");
 
     basicSpecieMixture& composition = thermo.composition();
     PtrList<volScalarField>& Y = composition.Y();
 
     // read molecular weight
-    volScalarField W(composition.W());
+    volScalarField W(thermo.W());
 
     bool propagateInertSpecie = true;
 
@@ -207,6 +201,12 @@
             phi,
             thermo
         )
+    );
+
+    Info<< "Creating combustion model\n" << endl;
+    autoPtr<CombustionModel<rhoReactionThermo>> combustion
+    (
+        CombustionModel<rhoReactionThermo>::New(thermo, turbulence())
     );
 
     Info<< "Creating field dpdt\n" << endl;

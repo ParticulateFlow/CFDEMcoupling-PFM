@@ -30,7 +30,8 @@ Description
 
 #include "fvCFD.H"
 #include "turbulentFluidThermoModel.H"
-#include "rhoCombustionModel.H"
+#include "rhoReactionThermo.H"
+#include "CombustionModel.H"
 #include "bound.H"
 #include "pimpleControl.H"
 #include "fvOptions.H"
@@ -117,7 +118,7 @@ int main(int argc, char *argv[])
 
        particleCloud.clockM().start(26,"Flow");
 
-        if (pimple.nCorrPIMPLE() <= 1)
+        if (pimple.nCorrPimple() <= 1)
         {
             #include "rhoEqn.H"
         }
