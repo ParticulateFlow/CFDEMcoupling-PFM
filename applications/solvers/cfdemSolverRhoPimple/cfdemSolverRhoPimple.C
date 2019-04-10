@@ -113,7 +113,7 @@ int main(int argc, char *argv[])
 
         particleCloud.clockM().start(26,"Flow");
 
-        if (pimple.nCorrPIMPLE() <= 1)
+        if (pimple.nCorrPimple() <= 1)
         {
             #include "rhoEqn.H"
         }
