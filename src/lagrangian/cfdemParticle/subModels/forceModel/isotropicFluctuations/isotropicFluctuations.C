@@ -66,7 +66,7 @@ isotropicFluctuations::isotropicFluctuations
     voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
     voidfractionRecFieldName_(propsDict_.lookupOrDefault<word>("voidfractionRecFieldName","voidfractionRec")),
     voidfractionRec_(sm.mesh().lookupObject<volScalarField> (voidfractionRecFieldName_)),
-    critVoidfraction_(propsDict_.lookupOrDefault<scalar>("critVoidfraction", 1.0)),
+    critVoidfraction_(propsDict_.lookupOrDefault<scalar>("critVoidfraction", 1.1)),
     D0_(propsDict_.lookupOrDefault<scalar>("D0",0.0)),
     D0FieldName_(propsDict_.lookupOrDefault<word>("D0FieldName","D0Field")),
     D0Field_
