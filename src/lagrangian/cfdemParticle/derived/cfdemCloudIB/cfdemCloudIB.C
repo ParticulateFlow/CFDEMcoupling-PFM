@@ -58,6 +58,7 @@ cfdemCloudIB::cfdemCloudIB
     angularVelocities_(NULL),
     pRefCell_(readLabel(mesh.solutionDict().subDict("PISO").lookup("pRefCell"))),
     pRefValue_(readScalar(mesh.solutionDict().subDict("PISO").lookup("pRefValue"))),
+    DEMTorques_(NULL),
     haveEvolvedOnce_(false),
     skipLagrangeToEulerMapping_(false)
 {
@@ -75,6 +76,7 @@ cfdemCloudIB::cfdemCloudIB
 cfdemCloudIB::~cfdemCloudIB()
 {
     dataExchangeM().destroy(angularVelocities_,3);
+    dataExchangeM().destroy(DEMTorques_,3);
 }
 
 
@@ -83,7 +85,7 @@ void cfdemCloudIB::getDEMdata()
 {
     cfdemCloud::getDEMdata();
     Info << "=== cfdemCloudIB::getDEMdata() === particle rotation not considered in CFD" << endl;
-    //dataExchangeM().getData("omega","vector-atom",angularVelocities_);
+    dataExchangeM().getData("omega","vector-atom",angularVelocities_);
 }
 
 bool cfdemCloudIB::reAllocArrays()
@@ -92,9 +94,21 @@ bool cfdemCloudIB::reAllocArrays()
     {
         // get arrays of new length
         dataExchangeM().allocateArray(angularVelocities_,0.,3);
+        dataExchangeM().allocateArray(DEMTorques_,0.,3);
         return true;
     }
     return false;
+}
+
+void cfdemCloudIB::giveDEMdata()
+{
+    cfdemCloud::giveDEMdata();
+    dataExchangeM().giveData("hdtorque","vector-atom",DEMTorques_);
+}
+
+inline double ** cfdemCloudIB::DEMTorques() const
+{
+    return DEMTorques_;
 }
 
 bool cfdemCloudIB::evolve()
@@ -186,13 +200,12 @@ void cfdemCloudIB::calcVelocityCorrection
                     // calc particle velocity
                     for(int i=0;i<3;i++) rVec[i]=U.mesh().C()[cellI][i]-position(index)[i];
                     for(int i=0;i<3;i++) angVel[i]=angularVelocities()[index][i];
-                    velRot=angVel^rVec;
+                    velRot=angVel^rVec;                   
                     for(int i=0;i<3;i++) uParticle[i] = velocities()[index][i]+velRot[i];
 
                     // impose field velocity
                     U[cellI]=(1-voidfractions_[index][subCell])*uParticle+voidfractions_[index][subCell]*U[cellI];
                 }
-
             }
         //}
     }

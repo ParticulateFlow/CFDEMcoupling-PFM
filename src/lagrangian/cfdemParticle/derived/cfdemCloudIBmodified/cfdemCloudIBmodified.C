@@ -79,9 +79,9 @@ cfdemCloudIBmodified::cfdemCloudIBmodified
 cfdemCloudIBmodified::~cfdemCloudIBmodified()
 {
     dataExchangeM().destroy(angularVelocities_,3);
-    dataExchangeM().destroy(DEMTorques_,3);
     dataExchangeM().destroy(xmol_,3);
     dataExchangeM().destroy(vmol_,3);
+    dataExchangeM().destroy(DEMTorques_,3);
 }
 
 
@@ -100,9 +100,9 @@ bool cfdemCloudIBmodified::reAllocArrays()
     {
         // get arrays of new length
         dataExchangeM().allocateArray(angularVelocities_,0.,3);
-        dataExchangeM().allocateArray(DEMTorques_,0.,3);
         dataExchangeM().allocateArray(xmol_,0.,3);
         dataExchangeM().allocateArray(vmol_,0.,3);
+        dataExchangeM().allocateArray(DEMTorques_,0.,3);
         return true;
     }
     return false;
@@ -217,13 +217,18 @@ void cfdemCloudIBmodified::calcVelocityCorrection
                     velRot=angVel^rVec;
 
                     for(int i=0;i<3;i++) rRel[i]=position(index)[i]-moleculeCOM()[index][i];
-                    for(int i=0;i<3;i++) vRel[i]=velocities()[index][i]-moleculeVel()[index][i];
+
+                    // change the v_rel to the v_mol
+                    for(int i=0;i<3;i++) vRel[i]=moleculeVel()[index][i];
                     double r = magSqr(rRel);
                     angRel = (rRel^vRel)/r;
                     for(int i=0;i<3;i++) rCell[i]=U.mesh().C()[cellI][i]-moleculeCOM()[index][i];
                     vCell=angRel^rCell;
 
-                    for(int i=0;i<3;i++) uParticle[i] = moleculeVel()[index][i]+velRot[i]+vCell[i];
+                    for(int i=0;i<3;i++) uParticle[i] = velocities()[index][i]+velRot[i]+vCell[i];
+
+                    //printf("Moleucle = %f, %f, %f; Ang Rel = %f, %f %f; uParticle = %f, %f, %f \n", moleculeCOM()[index][0], moleculeCOM()[index][1],
+                    //        moleculeCOM()[index][2],angRel[0],angRel[1],angRel[2], uParticle[0],uParticle[1],uParticle[2]);
 
                     // impose field velocity
                     U[cellI]=(1-voidfractions_[index][subCell])*uParticle+voidfractions_[index][subCell]*U[cellI];

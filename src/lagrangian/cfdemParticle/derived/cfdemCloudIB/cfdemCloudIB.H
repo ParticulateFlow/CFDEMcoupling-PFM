@@ -62,6 +62,8 @@ protected:
     label pRefCell_;
     scalar pRefValue_;
 
+    mutable double **DEMTorques_;
+
     mutable bool haveEvolvedOnce_;
     mutable bool skipLagrangeToEulerMapping_;
 
@@ -85,6 +87,10 @@ public:
 
         bool reAllocArrays();
 
+        void giveDEMdata();
+
+        inline double ** DEMTorques() const;
+
         bool evolve();
 
         void calcVelocityCorrection(volScalarField&,volVectorField&,volScalarField&,volScalarField&); // this could be moved to an IB mom couple model
@@ -96,7 +102,6 @@ public:
         {
             return angularVelocities_;
         }
-
 };
 
 
