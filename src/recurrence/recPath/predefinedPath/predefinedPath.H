@@ -20,6 +20,10 @@ License
 
     You should have received a copy of the GNU General Public License
     along with CFDEMcoupling academic.  If not, see <http://www.gnu.org/licenses/>.
+
+Description
+    Follow a pre-defined path specified in a user-provided recurrencePath file.
+
 \*---------------------------------------------------------------------------*/
 
 #ifndef predefinedPath_H
