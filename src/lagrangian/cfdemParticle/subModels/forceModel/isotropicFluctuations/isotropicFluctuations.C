@@ -51,11 +51,12 @@ addToRunTimeSelectionTable
 isotropicFluctuations::isotropicFluctuations
 (
     const dictionary& dict,
-    cfdemCloud& sm
+    cfdemCloud& sm,
+    word type
 )
 :
     forceModel(dict,sm),
-    propsDict_(dict.subDict(typeName + "Props")),
+    propsDict_(dict.subDict(type + "Props")),
     interpolate_(propsDict_.lookupOrDefault<bool>("interpolation", false)),
     measureDiff_(propsDict_.lookupOrDefault<bool>("measureDiff", false)),
     recErrorFile_("recurrenceError"),
@@ -87,7 +88,7 @@ isotropicFluctuations::isotropicFluctuations
     if(ignoreCellsName_ != "none")
     {
        ignoreCells_.set(new cellSet(particleCloud_.mesh(),ignoreCellsName_));
-       Info << "isotropicFluctuations: ignoring fluctuations in cellSet " << ignoreCells_().name() <<
+       Info << type << ": ignoring fluctuations in cellSet " << ignoreCells_().name() <<
         " with " << ignoreCells_().size() << " cells." << endl;
     }
     else existIgnoreCells_ = false;
@@ -156,7 +157,7 @@ void isotropicFluctuations::setForce() const
                     if(deltaVoidfrac>0)
                     {
                         D = D0Field_[cellI];
-                        flucU=unitRndVec()*fluctuationMag(relVolfractionExcess,D);
+                        flucU=unitFlucDir()*fluctuationMag(relVolfractionExcess,D);
                     }              
 
                     // write particle based data to global array
@@ -192,8 +193,9 @@ scalar isotropicFluctuations::fluctuationMag(const scalar relVolfractionExcess, 
     }
 }
 
-vector isotropicFluctuations::unitRndVec() const
+vector isotropicFluctuations::unitFlucDir() const
 {
+    // unit random vector
     // algorithm according to:
     // Marsaglia. "Choosing a point from the surface of a sphere." The Annals of Mathematical Statistics 43.2 (1972): 645-646.
     scalar v1(0.0);

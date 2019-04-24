@@ -44,7 +44,7 @@ class isotropicFluctuations
 :
     public forceModel
 {
-private:
+protected:
     dictionary propsDict_;
     
     bool interpolate_;
@@ -78,7 +78,7 @@ private:
 
     const scalar dtDEM_;
 
-    vector unitRndVec() const;
+    virtual vector unitFlucDir() const;
 
     scalar fluctuationMag(const scalar, const scalar) const;
 
@@ -98,7 +98,8 @@ public:
         isotropicFluctuations
         (
             const dictionary& dict,
-            cfdemCloud& sm
+            cfdemCloud& sm,
+            word type = "isotropicFluctuations"
         );
 
     // Destructor
