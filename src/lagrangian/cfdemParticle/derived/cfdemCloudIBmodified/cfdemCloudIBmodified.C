@@ -55,12 +55,10 @@ cfdemCloudIBmodified::cfdemCloudIBmodified
 )
 :
     cfdemCloud(mesh),
-    angularVelocities_(NULL),
     xmol_(NULL),
     vmol_(NULL),
     pRefCell_(readLabel(mesh.solutionDict().subDict("PISO").lookup("pRefCell"))),
     pRefValue_(readScalar(mesh.solutionDict().subDict("PISO").lookup("pRefValue"))),
-    DEMTorques_(NULL),
     haveEvolvedOnce_(false),
     skipLagrangeToEulerMapping_(false)
 
@@ -78,10 +76,8 @@ cfdemCloudIBmodified::cfdemCloudIBmodified
 
 cfdemCloudIBmodified::~cfdemCloudIBmodified()
 {
-    dataExchangeM().destroy(angularVelocities_,3);
     dataExchangeM().destroy(xmol_,3);
     dataExchangeM().destroy(vmol_,3);
-    dataExchangeM().destroy(DEMTorques_,3);
 }
 
 
@@ -89,7 +85,6 @@ cfdemCloudIBmodified::~cfdemCloudIBmodified()
 void cfdemCloudIBmodified::getDEMdata()
 {
     cfdemCloud::getDEMdata();
-    dataExchangeM().getData("omega","vector-atom",angularVelocities_);
     dataExchangeM().getData("x_mol","vector-atom",xmol_);
     dataExchangeM().getData("v_mol","vector-atom",vmol_);
 }
@@ -99,24 +94,11 @@ bool cfdemCloudIBmodified::reAllocArrays()
     if(cfdemCloud::reAllocArrays())
     {
         // get arrays of new length
-        dataExchangeM().allocateArray(angularVelocities_,0.,3);
         dataExchangeM().allocateArray(xmol_,0.,3);
         dataExchangeM().allocateArray(vmol_,0.,3);
-        dataExchangeM().allocateArray(DEMTorques_,0.,3);
         return true;
     }
     return false;
-}
-
-void cfdemCloudIBmodified::giveDEMdata()
-{
-    cfdemCloud::giveDEMdata();
-    dataExchangeM().giveData("hdtorque","vector-atom",DEMTorques_);
-}
-
-inline double ** cfdemCloudIBmodified::DEMTorques() const
-{
-    return DEMTorques_;
 }
 
 bool cfdemCloudIBmodified::evolve()
@@ -190,10 +172,6 @@ void cfdemCloudIBmodified::calcVelocityCorrection
 {
     label cellI=0;
     vector uParticle(0,0,0);
-    vector rVec(0,0,0);
-    vector velRot(0,0,0);
-    vector angVel(0,0,0);
-
     vector rRel(0,0,0);
     vector vRel(0,0,0);
     vector angRel(0,0,0);
@@ -212,23 +190,19 @@ void cfdemCloudIBmodified::calcVelocityCorrection
                 if (cellI >= 0)
                 {
                     // calc particle velocity
-                    for(int i=0;i<3;i++) rVec[i]=U.mesh().C()[cellI][i]-position(index)[i];
-                    for(int i=0;i<3;i++) angVel[i]=angularVelocities()[index][i];
-                    velRot=angVel^rVec;
-
                     for(int i=0;i<3;i++) rRel[i]=position(index)[i]-moleculeCOM()[index][i];
 
-                    // change the v_rel to the v_mol
+                    // capture the relative velocity from DEM side
                     for(int i=0;i<3;i++) vRel[i]=moleculeVel()[index][i];
                     double r = magSqr(rRel);
                     angRel = (rRel^vRel)/r;
                     for(int i=0;i<3;i++) rCell[i]=U.mesh().C()[cellI][i]-moleculeCOM()[index][i];
                     vCell=angRel^rCell;
 
-                    for(int i=0;i<3;i++) uParticle[i] = velocities()[index][i]+velRot[i]+vCell[i];
+                    for(int i=0;i<3;i++) uParticle[i] = velocities()[index][i]+vCell[i];
 
-                    //printf("Moleucle = %f, %f, %f; Ang Rel = %f, %f %f; uParticle = %f, %f, %f \n", moleculeCOM()[index][0], moleculeCOM()[index][1],
-                    //        moleculeCOM()[index][2],angRel[0],angRel[1],angRel[2], uParticle[0],uParticle[1],uParticle[2]);
+                    printf("Cell position = %f, %f, %f; COM position = %f %f %f \n", rCell[0], rCell[1], rCell[2],
+                            moleculeCOM()[index][0],moleculeCOM()[index][1],moleculeCOM()[index][2]);
 
                     // impose field velocity
                     U[cellI]=(1-voidfractions_[index][subCell])*uParticle+voidfractions_[index][subCell]*U[cellI];
@@ -264,12 +238,6 @@ void cfdemCloudIBmodified::calcVelocityCorrection
     }
 
 }
-
-vector cfdemCloudIBmodified::angularVelocity(int index) const
-{
-    return vector(angularVelocities_[index][0],angularVelocities_[index][1],angularVelocities_[index][2]);
-}
-
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

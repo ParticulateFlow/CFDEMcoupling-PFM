@@ -58,14 +58,10 @@ class cfdemCloudIBmodified
 {
 protected:
 
-    mutable double **angularVelocities_;
     mutable double **xmol_;
     mutable double **vmol_;
     label pRefCell_;
     scalar pRefValue_;
-
-    // Mod by A.N.
-    mutable double **DEMTorques_;   // particle torque
 
     mutable bool haveEvolvedOnce_;
     mutable bool skipLagrangeToEulerMapping_;
@@ -86,27 +82,16 @@ public:
 
 
     // Member Functions
-        void giveDEMdata();
-
         void getDEMdata();
 
         bool reAllocArrays();
 
     // Modification
-        inline double ** DEMTorques() const;
-
         bool evolve();
 
         void calcVelocityCorrection(volScalarField&,volVectorField&,volScalarField&,volScalarField&); // this could be moved to an IB mom couple model
 
       // Access
-        vector angularVelocity(int) const;
-
-        inline double ** angularVelocities() const
-        {
-            return angularVelocities_;
-        }
-
         inline double ** moleculeCOM() const
         {
             return xmol_;
