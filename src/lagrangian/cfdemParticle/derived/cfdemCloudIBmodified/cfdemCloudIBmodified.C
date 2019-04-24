@@ -178,6 +178,8 @@ void cfdemCloudIBmodified::calcVelocityCorrection
     vector rCell(0,0,0);
     vector vCell(0,0,0);
 
+    const boundBox& globalBb = mesh().bounds();
+
     for(int index=0; index< numberOfParticles(); index++)
     {
         //if(regionM().inRegion()[index][0])
@@ -186,6 +188,7 @@ void cfdemCloudIBmodified::calcVelocityCorrection
             {
                 //Info << "subCell=" << subCell << endl;
                 cellI = cellIDs()[index][subCell];
+                int gamma;
 
                 if (cellI >= 0)
                 {
@@ -196,13 +199,20 @@ void cfdemCloudIBmodified::calcVelocityCorrection
                     for(int i=0;i<3;i++) vRel[i]=moleculeVel()[index][i];
                     double r = magSqr(rRel);
                     angRel = (rRel^vRel)/r;
-                    for(int i=0;i<3;i++) rCell[i]=U.mesh().C()[cellI][i]-moleculeCOM()[index][i];
+
+                    // calc cell distance from molecule com and setting gammaFactor for vCell calc
+                    for(int i=0;i<3;i++) {
+                        rCell[i]=U.mesh().C()[cellI][i]-moleculeCOM()[index][i];
+
+                        if(rCell[i]>abs(globalBb.max()[i]-globalBb.min()[i]))
+                            gamma = 0;
+                        else
+                            gamma = 1;
+                    }
+
                     vCell=angRel^rCell;
 
-                    for(int i=0;i<3;i++) uParticle[i] = velocities()[index][i]+vCell[i];
-
-                    printf("Cell position = %f, %f, %f; COM position = %f %f %f \n", rCell[0], rCell[1], rCell[2],
-                            moleculeCOM()[index][0],moleculeCOM()[index][1],moleculeCOM()[index][2]);
+                    for(int i=0;i<3;i++) uParticle[i] = velocities()[index][i]+gamma*vCell[i];
 
                     // impose field velocity
                     U[cellI]=(1-voidfractions_[index][subCell])*uParticle+voidfractions_[index][subCell]*U[cellI];
