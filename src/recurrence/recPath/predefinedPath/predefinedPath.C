@@ -56,8 +56,17 @@ predefinedPath::predefinedPath
 :
     recPath(dict, base),
     propsDict_(dict.subDict(typeName + "Props")),
-    fileName_(propsDict_.lookupOrDefault<word>("recPathName", "recurrencePath"))
-{}
+    fileName_(propsDict_.lookupOrDefault<word>("recPathName", "predefinedRecurrencePath"))
+{
+    if (fileName_ == "recurrencePath")
+    {
+        FatalError << "File name of the user-provided recurrencePath file is "
+            << fileName_ << nl
+            << "This is in conflict with the automatically written recurrencePath file!" << nl
+            << nl << "Choose a different name!"
+            << abort(FatalError);
+    }
+}
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
