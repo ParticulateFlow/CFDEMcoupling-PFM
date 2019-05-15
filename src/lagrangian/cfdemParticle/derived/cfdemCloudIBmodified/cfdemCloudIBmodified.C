@@ -101,7 +101,7 @@ bool cfdemCloudIBmodified::reAllocArrays()
     return false;
 }
 
-bool cfdemCloudIBmodified::evolve()
+bool cfdemCloudIBmodified::evolve(volVectorField& Us)
 {
     numberOfParticlesChanged_ = false;
     arraysReallocated_=false;
@@ -143,6 +143,39 @@ bool cfdemCloudIBmodified::evolve()
         }
         for (int i=0;i<nrForceModels();i++) forceM(i).setForce();
         if(verbose_) Info << "setForce done." << endl;
+
+        // set particle velocity field
+        if(verbose_) Info << "- setVelocity(velocities_)" << endl;
+        label cell = 0;
+        vector uP(0,0,0);
+        vector rRel(0,0,0);
+        vector vRel(0,0,0);
+        vector angRel(0,0,0);
+        vector rCell(0,0,0);
+        vector vCell(0,0,0);
+        for (int index = 0; index < numberOfParticles(); ++index){
+            for(int subCell = 0; subCell < voidFractionM().cellsPerParticle()[index][0]; subCell++)
+            {
+                cell = cellIDs()[index][subCell];
+
+                if(cell >=0){
+                    // calc particle velocity
+                    for(int i=0;i<3;i++) rRel[i]=position(index)[i]-moleculeCOM()[index][i];
+
+                    // capture the relative velocity from DEM side
+                    for(int i=0;i<3;i++) vRel[i]=moleculeVel()[index][i];
+                    double r = magSqr(rRel);
+                    angRel = (rRel^vRel)/r;
+
+                    // calc cell distance from molecule com and setting gammaFactor for vCell calc
+                    for(int i=0;i<3;i++) rCell[i]=Us.mesh().C()[cell][i]-moleculeCOM()[index][i];
+                    vCell=angRel^rCell;
+                    for(int i=0;i<3;i++) uP[i] = velocities()[index][i]+vCell[i];
+                    Us[cell] = (1-voidfractions_[index][subCell])*uP;
+                }
+            }
+        }
+        if(verbose_) Info << "setVelocity done." << endl;
 
         // write DEM data
         if(verbose_) Info << " -giveDEMdata()" << endl;

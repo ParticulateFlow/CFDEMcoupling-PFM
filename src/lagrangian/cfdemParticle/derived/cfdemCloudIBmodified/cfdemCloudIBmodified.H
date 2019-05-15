@@ -87,7 +87,7 @@ public:
         bool reAllocArrays();
 
     // Modification
-        bool evolve();
+        bool evolve(volVectorField&);
 
         void calcVelocityCorrection(volScalarField&,volVectorField&,volScalarField&,volScalarField&); // this could be moved to an IB mom couple model
 
