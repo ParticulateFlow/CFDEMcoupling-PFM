@@ -14,6 +14,6 @@ name    outlet;
 fields  (alpha.air alpha.water alpha.oil);
 
 operation average;
-#includeEtc "caseDicts/postProcessing/surfaceRegion/patch.cfg"
+#includeEtc "caseDicts/postProcessing/surfaceFieldValue/patch.cfg"
 
 // ************************************************************************* //
