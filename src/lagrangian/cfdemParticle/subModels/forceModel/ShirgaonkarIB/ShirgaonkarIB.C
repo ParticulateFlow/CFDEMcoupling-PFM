@@ -70,7 +70,9 @@ ShirgaonkarIB::ShirgaonkarIB
     velFieldName_(propsDict_.lookup("velFieldName")),
     U_(sm.mesh().lookupObject<volVectorField> (velFieldName_)),
     pressureFieldName_(propsDict_.lookup("pressureFieldName")),
-    p_(sm.mesh().lookupObject<volScalarField> (pressureFieldName_))
+    p_(sm.mesh().lookupObject<volScalarField> (pressureFieldName_)),
+    solidVolFractionName_(propsDict_.lookup("solidVolFractionName")),
+    lambda_(sm.mesh().lookupObject<volScalarField> (solidVolFractionName_))
 {
     //Append the field names to be probed
     particleCloud_.probeM().initialize(typeName, typeName+".logDat");
@@ -162,40 +164,16 @@ void ShirgaonkarIB::setForce() const
 
 void ShirgaonkarIB::calcForce() const
 {
-    label cellID;
     vector dragMS;
 
     volVectorField h=forceSubM(0).IBDragPerV(U_,p_);
 
     dragMS = vector::zero;
 
-    for(int index=0; index< particleCloud_.numberOfParticles(); index++)
+    forAll(lambda_,cellI)
     {
-        int prev = 0;
-
-        for(int subCell=0;subCell<particleCloud_.voidFractionM().cellsPerParticle()[index][0];subCell++)
-        {
-            cellID = particleCloud_.cellIDs()[index][subCell];
-
-            if (cellID > -1) // Force on 1st particle
-            {
-                if (index == 0) dragMS += h[cellID]*h.mesh().V()[cellID];
-
-                if(index > 0)
-                {
-                    // Check for cellID in previous particles
-                    for(int i=index-1; i>= 0; i--)
-                    {
-                        for(int j=0; j< particleCloud_.voidFractionM().cellsPerParticle()[i][0];j++)
-                        {
-                            label cell = particleCloud_.cellIDs()[i][j];
-                            if(cell > -1 && cell == cellID){prev++;}
-                        }
-                    }
-                }
-            }
-            if(prev == 0){ dragMS += h[cellID]*h.mesh().V()[cellID];}
-        }
+        if(lambda_[cellI] > 0) dragMS += h[cellI]*h.mesh().V()[cellI];
+        else dragMS = dragMS;
     }
 
     //Info << "Drag force on particle clump = " << dragMS[0] << ", " << dragMS[1] << ", " << dragMS[2] << endl;

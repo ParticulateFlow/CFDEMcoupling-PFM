@@ -76,6 +76,10 @@ private:
 
     const volScalarField& p_;
 
+    word solidVolFractionName_;
+
+    const volScalarField& lambda_;
+
 public:
 
     //- Runtime type information
