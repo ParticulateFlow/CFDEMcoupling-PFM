@@ -65,8 +65,8 @@ ShirgaonkarIB::ShirgaonkarIB
     propsDict_(dict.subDict(typeName + "Props")),
     verbose_(false),
     twoDimensional_(false),
-    multisphere_(false), //  drag for a multisphere particle
     depth_(1),
+    multisphere_(false), //  drag for a multisphere particle
     velFieldName_(propsDict_.lookup("velFieldName")),
     U_(sm.mesh().lookupObject<volVectorField> (velFieldName_)),
     pressureFieldName_(propsDict_.lookup("pressureFieldName")),
@@ -171,38 +171,35 @@ void ShirgaonkarIB::calcForce() const
 
     for(int index=0; index< particleCloud_.numberOfParticles(); index++)
     {
-        int prev;
+        int prev = 0;
 
         for(int subCell=0;subCell<particleCloud_.voidFractionM().cellsPerParticle()[index][0];subCell++)
         {
             cellID = particleCloud_.cellIDs()[index][subCell];
 
-            prev = 0;
-
-            if (cellID > -1 && index == 0) // Force on 1st particle
+            if (cellID > -1) // Force on 1st particle
             {
-                dragMS += h[cellID]*h.mesh().V()[cellID];
+                if (index == 0) dragMS += h[cellID]*h.mesh().V()[cellID];
 
-            }
-
-            else if(cellID > -1 && index > 0)
-            {
-
-                // Check for cellID in previous particles
-                for(int i=index-1; i>= 0; i--)
+                if(index > 0)
                 {
-                    for(int j=0; j< particleCloud_.voidFractionM().cellsPerParticle()[i][0];j++)
+                    // Check for cellID in previous particles
+                    for(int i=index-1; i>= 0; i--)
                     {
-                        label cell = particleCloud_.cellIDs()[i][j];
-                        if(cellID == cell){prev++;}
+                        for(int j=0; j< particleCloud_.voidFractionM().cellsPerParticle()[i][0];j++)
+                        {
+                            label cell = particleCloud_.cellIDs()[i][j];
+                            if(cell > -1 && cell == cellID){prev++;}
+                        }
                     }
                 }
-                if(prev == 0){ dragMS += h[cellID]*h.mesh().V()[cellID];}
             }
+            if(prev == 0){ dragMS += h[cellID]*h.mesh().V()[cellID];}
         }
     }
 
-    Info << "Drag force on particle clump = " << dragMS[0]<<","<<dragMS[1]<<","<<dragMS[2] << endl;
+    //Info << "Drag force on particle clump = " << dragMS[0] << ", " << dragMS[1] << ", " << dragMS[2] << endl;
+    printf("Drag force on particle clump = %f, %f, %f\n",dragMS[0],dragMS[1],dragMS[2]);
 }
 
 
