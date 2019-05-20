@@ -61,7 +61,7 @@ protected:
 
     mutable scalar scaleDia_;
 
-    scalarList typeCG_;
+    mutable scalarList typeCG_;
 
     mutable scalar scaleDrag_;
 
