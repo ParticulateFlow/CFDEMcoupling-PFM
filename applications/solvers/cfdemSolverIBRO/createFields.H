@@ -104,19 +104,19 @@
         mesh
     );
 
-    /*Info<< "Reading the momentum forcing term F\n" << endl;
-    volVectorField F
+    Info<< "Reading the additional volume ratio field V_ratio\n" << endl;
+    volScalarField V_ratio
     (
         IOobject
         (
-            "F",
+            "V_ratio",
             runTime.timeName(),
             mesh,
             IOobject::MUST_READ,
-            IOobject::AUTO_WRITE
+            IOobject::NO_WRITE
         ),
         mesh
-    );*/
+    );
 
 //========================
 

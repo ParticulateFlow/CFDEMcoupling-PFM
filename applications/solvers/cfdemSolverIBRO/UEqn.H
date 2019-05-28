@@ -7,8 +7,8 @@ fvVectorMatrix UEqn
   + turbulence->divDevReff(U)
  ==
     fvOptions(U)
-  + lambda*Us/U.mesh().time().deltaT()
-  - fvm::Sp(lambda/U.mesh().time().deltaT(),U)
+  + V_ratio*lambda*Us/U.mesh().time().deltaT()
+  - fvm::Sp(V_ratio*lambda/U.mesh().time().deltaT(),U)
 );
 
 UEqn.relax();
