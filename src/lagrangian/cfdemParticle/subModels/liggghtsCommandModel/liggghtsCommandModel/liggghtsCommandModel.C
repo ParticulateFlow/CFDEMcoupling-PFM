@@ -277,6 +277,10 @@ void liggghtsCommandModel::parseCommandList(wordList& commandList,labelList& lab
         else if (add=="dotdot") add = "..";
         else if (add=="slash")  add = "/";
 	else if (add=="dollar") add = "$";
+	else if (add=="curlyOpen") add = "{";
+	else if (add=="curlyClose") add = "}";
+	else if (add=="squareOpen") add = "[";
+	else if (add=="squareClose") add = "]";
         else if (add=="noBlanks")  // no blanks after the following words
         {
             add = "";
