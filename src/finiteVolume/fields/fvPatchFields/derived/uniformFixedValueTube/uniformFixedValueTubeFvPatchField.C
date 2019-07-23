@@ -89,7 +89,7 @@ uniformFixedValueTubeFvPatchField<Type>::uniformFixedValueTubeFvPatchField
 :
     fixedValueFvPatchField<Type>(p, iF),
     uniformValue_(Function1<Type>::New("uniformValue", dict)),
-	pName_("p"), //JOKER
+	pName_("p_rgh"), //JOKER
 	phiName_("phi"), //JOKER
     velocityFieldName_("U"),
     densityFieldName_("rho"),
@@ -110,7 +110,7 @@ uniformFixedValueTubeFvPatchField<Type>::uniformFixedValueTubeFvPatchField
 :
     fixedValueFvPatchField<Type>(ptf),
     uniformValue_(ptf.uniformValue_().clone().ptr()),
-	pName_("p"), //JOKER
+	pName_("p_rgh"), //JOKER
 	phiName_("phi"), //JOKER
     velocityFieldName_("U"),
     densityFieldName_("rho"),
@@ -132,7 +132,7 @@ uniformFixedValueTubeFvPatchField<Type>::uniformFixedValueTubeFvPatchField
 :
     fixedValueFvPatchField<Type>(ptf, iF),
     uniformValue_(ptf.uniformValue_().clone().ptr()),
-	pName_("p"), //JOKER
+	pName_("p_rgh"), //JOKER
 	phiName_("phi"), //JOKER
     velocityFieldName_("U"),
     densityFieldName_("rho"),
@@ -181,7 +181,7 @@ void uniformFixedValueTubeFvPatchField<Type>::updateCoeffs()
 	//calc cell velocity from flux phip
 	//scalar vel = phip/this->patch().magSf();
     // some relaxation might be useful?
-    
+	
     // calc pressure drop
 //    fvPatchField<Type>::operator==(0.5*zeta*density*mag(velocity)*mag(velocity)*uniformValue_->value(t));
 	//dP = zeta * l/d * rho u^2 / 2
