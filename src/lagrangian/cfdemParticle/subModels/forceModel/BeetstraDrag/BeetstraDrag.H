@@ -17,6 +17,11 @@ Description
     drag law for monodisperse systems according to
     Beetstra et al. AIChE J 53.2 (2007)
 
+Reference
+    R. Beetstra, M.A. van der Hoef, J.A.M. Kuipers
+    "Drag force of intermediate Reynolds number flow past mono- and bidisperse arrays of spheres"
+    AIChE Journal, 53 (2007)
+
 SourceFiles
     BeetstraDrag.C
 \*---------------------------------------------------------------------------*/
@@ -86,12 +91,12 @@ protected:
     virtual void adaptVoidfraction(double&, label) const {}
 
     virtual scalar effDiameter(double d, label cellI, label index) const {return d;}
-    
+
     virtual scalar meanSauterDiameter(double d, label cellI) const {return d;}
 
     double F(double, double) const;
 
-    double terminalVelocity(double, double, double, double, double, double) const; 
+    double terminalVelocity(double, double, double, double, double, double) const;
 
     double a(double) const;
 

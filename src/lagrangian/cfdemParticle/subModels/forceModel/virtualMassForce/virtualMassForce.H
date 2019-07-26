@@ -28,6 +28,10 @@ Description
     This code is designed to realize coupled CFD-DEM simulations using LIGGGHTS
     and OpenFOAM(R). Note: this code is not part of OpenFOAM(R) (see DISCLAIMER).
 
+Reference
+    Crowe, Clayton T.; Sommerfeld, Martin; Tsuji, Yutaka (1998).
+    "Multiphase flows with droplets and particles"
+
 Class
     virtualMassForce
 

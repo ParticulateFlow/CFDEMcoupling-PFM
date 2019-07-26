@@ -665,7 +665,7 @@ bool cfdemCloud::evolve
         }
 
         //============================================
-        //CHECK JUST TIME-INTERPOATE ALREADY SMOOTHENED VOIDFRACTIONNEXT AND UsNEXT FIELD
+        //CHECK JUST TIME-INTERPOLATE ALREADY SMOOTHENED VOIDFRACTIONNEXT AND UsNEXT FIELD
         //      IMPLICIT FORCE CONTRIBUTION AND SOLVER USE EXACTLY THE SAME AVERAGED
         //      QUANTITIES AT THE GRID!
         scalar timeStepFrac = dataExchangeM().timeStepFraction();

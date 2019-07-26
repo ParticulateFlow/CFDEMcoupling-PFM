@@ -186,15 +186,15 @@ public:
 
         inline int couplingInterval() const { return couplingInterval_; }
 
-        inline scalar couplingTime() const { return couplingInterval_*DEMts_; }
+        inline scalar couplingTime() const { return couplingInterval_ * DEMts_; }
 
         inline scalar TSstart() const { return particleCloud_.mesh().time().startTime().value()
                                         + (couplingStep_-1) * couplingTime(); }
 
-        inline scalar TSend() const { return particleCloud_.mesh().time().startTime().value()
-                                        + (couplingStep_) * couplingTime(); }
+        inline scalar TSend() const   { return particleCloud_.mesh().time().startTime().value()
+                                        + (couplingStep_  ) * couplingTime(); }
 
-        inline int DEMstepsTillT(scalar t) const { return (t - (particleCloud_.mesh().time().value() - couplingTime())  + SMALL) / DEMts_; }
+        inline int DEMstepsTillT(scalar t) const { return (t - (particleCloud_.mesh().time().value() - couplingTime()) + SMALL) / DEMts_; }
 
         inline void checkTSsize() const
         {
@@ -210,7 +210,7 @@ public:
                 Info << "particleCloud_.mesh().time().deltaT().value() = " << particleCloud_.mesh().time().deltaT().value() << endl;
                 Info << "couplingInterval_ = " << couplingInterval_ << endl;
                 Info << "DEMts_ = " << DEMts_ << endl;
-                Warning << "\nWarning - Coupling time (= DEM time step * coupling interval) is not a multiple of  CFD time-step!\n" << endl;
+                Warning << "\nWarning - Coupling time (= DEM time step * coupling interval) is not a multiple of CFD time-step!\n" << endl;
             }
             if (!particleCloud_.allowCFDsubTimestep())
                 if (particleCloud_.mesh().time().deltaT().value() < couplingInterval_ * DEMts_ + SMALL)

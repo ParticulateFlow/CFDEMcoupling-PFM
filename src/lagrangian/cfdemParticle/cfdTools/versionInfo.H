@@ -39,7 +39,7 @@ word compatibleLIGGGHTSversion="PFM 19.02";
 word OFversion="4.x";
 
 Info << "\nCFDEMcoupling version: " << CFDEMversion <<  endl;
-Info << ", compatible to LIGGGHTS version: " << compatibleLIGGGHTSversion <<  endl;
-Info << ", compatible to OpenFOAM version: " << OFversion <<  endl;
+Info << "compatible to LIGGGHTS version: " << compatibleLIGGGHTSversion <<  endl;
+Info << "compatible to OpenFOAM version: " << OFversion <<  endl;
 
 #endif
