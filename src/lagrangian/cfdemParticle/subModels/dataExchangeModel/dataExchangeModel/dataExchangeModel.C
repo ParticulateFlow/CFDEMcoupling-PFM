@@ -209,7 +209,7 @@ bool dataExchangeModel::couple(int i)
 scalar dataExchangeModel::timeStepFraction() const
 {
     //return fraction between previous coupling TS and actual TS
-    return ( (particleCloud_.mesh().time().timeIndex() - timeIndexOffset_) * particleCloud_.mesh().time().deltaTValue() / couplingTime() - (couplingStep_ - 1) );
+    return clamp( (particleCloud_.mesh().time().timeIndex() - timeIndexOffset_) * particleCloud_.mesh().time().deltaTValue() / couplingTime() - (couplingStep_ - 1) );
 }
 
 int dataExchangeModel::getNumberOfParticles() const

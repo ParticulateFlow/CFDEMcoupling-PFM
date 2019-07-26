@@ -72,6 +72,12 @@ protected:
 
     // Protected member functions
 
+        // note: C++17 has std::clamp
+        scalar clamp(scalar v, scalar lo=0.0, scalar hi=1.0) const
+        {
+            return ((v < lo) ? lo : (hi < v) ? hi : v);
+        }
+
 public:
 
     //- Runtime type information

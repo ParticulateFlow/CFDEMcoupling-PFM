@@ -673,13 +673,7 @@ bool cfdemCloud::evolve
         int old_precision = Info().precision(10);
         Info << "\n timeStepFraction() = " << timeStepFrac << endl;
         Info().precision(old_precision);
-        if(timeStepFrac > 1.0000001)
-        {
-   //         FatalError << "cfdemCloud::dataExchangeM().timeStepFraction()>1: Do not do this, since dangerous. This might be due to the fact that you used a adjustable CFD time step. Please use a fixed CFD time step." << abort(FatalError);
-              old_precision = Warning().precision(10);
-              Warning << "cfdemCloud::dataExchangeM().timeStepFraction() = " << timeStepFrac << endl;
-              Warning().precision(old_precision);
-        }
+
         clockM().start(24,"interpolateEulerFields");
 
         // update voidFractionField
