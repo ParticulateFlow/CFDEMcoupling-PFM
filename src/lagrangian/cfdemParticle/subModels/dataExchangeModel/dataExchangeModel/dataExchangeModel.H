@@ -68,6 +68,8 @@ protected:
 
         int couplingInterval_;
 
+        const label timeIndexOffset_;
+
     // Protected member functions
 
 public:
@@ -229,15 +231,10 @@ public:
 
         inline bool doCoupleNow() const
         {
-            if (particleCloud_.mesh().time().value()-particleCloud_.mesh().time().startTime().value()-SMALL
-                > couplingStep_*DEMts_*couplingInterval_)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return ( (particleCloud_.mesh().time().timeIndex() - timeIndexOffset_) * particleCloud_.mesh().time().deltaTValue() - SMALL
+                     >
+                     couplingStep_ * DEMts_ * couplingInterval_
+                   );
         }
 
         virtual int getNumberOfParticles() const;
