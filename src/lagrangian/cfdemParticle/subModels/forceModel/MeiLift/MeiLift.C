@@ -278,17 +278,19 @@ void MeiLift::setForce() const
                     if (magUr>0.0 && magVorticity>0.0)
                     {
                     	//Loth and Dorgan (2009), Eq (27)
+                         // please note: in Loth and Dorgan Vrel = Vp-Uf, here Urel = Uf-Vp. Hence the reversed cross products.
                     	lift = 0.125 * constant::mathematical::pi
                     			* rho
 								* Clcombined
 								* magUr * magUr
-								* (vorticity ^ Ur) / mag(vorticity ^ Ur) // force direction
+								* (Ur ^ vorticity) / mag(Ur ^ vorticity) // force direction
 								* ds * ds;
                     }
                 }
                 else
                 {
                 	//Loth and Dorgan (2009), Eq (36)
+                    // please note: in Loth and Dorgan Vrel = Vp-Uf, here Urel = Uf-Vp. Hence the reversed cross products.
                 	if (useShearInduced_)
                 	{
                         if (magUr>0.0 && magVorticity>0.0)
@@ -298,7 +300,7 @@ void MeiLift::setForce() const
                         			* rho
 									* Clshear
 									* magUr * magUr
-									* (vorticity ^ Ur) / mag(vorticity ^ Ur) // force direction
+                                    * (Ur ^ vorticity) / mag(Ur ^ vorticity) // force direction
 									* ds * ds;
                         }
                 	}
@@ -310,7 +312,7 @@ void MeiLift::setForce() const
                         	lift += 0.125 * constant::mathematical::pi
                         			* rho
 									* Clspin_star
-									* (Omega ^ Ur)
+									* (Ur ^ Omega)
 									* ds * ds * ds;
                         }
                 	}
