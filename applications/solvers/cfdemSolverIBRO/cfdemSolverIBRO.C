@@ -91,7 +91,8 @@ int main(int argc, char *argv[])
 
         // do particle stuff
         Info << "- evolve()" << endl;
-        particleCloud.evolve(Us);
+        particleCloud.evolve();
+        particleCloud.calcForcingTerm(Us);
         Us.correctBoundaryConditions();
 
         volScalarField voidfractionNext=mesh.lookupObject<volScalarField>("voidfractionNext");

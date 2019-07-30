@@ -104,20 +104,6 @@
         mesh
     );
 
-    Info<< "Reading the additional volume ratio field V_ratio\n" << endl;
-    volScalarField V_ratio
-    (
-        IOobject
-        (
-            "V_ratio",
-            runTime.timeName(),
-            mesh,
-            IOobject::MUST_READ,
-            IOobject::NO_WRITE
-        ),
-        mesh
-    );
-
 //========================
 
 #   include "createPhi.H"

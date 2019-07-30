@@ -87,9 +87,9 @@ public:
         bool reAllocArrays();
 
     // Modification
-        bool evolve(volVectorField&);
+        bool evolve();
 
-        void calcVelocityCorrection(volScalarField&,volVectorField&,volScalarField&,volScalarField&); // this could be moved to an IB mom couple model
+        void calcForcingTerm(volVectorField&);
 
       // Access
         inline double ** moleculeCOM() const

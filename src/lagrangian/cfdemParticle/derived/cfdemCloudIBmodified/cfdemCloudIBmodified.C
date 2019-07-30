@@ -101,7 +101,7 @@ bool cfdemCloudIBmodified::reAllocArrays()
     return false;
 }
 
-bool cfdemCloudIBmodified::evolve(volVectorField& Us)
+bool cfdemCloudIBmodified::evolve()
 {
     numberOfParticlesChanged_ = false;
     arraysReallocated_=false;
@@ -144,6 +144,26 @@ bool cfdemCloudIBmodified::evolve(volVectorField& Us)
         for (int i=0;i<nrForceModels();i++) forceM(i).setForce();
         if(verbose_) Info << "setForce done." << endl;
 
+        // write DEM data
+        if(verbose_) Info << " -giveDEMdata()" << endl;
+        giveDEMdata();
+
+        dataExchangeM().couple(1);
+
+        haveEvolvedOnce_=true;
+    }
+    Info << "evolve done." << endl;
+
+    //if(verbose_)    #include "debugInfo.H";
+
+    // do particle IO
+    IOM().dumpDEMdata();
+
+    return doCouple;
+}
+
+void cfdemCloudIBmodified::calcForcingTerm(volVectorField& Us)
+{
         // set particle velocity field
         if(verbose_) Info << "- setVelocity(velocities_)" << endl;
         label cell = 0;
@@ -176,99 +196,6 @@ bool cfdemCloudIBmodified::evolve(volVectorField& Us)
             }
         }
         if(verbose_) Info << "setVelocity done." << endl;
-
-        // write DEM data
-        if(verbose_) Info << " -giveDEMdata()" << endl;
-        giveDEMdata();
-
-        dataExchangeM().couple(1);
-
-        haveEvolvedOnce_=true;
-    }
-    Info << "evolve done." << endl;
-
-    //if(verbose_)    #include "debugInfo.H";
-
-    // do particle IO
-    IOM().dumpDEMdata();
-
-    return doCouple;
-}
-
-void cfdemCloudIBmodified::calcVelocityCorrection
-(
-    volScalarField& p,
-    volVectorField& U,
-    volScalarField& phiIB,
-    volScalarField& voidfraction
-)
-{
-    label cellI=0;
-    vector uParticle(0,0,0);
-    vector rRel(0,0,0);
-    vector vRel(0,0,0);
-    vector angRel(0,0,0);
-    vector rCell(0,0,0);
-    vector vCell(0,0,0);
-
-    for(int index=0; index< numberOfParticles(); index++)
-    {
-        //if(regionM().inRegion()[index][0])
-        //{
-            for(int subCell=0;subCell<voidFractionM().cellsPerParticle()[index][0];subCell++)
-            {
-                //Info << "subCell=" << subCell << endl;
-                cellI = cellIDs()[index][subCell];
-
-                if (cellI >= 0)
-                {
-                    // calc particle velocity
-                    for(int i=0;i<3;i++) rRel[i]=position(index)[i]-moleculeCOM()[index][i];
-
-                    // capture the relative velocity from DEM side
-                    for(int i=0;i<3;i++) vRel[i]=moleculeVel()[index][i];
-                    double r = magSqr(rRel);
-                    angRel = (rRel^vRel)/r;
-
-                    // calc cell distance from molecule com and setting gammaFactor for vCell calc
-                    for(int i=0;i<3;i++) rCell[i]=U.mesh().C()[cellI][i]-moleculeCOM()[index][i];
-                    vCell=angRel^rCell;
-
-                    for(int i=0;i<3;i++) uParticle[i] = velocities()[index][i]+vCell[i];
-
-                    // impose field velocity
-                    U[cellI]=(1-voidfractions_[index][subCell])*uParticle+voidfractions_[index][subCell]*U[cellI];
-                }
-            }
-        //}
-    }
-    U.correctBoundaryConditions();
-
-    // make field divergence free - set reference value in case it is needed
-    fvScalarMatrix phiIBEqn
-    (
-        fvm::laplacian(phiIB) == fvc::div(U) + fvc::ddt(voidfraction)
-    );
-    if(phiIB.needReference())
-    {
-        phiIBEqn.setReference(pRefCell_, pRefValue_);
-    }
-
-    phiIBEqn.solve();
-
-    U=U-fvc::grad(phiIB);
-    U.correctBoundaryConditions();
-
-    // correct the pressure as well
-    p=p+phiIB/U.mesh().time().deltaT();  // do we have to  account for rho here?
-    p.correctBoundaryConditions();
-
-    if (couplingProperties_.found("checkinterface"))
-    {
-        Info << "checking no-slip on interface..." << endl;
-//          #include "checkInterfaceVelocity.H" //TODO: check carefully!
-    }
-
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -1,14 +1,12 @@
 fvVectorMatrix UEqn
 (
-    fvm::ddt(voidfraction,U) + MRF.DDt(U)
-  // + 1.5*fvm::div(phi, U)                //Adams Bashforth implicit scheme
-  // - 0.5*fvc::div(phi, U)
+    fvm::ddt(voidfractionNext,U) + MRF.DDt(U)
   + fvm::div(phi, U)
   + turbulence->divDevReff(U)
  ==
     fvOptions(U)
-  + V_ratio*lambda*Us/U.mesh().time().deltaT()
-  - fvm::Sp(V_ratio*lambda/U.mesh().time().deltaT(),U)
+  + lambda*Us/U.mesh().time().deltaT() // explicit part of source term
+  - fvm::Sp(lambda/U.mesh().time().deltaT(),U) //fvm::ddt(V_ratio*lambda,U) //   // implicit part of source term
 );
 
 UEqn.relax();

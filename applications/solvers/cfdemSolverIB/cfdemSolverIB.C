@@ -91,16 +91,17 @@ int main(int argc, char *argv[])
 
         // do particle stuff
         Info << "- evolve()" << endl;
-        particleCloud.evolve();
+        particleCloud.evolve(Us);
 
         // Pressure-velocity PISO corrector
         {
+            MRF.correctBoundaryVelocity(U);
 
             // Momentum predictor
 
             fvVectorMatrix UEqn
             (
-                fvm::ddt(voidfraction,U)
+                fvm::ddt(voidfraction,U) + MRF.DDt(U)
               + fvm::div(phi, U)
               + turbulence->divDevReff(U)
              ==
@@ -114,6 +115,7 @@ int main(int argc, char *argv[])
             if (piso.momentumPredictor())
             {
                 solve(UEqn == -fvc::grad(p));
+                fvOptions.correct(U);
             }
 
             // --- PISO loop

@@ -111,7 +111,7 @@ inline double ** cfdemCloudIB::DEMTorques() const
     return DEMTorques_;
 }
 
-bool cfdemCloudIB::evolve()
+bool cfdemCloudIB::evolve(volVectorField& Us)
 {
     numberOfParticlesChanged_ = false;
     arraysReallocated_=false;
@@ -153,6 +153,30 @@ bool cfdemCloudIB::evolve()
         }
         for (int i=0;i<nrForceModels();i++) forceM(i).setForce();
         if(verbose_) Info << "setForce done." << endl;
+
+        // set particle velocity field
+        if(verbose_) Info << "- setVelocity(velocities_)" << endl;
+        label cell = 0;
+        vector uP(0,0,0);
+        vector rVec(0,0,0);
+        vector velRot(0,0,0);
+        vector angVel(0,0,0);
+        for (int index = 0; index < numberOfParticles(); ++index){
+            for(int subCell = 0; subCell < voidFractionM().cellsPerParticle()[index][0]; subCell++)
+            {
+                cell = cellIDs()[index][subCell];
+
+                if(cell >=0){
+                    // calc particle velocity
+                    for(int i=0;i<3;i++) rVec[i]=Us.mesh().C()[cell][i]-position(index)[i];
+                    for(int i=0;i<3;i++) angVel[i]=angularVelocities()[index][i];
+                    velRot=angVel^rVec;
+                    for(int i=0;i<3;i++) uP[i] = velocities()[index][i]+velRot[i];
+                    Us[cell] = (1-voidfractions_[index][subCell])*uP;
+                }
+            }
+        }
+        if(verbose_) Info << "setVelocity done." << endl;
 
         // write DEM data
         if(verbose_) Info << " -giveDEMdata()" << endl;
@@ -204,7 +228,7 @@ void cfdemCloudIB::calcVelocityCorrection
                     for(int i=0;i<3;i++) uParticle[i] = velocities()[index][i]+velRot[i];
 
                     // impose field velocity
-                    U[cellI]=(1-voidfractions_[index][subCell])*uParticle+voidfractions_[index][subCell]*U[cellI];
+                    U[cellI]= (1-voidfractions_[index][subCell])*uParticle+voidfractions_[index][subCell]*U[cellI];
                 }
             }
         //}
@@ -227,7 +251,7 @@ void cfdemCloudIB::calcVelocityCorrection
     U.correctBoundaryConditions();
 
     // correct the pressure as well
-    p=p+phiIB/U.mesh().time().deltaT();  // do we have to  account for rho here?
+    p=p+phiIB/U.mesh().time().deltaT();  // no need to account for rho since p=(p/rho) in OF
     p.correctBoundaryConditions();
 
     if (couplingProperties_.found("checkinterface"))
