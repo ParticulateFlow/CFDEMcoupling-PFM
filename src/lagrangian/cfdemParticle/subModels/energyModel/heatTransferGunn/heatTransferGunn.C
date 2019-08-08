@@ -359,9 +359,8 @@ void heatTransferGunn::calcEnergyContribution()
                     partNu_[index][0] = Nup;
                 }
 
-                 //if(particleCloud_.verbose() && index >=0 && index <2)
-                 if(verbose_ && index >=0 && index <2)
-                 {
+                if(verbose_ && index >=0 && index <2)
+                {
                     Pout << "partHeatFlux = " << partHeatFlux_[index][0] << endl;
                     Pout << "magUr = " << magUr << endl;
                     Pout << "kf0 = " << kf0_ << endl;
@@ -489,9 +488,6 @@ scalar heatTransferGunn::Nusselt(scalar voidfraction, scalar Rep, scalar Pr) con
 
 void heatTransferGunn::heatFlux(label index, scalar h, scalar As, scalar Tfluid, scalar cg3)
 {
-    //Info << "partTemp from HTGunn.C = " << partTemp_[100][0] << endl;
-    //Info << "partTemp = " << partTemp_[index][0] << endl;
-    //Info << "Tfluid =  " << Tfluid << endl;
     scalar hAs = h * As * cg3;
 
     if (particleCloud_.getParticleEffVolFactors())

@@ -290,8 +290,6 @@ void species::execute()
         }
     }
 
-    //Info << "partTemp from species.C = " << partTemp_[100][0] << endl;
-
         // give DEM data
         particleCloud_.dataExchangeM().giveData(partTempName_, "scalar-atom", partTemp_);
         particleCloud_.dataExchangeM().giveData(partRhoName_,  "scalar-atom", partRho_);

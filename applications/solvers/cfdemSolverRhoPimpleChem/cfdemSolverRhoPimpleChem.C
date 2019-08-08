@@ -52,7 +52,6 @@ Description
 
 int main(int argc, char *argv[])
 {
-//    #include "postProcess.H"
     #include "setRootCase.H"
     #include "createTime.H"
     #include "createMesh.H"
@@ -61,7 +60,6 @@ int main(int argc, char *argv[])
     #include "createRDeltaT.H"
 
     #include "createFields.H"
-    //#include "createFieldRefs.H"
     #include "createFvOptions.H"
     #include "initContinuityErrs.H"
 

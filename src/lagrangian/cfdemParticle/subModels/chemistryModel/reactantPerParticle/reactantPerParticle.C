@@ -56,7 +56,7 @@ reactantPerParticle::reactantPerParticle
     chemistryModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
     mesh_(sm.mesh()),
-        verbose_(propsDict_.lookupOrDefault<bool>("verbose",false)),
+    verbose_(propsDict_.lookupOrDefault<bool>("verbose",false)),
     reactantPerParticle_(NULL),
     voidfractionFieldName_(propsDict_.lookupOrDefault<word>("voidfractionFieldName","voidfraction")),
     voidfraction_(sm.mesh().lookupObject<volScalarField>(voidfractionFieldName_)),

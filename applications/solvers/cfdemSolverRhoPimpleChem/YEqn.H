@@ -33,7 +33,6 @@ tmp<fv::convectionScheme<scalar> > mvConvection
                combustion->R(Yi)
               + particleCloud.chemistryM(0).Smi(i)
               + fvOptions(rho, Yi)
-               
             );
 
             YiEqn.relax();

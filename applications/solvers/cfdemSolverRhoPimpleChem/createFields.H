@@ -14,7 +14,6 @@
     PtrList<volScalarField>& Y = composition.Y();
 
     // read molecular weight
-    //const volScalarField& W = composition.W();
     volScalarField W(composition.W());
 
     bool propagateInertSpecie = true;
