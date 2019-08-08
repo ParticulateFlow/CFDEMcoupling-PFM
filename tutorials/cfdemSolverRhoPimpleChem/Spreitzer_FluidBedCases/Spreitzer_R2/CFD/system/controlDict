@@ -15,7 +15,7 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-application     cfdemSolverRhoPimpleChem; 
+application     cfdemSolverRhoPimpleChem;
 
 startFrom       startTime;
 
@@ -25,11 +25,11 @@ stopAt          endTime;
 
 endTime         70;
 
-deltaT          0.0005; //0.00025;
+deltaT          0.0005;
 
-writeControl    timeStep; 
+writeControl    timeStep;
 
-writeInterval   5000; 
+writeInterval   5000;
 
 purgeWrite      0;
 
@@ -53,7 +53,7 @@ maxDeltaT       0.1;
 
 
 // ************************************************************************* //
- libs (  
+ libs (
         "libfieldFunctionObjects.so"
      );
 
@@ -61,9 +61,9 @@ functions
 {
     moleFrac
     {
-        type	rhoReactionThermoMoleFractions;
+        type    rhoReactionThermoMoleFractions;
     } 
-    
+
     residuals
     {
         type            residuals;
@@ -78,9 +78,9 @@ functions
             U
         );
     }
-    
+
     gasResidual
-        {
+    {
         type            residuals;
         functionObjectLibs ("libutilityFunctionObjects.so");
         enabled         true;
@@ -96,35 +96,34 @@ functions
             N2
         );
     }
-    
+
     probes1
     {
-	type probes;
+        type probes;
 
         functionObjectLibs ("libsampling.so");
 
-	#include "probesDict";
+        #include "probesDict";
     }
 
 
     fieldMinMax1
     {
-    	type            fieldMinMax;
-    	libs            ("libfieldFunctionObjects.so");
-	fields          (U);	
-	// Report the location of the field extrema
-	location   yes;
-	// Type of extrema for rank > 0 primitives
-	mode	magnitude; // magnitude | component
+        type            fieldMinMax;
+        libs            ("libfieldFunctionObjects.so");
+        fields          (U);
+        // Report the location of the field extrema
+        location   yes;
+        // Type of extrema for rank > 0 primitives
+        mode            magnitude; // magnitude | component
      }
-    
 
-  
+
     globalMassFrac
-    {          
+    {
         type            volRegion;
         libs ("libfieldFunctionObjects.so");
-        writeControl   	timeStep;//outputTime; 
+        writeControl   	timeStep;//outputTime;
         writeInterval  	1;
         log             true;
         writeFields     false;
@@ -140,13 +139,13 @@ functions
             CO
             N2
         ); 
-    } 
+    }
 
     globalMass
-    {          
+    {
         type            volRegion;
         libs ("libfieldFunctionObjects.so");
-        writeControl   timeStep;//outputTime; 
+        writeControl   timeStep;//outputTime;
         writeInterval   1;
         log             true;
         writeFields     false;
@@ -158,7 +157,7 @@ functions
             rhoeps
             rho
         );
-    } 
-} 
+    }
+}
 
 // ************************************************************************* //

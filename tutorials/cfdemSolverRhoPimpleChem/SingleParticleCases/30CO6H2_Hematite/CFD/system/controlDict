@@ -29,7 +29,7 @@ deltaT          1;
 
 writeControl    runTime;
 
-writeInterval   1000; 
+writeInterval   1000;
 
 purgeWrite      0;
 
@@ -53,7 +53,7 @@ maxDeltaT       0.1;
 
 
 // ************************************************************************* //
- libs (  
+ libs (
         "libfieldFunctionObjects.so"
      );
 
@@ -61,24 +61,24 @@ functions
 {
     moleFrac
     {
-        type	rhoReactionThermoMoleFractions;
+        type    rhoReactionThermoMoleFractions;
     }
 
     probes1
     {
-	type probes;
+        type probes;
 
         functionObjectLibs ("libsampling.so");
 
-	#include "probesDict";
+        #include "probesDict";
     }
-  
+
     globalMassFrac
-    {          
+    {
         type            volRegion;
         libs ("libfieldFunctionObjects.so");
-        writeControl   	timeStep;//outputTime; 
-        writeInterval  	1;
+        writeControl    timeStep;//outputTime;
+        writeInterval   1;
         log             true;
         writeFields     false;
         regionType      all;
@@ -96,10 +96,10 @@ functions
     }
 
     globalMass
-    {          
+    {
         type            volRegion;
         libs ("libfieldFunctionObjects.so");
-        writeControl   timeStep;//outputTime; 
+        writeControl   timeStep;//outputTime;
         writeInterval   1;
         log             true;
         writeFields     false;
@@ -112,6 +112,6 @@ functions
             rho
         );
     }
-} 
+}
 
 // ************************************************************************* //
