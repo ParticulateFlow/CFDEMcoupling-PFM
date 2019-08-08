@@ -94,7 +94,7 @@ fix     LayerRelRadii all property/atom relRadii vector yes no no 1.0 0.9999 0.9
 fix	LayerMasses all property/atom massLayer vector yes no no 0. 0. 0. 0.
 
 ## define fix for rho_eff and fracRed - initialize as zero
-fix fracRed all property/atom fracRed vector yes no no 0. 0. 0.
+fix fracRed all property/atom fracRed_all vector yes no no 0. 0. 0.
 fix rhoeff all property/atom rhoeff vector yes no no 0. 0. 0. 0.
 fix dY_cfd5 all property/atom dY_cfd5 vector yes yes no 0. 0. 0.
 fix dY_cfd6 all property/atom dY_cfd6 vector yes yes no 0. 0. 0.
