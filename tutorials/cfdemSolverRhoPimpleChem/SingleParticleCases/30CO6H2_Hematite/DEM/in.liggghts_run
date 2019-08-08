@@ -51,8 +51,8 @@ fix     cfd2 all couple/cfd/force
 fix     cfd3 all couple/cfd/chemistry n_species 5 species_names H2 H2O CO CO2 N2 n_diff 2 diffusant_names CO H2
 
 # Activate for 3-layer unreacted core shrink model
-fix     cfd5 all chem/shrink/core speciesA CO molMassA 0.02801 speciesC CO2 molMassC 0.04401 kch2 0.375161 screen no nevery 1 
-fix     cfd6 all chem/shrink/core speciesA H2 molMassA 0.00202 speciesC H2O molMassC 0.01801 kch2 0.0044738 screen no nevery 1 
+fix     cfd5 all chem/shrink/core speciesA CO molMassA 0.02801 speciesC CO2 molMassC 0.04401 kch2 0.375161 screen no nevery 1
+fix     cfd6 all chem/shrink/core speciesA H2 molMassA 0.00202 speciesC H2O molMassC 0.01801 kch2 0.0044738 screen no nevery 1
 #0.34
 #0.06
 
@@ -61,12 +61,12 @@ fix     cfd6 all chem/shrink/core speciesA H2 molMassA 0.00202 speciesC H2O molM
 fix     k0_CO all property/global k0_cfd5 vector 17 25 2700
 fix     Ea_CO all property/global Ea_cfd5 vector 69488 73674 113859
 
-fix 	k0_H2 all property/global k0_cfd6 vector 30 23 160
-fix 	Ea_H2 all property/global Ea_cfd6 vector 63627 71162 92092
+fix     k0_H2 all property/global k0_cfd6 vector 30 23 160
+fix     Ea_H2 all property/global Ea_cfd6 vector 63627 71162 92092
 
 # particle porosity/tortuosity/pore diameter
-fix     porosity 	all property/atom   porosity_ 	    vector yes no no 0.598 0.2122 0.0399 0.02 
-fix     tortuosity 	all property/global tortuosity_     scalar 3
+fix     porosity        all property/atom   porosity_       vector yes no no 0.598 0.2122 0.0399 0.02
+fix     tortuosity      all property/global tortuosity_     scalar 3
 fix     pore_diameter   all property/global pore_diameter_  scalar 1e-6 
 
 # Material properties for unreacted chemical shrink core (activate only when chem/shrink/core is active)
@@ -77,17 +77,17 @@ fix     molMass all property/global molMass_all vector 0.055845 0.071844 0.23153
 fix     layerRelRad all property/atom relRadii vector yes no no 1.0 0.998 0.995 0.98
 
 # define fix for mass layer - initial testing
-fix	massLayer all property/atom massLayer vector no no no 0. 0. 0. 0.
+fix     massLayer all property/atom massLayer vector no no no 0. 0. 0. 0.
 
 ## debug fixes ##
 # fix to compute fracRed
 fix     fracRed all property/atom fracRed_all vector yes no no 0. 0. 0.
 fix     rhoeff all property/atom rhoeff vector yes no no 0. 0. 0. 0.
-fix	Aterm all property/atom Aterm vector yes no no 0. 0. 0.
-fix 	Bterm all property/atom Bterm vector yes no no 0. 0. 0.
-fix	Massterm all property/atom Massterm scalar yes no no 0.
-fix	effDiffBinary all property/atom effDiffBinary vector yes no no 0. 0. 0.
-fix	effDiffKnud all property/atom effDiffKnud vector yes no no 0. 0. 0.
+fix     Aterm all property/atom Aterm vector yes no no 0. 0. 0.
+fix     Bterm all property/atom Bterm vector yes no no 0. 0. 0.
+fix     Massterm all property/atom Massterm scalar yes no no 0.
+fix     effDiffBinary all property/atom effDiffBinary vector yes no no 0. 0. 0.
+fix     effDiffKnud all property/atom effDiffKnud vector yes no no 0. 0. 0.
 
 # apply nve integration to all particles that are inserted as single particles
 # fix     integr all nve/sphere 
@@ -114,48 +114,48 @@ fix     redRad4 all ave/time 1000 1 1000 c_layerRad4 file relRad4.dat
 
 #### give information to file 
 compute Aterm_red all reduce sum f_Aterm[1] f_Aterm[2] f_Aterm[3]
-fix	Aterm1 all ave/time 100 1 100 c_Aterm_red[1] c_Aterm_red[2] c_Aterm_red[3]
+fix     Aterm1 all ave/time 100 1 100 c_Aterm_red[1] c_Aterm_red[2] c_Aterm_red[3]
 variable a1 equal f_Aterm1[1]
 variable a2 equal f_Aterm1[2]
 variable a3 equal f_Aterm1[3]
 
 compute Bterm_red all reduce sum f_Bterm[1] f_Bterm[2] f_Bterm[3]
-fix	Bterm1 all ave/time 100 1 100 c_Bterm_red[1] c_Bterm_red[2] c_Bterm_red[3]
+fix     Bterm1 all ave/time 100 1 100 c_Bterm_red[1] c_Bterm_red[2] c_Bterm_red[3]
 variable b1 equal f_Bterm1[1]
 variable b2 equal f_Bterm1[2]
 variable b3 equal f_Bterm1[3]
 
 compute Massterm_red all reduce sum f_Massterm
-fix	Massterm1 all ave/time 100 1 100 c_Massterm_red
+fix     Massterm1 all ave/time 100 1 100 c_Massterm_red
 variable mt1 equal f_Massterm1
 
 compute fracRedTerm all reduce sum f_fracRed[1] f_fracRed[2] f_fracRed[3]
-fix	fracRed1 all ave/time 100 1 100 c_fracRedTerm[1] c_fracRedTerm[2] c_fracRedTerm[3]
+fix     fracRed1 all ave/time 100 1 100 c_fracRedTerm[1] c_fracRedTerm[2] c_fracRedTerm[3]
 variable fr1 equal f_fracRed1[1]
 variable fr2 equal f_fracRed1[2]
 variable fr3 equal f_fracRed1[3]
 
 compute effDiffBinary_red all reduce sum f_effDiffBinary[1] f_effDiffBinary[2] f_effDiffBinary[3]
-fix	effDiffBinary1 all ave/time 1000 1 1000 c_effDiffBinary_red[1] c_effDiffBinary_red[2] c_effDiffBinary_red[3]
+fix     effDiffBinary1 all ave/time 1000 1 1000 c_effDiffBinary_red[1] c_effDiffBinary_red[2] c_effDiffBinary_red[3]
 variable dij1 equal f_effDiffBinary1[1]
 variable dij2 equal f_effDiffBinary1[2]
 variable dij3 equal f_effDiffBinary1[3]
 
 compute effDiffKnud_red all reduce sum f_effDiffKnud[1] f_effDiffKnud[2] f_effDiffKnud[3]
-fix	effDiffKnud1 all ave/time 1000 1 1000 c_effDiffKnud_red[1] c_effDiffKnud_red[2] c_effDiffKnud_red[3]
+fix     effDiffKnud1 all ave/time 1000 1 1000 c_effDiffKnud_red[1] c_effDiffKnud_red[2] c_effDiffKnud_red[3]
 variable dik1 equal f_effDiffKnud1[1]
 variable dik2 equal f_effDiffKnud1[2]
 variable dik3 equal f_effDiffKnud1[3]
 
 compute porosity_red all reduce sum f_porosity[1] f_porosity[2] f_porosity[3] f_porosity[4]
-fix	porosity1 all ave/time 1000 1 1000 c_porosity_red[1] c_porosity_red[2] c_porosity_red[3] c_porosity_red[4]
+fix     porosity1 all ave/time 1000 1 1000 c_porosity_red[1] c_porosity_red[2] c_porosity_red[3] c_porosity_red[4]
 variable p1 equal f_porosity1[1]
 variable p2 equal f_porosity1[2]
 variable p3 equal f_porosity1[3]
 variable p4 equal f_porosity1[4]
 
 compute mass_layer all reduce sum f_massLayer[1] f_massLayer[2] f_massLayer[3] f_massLayer[4]
-fix	massLayerPrintout all ave/time 100 1 100 c_mass_layer[1] c_mass_layer[2] c_mass_layer[3] c_mass_layer[4]
+fix     massLayerPrintout all ave/time 100 1 100 c_mass_layer[1] c_mass_layer[2] c_mass_layer[3] c_mass_layer[4]
 variable mL1 equal f_massLayerPrintout[1]
 variable mL2 equal f_massLayerPrintout[2]
 variable mL3 equal f_massLayerPrintout[3]
