@@ -109,7 +109,7 @@ writeLiggghts::writeLiggghts
     command_ += " " + path_ + "/" + writeName_;
     if (overwrite_)
     {
-        strCommand_=string(command_);
+        strCommand_ = command_;
     }
     else
     {
