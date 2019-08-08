@@ -48,7 +48,7 @@ fix     cfd all couple/cfd couple_every 100 mpi
 fix     cfd2 all couple/cfd/force
 
 # this should invoke chemistry
-fix     cfd3 all couple/cfd/chemistry n_species 5 species_names H2 H2O CO CO2 N2
+fix     cfd3 all couple/cfd/chemistry n_species 5 species_names H2 H2O CO CO2 N2 n_diff 2 diffusant_names CO H2
 
 # Activate for 3-layer unreacted core shrink model
 fix     cfd5 all chem/shrink/core speciesA CO molMassA 0.02801 speciesC CO2 molMassC 0.04401 kch2 0.375161 screen no nevery 1 
@@ -81,7 +81,8 @@ fix	massLayer all property/atom massLayer vector no no no 0. 0. 0. 0.
 
 ## debug fixes ##
 # fix to compute fracRed
-fix	fracRed	all property/atom fracRed vector yes no no 0. 0. 0. 
+fix     fracRed all property/atom fracRed_all vector yes no no 0. 0. 0.
+fix     rhoeff all property/atom rhoeff vector yes no no 0. 0. 0. 0.
 fix	Aterm all property/atom Aterm vector yes no no 0. 0. 0.
 fix 	Bterm all property/atom Bterm vector yes no no 0. 0. 0.
 fix	Massterm all property/atom Massterm scalar yes no no 0.
