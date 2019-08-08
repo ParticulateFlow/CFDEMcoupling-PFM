@@ -59,7 +59,7 @@ compute_modify  thermo_temp dynamic yes
 
 # insert the first particles so that dump is not empty
 run     1
-dump    dmp all custom 1000 post/dump.liggghts_init id type x y z ix iy iz vx vy vz fx fy fz omegax omegay omegaz radius 
+dump    dmp all custom 1000 post/dump.liggghts_init id type x y z vx vy vz fx fy fz omegax omegay omegaz radius
 
 run        150000 upto 
 write_restart   ../DEM/post/restart/liggghts.restart
