@@ -12,7 +12,7 @@ boundary        f f f
 newton          off
 
 units           si
-processors      4 1 2
+processors      * 1 2
 
 # read the restart file
 read_restart    ../DEM/post/restart/liggghts.restart
