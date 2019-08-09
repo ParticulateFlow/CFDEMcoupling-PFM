@@ -298,8 +298,8 @@ compute_modify  thermo_temp dynamic yes
 
 dump        dmp all custom ${WI} ../DEM/post/dump.liggghts_run id type x y z vx vy vz fx fy fz omegax omegay omegaz radius
 
-dump	    tstdmp2 all custom 250000 ../DEM/dumptest.liggghts_run id type x y z vx vy vz f_Aterm_cfd5[1] f_Aterm_cfd5[2] f_Aterm_cfd5[3] f_Aterm_cfd6[1] f_Aterm_cfd6[2] f_Aterm_cfd6[3] f_Bterm_cfd5[1] f_Bterm_cfd5[2] f_Bterm_cfd5[3] f_Bterm_cfd6[1] f_Bterm_cfd6[2] f_Bterm_cfd6[3] f_Massterm_cfd5 f_Massterm_cfd6 f_X_CO f_X_H2 f_X_CO2 f_X_H2O f_fracRed[1] f_fracRed[2] f_fracRed[3]
+dump	    tstdmp2 all custom 250000 ../DEM/post/dumptest.liggghts_run id type x y z vx vy vz f_Aterm_cfd5[1] f_Aterm_cfd5[2] f_Aterm_cfd5[3] f_Aterm_cfd6[1] f_Aterm_cfd6[2] f_Aterm_cfd6[3] f_Bterm_cfd5[1] f_Bterm_cfd5[2] f_Bterm_cfd5[3] f_Bterm_cfd6[1] f_Bterm_cfd6[2] f_Bterm_cfd6[3] f_Massterm_cfd5 f_Massterm_cfd6 f_X_CO f_X_H2 f_X_CO2 f_X_H2O f_fracRed[1] f_fracRed[2] f_fracRed[3]
 
-#dump	    tstdmp3 all custom 250000 ../DEM/dumpDIFF.liggghts_run id type x y z vx vy vz f_effDiffBinary_cfd5[1] f_effDiffBinary_cfd5[2] f_effDiffBinary_cfd5[3] f_effDiffBinary_cfd6[1] f_effDiffBinary_cfd6[2] f_effDiffBinary_cfd6[3]
+#dump	    tstdmp3 all custom 250000 ../DEM/post/dumpDIFF.liggghts_run id type x y z vx vy vz f_effDiffBinary_cfd5[1] f_effDiffBinary_cfd5[2] f_effDiffBinary_cfd5[3] f_effDiffBinary_cfd6[1] f_effDiffBinary_cfd6[2] f_effDiffBinary_cfd6[3]
 
 run         1
