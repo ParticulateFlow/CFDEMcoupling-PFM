@@ -104,7 +104,7 @@ reactionHeatProps
 
 speciesProps
 {
-	ChemistryFile 		"$casePath/CFD/constant/foam.inp";
+	ChemistryFile 		"$FOAM_CASE/constant/foam.inp";
 	Nevery			1;
 	verbose			true;
 }
@@ -112,7 +112,7 @@ speciesProps
 diffusionCoefficientsProps
 {
 	verbose			false;        
-	ChemistryFile 		"$casePath/CFD/constant/foam.inp";
+	ChemistryFile 		"$FOAM_CASE/constant/foam.inp";
         diffusantGasNames       (    CO
                                      H2
                                 ); 
