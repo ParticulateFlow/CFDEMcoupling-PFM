@@ -10,7 +10,7 @@ boundary        f f f
 newton          off
 
 units           si
-processors      4 1 2
+processors      * 1 2
 
 region          reg block 0.0 0.06 0.0 0.15 0.0 0.06 units box
 create_box      1 reg
