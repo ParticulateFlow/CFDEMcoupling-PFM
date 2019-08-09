@@ -53,9 +53,10 @@ maxDeltaT       0.1;
 
 
 // ************************************************************************* //
- libs (
-        "libfieldFunctionObjects.so"
-     );
+libs
+(
+    "libfieldFunctionObjects.so"
+);
 
 functions
 {
