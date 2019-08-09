@@ -300,7 +300,7 @@ void species::execute()
             particleCloud_.dataExchangeM().giveData("X_"+speciesNames_[i],"scalar-atom",molarFractions_[i]);
         };
 
-        Info << "give data done" << endl;
+        if (verbose_) Info << "give data done" << endl;
 
         // pull changeOfSpeciesMass_, transform onto fields changeOfSpeciesMassFields_, add them up on changeOfGasMassField_
         scalar timestep = mesh_.time().deltaTValue();
