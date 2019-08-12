@@ -78,17 +78,11 @@ functions
             rho
             p
             T
-            molC
             N2
             CO2
             CO
             H2
             H2O
-            ModSpeciesMassField_N2
-            ModSpeciesMassField_CO2
-            ModSpeciesMassField_CO
-            ModSpeciesMassField_H2
-            ModSpeciesMassField_H2O
             X_CO
             X_CO2
             X_H2
