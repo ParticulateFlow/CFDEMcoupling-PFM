@@ -104,6 +104,8 @@ functions
 
         functionObjectLibs ("libsampling.so");
 
+        name probes1;
+
         fields
         (
             rho
