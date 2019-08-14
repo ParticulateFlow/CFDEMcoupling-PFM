@@ -83,11 +83,6 @@ fix     massLayer all property/atom massLayer vector no no no 0. 0. 0. 0.
 # fix to compute fracRed
 fix     fracRed all property/atom fracRed_all vector yes no no 0. 0. 0.
 fix     rhoeff all property/atom rhoeff vector yes no no 0. 0. 0. 0.
-fix     Aterm all property/atom Aterm vector yes no no 0. 0. 0.
-fix     Bterm all property/atom Bterm vector yes no no 0. 0. 0.
-fix     Massterm all property/atom Massterm scalar yes no no 0.
-fix     effDiffBinary all property/atom effDiffBinary vector yes no no 0. 0. 0.
-fix     effDiffKnud all property/atom effDiffKnud vector yes no no 0. 0. 0.
 
 # apply nve integration to all particles that are inserted as single particles
 # fix     integr all nve/sphere 
@@ -100,6 +95,8 @@ variable rp   equal radius[1]
 variable rho1 equal mass[1]/((4/3)*PI*radius[1]*radius[1]*radius[1])
 fix printmass all print 1000 "${time} ${m1} ${rho1} ${rp}" file mass_rho_rad.txt title "#time mass rho rad_par"
 
+###############################################
+## Check Layer Radii and Write them to files ###
 compute layerRad1 all reduce sum f_layerRelRad[1]   
 fix     redRad1 all ave/time 1000 1 1000 c_layerRad1 file relRad1.dat
 
@@ -112,20 +109,21 @@ fix     redRad3 all ave/time 1000 1 1000 c_layerRad3 file relRad3.dat
 compute layerRad4 all reduce sum f_layerRelRad[4]
 fix     redRad4 all ave/time 1000 1 1000 c_layerRad4 file relRad4.dat 
 
-#### give information to file 
-compute Aterm_red all reduce sum f_Aterm[1] f_Aterm[2] f_Aterm[3]
+###############################################
+#### Give information about resistance terms and molar fractions to specified files ###
+compute Aterm_red all reduce sum f_Aterm_cfd5[1] f_Aterm_cfd5[2] f_Aterm_cfd5[3]
 fix     Aterm1 all ave/time 100 1 100 c_Aterm_red[1] c_Aterm_red[2] c_Aterm_red[3]
 variable a1 equal f_Aterm1[1]
 variable a2 equal f_Aterm1[2]
 variable a3 equal f_Aterm1[3]
 
-compute Bterm_red all reduce sum f_Bterm[1] f_Bterm[2] f_Bterm[3]
+compute Bterm_red all reduce sum f_Bterm_cfd5[1] f_Bterm_cfd5[2] f_Bterm_cfd5[3]
 fix     Bterm1 all ave/time 100 1 100 c_Bterm_red[1] c_Bterm_red[2] c_Bterm_red[3]
 variable b1 equal f_Bterm1[1]
 variable b2 equal f_Bterm1[2]
 variable b3 equal f_Bterm1[3]
 
-compute Massterm_red all reduce sum f_Massterm
+compute Massterm_red all reduce sum f_Massterm_cfd5
 fix     Massterm1 all ave/time 100 1 100 c_Massterm_red
 variable mt1 equal f_Massterm1
 
@@ -135,13 +133,13 @@ variable fr1 equal f_fracRed1[1]
 variable fr2 equal f_fracRed1[2]
 variable fr3 equal f_fracRed1[3]
 
-compute effDiffBinary_red all reduce sum f_effDiffBinary[1] f_effDiffBinary[2] f_effDiffBinary[3]
+compute effDiffBinary_red all reduce sum f_effDiffBinary_cfd5[1] f_effDiffBinary_cfd5[2] f_effDiffBinary_cfd5[3]
 fix     effDiffBinary1 all ave/time 1000 1 1000 c_effDiffBinary_red[1] c_effDiffBinary_red[2] c_effDiffBinary_red[3]
 variable dij1 equal f_effDiffBinary1[1]
 variable dij2 equal f_effDiffBinary1[2]
 variable dij3 equal f_effDiffBinary1[3]
 
-compute effDiffKnud_red all reduce sum f_effDiffKnud[1] f_effDiffKnud[2] f_effDiffKnud[3]
+compute effDiffKnud_red all reduce sum f_effDiffKnud_cfd5[1] f_effDiffKnud_cfd5[2] f_effDiffKnud_cfd5[3]
 fix     effDiffKnud1 all ave/time 1000 1 1000 c_effDiffKnud_red[1] c_effDiffKnud_red[2] c_effDiffKnud_red[3]
 variable dik1 equal f_effDiffKnud1[1]
 variable dik2 equal f_effDiffKnud1[2]
