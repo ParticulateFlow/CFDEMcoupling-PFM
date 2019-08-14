@@ -164,10 +164,6 @@ void diffusionCoefficient::execute()
     scalar dBinary_(0);
     scalar Xnegative(0);
 
-    List<scalar> Xfluid_(0);
-    Xfluid_.setSize(speciesNames_.size());
-    List<scalar> XfluidDiffusant_(0);
-    XfluidDiffusant_.setSize(diffusantGasNames_.size());
     List<scalar> TotalFraction_(0);
     TotalFraction_.setSize(diffusantGasNames_.size());
 
@@ -193,21 +189,13 @@ void diffusionCoefficient::execute()
 
                 for (int i = 0; i<speciesNames_.size();i++)
                 {
-                    Xfluid_[i] = X_[i][cellI];
-
                     // total amount of negative molar fractions in the domain
                     // check it and then delete it
-                    scalar timestep = mesh_.time().deltaTValue();
-                    if (Xfluid_[i] < 0.0)
+                    if (X_[i][cellI] < 0.0)
                     {
-                        Xnegative += Xfluid_[i]*timestep;
+                        Xnegative += X_[i][cellI] * mesh_.time().deltaTValue();
                         Info << "total negative molar fractions =" << Xnegative << endl;
                     }
-                }
-
-                for (int j=0; j<diffusantGasNames_.size();j++)
-                {
-                    XfluidDiffusant_[j] = Xdiffusant_[j][cellI];
                 }
             }
 
@@ -241,11 +229,11 @@ void diffusionCoefficient::execute()
                             dBinary_ = 1e-7*Texp*calcMolNum(j,i)/(Pfluid*calcDiffVol(j,i));
 
                             if (verbose_) {
-                                Info << "Xfluid for " << speciesNames_[i] << " : " << Xfluid_[i] << nl << endl;
-                                Info << "Xdiffusant for " << diffusantGasNames_[j] << " : " << XfluidDiffusant_[j] << nl << endl;
+                                Info << "Xfluid for " << speciesNames_[i] << " : " << X_[i][cellI] << nl << endl;
+                                Info << "Xdiffusant for " << diffusantGasNames_[j] << " : " << Xdiffusant_[j][cellI] << nl << endl;
                             }
 
-                            TotalFraction_[j] += Xfluid_[i]/dBinary_;
+                            TotalFraction_[j] += X_[i][cellI]/dBinary_;
 
                             if (verbose_)
                                 Info << "Total Fraction = " << TotalFraction_[j] << nl << endl;
@@ -254,7 +242,7 @@ void diffusionCoefficient::execute()
                             if (TotalFraction_[j] < VSMALL)
                                 diffusionCoefficients_[j][index][0] = VSMALL;
                             else
-                                diffusionCoefficients_[j][index][0] = (1.0-XfluidDiffusant_[j])/TotalFraction_[j];
+                                diffusionCoefficients_[j][index][0] = (1.0-Xdiffusant_[j][cellI])/TotalFraction_[j];
                         }else
                         {
                         FatalError
