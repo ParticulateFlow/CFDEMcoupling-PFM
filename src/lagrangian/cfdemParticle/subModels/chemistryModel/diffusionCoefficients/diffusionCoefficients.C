@@ -264,7 +264,7 @@ void diffusionCoefficient::execute()
     {
         word pushName = diffusantGasNames_[j] + "_diffCoeff";
         particleCloud_.dataExchangeM().giveData(pushName,"scalar-atom",diffusionCoefficients_[j]);
-    };
+    }
 
     Info << "give data done" << endl;
 }
