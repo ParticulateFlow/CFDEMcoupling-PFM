@@ -96,7 +96,8 @@ diffusionCoefficient::~diffusionCoefficient()
 }
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
- void diffusionCoefficient::allocateMyArrays() const
+
+void diffusionCoefficient::allocateMyArrays() const
 {
     double initVal=0.0;
     if (particleCloud_.dataExchangeM().maxNumberOfParticles() > 0)
@@ -135,13 +136,14 @@ void diffusionCoefficient::init()
                 (mesh_.lookupObject<volScalarField>("X_"+diffusantGasNames_[j]));
         Xdiffusant_.set(j, &Xdiffusant);
 
-        if(verbose_)
+        if (verbose_)
         {
             Info << " Reading diffusing gas species list: " << diffusantGasNames_ << endl;
             Info << " Looking up diffusin gas species fields: " << "X_"+diffusantGasNames_[j] << endl;
             Info << " The molar fraction fields (Xdiffusant_i): " << Xdiffusant_[j].name() << nl << endl;
         }
     }
+
     initialized_ = true;
 }
 
@@ -172,67 +174,69 @@ void diffusionCoefficient::execute()
 
     for (int index=0; index<particleCloud_.numberOfParticles(); ++index)
     {
-        cellI=particleCloud_.cellIDs()[index][0];
+        cellI = particleCloud_.cellIDs()[index][0];
         if (cellI >=0)
         {
             if(interpolation_)
             {
-                vector position     =   particleCloud_.position(index);
-                Tfluid              =   TInterpolator_.interpolate(position,cellI);
-                Pfluid              =   PInterpolator_.interpolate(position,cellI);
+                vector position = particleCloud_.position(index);
+                Tfluid          = TInterpolator_.interpolate(position,cellI);
+                Pfluid          = PInterpolator_.interpolate(position,cellI);
             }
             else
             {
-                Tfluid          =   tempField_[cellI];
-                Pfluid          =   P_[cellI];
+                Tfluid = tempField_[cellI];
+                Pfluid = P_[cellI];
 
-                for (int i = 0; i<speciesNames_.size();i++)
+                for (int i = 0; i<speciesNames_.size(); i++)
                 {
                     // total amount of negative molar fractions in the domain
                     // check it and then delete it
                     if (X_[i][cellI] < 0.0)
                     {
                         Xnegative += X_[i][cellI] * mesh_.time().deltaTValue();
-                        Info << "total negative molar fractions =" << Xnegative << endl;
+                        Info << "total negative molar fractions = " << Xnegative << endl;
                     }
                 }
             }
 
             partPressure_[index][0] = Pfluid;
             // change fluid pressure to 1 bar instead of Pa
-            Pfluid  =  Pfluid/100000.0;
-            Texp  = Tfluid*sqrt(sqrt(Tfluid*Tfluid*Tfluid));
+            Pfluid = Pfluid / 100000.0;
+            Texp   = Tfluid * sqrt(sqrt(Tfluid*Tfluid*Tfluid));
 
-            for (int j=0; j<diffusantGasNames_.size();j++)
+            for (int j=0; j<diffusantGasNames_.size(); j++)
             {
-                TotalFraction_[j]   =   0.0;
-                dBinary_    =   0.0;
-                for (int i=0; i < speciesNames_.size();i++)
+                TotalFraction_[j] = 0.0;
+                dBinary_ = 0.0;
+
+                for (int i=0; i < speciesNames_.size(); i++)
                 {
                     // get molecular diffusion coefficients if diffusant gas and reactant gas are not equal
                     if (diffusantGasNames_[j] != speciesNames_[i])
                     {
-                        if(verbose_)
+                        if (verbose_)
                         {
-                            Info << "molar weights diffuser gases: " << molWeight(speciesNames_[i]) << nl << endl;
+                            Info << "molar weights diffuser gases: "  << molWeight(speciesNames_[i])      << nl << endl;
                             Info << "molar weights diffusant gases: " << molWeight(diffusantGasNames_[j]) << nl << endl;
                             Info << "Pressure: " << Pfluid << nl << endl;
                         }
 
-                        if(coeffs.found(diffusantGasNames_[j]) && coeffs.found(speciesNames_[i]))
+                        if (coeffs.found(diffusantGasNames_[j]) && coeffs.found(speciesNames_[i]))
                         {
                             //  Fuller-Schettler-Giddings Equation
                             //  Unit of dBinary is [m^2/s]
                             //  INFO:: Normally unit of dBinary is cm^2/s, but the 1st term in RHS is 10^-3 instead
                             //  So here it is already converted
-                            dBinary_ = 1e-7*Texp*calcMolNum(j,i)/(Pfluid*calcDiffVol(j,i));
+                            dBinary_ = 1e-7 * Texp * calcMolNum(j,i) / (Pfluid * calcDiffVol(j,i));
 
-                            if (verbose_) {
-                                Info << "Xfluid for " << speciesNames_[i] << " : " << X_[i][cellI] << nl << endl;
+                            if (verbose_)
+                            {
+                                Info << "Xfluid for "     << speciesNames_[i]      << " : " << X_[i][cellI]          << nl << endl;
                                 Info << "Xdiffusant for " << diffusantGasNames_[j] << " : " << Xdiffusant_[j][cellI] << nl << endl;
                             }
 
-                            TotalFraction_[j] += X_[i][cellI]/dBinary_;
+                            TotalFraction_[j] += X_[i][cellI] / dBinary_;
 
                             if (verbose_)
                                 Info << "Total Fraction = " << TotalFraction_[j] << nl << endl;
@@ -241,10 +245,11 @@ void diffusionCoefficient::execute()
                             if (TotalFraction_[j] < VSMALL)
                                 diffusionCoefficients_[j][index][0] = VSMALL;
                             else
-                                diffusionCoefficients_[j][index][0] = (1.0-Xdiffusant_[j][cellI])/TotalFraction_[j];
-                        }else
+                                diffusionCoefficients_[j][index][0] = (1.0 - Xdiffusant_[j][cellI]) / TotalFraction_[j];
+                        }
+                        else
                         {
-                        FatalError
+                            FatalError
                                 << "check tables for species diffusion volume"
                                 << endl
                                 << abort(FatalError);
@@ -253,14 +258,14 @@ void diffusionCoefficient::execute()
                 }
 
                 if(verbose_)
-                    Info << "diffusionCoefficient of species " << diffusantGasNames_[j] << " = " << diffusionCoefficients_[j][index][0] << endl; //
+                    Info << "diffusionCoefficient of species " << diffusantGasNames_[j] << " = " << diffusionCoefficients_[j][index][0] << endl;
             }
         }
     }
 
-    particleCloud_.dataExchangeM().giveData(partPressureName_, "scalar-atom",partPressure_);
+    particleCloud_.dataExchangeM().giveData(partPressureName_,"scalar-atom",partPressure_);
 
-    for (int j=0; j<diffusantGasNames_.size();j++)
+    for (int j=0; j<diffusantGasNames_.size(); j++)
     {
         word pushName = diffusantGasNames_[j] + "_diffCoeff";
         particleCloud_.dataExchangeM().giveData(pushName,"scalar-atom",diffusionCoefficients_[j]);
@@ -294,8 +299,8 @@ void diffusionCoefficient::createCoeffs()
 
 double diffusionCoefficient::calcDiffVol(int j, int i)
 {
-    double sqrtvolDiff  =   coeffs(diffusantGasNames_[j])+coeffs(speciesNames_[i]);
-    return sqrtvolDiff*sqrtvolDiff;
+    double sqrtvolDiff = coeffs(diffusantGasNames_[j])+coeffs(speciesNames_[i]);
+    return sqrtvolDiff * sqrtvolDiff;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -322,8 +327,8 @@ double diffusionCoefficient::calcMolNum(int j, int i)
     double W1 = molWeight(diffusantGasNames_[j]);
     double W2 = molWeight(speciesNames_[i]);
 
-    molNum_   =   (W1 + W2) / (W1 * W2);
-    molNum_   =   sqrt(molNum_);
+    molNum_ = (W1 + W2) / (W1 * W2);
+    molNum_ = sqrt(molNum_);
 
     return molNum_;
 }
