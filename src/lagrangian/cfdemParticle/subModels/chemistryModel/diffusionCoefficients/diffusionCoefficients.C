@@ -168,8 +168,6 @@ void diffusionCoefficient::execute()
     Xfluid_.setSize(speciesNames_.size());
     List<scalar> XfluidDiffusant_(0);
     XfluidDiffusant_.setSize(diffusantGasNames_.size());
-    List<scalar> MixtureBinaryDiffusion_(0);
-    MixtureBinaryDiffusion_.setSize(diffusantGasNames_.size());
     List<scalar> TotalFraction_(0);
     TotalFraction_.setSize(diffusantGasNames_.size());
 
@@ -220,7 +218,6 @@ void diffusionCoefficient::execute()
 
             for (int j=0; j<diffusantGasNames_.size();j++)
             {
-                MixtureBinaryDiffusion_[j]  =   0.0;
                 TotalFraction_[j]   =   0.0;
                 dBinary_    =   0.0;
                 for (int i=0; i < speciesNames_.size();i++)
@@ -253,14 +250,11 @@ void diffusionCoefficient::execute()
                             if (verbose_)
                                 Info << "Total Fraction = " << TotalFraction_[j] << nl << endl;
 
-                            if (TotalFraction_[j] < VSMALL)
-                                MixtureBinaryDiffusion_[j] = VSMALL;
-                            else
-                                MixtureBinaryDiffusion_[j] = (1.0-XfluidDiffusant_[j])/TotalFraction_[j];
-
                             // pass on dCoeff values to array
-                            diffusionCoefficients_[j][index][0]= MixtureBinaryDiffusion_[j];
-
+                            if (TotalFraction_[j] < VSMALL)
+                                diffusionCoefficients_[j][index][0] = VSMALL;
+                            else
+                                diffusionCoefficients_[j][index][0] = (1.0-XfluidDiffusant_[j])/TotalFraction_[j];
                         }else
                         {
                         FatalError
