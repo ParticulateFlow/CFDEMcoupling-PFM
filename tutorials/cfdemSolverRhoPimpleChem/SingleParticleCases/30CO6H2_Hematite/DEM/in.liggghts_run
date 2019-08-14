@@ -51,8 +51,8 @@ fix     cfd2 all couple/cfd/force
 fix     cfd3 all couple/cfd/chemistry n_species 5 species_names H2 H2O CO CO2 N2 n_diff 2 diffusant_names CO H2
 
 # Activate for 3-layer unreacted core shrink model
-fix     cfd5 all chem/shrink/core speciesA CO molMassA 0.02801 speciesC CO2 molMassC 0.04401 kch2 0.375161 screen no nevery 1
-fix     cfd6 all chem/shrink/core speciesA H2 molMassA 0.00202 speciesC H2O molMassC 0.01801 kch2 0.0044738 screen no nevery 1
+fix     cfd5 all chem/shrink/core speciesA CO molMassA 0.02801 speciesC CO2 molMassC 0.04401 screen no nevery 1
+fix     cfd6 all chem/shrink/core speciesA H2 molMassA 0.00202 speciesC H2O molMassC 0.01801 screen no nevery 1
 #0.34
 #0.06
 
