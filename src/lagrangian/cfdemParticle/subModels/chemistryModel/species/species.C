@@ -125,6 +125,7 @@ species::~species()
 }
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
+
 void species::allocateMyArrays() const
 {
     double initVal=0.0;
@@ -139,7 +140,6 @@ void species::allocateMyArrays() const
         {
             particleCloud_.dataExchangeM().allocateArray(molarFractions_[i],initVal,1,"nparticles");
             particleCloud_.dataExchangeM().allocateArray(changeOfSpeciesMass_[i],initVal,1,"nparticles");
-
         }
     }
 }
@@ -200,7 +200,7 @@ void species::init()
                 mesh_,
                 dimensionedScalar("zero",dimMass/(dimVol*dimTime), 0.0)
             )
-         );
+        );
     }
     initialized_ = true;
 }
@@ -223,7 +223,7 @@ void species::execute()
     reAllocMyArrays();
 
     // get X_i, T, rho at particle positions
-    label  cellI=0;
+    label  cellI = 0;
     scalar Tfluid(0);
     scalar rhofluid(0);
     scalar voidfraction(1);
@@ -243,23 +243,24 @@ void species::execute()
         {
             if(interpolation_)
             {
-                vector position     =   particleCloud_.position(index);
-                Tfluid              =   TInterpolator_.interpolate(position,cellI);
-                rhofluid            =   rhoInterpolator_.interpolate(position,cellI);
-                voidfraction        =   voidfractionInterpolator_.interpolate(position,cellI);
-                molarConcfluid      =   molarConcInterpolator_.interpolate(position,cellI);
+                vector position = particleCloud_.position(index);
+                Tfluid          = TInterpolator_.interpolate(position,cellI);
+                rhofluid        = rhoInterpolator_.interpolate(position,cellI);
+                voidfraction    = voidfractionInterpolator_.interpolate(position,cellI);
+                molarConcfluid  = molarConcInterpolator_.interpolate(position,cellI);
             }
             else
             {
-                Tfluid          =   tempField_[cellI];
-                rhofluid        =   rho_[cellI];
-                voidfraction    =   voidfraction_[cellI];
-                molarConcfluid	=   molarConc_[cellI];
+                Tfluid          = tempField_[cellI];
+                rhofluid        = rho_[cellI];
+                voidfraction    = voidfraction_[cellI];
+                molarConcfluid  = molarConc_[cellI];
             }
 
             partTemp_[index][0] = Tfluid;
             partRho_[index][0]  = rhofluid;
-            partMolarConc_[index][0]    =   molarConcfluid;
+            partMolarConc_[index][0] = molarConcfluid;
+
             for (int i=0; i<speciesNames_.size();i++)
             {
                 // attention for indices when not communicating all species
@@ -268,21 +269,23 @@ void species::execute()
         }
     }
 
+
     if(verbose_)
     {
-        for(int i =0; i<speciesNames_.size();i++)
+        for(int i =0; i<speciesNames_.size(); i++)
         {
             Info << "X_i = " << X_[i].name() << endl;
             Info << "molarFractions_= " << molarFractions_[i][0][0] << endl;
             Info << "partRho_[index][0] = " << partRho_[0][0] << endl;
-            Info << "rhofluid =" << rhofluid << endl;
+            Info << "rhofluid = " << rhofluid << endl;
             Info << "partTemp_[index][0] = " << partTemp_[0][0] << endl;
-            Info << "Tfluid = " << Tfluid << endl  ;
-            Info << "voidfraction =" << voidfraction << endl;
+            Info << "Tfluid = " << Tfluid << endl;
+            Info << "voidfraction = " << voidfraction << endl;
         }
     }
 
-        // give DEM data
+    // give DEM data
+    {
         particleCloud_.dataExchangeM().giveData(partTempName_, "scalar-atom", partTemp_);
         particleCloud_.dataExchangeM().giveData(partRhoName_,  "scalar-atom", partRho_);
         particleCloud_.dataExchangeM().giveData(partMolarConcName_, "scalar-atom", partMolarConc_);
@@ -290,11 +293,13 @@ void species::execute()
         for (int i=0; i<speciesNames_.size();i++)
         {
             particleCloud_.dataExchangeM().giveData("X_"+speciesNames_[i],"scalar-atom",molarFractions_[i]);
-        };
+        }
 
         if (verbose_) Info << "give data done" << endl;
+    }
 
-        // pull changeOfSpeciesMass_, transform onto fields changeOfSpeciesMassFields_, add them up on changeOfGasMassField_
+    // pull changeOfSpeciesMass_, transform onto fields changeOfSpeciesMassFields_, add them up on changeOfGasMassField_
+    {
         scalar timestep = mesh_.time().deltaTValue();
         changeOfGasMassField_.primitiveFieldRef() = 0.0;
         changeOfGasMassField_.boundaryFieldRef() = 0.0;
@@ -320,18 +325,22 @@ void species::execute()
             changeOfSpeciesMassFields_[i].primitiveFieldRef() /= (changeOfSpeciesMassFields_[i].mesh().V() * Nevery_ * timestep);
             changeOfSpeciesMassFields_[i].correctBoundaryConditions();
             changeOfGasMassField_ += changeOfSpeciesMassFields_[i];
+
             if (verbose_)
             {
-                Info << "total conversion of species" << speciesNames_[i] << " = " << gSum(changeOfSpeciesMassFields_[i]*1.0*changeOfSpeciesMassFields_[i].mesh().V() * Nevery_ * timestep) << endl;
+                Info << "total conversion of species" << speciesNames_[i] << " = "
+                     << gSum(changeOfSpeciesMassFields_[i]*1.0*changeOfSpeciesMassFields_[i].mesh().V() * Nevery_ * timestep) << endl;
             }
         }
         massSourceCurr_ = gSum(changeOfGasMassField_*1.0*changeOfGasMassField_.mesh().V() * Nevery_ * timestep);
         massSourceTot_ += massSourceCurr_;
+
         if (verbose_)
         {
             Info << "total conversion of mass:\n\tcurrent source = " << massSourceCurr_ << "\n\ttotal source = " << massSourceTot_ << "\n" << endl;
             Info << "get data done" << endl;
         }
+    }
 }
 
 tmp<volScalarField> species::Smi (const label i) const
