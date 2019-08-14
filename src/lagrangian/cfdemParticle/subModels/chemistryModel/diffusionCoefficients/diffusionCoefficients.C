@@ -164,8 +164,7 @@ void diffusionCoefficient::execute()
     scalar dBinary_(0);
     scalar Xnegative(0);
 
-    List<scalar> TotalFraction_(0);
-    TotalFraction_.setSize(diffusantGasNames_.size());
+    List<scalar> TotalFraction_(diffusantGasNames_.size(),0);
 
     // defining interpolators for T and Pressure
     interpolationCellPoint <scalar> TInterpolator_(tempField_);
