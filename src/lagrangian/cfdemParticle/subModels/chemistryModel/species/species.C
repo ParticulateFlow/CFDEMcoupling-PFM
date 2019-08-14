@@ -226,9 +226,7 @@ void species::execute()
     label  cellI=0;
     scalar Tfluid(0);
     scalar rhofluid(0);
-    List<scalar> Xfluid_;
     scalar voidfraction(1);
-    Xfluid_.setSize(speciesNames_.size());
     scalar molarConcfluid(0);
 
     // defining interpolators for T, rho, voidfraction, molarConc
@@ -257,11 +255,6 @@ void species::execute()
                 rhofluid        =   rho_[cellI];
                 voidfraction    =   voidfraction_[cellI];
                 molarConcfluid	=   molarConc_[cellI];
-
-                for (int i = 0; i<speciesNames_.size();i++)
-                {
-                    Xfluid_[i] = X_[i][cellI];
-                }
             }
 
             partTemp_[index][0] = Tfluid;
@@ -270,7 +263,7 @@ void species::execute()
             for (int i=0; i<speciesNames_.size();i++)
             {
                 // attention for indices when not communicating all species
-                molarFractions_[i][index][0]=Xfluid_[i];
+                molarFractions_[i][index][0] = X_[i][cellI];
             }
         }
     }
@@ -283,7 +276,6 @@ void species::execute()
             Info << "molarFractions_= " << molarFractions_[i][0][0] << endl;
             Info << "partRho_[index][0] = " << partRho_[0][0] << endl;
             Info << "rhofluid =" << rhofluid << endl;
-            Info << "Xfluid = " << Xfluid_[i] << endl;
             Info << "partTemp_[index][0] = " << partTemp_[0][0] << endl;
             Info << "Tfluid = " << Tfluid << endl  ;
             Info << "voidfraction =" << voidfraction << endl;
