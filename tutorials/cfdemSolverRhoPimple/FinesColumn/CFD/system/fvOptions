@@ -37,7 +37,7 @@ source1
     {
         active          yes;
         selectionMode   all;
-        Tmin     288;
-        Tmax     298;
+        min     288;
+        max     298;
     }
 }

@@ -46,6 +46,10 @@ private:
 
     bool verbose_;
 
+    bool clogKin_;
+
+    bool clogStick_;
+
     word velFieldName_;
 
     const volVectorField& U_;
@@ -90,7 +94,6 @@ private:
 
     volScalarField Sds_;
 
-    //volVectorField massFluxDyn_;
     surfaceScalarField massFluxDyn_;
 
     volVectorField uDyn_;
@@ -111,7 +114,7 @@ private:
 
     scalar critVoidfraction_;
 
-    scalar depRate_;
+    scalar depositionLength_;
 
     scalar exponent_;
 
@@ -122,6 +125,12 @@ private:
     scalar prefactor_;
 
     scalar ratioHydraulicPore_;
+
+    scalar tauRelease_;
+
+    scalar uBind_;
+
+    scalar uMin_;
 
     void calcSource();
 

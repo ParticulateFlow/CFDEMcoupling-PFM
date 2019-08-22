@@ -45,6 +45,8 @@ FinesFields::FinesFields
     propsDict_(dict.subDict("FinesFieldsProps")),
     smoothing_(propsDict_.lookupOrDefault<bool>("smoothing",false)),
     verbose_(propsDict_.lookupOrDefault<bool>("verbose",false)),
+    clogKin_(propsDict_.lookupOrDefault<bool>("kineticClogging",false)),
+    clogStick_(propsDict_.lookupOrDefault<bool>("stickyClogging",false)),
     velFieldName_(propsDict_.lookupOrDefault<word>("velFieldName","U")),
     U_(sm.mesh().lookupObject<volVectorField> (velFieldName_)),
     voidfractionFieldName_(propsDict_.lookupOrDefault<word>("voidfractionFieldName","voidfraction")),
@@ -221,33 +223,65 @@ FinesFields::FinesFields
     alphaDynMax_(0.1),
     alphaMax_(readScalar(propsDict_.lookup ("alphaMax"))),
     critVoidfraction_(readScalar(propsDict_.lookup ("critVoidfraction"))),
-    depRate_(readScalar(propsDict_.lookup ("depRate"))),
+    depositionLength_(readScalar(propsDict_.lookup ("depositionLength"))),
     exponent_(-1.33),
-    nCrit_(readScalar(propsDict_.lookup ("nCrit"))),
-    poresizeWidth_(readScalar(propsDict_.lookup ("poresizeWidth"))),
+    nCrit_(0.0),
+    poresizeWidth_(0.0),
     prefactor_(10.5),
-    ratioHydraulicPore_(1.5)
+    ratioHydraulicPore_(1.5),
+    tauRelease_(readScalar(propsDict_.lookup ("tauRelease"))),
+    uBind_(0.0),
+    uMin_(0.001)
 {
     Sds_.write();
 
     if (propsDict_.found("prefactor"))
+    {
         prefactor_=readScalar(propsDict_.lookup ("prefactor"));
+    }
     if (propsDict_.found("exponent"))
+    {
         exponent_=readScalar(propsDict_.lookup ("exponent"));
+    }
     if (propsDict_.found("dFine"))
+    {
         dFine_.value()=readScalar(propsDict_.lookup ("dFine"));
+    }
     else
+    {
         FatalError <<"Please specify dFine.\n" << abort(FatalError);
+    }
     if (propsDict_.found("diffCoeff"))
+    {
         diffCoeff_.value()=readScalar(propsDict_.lookup ("diffCoeff"));
+    }
     if (propsDict_.found("rhoFine"))
+    {
         rhoFine_.value()=readScalar(propsDict_.lookup ("rhoFine"));
+    }
     else
+    {
         FatalError <<"Please specify rhoFine.\n" << abort(FatalError);
+    }
     if (propsDict_.found("nuAve"))
+    {
         nuAve_.value()=readScalar(propsDict_.lookup ("nuAve"));
+    }
     if (propsDict_.found("alphaDynMax"))
+    {
         alphaDynMax_=readScalar(propsDict_.lookup ("alphaDynMax"));
+    }
+
+    if (clogKin_)
+    {
+        nCrit_ = readScalar(propsDict_.lookup ("nCrit"));
+        poresizeWidth_ = readScalar(propsDict_.lookup ("poresizeWidth"));
+    }
+
+    if (clogStick_)
+    {
+        uBind_ = readScalar(propsDict_.lookup ("uBind"));
+    }
 
     if(verbose_)
     {
@@ -307,50 +341,52 @@ void FinesFields::update()
 
 void FinesFields::calcSource()
 {
+    if(!clogKin_ & !clogStick_) return;
     Sds_.primitiveFieldRef() = 0;
     deltaAlpha_.primitiveFieldRef() = 0.0;
-    scalar f(0.0);
-    scalar critpore(0.0);
-    scalar dmean(0.0);
-    scalar d1(0.0);
-    scalar d2(0.0);
+    scalar fKin = 0.0;
+    scalar fStick = 0.0;
+    scalar critpore = 0.0;
+    scalar dmean = 0.0;
+    scalar d1 = 0.0;
+    scalar d2 = 0.0;
+    scalar tauDeposition = 0.0;
 
     forAll(Sds_,cellI)
     {
-        // calculate everything in units auf dSauter
-        critpore = nCrit_*dFine_.value()/dSauter_[cellI];
-        // pore size from hydraulic radius
-        dmean = 2 * (1 - alphaP_[cellI]) / ( (1 + poresizeWidth_*poresizeWidth_/3) * 3 * alphaP_[cellI] );
-        // Sweeney and Martin, Acta Materialia 51 (2003): ratio of hydraulic to pore throat radius
-        dmean /= ratioHydraulicPore_;
-        d1 = dmean * (1 - poresizeWidth_);
-        d2 = dmean * (1 + poresizeWidth_);
+        if(clogKin_)
+        {
+            // calculate everything in units auf dSauter
+            critpore = nCrit_*dFine_.value()/dSauter_[cellI];
+            // pore size from hydraulic radius
+            dmean = 2 * (1 - alphaP_[cellI]) / ( (1 + poresizeWidth_*poresizeWidth_/3) * 3 * alphaP_[cellI] );
+            // Sweeney and Martin, Acta Materialia 51 (2003): ratio of hydraulic to pore throat radius
+            dmean /= ratioHydraulicPore_;
+            d1 = dmean * (1 - poresizeWidth_);
+            d2 = dmean * (1 + poresizeWidth_);
 
-        f = (critpore*critpore*critpore - d1 * d1 * d1) / (d2 * d2 * d2 - d1 * d1 * d1);
-        if (f < 0)
-        {
-            f = 0.0;
+            fKin = (critpore*critpore*critpore - d1 * d1 * d1) / (d2 * d2 * d2 - d1 * d1 * d1);
+            if (fKin < 0) fKin = 0.0;
+            else if (fKin > 1.0) fKin = 1.0;
         }
-        else if (f > 1.0)
+
+        if(clogStick_)
         {
-            f = 1.0;
+            fStick = 1.0 / ( 1.0 + mag(U_[cellI])/uBind_);
         }
 
         // at this point, voidfraction is still calculated from the true particle sizes
-        deltaAlpha_[cellI] = f * (alphaMax_ - alphaP_[cellI]) - alphaSt_[cellI];
-        // too much volume occupied: release it (50% per time step)
+        deltaAlpha_[cellI] = max(fKin,fStick) * (alphaMax_ - alphaP_[cellI]) - alphaSt_[cellI];
+        // too much volume occupied: release it
         if (deltaAlpha_[cellI] < 0.0)
         {
-            Sds_[cellI] = 0.5*deltaAlpha_[cellI];
+            Sds_[cellI] = deltaAlpha_[cellI] / tauRelease_;
         }
-        // volume too occupy available: deposit at most 80% of dyn hold up
-        else if (depRate_ * deltaAlpha_[cellI] > 0.8 * alphaDyn_[cellI])
-        {
-            Sds_[cellI] = 0.8 * alphaDyn_[cellI];
-        }
+        // volume to occupy available
         else
         {
-            Sds_[cellI] = depRate_ * deltaAlpha_[cellI];
+            tauDeposition = depositionLength_ / max(mag(U_[cellI]),uMin_);
+            Sds_[cellI] = deltaAlpha_[cellI] / tauDeposition;
         }
     }
 }
