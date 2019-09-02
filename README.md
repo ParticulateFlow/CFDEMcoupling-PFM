@@ -29,5 +29,5 @@ endorsed by DCS Computing GmbH, the official producer of the LIGGGHTS® and CFDE
 - Some parts of CFDEM®coupling are based on OpenFOAM® and Copyright on these
   parts is held by the OpenFOAM® Foundation (www.openfoam.org)
   and potentially other parties.
-- Some parts of CFDEM®coupling are contributied by other parties, which are
+- Some parts of CFDEM®coupling are contributed by other parties, which are
   holding the Copyright. This is listed in each file of the distribution.
