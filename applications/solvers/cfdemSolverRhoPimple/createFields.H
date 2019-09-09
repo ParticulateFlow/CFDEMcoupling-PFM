@@ -94,21 +94,6 @@ Info<< "Reading thermophysical properties\n" << endl;
         dimensionedScalar("zero", dimensionSet(1,-1,-3,-1,0,0,0), 0.0)
     );
 
-  /*  Info<< "\nCreating thermal diffusivity field\n" << endl;
-    volScalarField thDiff
-    (
-        IOobject
-        (
-            "thDiff",
-            runTime.timeName(),
-            mesh,
-            IOobject::NO_READ,
-            IOobject::AUTO_WRITE
-        ),
-        mesh,
-        dimensionedScalar("zero", dimensionSet(0,2,-1,0,0,0,0), 0.0)
-    );
-  */
     Info<< "\nCreating thermal conductivity field\n" << endl;
     volScalarField thCond
     (
@@ -189,6 +174,17 @@ Info<< "Reading thermophysical properties\n" << endl;
             0
         )
     );
+
+    bool smoothenForces
+    (
+        pimple.dict().lookupOrDefault<bool>
+        (
+            "smoothenForces",
+            false
+        )
+    );
+    if (smoothenForces) Info << "Smoothening implicit particle forces.\n" << endl;
+    else Info << "Not smoothening implicit particle forces.\n" << endl;
 
     Info<< "Creating turbulence model\n" << endl;
     autoPtr<compressible::turbulenceModel> turbulence
