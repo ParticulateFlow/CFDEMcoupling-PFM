@@ -47,11 +47,13 @@ FinesFields::FinesFields
     verbose_(propsDict_.lookupOrDefault<bool>("verbose",false)),
     clogKin_(propsDict_.lookupOrDefault<bool>("kineticClogging",false)),
     clogStick_(propsDict_.lookupOrDefault<bool>("stickyClogging",false)),
+    movingBed_(propsDict_.lookupOrDefault<bool>("movingBed",true)),
+    fluxFieldName_(propsDict_.lookupOrDefault<word>("fluxFieldName","phi")),
+    phi_(sm.mesh().lookupObject<surfaceScalarField> (fluxFieldName_)),
     velFieldName_(propsDict_.lookupOrDefault<word>("velFieldName","U")),
     U_(sm.mesh().lookupObject<volVectorField> (velFieldName_)),
     voidfractionFieldName_(propsDict_.lookupOrDefault<word>("voidfractionFieldName","voidfraction")),
-    // this is probably really bad
-    voidfraction_(const_cast<volScalarField&>(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_))),
+    voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
     UsFieldName_(propsDict_.lookupOrDefault<word>("granVelFieldName","Us")),
     UsField_(sm.mesh().lookupObject<volVectorField> (UsFieldName_)),
     pFieldName_(propsDict_.lookupOrDefault<word>("pFieldName","p")),
@@ -202,7 +204,6 @@ FinesFields::FinesFields
         ),
         sm.mesh(),
         dimensionedScalar("zero", dimensionSet(1,0,-1,0,0), 0)
-        //dimensionedVector("zero", dimensionSet(1,-2,-1,0,0), vector::zero)
     ),
     uDyn_
     (   IOobject
@@ -221,8 +222,10 @@ FinesFields::FinesFields
     rhoFine_("rhoFine",dimensionSet(1,-3,0,0,0),0.0),
     g_("g",dimensionSet(0,1,-2,0,0),vector(0,0,-9.81)),
     alphaDynMax_(0.1),
-    alphaMax_(readScalar(propsDict_.lookup ("alphaMax"))),
-    critVoidfraction_(readScalar(propsDict_.lookup ("critVoidfraction"))),
+    alphaMax_(propsDict_.lookupOrDefault<scalar>("alphaMax",0.95)),
+    alphaMinClog_(propsDict_.lookupOrDefault<scalar>("alphaMinClog",0.3)),
+    critVoidfraction_(propsDict_.lookupOrDefault<scalar>("critVoidfraction", 0.05)),
+    deltaT_(voidfraction_.mesh().time().deltaTValue()),
     depositionLength_(readScalar(propsDict_.lookup ("depositionLength"))),
     exponent_(-1.33),
     nCrit_(0.0),
@@ -281,26 +284,48 @@ FinesFields::FinesFields
     if (clogStick_)
     {
         uBind_ = readScalar(propsDict_.lookup ("uBind"));
+
+        uReconstructed_.set
+        (
+            new volVectorField
+            (
+                IOobject
+                (
+                    "uReconstructed",
+                    sm.mesh().time().timeName(),
+                    sm.mesh(),
+                    IOobject::NO_READ,
+                    IOobject::NO_WRITE
+                ),
+                U_//sm.mesh()
+            )
+        );
+
     }
 
-    if(verbose_)
+    if (verbose_)
     {
-      alphaG_.writeOpt() = IOobject::AUTO_WRITE;
-      alphaG_.write();
-      alphaP_.writeOpt() = IOobject::AUTO_WRITE;
-      alphaP_.write();
-      deltaAlpha_.writeOpt() = IOobject::AUTO_WRITE;
-      deltaAlpha_.write();
-      dHydMix_.writeOpt() = IOobject::AUTO_WRITE;
-      dHydMix_.write();
-      DragCoeff_.writeOpt() = IOobject::AUTO_WRITE;
-      DragCoeff_.write();
-      dSauterMix_.writeOpt() = IOobject::AUTO_WRITE;
-      dSauterMix_.write();
-      FanningCoeff_.writeOpt() = IOobject::AUTO_WRITE;
-      FanningCoeff_.write();
-      Froude_.writeOpt() = IOobject::AUTO_WRITE;
-      Froude_.write();
+        alphaG_.writeOpt() = IOobject::AUTO_WRITE;
+        alphaG_.write();
+        alphaP_.writeOpt() = IOobject::AUTO_WRITE;
+        alphaP_.write();
+        deltaAlpha_.writeOpt() = IOobject::AUTO_WRITE;
+        deltaAlpha_.write();
+        dHydMix_.writeOpt() = IOobject::AUTO_WRITE;
+        dHydMix_.write();
+        DragCoeff_.writeOpt() = IOobject::AUTO_WRITE;
+        DragCoeff_.write();
+        dSauterMix_.writeOpt() = IOobject::AUTO_WRITE;
+        dSauterMix_.write();
+        FanningCoeff_.writeOpt() = IOobject::AUTO_WRITE;
+        FanningCoeff_.write();
+        Froude_.writeOpt() = IOobject::AUTO_WRITE;
+        Froude_.write();
+        if (clogStick_)
+        {
+            uReconstructed_().writeOpt() = IOobject::AUTO_WRITE;
+            uReconstructed_().write();
+        }
     }
 }
 
@@ -315,33 +340,38 @@ FinesFields::~FinesFields()
 
 void FinesFields::update()
 {
-    if(verbose_)  Info << "FinesFields: Updating alphaP.\n" << endl;
+    if (verbose_)  Info << "FinesFields: Updating alphaP.\n" << endl;
     updateAlphaP();
-    if(verbose_)  Info << "FinesFields: Updating alphaG.\n" << endl;
+    if (verbose_)  Info << "FinesFields: Updating alphaG.\n" << endl;
     updateAlphaG();
-    if(verbose_)  Info << "FinesFields: Calculating source terms.\n" << endl;
+    if (clogStick_)
+    {
+        if (verbose_)  Info << "FinesFields: Updating uReconstructed.\n" << endl;
+        updateUReconstructed();
+    }
+    if (verbose_)  Info << "FinesFields: Calculating source terms.\n" << endl;
     calcSource();
-    if(verbose_)  Info << "FinesFields: Updating dSauter.\n" << endl;
+    if (verbose_)  Info << "FinesFields: Updating dSauter.\n" << endl;
     updateDSauter();
-    if(verbose_)  Info << "FinesFields: Updating dHydMix.\n" << endl;
+    if (verbose_)  Info << "FinesFields: Updating dHydMix.\n" << endl;
     updateDHydMix();
-    if(verbose_)  Info << "FinesFields: Updating Froude.\n" << endl;
+    if (verbose_)  Info << "FinesFields: Updating Froude.\n" << endl;
     updateFroude();
-    if(verbose_)  Info << "FinesFields: Updating FanningCoeff.\n" << endl;
+    if (verbose_)  Info << "FinesFields: Updating FanningCoeff.\n" << endl;
     updateFanningCoeff();
-    if(verbose_)  Info << "FinesFields: Updating DragCoeff.\n" << endl;
+    if (verbose_)  Info << "FinesFields: Updating DragCoeff.\n" << endl;
     updateDragCoeff();
-    if(verbose_)  Info << "FinesFields: Updating uDyn.\n" << endl;
+    if (verbose_)  Info << "FinesFields: Updating uDyn.\n" << endl;
     updateUDyn();
-    if(verbose_)  Info << "FinesFields: Integrating alphas.\n" << endl;
+    if (verbose_)  Info << "FinesFields: Integrating alphas.\n" << endl;
     integrateFields();
-    if(verbose_)  Info << "FinesFields: Update finished.\n" << endl;
+    if (verbose_)  Info << "FinesFields: Update finished.\n" << endl;
 }
 
 
 void FinesFields::calcSource()
 {
-    if(!clogKin_ & !clogStick_) return;
+    if (!clogKin_ & !clogStick_) return;
     Sds_.primitiveFieldRef() = 0;
     deltaAlpha_.primitiveFieldRef() = 0.0;
     scalar fKin = 0.0;
@@ -350,11 +380,14 @@ void FinesFields::calcSource()
     scalar dmean = 0.0;
     scalar d1 = 0.0;
     scalar d2 = 0.0;
+    scalar magU = 0.0;
     scalar tauDeposition = 0.0;
 
     forAll(Sds_,cellI)
     {
-        if(clogKin_)
+        fKin = 0.0;
+        fStick = 0.0;
+        if (clogKin_ && alphaP_[cellI] > alphaMinClog_) // no kinetic cloggig in dilute regions
         {
             // calculate everything in units auf dSauter
             critpore = nCrit_*dFine_.value()/dSauter_[cellI];
@@ -370,9 +403,11 @@ void FinesFields::calcSource()
             else if (fKin > 1.0) fKin = 1.0;
         }
 
-        if(clogStick_)
+        if (clogStick_)
         {
-            fStick = 1.0 / ( 1.0 + mag(U_[cellI])/uBind_);
+            magU = mag(uReconstructed_()[cellI]); // use U reconstructed from phi to suppress oscillations at interfaces
+            fStick = 1.0 / ( 1.0 + magU/uBind_) * alphaP_[cellI] / 0.65;
+            if (fStick > 1.0) fStick = 1.0;
         }
 
         // at this point, voidfraction is still calculated from the true particle sizes
@@ -386,7 +421,8 @@ void FinesFields::calcSource()
         else
         {
             tauDeposition = depositionLength_ / max(mag(U_[cellI]),uMin_);
-            Sds_[cellI] = deltaAlpha_[cellI] / tauDeposition;
+            if (tauDeposition < 4.0*deltaT_) tauDeposition = 4.0*deltaT_; // do not deposit all dyn hold-up within less than 3 time steps
+            Sds_[cellI] = alphaDyn_[cellI] / tauDeposition;
         }
     }
 }
@@ -400,11 +436,12 @@ void FinesFields::integrateFields()
 
     fvScalarMatrix alphaStEqn
     (
-          fvm::ddt(alphaSt_)
-        + fvm::div(phiSt,alphaSt_)
+        fvm::ddt(alphaSt_)
         ==
         Sds_
     );
+    if (movingBed_) alphaStEqn += fvm::div(phiSt,alphaSt_);
+
     fvScalarMatrix alphaDynEqn
     (
         fvm::ddt(alphaDyn_)
@@ -413,10 +450,11 @@ void FinesFields::integrateFields()
         ==
         -Sds_
     );
+
     alphaStEqn.solve();
     alphaDynEqn.solve();
 
-    if(smoothing_)
+    if (smoothing_)
         particleCloud_.smoothingM().smoothen(alphaDyn_);
 
     // limit hold-ups, should be done more elegantly
@@ -475,7 +513,7 @@ void FinesFields::updateDHydMix()
     forAll(dHydMix_,cellI)
     {
         scalar aPSt =  alphaP_[cellI] + alphaSt_[cellI];
-        if(aPSt < SMALL || aPSt > 1 - SMALL)
+        if (aPSt < SMALL || aPSt > 1 - SMALL)
             dHydMix_[cellI] = SMALL;
         else
             dHydMix_[cellI] = 2*(1 - aPSt) / (3*aPSt ) * dSauterMix_[cellI];
@@ -495,11 +533,11 @@ void FinesFields::updateDragCoeff()
     forAll(DragCoeff_,cellI)
     {
         Ref1 = Ref[cellI];
-        if(Ref1 <= SMALL)
+        if (Ref1 <= SMALL)
             Cd = 24.0 / SMALL;
-        else if(Ref1 <= 1.0)
+        else if (Ref1 <= 1.0)
             Cd = 24.0 / Ref1;
-        else if(Ref1 <= 1000)
+        else if (Ref1 <= 1000)
             Cd = 24 * (1.0 + 0.15 * Foam::pow(Ref1,0.687) ) / Ref1;
         else
             Cd = 0.44;
@@ -511,11 +549,11 @@ void FinesFields::updateDragCoeff()
         forAll(DragCoeff_.boundaryField()[patchI], faceI)
         {
             Ref1 = Ref.boundaryField()[patchI][faceI];
-            if(Ref1 <= SMALL)
+            if (Ref1 <= SMALL)
                 Cd = 24.0 / SMALL;
-            else if(Ref1 <= 1.0)
+            else if (Ref1 <= 1.0)
                 Cd = 24.0 / Ref1;
-            else if(Ref1 <= 1000)
+            else if (Ref1 <= 1000)
                 Cd = 24 * (1.0 + 0.15 * Foam::pow(Ref1,0.687) ) / Ref1;
             else
                 Cd = 0.44;
@@ -532,9 +570,9 @@ void FinesFields::updateDSauter()
     {
         scalar aP = alphaP_[cellI];
         scalar aSt = alphaSt_[cellI];
-        if(aSt < SMALL)
+        if (aSt < SMALL)
             dSauterMix_[cellI] = dSauter_[cellI];
-        else if(aP < SMALL)
+        else if (aP < SMALL)
             dSauterMix_[cellI] = dFine_.value();
         else
             dSauterMix_[cellI] = (aP + aSt) / (aP / dSauter_[cellI] + aSt / dFine_.value() );
@@ -577,7 +615,7 @@ void FinesFields::updateUDyn()
     {
         scalar mU(mag(U_[cellI]));
         scalar muDyn(mag(uDyn_[cellI]));
-        if(muDyn > mU && muDyn > SMALL)
+        if (muDyn > mU && muDyn > SMALL)
         {
             uDyn_[cellI] *= mU / muDyn;
         }
@@ -588,13 +626,24 @@ void FinesFields::updateUDyn()
         {
             scalar mU(mag(U_.boundaryField()[patchI][faceI]));
             scalar muDyn(mag(uDyn_.boundaryField()[patchI][faceI]));
-            if(muDyn > mU && muDyn > SMALL)
+            if (muDyn > mU && muDyn > SMALL)
             {
                 uDyn_.boundaryFieldRef()[patchI][faceI] *= mU / muDyn;
             }
         }
 }
 
+void FinesFields::updateUReconstructed()
+{
+    if (phi_.dimensions() == dimensionSet(1, 0, -1, 0, 0)) // compressible
+    {
+        uReconstructed_() = fvc::reconstruct(phi_) / (rhoG_ * voidfraction_);
+    }
+    else
+    {
+        uReconstructed_() = fvc::reconstruct(phi_) / voidfraction_;
+    }
+}
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
