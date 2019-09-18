@@ -1,8 +1,9 @@
 #!/bin/bash
 
 #===================================================================#
-# allrun script for single particle testcase
-# M. Efe Kinaci - Sep 2018
+# allrun script for testcase as part of test routine 
+# run settlingTest CFD part
+# Christoph Goniva - Feb. 2011
 #===================================================================#
 
 #- source CFDEM env vars
@@ -15,7 +16,7 @@ source $CFDEM_PROJECT_DIR/etc/functions.sh
 #- define variables
 casePath="$(dirname "$(readlink -f ${BASH_SOURCE[0]})")"
 logpath=$casePath
-headerText="test_case_Valipour_2009"
+headerText="GOD0k1H26pcnt"
 logfileName="log_$headerText"
 solverName="cfdemSolverRhoPimpleChem"
 nrProcs="2"
@@ -23,7 +24,7 @@ machineFileName="none"   # yourMachinefileName | none
 debugMode="off"          # on | off| strict
 testHarnessPath="$CFDEM_TEST_HARNESS_PATH"
 runOctave="false"
-postproc="true"
+postproc="false"
 
 #--------------------------------------------------------------------------------#
 

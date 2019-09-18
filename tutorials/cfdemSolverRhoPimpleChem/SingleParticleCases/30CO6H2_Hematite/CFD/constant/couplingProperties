@@ -26,16 +26,13 @@ FoamFile
 //===========================================================================//
 // sub-models & settings
 
-//syncMode false;
-//verbose;
-
 modelType "A"; // A or B
 
-couplingInterval 100;
+couplingInterval 50;
 
 voidFractionModel divided;//centre;//
 
-locateModel engine;//turboEngineM2M;//
+locateModel engine;	//turboEngineM2M;//
 
 meshMotionModel noMeshMotion;
 
@@ -49,36 +46,24 @@ dataExchangeModel twoWayMPI;//twoWayM2M;//twoWayFiles;//oneWayVTK;//
 
 averagingModel dilute;	//dense;////
 
-clockModel off;		//standardClock;//off;
+clockModel off;//standardClock;//off;
 
-smoothingModel off;	//localPSizeDiffSmoothing;// constDiffSmoothing; //
+smoothingModel off;// localPSizeDiffSmoothing;// constDiffSmoothing; //
 
 forceModels
 (
-    //GidaspowDrag
-    //BeetstraDrag
-    //DiFeliceDrag
+    GidaspowDrag
     gradPForce
     viscForce
-    // KochHillDrag
-    //DEMbasedDrag
-    //RongDrag
-    //Archimedes
-    //volWeightedAverage
-    //totalMomentumExchange
-    //particleCellVolume
-    //fieldTimeAverage
-    //LaEuScalarTemp
 );
 
 energyModels
 (
-	//energyModel
-	//heatTransferGunn
-	//reactionHeat	
+	heatTransferGunn
+	reactionHeat	
 );
 
-thermCondModel off;//SyamlalThermCond;//thermCondModel;
+thermCondModel SyamlalThermCond;	
 
 chemistryModels	
 (
@@ -100,19 +85,33 @@ turbulenceModelType "turbulenceProperties";//"LESProperties";//
 reactionHeatProps
 {
     reactionHeatName            "reactionHeat";
+    verbose			false;
+}
+
+heatTransferGunnProps
+{
+    partTempName "Temp";
+    partHeatFluxName "convectiveHeatFlux";
+    calcPartTempField true;
+    partRefTemp 1223.15;
+    implicit true;
+    verbose false;
+    interpolation false;
 }
 
 speciesProps
 {
-	ChemistryFile 		"$FOAM_CASE/constant/foam.inp";
+	ChemistryFile 		"$casePath/CFD/constant/foam.inp";
 	Nevery			1;
-	verbose			true;
+	verbose			false;
+	interpolation 		false;
 }
 
 diffusionCoefficientsProps
 {
-	verbose			false;        
-	ChemistryFile 		"$FOAM_CASE/constant/foam.inp";
+	verbose			false;   
+	interpolation 		false;     
+	ChemistryFile 		"$casePath/CFD/constant/foam.inp";
         diffusantGasNames       (    CO
                                      H2
                                 ); 
@@ -121,7 +120,13 @@ diffusionCoefficientsProps
 massTransferCoeffProps
 {
     verbose 			false;
+    interpolation 		false;
 }
+
+reactantPerParticleProps
+{
+}
+
 
 SyamlalThermCondProps
 {
@@ -207,9 +212,32 @@ GidaspowDragProps
 {
     verbose true;
     velFieldName "U";
+    granVelFieldName "Us";
     voidfractionFieldName "voidfraction";
-    interpolation true;
+    interpolation true; //interpolation is on
     phi 1;
+    //implForceDEM true;
+    //implForceDEMaccumulated true;
+    //explicitCorr true;
+}
+
+BeetstraDragProps
+{
+    velFieldName "U";
+    granVelFieldName "Us";
+    gravityFieldName "g";
+    voidfractionFieldName "voidfraction";
+    interpolation false;
+    useFilteredDragModel ;
+    useParcelSizeDependentFilteredDrag ;
+    rhoP     4630.;
+    dPrim   0.00022;
+    rho     1.58;
+    nuf     1.126e-05;
+    g       9.81;
+    k       0.05;
+    aLimit  0.0;
+    verbose false;
 }
 
 DEMbasedDragProps
@@ -224,7 +252,7 @@ DiFeliceDragProps
     velFieldName "U";
     voidfractionFieldName "voidfraction";
     granVelFieldName "Us";
-    interpolation true;
+    interpolation false;
 }
 
 KochHillDragProps
@@ -232,7 +260,7 @@ KochHillDragProps
     verbose true;
     velFieldName "U";
     voidfractionFieldName "voidfraction";
-    interpolation true;
+    interpolation false;
     //forceSubModels
     //(
     //    ImExCorr
@@ -242,26 +270,12 @@ KochHillDragProps
     //explicitCorr true;
 }
 
-BeetstraDragProps
-{
-    velFieldName "U";
-    gravityFieldName "g";
-    rhoParticle     2000.;
-    voidfractionFieldName "voidfraction";
-    interpolation ;
-    useFilteredDragModel ;
-    useParcelSizeDependentFilteredDrag ;
-    k       0.05;
-    aLimit  0.0;
-//    verbose true;
-}
-
 RongDragProps
 {
     verbose true;
     velFieldName "U";
     voidfractionFieldName "voidfraction";
-    interpolation true;
+    interpolation false;
     implForceDEM true;
     implForceDEMaccumulated true;
     granVelFieldName "Us";
@@ -310,6 +324,11 @@ centreProps
 engineProps
 {
     treeSearch true;
+}
+
+turboEngineProps
+{
+	treeSearch true;
 }
 
 turboEngineM2MProps

@@ -41,7 +41,7 @@ fix     zwalls2 all wall/gran model hertz tangential history primitive type 1 zp
 
 # create single particle in a specific spot
 create_atoms 1 single 0.75 0.25 0.25 units box
-set atom 1 diameter 0.01106028 density 5135.2 vx 0 vy 0 vz 0
+set atom 1 diameter 0.01106028 density 4300 vx 0 vy 0 vz 0
 
 # screen output
 compute         rke all erotate/sphere
@@ -52,7 +52,7 @@ compute_modify  thermo_temp dynamic yes
 
 # insert the first particles so that dump is not empty
 run     1
-dump    dmp all custom 100 post/dump.liggghts_init id type x y z vx vy vz fx fy fz omegax omegay omegaz radius
+dump    dmp all custom 100 post/dump.liggghts_init id type x y z vx vy vz fx fy fz radius mass 
 
-run        10000 upto 
-write_restart   ../DEM/post/restart/liggghts.restart
+run        10 upto 
+write_restart   post/restart/liggghts.restart

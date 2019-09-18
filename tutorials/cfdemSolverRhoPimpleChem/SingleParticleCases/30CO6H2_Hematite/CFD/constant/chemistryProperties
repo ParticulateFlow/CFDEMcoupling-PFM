@@ -17,6 +17,7 @@ FoamFile
 
 chemistry       off; //on;
 
+/*
 chemistryType
 {
     chemistrySolver   ode;
@@ -35,7 +36,7 @@ odeCoeffs
 {
     solver          seulex;
     eps             0.05;
-}
+} */
 
 
 // ************************************************************************* //

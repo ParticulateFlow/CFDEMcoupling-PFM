@@ -21,7 +21,7 @@ fields
 	rho
 	p
 	T
-	molC
+	Cpv
 	N2
 	CO2
 	CO
@@ -40,7 +40,7 @@ fields
 );
 
 writeControl   timeStep;
-writeInterval  10;
+writeInterval  50;
 
 
 // Locations to be probed.

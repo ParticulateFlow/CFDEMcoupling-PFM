@@ -1,8 +1,9 @@
 #!/bin/bash
 
 #===================================================================#
-# allrun script for testcase
-# M. Efe Kinaci - Sep 2018
+# allrun script for testcase as part of test routine 
+# run settlingTest
+# Christoph Goniva - Sept. 2010
 #===================================================================#
 
 #- source CFDEM env vars

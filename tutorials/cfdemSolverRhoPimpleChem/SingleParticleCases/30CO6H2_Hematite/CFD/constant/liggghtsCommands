@@ -37,7 +37,7 @@ liggghtsCommandModels
 
 writeLiggghtsProps
 {
-    writeLast off;
+    writeLast on;
     writeName "post/restart/liggghts.restartCFDEM";
     overwrite on;
 }
