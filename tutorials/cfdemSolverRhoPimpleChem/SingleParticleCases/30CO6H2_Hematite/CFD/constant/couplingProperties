@@ -32,7 +32,7 @@ couplingInterval 50;
 
 voidFractionModel divided;//centre;//
 
-locateModel engine;	//turboEngineM2M;//
+locateModel engine;//turboEngineM2M;//
 
 meshMotionModel noMeshMotion;
 
@@ -46,9 +46,9 @@ dataExchangeModel twoWayMPI;//twoWayM2M;//twoWayFiles;//oneWayVTK;//
 
 averagingModel dilute;	//dense;////
 
-clockModel off;//standardClock;//off;
+clockModel off;//standardClock;
 
-smoothingModel off;// localPSizeDiffSmoothing;// constDiffSmoothing; //
+smoothingModel off;//localPSizeDiffSmoothing;// constDiffSmoothing; //
 
 forceModels
 (
@@ -59,13 +59,13 @@ forceModels
 
 energyModels
 (
-	heatTransferGunn
-	reactionHeat	
+    heatTransferGunn
+    reactionHeat
 );
 
-thermCondModel SyamlalThermCond;	
+thermCondModel SyamlalThermCond;
 
-chemistryModels	
+chemistryModels
 (
     species
     diffusionCoefficients
@@ -85,7 +85,7 @@ turbulenceModelType "turbulenceProperties";//"LESProperties";//
 reactionHeatProps
 {
     reactionHeatName            "reactionHeat";
-    verbose			false;
+    verbose                     false;
 }
 
 heatTransferGunnProps
@@ -119,8 +119,8 @@ diffusionCoefficientsProps
 
 massTransferCoeffProps
 {
-    verbose 			false;
-    interpolation 		false;
+    verbose             false;
+    interpolation       false;
 }
 
 reactantPerParticleProps
@@ -130,8 +130,8 @@ reactantPerParticleProps
 
 SyamlalThermCondProps
 {
-	voidfractionFieldName	"voidfraction";
-	rhoFieldName		"rho";
+    voidfractionFieldName   "voidfraction";
+    rhoFieldName            "rho";
 }
 
 LaEuScalarTempProps
@@ -150,7 +150,7 @@ localPSizeDiffSmoothingProps
     lowerLimit 0.1;
     upperLimit 1e10;
     dSmoothingLength 1.5e-3;
-    Csmoothing    1.0; 
+    Csmoothing    1.0;
 }
 
 constDiffSmoothingProps
@@ -214,11 +214,8 @@ GidaspowDragProps
     velFieldName "U";
     granVelFieldName "Us";
     voidfractionFieldName "voidfraction";
-    interpolation true; //interpolation is on
+    interpolation true;
     phi 1;
-    //implForceDEM true;
-    //implForceDEMaccumulated true;
-    //explicitCorr true;
 }
 
 BeetstraDragProps
@@ -228,8 +225,8 @@ BeetstraDragProps
     gravityFieldName "g";
     voidfractionFieldName "voidfraction";
     interpolation false;
-    useFilteredDragModel ;
-    useParcelSizeDependentFilteredDrag ;
+    useFilteredDragModel;
+    useParcelSizeDependentFilteredDrag;
     rhoP     4630.;
     dPrim   0.00022;
     rho     1.58;

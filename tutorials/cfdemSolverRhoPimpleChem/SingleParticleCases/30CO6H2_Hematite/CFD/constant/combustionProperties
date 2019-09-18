@@ -15,12 +15,12 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-combustionModel   noCombustion<rhoThermoCombustion>; //PaSR<rhoChemistryCombustion>;  //PaSR<psiChemistryCombustion>;
+combustionModel  noCombustion<rhoThermoCombustion>;
 
 active  false; //true;
 
 noCombustionCoeffs
-{ 
+{
 }
 
 

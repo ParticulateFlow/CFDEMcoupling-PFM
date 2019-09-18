@@ -17,12 +17,12 @@ FoamFile
 
 thermoType
 {
-    type            heRhoThermo; 	//hePsiThermo;        //
+    type            heRhoThermo;
     mixture         reactingMixture;    //species and reactions are listed in chemistry file
-    transport       const;	//sutherland;         //calcualtes viscosity as a function of temperature from Stuherland coefficient As and Ts
-    thermo          hConst; 	//janaf;
-    equationOfState perfectGas;   
-    energy          sensibleInternalEnergy; //sensibleEnthalpy;   //uses enthaly in the solution
+    transport       const; //sutherland;         //calcualtes viscosity as a function of temperature from Stuherland coefficient As and Ts
+    thermo          hConst; //janaf;
+    equationOfState perfectGas;
+    energy          sensibleInternalEnergy;
     specie          specie;
 }
 
@@ -32,6 +32,6 @@ foamChemistryThermoFile     "$casePath/CFD/constant/foam.dat";
 
 foamChemistryFile           "$casePath/CFD/constant/foam.inp";
 
-inertSpecie     N2;        
+inertSpecie     N2;
 
 // ************************************************************************* //

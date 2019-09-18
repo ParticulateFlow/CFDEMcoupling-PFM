@@ -53,62 +53,65 @@ maxDeltaT       0.1;
 
 
 // ************************************************************************* //
- libs (  
-        "libfieldFunctionObjects.so"
-     );
+ libs
+(
+    "libfieldFunctionObjects.so"
+);
 
 functions
 {
     moleFrac
     {
-        type	rhoReactionThermoMoleFractions;
-    } 
-    
+        type    rhoReactionThermoMoleFractions;
+    }
+
     probes1
     {
-	type probes;
+        type probes;
+
         functionObjectLibs ("libsampling.so");
-	#include "probesDict";
+
+        #include "probesDict";
     }
 
 
     fieldMinMax_T
     {
-    	type            fieldMinMax;
-    	libs            ("libfieldFunctionObjects.so");
-	fields          (T);	
-	// Report the location of the field extrema
-	location   yes;
-	// Type of extrema for rank > 0 primitives
-	mode	magnitude; // magnitude | component
-     }
-    
-    fieldMinMax_Cpv
-    {
-    	type            fieldMinMax;
-    	libs            ("libfieldFunctionObjects.so");
-	fields          (Cpv);	
-	// Report the location of the field extrema
-	location   yes;
-	// Type of extrema for rank > 0 primitives
-	mode	magnitude; // magnitude | component
-     }
-     
-     fieldMinMax_partTemp
-     {	
-     	type 	fieldMinMax;
-     	libs 	("libfieldFunctionObjects.so");
-     	fields	(partTemp);
-     	location yes;
-     	mode	magnitude;
+        type        fieldMinMax;
+        libs        ("libfieldFunctionObjects.so");
+        fields      (T);
+        // Report the location of the field extrema
+        location    yes;
+        // Type of extrema for rank > 0 primitives
+        mode        magnitude; // magnitude | component
      }
 
+    fieldMinMax_Cpv
+    {
+        type        fieldMinMax;
+        libs        ("libfieldFunctionObjects.so");
+        fields      (Cpv);	
+        // Report the location of the field extrema
+        location    yes;
+        // Type of extrema for rank > 0 primitives
+        mode        magnitude; // magnitude | component
+    }
+
+    fieldMinMax_partTemp
+    {
+        type    fieldMinMax;
+        libs    ("libfieldFunctionObjects.so");
+        fields  (partTemp);
+        location yes;
+        mode    magnitude;
+    }
+
     globalMassFrac
-    {          
+    {
         type            volRegion;
         libs ("libfieldFunctionObjects.so");
-        writeControl   	timeStep;//outputTime; 
-        writeInterval  	1;
+        writeControl    timeStep;//outputTime;
+        writeInterval   1;
         log             true;
         writeFields     false;
         regionType      all;
@@ -122,14 +125,14 @@ functions
             CO
             N2
             H2O
-        ); 
-    } 
+        );
+    }
 
     globalMass
-    {          
+    {
         type            volRegion;
         libs ("libfieldFunctionObjects.so");
-        writeControl   timeStep;//outputTime; 
+        writeControl   timeStep;//outputTime;
         writeInterval   1;
         log             true;
         writeFields     false;
@@ -142,6 +145,6 @@ functions
             rho
         );
     }
-} 
+}
 
 // ************************************************************************* //

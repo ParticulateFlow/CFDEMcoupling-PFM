@@ -38,13 +38,13 @@ boundaryField
 
     inlet
     {
-	type            fixedValue;
-	value		uniform 0.0649770565;
+        type            fixedValue;
+        value           uniform 0.0649770565;
     }
 
     outlet
     {
-        type            zeroGradient;  
+        type            zeroGradient;
     }
 }
 
