@@ -38,12 +38,12 @@ boundaryField
 
     inlet
     {
-	type            zeroGradient;
+        type            zeroGradient;
     }
 
     outlet
     {
-        type            zeroGradient;  
+        type            zeroGradient;
     }
 }
 

@@ -27,13 +27,13 @@ define(vlabel, [[// ]Vertex $1 = VCOUNT define($1, VCOUNT)define([VCOUNT], incr(
    define(D, 0.075) //75 mm column diameter
    define(L, 0.15)  //150 mm length
    define(PI, 3.14159265)
-   
+
    define(R, calc(D/2))
    define(CW, calc(D/4)) //Width of middle square section
-   
+
    define(CX, calc(R*cos((PI/180)*45)))
    define(CZ, calc(R*sin((PI/180)*45)))
-   
+
    define(NPS, 4) //how many cells in the square section
    define(NPD, 2) //how many cells from square section to perimeter
    define(NPY, 15) // how many cells from top to bottom
@@ -59,7 +59,7 @@ define(vlabel, [[// ]Vertex $1 = VCOUNT define($1, VCOUNT)define([VCOUNT], incr(
     (-CX L  CZ) vlabel(sevenoclockct)
     (-CX L -CZ) vlabel(elevenoclockct)
     ( CX L -CZ) vlabel(oneoclockct)
-   );				
+   );
 
    blocks
    (
@@ -81,27 +81,27 @@ define(vlabel, [[// ]Vertex $1 = VCOUNT define($1, VCOUNT)define([VCOUNT], incr(
 
     //slice2
     hex (
-       sevenoclocksqb elevenoclocksqb elevenoclockcb sevenoclockcb 
-       sevenoclocksqt elevenoclocksqt elevenoclockct sevenoclockct 
-       )
-   (NPS NPD NPY)
-simpleGrading (1 1 1)
+        sevenoclocksqb elevenoclocksqb elevenoclockcb sevenoclockcb
+        sevenoclocksqt elevenoclocksqt elevenoclockct sevenoclockct
+        )
+    (NPS NPD NPY)
+    simpleGrading (1 1 1)
 
-   //slice3
-   hex (
-         elevenoclocksqb oneoclocksqb oneoclockcb elevenoclockcb
-         elevenoclocksqt oneoclocksqt oneoclockct elevenoclockct
-       )
-   (NPS NPD NPY)
-simpleGrading (1 1 1)
+    //slice3
+    hex (
+        elevenoclocksqb oneoclocksqb oneoclockcb elevenoclockcb
+        elevenoclocksqt oneoclocksqt oneoclockct elevenoclockct
+        )
+    (NPS NPD NPY)
+    simpleGrading (1 1 1)
 
-   //slice4
-   hex (
-         oneoclocksqb fiveoclocksqb fiveoclockcb oneoclockcb
-         oneoclocksqt fiveoclocksqt fiveoclockct oneoclockct
-       )
-   (NPS NPD  NPY)
-simpleGrading (1 1 1)
+    //slice4
+    hex (
+        oneoclocksqb fiveoclocksqb fiveoclockcb oneoclockcb
+        oneoclocksqt fiveoclocksqt fiveoclockct oneoclockct
+        )
+    (NPS NPD  NPY)
+    simpleGrading (1 1 1)
 
    );
 

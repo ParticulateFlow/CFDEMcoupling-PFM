@@ -1,9 +1,8 @@
 #!/bin/bash
 
 #===================================================================#
-# DEMrun script for ErgunTestMPI testcase
-# init ErgunTestMPI
-# Christoph Goniva - July 2014
+# DEMrun script for testcase
+# M. Efe Kinaci - Sep 2019
 #===================================================================#
 
 #- source CFDEM env vars

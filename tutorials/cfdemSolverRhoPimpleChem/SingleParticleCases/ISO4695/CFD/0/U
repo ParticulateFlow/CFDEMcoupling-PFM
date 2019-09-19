@@ -23,15 +23,15 @@ boundaryField
 {
     top
     {
-	type		zeroGradient;
+        type            zeroGradient;
     }
     bottom
     {
-	type		zeroGradient;
+        type            zeroGradient;
     }
     side-walls
     {
-	type		zeroGradient;
+        type            zeroGradient;
     }
     inlet
     {
