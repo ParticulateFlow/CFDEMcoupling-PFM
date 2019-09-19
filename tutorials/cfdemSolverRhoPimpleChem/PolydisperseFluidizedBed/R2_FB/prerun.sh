@@ -11,3 +11,6 @@ else
     cd $casePath/CFD
     blockMesh
 fi
+
+# adapt settings for test harness run
+cp $casePath/CFD/system/controlDict_test $casePath/CFD/system/controlDict
