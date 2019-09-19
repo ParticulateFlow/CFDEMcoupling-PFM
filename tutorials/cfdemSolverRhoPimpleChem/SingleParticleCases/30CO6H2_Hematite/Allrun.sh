@@ -32,7 +32,7 @@ else
    blockMesh
 fi
 
-if [ -f "$casePath/DEM/post/restart/liggghts.restart" ];  then
+if [ -f "$casePath/DEM/post/restart/liggghts.restart" ]; then
     echo "LIGGGHTS init was run before - using existing restart file"
 else
     #- run DEM in new terminal
