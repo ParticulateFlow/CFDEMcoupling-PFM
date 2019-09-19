@@ -15,7 +15,7 @@ source $CFDEM_PROJECT_DIR/etc/functions.sh
 #- define variables
 casePath="$(dirname "$(readlink -f ${BASH_SOURCE[0]})")"
 logpath=$casePath
-headerText="GOD0k1H26pcnt"
+headerText="30CO6H2_Hematite"
 logfileName="log_$headerText"
 solverName="cfdemSolverRhoPimpleChem"
 nrProcs="2"

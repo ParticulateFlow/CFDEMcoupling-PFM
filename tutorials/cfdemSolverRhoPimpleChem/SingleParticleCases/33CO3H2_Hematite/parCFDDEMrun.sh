@@ -1,9 +1,8 @@
 #!/bin/bash
 
 #===================================================================#
-# allrun script for testcase as part of test routine 
-# run settlingTest CFD part
-# Christoph Goniva - Feb. 2011
+# allrun script for testcase
+# M. Efe Kinaci - Sep 2019
 #===================================================================#
 
 #- source CFDEM env vars
@@ -16,7 +15,7 @@ source $CFDEM_PROJECT_DIR/etc/functions.sh
 #- define variables
 casePath="$(dirname "$(readlink -f ${BASH_SOURCE[0]})")"
 logpath=$casePath
-headerText="GOD0k1H23pcnt"
+headerText="33CO3H2_Hematite"
 logfileName="log_$headerText"
 solverName="cfdemSolverRhoPimpleChem"
 nrProcs="2"

@@ -1,9 +1,8 @@
 #!/bin/bash
 
 #===================================================================#
-# DEMrun script for ErgunTestMPI testcase
-# init ErgunTestMPI
-# Christoph Goniva - July 2014
+# DEMrun script for testcase
+# M. Efe Kinaci - Sep 2018
 #===================================================================#
 
 #- source CFDEM env vars
@@ -20,7 +19,7 @@ logpath="$casePath"
 headerText="run_liggghts_init_DEM"
 logfileName="log_$headerText"
 solverName="in.liggghts_init"
-nrProcs=8
+nrProcs=4
 machineFileName="none"
 debugMode="off"
 #--------------------------------------------------------------------------------#

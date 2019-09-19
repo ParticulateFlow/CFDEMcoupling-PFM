@@ -1,9 +1,8 @@
 #!/bin/bash
 
 #===================================================================#
-# allrun script for testcase as part of test routine 
-# run settlingTest CFD part
-# Christoph Goniva - Feb. 2011
+# allrun script for testcase
+# M. Efe Kinaci - Sep 2018
 #===================================================================#
 
 #- source CFDEM env vars
@@ -19,7 +18,7 @@ logpath=$casePath
 headerText="R2_FluidBed"
 logfileName="log_$headerText"
 solverName="cfdemSolverRhoPimpleChem"   #"cfdemSolverPiso"  #
-nrProcs="8"
+nrProcs="4"
 machineFileName="none"   # yourMachinefileName | none
 debugMode="off"          # on | off| strict
 testHarnessPath="$CFDEM_TEST_HARNESS_PATH"
