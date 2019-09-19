@@ -101,20 +101,20 @@ heatTransferGunnProps
 
 speciesProps
 {
-	ChemistryFile 		"$casePath/CFD/constant/foam.inp";
-	Nevery			1;
-	verbose			false;
-	interpolation 		false;
+    ChemistryFile       "$FOAM_CASE/constant/foam.inp";
+    Nevery              1;
+    verbose             false;
+    interpolation       false;
 }
 
 diffusionCoefficientsProps
 {
-	verbose			false;   
-	interpolation 		false;     
-	ChemistryFile 		"$casePath/CFD/constant/foam.inp";
-        diffusantGasNames       (    CO
-                                     H2
-                                ); 
+    verbose             false;
+    interpolation       false;
+    ChemistryFile       "$FOAM_CASE/constant/foam.inp";
+    diffusantGasNames   (    CO
+                             H2
+                        );
 }
 
 massTransferCoeffProps

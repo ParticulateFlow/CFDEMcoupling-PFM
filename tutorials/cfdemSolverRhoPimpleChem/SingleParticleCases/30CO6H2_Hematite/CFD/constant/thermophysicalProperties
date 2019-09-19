@@ -28,9 +28,9 @@ thermoType
 
 chemistryReader foamChemistryReader;
 
-foamChemistryThermoFile     "$casePath/CFD/constant/foam.dat";
+foamChemistryThermoFile     "$FOAM_CASE/constant/foam.dat";
 
-foamChemistryFile           "$casePath/CFD/constant/foam.inp";
+foamChemistryFile           "$FOAM_CASE/constant/foam.inp";
 
 inertSpecie     N2;
 
