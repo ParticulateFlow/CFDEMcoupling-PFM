@@ -84,6 +84,12 @@ standardRecModel::standardRecModel
         {
             FatalError <<"database " << dataBaseNames_[i] << " does not exist or is empty\n" << abort(FatalError);
         }
+        else if (timeDirs.size() < 3)
+        {
+            FatalError <<"database " << dataBaseNames_[i] << " contains only one or two entries. "<<
+            "To describe a steady state, create copies of the steady fields so that the database contains "<<
+            "entries with three identical sets of fields.\n" << abort(FatalError);
+        } 
         timeDirs_.append(timeDirs);
 
         numRecFields_.append(label(timeDirs_[i].size()));
