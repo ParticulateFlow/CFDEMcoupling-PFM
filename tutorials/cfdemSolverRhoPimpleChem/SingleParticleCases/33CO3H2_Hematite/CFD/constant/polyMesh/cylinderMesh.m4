@@ -59,7 +59,7 @@ define(vlabel, [[// ]Vertex $1 = VCOUNT define($1, VCOUNT)define([VCOUNT], incr(
     (-CX L  CZ) vlabel(sevenoclockct)
     (-CX L -CZ) vlabel(elevenoclockct)
     ( CX L -CZ) vlabel(oneoclockct)
-   );				
+   );
 
    blocks
    (
@@ -81,11 +81,11 @@ define(vlabel, [[// ]Vertex $1 = VCOUNT define($1, VCOUNT)define([VCOUNT], incr(
 
     //slice2
     hex (
-       sevenoclocksqb elevenoclocksqb elevenoclockcb sevenoclockcb 
-       sevenoclocksqt elevenoclocksqt elevenoclockct sevenoclockct 
+       sevenoclocksqb elevenoclocksqb elevenoclockcb sevenoclockcb
+       sevenoclocksqt elevenoclocksqt elevenoclockct sevenoclockct
        )
    (NPS NPD NPY)
-simpleGrading (1 1 1)
+   simpleGrading (1 1 1)
 
    //slice3
    hex (
@@ -93,7 +93,7 @@ simpleGrading (1 1 1)
          elevenoclocksqt oneoclocksqt oneoclockct elevenoclockct
        )
    (NPS NPD NPY)
-simpleGrading (1 1 1)
+   simpleGrading (1 1 1)
 
    //slice4
    hex (
@@ -101,7 +101,7 @@ simpleGrading (1 1 1)
          oneoclocksqt fiveoclocksqt fiveoclockct oneoclockct
        )
    (NPS NPD  NPY)
-simpleGrading (1 1 1)
+   simpleGrading (1 1 1)
 
    );
 

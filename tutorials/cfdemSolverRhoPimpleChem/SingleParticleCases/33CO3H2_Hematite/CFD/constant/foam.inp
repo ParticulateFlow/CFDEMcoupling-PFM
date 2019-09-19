@@ -1,10 +1,10 @@
 species
 (
-	H2
-	H2O
-	CO
-	CO2
-	N2
+    H2
+    H2O
+    CO
+    CO2
+    N2
 );
 
 reactions

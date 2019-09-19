@@ -1,16 +1,16 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \    /   O peration     | Version:  2.1.x                                 |
-|   \  /    A nd           | Web:      www.OpenFOAM.org                      |
-|    \/     M anipulation  |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.1.x                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
-	version		2.0;
-	format		ascii;
-	class		dictionary;
-	object		probesDict;
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      probesDict;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -18,25 +18,25 @@ FoamFile
 
 fields
 (
-	rho
-	p
-	T
-	Cpv
-	N2
-	CO2
-	CO
-	H2
-	H2O
-	ModSpeciesMassField_N2
-	ModSpeciesMassField_CO2
-	ModSpeciesMassField_CO
-	ModSpeciesMassField_H2
-	ModSpeciesMassField_H2O
-	X_CO
-	X_CO2
-	X_H2
-	X_N2
-	X_H2O
+    rho
+    p
+    T
+    Cpv
+    N2
+    CO2
+    CO
+    H2
+    H2O
+    ModSpeciesMassField_N2
+    ModSpeciesMassField_CO2
+    ModSpeciesMassField_CO
+    ModSpeciesMassField_H2
+    ModSpeciesMassField_H2O
+    X_CO
+    X_CO2
+    X_H2
+    X_N2
+    X_H2O
 );
 
 writeControl   timeStep;
@@ -46,9 +46,9 @@ writeInterval  50;
 // Locations to be probed.
 probeLocations
 (
-	(7.0 2.5 2.5)
-        (8.0 2.5 2.5)
-        (1.0 2.5 2.5)
+    (7.0 2.5 2.5)
+    (8.0 2.5 2.5)
+    (1.0 2.5 2.5)
 );
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
