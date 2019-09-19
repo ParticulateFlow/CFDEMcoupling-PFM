@@ -81,15 +81,3 @@ if [ $postproc == "true" ]
 
 fi
 
-#- clean up case
-#echo "deleting data at: $casePath :\n"
-#source $WM_PROJECT_DIR/bin/tools/CleanFunctions
-#cd $casePath/CFD
-#cleanCase
-#rm -r $casePath/CFD/clockData
-#rm $casePath/DEM/post/*.*
-#touch $casePath/DEM/post/.gitignore
-#rm $casePath/DEM/post/restart/*.*
-#rm $casePath/DEM/post/restart/liggghts.restartCFDEM*
-#touch $casePath/DEM/post/restart/.gitignore
-#echo "done"
