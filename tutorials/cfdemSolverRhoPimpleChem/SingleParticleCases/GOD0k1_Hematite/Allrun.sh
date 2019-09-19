@@ -1,9 +1,8 @@
 #!/bin/bash
 
 #===================================================================#
-# allrun script for testcase as part of test routine 
-# run settlingTest
-# Christoph Goniva - Sept. 2010
+# allrun script for testcase
+# M. Efe Kinaci - Sep 2018
 #===================================================================#
 
 #- source CFDEM env vars
@@ -33,7 +32,7 @@ else
    blockMesh
 fi
 
-if [ -f "$casePath/DEM/post/restart/liggghts.restart" ];  then
+if [ -f "$casePath/DEM/post/restart/liggghts.restart" ]; then
     echo "LIGGGHTS init was run before - using existing restart file"
 else
     #- run DEM in new terminal
