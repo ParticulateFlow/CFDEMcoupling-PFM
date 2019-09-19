@@ -18,5 +18,12 @@ export casePath
 cd $casePath/CFD/
 blockMesh
 
+if [ -f "$casePath/DEM/post/restart/liggghts.restart" ]; then
+    echo "LIGGGHTS init was run before - using existing restart file"
+else
+    #- run DEM in new terminal
+    $casePath/parDEMrun.sh
+fi
+
 echo "Run Simulation"
-bash $casePath/parCFDDEMrun.sh   
+bash $casePath/parCFDDEMrun.sh
