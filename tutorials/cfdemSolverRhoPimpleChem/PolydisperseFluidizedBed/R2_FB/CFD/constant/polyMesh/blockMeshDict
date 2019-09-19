@@ -16,50 +16,41 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-
-
-
-
-
    meshGenApp blockMesh;
    convertToMeters 1.0;
 
     //68 mm column diameter
-     //150 mm length
-   
-   
-   
+    //150 mm length
+
+
     //Width of middle square section
-   
-   
-   
-   
+
     //how many cells in the square section
     //how many cells from square section to perimeter
     // how many cells from top to bottom
 
    vertices
    (
-    ( 0.017 0.0  0.017) // Vertex fiveoclocksqb = 0 
-    (-0.017 0.0  0.017) // Vertex sevenoclocksqb = 1 
-    (-0.017 0.0 -0.017) // Vertex elevenoclocksqb = 2 
-    ( 0.017 0.0 -0.017) // Vertex oneoclocksqb = 3 
-   
-    ( 0.0240416305819187 0.0  0.0240416305387665) // Vertex fiveoclockcb = 4 
-    (-0.0240416305819187 0.0  0.0240416305387665) // Vertex sevenoclockcb = 5 
-    (-0.0240416305819187 0.0 -0.0240416305387665) // Vertex elevenoclockcb = 6 
-    ( 0.0240416305819187 0.0 -0.0240416305387665) // Vertex oneoclockcb = 7 
+    ( 0.017 0.0  0.017) // Vertex fiveoclocksqb = 0
+    (-0.017 0.0  0.017) // Vertex sevenoclocksqb = 1
+    (-0.017 0.0 -0.017) // Vertex elevenoclocksqb = 2
+    ( 0.017 0.0 -0.017) // Vertex oneoclocksqb = 3
 
-    ( 0.017 0.150  0.017) // Vertex fiveoclocksqt = 8 
-    (-0.017 0.150  0.017) // Vertex sevenoclocksqt = 9 
-    (-0.017 0.150 -0.017) // Vertex elevenoclocksqt = 10 
-    ( 0.017 0.150 -0.017) // Vertex oneoclocksqt = 11 
-   
-    ( 0.0240416305819187 0.150  0.0240416305387665) // Vertex fiveoclockct = 12 
-    (-0.0240416305819187 0.150  0.0240416305387665) // Vertex sevenoclockct = 13 
-    (-0.0240416305819187 0.150 -0.0240416305387665) // Vertex elevenoclockct = 14 
-    ( 0.0240416305819187 0.150 -0.0240416305387665) // Vertex oneoclockct = 15 
-   );				
+    ( 0.0240416305819187 0.0  0.0240416305387665) // Vertex fiveoclockcb = 4
+    (-0.0240416305819187 0.0  0.0240416305387665) // Vertex sevenoclockcb = 5
+    (-0.0240416305819187 0.0 -0.0240416305387665) // Vertex elevenoclockcb = 6
+    ( 0.0240416305819187 0.0 -0.0240416305387665) // Vertex oneoclockcb = 7
+
+    ( 0.017 0.150  0.017) // Vertex fiveoclocksqt = 8
+    (-0.017 0.150  0.017) // Vertex sevenoclocksqt = 9
+    (-0.017 0.150 -0.017) // Vertex elevenoclocksqt = 10
+    ( 0.017 0.150 -0.017) // Vertex oneoclocksqt = 11
+
+    ( 0.0240416305819187 0.150  0.0240416305387665) // Vertex fiveoclockct = 12
+    (-0.0240416305819187 0.150  0.0240416305387665) // Vertex sevenoclockct = 13
+    (-0.0240416305819187 0.150 -0.0240416305387665) // Vertex elevenoclockct = 14
+    ( 0.0240416305819187 0.150 -0.0240416305387665) // Vertex oneoclockct = 15
+   );
 
    blocks
    (
@@ -81,11 +72,11 @@ FoamFile
 
     //slice2
     hex (
-       1 2 6 5 
-       9 10 14 13 
+       1 2 6 5
+       9 10 14 13
        )
    (7 3 24)
-simpleGrading (1 1 1)
+   simpleGrading (1 1 1)
 
    //slice3
    hex (
@@ -93,7 +84,7 @@ simpleGrading (1 1 1)
          10 11 15 14
        )
    (7 3 24)
-simpleGrading (1 1 1)
+   simpleGrading (1 1 1)
 
    //slice4
    hex (
@@ -101,7 +92,7 @@ simpleGrading (1 1 1)
          11 8 12 15
        )
    (7 3  24)
-simpleGrading (1 1 1)
+   simpleGrading (1 1 1)
 
    );
 

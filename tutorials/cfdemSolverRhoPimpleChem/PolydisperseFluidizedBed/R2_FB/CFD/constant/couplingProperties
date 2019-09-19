@@ -30,7 +30,7 @@ modelType "A"; // A or B
 
 couplingInterval 50;
 
-voidFractionModel divided;//centre;//
+voidFractionModel divided;
 
 locateModel engine;	//turboEngineM2M;//
 
@@ -59,18 +59,18 @@ forceModels
 
 energyModels
 (
-	heatTransferGunn
-	reactionHeat	
+    heatTransferGunn
+    reactionHeat
 );
 
-thermCondModel SyamlalThermCond;	
+thermCondModel SyamlalThermCond;
 
-chemistryModels	
+chemistryModels
 (
     species
     diffusionCoefficients
     massTransferCoeff
-    // off
+    //off
 );
 
 momCoupleModels
@@ -85,7 +85,7 @@ turbulenceModelType "turbulenceProperties";//"LESProperties";//
 reactionHeatProps
 {
     reactionHeatName            "reactionHeat";
-    verbose			false;
+    verbose                     false;
 }
 
 heatTransferGunnProps
@@ -119,8 +119,8 @@ diffusionCoefficientsProps
 
 massTransferCoeffProps
 {
-    verbose 			false;
-    interpolation 		false;
+    verbose         false;
+    interpolation   false;
 }
 
 reactantPerParticleProps
@@ -130,8 +130,8 @@ reactantPerParticleProps
 
 SyamlalThermCondProps
 {
-	voidfractionFieldName	"voidfraction";
-	rhoFieldName		"rho";
+    voidfractionFieldName   "voidfraction";
+    rhoFieldName            "rho";
 }
 
 LaEuScalarTempProps
@@ -214,11 +214,8 @@ GidaspowDragProps
     velFieldName "U";
     granVelFieldName "Us";
     voidfractionFieldName "voidfraction";
-    interpolation true; //interpolation is on
+    interpolation true;
     phi 1;
-    //implForceDEM true;
-    //implForceDEMaccumulated true;
-    //explicitCorr true;
 }
 
 BeetstraDragProps
@@ -328,7 +325,7 @@ engineProps
 
 turboEngineProps
 {
-	treeSearch true;
+    treeSearch true;
 }
 
 turboEngineM2MProps

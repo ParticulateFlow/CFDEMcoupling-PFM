@@ -15,7 +15,7 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-application     cfdemSolverRhoPimpleChem; 
+application     cfdemSolverRhoPimpleChem;
 
 startFrom       startTime;
 
@@ -25,11 +25,11 @@ stopAt          endTime;
 
 endTime         120.0;
 
-deltaT          0.00025; 
+deltaT          0.00025;
 
-writeControl    runTime; //timeStep; // 
+writeControl    runTime; //timeStep;
 
-writeInterval   0.25;	//4000; //0.5; //5000; 
+writeInterval   0.25;    //5000;
 
 purgeWrite      0;
 
@@ -53,62 +53,65 @@ maxDeltaT       0.1;
 
 
 // ************************************************************************* //
- libs (  
-        "libfieldFunctionObjects.so"
-     );
+libs
+(
+    "libfieldFunctionObjects.so"
+);
 
 functions
 {
     moleFrac
     {
-        type	rhoReactionThermoMoleFractions;
-    } 
-    
+        type    rhoReactionThermoMoleFractions;
+    }
+
     probes1
     {
-	type probes;
+        type probes;
+
         functionObjectLibs ("libsampling.so");
-	#include "probesDict";
+
+        #include "probesDict";
     }
 
 
     fieldMinMax_T
     {
-    	type            fieldMinMax;
-    	libs            ("libfieldFunctionObjects.so");
-	fields          (T);	
-	// Report the location of the field extrema
-	location   yes;
-	// Type of extrema for rank > 0 primitives
-	mode	magnitude; // magnitude | component
+        type            fieldMinMax;
+        libs            ("libfieldFunctionObjects.so");
+        fields          (T);
+        // Report the location of the field extrema
+        location        yes;
+        // Type of extrema for rank > 0 primitives
+        mode            magnitude; // magnitude | component
      }
-    
+
     fieldMinMax_Cpv
     {
-    	type            fieldMinMax;
-    	libs            ("libfieldFunctionObjects.so");
-	fields          (Cpv);	
-	// Report the location of the field extrema
-	location   yes;
-	// Type of extrema for rank > 0 primitives
-	mode	magnitude; // magnitude | component
+        type            fieldMinMax;
+        libs            ("libfieldFunctionObjects.so");
+        fields          (Cpv);	
+        // Report the location of the field extrema
+        location   yes;
+        // Type of extrema for rank > 0 primitives
+        mode            magnitude; // magnitude | component
      }
-     
+
      fieldMinMax_partTemp
-     {	
-     	type 	fieldMinMax;
-     	libs 	("libfieldFunctionObjects.so");
-     	fields	(partTemp);
-     	location yes;
-     	mode	magnitude;
+     {
+         type       fieldMinMax;
+         libs       ("libfieldFunctionObjects.so");
+         fields     (partTemp);
+         location   yes;
+         mode       magnitude;
      }
 
     globalMassFrac
-    {          
+    {
         type            volRegion;
         libs ("libfieldFunctionObjects.so");
-        writeControl   	timeStep;//outputTime; 
-        writeInterval  	1;
+        writeControl    timeStep;//outputTime;
+        writeInterval   1;
         log             true;
         writeFields     false;
         regionType      all;
@@ -122,14 +125,14 @@ functions
             CO2
             CO
             N2
-        ); 
-    } 
+        );
+    }
 
     globalMass
-    {          
+    {
         type            volRegion;
         libs ("libfieldFunctionObjects.so");
-        writeControl   timeStep;//outputTime; 
+        writeControl   timeStep;//outputTime;
         writeInterval   1;
         log             true;
         writeFields     false;
@@ -141,13 +144,13 @@ functions
             rhoeps
             rho
         );
-    } 
-    
+    }
+
     inflow_GasSpecies
     {
-	type            surfaceRegion;
+        type            surfaceRegion;
         libs ("libfieldFunctionObjects.so");
-        writeControl   timeStep;
+        writeControl    timeStep;
         writeInterval   100;
         log             true;
         // Output field values as well
@@ -165,10 +168,10 @@ functions
             N2
         );
     }
-     
+
     inflow_phi
     {
-	type            surfaceRegion;
+        type            surfaceRegion;
         libs ("libfieldFunctionObjects.so");
         writeControl   timeStep;
         writeInterval   100;
@@ -181,15 +184,15 @@ functions
 
         fields
         (
-	    phi
+            phi
         );
     }
-    
+
     inflow_U
     {
-	type            surfaceRegion;
+        type            surfaceRegion;
         libs ("libfieldFunctionObjects.so");
-        writeControl   timeStep;
+        writeControl    timeStep;
         writeInterval   100;
         log             true;
         // Output field values as well
@@ -200,27 +203,27 @@ functions
 
         fields
         (
-	    U
+            U
         );
     }
-     
+
     outflow_GasSpecies
     {
-	$inflow_GasSpecies;
-        name	outlet;
+        $inflow_GasSpecies;
+        name    outlet;
     }
-    
+
     outflow_phi
     {
-	$inflow_phi;
-        name	outlet;
+        $inflow_phi;
+        name    outlet;
     }
-    
+
     outflow_U
     {
-	$inflow_U;
-	name outlet;
+        $inflow_U;
+        name    outlet;
     }
-} 
+}
 
 // ************************************************************************* //

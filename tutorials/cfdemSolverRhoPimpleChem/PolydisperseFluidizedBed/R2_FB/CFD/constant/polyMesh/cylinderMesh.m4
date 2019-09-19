@@ -27,13 +27,13 @@ define(vlabel, [[// ]Vertex $1 = VCOUNT define($1, VCOUNT)define([VCOUNT], incr(
    define(D, 0.068) //68 mm column diameter
    define(L, 0.150)  //150 mm length
    define(PI, 3.14159265)
-   
+
    define(R, calc(D/2))
    define(CW, calc(D/4)) //Width of middle square section
-   
+
    define(CX, calc(R*cos((PI/180)*45)))
    define(CZ, calc(R*sin((PI/180)*45)))
-   
+
    define(NPS, 7) //how many cells in the square section
    define(NPD, 3) //how many cells from square section to perimeter
    define(NPY, 24) // how many cells from top to bottom
@@ -44,7 +44,7 @@ define(vlabel, [[// ]Vertex $1 = VCOUNT define($1, VCOUNT)define([VCOUNT], incr(
     (-CW 0.0  CW) vlabel(sevenoclocksqb)
     (-CW 0.0 -CW) vlabel(elevenoclocksqb)
     ( CW 0.0 -CW) vlabel(oneoclocksqb)
-   
+
     ( CX 0.0  CZ) vlabel(fiveoclockcb)
     (-CX 0.0  CZ) vlabel(sevenoclockcb)
     (-CX 0.0 -CZ) vlabel(elevenoclockcb)
@@ -54,12 +54,12 @@ define(vlabel, [[// ]Vertex $1 = VCOUNT define($1, VCOUNT)define([VCOUNT], incr(
     (-CW L  CW) vlabel(sevenoclocksqt)
     (-CW L -CW) vlabel(elevenoclocksqt)
     ( CW L -CW) vlabel(oneoclocksqt)
-   
+
     ( CX L  CZ) vlabel(fiveoclockct)
     (-CX L  CZ) vlabel(sevenoclockct)
     (-CX L -CZ) vlabel(elevenoclockct)
     ( CX L -CZ) vlabel(oneoclockct)
-   );				
+   );
 
    blocks
    (
@@ -81,11 +81,11 @@ define(vlabel, [[// ]Vertex $1 = VCOUNT define($1, VCOUNT)define([VCOUNT], incr(
 
     //slice2
     hex (
-       sevenoclocksqb elevenoclocksqb elevenoclockcb sevenoclockcb 
-       sevenoclocksqt elevenoclocksqt elevenoclockct sevenoclockct 
+       sevenoclocksqb elevenoclocksqb elevenoclockcb sevenoclockcb
+       sevenoclocksqt elevenoclocksqt elevenoclockct sevenoclockct
        )
    (NPS NPD NPY)
-simpleGrading (1 1 1)
+   simpleGrading (1 1 1)
 
    //slice3
    hex (
@@ -93,7 +93,7 @@ simpleGrading (1 1 1)
          elevenoclocksqt oneoclocksqt oneoclockct elevenoclockct
        )
    (NPS NPD NPY)
-simpleGrading (1 1 1)
+   simpleGrading (1 1 1)
 
    //slice4
    hex (
@@ -101,7 +101,7 @@ simpleGrading (1 1 1)
          oneoclocksqt fiveoclocksqt fiveoclockct oneoclockct
        )
    (NPS NPD  NPY)
-simpleGrading (1 1 1)
+   simpleGrading (1 1 1)
 
    );
 

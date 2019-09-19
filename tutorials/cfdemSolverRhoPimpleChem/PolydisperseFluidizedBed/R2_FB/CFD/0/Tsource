@@ -22,9 +22,9 @@ dimensions      [0 0 -1 1 0 0 0];
 // q=1000 W/m3
 // cp=1000
 // rho=1
-// --> Tsource = 1 
+// --> Tsource = 1
 
-internalField   uniform 0;  
+internalField   uniform 0;
 
 boundaryField
 {

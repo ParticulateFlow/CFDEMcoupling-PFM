@@ -4,7 +4,7 @@ species
         CO2
         H2
         H2O
-	N2
+        N2
 );
 
 reactions

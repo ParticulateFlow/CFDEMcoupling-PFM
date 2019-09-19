@@ -20,7 +20,7 @@ combustionModel   noCombustion<rhoThermoCombustion>; //PaSR<rhoChemistryCombusti
 active  false; //true;
 
 noCombustionCoeffs
-{ 
+{
 }
 
 
