@@ -54,6 +54,9 @@
 
     thermo.correct();
 
+    Info << "Qsource" << max(Qsource).value() << " " << min(Qsource).value() << endl;
+    Info << "QCoeff" << max(QCoeff).value() << " " << min(QCoeff).value() << endl;
+    Info << "Cpv" << max(Cpv).value() << " " << min(Cpv).value() << endl;
     Info<< "T max/min : " << max(T).value() << " " << min(T).value() << endl;
 
     particleCloud.clockM().start(31,"energySolve");

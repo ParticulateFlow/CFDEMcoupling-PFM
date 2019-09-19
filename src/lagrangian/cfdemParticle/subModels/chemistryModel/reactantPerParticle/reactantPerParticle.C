@@ -56,6 +56,7 @@ reactantPerParticle::reactantPerParticle
     chemistryModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
     mesh_(sm.mesh()),
+    verbose_(propsDict_.lookupOrDefault<bool>("verbose",false)),
     reactantPerParticle_(NULL),
     voidfractionFieldName_(propsDict_.lookupOrDefault<word>("voidfractionFieldName","voidfraction")),
     voidfraction_(sm.mesh().lookupObject<volScalarField>(voidfractionFieldName_)),
@@ -98,11 +99,8 @@ void reactantPerParticle::allocateMyArrays() const
 
 void reactantPerParticle::reAllocMyArrays() const
 {
-    if (particleCloud_.numberOfParticlesChanged())
-    {
-        double initVal=0.0;
-        particleCloud_.dataExchangeM().allocateArray(reactantPerParticle_,initVal,1);
-    }
+    double initVal=0.0;
+    particleCloud_.dataExchangeM().allocateArray(reactantPerParticle_,initVal,1);
 }
 
 // * * * * * * * * * * * * * * * * Member Fct  * * * * * * * * * * * * * * * //
@@ -145,6 +143,8 @@ void reactantPerParticle::execute()
             particlesPerCell=   particlesPerCell_[cellI];
             reactantPerParticle_[index][0] = voidfraction * cellvolume / particlesPerCell;
         }
+
+        if (verbose_) Info << "reactantPerParticle_" << reactantPerParticle_[index][0] << endl;
     }
 
         // give DEM data
