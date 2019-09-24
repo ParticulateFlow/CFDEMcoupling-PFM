@@ -91,7 +91,7 @@ fix     LayerRelRadii ore property/atom relRadii vector yes no no  1.0 0.998 0.9
 
 ### define fix for mass layer - initial testing
 fix     LayerMasses ore property/atom massLayer vector yes no no 0. 0. 0. 0.
-fix     LayerDennsities ore property/global density_ore vector 7870. 5740. 5170. 5240.
+fix     LayerDensities ore property/global density_ore vector 7870. 5740. 5170. 5240.
 
 ## define fix for rho_eff and fracRed - initialize as zero
 fix     fracRed ore property/atom fracRed_ore vector yes no no 0. 0. 0.
