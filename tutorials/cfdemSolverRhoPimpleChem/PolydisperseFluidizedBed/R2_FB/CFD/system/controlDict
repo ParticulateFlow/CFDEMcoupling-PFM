@@ -77,11 +77,11 @@ functions
         // Locations to be probed.
         probeLocations
         (
-            (0.03 0.025 0.03)
-            (0.03 0.05 0.03)
-            (0.03 0.075 0.03)
-            (0.03 0.09 0.03)
-            (0.03 0.12 0.03)
+            (0.03 0.025 0.0)
+            (0.03 0.050 0.0)
+            (0.03 0.075 0.0)
+            (0.03 0.090 0.0)
+            (0.03 0.120 0.0)
         );
 
         fields
@@ -121,7 +121,7 @@ functions
         location        yes;
         // Type of extrema for rank > 0 primitives
         mode            magnitude; // magnitude | component
-     }
+    }
 
     fieldMinMax_Cpv
     {
@@ -132,16 +132,16 @@ functions
         location   yes;
         // Type of extrema for rank > 0 primitives
         mode            magnitude; // magnitude | component
-     }
+    }
 
-     fieldMinMax_partTemp
-     {
-         type       fieldMinMax;
-         libs       ("libfieldFunctionObjects.so");
-         fields     (partTemp);
-         location   yes;
-         mode       magnitude;
-     }
+    fieldMinMax_partTemp
+    {
+        type       fieldMinMax;
+        libs       ("libfieldFunctionObjects.so");
+        fields     (partTemp);
+        location   yes;
+        mode       magnitude;
+    }
 
     globalMassFrac
     {
