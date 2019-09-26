@@ -58,10 +58,13 @@ class cfdemCloudIBmodified
 {
 protected:
 
-    mutable double **xmol_;
-    mutable double **vmol_;
+    //mutable double **xmol_;
+    //mutable double **vmol_;
+
+    mutable double **angularVelocities_;
     label pRefCell_;
     scalar pRefValue_;
+    mutable double **DEMTorques_;
 
     mutable bool haveEvolvedOnce_;
     mutable bool skipLagrangeToEulerMapping_;
@@ -86,13 +89,25 @@ public:
 
         bool reAllocArrays();
 
+        void giveDEMdata();
+
+        inline double ** DEMTorques() const;
+
     // Modification
         bool evolve();
 
         void calcForcingTerm(volVectorField&);
 
+    // Access
+        vector angularVelocity(int) const;
+
+        inline double ** angularVelocities() const
+        {
+            return angularVelocities_;
+        }
+
       // Access
-        inline double ** moleculeCOM() const
+      /*  inline double ** moleculeCOM() const
         {
             return xmol_;
         }
@@ -100,7 +115,7 @@ public:
         inline double ** moleculeVel() const
         {
             return vmol_;
-        }
+        }*/
 };
 
 

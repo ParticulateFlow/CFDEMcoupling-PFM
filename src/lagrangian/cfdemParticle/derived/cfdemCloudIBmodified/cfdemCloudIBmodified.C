@@ -55,10 +55,12 @@ cfdemCloudIBmodified::cfdemCloudIBmodified
 )
 :
     cfdemCloud(mesh),
-    xmol_(NULL),
-    vmol_(NULL),
+    //xmol_(NULL),
+    //vmol_(NULL),
+    angularVelocities_(NULL),
     pRefCell_(readLabel(mesh.solutionDict().subDict("PISO").lookup("pRefCell"))),
     pRefValue_(readScalar(mesh.solutionDict().subDict("PISO").lookup("pRefValue"))),
+    DEMTorques_(NULL),
     haveEvolvedOnce_(false),
     skipLagrangeToEulerMapping_(false)
 
@@ -76,8 +78,10 @@ cfdemCloudIBmodified::cfdemCloudIBmodified
 
 cfdemCloudIBmodified::~cfdemCloudIBmodified()
 {
-    dataExchangeM().destroy(xmol_,3);
-    dataExchangeM().destroy(vmol_,3);
+    //dataExchangeM().destroy(xmol_,3);
+    //dataExchangeM().destroy(vmol_,3);
+    dataExchangeM().destroy(angularVelocities_,3);
+    dataExchangeM().destroy(DEMTorques_,3);
 }
 
 
@@ -85,8 +89,9 @@ cfdemCloudIBmodified::~cfdemCloudIBmodified()
 void cfdemCloudIBmodified::getDEMdata()
 {
     cfdemCloud::getDEMdata();
-    dataExchangeM().getData("x_mol","vector-atom",xmol_);
-    dataExchangeM().getData("v_mol","vector-atom",vmol_);
+    //dataExchangeM().getData("x_mol","vector-atom",xmol_);
+    //dataExchangeM().getData("v_mol","vector-atom",vmol_);
+    dataExchangeM().getData("omega","vector-atom",angularVelocities_);
 }
 
 bool cfdemCloudIBmodified::reAllocArrays()
@@ -94,11 +99,24 @@ bool cfdemCloudIBmodified::reAllocArrays()
     if(cfdemCloud::reAllocArrays())
     {
         // get arrays of new length
-        dataExchangeM().allocateArray(xmol_,0.,3);
-        dataExchangeM().allocateArray(vmol_,0.,3);
+        //dataExchangeM().allocateArray(xmol_,0.,3);
+        //dataExchangeM().allocateArray(vmol_,0.,3);
+        dataExchangeM().allocateArray(angularVelocities_,0.,3);
+        dataExchangeM().allocateArray(DEMTorques_,0.,3);
         return true;
     }
     return false;
+}
+
+void cfdemCloudIBmodified::giveDEMdata()
+{
+    cfdemCloud::giveDEMdata();
+    dataExchangeM().giveData("hdtorque","vector-atom",DEMTorques_);
+}
+
+inline double ** cfdemCloudIBmodified::DEMTorques() const
+{
+    return DEMTorques_;
 }
 
 bool cfdemCloudIBmodified::evolve()
@@ -168,6 +186,27 @@ void cfdemCloudIBmodified::calcForcingTerm(volVectorField& Us)
         if(verbose_) Info << "- setVelocity(velocities_)" << endl;
         label cell = 0;
         vector uP(0,0,0);
+        vector rVec(0,0,0);
+        vector velRot(0,0,0);
+        vector angVel(0,0,0);
+        for (int index = 0; index < numberOfParticles(); ++index){
+            for(int subCell = 0; subCell < voidFractionM().cellsPerParticle()[index][0]; subCell++)
+            {
+                cell = cellIDs()[index][subCell];
+
+                if(cell >=0){
+                    // calc particle velocity
+                    for(int i=0;i<3;i++) rVec[i]=Us.mesh().C()[cell][i]-position(index)[i];
+                    for(int i=0;i<3;i++) angVel[i]=angularVelocities()[index][i];
+                    velRot=angVel^rVec;
+                    for(int i=0;i<3;i++) uP[i] = velocities()[index][i]+velRot[i];
+                    Us[cell] = (1-voidfractions_[index][subCell])*uP;
+                }
+            }
+        }
+
+        /*label cell = 0;
+        vector uP(0,0,0);
         vector rRel(0,0,0);
         vector vRel(0,0,0);
         vector angRel(0,0,0);
@@ -194,8 +233,14 @@ void cfdemCloudIBmodified::calcForcingTerm(volVectorField& Us)
                     Us[cell] = (1-voidfractions_[index][subCell])*uP;
                 }
             }
-        }
+        }*/
+
         if(verbose_) Info << "setVelocity done." << endl;
+}
+
+vector cfdemCloudIBmodified::angularVelocity(int index) const
+{
+    return vector(angularVelocities_[index][0],angularVelocities_[index][1],angularVelocities_[index][2]);
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
