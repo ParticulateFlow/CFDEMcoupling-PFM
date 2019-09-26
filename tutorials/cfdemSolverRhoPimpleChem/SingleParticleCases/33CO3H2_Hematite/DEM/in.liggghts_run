@@ -208,7 +208,9 @@ compute         rke all erotate/sphere
 thermo_style    custom step atoms ke c_rke vol
 thermo          10
 thermo_modify   lost ignore norm no
-compute_modify  thermo_temp dynamic yes
+compute_modify  thermo_temp dynamic no extra 0
 
 dump        dmp all custom 100 ../DEM/post/dump*.liggghts_run id type x y z vx vy vz fx fy fz radius mass f_fracRed[1] f_fracRed[2] f_fracRed[3]
+
 run         1
+
