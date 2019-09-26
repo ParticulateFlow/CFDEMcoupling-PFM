@@ -1,0 +1,47 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.1.x                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      probesDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+
+
+fields
+(
+    rho
+    p
+    T
+    Cpv
+    N2
+    CO2
+    CO
+    ModSpeciesMassField_N2
+    ModSpeciesMassField_CO2
+    ModSpeciesMassField_CO
+    X_CO
+    X_CO2
+);
+
+writeControl   timeStep;
+writeInterval  50;
+
+
+// Locations to be probed.
+probeLocations
+(
+    (0.7 0.25 0.25)
+    (0.8 0.25 0.25)
+    (1.0 0.25 0.25)
+);
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -1,0 +1,37 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.3.0                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      thermophysicalProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+thermoType
+{
+    type            heRhoThermo;
+    mixture         reactingMixture;    //species and reactions are listed in chemistry file
+    transport       const; //sutherland;         //calcualtes viscosity as a function of temperature from Stuherland coefficient As and Ts
+    thermo          hConst; //janaf;
+    equationOfState perfectGas;
+    energy          sensibleInternalEnergy;
+    specie          specie;
+}
+
+chemistryReader foamChemistryReader;
+
+foamChemistryThermoFile     "$FOAM_CASE/constant/foam.dat";
+
+foamChemistryFile           "$FOAM_CASE/constant/foam.inp";
+
+inertSpecie     N2;
+
+// ************************************************************************* //

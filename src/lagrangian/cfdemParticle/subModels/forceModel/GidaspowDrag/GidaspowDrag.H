@@ -34,6 +34,11 @@ Description
     - splits off explicit drag component due to fluctuation in fluid and particle
       velocity (optional via forceSubModel "ImExCorr")
 
+Reference
+    D. Gidaspow
+    "Multiphase flow and fluidization: Continuum and kinetic theory description",
+    1994
+
 Class
     GidaspowDrag
 

@@ -66,7 +66,7 @@ twoWayMPI::twoWayMPI
     propsDict_(dict.subDict(typeName + "Props")),
     lmp(NULL)
 {
-    Info<<"Starting up LIGGGHTS for first time execution"<<endl;
+    Info << "Starting up LIGGGHTS for first time execution" << endl;
 
     MPI_Comm_dup(MPI_COMM_WORLD, &comm_liggghts);
 
@@ -74,8 +74,8 @@ twoWayMPI::twoWayMPI
     const fileName liggghtsPath(propsDict_.lookup("liggghtsPath"));
 
     // open LIGGGHTS input script
-    Info<<"Executing input script '"<< liggghtsPath.c_str() <<"'"<<endl;
-    lmp = new LAMMPS_NS::LAMMPS(0,NULL,comm_liggghts);
+    Info << "Executing input script '" << liggghtsPath.c_str() << "'" << endl;
+    lmp = new LAMMPS_NS::LAMMPS(0, NULL, comm_liggghts);
     lmp->input->file(liggghtsPath.c_str());
 
     // get DEM time step size

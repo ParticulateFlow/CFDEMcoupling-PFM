@@ -10,8 +10,8 @@ thCond=particleCloud.thermCondM().thermCond();
 Cpv = he.name() == "e" ? thermo.Cv() : thermo.Cp();
 
 // correct source for the thermodynamic reference temperature
-dimensionedScalar Tref("Tref", dimTemperature, T[0]-he[0]/(Cpv[0]+SMALL));
-Qsource += QCoeff*Tref;
+// dimensionedScalar Tref("Tref", dimTemperature, T[0]-he[0]/(Cpv[0]+SMALL));
+// Qsource += QCoeff*Tref;
 
 fvScalarMatrix EEqn
 (
@@ -49,7 +49,13 @@ fvScalarMatrix EEqn
 
     thermo.correct();
 
-    Info<< "T max/min : " << max(T).value() << " " << min(T).value() << endl;
-    Info << "he min/max : " << max(he).value() << "  " << min(he).value() << endl;
+    Info << "Qsource :" << max(Qsource).value() << " " << min(Qsource).value() << endl;
+    Info << "QCoeff :" << max(QCoeff).value() << " " << min(QCoeff).value() << endl;
+    Info << "Cpv :" << max(Cpv).value() << " " << min(Cpv).value() << endl;
+    Info<<  "T max/min : " << max(T).value() << " " << min(T).value() << endl;
+    Info << "he max/min : " << max(he).value() << "  " << min(he).value() << endl;
 
+    particleCloud.clockM().start(31,"energySolve");
+    particleCloud.solve();
+    particleCloud.clockM().stop("energySolve");
 }

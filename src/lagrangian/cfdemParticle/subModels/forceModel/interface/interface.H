@@ -28,6 +28,12 @@ Description
     This code is designed to realize coupled CFD-DEM simulations using LIGGGHTS
     and OpenFOAM(R). Note: this code is not part of OpenFOAM(R) (see DISCLAIMER).
 
+Reference
+    G. Wierink, C. Goniva, B. Niceno, K. Heiskanen,
+    "Mechanistic Modelling of Particle-Interface Interaction in Three-Phase Flows",
+    Proc. of the 8th Int. Conf. on CFD in Oil and Gas, Metallurgical and Process Industries,
+    Trondheim, 2011
+
 Class
     interface
 

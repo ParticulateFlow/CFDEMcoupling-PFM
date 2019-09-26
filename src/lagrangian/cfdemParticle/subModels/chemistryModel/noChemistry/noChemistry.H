@@ -66,6 +66,10 @@ public:
 
         void execute();
 
+        tmp <volScalarField> Smi(const label i) const;
+
+        tmp <volScalarField> Sm() const;
+
 };
 
 
