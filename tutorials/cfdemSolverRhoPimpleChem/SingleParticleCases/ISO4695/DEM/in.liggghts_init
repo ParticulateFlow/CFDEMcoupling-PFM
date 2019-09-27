@@ -48,7 +48,7 @@ compute         rke all erotate/sphere
 thermo_style    custom step atoms ke c_rke vol
 thermo          1000
 thermo_modify   lost ignore norm no
-compute_modify  thermo_temp dynamic yes
+compute_modify  thermo_temp dynamic no extra 0
 
 # insert the first particles so that dump is not empty
 run     1
@@ -56,4 +56,5 @@ dump    dmp all custom 100 ../DEM/post/dump.liggghts_init id type x y z vx vy vz
 
 run     10 upto
 
-write_restart   ../DEM/post/restart/liggghts.restart
+write_restart ../DEM/post/restart/liggghts.restart
+

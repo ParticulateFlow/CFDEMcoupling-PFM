@@ -74,7 +74,7 @@ fix     LayerRelRadii all property/atom relRadii vector yes no no  1.0 0.998 0.9
 
 ### define fix for mass layer - initial testing
 fix     LayerMasses all property/atom massLayer vector yes no no 0. 0. 0. 0.
-fix     LayerDennsities all property/global density_all vector 7870. 5740. 5170. 5240.
+fix     LayerDensities all property/global density_all vector 7870. 5740. 5170. 5240.
 
 ## define fix for rho_eff and fracRed - initialize as zero
 fix     fracRed all property/atom fracRed_all vector yes no no 0. 0. 0.
@@ -89,14 +89,14 @@ variable m1     equal mass[1]
 variable rp     equal radius[1]
 variable rho1   equal mass[1]/((4/3)*PI*radius[1]*radius[1]*radius[1])
 
-fix printmass all print ${WI} "${time} ${m1} ${rho1} ${rp}" file mass_rho_rad.txt title "#time mass rho rad_par"
+fix printmass all print ${WI} "${time} ${m1} ${rho1} ${rp}" file ../DEM/post/mass_rho_rad.txt title "#time mass rho rad_par"
 
 # compute kinetic energy of particles to see if they are moving changing
 compute  KinEn all ke
 variable ke_tot	equal c_KinEn
 
 # print total kinetic energy
-fix printCompute all print ${WI} "${time} ${ke_tot}" file printKE.txt title "#time ke_tot"
+fix printCompute all print ${WI} "${time} ${ke_tot}" file ../DEM/post/printKE.txt title "#time ke_tot"
 
 compute Ea_CO all reduce sum f_Ea_CO[1] f_Ea_CO[2] f_Ea_CO[3]
 fix     Ea    all ave/time 1 1 1 c_Ea_CO[1] c_Ea_CO[2] c_Ea_CO[3]
@@ -110,7 +110,7 @@ variable k01 equal f_k0[1]
 variable k02 equal f_k0[2]
 variable k03 equal f_k0[3]
 
-fix printk0Ea all print ${WI} "${time} ${Ea1} ${Ea2} ${Ea3} ${k01} ${k02} ${k03}" file k0Ea.dat title "#time Ea1 Ea2 Ea3 k01 k02 k03"
+fix printk0Ea all print ${WI} "${time} ${Ea1} ${Ea2} ${Ea3} ${k01} ${k02} ${k03}" file ../DEM/post/k0Ea.dat title "#time Ea1 Ea2 Ea3 k01 k02 k03"
 
 ###############
 # Print out values affecting chemical reduction into specified folder for given time
@@ -120,7 +120,7 @@ compute COdiff all reduce sum f_CO_diffCoeff
 fix     diffField_CO all ave/time 1 1 1 c_COdiff
 variable CO_diffCo equal f_diffField_CO
 
-fix printDCoeff all print ${WI} "${time} ${CO_diffCo}" file DiffCoeff.dat title "#time CO_diffCoeff"
+fix printDCoeff all print ${WI} "${time} ${CO_diffCo}" file ../DEM/post/DiffCoeff.dat title "#time CO_diffCoeff"
 
 ###############
 # Specific Resistance terms depending on reacting gases
@@ -141,11 +141,11 @@ compute MCOd1 all reduce sum f_Massterm_cfd5
 fix     MTCOd1 all ave/time 10 1 10 c_MCOd1
 variable mt_CO equal f_MTCOd1
 
-fix printAterm all print ${WI} "${time} ${a_CO_1} ${a_CO_2} ${a_CO_3}" file Aterm.dat title "#time a_CO_1 aCO_2 a_CO_3"
+fix printAterm all print ${WI} "${time} ${a_CO_1} ${a_CO_2} ${a_CO_3}" file ../DEM/post/Aterm.dat title "#time a_CO_1 aCO_2 a_CO_3"
 
-fix printBterm all print ${WI} "${time} ${b_CO_1} ${b_CO_2} ${b_CO_3}" file Bterm.dat title "#time b_CO_1 b_CO_2 b_CO_3"
+fix printBterm all print ${WI} "${time} ${b_CO_1} ${b_CO_2} ${b_CO_3}" file ../DEM/post/Bterm.dat title "#time b_CO_1 b_CO_2 b_CO_3"
 
-fix printMassTerm all print ${WI} "${time} ${mt_CO}" file MassTerm.dat title "#time mt_CO"
+fix printMassTerm all print ${WI} "${time} ${mt_CO}" file ../DEM/post/MassTerm.dat title "#time mt_CO"
 
 # Print out fractional reduction for specific diameter ranges as well as total fractional reduction
 
@@ -157,7 +157,7 @@ variable dmdot_1 equal f_dmA_val[1]
 variable dmdot_2 equal f_dmA_val[2]
 variable dmdot_3 equal f_dmA_val[3]
 
-fix printdmdot all print ${WI} "${time} ${dmdot_1} ${dmdot_2} ${dmdot_3}" file dmdot.dat title "#time dmdot_1 dmdot_2 dmdot_3"
+fix printdmdot all print ${WI} "${time} ${dmdot_1} ${dmdot_2} ${dmdot_3}" file ../DEM/post/dmdot.dat title "#time dmdot_1 dmdot_2 dmdot_3"
 
 compute fr_1  all reduce sum f_fracRed[1] f_fracRed[2] f_fracRed[3]
 fix     fr_d1 all ave/time 1 1 1 c_fr_1[1] c_fr_1[2] c_fr_1[3]
@@ -168,7 +168,7 @@ variable fr_d1_3 equal f_fr_d1[3]
 # Calculate total fractional reduction to be written into the dump file for postProcessing/graphical representation
 variable frOV_d1 equal 1/9*(f_fr_d1[3])+2/9*(f_fr_d1[2])+6/9*(f_fr_d1[1])
 
-fix printfr1 all print ${WI} "${time} ${fr_d1_1} ${fr_d1_2} ${fr_d1_3} ${frOV_d1}" file fr_d1.dat title "#time fr_d1_1 fr_d1_2 fr_d1_3 fr_overall_d1"
+fix printfr1 all print ${WI} "${time} ${fr_d1_1} ${fr_d1_2} ${fr_d1_3} ${frOV_d1}" file ../DEM/post/fr_d1.dat title "#time fr_d1_1 fr_d1_2 fr_d1_3 fr_overall_d1"
 
 ###############################################
 ## Check Layer Radii and Write them to files ###
@@ -188,7 +188,7 @@ compute layerRad4 all reduce sum f_LayerRelRadii[4]
 fix     redRad4 all ave/time 1 1 1 c_layerRad4
 variable rr4 equal f_redRad4
 
-fix printRelRadii all print ${WI} "${time} ${rr1} ${rr2} ${rr3} ${rr4}" file relRadii.dat title "#time relRad_1 relRad_2 relRad_3 relRad_4"
+fix printRelRadii all print ${WI} "${time} ${rr1} ${rr2} ${rr3} ${rr4}" file ../DEM/post/relRadii.dat title "#time relRad_1 relRad_2 relRad_3 relRad_4"
 ###############
 
 # screen output
@@ -196,8 +196,9 @@ compute         rke all erotate/sphere
 thermo_style    custom step atoms ke c_rke vol
 thermo          10
 thermo_modify   lost ignore norm no
-compute_modify  thermo_temp dynamic yes
+compute_modify  thermo_temp dynamic no extra 0
 
 dump    dmp all custom 100 ../DEM/post/dump*.liggghts_run id type x y z vx vy vz fx fy fz radius mass f_fracRed[1] f_fracRed[2] f_fracRed[3]
 
 run     1
+

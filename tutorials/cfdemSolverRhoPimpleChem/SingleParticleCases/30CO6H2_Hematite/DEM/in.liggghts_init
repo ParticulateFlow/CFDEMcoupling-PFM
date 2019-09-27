@@ -24,7 +24,7 @@ fix         m3 all property/global coefficientRestitution peratomtypepair 1 0.3
 fix         m4 all property/global coefficientFriction peratomtypepair 1 0.5
 
 # pair style
-pair_style  gran model hertz tangential history # Hertzian without cohesion
+pair_style  gran model hertz tangential history
 pair_coeff  * *
 
 # timestep, gravity
@@ -48,11 +48,13 @@ compute         rke all erotate/sphere
 thermo_style    custom step atoms ke c_rke vol 
 thermo          1000
 thermo_modify   lost ignore norm no
-compute_modify  thermo_temp dynamic yes
+compute_modify  thermo_temp dynamic no extra 0
 
 # insert the first particles so that dump is not empty
 run     1
-dump    dmp all custom 100 post/dump.liggghts_init id type x y z vx vy vz fx fy fz radius mass 
+dump    dmp all custom 100 ../DEM/post/dump.liggghts_init id type x y z vx vy vz fx fy fz radius mass 
 
-run        10 upto 
-write_restart   post/restart/liggghts.restart
+run     10 upto
+
+write_restart ../DEM/post/restart/liggghts.restart
+
