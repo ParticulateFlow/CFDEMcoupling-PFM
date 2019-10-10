@@ -550,6 +550,34 @@ void standardRecModel::exportSurfaceScalarFieldAve(word fieldname, surfaceScalar
     field = aveSurfaceScalarFieldList_[fieldI][db];
 }
 
+tmp<volScalarField> standardRecModel::exportVolScalarFieldAve(word fieldname, label db)
+{
+    if(!storeAveragedFields_)
+    {
+        FatalError <<"no averaged fields available, need to activate \"storeAveragedFields\"\n" << abort(FatalError);
+    }
+    if (db >= numDataBases_)
+    {
+        FatalError <<"can't find database with number " << db << abort(FatalError);
+    }
+    const label fieldI = getVolScalarFieldIndex(fieldname, 0);
+    return aveVolScalarFieldList_[fieldI][db];
+}
+
+tmp<volVectorField> standardRecModel::exportVolVectorFieldAve(word fieldname, label db)
+{
+    if(!storeAveragedFields_)
+    {
+        FatalError <<"no averaged fields available, need to activate \"storeAveragedFields\"\n" << abort(FatalError);
+    }
+    if (db >= numDataBases_)
+    {
+        FatalError <<"can't find database with number " << db << abort(FatalError);
+    }
+    const label fieldI = getVolVectorFieldIndex(fieldname, 0);
+    return aveVolVectorFieldList_[fieldI][db];
+}
+
 tmp<surfaceScalarField> standardRecModel::exportSurfaceScalarFieldAve(word fieldname, label db)
 {
     if(!storeAveragedFields_)
@@ -601,6 +629,27 @@ const surfaceScalarField& standardRecModel::exportSurfaceScalarField(word fieldn
     const label fieldI = getSurfaceScalarFieldIndex(fieldname, index);
 
     return surfaceScalarFieldList_[fieldI][index];
+}
+
+PtrList<volScalarField>& standardRecModel::exportVolScalarFieldList(word fieldname)
+{
+    const label fieldI = getVolScalarFieldIndex(fieldname);
+
+    return volScalarFieldList_[fieldI];
+}
+
+PtrList<volVectorField>& standardRecModel::exportVolVectorFieldList(word fieldname)
+{
+    const label fieldI = getVolVectorFieldIndex(fieldname);
+
+    return volVectorFieldList_[fieldI];
+}
+
+PtrList<surfaceScalarField>& standardRecModel::exportSurfaceScalarFieldList(word fieldname)
+{
+    const label fieldI = getSurfaceScalarFieldIndex(fieldname);
+
+    return surfaceScalarFieldList_[fieldI];
 }
 
 

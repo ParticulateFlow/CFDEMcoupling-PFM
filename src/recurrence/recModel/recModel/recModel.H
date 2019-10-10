@@ -135,11 +135,7 @@ public:
 
     /*virtual void exportVolScalarField(word, volScalarField&) const = 0;
     virtual void exportVolVectorField(word, volVectorField&) const = 0;
-    virtual void exportSurfaceScalarField(word, surfaceScalarField&) const = 0;
-
-    virtual const volScalarField& exportVolScalarField(word, label) const = 0;
-    virtual const volVectorField& exportVolVectorField(word, label) const = 0;
-    virtual const surfaceScalarField& exportSurfaceScalarField(word, label) const = 0;*/
+    virtual void exportSurfaceScalarField(word, surfaceScalarField&) const = 0;*/
 
     virtual void exportVolScalarFieldAve(word, volScalarField&, label = 0)
     {}
@@ -148,6 +144,14 @@ public:
     virtual void exportSurfaceScalarFieldAve(word, surfaceScalarField&, label = 0)
     {}
 
+    virtual tmp<volScalarField> exportVolScalarFieldAve(word, label = 0)
+    {
+        return volScalarField::null();
+    }
+    virtual tmp<volVectorField> exportVolVectorFieldAve(word, label = 0)
+    {
+        return volVectorField::null();
+    }
     virtual tmp<surfaceScalarField> exportSurfaceScalarFieldAve(word, label = 0)
     {
         return surfaceScalarField::null();
@@ -160,6 +164,10 @@ public:
     virtual const volScalarField& exportVolScalarField(word, label)  = 0;
     virtual const volVectorField& exportVolVectorField(word, label)  = 0;
     virtual const surfaceScalarField& exportSurfaceScalarField(word, label)  = 0;
+
+    virtual PtrList<volScalarField>& exportVolScalarFieldList(word)  = 0;
+    virtual PtrList<volVectorField>& exportVolVectorFieldList(word)  = 0;
+    virtual PtrList<surfaceScalarField>& exportSurfaceScalarFieldList(word)  = 0;
 
   //  virtual tmp<surfaceScalarField> exportAveragedSurfaceScalarField(word, scalar, label index = -1) = 0;
     virtual void exportAveragedVolVectorField(volVectorField&, word, scalar, label index = -1) const = 0;

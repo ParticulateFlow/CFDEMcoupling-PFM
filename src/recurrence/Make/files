@@ -2,7 +2,6 @@ recBase/recBase.C
 recModel/recModel/recModel.C
 recModel/recModel/newRecModel.C
 recModel/standardRecModel/standardRecModel.C
-recModel/gerhardsRecModel/gerhardsRecModel.C
 recNorm/recNorm/recNorm.C
 recNorm/recNorm/newRecNorm.C
 recNorm/diffNorm/diffNorm.C
@@ -23,5 +22,6 @@ recStatAnalysis/recStatAnalysis/recStatAnalysis.C
 recStatAnalysis/recStatAnalysis/newRecStatAnalysis.C
 recStatAnalysis/noRecStatAnalysis/noRecStatAnalysis.C
 recStatAnalysis/standardRecStatAnalysis/standardRecStatAnalysis.C
+recStatAnalysis/autocorrelation/autocorrelation.C
 
 LIB = $(CFDEM_LIB_DIR)/librecurrence

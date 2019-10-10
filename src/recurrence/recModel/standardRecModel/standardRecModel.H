@@ -84,9 +84,9 @@ protected:
     
     scalar checkTimeStep();
     
-    inline label getVolScalarFieldIndex(word, label) const;
-    inline label getVolVectorFieldIndex(word, label) const;
-    inline label getSurfaceScalarFieldIndex(word, label) const;
+    inline label getVolScalarFieldIndex(word, label = 0) const;
+    inline label getVolVectorFieldIndex(word, label = 0) const;
+    inline label getSurfaceScalarFieldIndex(word, label = 0) const;
 
     void init();
 
@@ -119,6 +119,8 @@ public:
     void exportVolVectorFieldAve(word, volVectorField&, label);
     void exportSurfaceScalarFieldAve(word, surfaceScalarField&, label);
     
+    tmp<volScalarField> exportVolScalarFieldAve(word, label = 0);
+    tmp<volVectorField> exportVolVectorFieldAve(word, label = 0);
     tmp<surfaceScalarField> exportSurfaceScalarFieldAve(word, label = 0);
 
     void exportVolScalarField(word, volScalarField&);
@@ -128,6 +130,10 @@ public:
     const volScalarField& exportVolScalarField(word, label);
     const volVectorField& exportVolVectorField(word, label);
     const surfaceScalarField& exportSurfaceScalarField(word, label);
+
+    PtrList<volScalarField>& exportVolScalarFieldList(word);
+    PtrList<volVectorField>& exportVolVectorFieldList(word);
+    PtrList<surfaceScalarField>& exportSurfaceScalarFieldList(word);
     
   //  tmp<surfaceScalarField> exportAveragedSurfaceScalarField(word, scalar, label index = -1);
     void exportAveragedVolVectorField(volVectorField&, word, scalar, label index = -1) const;
