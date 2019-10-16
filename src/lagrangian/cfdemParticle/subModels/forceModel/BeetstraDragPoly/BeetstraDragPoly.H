@@ -46,13 +46,15 @@ protected:
     
     scalar dFine_;
 
+    autoPtr<volScalarField> alphaDyn_;
+
     autoPtr<volScalarField> alphaP_;
     
     autoPtr<volScalarField> alphaSt_;
 
     autoPtr<volScalarField> dSauter_;
 
-    void adaptVoidfraction(double&, label) const;
+//    void adaptVoidfraction(double&, label) const;
 
     scalar effDiameter(double, label, label) const;
     

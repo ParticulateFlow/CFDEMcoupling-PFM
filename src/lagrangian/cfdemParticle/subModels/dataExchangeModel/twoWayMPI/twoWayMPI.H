@@ -48,6 +48,7 @@ SourceFiles
 #include "pair.h"
 #include "force.h"
 #include "forceModel.H"
+#include "scalarIOList.H"
 
 //=================================//
 //LAMMPS/LIGGGHTS
@@ -82,6 +83,10 @@ private:
   // private data
     dictionary propsDict_;
     MPI_Comm comm_liggghts;
+
+    wordList DEMVariableNames_;
+
+    scalarIOList DEMVariables_; 
 
   // private member functions
 
@@ -160,6 +165,10 @@ public:
 
 
         scalar getCG() const { return lmp->force->cg(); }
+
+        void updateDEMVariables();
+
+        double DEMVariableValue(word);
 };
 
 

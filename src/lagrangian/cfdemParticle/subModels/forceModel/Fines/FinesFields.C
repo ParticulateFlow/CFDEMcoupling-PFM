@@ -53,7 +53,7 @@ FinesFields::FinesFields
     velFieldName_(propsDict_.lookupOrDefault<word>("velFieldName","U")),
     U_(sm.mesh().lookupObject<volVectorField> (velFieldName_)),
     voidfractionFieldName_(propsDict_.lookupOrDefault<word>("voidfractionFieldName","voidfraction")),
-    voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
+    voidfraction_(sm.mesh().lookupObjectRef<volScalarField> (voidfractionFieldName_)),
     UsFieldName_(propsDict_.lookupOrDefault<word>("granVelFieldName","Us")),
     UsField_(sm.mesh().lookupObject<volVectorField> (UsFieldName_)),
     pFieldName_(propsDict_.lookupOrDefault<word>("pFieldName","p")),
@@ -233,7 +233,8 @@ FinesFields::FinesFields
     prefactor_(10.5),
     ratioHydraulicPore_(1.5),
     tauRelease_(readScalar(propsDict_.lookup ("tauRelease"))),
-    uBind_(0.0),
+    uBindHigh_(propsDict_.lookupOrDefault<scalar>("uBindHigh",0.0)),
+    uBindLow_(propsDict_.lookupOrDefault<scalar>("uBindLow",0.0)),
     uMin_(0.001)
 {
     Sds_.write();
@@ -283,7 +284,10 @@ FinesFields::FinesFields
 
     if (clogStick_)
     {
-        uBind_ = readScalar(propsDict_.lookup ("uBind"));
+        if (uBindHigh_ - uBindLow_ < SMALL)
+        {
+            FatalError <<"No reasonable values for critical binding velocities.\n" << abort(FatalError);
+        }
 
         uReconstructed_.set
         (
@@ -406,8 +410,12 @@ void FinesFields::calcSource()
         if (clogStick_)
         {
             magU = mag(uReconstructed_()[cellI]); // use U reconstructed from phi to suppress oscillations at interfaces
-            fStick = 1.0 / ( 1.0 + magU/uBind_) * alphaP_[cellI] / 0.65;
-            if (fStick > 1.0) fStick = 1.0;
+           // fStick = 1.0 / ( 1.0 + magU/uBind_) * alphaP_[cellI] / 0.65;
+            if (magU < uBindLow_) fStick = 1.0;
+            else if (magU > uBindHigh_) fStick = 0.0;
+            else fStick = 1.0 - (magU - uBindLow_) / (uBindHigh_ - uBindLow_);
+      //      if (fStick > 1.0) fStick = 1.0;
+            fStick *= alphaP_[cellI] / 0.65;
         }
 
         // at this point, voidfraction is still calculated from the true particle sizes
@@ -496,13 +504,14 @@ void FinesFields::integrateFields()
 }
 
 
-void FinesFields::updateAlphaG()
+void FinesFields::updateAlphaG() // called after updateAlphaP() - correct voidfraction by removing space occupied by fines
 {
     alphaG_ = max(voidfraction_ - alphaSt_ - alphaDyn_, critVoidfraction_);
+    voidfraction_ = alphaG_;
 }
 
 
-void FinesFields::updateAlphaP()
+void FinesFields::updateAlphaP() // called first in the update cycle - voidfraction_ is current with DEM data
 {
     alphaP_ = 1.0 - voidfraction_ + SMALL;
 }

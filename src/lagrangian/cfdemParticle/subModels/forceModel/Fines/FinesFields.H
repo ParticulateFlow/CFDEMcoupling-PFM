@@ -62,7 +62,7 @@ private:
 
     word voidfractionFieldName_;
 
-    const volScalarField& voidfraction_;
+    volScalarField& voidfraction_;
 
     word UsFieldName_;
 
@@ -140,7 +140,9 @@ private:
 
     scalar tauRelease_;
 
-    scalar uBind_;
+    scalar uBindHigh_;
+
+    scalar uBindLow_;
 
     scalar uMin_;
 
