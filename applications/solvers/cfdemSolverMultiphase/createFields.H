@@ -76,17 +76,17 @@ volVectorField U
 
 Info<< "Reading/calculating face flux field phi\n" << endl;
 surfaceScalarField phi
- (
-     IOobject
-     (
+(
+    IOobject
+    (
         "phi",
         runTime.timeName(),
          mesh,
         IOobject::READ_IF_PRESENT,
         IOobject::AUTO_WRITE
-     ),
-     linearInterpolate(U*voidfraction) & mesh.Sf()
- );
+    ),
+    linearInterpolate(U*voidfraction) & mesh.Sf()
+);
 
 multiphaseMixture mixture(U, phi, voidfraction);
 

@@ -21,6 +21,7 @@ License
 #include "error.H"
 #include "heatTransferGunn.H"
 #include "addToRunTimeSelectionTable.H"
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -481,7 +482,7 @@ void heatTransferGunn::heatFlux(label index, scalar h, scalar As, scalar Tfluid,
 {
     scalar hAs = h * As * cg3;
 
-    if (particleCloud_.getParticleEffVolFactors()) 
+    if (particleCloud_.getParticleEffVolFactors())
     {
         scalar effVolFac = particleCloud_.particleEffVolFactor(index);
         hAs *= effVolFac;
@@ -550,22 +551,22 @@ void heatTransferGunn::postFlow()
 
 void heatTransferGunn::partTempField()
 {
-        partTempField_.primitiveFieldRef() = 0.0;
-        particleCloud_.averagingM().resetWeightFields();
-        particleCloud_.averagingM().setScalarAverage
-        (
-            partTempField_,
-            partTemp_,
-            particleCloud_.particleWeights(),
-            particleCloud_.averagingM().UsWeightField(),
-            NULL
-        );
+    partTempField_.primitiveFieldRef() = 0.0;
+    particleCloud_.averagingM().resetWeightFields();
+    particleCloud_.averagingM().setScalarAverage
+    (
+        partTempField_,
+        partTemp_,
+        particleCloud_.particleWeights(),
+        particleCloud_.averagingM().UsWeightField(),
+        NULL
+    );
 
-        dimensionedScalar denom = partTempAve_ - partRefTemp_;
-        if (denom.value() < SMALL && denom.value() > -SMALL) denom.value() = SMALL;
-        partRelTempField_ = (partTempField_ - partTempAve_) / denom;
+    dimensionedScalar denom = partTempAve_ - partRefTemp_;
+    if (denom.value() < SMALL && denom.value() > -SMALL) denom.value() = SMALL;
+    partRelTempField_ = (partTempField_ - partTempAve_) / denom;
 
-        Info << "heatTransferGunn: average part. temp = " << partTempAve_.value() << endl;
+    Info << "heatTransferGunn: average part. temp = " << partTempAve_.value() << endl;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

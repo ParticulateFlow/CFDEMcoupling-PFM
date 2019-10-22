@@ -38,7 +38,7 @@ models used for chemical reaction calculations.
 "diffusionCoefficients"_chemistryModel_diffusionCoefficients.html,
 "massTransferCoeff"_chemistryModel_massTransferCoeff.html,
 "off"_chemistryModel_noChemistry.html,
-reactantPerParticle,
+"reactantPerParticle"_chemistryModel_reactantPerParticle.html,
 "species"_chemistryModel_species.html :tb(c=2,ea=c)
 
 
@@ -60,7 +60,8 @@ that performs the data exchange between the DEM code and the CFD code.
 "oneWayVTK"_dataExchangeModel_oneWayVTK.html,
 "twoWayFiles"_dataExchangeModel_twoWayFiles.html,
 "twoWayMPI"_dataExchangeModel_twoWayMPI.html,
-"twoWayMany2Many"_dataExchangeModel_twoWayMany2Many.html :tb(c=2,ea=c)
+"twoWayMany2Many"_dataExchangeModel_twoWayMany2Many.html,
+"twoWayOne2One"_dataExchangeModel_twoWayOne2One.html :tb(c=2,ea=c)
 
 
 6.6 Energy models :h4

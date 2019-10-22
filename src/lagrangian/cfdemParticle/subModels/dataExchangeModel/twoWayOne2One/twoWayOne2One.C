@@ -161,7 +161,7 @@ twoWayOne2One::twoWayOne2One
     }
 }
 
-void twoWayOne2One::createProcMap() const
+void twoWayOne2One::createProcMap()
 {
     List<treeBoundBox> foamBoxes(Pstream::nProcs());
     foamBoxes[Pstream::myProcNo()] = thisFoamBox_;
@@ -529,7 +529,7 @@ void inline twoWayOne2One::destroy(int* array) const
 }
 //==============
 
-bool twoWayOne2One::couple(int i) const
+bool twoWayOne2One::couple(int i)
 {
     bool coupleNow = false;
     if (i==0)
@@ -554,11 +554,11 @@ bool twoWayOne2One::couple(int i) const
             // Check if exact timing is needed
             // get time for execution
             // store time for execution in list
-            if(particleCloud_.liggghtsCommand()[i]().exactTiming())
+            if(particleCloud_.liggghtsCommand(i).exactTiming())
             {
                 exactTiming = true;
-                DynamicList<scalar> h 
-                  = particleCloud_.liggghtsCommand()[i]().executionsWithinPeriod
+                DynamicList<scalar> h
+                  = particleCloud_.liggghtsCommand(i).executionsWithinPeriod
                 (
                     TSstart(),
                     TSend()
@@ -594,7 +594,7 @@ bool twoWayOne2One::couple(int i) const
                     << endl;
             }
 
-            if(particleCloud_.liggghtsCommand()[i]().type() == "runLiggghts")
+            if(particleCloud_.liggghtsCommand(i).type() == "runLiggghts")
             {
                 runComNr = i;
             }
@@ -613,22 +613,22 @@ bool twoWayOne2One::couple(int i) const
             {
                 // set run command till interrupt
                 DEMstepsRun += DEMstepsToInterrupt[j];
-                particleCloud_.liggghtsCommand()[runComNr]().set(DEMstepsToInterrupt[j]);
-                const char* command = particleCloud_.liggghtsCommand()[runComNr]().command(0);
+                particleCloud_.liggghtsCommand(runComNr).set(DEMstepsToInterrupt[j]);
+                const char* command = particleCloud_.liggghtsCommand(runComNr).command(0);
                 Info<< "Executing run command: '"<< command <<"'"<< endl;
                 lmp->input->one(command);
 
                 // run liggghts command with exact timing
-                command = particleCloud_.liggghtsCommand()[lcModel[j]]().command(0);
+                command = particleCloud_.liggghtsCommand(lcModel[j]).command(0);
                 Info << "Executing command: '"<< command <<"'"<< endl;
                 lmp->input->one(command);
             }
 
             // do the run
-            if(particleCloud_.liggghtsCommand()[runComNr]().runCommand(couplingStep()))
+            if(particleCloud_.liggghtsCommand(runComNr).runCommand(couplingStep()))
             {
-                particleCloud_.liggghtsCommand()[runComNr]().set(couplingInterval() - DEMstepsRun);
-                const char* command = particleCloud_.liggghtsCommand()[runComNr]().command(0);
+                particleCloud_.liggghtsCommand(runComNr).set(couplingInterval() - DEMstepsRun);
+                const char* command = particleCloud_.liggghtsCommand(runComNr).command(0);
                 Info<< "Executing run command: '"<< command <<"'"<< endl;
                 lmp->input->one(command);
             }
@@ -638,14 +638,14 @@ bool twoWayOne2One::couple(int i) const
             {
                 if
                 (
-                  ! particleCloud_.liggghtsCommand()[i]().exactTiming() &&
-                    particleCloud_.liggghtsCommand()[i]().runCommand(couplingStep())
+                  ! particleCloud_.liggghtsCommand(i).exactTiming() &&
+                    particleCloud_.liggghtsCommand(i).runCommand(couplingStep())
                 )
                 {
-                    commandLines=particleCloud_.liggghtsCommand()[i]().commandLines();
+                    commandLines=particleCloud_.liggghtsCommand(i).commandLines();
                     for(int j=0;j<commandLines;j++)
                     {
-                        const char* command = particleCloud_.liggghtsCommand()[i]().command(j);
+                        const char* command = particleCloud_.liggghtsCommand(i).command(j);
                         Info << "Executing command: '"<< command <<"'"<< endl;
                         lmp->input->one(command);
                     }
@@ -657,12 +657,12 @@ bool twoWayOne2One::couple(int i) const
         {
             forAll(particleCloud_.liggghtsCommandModelList(),i)
             {
-                if(particleCloud_.liggghtsCommand()[i]().runCommand(couplingStep()))
+                if(particleCloud_.liggghtsCommand(i).runCommand(couplingStep()))
                 {
-                    commandLines=particleCloud_.liggghtsCommand()[i]().commandLines();
+                    commandLines=particleCloud_.liggghtsCommand(i).commandLines();
                     for(int j=0;j<commandLines;j++)
                     {
-                        const char* command = particleCloud_.liggghtsCommand()[i]().command(j);
+                        const char* command = particleCloud_.liggghtsCommand(i).command(j);
                         Info << "Executing command: '"<< command <<"'"<< endl;
                         lmp->input->one(command);
                     }
@@ -700,7 +700,7 @@ bool twoWayOne2One::couple(int i) const
     return coupleNow;
 }
 
-void twoWayOne2One::setupLig2FoamCommunication() const
+void twoWayOne2One::setupLig2FoamCommunication()
 {
     int* src_procs = new int[thisLigPartner_.size()];
     for (int proci = 0; proci < thisLigPartner_.size(); proci++)
@@ -738,7 +738,7 @@ void twoWayOne2One::setupLig2FoamCommunication() const
 }
 
 
-void twoWayOne2One::locateParticles() const
+void twoWayOne2One::locateParticles()
 {
     // get positions for locate
     double** my_positions = static_cast<double**>(lmp->atom->x);
@@ -823,7 +823,7 @@ void twoWayOne2One::locateParticles() const
                 << " ouf of " << returnReduce(lmp->atom->nlocal, sumOp<label>())
                 << " particles in FOAM. "
                 << endl;
-    } 
+    }
 
     // copy positions/cellids/ids of located particles into arrays
     allocateArray(lig2foam_ids_, 0, getNumberOfParticles());
@@ -847,7 +847,7 @@ void twoWayOne2One::locateParticles() const
     setCellIDs(cellIds);
 }
 
-void twoWayOne2One::setupFoam2LigCommunication() const
+void twoWayOne2One::setupFoam2LigCommunication()
 {
     int* src_procs = new int[thisFoamPartner_.size()];
     for (int proci = 0; proci < thisFoamPartner_.size(); proci++)
@@ -954,12 +954,6 @@ void twoWayOne2One::extractCollected(T*& src, T**& dst, int width) const
         locali++;
     }
 }
-
-int twoWayOne2One::getNumberOfParticles() const
-{
-    return particleCloud_.numberOfParticles();
-}
-
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

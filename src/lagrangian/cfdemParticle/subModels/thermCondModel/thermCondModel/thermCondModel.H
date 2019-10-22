@@ -33,6 +33,7 @@ SourceFiles
 
 #include "fvCFD.H"
 #include "cfdemCloud.H"
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -51,10 +52,10 @@ protected:
         const dictionary& dict_;
 
         cfdemCloud& particleCloud_;
-	
-	IOdictionary transportProperties_;
-	
-	dimensionedScalar kf0_;
+
+        IOdictionary transportProperties_;
+
+        dimensionedScalar kf0_;
 
 public:
 
@@ -103,7 +104,7 @@ public:
     // Member Functions
 
         virtual void calcThermCond() {}
-     
+
 };
 
 

@@ -6,16 +6,18 @@
     particleCloud.energyContributions(Qsource);
     particleCloud.energyCoefficients(QCoeff);
 
-    addSource = fvc::ddt(rhoeps, K) + fvc::div(phi, K)
-      + (
+    addSource =
+        (
             he.name() == "e"
-          ? fvc::div
+          ?
+            fvc::div(phi, K) +
+            fvc::div
             (
                 fvc::absolute(phi/fvc::interpolate(rho), voidfraction*U),
                 p,
                 "div(phiv,p)"
             )
-          : -dpdt
+          : fvc::div(phi, K)
         );
 
     Cpv = he.name() == "e" ? thermo.Cv() : thermo.Cp();
@@ -26,15 +28,11 @@
 
     fvScalarMatrix EEqn
     (
-        fvm::ddt(rhoeps, he) + fvm::div(phi, he)
+        fvm::div(phi, he)
       + addSource
-     // net heat transfer from particles to fluid
       - Qsource
       - fvm::Sp(QCoeff/Cpv, he)
-     // thermal conduction of the fluid with effective conductivity
       - fvm::laplacian(voidfraction*thCond/Cpv,he)
-      // + particle-fluid energy transfer due to work
-      // + fluid energy dissipation due to shearing
      ==
         fvOptions(rho, he)
     );
@@ -51,6 +49,7 @@
     thermo.correct();
 
     Info<< "T max/min : " << max(T).value() << " " << min(T).value() << endl;
+
 
     particleCloud.clockM().start(31,"energySolve");
     particleCloud.solve();

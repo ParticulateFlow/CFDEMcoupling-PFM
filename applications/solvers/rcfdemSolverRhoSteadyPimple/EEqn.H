@@ -5,11 +5,11 @@
     volScalarField& he = thermo.he();
     particleCloud.energyContributions(Qsource);
     particleCloud.energyCoefficients(QCoeff);
- 
-    addSource = 
+
+    addSource =
         (
             he.name() == "e"
-          ? 
+          ?
             fvc::div(phi, K) +
             fvc::div
             (

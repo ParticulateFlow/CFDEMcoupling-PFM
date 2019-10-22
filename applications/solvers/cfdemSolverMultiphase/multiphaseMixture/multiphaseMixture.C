@@ -57,12 +57,12 @@ Foam::multiphaseMixture::calcNu() const
 
     tmp<volScalarField> tnu = iter()*iter().nu();
     volScalarField& nu = tnu.ref();
-    
+
     for (++iter; iter != phases_.end(); ++iter)
     {
         nu += iter()*iter().nu();
     }
-    
+
     return tnu;
 }
 
@@ -216,7 +216,7 @@ Foam::multiphaseMixture::multiphaseMixture
     calcAlphas();
     alphas_.write();
     surfaceTensionForce_ = calcStf();
-    
+
 }
 
 
@@ -300,20 +300,20 @@ Foam::multiphaseMixture::mu(const label patchi) const
 Foam::tmp<Foam::surfaceScalarField>
 Foam::multiphaseMixture::muf() const
 {
-    
+
     return nuf()*fvc::interpolate(rho());
 //    PtrDictionary<phase>::const_iterator iter = phases_.begin();
-    
+
 //    tmp<surfaceScalarField> tmuf =
 //            fvc::interpolate(iter())*iter().rho()*fvc::interpolate(iter().nu());
 //    surfaceScalarField& muf = tmuf.ref();
-    
+
 //    for (++iter; iter != phases_.end(); ++iter)
 //    {
 //        muf +=
 //                fvc::interpolate(iter())*iter().rho()*fvc::interpolate(iter().nu());
 //    }
-    
+
 //    return tmuf;
 }
 
@@ -400,7 +400,7 @@ void Foam::multiphaseMixture::solve()
             !(++alphaSubCycle).end();
         )
         {
-            FatalError << "Sub-cycling of the alpha equation not yet implemented!!" << abort(FatalError);            
+            FatalError << "Sub-cycling of the alpha equation not yet implemented!!" << abort(FatalError);
             solveAlphas(cAlpha);
             rhoPhiSum += (runTime.deltaT()/totalDeltaT)*rhoPhi_;
         }

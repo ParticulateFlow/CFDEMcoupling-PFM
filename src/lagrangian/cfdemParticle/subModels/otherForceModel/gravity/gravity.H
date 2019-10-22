@@ -26,6 +26,7 @@ SourceFiles
 #define gravity_H
 
 #include "otherForceModel.H"
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam

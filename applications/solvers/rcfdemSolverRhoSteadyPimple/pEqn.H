@@ -28,7 +28,7 @@ else
             fvc::flux(rhoeps*HbyA)
         )
     );
-    
+
     // flux without pressure gradient contribution
     phi = phiHbyA + phiUs;
 

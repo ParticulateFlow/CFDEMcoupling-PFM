@@ -15,7 +15,7 @@ License
     along with this code.  If not, see <http://www.gnu.org/licenses/>.
 
     Copyright (C) 2015- Thomas Lichtenegger, JKU Linz, Austria
-    
+
     Description
     Correlation for Nusselt number according to
     Gunn, D. J. International Journal of Heat and Mass Transfer 21.4 (1978)
@@ -30,6 +30,7 @@ License
 #include "heatTransferGunn.H"
 #include "fvOptions.H"
 #include "scalarList.H"
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -88,9 +89,9 @@ public:
     // Member Functions
         void addEnergyContribution(volScalarField&) const;
 
-	void calcEnergyContribution();
+        void calcEnergyContribution();
 
-	void postFlow();
+        void postFlow();
 
         void solve();
 

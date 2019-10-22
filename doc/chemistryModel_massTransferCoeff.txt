@@ -21,7 +21,7 @@ massTransferCoeffProps
     verbose         switch1;
 \} :pre
 
-{switch1} = (optional, normally off) flag to give information :l
+{switch1} = (optional, default false) flag to output verbose information :l
 :ule
 
 [Examples:]

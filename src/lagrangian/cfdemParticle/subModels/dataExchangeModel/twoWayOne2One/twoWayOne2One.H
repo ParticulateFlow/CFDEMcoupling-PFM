@@ -28,8 +28,8 @@ Description
     enhanced two way DEM-CFD coupling via MPI.
 
     Compared to twoWayMPI, no Allreduces are used for communication.
-    Instead, a geomatric map between FOAM and LIG domains is created and
-    subsequently used for communication. 
+    Instead, a geometric map between FOAM and LIG domains is created and
+    subsequently used for communication.
 
 Class
     twoWayOne2One
@@ -67,7 +67,7 @@ Contributing authors
 #include <atom.h>
 #include <memory.h>
 #include <library.h>
-#include <library_cfd_coupling_one2one.h>
+#include <library_cfd_coupling.h>
 #include <update.h>
 #include <comm.h>
 #include <fix.h>
@@ -92,20 +92,20 @@ private:
   // private data
     dictionary        propsDict_;
 
-    mutable MPI_Comm  comm_liggghts_;
+    MPI_Comm  comm_liggghts_;
 
 
     // LIG ranks from which to retrieve particle data
-    mutable labelList thisLigPartner_;
-    mutable labelList thisFoamPartner_;
+    labelList thisLigPartner_;
+    labelList thisFoamPartner_;
 
-    mutable One2One*  lig2foam_;
-    mutable One2One*  foam2lig_;
+    One2One*  lig2foam_;
+    One2One*  foam2lig_;
 
-    mutable bool*     lig2foam_mask_;
+    bool*     lig2foam_mask_;
 
-    mutable int*      lig2foam_ids_;
-    mutable int*      foam2lig_ids_;
+    int*      lig2foam_ids_;
+    int*      foam2lig_ids_;
 
     mutable double*   lig2foam_vec_tmp_;
     mutable double*   lig2foam_scl_tmp_;
@@ -113,11 +113,11 @@ private:
     mutable double*   foam2lig_vec_tmp_;
     mutable double*   foam2lig_scl_tmp_;
 
-    mutable Switch    staticProcMap_;
-    mutable Switch    cellIdComm_;
-    mutable double*   prev_cell_ids_;
-    mutable double**  dbl_cell_ids_;
-    mutable LAMMPS_NS::FixPropertyAtom* my_prev_cell_ids_fix_;
+    Switch    staticProcMap_;
+    Switch    cellIdComm_;
+    double*   prev_cell_ids_;
+    double**  dbl_cell_ids_;
+    LAMMPS_NS::FixPropertyAtom* my_prev_cell_ids_fix_;
 
     const scalar      boundBoxMargin_;
 
@@ -129,16 +129,16 @@ private:
   // private member functions
 
     //- creates a geometric mapping between FOAM and LIG domains
-    void createProcMap() const;
+    void createProcMap();
 
     //- create a One2One communicator which transfers from LIG to FOAM
-    void setupLig2FoamCommunication() const;
+    void setupLig2FoamCommunication();
 
     //- locates particles received from Lig
-    void locateParticles() const;
+    void locateParticles();
 
     //- create a One2One communicator which transfers from FOAM to LIG
-    void setupFoam2LigCommunication() const;
+    void setupFoam2LigCommunication();
 
 protected:
     LAMMPS_NS::LAMMPS *lmp;
@@ -210,11 +210,11 @@ public:
         void inline destroy(int*) const;
         //==============
 
-        bool couple(int) const;
+        bool couple(int);
 
         //- extractCollected takes the collected data from Lig
         //  present in this Foam domain and applies the mask.
-        //  the width parameter can be used for reshaping. 
+        //  the width parameter can be used for reshaping.
         template <typename T>
         void extractCollected(T**&, T**&, int width=1) const;
         template <typename T>
@@ -222,9 +222,7 @@ public:
         template <typename T>
         void extractCollected(T*&, T**&, int width=1) const;
 
-        int getNumberOfParticles() const;
-
-        void setCG() { particleCloud_.setCG(lmp->force->cg()); }
+        scalar getCG() const { return lmp->force->cg(); }
 };
 
 

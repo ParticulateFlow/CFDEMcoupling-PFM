@@ -57,9 +57,9 @@ temporalSmoothing::temporalSmoothing
     gamma_(readScalar(propsDict_.lookup("gamma")))
 {
 
-    if(propsDict_.found("verbose"))  
+    if(propsDict_.found("verbose"))
         verbose_ = true;
-    
+
     checkFields(sSmoothField_);
     checkFields(vSmoothField_);
 }
@@ -80,14 +80,14 @@ void Foam::temporalSmoothing::smoothen(volScalarField& fieldSrc) const
 {
     // Create scalar smooth field from virgin scalar smooth field template
     volScalarField sSmoothField = sSmoothField_;
-    
+
     sSmoothField.dimensions().reset(fieldSrc.dimensions());
     sSmoothField.ref()=fieldSrc.internalField();
     sSmoothField.correctBoundaryConditions();
     sSmoothField.oldTime().dimensions().reset(fieldSrc.dimensions());
     sSmoothField.oldTime()=fieldSrc;
     sSmoothField.oldTime().correctBoundaryConditions();
-    
+
     volScalarField refField = particleCloud_.mesh().lookupObject<volScalarField>(refFieldName_);
 
     // do smoothing
@@ -103,8 +103,8 @@ void Foam::temporalSmoothing::smoothen(volScalarField& fieldSrc) const
     forAll(sSmoothField,cellI)
     {
         sSmoothField[cellI]=max(lowerLimit_,min(upperLimit_,sSmoothField[cellI]));
-    }  
-    
+    }
+
     // get data from working sSmoothField - will copy only values at new time
     fieldSrc=sSmoothField;
     fieldSrc.correctBoundaryConditions();
@@ -122,16 +122,16 @@ void Foam::temporalSmoothing::smoothen(volVectorField& fieldSrc) const
 {
     // Create scalar smooth field from virgin scalar smooth field template
     volVectorField vSmoothField = vSmoothField_;
-    
+
     vSmoothField.dimensions().reset(fieldSrc.dimensions());
     vSmoothField.ref()=fieldSrc.internalField();
     vSmoothField.correctBoundaryConditions();
     vSmoothField.oldTime().dimensions().reset(fieldSrc.dimensions());
     vSmoothField.oldTime()=fieldSrc;
     vSmoothField.oldTime().correctBoundaryConditions();
-    
+
     volVectorField refField = particleCloud_.mesh().lookupObject<volVectorField>(refFieldName_);
-    
+
     dimensionedScalar deltaT = vSmoothField.mesh().time().deltaT();
     solve
     (
@@ -142,7 +142,7 @@ void Foam::temporalSmoothing::smoothen(volVectorField& fieldSrc) const
 
     // get data from working vSmoothField
     fieldSrc=vSmoothField;
-    fieldSrc.correctBoundaryConditions(); 
+    fieldSrc.correctBoundaryConditions();
 
     if(verbose_)
     {
@@ -150,7 +150,7 @@ void Foam::temporalSmoothing::smoothen(volVectorField& fieldSrc) const
         Info << "min/max(fieldSrc): " << min(fieldSrc) << tab << max(fieldSrc) << endl;
         Info << "min/max(fieldSrc.oldTime): " << min(fieldSrc.oldTime()) << tab << max(fieldSrc.oldTime()) << endl;
     }
-    
+
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -312,7 +312,7 @@ void diffusionCoefficient::execute()
                                 TotalFraction_[i]   +=  Xfluid_[j]/dBinary_;
 
                                 // dCoeff -- diffusion component of diffusant gas
-                                MixtureBinaryDiffusion_[i]  =   (1.0-XfluidDiffusant_[i])/TotalFraction_[i];                             
+                                MixtureBinaryDiffusion_[i]  =   (1.0-XfluidDiffusant_[i])/TotalFraction_[i];
 
                                 if(verbose_)
                                 {

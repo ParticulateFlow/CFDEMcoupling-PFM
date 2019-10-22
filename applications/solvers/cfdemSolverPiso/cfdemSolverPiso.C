@@ -86,12 +86,12 @@ int main(int argc, char *argv[])
         Ksl = particleCloud.momCoupleM(0).impMomSource();
         Ksl.correctBoundaryConditions();
 
-       //Force Checks
-       vector fTotal(0,0,0);
-       vector fImpTotal = sum(mesh.V()*Ksl.internalField()*(Us.internalField()-U.internalField())).value();
-       reduce(fImpTotal, sumOp<vector>());
-       Info << "TotalForceExp: " << fTotal << endl;
-       Info << "TotalForceImp: " << fImpTotal << endl;
+        //Force Checks
+        vector fTotal(0,0,0);
+        vector fImpTotal = sum(mesh.V()*Ksl.internalField()*(Us.internalField()-U.internalField())).value();
+        reduce(fImpTotal, sumOp<vector>());
+        Info << "TotalForceExp: " << fTotal << endl;
+        Info << "TotalForceImp: " << fImpTotal << endl;
 
         #include "solverDebugInfo.H"
         particleCloud.clockM().stop("Coupling");

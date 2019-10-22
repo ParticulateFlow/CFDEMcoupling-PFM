@@ -13,7 +13,7 @@ This section lists all CFDEMcoupling solvers alphabetically.
 "cfdemSolverMultiphase"_cfdemSolverMultiphase.html,
 "cfdemSolverPiso"_cfdemSolverPiso.html,
 "cfdemSolverPisoScalar"_cfdemSolverPisoScalar.html,
-cfdemSolverRhoPimple,
-cfdemSolverRhoPimpleChem,
-cfdemSolverRhoSimple :tb(c=2,ea=c)
+"cfdemSolverRhoPimple"_cfdemSolverRhoPimple.html,
+"cfdemSolverRhoPimpleChem"_cfdemSolverRhoPimpleChem.html,
+"cfdemSolverRhoSimple"_cfdemSolverRhoSimple.html :tb(c=2,ea=c)
 

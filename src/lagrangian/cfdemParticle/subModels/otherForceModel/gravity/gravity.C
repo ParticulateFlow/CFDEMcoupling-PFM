@@ -19,6 +19,7 @@ License
 #include "gravity.H"
 #include "mathExtra.H"
 #include "addToRunTimeSelectionTable.H"
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam

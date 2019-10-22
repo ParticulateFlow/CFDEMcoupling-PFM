@@ -14,69 +14,70 @@ License
     You should have received a copy of the GNU General Public License
     along with this code.  If not, see <http://www.gnu.org/licenses/>.
 
-    Copyright (C) 2018- Mathias Vångö, JKU Linz, Austria
+    Copyright (C) 2015- Thomas Lichtenegger, JKU Linz, Austria
 
 Application
-    cfdemSolverMultiphase
+    cfdemSolverRhoSimple
 
 Description
-    CFD-DEM solver for n incompressible fluids which captures the interfaces and
-    includes surface-tension and contact-angle effects for each phase. It is based
-    on the OpenFOAM(R)-4.x solver multiphaseInterFoam but extended to incorporate
-    DEM functionalities from the open-source DEM code LIGGGHTS.
-
-    Turbulence modelling is generic, i.e. laminar, RAS or LES may be selected.
+    Steady-state solver for turbulent flow of compressible fluids based on
+    rhoSimpleFoam where functionality for CFD-DEM coupling has been added.
 
 \*---------------------------------------------------------------------------*/
 
 #include "fvCFD.H"
-#include "multiphaseMixture.H"
-#include "turbulentTransportModel.H"
-#include "pimpleControl.H"
+#include "psiThermo.H"
+#include "turbulentFluidThermoModel.H"
+#include "bound.H"
+#include "simpleControl.H"
 #include "fvOptions.H"
-#include "CorrectPhi.H"
+#include "localEulerDdtScheme.H"
+#include "fvcSmooth.H"
 
-#include "cfdemCloud.H"
+#include "cfdemCloudEnergy.H"
 #include "implicitCouple.H"
 #include "clockModel.H"
 #include "smoothingModel.H"
 #include "forceModel.H"
+#include "thermCondModel.H"
+#include "energyModel.H"
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 int main(int argc, char *argv[])
 {
     #include "postProcess.H"
+
     #include "setRootCase.H"
     #include "createTime.H"
     #include "createMesh.H"
     #include "createControl.H"
+    #include "createTimeControls.H"
+    #include "createRDeltaT.H"
     #include "initContinuityErrs.H"
     #include "createFields.H"
+    #include "createFieldRefs.H"
     #include "createFvOptions.H"
-    #include "correctPhi.H"
-    #include "CourantNo.H"
-
-    turbulence->validate();
 
     // create cfdemCloud
-    cfdemCloud particleCloud(mesh);
+    #include "readGravitationalAcceleration.H"
+    cfdemCloudEnergy particleCloud(mesh);
+    #include "checkModelType.H"
 
-    #include "additionalChecks.H"
+    turbulence->validate();
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
     Info<< "\nStarting time loop\n" << endl;
 
-    while (runTime.loop())
+    while (simple.loop())
     {
-        #include "CourantNo.H"
-        #include "alphaCourantNo.H"
-
         particleCloud.clockM().start(1,"Global");
 
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
+        // do particle stuff
         particleCloud.clockM().start(2,"Coupling");
         bool hasEvolved = particleCloud.evolve(voidfraction,Us,U);
 
@@ -91,7 +92,7 @@ int main(int argc, char *argv[])
 
         //Force Checks
         vector fTotal(0,0,0);
-        vector fImpTotal = sum(mesh.V()*Ksl.internalField()*(Us.internalField()-U.internalField())).value();
+        vector fImpTotal = sum(mesh.V()*Ksl.primitiveFieldRef()*(Us.primitiveFieldRef()-U.primitiveFieldRef()));
         reduce(fImpTotal, sumOp<vector>());
         Info << "TotalForceExp: " << fTotal << endl;
         Info << "TotalForceImp: " << fImpTotal << endl;
@@ -101,35 +102,26 @@ int main(int argc, char *argv[])
 
         particleCloud.clockM().start(26,"Flow");
 
-        if(particleCloud.solveFlow())
-        {
-            mixture.solve();
-            rho = mixture.rho();
-            rhoEps = rho * voidfraction;
+        volScalarField rhoeps("rhoeps",rho*voidfraction);
+        // Pressure-velocity SIMPLE corrector
 
-             // --- Pressure-velocity PIMPLE corrector loop
-            while (pimple.loop())
-            {
-                #include "UEqn.H"
+        #include "UEqn.H"
 
-                // --- Pressure corrector loop
-                while (pimple.correct())
-                {
-                    #include "pEqn.H"
-                }
 
-                if (pimple.turbCorr())
-                {
-                    turbulence->correct();
-                }
-            }
-        }
-        else
-        {
-            Info << "skipping flow solution." << endl;
-        }
+        // besides this pEqn, OF offers a "simple consistent"-option
+        #include "pEqn.H"
+        rhoeps=rho*voidfraction;
+
+        #include "EEqn.H"
+
+        turbulence->correct();
+
+        particleCloud.clockM().start(32,"postFlow");
+        if(hasEvolved) particleCloud.postFlow();
+        particleCloud.clockM().stop("postFlow");
 
         runTime.write();
+
 
         Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
             << "  ClockTime = " << runTime.elapsedClockTime() << " s"

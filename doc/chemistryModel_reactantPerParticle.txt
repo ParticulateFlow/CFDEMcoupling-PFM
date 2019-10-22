@@ -1,0 +1,54 @@
+"CFDEMproject Website"_lws - "Main Page"_main :c
+
+:link(lws,http://www.cfdem.com)
+:link(main,CFDEMcoupling_Manual.html)
+
+:line
+
+chemistryModel reactantPerParticle command :h3
+
+[Syntax:]
+
+Defined in "couplingProperties"_CFDEMcoupling_dicts.html#couplingProperties
+dictionary.
+
+chemistryModels
+(
+    reactantPerParticle
+);
+reactantPerParticleProps
+\{
+    voidfractionFieldName   "voidfraction";
+    Nevery                  number1;
+\} :pre
+
+{voidfraction} = (optional, default "voidfraction") name of the finite volume void fraction field :l
+{number1} = (optional, default 1) number to adjust execution interval :l
+:ule
+
+[Examples:]
+
+chemistryModels
+(
+    reactantPerParticle
+);
+reactantPerParticleProps
+\{
+    voidfractionFieldName   "voidfraction";
+    Nevery                  1;
+\} :pre
+
+[Description:]
+
+The chemistry model performs the calculation of chemical reactional effects
+acting on each DEM particle. The reactantPerParticle model is the model to
+communicate the available reactant per particle.
+
+[Restrictions:]
+
+none
+
+[Related commands:]
+
+"chemistryModel"_chemistryModel.html
+

@@ -10,31 +10,32 @@
 
 :line
 
-cfdemSolverMultiphase command :h3
+cfdemSolverRhoPimpleChem command :h3
 
 [Description:]
 
 <!-- HTML_ONLY -->
-"cfdemSolverMultiphase" is a coupled CFD-DEM solver using the CFDEMcoupling framework. Based on the OpenFOAM solver multiphaseInterFoam&reg;(*) it has functionality to simulate several fluids using the Volume of Fluid approach, coupled with the DEM code LIGGGHTS for solid particles.
+"cfdemSolverRhoPimpleChem" is a coupled CFD-DEM solver using the CFDEMcoupling
+framework. Based on the OpenFOAM&reg;(*) solver rhoPimpleFoam, this is a
+transient solver for compressible flow using the flexible PIMPLE (PISO-SIMPLE)
+algorithm, coupled with the DEM code LIGGGHTS for solid particles.
+Compared to cfdemSolverRhoPimple this solver adds functionality for chemical
+reactions.
 
 <!-- END_HTML_ONLY -->
 
 <!-- RST
 
-"cfdemSolverMultiphase" is a coupled CFD-DEM solver using the CFDEMcoupling framework. Based on the OpenFOAM solver multiphaseInterFoam\ |reg|\ (*) it has functionality to simulate several fluids using the Volume of Fluid approach, coupled with the DEM code LIGGGHTS for solid particles.
+"cfdemSolverRhoPimpleChem" is a coupled CFD-DEM solver using the CFDEMcoupling
+framework. Based on the OpenFOAM\ |reg|\ (*) solver rhoPimpleFoam, this is a
+transient solver for compressible flow using the flexible PIMPLE (PISO-SIMPLE)
+algorithm, coupled with the DEM code LIGGGHTS for solid particles.
+Compared to cfdemSolverRhoPimple this solver adds functionality for chemical
+reactions.
 
 .. |reg|    unicode:: U+000AE .. REGISTERED SIGN
 
 END_RST -->
-
-For more details, see "Vångö et al. (2018)"_#Vångö2018.
-
-:line
-
-:link(Vångö2018)
-[(Vångö2018)] M. Vångö, S. Pirker, T. Lichtenegger. (2018):
-"Unresolved CFD-DEM modeling of multiphase flow in densely packed particle beds",
-Applied Mathematical Modelling
 
 :line
 

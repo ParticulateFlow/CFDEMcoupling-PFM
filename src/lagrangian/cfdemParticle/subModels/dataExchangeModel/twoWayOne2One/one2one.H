@@ -23,7 +23,7 @@ Copyright 2018-     Paul Kieckhefen, TUHH
 
 #include <mpi.h>
 
-class One2One 
+class One2One
 {
  public:
   One2One(MPI_Comm);

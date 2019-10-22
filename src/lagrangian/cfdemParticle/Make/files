@@ -159,6 +159,8 @@ $(dataExchangeModels)/oneWayVTK/oneWayVTK.C
 $(dataExchangeModels)/twoWayFiles/twoWayFiles.C
 $(dataExchangeModels)/noDataExchange/noDataExchange.C
 $(dataExchangeModels)/twoWayMPI/twoWayMPI.C
+$(dataExchangeModels)/twoWayOne2One/twoWayOne2One.C
+$(dataExchangeModels)/twoWayOne2One/one2one.C
 
 $(averagingModels)/averagingModel/averagingModel.C
 $(averagingModels)/averagingModel/newAveragingModel.C
