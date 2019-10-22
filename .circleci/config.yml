@@ -1,0 +1,72 @@
+version: 2
+jobs:
+  build:
+    branches:
+      only:
+        - master
+        - develop
+
+    docker:
+      - image: ubuntu:trusty
+
+    environment:
+      WM_NCOMPPROCS: 2
+
+    working_directory: /root/CFDEM/CFDEMcoupling
+
+    steps:
+      - run:
+          name: Install package dependencies
+          command: sudo apt-get update && sudo apt-get install -y build-essential cmake openmpi-bin libopenmpi-dev python-dev git bc
+          
+      - run:
+          name: Make project and user dir
+          command: mkdir -p /root/CFDEM/CFDEMcoupling && mkdir -p /root/CFDEM/-4.1
+
+      - checkout:
+          path: /root/CFDEM/CFDEMcoupling
+
+      - run:
+          name: Add OpenFOAM package repository
+          command: sudo apt-get install -y software-properties-common wget apt-transport-https && sudo add-apt-repository http://dl.openfoam.org/ubuntu && sudo sh -c "wget -O - http://dl.openfoam.org/gpg.key | apt-key add -"
+
+      - run:
+          name: Install OpenFOAM 4.1
+          command: sudo apt-get update && sudo apt-get -y install openfoam4
+
+      - run:
+          name: Clone LIGGGHTS repository
+          command: git clone https://github.com/ParticulateFlow/LIGGGHTS-PFM.git /root/CFDEM/LIGGGHTS
+
+      - run:
+          name: Build LIGGGHTS
+          command: >
+            shopt -s expand_aliases &&
+            source /opt/openfoam4/etc/bashrc &&
+            source /root/CFDEM/CFDEMcoupling/etc/bashrc &&
+            bash /root/CFDEM/CFDEMcoupling/etc/compileLIGGGHTS.sh
+          no_output_timeout: 30m
+
+      - run:
+          name: Build CFDEMcoupling library
+          command: >
+            shopt -s expand_aliases &&
+            source /opt/openfoam4/etc/bashrc &&
+            source /root/CFDEM/CFDEMcoupling/etc/bashrc &&
+            bash /root/CFDEM/CFDEMcoupling/etc/compileCFDEMcoupling_src.sh
+          
+      - run:
+          name: Build CFDEMcoupling solvers
+          command: >
+            shopt -s expand_aliases &&
+            source /opt/openfoam4/etc/bashrc &&
+            source /root/CFDEM/CFDEMcoupling/etc/bashrc &&
+            bash /root/CFDEM/CFDEMcoupling/etc/compileCFDEMcoupling_sol.sh
+
+      - run:
+          name: Build CFDEMcoupling utilities
+          command: >
+            shopt -s expand_aliases &&
+            source /opt/openfoam4/etc/bashrc &&
+            source /root/CFDEM/CFDEMcoupling/etc/bashrc &&
+            bash /root/CFDEM/CFDEMcoupling/etc/compileCFDEMcoupling_uti.sh

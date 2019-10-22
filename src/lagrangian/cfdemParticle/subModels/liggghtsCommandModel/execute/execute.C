@@ -100,7 +100,7 @@ execute::execute
     parseCommandList(commandList_, labelList_, scalarList_, command_, propsDict_, timeStamp_);
     Info << "liggghtsCommand " << command_ << endl;
 
-    strCommand_ = string(command_);
+    strCommand_ = command_;
 
     checkTimeMode(propsDict_);
 

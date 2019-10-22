@@ -1,0 +1,266 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.3.0                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+application     cfdemSolverRhoPimpleChem;
+
+startFrom       startTime;
+
+startTime       0.0;
+
+stopAt          endTime;
+
+endTime         120.0;
+
+deltaT          0.00025;
+
+writeControl    runTime; //timeStep;
+
+writeInterval   0.25;    //5000;
+
+purgeWrite      0;
+
+writeFormat     ascii;
+
+writePrecision  6;
+
+writeCompression off;
+
+timeFormat      general;
+
+timePrecision   6;
+
+runTimeModifiable true;
+
+adjustTimeStep  no;
+
+maxCo           0.5;
+
+maxDeltaT       0.1;
+
+
+// ************************************************************************* //
+libs
+(
+    "libfieldFunctionObjects.so"
+);
+
+functions
+{
+    moleFrac
+    {
+        type    rhoReactionThermoMoleFractions;
+    }
+
+    probes
+    {
+        type probes;
+
+        functionObjectLibs ("libsampling.so");
+
+        // Name of the directory for probe data
+        name probes;
+
+        // Locations to be probed.
+        probeLocations
+        (
+            (0.03 0.025 0.0)
+            (0.03 0.050 0.0)
+            (0.03 0.075 0.0)
+            (0.03 0.090 0.0)
+            (0.03 0.120 0.0)
+        );
+
+        fields
+        (
+            rho
+            p
+            T
+            Cpv
+            N2
+            CO2
+            CO
+            H2
+            H2O
+            ModSpeciesMassField_N2
+            ModSpeciesMassField_CO2
+            ModSpeciesMassField_CO
+            ModSpeciesMassField_H2
+            ModSpeciesMassField_H2O
+            X_CO
+            X_CO2
+            X_H2
+            X_N2
+            X_H2O
+        );
+
+        writeControl   timeStep;
+        writeInterval  10000;
+    }
+
+
+    fieldMinMax_T
+    {
+        type            fieldMinMax;
+        libs            ("libfieldFunctionObjects.so");
+        fields          (T);
+        // Report the location of the field extrema
+        location        yes;
+        // Type of extrema for rank > 0 primitives
+        mode            magnitude; // magnitude | component
+    }
+
+    fieldMinMax_Cpv
+    {
+        type            fieldMinMax;
+        libs            ("libfieldFunctionObjects.so");
+        fields          (Cpv);	
+        // Report the location of the field extrema
+        location   yes;
+        // Type of extrema for rank > 0 primitives
+        mode            magnitude; // magnitude | component
+    }
+
+    fieldMinMax_partTemp
+    {
+        type       fieldMinMax;
+        libs       ("libfieldFunctionObjects.so");
+        fields     (partTemp);
+        location   yes;
+        mode       magnitude;
+    }
+
+    globalMassFrac
+    {
+        type            volRegion;
+        libs ("libfieldFunctionObjects.so");
+        writeControl    timeStep;//outputTime;
+        writeInterval   1;
+        log             true;
+        writeFields     false;
+        regionType      all;
+        name            c0;
+        operation       weightedVolAverage;
+        weightField     rhoeps;
+        fields
+        (
+            H2
+            H2O
+            CO2
+            CO
+            N2
+        );
+    }
+
+    globalMass
+    {
+        type            volRegion;
+        libs ("libfieldFunctionObjects.so");
+        writeControl   timeStep;//outputTime;
+        writeInterval   1;
+        log             true;
+        writeFields     false;
+        regionType      all;
+        name            c1;
+        operation       volIntegrate;
+        fields
+        (
+            rhoeps
+            rho
+        );
+    }
+
+    inflow_GasSpecies
+    {
+        type            surfaceRegion;
+        libs ("libfieldFunctionObjects.so");
+        writeControl    timeStep;
+        writeInterval   100;
+        log             true;
+        // Output field values as well
+        writeFields     false;
+        regionType      patch;
+        name            inlet;
+        operation       sum;//areaIntegrate;
+
+        fields
+        (
+            CO
+            CO2
+            H2
+            H2O
+            N2
+        );
+    }
+
+    inflow_phi
+    {
+        type            surfaceRegion;
+        libs ("libfieldFunctionObjects.so");
+        writeControl   timeStep;
+        writeInterval   100;
+        log             true;
+        // Output field values as well
+        writeFields     false;
+        regionType      patch;
+        name            inlet;
+        operation       sum;//areaIntegrate;
+
+        fields
+        (
+            phi
+        );
+    }
+
+    inflow_U
+    {
+        type            surfaceRegion;
+        libs ("libfieldFunctionObjects.so");
+        writeControl    timeStep;
+        writeInterval   100;
+        log             true;
+        // Output field values as well
+        writeFields     false;
+        regionType      patch;
+        name            inlet;
+        operation       sum;//areaIntegrate;
+
+        fields
+        (
+            U
+        );
+    }
+
+    outflow_GasSpecies
+    {
+        $inflow_GasSpecies;
+        name    outlet;
+    }
+
+    outflow_phi
+    {
+        $inflow_phi;
+        name    outlet;
+    }
+
+    outflow_U
+    {
+        $inflow_U;
+        name    outlet;
+    }
+}
+
+// ************************************************************************* //

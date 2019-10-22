@@ -94,7 +94,7 @@ writeLiggghts::writeLiggghts
     {
         overwrite_ = Switch(propsDict_.lookup("overwrite"));
     }
-    
+
     if (writeLast_)
     {
         runLast_ = true;
@@ -103,13 +103,13 @@ writeLiggghts::writeLiggghts
     {
         //Warning << "Using invalid options of writeLiggghts, please use 'writeLast' option." << endl;
         runEveryWriteStep_ = true;
-    }    
+    }
 
 
     command_ += " " + path_ + "/" + writeName_;
     if (overwrite_)
     {
-        strCommand_=string(command_);
+        strCommand_ = command_;
     }
     else
     {

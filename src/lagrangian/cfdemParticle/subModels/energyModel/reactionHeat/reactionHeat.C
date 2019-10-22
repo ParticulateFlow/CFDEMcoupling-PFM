@@ -46,6 +46,7 @@ reactionHeat::reactionHeat
     energyModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
     interpolation_(propsDict_.lookupOrDefault<bool>("interpolation",false)),
+    verbose_(propsDict_.lookupOrDefault<bool>("verbose",false)),
     mesh_(sm.mesh()),
     maxSource_(1e30),
     reactionHeatName_(propsDict_.lookupOrDefault<word>("reactionHeatName","reactionHeat")),
@@ -97,6 +98,14 @@ void reactionHeat::calcEnergyContribution()
     allocateMyArrays();
 
     particleCloud_.dataExchangeM().getData(reactionHeatName_,"scalar-atom",reactionHeat_);
+
+    for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)
+    {
+        if (verbose_ && index>=0 && index < 2)
+        {
+            Pout << "reactionHeat = " << reactionHeat_[index][0] << endl;
+        }
+    }
 
     reactionHeatField_.primitiveFieldRef() = 0.0;
     reactionHeatField_.boundaryFieldRef() = 0.0;

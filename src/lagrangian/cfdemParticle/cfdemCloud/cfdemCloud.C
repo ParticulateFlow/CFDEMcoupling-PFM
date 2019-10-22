@@ -45,6 +45,7 @@ Description
 #include "smoothingModel.H"
 #include "liggghtsCommandModel.H"
 #include "otherForceModel.H"
+#include "IOmanip.H"
 
 namespace Foam
 {
@@ -671,17 +672,14 @@ bool cfdemCloud::evolve
         }
 
         //============================================
-        //CHECK JUST TIME-INTERPOATE ALREADY SMOOTHENED VOIDFRACTIONNEXT AND UsNEXT FIELD
+        //CHECK JUST TIME-INTERPOLATE ALREADY SMOOTHENED VOIDFRACTIONNEXT AND UsNEXT FIELD
         //      IMPLICIT FORCE CONTRIBUTION AND SOLVER USE EXACTLY THE SAME AVERAGED
         //      QUANTITIES AT THE GRID!
-        scalar timeStepFrac = dataExchangeM().timeStepFraction();
+        const scalar timeStepFrac = dataExchangeM().timeStepFraction();
+        int old_precision = Info().precision(10);
         Info << "\n timeStepFraction() = " << timeStepFrac << endl;
-        if(timeStepFrac > 1.0000001)
-        {
+        Info().precision(old_precision);
 
-   //         FatalError << "cfdemCloud::dataExchangeM().timeStepFraction()>1: Do not do this, since dangerous. This might be due to the fact that you used a adjustable CFD time step. Please use a fixed CFD time step." << abort(FatalError);
-              Warning << "cfdemCloud::dataExchangeM().timeStepFraction() = " << timeStepFrac << endl;
-        }
         clockM().start(24,"interpolateEulerFields");
 
         // update voidFractionField
