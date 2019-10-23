@@ -115,9 +115,13 @@ private:
 
     Switch    staticProcMap_;
     Switch    cellIdComm_;
+    double*   prev_cell_ids_;
+    double**  dbl_cell_ids_;
     LAMMPS_NS::FixPropertyAtom* my_prev_cell_ids_fix_;
 
-    treeBoundBox       thisFoamBox_;
+    const scalar      boundBoxMargin_;
+
+    treeBoundBox      thisFoamBox_;
 
     Switch            verbose_;
 
