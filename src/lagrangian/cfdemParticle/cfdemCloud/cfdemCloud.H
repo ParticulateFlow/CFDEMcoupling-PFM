@@ -400,7 +400,7 @@ public:
       // write cfdemCloud internal data
         inline void setPositions(label n,double* pos);
         inline void setCellIDs(label n,int* ID);
-        inline void setCellIDs(labelList const& IDs);
+        inline void setCellIDs(DynamicList<label> const& IDs);
         inline void setImpDEMdrag(bool flag) { impDEMdrag_ = flag; }
         inline void setImpDEMdragAcc(bool flag) { impDEMdragAcc_ = flag; }
 

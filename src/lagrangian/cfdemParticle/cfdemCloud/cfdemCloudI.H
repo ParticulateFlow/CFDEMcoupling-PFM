@@ -63,7 +63,7 @@ inline void cfdemCloud::setCellIDs(label n,int* ID)
         cellIDs_[i][0]=ID[i];
 }
 
-inline void cfdemCloud::setCellIDs(labelList const& IDs)
+inline void cfdemCloud::setCellIDs(DynamicList<label> const& IDs)
 {
     for (int i=0; i<IDs.size(); ++i)
         cellIDs_[i][0] = IDs[i];
