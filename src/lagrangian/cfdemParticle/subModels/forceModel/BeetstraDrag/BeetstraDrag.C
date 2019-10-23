@@ -148,6 +148,7 @@ void BeetstraDrag::setForce() const
     else if (particleCloud_.cg() > 1)
     {
         scaleDia_=particleCloud_.cg();
+        typeCG_[0] = scaleDia_;
         Info << "Beetstra using scale from liggghts cg = " << scaleDia_ << endl;
     }
 

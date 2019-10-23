@@ -82,6 +82,7 @@ protected:
 
         List<Switch> switchesList_;         // switches which are requested from dict
 
+        // a Switch is set to false in the default Switch constructor
         List<Switch> switches_;             // switch status
 
         mutable volScalarField nu_;

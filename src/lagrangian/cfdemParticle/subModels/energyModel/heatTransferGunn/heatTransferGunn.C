@@ -242,6 +242,12 @@ void heatTransferGunn::calcEnergyContribution()
     // get DEM data
     particleCloud_.dataExchangeM().getData(partTempName_,"scalar-atom",partTemp_);
 
+    if(particleCloud_.cg() > 1.)
+    {
+        scaleDia_ = particleCloud_.cg();
+        Info << "Heat Transfer Gunn is using scale from liggghts cg = " << scaleDia_ << endl;
+    }
+
     if(calcPartTempField_)
     {
         partTempField_.primitiveFieldRef() = 0.0;
@@ -353,18 +359,24 @@ void heatTransferGunn::calcEnergyContribution()
                     partNu_[index][0] = Nup;
                 }
 
-                if(particleCloud_.verbose() && index >=0 && index <2)
+                if(verbose_ && index >=0 && index <2)
                 {
-                    Info << "partHeatFlux = " << partHeatFlux_[index][0] << endl;
-                    Info << "magUr = " << magUr << endl;
-                    Info << "As = " << As << endl;
-                    Info << "muf = " << muf << endl;
-                    Info << "Rep = " << Rep << endl;
-                    Info << "Pr = " << Pr << endl;
-                    Info << "Nup = " << Nup << endl;
-                    Info << "voidfraction = " << voidfraction << endl;
-                    Info << "partTemp_[index][0] = " << partTemp_[index][0] << endl;
-                    Info << "Tfluid = " << Tfluid << endl  ;
+                    Pout << "partHeatFlux = " << partHeatFlux_[index][0] << endl;
+                    Pout << "magUr = " << magUr << endl;
+                    Pout << "kf0 = " << kf0_ << endl;
+                    Pout << "Cp = " << Cp_ << endl;
+                    Pout << "rho = " << rho_[cellI] << endl;
+                    Pout << "h = " << h << endl;
+                    Pout << "ds = " << ds << endl;
+                    Pout << "ds_scaled = " << ds_scaled << endl;
+                    Pout << "As = " << As << endl;
+                    Pout << "muf = " << muf << endl;
+                    Pout << "Rep = " << Rep << endl;
+                    Pout << "Pr = " << Pr << endl;
+                    Pout << "Nup = " << Nup << endl;
+                    Pout << "voidfraction = " << voidfraction << endl;
+                    Pout << "partTemp_[index][0] = " << partTemp_[index][0] << endl;
+                    Pout << "Tfluid = " << Tfluid << endl  ;
                 }
             }
     }
@@ -444,6 +456,13 @@ void heatTransferGunn::calcEnergyContribution()
     }
 
     QPartFluid_.correctBoundaryConditions();
+
+    volScalarField minParticleWeights = particleCloud_.averagingM().UsWeightField();
+    Info << "Minimum Particle Weight " << gMin(minParticleWeights) << endl;
+    Info << "Minimum Particle Temperature: " << gMin(partTempField_) << endl;
+    Info << "Maximum Particle Temperature: " << gMax(partTempField_) << endl;
+    Info << "Minimum Fluid Temperature: " << gMin(tempField_) << endl;
+    Info << "Maximum Fluid Temperature: " << gMax(tempField_) << endl;
 }
 
 void heatTransferGunn::addEnergyContribution(volScalarField& Qsource) const
@@ -451,11 +470,11 @@ void heatTransferGunn::addEnergyContribution(volScalarField& Qsource) const
     Qsource += QPartFluid_;
 }
 
-void heatTransferGunn::addEnergyCoefficient(volScalarField& Qsource) const
+void heatTransferGunn::addEnergyCoefficient(volScalarField& Qcoeff) const
 {
     if(implicit_)
     {
-        Qsource += QPartFluidCoeff_;
+        Qcoeff += QPartFluidCoeff_;
     }
 }
 

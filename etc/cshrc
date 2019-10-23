@@ -15,7 +15,7 @@
 #------------------------------------------------------------------------------
 
 setenv CFDEM_PROJECT CFDEM
-setenv CFDEM_VERSION 19.02
+setenv CFDEM_VERSION 19.09
 
 ################################################################################
 # USER EDITABLE PART: Changes made here may be lost with the next upgrade
