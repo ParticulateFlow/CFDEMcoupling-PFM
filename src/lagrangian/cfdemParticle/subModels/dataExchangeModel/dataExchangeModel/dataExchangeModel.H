@@ -262,14 +262,14 @@ public:
             for (int i=0;i<n;i++)
                 particleCloud_.cellIDs_[i][0]=ID[i];
         }
-        inline void setCellIDs(labelList const& ids)
+
+        inline void setCellIDs(DynamicList<label> const& ids)
         {
             for (int i = 0; i < ids.size(); i++)
             {
                 particleCloud_.cellIDs_[i][0] = ids[i];
             }
         }
-
 
         virtual scalar getCG() const { Warning << "getCG() not executed correctly!" << endl; return 1.; }
 };
