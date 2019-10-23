@@ -45,33 +45,19 @@ Contributing authors
 #ifndef twoWayOne2One_H
 #define twoWayOne2One_H
 
+#include <mpi.h>
+
 #include "dataExchangeModel.H"
-#include "liggghtsCommandModel.H"
-#include "OFstream.H"
-#include <sys/stat.h>
-#include "pair.h"
-#include "force.h"
-#include "forceModel.H"
 #include "one2one.H"
 
-#include "meshSearch.H"
+#include <treeBoundBox.H>
 
 //=================================//
 //LAMMPS/LIGGGHTS
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <mpi.h>
-#include <lammps.h>         // these are LAMMPS include files
-#include <input.h>
-#include <atom.h>
-#include <memory.h>
-#include <library.h>
-#include <library_cfd_coupling.h>
-#include <update.h>
-#include <comm.h>
-#include <fix.h>
-#include <fix_property_atom.h>
+#include <lammps.h>          // these are LAMMPS include files
+#include <pair.h>
+#include <force.h>
+#include <fix_property_atom.h> /// needed
 //=================================//
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

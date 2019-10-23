@@ -29,13 +29,17 @@ Description
     and OpenFOAM(R). Note: this code is not part of OpenFOAM(R) (see DISCLAIMER).
 \*---------------------------------------------------------------------------*/
 
-#include "error.H"
 #include "twoWayMPI.H"
 #include "addToRunTimeSelectionTable.H"
+#include "OFstream.H"
 #include "clockModel.H"
-#include "pair.h"
-#include "force.h"
-#include "forceModel.H"
+#include "liggghtsCommandModel.H"
+
+//LAMMPS/LIGGGHTS
+#include <input.h>
+#include <library_cfd_coupling.h>
+#include <update.h>
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam

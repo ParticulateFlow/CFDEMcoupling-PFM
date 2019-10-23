@@ -33,13 +33,19 @@ Contributing authors
 
 \*---------------------------------------------------------------------------*/
 
-
 #include "twoWayOne2One.H"
 #include "addToRunTimeSelectionTable.H"
+#include "OFstream.H"
 #include "clockModel.H"
-#include "pair.h"
-#include "force.h"
-#include "forceModel.H"
+#include "liggghtsCommandModel.H"
+
+//LAMMPS/LIGGGHTS
+#include <atom.h>
+#include <input.h>
+#include <library.h>
+#include <library_cfd_coupling.h>
+#include <memory.h>
+#include <update.h>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
