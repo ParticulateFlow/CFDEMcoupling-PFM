@@ -106,13 +106,13 @@ protected:
 
     const word modelType_;
 
-    double **positions_;
+    double **positions_; // particle positions
 
-    double **velocities_;
+    double **velocities_; // particle velocities
 
-    double **fluidVel_;
+    double **fluidVel_; // fluid velocities at particle positions
 
-    double **fAcc_;
+    double **fAcc_; // accumulated implicit forces on particles (only used in Koch Hill drag model)
 
     double **impForces_;
 
@@ -120,25 +120,25 @@ protected:
 
     double **DEMForces_;
 
-    double **Cds_;
+    double **Cds_; // Ksl
 
-    double **radii_;
+    double **radii_; // particle radii
 
     double **voidfractions_;
 
-    int **cellIDs_;
+    int **cellIDs_; // ID of cell each particle is in
 
-    double **particleDensities_;
+    double **particleDensities_; // particle densities
 
-    double **particleEffVolFactors_;
+    double **particleEffVolFactors_; // per particle volume factor
 
-    int **particleTypes_;
+    int **particleTypes_; // per particle type
 
-    double **particleWeights_;
+    double **particleWeights_; // particle weights
 
-    double **particleVolumes_;
+    double **particleVolumes_; // particle volumes with subcell information
 
-    double **particleV_;
+    double **particleV_; // particle total volumes
 
     int numberOfParticles_;
 
