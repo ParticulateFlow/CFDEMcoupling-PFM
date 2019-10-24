@@ -523,7 +523,7 @@ void cfdemCloud::checkCG(bool ok)
     if(!ok) cgOK_ = ok;
 }
 
-void cfdemCloud::setPos(double**& pos)
+void cfdemCloud::setPos(const double *const * pos)
 {
     for(int index = 0; index <  numberOfParticles(); ++index)
     {
@@ -554,11 +554,6 @@ vector cfdemCloud::velocity(int index) const
 vector cfdemCloud::expForce(int index) const
 {
     return vector(DEMForces()[index][0],DEMForces()[index][1],DEMForces()[index][2]);
-}
-
-vector cfdemCloud::fluidVel(int index) const
-{
-    return vector(fluidVels()[index][0],fluidVels()[index][1],fluidVels()[index][2]);
 }
 
 const forceModel& cfdemCloud::forceM(int i)

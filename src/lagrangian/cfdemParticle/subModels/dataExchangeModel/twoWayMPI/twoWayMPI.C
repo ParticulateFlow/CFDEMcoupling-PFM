@@ -344,7 +344,7 @@ bool twoWayMPI::couple(int i)
         // give nr of particles to cloud
         double newNpart = liggghts_get_maxtag(lmp);
 
-        setNumberOfParticles(newNpart);
+        particleCloud_.setNumberOfParticles(newNpart);
 
         // re-allocate arrays of cloud
         particleCloud_.clockM().start(4,"LIGGGHTS_reallocArrays");

@@ -50,6 +50,25 @@ inline void cfdemCloud::setCG(double cg)
     Info << "cg is set to: " << cg_ << endl;
 }
 
+inline void cfdemCloud::setPositions(label n,double* pos)
+{
+    for (int i=0; i<n; ++i)
+        for (int j=0; j<3; ++j)
+            positions_[i][j]=pos[i*3+j];
+}
+
+inline void cfdemCloud::setCellIDs(label n,int* ID)
+{
+    for (int i=0; i<n; ++i)
+        cellIDs_[i][0]=ID[i];
+}
+
+inline void cfdemCloud::setCellIDs(DynamicList<label> const& IDs)
+{
+    for (int i=0; i<IDs.size(); ++i)
+        cellIDs_[i][0] = IDs[i];
+}
+
 inline bool cfdemCloud::impDEMdrag() const
 {
     return impDEMdrag_;
