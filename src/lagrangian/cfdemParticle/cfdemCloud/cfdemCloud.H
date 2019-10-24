@@ -106,13 +106,13 @@ protected:
 
     const word modelType_;
 
-    double **positions_;
+    double **positions_; // particle positions
 
-    double **velocities_;
+    double **velocities_; // particle velocities
 
-    double **fluidVel_;
+    double **fluidVel_; // fluid velocities at particle positions
 
-    double **fAcc_;
+    double **fAcc_; // accumulated implicit forces on particles (only used in Koch Hill drag model)
 
     double **impForces_;
 
@@ -120,26 +120,26 @@ protected:
 
     double **DEMForces_;
 
-    double **Cds_;
+    double **Cds_; // Ksl
 
-    double **radii_;
+    double **radii_; // particle radii
 
     double **voidfractions_;
 
-    int **cellIDs_;
+    int **cellIDs_; // ID of cell each particle is in
 
-    double **particleDensities_;
+    double **particleDensities_; // particle densities
 
-    double **particleEffVolFactors_;
+    double **particleEffVolFactors_; // per particle volume factor
 
-    int **particleTypes_;
+    int **particleTypes_; // per particle type
 
-    double **particleWeights_;
+    double **particleWeights_; // particle weights
 
-    double **particleVolumes_;
+    double **particleVolumes_; // particle volumes with subcell information
 
-    double **particleV_;
-    
+    double **particleV_; // particle total volumes
+
     double **particleConvVel_;
 
     double **particleFlucVel_;
@@ -215,8 +215,6 @@ protected:
 
     virtual void giveDEMdata();
 
-    virtual void setNumberOfParticles(int);
-
     virtual void findCells();
 
     virtual void setForces();
@@ -228,11 +226,6 @@ protected:
     virtual void setVectorAverages();
 
 public:
-
-    friend class dataExchangeModel;
-    friend class voidFractionModel;
-    friend class forceModel;
-    friend class forceSubModel;
 
 // Constructors
 
@@ -252,9 +245,11 @@ public:
 
        void setAllowCFDsubTimestep(bool b) { allowCFDsubTimestep_ = b; }
 
+       virtual void setNumberOfParticles(int numberOfParticles);
+
        void checkCG(bool);
 
-       void setPos(double **&);
+       void setPos(const double *const *);
 
        const word& modelType() const { return modelType_; }
 
@@ -265,8 +260,6 @@ public:
        vector velocity(int) const;
 
        vector expForce(int) const;
-
-       vector fluidVel(int) const;
 
        virtual const forceModel& forceM(int);
 
@@ -327,7 +320,7 @@ public:
        inline void get_cellIDs(int**&) const;
 
        inline double ** particleWeights() const;
-       
+
        inline double ** particleConvVels() const;
 
        inline double ** particleFlucVels() const;
@@ -413,6 +406,12 @@ public:
     // Write
 
       // write cfdemCloud internal data
+        inline void setPositions(label n,double* pos);
+        inline void setCellIDs(label n,int* ID);
+        inline void setCellIDs(DynamicList<label> const& IDs);
+        inline void setImpDEMdrag(bool flag) { impDEMdrag_ = flag; }
+        inline void setImpDEMdragAcc(bool flag) { impDEMdragAcc_ = flag; }
+
         virtual bool evolve(volScalarField&,volVectorField&,volVectorField&);
 
         virtual void postFlow() {}
@@ -420,9 +419,9 @@ public:
         virtual bool reAllocArrays();
 
     // IO
-        void writeScalarFieldToTerminal(double**&) const;
+        void writeScalarFieldToTerminal(const double *const *) const;
 
-        void writeVectorFieldToTerminal(double**&) const;
+        void writeVectorFieldToTerminal(const double *const *) const;
 
     // functions
         tmp<fvVectorMatrix> divVoidfractionTau(volVectorField& ,volScalarField&) const;

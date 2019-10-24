@@ -33,13 +33,19 @@ Contributing authors
 
 \*---------------------------------------------------------------------------*/
 
-
 #include "twoWayOne2One.H"
 #include "addToRunTimeSelectionTable.H"
+#include "OFstream.H"
 #include "clockModel.H"
-#include "pair.h"
-#include "force.h"
-#include "forceModel.H"
+#include "liggghtsCommandModel.H"
+
+//LAMMPS/LIGGGHTS
+#include <atom.h>
+#include <input.h>
+#include <library.h>
+#include <library_cfd_coupling.h>
+#include <memory_ns.h>
+#include <update.h>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -435,7 +441,7 @@ void twoWayOne2One::allocateArray
 ) const
 {
     int len = max(length,1);
-    lmp->memory->grow(array, len, width, "o2o:dbl**");
+    LAMMPS_MEMORY_NS::grow(array, len, width);
     for (int i = 0; i < len; i++)
         for (int j = 0; j < width; j++)
             array[i][j] = initVal;
@@ -450,7 +456,7 @@ void twoWayOne2One::allocateArray
 ) const
 {
     int len = max(particleCloud_.numberOfParticles(),1);
-    lmp->memory->grow(array, len, width, "o2o:dbl**:autolen");
+    LAMMPS_MEMORY_NS::grow(array, len, width);
     for (int i = 0; i < len; i++)
         for (int j = 0; j < width; j++)
             array[i][j] = initVal;
@@ -458,7 +464,7 @@ void twoWayOne2One::allocateArray
 
 void inline twoWayOne2One::destroy(double** array,int len) const
 {
-    lmp->memory->destroy(array);
+    LAMMPS_MEMORY_NS::destroy(array);
 }
 
 //============
@@ -472,7 +478,7 @@ void twoWayOne2One::allocateArray
 ) const
 {
     int len = max(length,1);
-    lmp->memory->grow(array, len, width, "o2o:int**");
+    LAMMPS_MEMORY_NS::grow(array, len, width);
     for (int i = 0; i < len; i++)
         for (int j = 0; j < width; j++)
             array[i][j] = initVal;
@@ -487,7 +493,7 @@ void twoWayOne2One::allocateArray
 ) const
 {
     int len = max(particleCloud_.numberOfParticles(),1);
-    lmp->memory->grow(array, len, width, "o2o:int**:autolen");
+    LAMMPS_MEMORY_NS::grow(array, len, width);
     for (int i = 0; i < len; i++)
         for (int j = 0; j < width; j++)
             array[i][j] = initVal;
@@ -495,7 +501,7 @@ void twoWayOne2One::allocateArray
 
 void inline twoWayOne2One::destroy(int** array,int len) const
 {
-    lmp->memory->destroy(array);
+    LAMMPS_MEMORY_NS::destroy(array);
 }
 
 //============
@@ -503,14 +509,14 @@ void inline twoWayOne2One::destroy(int** array,int len) const
 void twoWayOne2One::allocateArray(double*& array, double initVal, int length) const
 {
     int len = max(length,1);
-    lmp->memory->grow(array, len, "o2o:dbl*");
+    LAMMPS_MEMORY_NS::grow(array, len);
     for (int i = 0; i < len; i++)
         array[i] = initVal;
 }
 
 void inline twoWayOne2One::destroy(double* array) const
 {
-    lmp->memory->destroy(array);
+    LAMMPS_MEMORY_NS::destroy(array);
 }
 
 //==============
@@ -518,14 +524,14 @@ void inline twoWayOne2One::destroy(double* array) const
 void twoWayOne2One::allocateArray(int*& array, int initVal, int length) const
 {
     int len = max(length,1);
-    lmp->memory->grow(array, len, "o2o:int*");
+    LAMMPS_MEMORY_NS::grow(array, len);
     for (int i = 0; i < len; i++)
         array[i] = initVal;
 }
 
 void inline twoWayOne2One::destroy(int* array) const
 {
-    lmp->memory->destroy(array);
+    LAMMPS_MEMORY_NS::destroy(array);
 }
 //==============
 
@@ -813,7 +819,7 @@ void twoWayOne2One::locateParticles()
         }
     }
 
-    setNumberOfParticles(n_located);
+    particleCloud_.setNumberOfParticles(n_located);
     particleCloud_.reAllocArrays();
 
     reduce(n_located, sumOp<label>());
@@ -840,11 +846,11 @@ void twoWayOne2One::locateParticles()
         extracted_flattened_positions,
         3
     );
-    setPositions(getNumberOfParticles(), extracted_flattened_positions);
+    particleCloud_.setPositions(getNumberOfParticles(), extracted_flattened_positions);
     delete [] extracted_flattened_positions;
     destroy(collected_flattened_positions);
 
-    setCellIDs(cellIds);
+    particleCloud_.setCellIDs(cellIds);
 }
 
 void twoWayOne2One::setupFoam2LigCommunication()
