@@ -3,8 +3,6 @@ surfaceScalarField rUAf(fvc::interpolate(rUA));
 
 U = rUA*UEqn.H();
 
-surfaceScalarField phiS(fvc::interpolate(Us*lambda) & mesh.Sf());
-
 phi = (fvc::interpolate(U) & mesh.Sf())
     + rUAf*fvc::ddtCorr(U, phi);            // Is there additional flux term due to the particle presence?
 

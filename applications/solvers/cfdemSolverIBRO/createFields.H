@@ -41,6 +41,20 @@
         mesh
     );
 
+    Info<< "Reading the penalization factor field lambda\n" << endl;
+    volScalarField lambda
+    (
+        IOobject
+        (
+            "lambda",
+            runTime.timeName(),
+            mesh,
+            IOobject::MUST_READ,
+            IOobject::AUTO_WRITE
+        ),
+        mesh
+    );
+
 //========================
 // drag law modelling
 //========================
@@ -90,20 +104,6 @@
         mesh
     );
 
-    Info<< "Reading the solid volume fraction field lambda\n" << endl;
-    volScalarField lambda
-    (
-        IOobject
-        (
-            "lambda",
-            runTime.timeName(),
-            mesh,
-            IOobject::MUST_READ,
-            IOobject::AUTO_WRITE
-        ),
-        mesh
-    );
-
 //========================
 
 #   include "createPhi.H"
@@ -136,6 +136,19 @@
         mesh,
         //dimensionedScalar("0", dimensionSet(0, -1, 0, 0, 0), 0.0)
         dimensionedScalar("0", dimensionSet(0, 0, 0, 0, 0), 0.0)
+    );
+
+    volScalarField viscosity
+    (
+        IOobject
+        (
+            "viscosity",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        turbulence->nu()
     );
 
 //===========================

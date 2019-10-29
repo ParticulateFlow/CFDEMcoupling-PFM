@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
 
         // particle information update
         Info << "- evolve()" << endl;
-        particleCloud.evolve();
+        particleCloud.evolve(Us);
 
         // Pressure-velocity PIMPLE corrector loop
         while (pimple.loop())

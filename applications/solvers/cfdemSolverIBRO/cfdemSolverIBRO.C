@@ -97,12 +97,6 @@ int main(int argc, char *argv[])
 
         volScalarField voidfractionNext=mesh.lookupObject<volScalarField>("voidfractionNext");
 
-        forAll(voidfractionNext,cellI)
-        {
-            if(voidfractionNext[cellI] < 1) lambda[cellI]=(1.0-voidfractionNext[cellI]);
-            else lambda[cellI]=0.0;
-        }
-
         // Pressure-velocity PISO corrector
         {
             MRF.correctBoundaryVelocity(U);

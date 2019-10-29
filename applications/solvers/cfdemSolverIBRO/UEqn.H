@@ -5,8 +5,8 @@ fvVectorMatrix UEqn
   + turbulence->divDevReff(U)
  ==
     fvOptions(U)
-  + lambda*Us/U.mesh().time().deltaT() // explicit part of source term
-  - fvm::Sp(lambda/U.mesh().time().deltaT(),U) //fvm::ddt(V_ratio*lambda,U) //   // implicit part of source term
+  + lambda*(1-voidfractionNext)*Us/U.mesh().time().deltaT() // explicit part of source term
+  - fvm::Sp(lambda*(1-voidfractionNext)/U.mesh().time().deltaT(),U) //fvm::ddt(V_ratio*lambda,U) //   // implicit part of source term
 );
 
 UEqn.relax();
