@@ -90,6 +90,8 @@ $(forceModels)/granKineticEnergy/granKineticEnergy.C
 $(forceModels)/pdCorrelation/pdCorrelation.C
 $(forceModels)/surfaceTensionForce/surfaceTensionForce.C
 $(forceModels)/gradPForceSmooth/gradPForceSmooth.C
+$(forceModels)/particleDeformation/particleDeformation.C
+
 
 $(forceModelsMS)/forceModelMS/forceModelMS.C
 $(forceModelsMS)/forceModelMS/newForceModelMS.C

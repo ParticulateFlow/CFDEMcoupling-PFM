@@ -50,6 +50,7 @@ heatTransferGunn::heatTransferGunn
     verbose_(propsDict_.lookupOrDefault<bool>("verbose",false)),
     implicit_(propsDict_.lookupOrDefault<bool>("implicit",true)),
     calcTotalHeatFlux_(propsDict_.lookupOrDefault<bool>("calcTotalHeatFlux",true)),
+    initPartTemp_(propsDict_.lookupOrDefault<bool>("initPartTemp",false)),
     totalHeatFlux_(0.0),
     NusseltScalingFactor_(1.0),
     QPartFluidName_(propsDict_.lookupOrDefault<word>("QPartFluidName","QPartFluid")),
@@ -207,6 +208,11 @@ heatTransferGunn::heatTransferGunn
         typeCG_[0] = scaleDia_;
     }
     else if (typeCG_.size()>1) multiTypes_ = true;
+
+    if (initPartTemp_ && !partTempField_.headerOk())
+    {
+        FatalError <<"Trying to initialize particle temperatures, but no field found.\n" << abort(FatalError);
+    }
 }
 
 
@@ -253,8 +259,18 @@ void heatTransferGunn::calcEnergyContribution()
     // reset Scalar field
     QPartFluid_.primitiveFieldRef() = 0.0;
 
-    // get DEM data
-    particleCloud_.dataExchangeM().getData(partTempName_,"scalar-atom",partTemp_);
+    if (initPartTemp_)
+    {
+        // if particle temperatures are to be initialized from field, do a one-time push to DEM
+        initPartTemp();
+        particleCloud_.dataExchangeM().giveData("Temp","scalar-atom", partTemp_);
+        initPartTemp_ = false;
+    }
+    else
+    {
+        // get DEM data
+        particleCloud_.dataExchangeM().getData(partTempName_,"scalar-atom",partTemp_);
+    }
 
     #ifdef compre
        const volScalarField mufField = particleCloud_.turbulence().mu();
@@ -272,7 +288,6 @@ void heatTransferGunn::calcEnergyContribution()
         Info << "heatTransferGunn using scale from liggghts cg = " << scaleDia_ << endl;
     }
 
-    // calc La based heat flux
     scalar voidfraction(1);
     vector Ufluid(0,0,0);
     scalar Tfluid(0);
@@ -580,6 +595,19 @@ void heatTransferGunn::partTempField()
     partRelTempField_ = (partTempField_ - partTempAve_) / denom;
 
     Info << "heatTransferGunn: average part. temp = " << partTempAve_.value() << endl;
+}
+
+void heatTransferGunn::initPartTemp()
+{
+    label cellI = 0;
+    for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)
+    {
+        cellI = particleCloud_.cellIDs()[index][0];
+        if(cellI >= 0)
+        {
+            partTemp_[index][0] = partTempField_[cellI];
+        }
+    }
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
