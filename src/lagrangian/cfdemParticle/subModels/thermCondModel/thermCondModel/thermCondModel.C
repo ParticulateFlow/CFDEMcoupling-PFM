@@ -58,10 +58,7 @@ thermCondModel::thermCondModel
             IOobject::NO_WRITE
         )
     ),
-    kf0_(transportProperties_.lookup("kf")),
-    Cp_(transportProperties_.lookup("Cp"))
-//      kf0_(readScalar(transportProperties_.lookup("kf"))),
-//      Cp_(readScalar(transportProperties_.lookup("Cp")))
+    kf0_(transportProperties_.lookup("kf"))
 {}
 
 
@@ -69,7 +66,6 @@ thermCondModel::thermCondModel
 
 thermCondModel::~thermCondModel()
 {}
-
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

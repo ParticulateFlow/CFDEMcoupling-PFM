@@ -140,6 +140,10 @@ protected:
 
     double **particleV_; // particle total volumes
 
+    double **particleConvVel_;
+
+    double **particleFlucVel_;
+
     int numberOfParticles_;
 
     scalar d32_;
@@ -316,6 +320,10 @@ public:
        inline void get_cellIDs(int**&) const;
 
        inline double ** particleWeights() const;
+
+       inline double ** particleConvVels() const;
+
+       inline double ** particleFlucVels() const;
 
        virtual inline label body(int) const;
 

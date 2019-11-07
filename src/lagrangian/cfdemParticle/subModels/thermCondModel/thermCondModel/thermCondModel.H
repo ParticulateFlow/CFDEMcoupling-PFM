@@ -57,9 +57,6 @@ protected:
 
         dimensionedScalar kf0_;
 
-        dimensionedScalar Cp_;
-
-
 public:
 
     //- Runtime type information
@@ -106,9 +103,7 @@ public:
 
     // Member Functions
 
-        virtual tmp<volScalarField> thermCond() const = 0;
-
-        virtual tmp<volScalarField> thermDiff() const = 0;
+        virtual void calcThermCond() {}
 
 };
 

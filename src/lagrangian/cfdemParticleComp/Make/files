@@ -39,7 +39,8 @@ $(chemistryModels)/reactantPerParticle/reactantPerParticle.C
 $(energyModels)/energyModel/energyModel.C
 $(energyModels)/energyModel/newEnergyModel.C
 $(energyModels)/heatTransferGunn/heatTransferGunn.C
-$(energyModels)/heatTransferGunnPartField/heatTransferGunnPartField.C
+$(energyModels)/heatTransferRanzMarshall/heatTransferRanzMarshall.C
+$(energyModels)/heatTransferGranConduction/heatTransferGranConduction.C
 $(energyModels)/reactionHeat/reactionHeat.C
 
 $(thermCondModels)/thermCondModel/thermCondModel.C
@@ -67,6 +68,11 @@ $(forceModels)/gradPForce/gradPForce.C
 $(forceModels)/viscForce/viscForce.C
 $(forceModels)/MeiLift/MeiLift.C
 $(forceModels)/particleCellVolume/particleCellVolume.C
+$(forceModels)/deactivateForce/deactivateForce.C
+$(forceModels)/freeStreaming/freeStreaming.C
+$(forceModels)/isotropicFluctuations/isotropicFluctuations.C
+$(forceModels)/evaluateFluctuations/evaluateFluctuations.C
+$(forceModels)/directedDiffusiveRelaxation/directedDiffusiveRelaxation.C
 $(forceModels)/BeetstraDrag/BeetstraDrag.C
 $(forceModels)/BeetstraDragPoly/BeetstraDragPoly.C
 $(forceModels)/dSauter/dSauter.C
@@ -75,6 +81,7 @@ $(forceModels)/Fines/FinesFields.C
 $(forceModels)/Fines/FanningDynFines.C
 $(forceModels)/Fines/ErgunStatFines.C
 $(forceModels)/granKineticEnergy/granKineticEnergy.C
+$(forceModels)/particleDeformation/particleDeformation.C
 
 $(forceSubModels)/forceSubModel/newForceSubModel.C
 $(forceSubModels)/forceSubModel/forceSubModel.C
@@ -123,6 +130,7 @@ $(momCoupleModels)/momCoupleModel/newMomCoupleModel.C
 $(momCoupleModels)/explicitCouple/explicitCouple.C
 $(momCoupleModels)/implicitCouple/implicitCouple.C
 $(momCoupleModels)/noCouple/noCouple.C
+$(momCoupleModels)/deactivateCouple/deactivateCouple.C
 
 $(regionModels)/regionModel/regionModel.C
 $(regionModels)/regionModel/newRegionModel.C
@@ -139,6 +147,7 @@ $(averagingModels)/averagingModel/averagingModel.C
 $(averagingModels)/averagingModel/newAveragingModel.C
 $(averagingModels)/dilute/dilute.C
 $(averagingModels)/dense/dense.C
+$(averagingModels)/noAveraging/noAveraging.C
 
 $(clockModels)/clockModel/clockModel.C
 $(clockModels)/clockModel/newClockModel.C
@@ -158,3 +167,4 @@ $(smoothingModels)/noSmoothing/noSmoothing.C
 $(smoothingModels)/constDiffSmoothing/constDiffSmoothing.C
 
 LIB = $(CFDEM_LIB_DIR)/lib$(CFDEM_LIB_COMP_NAME)
+

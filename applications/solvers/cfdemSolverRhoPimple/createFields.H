@@ -58,10 +58,11 @@ Info<< "Reading thermophysical properties\n" << endl;
            "addSource",
            runTime.timeName(),
            mesh,
-           IOobject::MUST_READ,
+           IOobject::READ_IF_PRESENT,
            IOobject::AUTO_WRITE
         ),
-        mesh
+        mesh,
+        dimensionedScalar("zero", dimensionSet(1,-1,-3,0,0,0,0), 0.0)
     );
 
     Info<< "\nCreating fluid-particle heat flux field\n" << endl;
@@ -94,21 +95,6 @@ Info<< "Reading thermophysical properties\n" << endl;
         dimensionedScalar("zero", dimensionSet(1,-1,-3,-1,0,0,0), 0.0)
     );
 
-  /*  Info<< "\nCreating thermal diffusivity field\n" << endl;
-    volScalarField thDiff
-    (
-        IOobject
-        (
-            "thDiff",
-            runTime.timeName(),
-            mesh,
-            IOobject::NO_READ,
-            IOobject::AUTO_WRITE
-        ),
-        mesh,
-        dimensionedScalar("zero", dimensionSet(0,2,-1,0,0,0,0), 0.0)
-    );
-  */
     Info<< "\nCreating thermal conductivity field\n" << endl;
     volScalarField thCond
     (
@@ -117,11 +103,12 @@ Info<< "Reading thermophysical properties\n" << endl;
             "thCond",
             runTime.timeName(),
             mesh,
-            IOobject::NO_READ,
+            IOobject::READ_IF_PRESENT,
             IOobject::AUTO_WRITE
         ),
         mesh,
-        dimensionedScalar("zero", dimensionSet(1,1,-3,-1,0,0,0), 0.0)
+        dimensionedScalar("zero", dimensionSet(1,1,-3,-1,0,0,0), 0.0),
+        "zeroGradient"
     );
 
     Info<< "\nCreating heat capacity field\n" << endl;

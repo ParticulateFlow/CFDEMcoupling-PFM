@@ -1,0 +1,93 @@
+###############################################
+# variables
+
+# material parameters
+
+variable partDens	equal	2500
+
+# particle-particle properties
+variable knPP		equal	0
+variable ktPP		equal	0
+variable gnPP		equal	0
+variable gtPP		equal	0
+variable muPP		equal	0
+variable rfPP		equal	0
+
+
+# particle-wall properties
+# wall 1 = sapphire glass
+# wall 2 = aluminium
+variable knPW		equal	v_knPP
+variable ktPW		equal	v_ktPP
+variable gnPW		equal	v_gnPP/sqrt(2.0)
+variable gtPW		equal	v_gtPP/sqrt(2.0)
+variable muPW1		equal	0
+variable muPW2		equal	0
+variable rfPW1		equal	0
+variable rfPW2		equal	0
+
+variable Tpart equal 363
+
+#variable dt equal 0.00025
+variable dt equal 0.00025
+variable skin equal 0.0005
+###############################################
+
+atom_style		granular
+atom_modify		map array
+communicate	single vel yes
+
+boundary		f f f
+newton			off
+units			si
+processors      1 1 2
+
+read_restart 		../DEM/liggghts.restart
+
+
+#liggghts.restart
+reset_timestep 0
+
+neighbor	${skin} bin
+neigh_modify	delay 0 exclude type 1 1
+
+#Material properties required for new pair styles
+
+fix 		m1 all property/global kn peratomtypepair 3 ${knPP} ${knPW} ${knPW} ${knPW} 0 0 ${knPW} 0 0
+fix 		m2 all property/global kt peratomtypepair 3 ${ktPP} ${ktPW} ${ktPW} ${ktPW} 0 0 ${ktPW} 0 0
+fix 		m3 all property/global gamman peratomtypepair 3 ${gnPP} ${gnPW} ${gnPW} ${gnPW} 0 0 ${gnPW} 0 0
+fix 		m4 all property/global gammat peratomtypepair 3 ${gtPP} ${gtPW} ${gtPW} ${gtPW} 0 0 ${gtPW} 0 0
+fix 		m5 all property/global coefficientFriction peratomtypepair 3 ${muPP} ${muPW1} ${muPW2} ${muPW1} 0 0 ${muPW2} 0 0
+fix 		m6 all property/global coefficientRollingFriction peratomtypepair 3 ${rfPP} ${rfPW1} ${rfPW2} ${rfPW1} 0 0 ${rfPW2} 0 0
+
+#pair style
+pair_style gran model hooke/stiffness tangential history rolling_friction cdt
+pair_coeff  * *
+
+#timestep, gravity
+timestep    ${dt}
+#fix         gravi all gravity 9.81 vector 0.0 0.0 -1.0
+
+fix         container all mesh/surface file stl_files/mesh.stl type 2
+
+fix granwalls all wall/gran model hooke/stiffness tangential history mesh n_meshes 1 meshes container
+
+
+#cfd coupling, needs to come before integration fix to allow for fluctuations
+fix		cfd all couple/cfd couple_every 1 mpi
+fix		cfd2 all couple/cfd/recurrence transfer_force yes transfer_fluctuations no
+
+
+# allow freely floating particles to fall back into the bed: needs integration
+fix		integr all nve
+#fix		integr all nve/sphere
+#fix             integr all nve/noforce
+
+#screen output
+thermo_style	custom step atoms ke
+thermo		100
+thermo_modify	lost ignore norm no
+compute_modify	thermo_temp dynamic yes
+
+dump		dmp all custom/vtk 400 ../DEM/post/recdump*.liggghts_coupled.vtk id type radius x y z vx vy vz fx fy fz f_dragforce[1] f_dragforce[2] f_dragforce[3]
+run 1
