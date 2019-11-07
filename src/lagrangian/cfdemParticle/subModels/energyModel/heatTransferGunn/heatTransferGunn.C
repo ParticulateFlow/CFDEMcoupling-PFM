@@ -458,6 +458,9 @@ void heatTransferGunn::calcEnergyContribution()
             particleCloud_.averagingM().UsWeightField(),
             NULL
         );
+
+        Info << "Minimum particle temperature: " << gMin(partTempField_) << endl;
+        Info << "Maximum particle temperature: " << gMax(partTempField_) << endl;
     }
 
     // limit source term in explicit treatment
@@ -476,13 +479,6 @@ void heatTransferGunn::calcEnergyContribution()
     }
 
     QPartFluid_.correctBoundaryConditions();
-
-    volScalarField minParticleWeights = particleCloud_.averagingM().UsWeightField();
-    Info << "Minimum Particle Weight " << gMin(minParticleWeights) << endl;
-    Info << "Minimum Particle Temperature: " << gMin(partTempField_) << endl;
-    Info << "Maximum Particle Temperature: " << gMax(partTempField_) << endl;
-    Info << "Minimum Fluid Temperature: " << gMin(tempField_) << endl;
-    Info << "Maximum Fluid Temperature: " << gMax(tempField_) << endl;
 }
 
 void heatTransferGunn::addEnergyContribution(volScalarField& Qsource) const
