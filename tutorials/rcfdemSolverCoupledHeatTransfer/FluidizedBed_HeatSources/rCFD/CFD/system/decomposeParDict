@@ -30,7 +30,7 @@ numberOfSubdomains  4;
 
 simpleCoeffs
 {
-    n           (1 1 4);
+    n           (2 1 2);
 //    n           (2 1 4);
     delta       0.001;
 }
