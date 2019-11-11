@@ -49,6 +49,7 @@ heatTransferRanzMarshall::heatTransferRanzMarshall
     verbose_(propsDict_.lookupOrDefault<bool>("verbose",false)),
     implicit_(propsDict_.lookupOrDefault<bool>("implicit",true)),
     calcTotalHeatFlux_(propsDict_.lookupOrDefault<bool>("calcTotalHeatFlux",true)),
+    initPartTemp_(propsDict_.lookupOrDefault<bool>("initPartTemp",false)),
     totalHeatFlux_(0.0),
     NusseltScalingFactor_(1.0),
     QPartFluidName_(propsDict_.lookupOrDefault<word>("QPartFluidName","QPartFluid")),
@@ -206,6 +207,11 @@ heatTransferRanzMarshall::heatTransferRanzMarshall
         typeCG_[0] = scaleDia_;
     }
     else if (typeCG_.size()>1) multiTypes_ = true;
+
+    if (initPartTemp_ && !partTempField_.headerOk())
+    {
+        FatalError <<"Trying to initialize particle temperatures, but no field found.\n" << abort(FatalError);
+    }
 }
 
 
@@ -252,8 +258,18 @@ void heatTransferRanzMarshall::calcEnergyContribution()
     // reset Scalar field
     QPartFluid_.primitiveFieldRef() = 0.0;
 
-    // get DEM data
-    particleCloud_.dataExchangeM().getData(partTempName_,"scalar-atom",partTemp_);
+    if (initPartTemp_)
+    {
+        // if particle temperatures are to be initialized from field, do a one-time push to DEM
+        initPartTemp();
+        particleCloud_.dataExchangeM().giveData("Temp","scalar-atom", partTemp_);
+        initPartTemp_ = false;
+    }
+    else
+    {
+        // get DEM data
+        particleCloud_.dataExchangeM().getData(partTempName_,"scalar-atom",partTemp_);
+    }
 
     #ifdef compre
        const volScalarField mufField = particleCloud_.turbulence().mu();
@@ -563,6 +579,19 @@ void heatTransferRanzMarshall::partTempField()
         partRelTempField_ = (partTempField_ - partTempAve_) / denom;
 
         Info << "heatTransferRanzMarshall: average part. temp = " << partTempAve_.value() << endl;
+}
+
+void heatTransferRanzMarshall::initPartTemp()
+{
+    label cellI = 0;
+    for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)
+    {
+        cellI = particleCloud_.cellIDs()[index][0];
+        if(cellI >= 0)
+        {
+            partTemp_[index][0] = partTempField_[cellI];
+        }
+    }
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

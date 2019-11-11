@@ -57,6 +57,8 @@ protected:
 
     bool calcTotalHeatFlux_;
 
+    bool initPartTemp_;
+
     scalar totalHeatFlux_;
 
     scalar NusseltScalingFactor_;
@@ -128,6 +130,8 @@ protected:
     virtual void giveData();
 
     virtual void heatFlux(label, scalar, scalar, scalar, scalar cg3 = 1.0);
+
+    virtual void initPartTemp();
 
 public:
 
