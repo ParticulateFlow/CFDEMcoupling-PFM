@@ -1,0 +1,3 @@
+rcfdemSolverBase.C
+
+EXE=$(CFDEM_APP_DIR)/rcfdemSolverBase

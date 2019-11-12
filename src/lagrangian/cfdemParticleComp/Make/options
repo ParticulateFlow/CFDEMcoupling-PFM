@@ -42,3 +42,4 @@ LIB_LIBS = \
     -lliggghts \
     -L$(CFDEM_Many2ManyLIB_PATH) \
     -lcoupleMany2Many
+

@@ -57,8 +57,64 @@ noChemistry::~noChemistry()
 
 // * * * * * * * * * * * * * * * * Member Fct  * * * * * * * * * * * * * * * //
 
+tmp<volScalarField> noChemistry::Smi(label i) const
+{
+    tmp<volScalarField> Smi_
+    (
+        new volScalarField
+        (
+            IOobject
+            (
+                "smi_",
+                particleCloud_.mesh().time().timeName(),
+                particleCloud_.mesh(),
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+             ),
+             particleCloud_.mesh(),
+             dimensionedScalar
+             (
+              "zero",
+              dimMass/(dimVol*dimTime),
+              0.0
+             )
+        )
+    );
+
+    return Smi_;
+}
+
+tmp<volScalarField> noChemistry::Sm() const
+{
+    tmp<volScalarField> Sm_
+    (
+        new volScalarField
+        (
+            IOobject
+            (
+                "Sm_",
+                particleCloud_.mesh().time().timeName(),
+                particleCloud_.mesh(),
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+             ),
+             particleCloud_.mesh(),
+             dimensionedScalar
+             (
+              "zero",
+              dimMass/(dimVol*dimTime),
+              0.0
+             )
+        )
+    );
+
+    return Sm_;
+}
+
 void noChemistry::execute()
-{}
+{
+    //do nothing
+}
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

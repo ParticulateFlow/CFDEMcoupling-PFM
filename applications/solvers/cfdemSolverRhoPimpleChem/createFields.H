@@ -28,6 +28,8 @@
     }
 
     volScalarField& p = thermo.p();
+    const volScalarField& T = thermo.T();
+    const volScalarField& psi = thermo.psi();
 
     multivariateSurfaceInterpolationScheme<scalar>::fieldTable fields;
 
@@ -51,9 +53,6 @@
     );
 
     //  kinematic fields
-
-
-
     Info<< "Reading field U\n" << endl;
     volVectorField U
     (
@@ -82,18 +81,8 @@
         mesh
     );
 
-    volScalarField rhoeps
-    (
-        IOobject
-        (
-            "rhoeps",
-            runTime.timeName(),
-            mesh,
-            IOobject::MUST_READ,
-            IOobject::AUTO_WRITE
-        ),
-        rho*voidfraction
-    );
+    volScalarField rhoeps ("rhoeps", rho*voidfraction);
+
 
     Info<< "\nCreating fluid-particle heat flux field\n" << endl;
     volScalarField Qsource
@@ -133,11 +122,12 @@
             "thCond",
             runTime.timeName(),
             mesh,
-            IOobject::NO_READ,
+            IOobject::READ_IF_PRESENT,
             IOobject::AUTO_WRITE
         ),
         mesh,
-        dimensionedScalar("zero", dimensionSet(1,1,-3,-1,0,0,0), 0.0)
+        dimensionedScalar("zero", dimensionSet(1,1,-3,-1,0,0,0), 0.0),
+        "zeroGradient"
     );
 
     Info<< "\nCreating heat capacity field\n" << endl;
@@ -282,9 +272,18 @@
         mesh,
         dimensionedScalar("zero",dimensionSet(0, -3, 0, 0, 1),0)
     );
+
+    volScalarField dSauter
+    (
+        IOobject
+        (
+            "dSauter",
+            runTime.timeName(),
+            mesh,
+            IOobject::READ_IF_PRESENT,
+            IOobject::AUTO_WRITE
+        ),
+        mesh,
+        dimensionedScalar("zero",dimensionSet(0, 1, 0, 0, 0,0,0),0)
+    );
 //===============================
-
-
-
- //   singlePhaseTransportModel laminarTransport(U, phi);
-

@@ -1,0 +1,283 @@
+# chemistry in fluidized bed
+log             ../DEM/log.liggghts
+thermo_log      ../DEM/post/thermo.txt
+
+coarsegraining  7.0 model_check error
+
+atom_style      granular
+atom_modify     map array
+communicate     single vel yes
+
+boundary        f f f
+newton          off
+
+units           si
+processors      2 * 2
+
+# read the restart file
+read_restart    ../DEM/post/restart/liggghts.restart
+
+neighbor        1e-4 bin
+neigh_modify    delay 0 
+
+# Material properties required for granular pair styles
+fix         m1 all property/global youngsModulus peratomtype 5.e6 5.e6
+fix         m2 all property/global poissonsRatio peratomtype 0.45 0.45
+fix         m3 all property/global coefficientRestitution peratomtypepair 2 0.3 0.3 0.3 0.3
+fix         m4 all property/global coefficientFriction peratomtypepair 2 0.5 0.5 0.5 0.5
+
+# pair style
+pair_style  gran model hertz tangential history # Hertzian without cohesion
+pair_coeff  * *
+
+# timestep, gravity
+timestep    0.000005
+fix         gravi all gravity 9.81 vector 0.0 -1.0 0.0
+
+# walls
+fix     zwalls1  all wall/gran model hertz tangential history primitive type 1 yplane 0.000
+fix     zwalls2  all wall/gran model hertz tangential history primitive type 1 yplane 0.15
+fix     cylwalls all wall/gran model hertz tangential history primitive type 1 ycylinder 0.034 0. 0.
+
+# Thermal properties
+fix     ftco all property/global thermalConductivity peratomtype 1.4 1.4
+fix     ftca all property/global thermalCapacity peratomtype 3000 5000
+
+# re-make groups
+group   ore type 1
+group   quartz type 2
+
+###############################################
+fix ts_check all check/timestep/gran 10 0.1 0.1
+
+###############
+# cfd coupling
+fix     cfd all couple/cfd couple_every 50 mpi
+fix     cfd2 all couple/cfd/force
+
+# apply nve integration to all particles that are inserted as single particles
+fix     integr all nve/sphere 
+
+#compute kinetic energy of particles to see if they are moving changing
+compute  KinEn all ke
+variable ke_tot	equal c_KinEn
+
+# this one invokes heat transfer calculation, transfers per-particle temperature and adds convective heat flux to particles
+fix     tconv all couple/cfd/convection T0 1022
+
+###############
+# this should invoke chemistry
+fix     cfd3 ore couple/cfd/chemistry n_species 5 species_names H2 H2O CO CO2 N2 n_diff 2 diffusant_names CO H2
+
+# Activate for 3-layer unreacted core shrink model
+fix     cfd5 ore chem/shrink/core speciesA CO molMassA 0.02801 speciesC CO2 molMassC 0.04401 scale_reduction_rate 10.0 screen no
+fix     cfd6 ore chem/shrink/core speciesA H2 molMassA 0.00202 speciesC H2O molMassC 0.01801 scale_reduction_rate 10.0 screen no
+
+# Material properties for chemical reaction
+fix     k0_CO ore property/atom k0_cfd5 vector yes no no 17 25 2700
+fix     Ea_CO ore property/atom Ea_cfd5 vector yes no no 69488 95000 130940
+
+fix     k0_H2 ore property/atom k0_cfd6 vector yes no no 30 23 160
+fix     Ea_H2 ore property/atom Ea_cfd6 vector yes no no 63627 85000 105908
+
+# particle parameters
+fix     porosity        ore property/atom   porosity_       vector yes no no 0.61 0.34 0.19 0.17
+fix     tortuosity      ore property/global tortuosity_     scalar 3
+fix     pore_diameter   ore property/global pore_diameter_  scalar 1.e-7
+
+
+# define layer properties
+fix     LayerRelRadii ore property/atom relRadii vector yes no no  1.0 0.998 0.995 0.98
+
+### define fix for mass layer - initial testing
+fix     LayerMasses ore property/atom massLayer vector yes no no 0. 0. 0. 0.
+fix     LayerDensities ore property/global density_ore vector 7870. 5740. 5170. 5240.
+
+## define fix for rho_eff and fracRed - initialize as zero
+fix     fracRed ore property/atom fracRed_ore vector yes no no 0. 0. 0.
+fix     rhoeff  ore property/atom rhoeff      vector yes no no 0. 0. 0. 0.
+
+###############
+# Write data into files for post-processing
+group part type 1
+
+variable np equal count(part)
+variable WI equal 100000
+variable time equal time
+
+compute fr_1 all reduce sum f_fracRed[1] f_fracRed[2] f_fracRed[3]
+fix     fr_d1 all ave/time 1 1 1 c_fr_1[1] c_fr_1[2] c_fr_1[3]
+variable fr_d1_1 equal f_fr_d1[1]
+variable fr_d1_2 equal f_fr_d1[2]
+variable fr_d1_3 equal f_fr_d1[3]
+
+# Calculate total fractional reduction to be written into the dump file for postProcessing/graphical representation
+variable frOV_d1 equal 1/9*(f_fr_d1[3])+2/9*(f_fr_d1[2])+6/9*(f_fr_d1[1])
+
+fix printfr1 all print ${WI} "${time} ${fr_d1_1} ${fr_d1_2} ${fr_d1_3} ${frOV_d1}" file ../DEM/post/fr_d1.dat title "#time fr_d1_1 fr_d1_2 fr_d1_3 fr_overall_d1"
+
+variable fr_1_divided equal f_fr_d1[1]/${np}
+variable fr_2_divided equal f_fr_d1[2]/${np}
+variable fr_3_divided equal f_fr_d1[3]/${np}
+variable frOV_divided equal 1/9*v_fr_3_divided+2/9*v_fr_2_divided+6/9*v_fr_1_divided
+
+fix printfrdividied all print ${WI} "${time} ${fr_1_divided} ${fr_2_divided} ${fr_3_divided} ${frOV_divided}" file ../DEM/post/frDivided.dat title "#time fr_1 fr_2 fr_3 frOV"
+
+### Reactant gas mass change ###
+compute dma_CO all reduce sum f_dmA_cfd5[1] f_dmA_cfd5[2] f_dmA_cfd5[3]
+fix     dmA_f_CO all ave/time 1 1 1 c_dma_CO[1] c_dma_CO[2] c_dma_CO[3]
+variable dmA_CO_1 equal f_dmA_f_CO[1]
+variable dmA_CO_2 equal f_dmA_f_CO[2]
+variable dmA_CO_3 equal f_dmA_f_CO[3]
+
+compute dma_H2 all reduce sum f_dmA_cfd6[1] f_dmA_cfd6[2] f_dmA_cfd6[3]
+fix     dmA_f_H2 all ave/time 1 1 1 c_dma_H2[1] c_dma_H2[2] c_dma_H2[3]
+variable dmA_H2_1 equal f_dmA_f_H2[1]
+variable dmA_H2_2 equal f_dmA_f_H2[2]
+variable dmA_H2_3 equal f_dmA_f_H2[3]
+
+### Write Mass change files to file ###
+fix printdmA all print ${WI} "${time} ${dmA_CO_1} ${dmA_CO_2} ${dmA_CO_3} ${dmA_H2_1} ${dmA_H2_2} ${dmA_H2_3}" file ../DEM/post/dmA.dat title "#time dmA_CO_1 dmA_CO_2 dmA_CO_3 dmA_H2_1 dmA_H2_2 dmA_H2_3"
+
+###############
+
+compute Aterm_red_CO all reduce sum f_Aterm_cfd5[1] f_Aterm_cfd5[2] f_Aterm_cfd5[3]
+fix     Aterm1 all ave/time 10 1 10 c_Aterm_red_CO[1] c_Aterm_red_CO[2] c_Aterm_red_CO[3]
+variable a_CO_1 equal f_Aterm1[1]
+variable a_CO_2 equal f_Aterm1[2]
+variable a_CO_3 equal f_Aterm1[3]
+
+compute Aterm_red_H2 all reduce sum f_Aterm_cfd6[1] f_Aterm_cfd6[2] f_Aterm_cfd6[3]
+fix     Aterm2 all ave/time 10 1 10 c_Aterm_red_H2[1] c_Aterm_red_H2[2] c_Aterm_red_H2[3]
+variable a_H2_1 equal f_Aterm2[1]
+variable a_H2_2 equal f_Aterm2[2]
+variable a_H2_3 equal f_Aterm2[3]
+
+compute Bterm_red_CO all reduce sum f_Bterm_cfd5[1] f_Bterm_cfd5[2] f_Bterm_cfd5[3]
+fix     Bterm1 all ave/time 10 1 10 c_Bterm_red_CO[1] c_Bterm_red_CO[2] c_Bterm_red_CO[3]
+variable b_CO_1 equal f_Bterm1[1]
+variable b_CO_2 equal f_Bterm1[2]
+variable b_CO_3 equal f_Bterm1[3]
+
+compute Bterm_red_H2 all reduce sum f_Bterm_cfd6[1] f_Bterm_cfd6[2] f_Bterm_cfd6[3]
+fix     Bterm2 all ave/time 10 1 10 c_Bterm_red_H2[1] c_Bterm_red_H2[2] c_Bterm_red_H2[3]
+variable b_H2_1 equal f_Bterm2[1]
+variable b_H2_2 equal f_Bterm2[2]
+variable b_H2_3 equal f_Bterm2[3]
+
+compute Massterm_red_CO all reduce sum f_Massterm_cfd5
+fix     Massterm1 all ave/time 10 1 10 c_Massterm_red_CO
+variable mt_CO equal f_Massterm1
+
+compute Massterm_red_H2 all reduce sum f_Massterm_cfd6
+fix     Massterm2 all ave/time 10 1 10 c_Massterm_red_H2
+variable mt_H2 equal f_Massterm2
+
+fix printAterm all print ${WI} "${time} ${a_CO_1} ${a_CO_2} ${a_CO_3} ${a_H2_1} ${a_H2_2} ${a_H2_3}" file ../DEM/post/Aterm.dat title "#time a_CO_1 aCO_2 a_CO_3 a_H2_1 a_H2_2 a_H2_3"
+
+fix printBterm all print ${WI} "${time} ${b_CO_1} ${b_CO_2} ${b_CO_3} ${b_H2_1} ${b_H2_2} ${b_H2_3}" file ../DEM/post/Bterm.dat title "#time b_CO_1 b_CO_2 b_CO_3 b_H2_1 b_H2_2 b_H2_3"
+
+fix printMterm all print ${WI} "${time} ${mt_CO} ${mt_H2}" file ../DEM/post/Mterm.dat title "#time mt_CO mt_H2"
+
+###############
+compute mass_layer all reduce sum f_LayerMasses[1] f_LayerMasses[2] f_LayerMasses[3] f_LayerMasses[4]
+fix     massLayerPrintout all ave/time 1 1 1 c_mass_layer[1] c_mass_layer[2] c_mass_layer[3] c_mass_layer[4]
+variable mL1 equal f_massLayerPrintout[1]
+variable mL2 equal f_massLayerPrintout[2]
+variable mL3 equal f_massLayerPrintout[3]
+variable mL4 equal f_massLayerPrintout[4]
+
+compute dY_CO all reduce sum f_dY_cfd5[1] f_dY_cfd5[2] f_dY_cfd5[3]
+fix dY_CO_Output all ave/time 1 1 1 c_dY_CO[1] c_dY_CO[2] c_dY_CO[3]
+variable dY_CO_1 equal f_dY_CO_Output[1]
+variable dY_CO_2 equal f_dY_CO_Output[2]
+variable dY_CO_3 equal f_dY_CO_Output[3]
+
+compute dY_H2 all reduce sum f_dY_cfd6[1] f_dY_cfd6[2] f_dY_cfd6[3]
+fix dY_H2_Output all ave/time 1 1 1 c_dY_H2[1] c_dY_H2[2] c_dY_H2[3]
+variable dY_H2_1 equal f_dY_H2_Output[1]
+variable dY_H2_2 equal f_dY_H2_Output[2]
+variable dY_H2_3 equal f_dY_H2_Output[3]
+
+compute xA_CO all reduce sum f_X_CO
+fix     molarFractionA_CO all ave/time 1 1 1 c_xA_CO
+variable xA_CO_1 equal f_molarFractionA_CO
+
+compute xA_H2 all reduce sum f_X_H2
+fix     molarFractionA_H2 all ave/time 1 1 1 c_xA_H2
+variable xA_H2_1 equal f_molarFractionA_H2
+
+compute xC_CO2 all reduce sum f_X_CO2
+fix     molarFractionC_CO2 all ave/time 1 1 1 c_xC_CO2
+variable xC_CO2_1 equal f_molarFractionC_CO2
+
+compute xC_H2O all reduce sum f_X_H2O
+fix     molarFractionC_H2O all ave/time 1 1 1 c_xC_H2O
+variable xC_H2O_1 equal f_molarFractionC_H2O
+
+fix printMassLayer all print ${WI} "${time} ${mL1} ${mL2} ${mL3} ${mL4}" file ../DEM/post/MassLayers.dat title "#time mL_Fe mL_w mL_m mL_h"
+
+fix printdmYLayer all print ${WI} "${time} ${dY_CO_1} ${dY_CO_2} ${dY_CO_3} ${dY_H2_1} ${dY_H2_2} ${dY_H2_3}" file ../DEM/post/dmY.dat title "#time dY_CO_1 dY_CO_2 dY_CO_3 dY_H2_1 dY_H2_2 dY_H2_3"
+
+fix molarFractions all print ${WI} "${time} ${xA_CO_1} ${xA_H2_1} ${xC_CO2_1} ${xC_H2O_1}" file ../DEM/post/molarFractions.dat title "#title x_CO x_H2 x_CO2 x_H2O"
+
+###############
+
+compute effDiffBinary_red_CO all reduce sum f_effDiffBinary_cfd5[1] f_effDiffBinary_cfd5[2] f_effDiffBinary_cfd5[3]
+fix     effDiffBinary1 all ave/time 10 1 10 c_effDiffBinary_red_CO[1] c_effDiffBinary_red_CO[2] c_effDiffBinary_red_CO[3]
+variable dij_CO_1 equal f_effDiffBinary1[1]
+variable dij_CO_2 equal f_effDiffBinary1[2]
+variable dij_CO_3 equal f_effDiffBinary1[3]
+
+compute effDiffBinary_red_H2 all reduce sum f_effDiffBinary_cfd6[1] f_effDiffBinary_cfd6[2] f_effDiffBinary_cfd6[3]
+fix     effDiffBinary2 all ave/time 10 1 10 c_effDiffBinary_red_H2[1] c_effDiffBinary_red_H2[2] c_effDiffBinary_red_H2[3]
+variable dij_H2_1 equal f_effDiffBinary2[1]
+variable dij_H2_2 equal f_effDiffBinary2[2]
+variable dij_H2_3 equal f_effDiffBinary2[3]
+
+compute effDiffKnud_red_CO all reduce sum f_effDiffKnud_cfd5[1] f_effDiffKnud_cfd5[2] f_effDiffKnud_cfd5[3]
+fix     effDiffKnud1 all ave/time 10 1 10 c_effDiffKnud_red_CO[1] c_effDiffKnud_red_CO[2] c_effDiffKnud_red_CO[3]
+variable dik_CO_1 equal f_effDiffKnud1[1]
+variable dik_CO_2 equal f_effDiffKnud1[2]
+variable dik_CO_3 equal f_effDiffKnud1[3]
+
+compute effDiffKnud_red_H2 all reduce sum f_effDiffKnud_cfd6[1] f_effDiffKnud_cfd6[2] f_effDiffKnud_cfd6[3]
+fix     effDiffKnud2 all ave/time 10 1 10 c_effDiffKnud_red_H2[1] c_effDiffKnud_red_H2[2] c_effDiffKnud_red_H2[3]
+variable dik_H2_1 equal f_effDiffKnud2[1]
+variable dik_H2_2 equal f_effDiffKnud2[2]
+variable dik_H2_3 equal f_effDiffKnud2[3]
+
+fix printDiffTerms all print ${WI} "${time} ${dij_CO_1} ${dij_CO_2} ${dij_CO_3} ${dij_H2_1} ${dij_H2_2} ${dij_H2_3} ${dik_CO_1} ${dik_CO_2} ${dik_CO_3} ${dik_H2_1} ${dik_H2_2} ${dik_H2_3} " file ../DEM/post/DiffTerm.dat title "#time dij_CO_1 dij_CO_2 dij_CO_3 dij_H2_1 dij_H2_2 dij_H2_3 dik_CO_1 dik_CO_2 dik_CO_3 dik_H2_1 dik_H2_2 dik_H2_3"
+
+###############
+
+## Check Layer Radii and Write them to files ###
+compute layerRad1 all reduce sum f_LayerRelRadii[1]
+fix     redRad1 all ave/time 1 1 1 c_layerRad1
+variable rr1 equal f_redRad1
+
+compute layerRad2 all reduce sum f_LayerRelRadii[2]
+fix     redRad2 all ave/time 1 1 1 c_layerRad2
+variable rr2 equal f_redRad2
+
+compute layerRad3 all reduce sum f_LayerRelRadii[3]
+fix     redRad3 all ave/time 1 1 1 c_layerRad3
+variable rr3 equal f_redRad3
+
+compute layerRad4 all reduce sum f_LayerRelRadii[4]
+fix     redRad4 all ave/time 1 1 1 c_layerRad4
+variable rr4 equal f_redRad4
+
+fix printRelRadii all print ${WI} "${time} ${rr1} ${rr2} ${rr3} ${rr4}" file ../DEM/post/relRadii.dat title "#time relRad_1 relRad_2 relRad_3 relRad_4"
+
+###############
+# screen output
+compute         rke all erotate/sphere
+thermo_style    custom step atoms ke c_rke vol
+thermo          10
+thermo_modify   lost ignore norm no
+compute_modify  thermo_temp dynamic yes
+
+dump        dmp all custom ${WI} ../DEM/post/dump*.liggghts_run id type x y z vx vy vz fx fy fz radius mass f_fracRed[1] f_fracRed[2] f_fracRed[3]
+
+run         1

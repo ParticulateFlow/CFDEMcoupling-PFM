@@ -50,6 +50,25 @@ inline void cfdemCloud::setCG(double cg)
     Info << "cg is set to: " << cg_ << endl;
 }
 
+inline void cfdemCloud::setPositions(label n,double* pos)
+{
+    for (int i=0; i<n; ++i)
+        for (int j=0; j<3; ++j)
+            positions_[i][j]=pos[i*3+j];
+}
+
+inline void cfdemCloud::setCellIDs(label n,int* ID)
+{
+    for (int i=0; i<n; ++i)
+        cellIDs_[i][0]=ID[i];
+}
+
+inline void cfdemCloud::setCellIDs(DynamicList<label> const& IDs)
+{
+    for (int i=0; i<IDs.size(); ++i)
+        cellIDs_[i][0] = IDs[i];
+}
+
 inline bool cfdemCloud::impDEMdrag() const
 {
     return impDEMdrag_;
@@ -113,6 +132,16 @@ inline double ** cfdemCloud::velocities() const
 inline double ** cfdemCloud::fluidVels() const
 {
     return fluidVel_;
+}
+
+inline double ** cfdemCloud::particleConvVels() const
+{
+    return particleConvVel_;
+}
+
+inline double ** cfdemCloud::particleFlucVels() const
+{
+    return particleFlucVel_;
 }
 
 inline double ** cfdemCloud::fAccs() const
@@ -261,7 +290,7 @@ inline int ** cfdemCloud::particleTypes() const
 
 inline label cfdemCloud::particleType(label index) const
 {
-    if(!getParticleDensities_) return -1;
+    if(!getParticleTypes_) return -1;
     else
     {
         return particleTypes_[index][0];

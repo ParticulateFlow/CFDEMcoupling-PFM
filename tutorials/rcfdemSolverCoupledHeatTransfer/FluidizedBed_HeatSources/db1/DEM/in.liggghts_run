@@ -1,0 +1,133 @@
+# variables
+
+# material parameters
+
+variable partDens	equal	667
+variable partDiam	equal	0.00099
+variable partRad	equal	0.5*${partDiam}
+
+# particle-particle properties
+variable knPP		equal	1600
+variable ktPP		equal	800
+# ATTENTION: LIGGGHTS scales damping coefficients with m_eff
+variable gnPP		equal	3.1192e+04
+variable gtPP		equal	2.4446e+04
+variable muPP		equal	0.1
+
+
+###############
+# the following parameters need to be updated
+###############
+
+variable rfPP		equal	0.1
+
+
+# particle-wall properties
+# wall 1 = front and side walls
+# wall 2 = back wall
+variable knPW		equal	v_knPP
+variable ktPW		equal	v_ktPP
+variable gnPW		equal	v_gnPP/sqrt(2.0)
+variable gtPW		equal	v_gtPP/sqrt(2.0)
+variable muPW1		equal	0.2
+variable muPW2		equal	0.2
+variable rfPW1		equal	0.1
+variable rfPW2		equal	0.1
+
+variable Tpart equal 351
+
+variable dt equal 0.000005
+variable skin equal 0.0005
+###############################################
+
+atom_style		granular
+atom_modify		map array
+communicate	single vel yes
+
+boundary		f f f
+newton			off
+units			si
+processors      2 1 2
+
+region		reg block -0.04 0.04 -0.005 0.005 0.0 0.4 units box
+create_box	3 reg
+
+neighbor	${skin} bin
+neigh_modify	delay 0
+
+#Material properties required for new pair styles
+
+fix 		m1 all property/global kn peratomtypepair 3 ${knPP} ${knPW} ${knPW} ${knPW} 0 0 ${knPW} 0 0
+fix 		m2 all property/global kt peratomtypepair 3 ${ktPP} ${ktPW} ${ktPW} ${ktPW} 0 0 ${ktPW} 0 0
+fix 		m3 all property/global gamman peratomtypepair 3 ${gnPP} ${gnPW} ${gnPW} ${gnPW} 0 0 ${gnPW} 0 0
+fix 		m4 all property/global gammat peratomtypepair 3 ${gtPP} ${gtPW} ${gtPW} ${gtPW} 0 0 ${gtPW} 0 0
+fix 		m5 all property/global coefficientFriction peratomtypepair 3 ${muPP} ${muPW1} ${muPW2} ${muPW1} 0 0 ${muPW2} 0 0
+fix 		m6 all property/global coefficientRollingFriction peratomtypepair 3 ${rfPP} ${rfPW1} ${rfPW2} ${rfPW1} 0 0 ${rfPW2} 0 0
+
+#Thermal properties
+# therm. conductivity not relevant because collisional heat transfer negligible
+fix 		ftco all property/global thermalConductivity peratomtype 0.0 0.0 0.0
+fix 		ftca all property/global thermalCapacity peratomtype 1920. 1920. 1920.
+
+
+#pair style
+pair_style gran model hooke/stiffness tangential history rolling_friction cdt 
+pair_coeff  * *
+
+#timestep, gravity
+timestep    ${dt}
+fix         gravi all gravity 9.81 vector 0.0 0.0 -1.0
+
+fix xwall1 all wall/gran model hooke/stiffness tangential history rolling_friction cdt primitive type 2 xplane 0.04
+fix xwall2 all wall/gran model hooke/stiffness tangential history rolling_friction cdt primitive type 2 xplane -0.04
+
+fix ywall1 all wall/gran model hooke/stiffness tangential history rolling_friction cdt primitive type 3 yplane -0.005
+fix ywall2 all wall/gran model hooke/stiffness tangential history rolling_friction cdt primitive type 2 yplane 0.005
+
+fix zwall1 all wall/gran model hooke/stiffness tangential history rolling_friction cdt primitive type 2 zplane 0.0
+fix zwall2 all wall/gran model hooke/stiffness tangential history rolling_friction cdt primitive type 2 zplane 0.4
+
+# insertion
+############
+
+fix         pts1 all particletemplate/sphere 1 atom_type 1 density constant ${partDens} radius constant ${partRad}
+fix	    pdd1 all particledistribution/discrete 1.0 1 pts1 1.0
+
+region      insReg block -0.039 0.039 -0.004 0.004 0.001 0.31 units box
+fix ins_pack_dense all insert/pack/dense seed 123 region insReg distributiontemplate pdd1 volumefraction_region 0.238 
+
+
+
+#cfd coupling
+fix		cfd all couple/cfd couple_every 10 mpi
+fix		cfd2 all couple/cfd/force/implicit
+
+# this one invokes heat transfer calculation, transfers per-particle temperature and adds convective heat flux to particles
+fix		cfd3 all couple/cfd/convection T0 ${Tpart}
+
+# calculate average particle temperature
+region      total block INF INF INF INF INF INF units box
+
+variable time equal step*dt
+variable np equal count(all,total)
+compute sumtemp all reduce/region total sum f_Temp[0]
+variable sumT1 equal c_sumtemp
+variable Tave equal v_sumT1/v_np
+
+fix printheat all print 2000 "${time} ${Tave}" file ../DEM/temp_ave.txt title "#time   T_ave"
+
+fix tdist1 all ave/histo 200000 1 200000 324 380 56 f_Temp[0] mode vector file ../DEM/temp_histo.txt title1 "Particle temperatures [K]"
+fix tdist2 all ave/histo 200000 1 200000 324 380 224 f_Temp[0] mode vector file ../DEM/temp_histo_fine.txt title1 "Particle temperatures [K]"
+
+fix		integr all nve/sphere
+
+#screen output
+thermo_style	custom step atoms ke vol 
+thermo		10000
+thermo_modify	lost ignore norm no
+compute_modify	thermo_temp dynamic yes
+
+#dump		dmp all custom/vtk 20000 ../DEM/post/dump*.equil.vtk id type x y z vx vy vz fx fy fz radius f_Temp[0] f_convectiveHeatFlux[0] f_heatSource[0]
+
+run	1
+set		region insReg property/atom heatSource 3.3379e-04 # = V_p x \dot{q}

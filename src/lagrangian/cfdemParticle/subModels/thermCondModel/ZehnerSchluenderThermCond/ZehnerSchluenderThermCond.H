@@ -54,7 +54,9 @@ private:
 
     dictionary propsDict_;
 
-    mutable volScalarField partKsField_;
+    word partKsFieldName_;
+
+    volScalarField& partKsField_;
 
     word voidfractionFieldName_;
 
@@ -97,9 +99,7 @@ public:
 
     // Member Functions
 
-        tmp<volScalarField> thermCond() const;
-
-        tmp<volScalarField> thermDiff() const;
+        void calcThermCond();
 
 };
 

@@ -168,11 +168,12 @@ bool cfdemCloudEnergy::evolve
 {
     if (cfdemCloud::evolve(alpha, Us, U))
     {
-        // calc energy contributions
+        // calc energy contributions including thermal conductivity
         // position 26 was already defined as Flow in clockModels and RhoPimpleChem solver.
         clockM().start(27,"calcEnergyContributions");
         if(verbose_) Info << "- calcEnergyContributions" << endl;
         calcEnergyContributions();
+        thermCondModel_().calcThermCond();
         if(verbose_) Info << "calcEnergyContributions done." << endl;
         clockM().stop("calcEnergyContributions");
 

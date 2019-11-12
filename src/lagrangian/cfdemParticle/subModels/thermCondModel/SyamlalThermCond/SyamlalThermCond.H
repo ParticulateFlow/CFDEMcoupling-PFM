@@ -53,13 +53,13 @@ private:
 
     dictionary propsDict_;
 
+    word thermCondFieldName_;
+
+    volScalarField& thermCondField_;
+
     word voidfractionFieldName_;
 
     const volScalarField& voidfraction_;
-
-    word rhoFieldName_;
-
-    const volScalarField& rho_;
 
     word wallQFactorName_;
 
@@ -90,10 +90,7 @@ public:
 
     // Member Functions
 
-        tmp<volScalarField> thermCond() const;
-
-        tmp<volScalarField> thermDiff() const;
-
+        void calcThermCond();
 };
 
 

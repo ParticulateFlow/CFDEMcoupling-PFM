@@ -29,13 +29,17 @@ Description
     and OpenFOAM(R). Note: this code is not part of OpenFOAM(R) (see DISCLAIMER).
 \*---------------------------------------------------------------------------*/
 
-#include "error.H"
 #include "twoWayMPI.H"
 #include "addToRunTimeSelectionTable.H"
+#include "OFstream.H"
 #include "clockModel.H"
-#include "pair.h"
-#include "force.h"
-#include "forceModel.H"
+#include "liggghtsCommandModel.H"
+
+//LAMMPS/LIGGGHTS
+#include <input.h>
+#include <library_cfd_coupling.h>
+#include <update.h>
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -66,7 +70,7 @@ twoWayMPI::twoWayMPI
     propsDict_(dict.subDict(typeName + "Props")),
     lmp(NULL)
 {
-    Info<<"Starting up LIGGGHTS for first time execution"<<endl;
+    Info << "Starting up LIGGGHTS for first time execution" << endl;
 
     MPI_Comm_dup(MPI_COMM_WORLD, &comm_liggghts);
 
@@ -74,8 +78,8 @@ twoWayMPI::twoWayMPI
     const fileName liggghtsPath(propsDict_.lookup("liggghtsPath"));
 
     // open LIGGGHTS input script
-    Info<<"Executing input script '"<< liggghtsPath.c_str() <<"'"<<endl;
-    lmp = new LAMMPS_NS::LAMMPS(0,NULL,comm_liggghts);
+    Info << "Executing input script '" << liggghtsPath.c_str() << "'" << endl;
+    lmp = new LAMMPS_NS::LAMMPS(0, NULL, comm_liggghts);
     lmp->input->file(liggghtsPath.c_str());
 
     // get DEM time step size
@@ -340,7 +344,7 @@ bool twoWayMPI::couple(int i)
         // give nr of particles to cloud
         double newNpart = liggghts_get_maxtag(lmp);
 
-        setNumberOfParticles(newNpart);
+        particleCloud_.setNumberOfParticles(newNpart);
 
         // re-allocate arrays of cloud
         particleCloud_.clockM().start(4,"LIGGGHTS_reallocArrays");
