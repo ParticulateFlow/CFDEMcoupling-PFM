@@ -851,6 +851,27 @@ const surfaceScalarField& gerhardsRecModel::exportSurfaceScalarField(word fieldn
 }
 
 
+PtrList<volScalarField>& gerhardsRecModel::exportVolScalarFieldList(word fieldname)
+{
+    const label fieldI = getVolScalarFieldIndex(fieldname);
+
+    return volScalarFieldList_[fieldI];
+}
+
+PtrList<volVectorField>& gerhardsRecModel::exportVolVectorFieldList(word fieldname)
+{
+    const label fieldI = getVolVectorFieldIndex(fieldname);
+
+    return volVectorFieldList_[fieldI];
+}
+
+PtrList<surfaceScalarField>& gerhardsRecModel::exportSurfaceScalarFieldList(word fieldname)
+{
+    const label fieldI = getSurfaceScalarFieldIndex(fieldname);
+
+    return surfaceScalarFieldList_[fieldI];
+}
+
 
 
 SymmetricSquareMatrix<scalar>& gerhardsRecModel::recurrenceMatrix()

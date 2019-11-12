@@ -100,9 +100,9 @@ protected:
 
     scalar checkTimeStep();
 
-    inline label getVolScalarFieldIndex(word, label) const;
-    inline label getVolVectorFieldIndex(word, label) const;
-    inline label getSurfaceScalarFieldIndex(word, label) const;
+    inline label getVolScalarFieldIndex(word, label=0) const;
+    inline label getVolVectorFieldIndex(word, label=0) const;
+    inline label getSurfaceScalarFieldIndex(word, label=0) const;
 
     void readFieldSeries();
 
@@ -143,7 +143,11 @@ public:
     const volVectorField& exportVolVectorField(word, label);
     const surfaceScalarField& exportSurfaceScalarField(word, label);
 
-  //  tmp<surfaceScalarField> exportAveragedSurfaceScalarField(word, scalar, label index = -1);
+    PtrList<volScalarField>& exportVolScalarFieldList(word);
+    PtrList<volVectorField>& exportVolVectorFieldList(word);
+    PtrList<surfaceScalarField>& exportSurfaceScalarFieldList(word);
+
+    //  tmp<surfaceScalarField> exportAveragedSurfaceScalarField(word, scalar, label index = -1);
     void exportAveragedVolVectorField(volVectorField&, word, scalar, label index = -1) const;
 
     SymmetricSquareMatrix<scalar>& recurrenceMatrix();
