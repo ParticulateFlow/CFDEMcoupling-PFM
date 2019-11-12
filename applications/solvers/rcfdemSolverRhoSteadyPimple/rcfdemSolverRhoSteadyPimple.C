@@ -61,6 +61,7 @@ int main(int argc, char *argv[])
     #include "createTime.H"
     #include "createMesh.H"
     #include "createControl.H"
+    #include "createTimeControls.H"
     #include "createRDeltaT.H"
     #include "initContinuityErrs.H"
     #include "createFields.H"
