@@ -113,7 +113,8 @@ void multiIntervalPath::computeRecPath()
     Info << "\nComputing recurrence path\n" << endl;
 
 
-    Random ranGen(osRandomInteger());
+    const label seed = 0;
+    Random ranGen(seed);
 
     label virtualTimeIndex=0;
     label recSteps=0;

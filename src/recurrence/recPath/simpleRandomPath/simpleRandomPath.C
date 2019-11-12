@@ -69,15 +69,15 @@ void simpleRandomPath::computeRecPath()
 {
     Info << "\nComputing recurrence path\n" << endl;
 
-
-    Random ranGen(osRandomInteger());
+    const label seed = 0;
+    Random ranGen(seed);
 
     label virtualTimeIndex = 0;
     label recSteps = 0;
     label seqStart = 0;
     label lowerSeqLim( base_.recM().lowerSeqLim() );
     label upperSeqLim( base_.recM().upperSeqLim() );
-    label seqLength = ranGen.integer(lowerSeqLim, upperSeqLim);
+    label seqLength = ranGen.sampleAB(lowerSeqLim, upperSeqLim);
 
     virtualTimeIndex = seqEnd(seqStart,seqLength);
     labelPair seqStartEnd(seqStart,virtualTimeIndex);
@@ -123,7 +123,7 @@ void simpleRandomPath::computeRecPath()
             }
         }
 
-        seqLength = ranGen.integer(lowerSeqLim, upperSeqLim);
+        seqLength = ranGen.sampleAB(lowerSeqLim, upperSeqLim);
         virtualTimeIndex = seqEnd(seqStart,seqLength);
         labelPair seqStartEnd(seqStart,virtualTimeIndex);
         virtualTimeIndexList_.append(seqStartEnd);

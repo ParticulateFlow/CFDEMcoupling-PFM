@@ -92,7 +92,7 @@ MarkovPath::MarkovPath
         }
         intervalSizesCumulative_[i] = sum1;
     }
-    
+
     // check if meanIntervalSteps and correlationSteps are reasonable
     label critLength = meanIntervalSteps_ + 2 * correlationSteps_;
     for(int i=0;i<numIntervals_;i++)
@@ -150,7 +150,8 @@ void MarkovPath::computeRecPath()
 
 void MarkovPath::extendPath()
 {
-    Random ranGen(osRandomInteger());
+    const label seed = 0;
+    Random ranGen(seed);
 
     SymmetricSquareMatrix<scalar>& recurrenceMatrix( base_.recM().recurrenceMatrix() );
 
