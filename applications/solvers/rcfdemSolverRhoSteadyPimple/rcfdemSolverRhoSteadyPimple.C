@@ -137,7 +137,7 @@ int main(int argc, char *argv[])
             while (pimple.loop())
             {
                 // if needed, perform drag update here
-                if (pimple.nCorrPIMPLE() <= 1)
+                if (pimple.nCorrPimple() <= 1)
                 {
                     #include "rhoEqn.H"
                 }
