@@ -30,8 +30,12 @@ Description
 
 #include "fvCFD.H"
 #include "turbulentFluidThermoModel.H"
+#if OPENFOAM_VERSION_MAJOR < 6
+#include "rhoCombustionModel.H"
+#else
 #include "rhoReactionThermo.H"
 #include "CombustionModel.H"
+#endif
 #include "bound.H"
 #include "pimpleControl.H"
 #include "fvOptions.H"
@@ -116,7 +120,11 @@ int main(int argc, char *argv[])
 
        particleCloud.clockM().start(26,"Flow");
 
+#if OPENFOAM_VERSION_MAJOR < 6
+        if (pimple.nCorrPIMPLE() <= 1)
+#else
         if (pimple.nCorrPimple() <= 1)
+#endif
         {
             #include "rhoEqn.H"
         }

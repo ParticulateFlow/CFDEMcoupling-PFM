@@ -137,7 +137,11 @@ int main(int argc, char *argv[])
             while (pimple.loop())
             {
                 // if needed, perform drag update here
+#if OPENFOAM_VERSION_MAJOR < 6
+                if (pimple.nCorrPIMPLE() <= 1)
+#else
                 if (pimple.nCorrPimple() <= 1)
+#endif
                 {
                     #include "rhoEqn.H"
                 }

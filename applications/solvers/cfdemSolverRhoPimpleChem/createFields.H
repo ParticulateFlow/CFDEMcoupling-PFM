@@ -1,15 +1,28 @@
     //  thermodynamics, chemistry
 
+#if OPENFOAM_VERSION_MAJOR < 6
+    Info<< "Creating combustion model\n" << endl;
+    autoPtr<combustionModels::rhoCombustionModel> combustion
+    (
+        combustionModels::rhoCombustionModel::New(mesh)
+    );
+    rhoReactionThermo& thermo = combustion->thermo();
+#else
     Info<< "Reading thermophysical properties\n" << endl;
     autoPtr<rhoReactionThermo> pThermo(rhoReactionThermo::New(mesh));
     rhoReactionThermo& thermo = pThermo();
+#endif
     thermo.validate(args.executable(), "h", "e");
 
     basicSpecieMixture& composition = thermo.composition();
     PtrList<volScalarField>& Y = composition.Y();
 
     // read molecular weight
+#if OPENFOAM_VERSION_MAJOR < 6
+    volScalarField W(composition.W());
+#else
     volScalarField W(thermo.W());
+#endif
 
     bool propagateInertSpecie = true;
 
@@ -193,11 +206,13 @@
         )
     );
 
+#if OPENFOAM_VERSION_MAJOR >= 6
     Info<< "Creating combustion model\n" << endl;
     autoPtr<CombustionModel<rhoReactionThermo>> combustion
     (
         CombustionModel<rhoReactionThermo>::New(thermo, turbulence())
     );
+#endif
 
     Info<< "Creating field dpdt\n" << endl;
     volScalarField dpdt

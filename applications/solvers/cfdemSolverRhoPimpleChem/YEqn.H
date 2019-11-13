@@ -13,7 +13,11 @@ tmp<fv::convectionScheme<scalar> > mvConvection
 
 {
     combustion->correct();
+#if OPENFOAM_VERSION_MAJOR < 5
+    dQ = combustion->dQ();
+#else
     dQ = combustion->Qdot();
+#endif
     label inertIndex = -1;
     volScalarField Yt(0.0*Y[0]);
 

@@ -77,7 +77,11 @@ void simpleRandomPath::computeRecPath()
     label seqStart = 0;
     label lowerSeqLim( base_.recM().lowerSeqLim() );
     label upperSeqLim( base_.recM().upperSeqLim() );
+#if OPENFOAM_VERSION_MAJOR < 6
+    label seqLength = ranGen.integer(lowerSeqLim, upperSeqLim);
+#else
     label seqLength = ranGen.sampleAB(lowerSeqLim, upperSeqLim);
+#endif
 
     virtualTimeIndex = seqEnd(seqStart,seqLength);
     labelPair seqStartEnd(seqStart,virtualTimeIndex);
@@ -123,7 +127,11 @@ void simpleRandomPath::computeRecPath()
             }
         }
 
+#if OPENFOAM_VERSION_MAJOR < 6
+        seqLength = ranGen.integer(lowerSeqLim, upperSeqLim);
+#else
         seqLength = ranGen.sampleAB(lowerSeqLim, upperSeqLim);
+#endif
         virtualTimeIndex = seqEnd(seqStart,seqLength);
         labelPair seqStartEnd(seqStart,virtualTimeIndex);
         virtualTimeIndexList_.append(seqStartEnd);
