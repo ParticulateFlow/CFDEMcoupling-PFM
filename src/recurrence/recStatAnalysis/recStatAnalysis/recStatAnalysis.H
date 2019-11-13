@@ -102,6 +102,8 @@ public:
 
     virtual void statistics() = 0;
 
+    virtual bool suppressMatrixAndPath() {return false;}
+
 
 };
 

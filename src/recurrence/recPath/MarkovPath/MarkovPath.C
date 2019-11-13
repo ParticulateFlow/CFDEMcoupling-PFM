@@ -150,8 +150,7 @@ void MarkovPath::computeRecPath()
 
 void MarkovPath::extendPath()
 {
-    const label seed = 0;
-    Random ranGen(seed);
+    Random ranGen(clock::getTime()+pid());
 
     SymmetricSquareMatrix<scalar>& recurrenceMatrix( base_.recM().recurrenceMatrix() );
 

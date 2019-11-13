@@ -85,9 +85,21 @@ private:
 
     bool normalize_;
 
+    PtrList<volScalarField> scalarFieldList_;
+
+    PtrList<volVectorField> vectorFieldList_;
+
     volScalarField autoCorrField_;
 
+    bool suppressMatrixAndPath_;
+
     void autocorr();
+
+    scalar autocorrSummand(label, label, label, label);
+
+    volScalarField meanProd();
+
+    bool suppressMatrixAndPath() {return suppressMatrixAndPath_;}
 };
 
 

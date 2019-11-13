@@ -69,8 +69,7 @@ void simpleRandomPath::computeRecPath()
 {
     Info << "\nComputing recurrence path\n" << endl;
 
-    const label seed = 0;
-    Random ranGen(seed);
+    Random ranGen(clock::getTime()+pid());
 
     label virtualTimeIndex = 0;
     label recSteps = 0;
