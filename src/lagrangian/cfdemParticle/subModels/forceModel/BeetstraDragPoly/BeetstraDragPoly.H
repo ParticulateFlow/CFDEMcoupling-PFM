@@ -46,11 +46,11 @@ protected:
     
     scalar dFine_;
 
-    autoPtr<volScalarField> alphaP_;
+    volScalarField* alphaP_;
     
-    autoPtr<volScalarField> alphaSt_;
+    volScalarField* alphaSt_;
 
-    autoPtr<volScalarField> dSauter_;
+    volScalarField* dSauter_;
 
     void adaptVoidfraction(double&, label) const;
 
