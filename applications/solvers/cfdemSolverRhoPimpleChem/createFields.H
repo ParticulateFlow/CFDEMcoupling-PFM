@@ -230,6 +230,7 @@
     Info<< "Creating field kinetic energy K\n" << endl;
     volScalarField K("K", 0.5*magSqr(U));
 
+#if OPENFOAM_VERSION_MAJOR < 5
     volScalarField dQ
     (
         IOobject
@@ -243,6 +244,21 @@
         mesh,
         dimensionedScalar("dQ", dimEnergy/dimTime, 0.0)
     );
+#else
+    volScalarField Qdot
+    (
+        IOobject
+        (
+            "Qdot",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        mesh,
+        dimensionedScalar("Qdot", dimEnergy/dimVolume/dimTime, 0.0)
+    );
+#endif
 
     Info<< "\nReading momentum exchange field Ksl\n" << endl;
     volScalarField Ksl
