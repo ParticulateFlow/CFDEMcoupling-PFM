@@ -36,7 +36,7 @@ Description
 
 word CFDEMversion="PFM 19.09";
 word compatibleLIGGGHTSversion="PFM 19.09";
-word OFversion="4.x";
+word OFversion="6";
 
 Info << "\nCFDEMcoupling version: " << CFDEMversion <<  endl;
 Info << "compatible to LIGGGHTS version: " << compatibleLIGGGHTSversion <<  endl;
