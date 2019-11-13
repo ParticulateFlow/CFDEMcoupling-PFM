@@ -163,6 +163,12 @@ twoWayMany2Many::~twoWayMany2Many()
     delete lmp2foam_vec_;
     delete foam2lmp_vec_;
     delete foam2lmp_;
+
+    if (propsDict_.found("liggghtsEndOfRunPath"))
+    {
+        const fileName liggghtsEndOfRunPath(propsDict_.lookup("liggghtsEndOfRunPath"));
+        lmp->input->file(liggghtsEndOfRunPath.c_str());
+    }
     delete lmp;
 }
 

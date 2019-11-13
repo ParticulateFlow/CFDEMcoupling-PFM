@@ -92,6 +92,11 @@ twoWayMPI::twoWayMPI
 
 twoWayMPI::~twoWayMPI()
 {
+    if (propsDict_.found("liggghtsEndOfRunPath"))
+    {
+        const fileName liggghtsEndOfRunPath(propsDict_.lookup("liggghtsEndOfRunPath"));
+        lmp->input->file(liggghtsEndOfRunPath.c_str());
+    }
     delete lmp;
 }
 

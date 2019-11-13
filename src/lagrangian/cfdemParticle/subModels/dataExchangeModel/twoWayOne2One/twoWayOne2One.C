@@ -242,6 +242,11 @@ twoWayOne2One::~twoWayOne2One()
     destroy(prev_cell_ids_);
     destroy(dbl_cell_ids_);
 
+    if (propsDict_.found("liggghtsEndOfRunPath"))
+    {
+        const fileName liggghtsEndOfRunPath(propsDict_.lookup("liggghtsEndOfRunPath"));
+        lmp->input->file(liggghtsEndOfRunPath.c_str());
+    }
     delete lmp;
 }
 
