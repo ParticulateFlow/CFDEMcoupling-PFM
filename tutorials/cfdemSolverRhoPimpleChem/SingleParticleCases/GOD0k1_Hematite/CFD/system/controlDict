@@ -136,7 +136,8 @@ functions
 
     globalMassFrac
     {
-        type            volRegion;
+        //type            volRegion; // OF4
+        type            volFieldValue; // OF5,OF6
         libs ("libfieldFunctionObjects.so");
         writeControl    timeStep;//outputTime;
         writeInterval   1;
@@ -156,7 +157,8 @@ functions
 
     globalMass
     {
-        type            volRegion;
+        //type            volRegion; // OF4
+        type            volFieldValue; // OF5,OF6
         libs ("libfieldFunctionObjects.so");
         writeControl    timeStep;//outputTime;
         writeInterval   1;
