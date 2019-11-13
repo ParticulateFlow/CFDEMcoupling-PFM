@@ -12,11 +12,10 @@ recNorm/readNorm/readNorm.C
 recNorm/sqrDiffNorm/sqrDiffNorm.C
 recNorm/noRecNorm/noRecNorm.C
 recPath/recPath/recPath.C
-recPath/recPath/newRecPath.C
 recPath/simpleRandomPath/simpleRandomPath.C
+recPath/recPath/newRecPath.C
 recPath/noPath/noPath.C
 recPath/MarkovPath/MarkovPath.C
-recPath/multiIntervalPath/multiIntervalPath.C
 recPath/predefinedPath/predefinedPath.C
 recStatAnalysis/recStatAnalysis/recStatAnalysis.C
 recStatAnalysis/recStatAnalysis/newRecStatAnalysis.C

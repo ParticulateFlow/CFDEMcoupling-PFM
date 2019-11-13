@@ -73,7 +73,8 @@ autocorrelation::autocorrelation
         ),
         base.mesh(),
         dimensionedScalar("zero", dimensionSet(0,0,0,0,0), 0.0)
-    )
+    ),
+    suppressMatrixAndPath_(propsDict_.lookupOrDefault<bool>("suppressMatrixAndPath",false))
 {
     if (fieldtype_ != "scalar" && fieldtype_ != "vector")
     {
@@ -108,30 +109,22 @@ void autocorrelation::statistics()
 
 void autocorrelation::autocorr()
 {
-    scalar res = 0.0;
-    PtrList<volScalarField> scalarFieldList;
-    PtrList<volVectorField> vectorFieldList;
-    if (fieldtype_ == "scalar") scalarFieldList.transfer(base_.recM().exportVolScalarFieldList(fieldname_));
-    else vectorFieldList.transfer(base_.recM().exportVolVectorFieldList(fieldname_));
+    if (fieldtype_ == "scalar") scalarFieldList_.transfer(base_.recM().exportVolScalarFieldList(fieldname_));
+    else vectorFieldList_.transfer(base_.recM().exportVolVectorFieldList(fieldname_));
 
     label tmax = base_.recM().totRecSteps();
     for (label ti = delaySteps_; ti < tmax; ti++)
     {
         forAll(autoCorrField_, cellI)
         {
-            if (fieldtype_ == "scalar") 
-            {
-                res = scalarFieldList[ti-delaySteps_][refCell_] * scalarFieldList[ti][cellI];
-            }
-            else
-            {
-                res = vectorFieldList[ti-delaySteps_][refCell_] & vectorFieldList[ti][cellI];
-            }
-            autoCorrField_[cellI] += res;
+            autoCorrField_[cellI] += autocorrSummand(ti-delaySteps_,ti,refCell_,cellI);
         }
     }
 
     autoCorrField_ /= (tmax - delaySteps_);
+
+    autoCorrField_ -= meanProd();
+
 
     if (normalize_)
     {
@@ -159,17 +152,55 @@ void autocorrelation::autocorr()
         dimensionSet fieldDim(0,0,0,0,0);
         if (fieldtype_ == "scalar")
         {
-            fieldDim.reset(scalarFieldList[0].dimensions());
+            fieldDim.reset(scalarFieldList_[0].dimensions());
         }
         else
         {
-            fieldDim.reset(vectorFieldList[0].dimensions());
+            fieldDim.reset(vectorFieldList_[0].dimensions());
         }
 
-        fieldDim = fieldDim * fieldDim;
+        fieldDim.reset(fieldDim * fieldDim);
 
         autoCorrField_.dimensions().reset(fieldDim);
     }
+
+    autoCorrField_.write();
+}
+
+scalar autocorrelation::autocorrSummand(label t1, label t2, label c1, label c2)
+{
+    scalar res;
+    if (fieldtype_ == "scalar") 
+    {
+        res = scalarFieldList_[t1][c1] * scalarFieldList_[t2][c2];
+    }
+    else
+    {
+        res = vectorFieldList_[t1][c1] & vectorFieldList_[t2][c2];
+    }
+    return res;
+}
+
+volScalarField autocorrelation::meanProd()
+{
+    volScalarField meanProd(autoCorrField_);
+    if (fieldtype_ == "scalar")
+    {
+        volScalarField aveField = base_.recM().exportVolScalarFieldAve(fieldname_);
+        forAll(meanProd, cellI)
+        {
+            meanProd[cellI] = aveField()[cellI] * aveField()[refCell_];
+        }
+    }
+    else
+    {
+        volVectorField aveField = base_.recM().exportVolVectorFieldAve(fieldname_);
+        forAll(meanProd, cellI)
+        {
+            meanProd[cellI] = aveField()[cellI] & aveField()[refCell_];
+        }
+    }
+    return meanProd;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

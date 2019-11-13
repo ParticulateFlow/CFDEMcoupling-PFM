@@ -83,7 +83,7 @@ isotropicFluctuations::isotropicFluctuations
         dimensionedScalar("D0", dimensionSet(0,0,0,0,0,0,0), D0_)
     ),
     dtDEM_(particleCloud_.dataExchangeM().DEMts()),
-    ranGen_(0)
+    ranGen_(clock::getTime()+pid())
 {
     if(ignoreCellsName_ != "none")
     {
