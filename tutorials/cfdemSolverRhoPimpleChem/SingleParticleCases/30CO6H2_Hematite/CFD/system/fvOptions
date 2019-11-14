@@ -22,10 +22,10 @@ limitedTemperature
     {
         active          yes;
         selectionMode   all;
-        //Tmin     1200; // OF4
-        //Tmax     2500; // OF4
-        min     1200; // OF5,OF6
-        max     2500; // OF5,OF6
+        Tmin     1200; // OF4
+        Tmax     2500; // OF4
+        min      $Tmin; // OF5,OF6
+        max      $Tmax; // OF5,OF6
     }
 }
 
