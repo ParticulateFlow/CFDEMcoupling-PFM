@@ -226,7 +226,11 @@ scalar gerhardsRecModel::checkTimeStep()
     }
 
     // set deltaT
+#if OPENFOAM_VERSION_MAJOR < 6
     recTime.setDeltaT(dtCur, false);
+#else
+    recTime.setDeltaT(dtCur);
+#endif
 
     if (verbose_)
     {
@@ -296,7 +300,11 @@ void gerhardsRecModel::readFieldSeries()
                 for OpenFOAM versions prior to OpenFOAM-5.0
                 Do this the other way around for OpenFOAM-5.0 and potentially later versions
             */
+#if OPENFOAM_VERSION_MAJOR < 5
             if (! header.headerOk())
+#else
+            if (! header.typeHeaderOk<volScalarField>(true))
+#endif
             {
                 FatalError
                 << "Field " << volScalarFieldNames_[i] << " not found"
@@ -320,7 +328,11 @@ void gerhardsRecModel::readFieldSeries()
                 for OpenFOAM versions prior to OpenFOAM-5.0
                 Do this the other way around for OpenFOAM-5.0 and potentially later versions
             */
+#if OPENFOAM_VERSION_MAJOR < 5
             if (! header.headerOk())
+#else
+            if (! header.typeHeaderOk<volVectorField>(true))
+#endif
             {
                 FatalError
                 << "Field " << volVectorFieldNames_[i] << " not found"
@@ -344,7 +356,11 @@ void gerhardsRecModel::readFieldSeries()
                 for OpenFOAM versions prior to OpenFOAM-5.0
                 Do this the other way around for OpenFOAM-5.0 and potentially later versions
             */
+#if OPENFOAM_VERSION_MAJOR < 5
             if (! header.headerOk())
+#else
+            if (! header.typeHeaderOk<surfaceScalarField>(true))
+#endif
             {
                 FatalError
                 << "Field " << surfaceScalarFieldNames_[i] << " not found"
@@ -850,6 +866,27 @@ const surfaceScalarField& gerhardsRecModel::exportSurfaceScalarField(word fieldn
     return surfaceScalarFieldList_[fieldI][storageIndex_[index]];
 }
 
+
+PtrList<volScalarField>& gerhardsRecModel::exportVolScalarFieldList(word fieldname)
+{
+    const label fieldI = getVolScalarFieldIndex(fieldname);
+
+    return volScalarFieldList_[fieldI];
+}
+
+PtrList<volVectorField>& gerhardsRecModel::exportVolVectorFieldList(word fieldname)
+{
+    const label fieldI = getVolVectorFieldIndex(fieldname);
+
+    return volVectorFieldList_[fieldI];
+}
+
+PtrList<surfaceScalarField>& gerhardsRecModel::exportSurfaceScalarFieldList(word fieldname)
+{
+    const label fieldI = getSurfaceScalarFieldIndex(fieldname);
+
+    return surfaceScalarFieldList_[fieldI];
+}
 
 
 

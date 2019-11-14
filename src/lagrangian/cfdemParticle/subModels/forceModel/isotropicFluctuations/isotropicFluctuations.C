@@ -1,6 +1,6 @@
 /*---------------------------------------------------------------------------*\
     CFDEMcoupling academic - Open Source CFD-DEM coupling
-    
+
     Contributing authors:
     Thomas Lichtenegger
     Copyright (C) 2015- Johannes Kepler University, Linz
@@ -83,7 +83,7 @@ isotropicFluctuations::isotropicFluctuations
         dimensionedScalar("D0", dimensionSet(0,0,0,0,0,0,0), D0_)
     ),
     dtDEM_(particleCloud_.dataExchangeM().DEMts()),
-    ranGen_(osRandomInteger())
+    ranGen_(clock::getTime()+pid())
 {
     if(ignoreCellsName_ != "none")
     {
@@ -122,10 +122,10 @@ void isotropicFluctuations::setForce() const
     vector flucU(0,0,0);
     label cellI=0;
     scalar relVolfractionExcess(0.0);
-   
+
     interpolationCellPoint<scalar> voidfractionInterpolator_(voidfraction_);
     interpolationCellPoint<scalar> voidfractionRecInterpolator_(voidfractionRec_);
-    
+
     for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
     {
             cellI = particleCloud_.cellIDs()[index][0];
@@ -151,14 +151,14 @@ void isotropicFluctuations::setForce() const
                         voidfractionRec = voidfractionRec_[cellI];
                     }
                     // write particle based data to global array
-                    
+
                     deltaVoidfrac=voidfractionRec-voidfraction;
                     relVolfractionExcess=deltaVoidfrac/(1-voidfraction+SMALL);
                     if(deltaVoidfrac>0)
                     {
                         D = D0Field_[cellI];
                         flucU=unitFlucDir()*fluctuationMag(relVolfractionExcess,D);
-                    }              
+                    }
 
                     // write particle based data to global array
                     for(int j=0;j<3;j++)
@@ -168,11 +168,11 @@ void isotropicFluctuations::setForce() const
                 }
             }
     }
-    
+
     if (measureDiff_)
     {
         dimensionedScalar diff( fvc::domainIntegrate( sqr( voidfraction_ - voidfractionRec_ ) ) );
-        scalar t = particleCloud_.mesh().time().timeOutputValue(); 
+        scalar t = particleCloud_.mesh().time().timeOutputValue();
         recErrorFile_ << t << "\t" << diff.value() << endl;
     }
 }

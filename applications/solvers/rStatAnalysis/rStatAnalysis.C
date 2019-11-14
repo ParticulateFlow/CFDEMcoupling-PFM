@@ -29,11 +29,6 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
-// #include "fvCFD.H"
-// #include "singlePhaseTransportModel.H"
-// #include "turbulentTransportModel.H"
-// #include "fvOptions.H"
-
 #include "recBase.H"
 #include "recStatAnalysis.H"
 
