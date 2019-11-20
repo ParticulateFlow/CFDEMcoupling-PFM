@@ -190,7 +190,7 @@ void uniformFixedValueTubeFvPatchField<Type>::updateCoeffs()
     // calc pressure drop
 //    fvPatchField<Type>::operator==(0.5*zeta*density*mag(velocity)*mag(velocity)*uniformValue_->value(t));
 	//dP = zeta * l/d * rho u^2 / 2
-	fvPatchField<Type>::operator==((pressure+p0_+(0.5*zeta_*tubeLength_/tubeDiameter_*density*phip/this->patch().magSf()*phip/this->patch().magSf()-pressure)*uRelFact)*uniformValue_->value(t));
+	fvPatchField<Type>::operator==((pressure+(0.5*zeta_*tubeLength_/tubeDiameter_*density*phip/this->patch().magSf()*phip/this->patch().magSf()+p0_-pressure)*uRelFact)*uniformValue_->value(t));
 	//fvPatchField<Type>::operator==((100.*uniformValue_->value(t)));
     fixedValueFvPatchField<Type>::updateCoeffs();
 }
