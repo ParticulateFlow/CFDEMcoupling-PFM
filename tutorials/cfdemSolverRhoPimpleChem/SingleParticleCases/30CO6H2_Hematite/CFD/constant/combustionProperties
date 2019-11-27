@@ -15,11 +15,14 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-combustionModel  noCombustion<rhoThermoCombustion>;
+// OF5 -> OF6: noCombustion<> -> none (template parameters are no longer required)
+//combustionModel  noCombustion<rhoThermoCombustion>; // OF4,OF5
+combustionModel  none; // OF6
 
 active  false; //true;
 
-noCombustionCoeffs
+//noCombustionCoeffs
+noneCoeffs
 {
 }
 

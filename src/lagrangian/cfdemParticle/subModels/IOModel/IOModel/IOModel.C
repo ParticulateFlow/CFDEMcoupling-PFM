@@ -30,6 +30,7 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include "error.H"
+#include "particle.H"
 #include "IOModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -99,13 +100,22 @@ void IOModel::streamDataToPath(const fileName& path, const double* const* array,
     OFstream fileStream(path/name);
 
     fileStream
-        << "FoamFile\n{\n"
-        << "    version     " << fileStream.version() << ";\n"
-        << "    format      " << fileStream.format() << ";\n"
-        << "    class       " << className << ";\n"
-        << "    location    " << 0 << ";\n"
-        << "    object      " << name << ";\n"
-        << "}" << nl;
+        << "/*--------------------------------*- C++ -*----------------------------------*\\" << nl
+        << "  =========                 |" << nl
+        << "  \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox" << nl
+        << "   \\\\    /   O peration     | Website:  https://openfoam.org" << nl
+        << "    \\\\  /    A nd           | Version:  " << FOAMversion << nl
+        << "     \\\\/     M anipulation  |" << nl
+        << "\\*---------------------------------------------------------------------------*/" << nl
+        << "FoamFile" << nl
+        << "{" << nl
+        << "    version     " << fileStream.version() << ";" << nl
+        << "    format      " << fileStream.format() << ";" << nl
+        << "    class       " << className << ";" << nl
+        << "    location    " << 0 << ";" << nl
+        << "    object      " << name << ";" << nl
+        << "}" << nl
+        << "// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //" << nl << nl;
 
     fileStream << nPProc << "\n";
 
@@ -129,7 +139,19 @@ void IOModel::streamDataToPath(const fileName& path, const double* const* array,
             }
             else if (type == "position")
             {
-                fileStream << "( "<< array[index][0] << " " << array[index][1] << " " << array[index][2] << " ) " << cellIDs[index][0] << " \n";
+#if OPENFOAM_VERSION_MAJOR < 5
+                fileStream << "( " << array[index][0] << " " << array[index][1] << " " << array[index][2] << " ) " << cellIDs[index][0] << nl;
+#else
+                particle part
+                (
+                    particleCloud_.mesh(),
+                    vector(array[index][0],array[index][1],array[index][2]),
+                    cellIDs[index][0]
+                );
+
+                part.writePosition(fileStream);
+                fileStream << nl;
+#endif
             }
             else if (type == "vector")
             {

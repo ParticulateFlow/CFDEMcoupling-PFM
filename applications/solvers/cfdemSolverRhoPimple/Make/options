@@ -1,5 +1,7 @@
 include $(CFDEM_ADD_LIBS_DIR)/additionalLibs
 
+FOAM_VERSION_MAJOR := $(word 1,$(subst ., ,$(WM_PROJECT_VERSION)))
+PFLAGS+= -DOPENFOAM_VERSION_MAJOR=$(FOAM_VERSION_MAJOR)
 PFLAGS+= -Dcompre
 
 EXE_INC = \

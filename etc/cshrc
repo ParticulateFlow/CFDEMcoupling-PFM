@@ -23,7 +23,7 @@ setenv CFDEM_VERSION 19.09
 # Please set to the appropriate path if the default is not correct.
 #
 # activate compatible OpenFOAM version
-. $HOME/OpenFOAM/OpenFOAM-4.x/etc/cshrc
+. $HOME/OpenFOAM/OpenFOAM-6/etc/cshrc
 #
 # CFDEMcoupling
 setenv CFDEM_INST_DIR $HOME/$CFDEM_PROJECT
