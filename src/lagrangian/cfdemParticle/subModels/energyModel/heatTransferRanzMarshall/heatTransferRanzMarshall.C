@@ -50,6 +50,8 @@ heatTransferRanzMarshall::heatTransferRanzMarshall
     implicit_(propsDict_.lookupOrDefault<bool>("implicit",true)),
     calcTotalHeatFlux_(propsDict_.lookupOrDefault<bool>("calcTotalHeatFlux",true)),
     initPartTemp_(propsDict_.lookupOrDefault<bool>("initPartTemp",false)),
+    Tmin_(propsDict_.lookupOrDefault<scalar>("Tmin",0.0)),
+    Tmax_(propsDict_.lookupOrDefault<scalar>("Tmax",1e6)),
     totalHeatFlux_(0.0),
     NusseltScalingFactor_(1.0),
     QPartFluidName_(propsDict_.lookupOrDefault<word>("QPartFluidName","QPartFluid")),
@@ -584,12 +586,22 @@ void heatTransferRanzMarshall::partTempField()
 void heatTransferRanzMarshall::initPartTemp()
 {
     label cellI = 0;
+    scalar T = 0.0;
     for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)
     {
         cellI = particleCloud_.cellIDs()[index][0];
         if(cellI >= 0)
         {
-            partTemp_[index][0] = partTempField_[cellI];
+            T = partTempField_[cellI];
+            if (T < Tmin_)
+            {
+                T = Tmin_;
+            }
+            else if (T > Tmax_)
+            {
+                T = Tmax_;
+            }
+            partTemp_[index][0] = T;
         }
     }
 }

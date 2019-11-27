@@ -59,6 +59,10 @@ protected:
 
     bool initPartTemp_;
 
+    scalar Tmin_;
+
+    scalar Tmax_;
+
     scalar totalHeatFlux_;
 
     scalar NusseltScalingFactor_;
