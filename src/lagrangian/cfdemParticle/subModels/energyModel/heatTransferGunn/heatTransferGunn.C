@@ -122,7 +122,12 @@ heatTransferGunn::heatTransferGunn
     partHeatFluxName_(propsDict_.lookup("partHeatFluxName")),
     partHeatFlux_(NULL),
     partRe_(NULL),
-    partNu_(NULL)
+    partNu_(NULL),
+	multiphase_(propsDict_.lookupOrDefault<bool>("multiphase",false)),
+	kfFieldName_(propsDict_.lookupOrDefault<word>("kfFieldName",voidfractionFieldName_)), // use voidfractionField as dummy to prevent lookup error when not using multiphase
+	kfField_(sm.mesh().lookupObject<volScalarField> (kfFieldName_)),
+	CpFieldName_(propsDict_.lookupOrDefault<word>("CpFieldName",voidfractionFieldName_)), // use voidfractionField as dummy to prevent lookup error when not using multiphase
+	CpField_(sm.mesh().lookupObject<volScalarField> (CpFieldName_))
 {
      allocateMyArrays();
 
@@ -260,6 +265,13 @@ void heatTransferGunn::calcEnergyContribution()
                 magUr = mag(Ufluid - Us);
                 ds = 2.*particleCloud_.radius(index);
                 muf = mufField[cellI];
+
+                if(multiphase_)
+                {
+                	kf0_ = kfField_[cellI];
+                	Cp_  = CpField_[cellI];
+                }
+
                 Rep = ds * magUr * voidfraction * rho_[cellI]/ muf;
                 Pr = max(SMALL, Cp_ * muf / kf0_);
 
