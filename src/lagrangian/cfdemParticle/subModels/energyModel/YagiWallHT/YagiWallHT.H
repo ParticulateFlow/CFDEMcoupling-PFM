@@ -16,57 +16,76 @@ License
 
     Copyright (C) 2015- Thomas Lichtenegger, JKU Linz, Austria
 
-
-Description
-    thermal conductivity of fluid phase in presence of particles according to
-    Syamlal, M. and Gidaspow, M. AIChE Journal 31.1 (1985)
-
-Class
-    SyamlalThermCond
-
-SourceFiles
-    SyamlalThermCond.C
+    Description
+    Correlation for Nusselt number according to
+    Gunn, D. J. International Journal of Heat and Mass Transfer 21.4 (1978)
 
 \*---------------------------------------------------------------------------*/
 
+#ifndef YagiWallHT_H
+#define YagiWallHT_H
 
-#ifndef SyamlalThermCond_H
-#define SyamlalThermCond_H
-
-#include "thermCondModel.H"
-
+#include "fvCFD.H"
+#include "cfdemCloudEnergy.H"
+#include "energyModel.H"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class SyamlalThermCond Declaration
+                           Class heatTransferGunn Declaration
 \*---------------------------------------------------------------------------*/
 
-class SyamlalThermCond
+class YagiWallHT
 :
-    public thermCondModel
+    public energyModel
 {
-  
-private:
-  
+protected:
+
     dictionary propsDict_;
-  
+
+    bool interpolation_;
+
+    bool verbose_;
+
+    word QWallFluidName_;
+
+    volScalarField QWallFluid_;
+
+    volScalarField WallTempField_;
+
+    volScalarField ReField_;
+
+    volScalarField PrField_;
+
+    word tempFieldName_;
+
+    const volScalarField& tempField_;
+
     word voidfractionFieldName_;
-  
+
     const volScalarField& voidfraction_;
-    
-    word rhoFieldName_;
-    
+
+    scalar maxSource_;
+
+    word velFieldName_;
+
+    const volVectorField& U_;
+
+    word UsFieldName_;
+
+    const volVectorField& Us_;
+
+    word densityFieldName_;
+
     const volScalarField& rho_;
-    
-    word wallQFactorName_;
-    
-    // ratio of half-cell-size and near-wall film
-    mutable volScalarField wallQFactor_;
-    
-    bool hasWallQFactor_;
+
+    word WallTempName_;
+
+    const volScalarField& WallTemp_;                          // Lagrangian array
+
+    mutable double **partRe_;
 
     bool multiphase_;
 
@@ -78,33 +97,36 @@ private:
 
     const volScalarField& CpField_;
 
+    void allocateMyArrays() const;
+
+
 public:
 
     //- Runtime type information
-    TypeName("SyamlalThermCond");
-
+    TypeName("YagiWallHT");
 
     // Constructors
 
         //- Construct from components
-        SyamlalThermCond
+        YagiWallHT
         (
             const dictionary& dict,
-            cfdemCloud& sm
+            cfdemCloudEnergy& sm
         );
+
 
     // Destructor
 
-        ~SyamlalThermCond();
+        virtual ~YagiWallHT();
 
 
     // Member Functions
-	
-	tmp<volScalarField> thermCond() const;
-	
-	tmp<volScalarField> thermDiff() const;
-       
-       
+
+        void addEnergyContribution(volScalarField&) const;
+
+	void addEnergyCoefficient(volScalarField&) const {}
+
+	void calcEnergyContribution();
 };
 
 

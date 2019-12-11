@@ -95,6 +95,16 @@ protected:
     
     mutable double **partNu_;
 
+    bool multiphase_;
+
+    word kfFieldName_;
+
+    const volScalarField& kfField_;
+
+    word CpFieldName_;
+
+    const volScalarField& CpField_;
+
     void allocateMyArrays() const;
     
     scalar Nusselt(scalar, scalar, scalar) const;
