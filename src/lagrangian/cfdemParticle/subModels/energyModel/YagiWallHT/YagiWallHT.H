@@ -28,6 +28,7 @@ License
 #include "fvCFD.H"
 #include "cfdemCloudEnergy.H"
 #include "energyModel.H"
+#include "fixedGradientFvPatchFields.H"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -61,7 +62,7 @@ protected:
 
     word tempFieldName_;
 
-    const volScalarField& tempField_;
+    volScalarField tempField_;
 
     word voidfractionFieldName_;
 
@@ -83,7 +84,7 @@ protected:
 
     word WallTempName_;
 
-    const volScalarField& WallTemp_;                          // Lagrangian array
+    const volScalarField& WallTemp_;
 
     mutable double **partRe_;
 
