@@ -33,7 +33,7 @@ tmp<fv::convectionScheme<scalar> > mvConvection
                 //fvm::ddt(rhoeps, Yi)
               //+
                 mvConvection->fvmDiv(phi, Yi)
-              - fvm::laplacian(voidfraction*turbulence->muEff(), Yi)
+              - fvm::laplacian(voidfractionRec*turbulence->muEff(), Yi)
               ==
                 combustion->R(Yi)
               + particleCloud.chemistryM(0).Smi(i)
