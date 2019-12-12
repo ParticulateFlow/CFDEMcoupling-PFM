@@ -11,3 +11,5 @@ cfdemSolverIB/dir
 cfdemSolverPisoScalar/dir
 cfdemSolverRhoPimpleChem/dir
 cfdemSolverMultiphase/dir
+rcfdemSolverRhoSteadyPimpleChem/dir
+
