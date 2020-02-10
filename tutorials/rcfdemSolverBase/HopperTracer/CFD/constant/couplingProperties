@@ -1,0 +1,165 @@
+/*---------------------------------------------------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.4                                   |
+|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+
+    root            "";
+    case            "";
+    instance        "";
+    local           "";
+
+    class           dictionary;
+    object          couplingProperties;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+//===========================================================================//
+// sub-models & settings
+
+modelType "A"; // A or B
+
+couplingInterval 1;
+
+voidFractionModel centre;
+
+locateModel engine;//turboEngineM2M;//
+
+meshMotionModel noMeshMotion;
+
+regionModel allRegion;
+
+IOModel "off";
+
+dataExchangeModel twoWayMPI;
+
+averagingModel dense;
+
+clockModel standardClock;
+
+smoothingModel off;//constDiffSmoothing;
+
+probeModel off;
+
+forceModels
+(
+    freeStreaming
+);
+
+
+energyModels
+(
+    heatTransferGunn
+);
+
+chemistryModel off;
+
+thermCondModel SyamlalThermCond;
+
+momCoupleModels
+(
+    deactivateCouple
+);
+
+
+turbulenceModelType "turbulenceProperties";
+
+//===========================================================================//
+// sub-model properties
+
+implicitCoupleProps
+{
+    velFieldName "U";
+    granVelFieldName "Us";
+    voidfractionFieldName "voidfraction";
+}
+
+freeStreamingProps
+{
+  critVoidfraction 0.98;
+  // density can be chosen arbitrarily
+  particleDensity 2500;
+//particleDensity 10000;
+  ballisticVelLimit 1.0;
+}
+
+
+totalMomentumExchangeProps
+{
+    implicitMomExFieldName "Ksl";
+    explicitMomExFieldName "none";
+    fluidVelFieldName "U";
+    granVelFieldName "Us";
+    densityFieldName "rho";
+}
+
+
+heatTransferGunnProps
+{
+    partTempName "Temp";
+    partHeatFluxName "convectiveHeatFlux";
+    calcPartTempField false;
+    partRefTemp 293;
+    verbose false;
+}
+
+SyamlalThermCondProps
+{
+}
+
+constDiffSmoothingProps
+{
+    lowerLimit 0.3;
+    upperLimit 1.0;
+    smoothingLength 3.0e-3;
+}
+
+centreProps
+{
+    alphaMin 0.10;
+}
+
+engineProps
+{
+    treeSearch true;
+}
+
+turboEngineM2MProps
+{
+    turboEngineProps
+    {
+        treeSearch true;
+    }
+}
+
+dividedProps
+{
+    alphaMin 0.08;
+    scaleUpVol 1.0;
+    weight 1.0;
+    verbose;
+}
+
+
+
+twoWayMPIProps
+{
+    maxNumberOfParticles 50000;
+    liggghtsPath "../DEM/in.liggghts_rec";
+}
+
+
+particleProbeProps
+{
+        particleIDsToSample "0";
+}
+// ************************************************************************* //

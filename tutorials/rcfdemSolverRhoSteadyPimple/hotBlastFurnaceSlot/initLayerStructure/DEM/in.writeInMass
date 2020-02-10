@@ -1,0 +1,20 @@
+region insBlock block -8.0 8.0 -1 1 24 26
+
+group insBlockAll region insBlock
+group insBlockOre intersect insBlockAll ore
+group insBlockCoke intersect insBlockAll coke
+
+write_dump insBlockOre custom ../DEM/initOre id type radius mass density x y z
+write_dump insBlockCoke custom ../DEM/initCoke id type radius mass density x y z
+
+
+
+
+
+
+#read_dump ../DEM/initOre 0 x y z radius mass density bruteadd yes retaintimestep yes
+#read_dump ../DEM/initCoke 0 x y z radius mass density bruteadd yes retaintimestep yes
+
+#run 1
+
+

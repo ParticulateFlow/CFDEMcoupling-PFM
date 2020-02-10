@@ -1,0 +1,109 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.3.0                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      fvSolution;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+solvers
+{
+    "(p|rho|correctedField)"
+    {
+        solver          PCG;
+        preconditioner  DIC;
+        tolerance       1e-8;
+        relTol          1e-1;
+    }
+
+    "(p|rho|correctedField)Final"
+    {
+        $p;
+        relTol          0;
+    }
+
+    "(U|k|e|epsilon|R|nuTilda|c)"
+    {
+        solver          smoothSolver;
+        smoother        GaussSeidel;
+        tolerance       1e-8;
+        relTol          1e-1;
+    }
+
+    "(U|e|k|nuTilda)Final"
+    {
+        $U;
+        relTol          0;
+    }
+
+    T
+    {
+        solver          PBiCG;
+        preconditioner  DILU;
+        tolerance       1e-8;
+        relTol          0;
+    }
+
+    
+
+    "(voidfraction|Ksl|UsNext|voidfractionNext|sSmoothField|vSmoothField|fSmooth)"
+    {
+        solver          PCG;
+        preconditioner  DIC;
+        tolerance       1e-09;
+        relTol          1e-06;
+    }
+}
+
+PIMPLE
+{
+    momentumPredictor yes;
+    nOuterCorrectors 20;
+    nCorrectors     1;
+    nNonOrthogonalCorrectors 0;
+    rhoMin          rhoMin [ 1 -3 0 0 0 ] 0.3;
+    rhoMax          rhoMax [ 1 -3 0 0 0 ] 4.0;
+
+    pMin            pMin [ 1 -1 -2 0 0 ] 90000;
+    pMax            pMax [ 1 -1 -2 0 0 ] 500000;
+
+    UMax            UMax [ 0 1 -1 0 0 ] 250;
+}
+
+PISO
+{
+    nCorrectors     4;
+    nNonOrthogonalCorrectors 1;
+    pRefCell        0;
+    pRefValue       0;
+}
+
+relaxationFactors
+{
+    fields
+    {
+	U	0.8;
+	p	0.8;
+	UFinal	0.8;
+	pFinal	0.8;
+    }
+    equations
+    {
+        ".*"  0.8;
+//	"tUEqn" 0.5;
+//	"UEqn"  0.5;
+//	"pEqn"  0.5;
+    }
+}
+
+
+// ************************************************************************* //

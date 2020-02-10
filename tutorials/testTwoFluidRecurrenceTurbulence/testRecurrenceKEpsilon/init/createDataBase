@@ -1,0 +1,38 @@
+#!/bin/bash
+cd ${0%/*} || exit 1    # Run from this directory
+
+
+echo ""
+
+if [ -e ../dataBase ];
+then
+    echo "dataBase exists"
+else
+    echo "no local dataBase found"
+    echo "   ... creating dataBase"
+    mkdir ../dataBase
+    
+    # copy system directory to dataBase
+    cp -r system ../dataBase/
+    
+    # copy mesh from init to dataBase
+    mkdir ../dataBase/constant
+    cp -r constant/polyMesh ../dataBase/constant/
+    
+    # fill dataBase from init case
+    # adjust copy commands when changing init case endTime
+    cp -r [2-9][0-9]* ../dataBase/
+    
+    # rename folders and delete 'uniform' directories
+    cd ../dataBase
+    rename 's/(\d+)/($1-28)/e' *
+    find . -type d -name uniform | xargs rm -rf
+    
+    echo "   ... dataBase created"
+    
+    cd ../init
+fi
+
+echo ""
+
+#------------------------------------------------------------------------------

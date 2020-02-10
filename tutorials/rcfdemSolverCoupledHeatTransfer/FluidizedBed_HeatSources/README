@@ -1,0 +1,4 @@
+1.) creation of databases
+	go to folder db1 and execute run.sh; once finished, execute postrun.sh; same for folder db2
+2.) rCFD run
+	first transfer and decompose the databases by executing prerun.sh; for the actual rCFD run, execute run.sh

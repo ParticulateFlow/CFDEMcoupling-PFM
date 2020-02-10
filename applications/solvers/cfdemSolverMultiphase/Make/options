@@ -1,6 +1,10 @@
+FOAM_VERSION_MAJOR := $(word 1,$(subst ., ,$(WM_PROJECT_VERSION)))
+PFLAGS+= -DOPENFOAM_VERSION_MAJOR=$(FOAM_VERSION_MAJOR)
+
 include $(CFDEM_ADD_LIBS_DIR)/additionalLibs
 
 EXE_INC = \
+     $(PFLAGS) \
     -I$(CFDEM_OFVERSION_DIR) \
     -ImultiphaseMixture/lnInclude \
     -I$(LIB_SRC)/transportModels \

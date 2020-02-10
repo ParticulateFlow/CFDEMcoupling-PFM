@@ -56,6 +56,18 @@ protected:
 
     bool implicit_;
 
+    bool calcTotalHeatFlux_;
+
+    bool initPartTemp_;
+
+    scalar Tmin_;
+
+    scalar Tmax_;
+
+    scalar totalHeatFlux_;
+
+    scalar NusseltScalingFactor_;
+
     word QPartFluidName_;
 
     volScalarField QPartFluid_;
@@ -76,9 +88,7 @@ protected:
 
     bool calcPartTempField_;
 
-    bool calcPartTempAve_;
-
-    scalar partTempAve_;
+    dimensionedScalar partTempAve_;
 
     word tempFieldName_;
 
@@ -126,6 +136,8 @@ protected:
 
     virtual void heatFlux(label, scalar, scalar, scalar, scalar cg3 = 1.0);
 
+    virtual void initPartTemp();
+
 public:
 
     //- Runtime type information
@@ -155,8 +167,6 @@ public:
         void calcEnergyContribution();
 
         void postFlow();
-
-        scalar aveTpart() const;
 };
 
 

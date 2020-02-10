@@ -1,15 +1,28 @@
     //  thermodynamics, chemistry
 
+#if OPENFOAM_VERSION_MAJOR < 6
+    Info<< "Creating combustion model\n" << endl;
+    autoPtr<combustionModels::rhoCombustionModel> combustion
+    (
+        combustionModels::rhoCombustionModel::New(mesh)
+    );
+    rhoReactionThermo& thermo = combustion->thermo();
+#else
     Info<< "Reading thermophysical properties\n" << endl;
     autoPtr<rhoReactionThermo> pThermo(rhoReactionThermo::New(mesh));
     rhoReactionThermo& thermo = pThermo();
+#endif
     thermo.validate(args.executable(), "h", "e");
 
     basicSpecieMixture& composition = thermo.composition();
     PtrList<volScalarField>& Y = composition.Y();
 
     // read molecular weight
+#if OPENFOAM_VERSION_MAJOR < 6
+    volScalarField W(composition.W());
+#else
     volScalarField W(thermo.W());
+#endif
 
     bool propagateInertSpecie = true;
 
@@ -28,6 +41,8 @@
     }
 
     volScalarField& p = thermo.p();
+    const volScalarField& T = thermo.T();
+    const volScalarField& psi = thermo.psi();
 
     multivariateSurfaceInterpolationScheme<scalar>::fieldTable fields;
 
@@ -51,9 +66,6 @@
     );
 
     //  kinematic fields
-
-
-
     Info<< "Reading field U\n" << endl;
     volVectorField U
     (
@@ -82,18 +94,8 @@
         mesh
     );
 
-    volScalarField rhoeps
-    (
-        IOobject
-        (
-            "rhoeps",
-            runTime.timeName(),
-            mesh,
-            IOobject::MUST_READ,
-            IOobject::AUTO_WRITE
-        ),
-        rho*voidfraction
-    );
+    volScalarField rhoeps ("rhoeps", rho*voidfraction);
+
 
     Info<< "\nCreating fluid-particle heat flux field\n" << endl;
     volScalarField Qsource
@@ -133,11 +135,12 @@
             "thCond",
             runTime.timeName(),
             mesh,
-            IOobject::NO_READ,
+            IOobject::READ_IF_PRESENT,
             IOobject::AUTO_WRITE
         ),
         mesh,
-        dimensionedScalar("zero", dimensionSet(1,1,-3,-1,0,0,0), 0.0)
+        dimensionedScalar("zero", dimensionSet(1,1,-3,-1,0,0,0), 0.0),
+        "zeroGradient"
     );
 
     Info<< "\nCreating heat capacity field\n" << endl;
@@ -203,11 +206,13 @@
         )
     );
 
+#if OPENFOAM_VERSION_MAJOR >= 6
     Info<< "Creating combustion model\n" << endl;
     autoPtr<CombustionModel<rhoReactionThermo>> combustion
     (
         CombustionModel<rhoReactionThermo>::New(thermo, turbulence())
     );
+#endif
 
     Info<< "Creating field dpdt\n" << endl;
     volScalarField dpdt
@@ -225,6 +230,7 @@
     Info<< "Creating field kinetic energy K\n" << endl;
     volScalarField K("K", 0.5*magSqr(U));
 
+#if OPENFOAM_VERSION_MAJOR < 5
     volScalarField dQ
     (
         IOobject
@@ -238,6 +244,21 @@
         mesh,
         dimensionedScalar("dQ", dimEnergy/dimTime, 0.0)
     );
+#else
+    volScalarField Qdot
+    (
+        IOobject
+        (
+            "Qdot",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        mesh,
+        dimensionedScalar("Qdot", dimEnergy/dimVolume/dimTime, 0.0)
+    );
+#endif
 
     Info<< "\nReading momentum exchange field Ksl\n" << endl;
     volScalarField Ksl
@@ -282,9 +303,18 @@
         mesh,
         dimensionedScalar("zero",dimensionSet(0, -3, 0, 0, 1),0)
     );
+
+    volScalarField dSauter
+    (
+        IOobject
+        (
+            "dSauter",
+            runTime.timeName(),
+            mesh,
+            IOobject::READ_IF_PRESENT,
+            IOobject::AUTO_WRITE
+        ),
+        mesh,
+        dimensionedScalar("zero",dimensionSet(0, 1, 0, 0, 0,0,0),0)
+    );
 //===============================
-
-
-
- //   singlePhaseTransportModel laminarTransport(U, phi);
-

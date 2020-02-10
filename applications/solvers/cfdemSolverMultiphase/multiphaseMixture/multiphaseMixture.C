@@ -679,8 +679,13 @@ void Foam::multiphaseMixture::solveAlphas
             alphaPhiCorr,
             zeroField(),
             zeroField(),
+#if OPENFOAM_VERSION_MAJOR < 6
+            1,
+            0,
+#else
             oneField(),
             zeroField(),
+#endif
             true
         );
 

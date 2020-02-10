@@ -54,7 +54,9 @@ private:
 
     dictionary propsDict_;
 
-    mutable volScalarField partKsField_;
+    word partKsFieldName_;
+
+    volScalarField& partKsField_;
 
     word voidfractionFieldName_;
 
@@ -63,13 +65,6 @@ private:
     scalarList typeKs_;
 
     mutable double **partKs_;
-
-    word wallQFactorName_;
-
-    // ratio of half-cell-size and near-wall film
-    mutable volScalarField wallQFactor_;
-
-    bool hasWallQFactor_;
 
     void allocateMyArrays() const;
 
@@ -97,9 +92,7 @@ public:
 
     // Member Functions
 
-        tmp<volScalarField> thermCond() const;
-
-        tmp<volScalarField> thermDiff() const;
+        void calcThermCond();
 
 };
 

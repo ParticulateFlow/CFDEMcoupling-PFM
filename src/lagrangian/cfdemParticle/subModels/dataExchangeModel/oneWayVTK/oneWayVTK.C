@@ -69,7 +69,7 @@ oneWayVTK::oneWayVTK
 
     // set max nr of particles from dict
     maxNumberOfParticles_ = readScalar(propsDict_.lookup("maxNumberOfParticles"));
-    setNumberOfParticles(maxNumberOfParticles_);
+    particleCloud_.setNumberOfParticles(maxNumberOfParticles_);
 
     Info << "relativePath_" << relativePath_ << endl;
 }
@@ -156,7 +156,7 @@ void oneWayVTK::getData
             input >> just_read;                                     // skip text for dataType
 
             // give nr of particles to cloud
-            setNumberOfParticles(numberOfParticles);
+            particleCloud_.setNumberOfParticles(numberOfParticles);
 
             // re-allocate arrays of cloud
             particleCloud_.reAllocArrays();

@@ -1,0 +1,87 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.3.0                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+application     pisoFoam;
+
+startFrom       startTime;
+
+startTime       0;
+
+stopAt          endTime;
+
+endTime         0.00025;
+
+deltaT          0.00025;
+
+writeControl    timeStep;
+
+writeInterval   4000;
+
+purgeWrite      0;
+
+writeFormat     ascii;
+
+writePrecision  6;
+
+writeCompression off;
+
+timeFormat      general;
+
+timePrecision   6;
+
+runTimeModifiable true;
+
+libs (
+ //     "libOpenFOAM.so"
+ //     "libsimpleSwakFunctionObjects.so"
+ //     "libswakFunctionObjects.so"
+ //     "libgroovyBC.so"
+ //     "libgroovyStandardBCs.so"
+     );
+
+functions
+{
+ 
+/*	probes1
+	{
+		type probes;
+
+		functionObjectLibs ("libsampling.so");
+
+		#include "probesDict";
+	}
+*/
+/*        temperatureSum
+        {
+            type patchExpression;
+	    outputControl   timeStep;
+	    outputInterval  40;
+            accumulations (
+                sum
+            );
+            patches (
+                outlet 
+            );
+            expression "phi*T";
+            verbose false;
+        }
+
+*/
+
+}
+
+// ************************************************************************* //

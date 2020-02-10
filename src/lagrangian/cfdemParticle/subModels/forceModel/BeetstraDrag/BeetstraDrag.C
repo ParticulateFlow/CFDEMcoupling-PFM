@@ -148,6 +148,7 @@ void BeetstraDrag::setForce() const
     else if (particleCloud_.cg() > 1)
     {
         scaleDia_=particleCloud_.cg();
+        typeCG_[0] = scaleDia_;
         Info << "Beetstra using scale from liggghts cg = " << scaleDia_ << endl;
     }
 
@@ -212,8 +213,6 @@ void BeetstraDrag::setForce() const
                     voidfraction = voidfraction_[cellI];
                     Ufluid = U_[cellI];
                 }
-                // in case a fines phase is present, void fraction needs to be adapted
-         //       adaptVoidfraction(voidfraction, cellI);
 
                 if (multiTypes_)
                 {

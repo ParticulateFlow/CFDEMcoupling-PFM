@@ -1,0 +1,10 @@
+#!/bin/bash
+#
+# run the post-processing
+
+rStatAnalysis 2>&1 | tee log.rStatAnalysis 2>&1
+
+cd recMat
+
+./plot.sh
+

@@ -5,6 +5,8 @@
 log_*
 log.*
 *~
+*.swp
+*.swo
 
 **/linux*Gcc*/
 **/.vscode

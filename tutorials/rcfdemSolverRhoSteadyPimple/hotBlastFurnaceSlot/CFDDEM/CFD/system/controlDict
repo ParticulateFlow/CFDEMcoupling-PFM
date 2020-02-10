@@ -1,0 +1,155 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.3.0                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+application     potentialFoam;
+
+startFrom       startTime;
+
+startTime       0;
+
+stopAt          endTime;
+
+endTime         50.0;
+
+deltaT          0.00025;
+
+writeControl    timeStep;
+
+writeInterval   10000;
+
+purgeWrite      0;
+
+writeFormat     ascii;
+
+writePrecision  6;
+
+writeCompression off;
+
+timeFormat      general;
+
+timePrecision   6;
+
+runTimeModifiable true;
+
+adjustTimeStep no;
+
+functions
+{
+    fieldAverage1
+    {
+        type            fieldAverage;
+        libs            ("libfieldFunctionObjects.so");
+        writeControl    writeTime;
+
+        fields
+        (
+            U
+            {
+                mean        on;
+                prime2Mean  off;
+                base        time;
+                window	    10.0001;
+            }
+	    Us
+            {
+                mean        on;
+                prime2Mean  off;
+                base        time;
+                window	    10.0001;
+            }
+	    voidfraction
+            {
+                mean        on;
+                prime2Mean  off;
+                base        time;
+                window	    10.0001;
+            }
+        );
+    }
+
+    fieldOutput
+    {
+        type writeObjects;
+        functionObjectLibs ( "libutilityFunctionObjects.so" );
+        exclusiveWriting     true;
+        objects ("Us" "UsMean" "voidfraction" "voidfractionMean" "partType" "dSauter" "dSauterMean");
+        writeControl timeStep;
+        writeInterval       10000;
+    }
+
+    probes1
+    {
+        type probes;
+
+	functionObjectLibs ("libsampling.so");
+
+	#include "probesDict";
+    }
+
+// OF 4
+/*
+    cellObj1
+    {
+        type            volRegion;
+        libs ("libfieldFunctionObjects.so");
+        enabled         true;
+        writeControl    timeStep;
+        writeInterval   400;
+        log             true;
+        writeFields     false;
+        regionType      cellZone;
+        name            topReg;
+        operation       volAverage;
+
+        fields
+        (
+            UsMean
+        );
+    }
+*/
+
+// OF 6
+    cellObj1
+    {
+        type            volFieldValue;
+        libs ("libfieldFunctionObjects.so");
+        enabled         true;
+        writeControl    timeStep;
+        writeInterval   400;
+        log             true;
+        writeFields     false;
+        regionType      cellZone;
+        name            topReg;
+        operation       volAverage;
+
+        fields
+        (
+            UsMean
+        );
+    }
+
+    conditionalStop
+    {
+        type abort;
+        functionObjectLibs ( "libjobControl.so" );
+        action writeNow;
+        fileName "ABORT";
+    }
+
+}
+
+// ************************************************************************* //

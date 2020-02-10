@@ -1,0 +1,226 @@
+/*---------------------------------------------------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.4                                   |
+|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+
+    root            "";
+    case            "";
+    instance        "";
+    local           "";
+
+    class           dictionary;
+    object          couplingProperties;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+//===========================================================================//
+// sub-models & settings
+
+modelType "A"; // A or B
+
+couplingInterval 1;
+
+voidFractionModel divided;
+
+locateModel engine;//turboEngineM2M;//
+
+meshMotionModel noMeshMotion;
+
+regionModel allRegion;
+
+IOModel "off";
+
+dataExchangeModel twoWayMPI;//twoWayM2M;//twoWayFiles;//oneWayVTK;//
+//dataExchangeModel twoWayMany2Many;
+
+averagingModel dense;//dilute;//
+
+clockModel standardClock;//off;
+
+smoothingModel off;
+
+probeModel off;
+
+forceModels
+(
+    freeStreaming
+    isotropicFluctuations
+    directedDiffusiveRelaxation
+    dSauter
+    BeetstraDragPoly
+    gradPForce
+    viscForce
+    particleDeformation
+);
+
+momCoupleModels
+(
+    implicitCouple
+);
+
+energyModels
+(
+    heatTransferRanzMarshall
+    heatTransferGranConduction
+);
+
+thermCondModel SyamlalThermCond;
+
+chemistryModels ();
+//chemistryModel off;
+
+turbulenceModelType "turbulenceProperties";
+
+
+getParticleTypes true;
+getParticleDensities true;
+getParticleEffVolFactors true;
+
+coupleRecFluc true;
+coupleRecForce false;
+setForceField true;
+
+nEveryFlow 1;
+//===========================================================================//
+// sub-model properties
+
+implicitCoupleProps
+{
+    velFieldName "U";
+    granVelFieldName "UsRec";
+    voidfractionFieldName "voidfractionRec";
+}
+
+gradPForceProps
+{
+    pFieldName "p";
+    densityFieldName "rho";
+    voidfractionFieldName "voidfractionRec";
+    velocityFieldName "U";
+}
+
+viscForceProps
+{
+    velocityFieldName "U";
+    densityFieldName "rho";
+}
+
+
+BeetstraDragProps
+{
+    velFieldName "U";
+    granVelFieldName "UsRec";
+    densityFieldName "rho";
+    voidfractionFieldName "voidfractionRec";
+    phi 1;
+    coarseGrainingFactors (4.0 10.0);
+}
+
+dSauterProps
+{
+    coarseGrainingFactors (4.0 10.0);
+}
+
+freeStreamingProps
+{
+    critVoidfraction 1.5;
+    // density can be chosen arbitrarily
+    particleDensity 667;
+    ballisticVelLimit 0.0;
+    scalingFactor 250.09045;
+    interpolation true;
+}
+
+isotropicFluctuationsProps
+{
+    critVoidfraction 1.1;
+    D0 5e-4;
+    measureDiff true;
+    ignoreCellsName "aboveCZ";
+}
+
+directedDiffusiveRelaxationProps
+{
+    critVoidfraction 1.1;
+    D0 1e-1;
+    measureDiff false;
+    maxDisplacement 0.01;
+    ignoreCellsName "aboveCZ";
+}
+
+particleDeformationProps
+{
+    refFieldName "partTempRef";
+    partType 2;
+// same as Huo et al. (2017)
+    lowerBound 1475;
+    upperBound 1675;
+}
+
+heatTransferRanzMarshallProps
+{
+    partTempName "Temp";
+    partHeatFluxName "convectiveHeatFlux";
+    calcPartTempField true;
+    partRefTemp 293;
+    interpolation false;
+    voidfractionFieldName "voidfractionRec";
+    coarseGrainingFactors (4.0 10.0);
+    verbose true;
+    initPartTemp true;
+    Tmin 293;
+    Tmax 3000;
+    NusseltScalingFactor 0.1;
+}
+
+heatTransferGranConductionProps
+{
+    prescribedVoidfractionFieldName "voidfractionRec";
+// data taken from Hou et al. Powder Technology 314 (2017)
+    thermalConductivities (1.7 80.0);
+    calcTotalHeatFlux true;
+}
+
+SyamlalThermCondProps
+{
+    voidfractionFieldName "voidfractionRec";
+}
+
+
+centreProps
+{
+    alphaMin 0.10;
+}
+
+engineProps
+{
+    treeSearch true;
+}
+
+dividedProps
+{
+    alphaMin -20;
+    scaleUpVol 1.0;
+    weight 1.0;//1.06; //1.33;
+    verbose;
+}
+
+twoWayMPIProps
+{
+    maxNumberOfParticles 50000;
+    liggghtsPath "../DEM/in.liggghts_dataDrivenCFD";
+    liggghtsEndOfRunPath "../DEM/in.final";
+}
+
+
+// ************************************************************************* //

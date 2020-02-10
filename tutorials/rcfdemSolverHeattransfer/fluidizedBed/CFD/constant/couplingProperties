@@ -1,0 +1,200 @@
+/*---------------------------------------------------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.4                                   |
+|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+
+    root            "";
+    case            "";
+    instance        "";
+    local           "";
+
+    class           dictionary;
+    object          couplingProperties;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+//===========================================================================//
+// sub-models & settings
+
+modelType "A"; // A or B
+
+couplingInterval 1;
+
+voidFractionModel centre;
+
+locateModel turboEngine;//turboEngineM2M;//
+
+meshMotionModel noMeshMotion;
+
+regionModel allRegion;
+
+IOModel "off";
+
+dataExchangeModel twoWayMPI;
+
+averagingModel dense;
+
+clockModel standardClock;
+
+smoothingModel off;
+
+probeModel off;
+
+forceModels
+(
+    freeStreaming
+    isotropicFluctuations   
+);
+
+energyModels
+(
+    //heatTransferGunn
+    heatTransferGunnImplicit
+);
+
+chemistryModel off;
+
+thermCondModel SyamlalThermCond;
+
+momCoupleModels
+(
+    deactivateCouple
+);
+
+densityFieldName "rhoRec";
+
+turbulenceModelType "turbulenceProperties";
+
+//verbose;
+
+
+//===========================================================================//
+// sub-model properties
+
+standardRecModelProps
+{
+  velRecFieldName "U";
+  voidfractionRecFieldName "voidfraction";
+  granVelRecFieldName "Us";
+  phiRecFieldName "phi";
+  granPhiRecFieldName "phiS";
+  readPhi false;
+  readPhiS false;
+  normType "volumeFraction";
+  //normType "solidPhaseMomentum";
+  refVel 1.2;
+  refVol 3e-4;
+}
+
+freeStreamingProps
+{
+  critVoidfraction 0.98;
+  // density can be chosen arbitrarily
+  particleDensity 2500;
+//particleDensity 10000;
+  ballisticVelLimit 1.0;
+}
+
+isotropicFluctuationsProps
+{
+  critVoidfraction 0.98;
+  D0 1e-4;
+}
+
+
+implicitCoupleProps
+{
+    velFieldName "U";
+    granVelFieldName "Us";
+    voidfractionFieldName "voidfraction";
+}
+
+
+
+heatTransferGunnProps
+{
+    partTempName "Temp";
+    partHeatFluxName "convectiveHeatFlux";
+    calcPartTempField true;
+    partRefTemp 293;
+    tempFieldName "T";
+    voidfractionFieldName "voidfractionRec";
+    velFieldName "URec";
+    densityFieldName "rhoRec";
+    maxSource 1e10;
+  //  verbose true;
+    expNusselt true;
+}
+
+
+SyamlalThermCondProps
+{
+    rhoFieldName "rhoRec";
+    voidfractionFieldName "voidfractionRec";
+}
+
+
+
+
+fieldTimeAverageProps
+{
+    startTime 5.0;
+
+    scalarFieldNames
+    (
+        "voidfraction"
+    );
+
+    vectorFieldNames
+    (
+        "Us"
+    );
+}
+
+centreProps
+{
+    alphaMin -10.0;
+}
+
+engineProps
+{
+    treeSearch true;
+}
+
+turboEngineProps
+{
+    treeSearch true;
+}
+
+dividedProps
+{
+    alphaMin 0.02;
+    scaleUpVol 1.0;
+    weight 1.0;
+    verbose;
+}
+
+
+
+twoWayMPIProps
+{
+    maxNumberOfParticles 50000;
+    liggghtsPath "../DEM/in.liggghts_rec";
+}
+
+
+particleProbeProps
+{
+        particleIDsToSample "0";
+}
+// ************************************************************************* //

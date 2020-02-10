@@ -1,0 +1,75 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.6                                   |
+|   \\  /    A nd           | Web:      http://www.OpenFOAM.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    object      T;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 0 0 1 0 0 0];
+
+internalField   uniform 293;
+
+boundaryField
+{
+ /*   walls
+    {
+        type groovyBC;
+        voidfraction voidfraction;
+//        variables "k=0.024;sqrt1e=sqrt(1-voidfraction);keff=(1-sqrt1e)/voidfraction*k;h=350;Tw=293;";
+        variables "k=0.03;sqrt1e=sqrt(1-voidfraction);keff=(1-sqrt1e)/voidfraction*k;h=350;Tw=293;";
+        valueExpression "Tw";
+        fractionExpression "1/(1+keff/(h*mag(delta())))";
+        value           uniform 293.0;
+    }
+    
+
+
+    nozzle
+    {
+        type groovyBC;
+        voidfraction voidfraction;
+//        variables "k=0.024;sqrt1e=sqrt(1-voidfraction);keff=(1-sqrt1e)/voidfraction*k;h=350;Tw=293;";
+        variables "k=0.03;sqrt1e=sqrt(1-voidfraction);keff=(1-sqrt1e)/voidfraction*k;h=350;Tw=293;";
+        valueExpression "Tw";
+        fractionExpression "1/(1+keff/(h*mag(delta())))";
+        value           uniform 293.0;
+    }
+
+*/
+
+    walls
+    {
+        type            fixedValue;
+        value		uniform 293;
+     //    type	zeroGradient;
+    }
+
+    nozzle
+    {
+        type            fixedValue;
+        value		uniform 293;
+    }
+
+    
+    inlet
+    {
+        type            fixedValue;
+        value		uniform 293;
+    }
+
+    outlet
+    {
+        type            zeroGradient;
+    }
+}
+
+// ************************************************************************* //

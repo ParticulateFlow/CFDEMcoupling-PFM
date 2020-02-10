@@ -29,13 +29,17 @@ Description
     and OpenFOAM(R). Note: this code is not part of OpenFOAM(R) (see DISCLAIMER).
 \*---------------------------------------------------------------------------*/
 
-#include "error.H"
 #include "twoWayMPI.H"
 #include "addToRunTimeSelectionTable.H"
+#include "OFstream.H"
 #include "clockModel.H"
-#include "pair.h"
-#include "force.h"
-#include "forceModel.H"
+#include "liggghtsCommandModel.H"
+
+//LAMMPS/LIGGGHTS
+#include <input.h>
+#include <library_cfd_coupling.h>
+#include <update.h>
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -75,11 +79,10 @@ twoWayMPI::twoWayMPI
             IOobject::NO_READ,
             IOobject::NO_WRITE
          )
-//         DEMVariableNames_.size()
     ),
     lmp(NULL)
 {
-    Info<<"Starting up LIGGGHTS for first time execution"<<endl;
+    Info << "Starting up LIGGGHTS for first time execution" << endl;
 
     MPI_Comm_dup(MPI_COMM_WORLD, &comm_liggghts);
 
@@ -87,8 +90,8 @@ twoWayMPI::twoWayMPI
     const fileName liggghtsPath(propsDict_.lookup("liggghtsPath"));
 
     // open LIGGGHTS input script
-    Info<<"Executing input script '"<< liggghtsPath.c_str() <<"'"<<endl;
-    lmp = new LAMMPS_NS::LAMMPS(0,NULL,comm_liggghts);
+    Info << "Executing input script '" << liggghtsPath.c_str() << "'" << endl;
+    lmp = new LAMMPS_NS::LAMMPS(0, NULL, comm_liggghts);
     lmp->input->file(liggghtsPath.c_str());
 
     // get DEM time step size
@@ -101,10 +104,38 @@ twoWayMPI::twoWayMPI
 
 twoWayMPI::~twoWayMPI()
 {
+    if (propsDict_.found("liggghtsEndOfRunPath"))
+    {
+        const fileName liggghtsEndOfRunPath(propsDict_.lookup("liggghtsEndOfRunPath"));
+        lmp->input->file(liggghtsEndOfRunPath.c_str());
+    }
     delete lmp;
 }
 
+
+// * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
+
+void twoWayMPI::updateDEMVariables()
+{
+    scalar variablevalue = 0.0;
+    word variablename("");
+    DEMVariables_.clear();
+    for (label i=0; i<DEMVariableNames_.size(); i++)
+    {
+        variablename = DEMVariableNames_[i];
+        variablevalue = DEMVariableValue(variablename);
+        DEMVariables_.append(variablevalue);
+    }
+}
+
+double twoWayMPI::DEMVariableValue(word variablename)
+{
+    return liggghts_get_variable(lmp,variablename.c_str());
+}
+
+
 // * * * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * * //
+
 void twoWayMPI::getData
 (
     word name,
@@ -353,7 +384,7 @@ bool twoWayMPI::couple(int i)
         // give nr of particles to cloud
         double newNpart = liggghts_get_maxtag(lmp);
 
-        setNumberOfParticles(newNpart);
+        particleCloud_.setNumberOfParticles(newNpart);
 
         // re-allocate arrays of cloud
         particleCloud_.clockM().start(4,"LIGGGHTS_reallocArrays");
@@ -399,24 +430,6 @@ double* twoWayMPI::getTypeVol() const
 
     Warning << "liggghts_get_vclump_ms(lmp) is not available here!" << endl;
     return NULL;
-}
-
-void twoWayMPI::updateDEMVariables()
-{
-    scalar variablevalue = 0.0;
-    word variablename("");
-    DEMVariables_.clear();
-    for (label i=0; i<DEMVariableNames_.size(); i++)
-    {
-        variablename = DEMVariableNames_[i];
-        variablevalue = DEMVariableValue(variablename);
-        DEMVariables_.append(variablevalue);
-    }
-}
-
-double twoWayMPI::DEMVariableValue(word variablename)
-{
-    return liggghts_get_variable(lmp,variablename.c_str());
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

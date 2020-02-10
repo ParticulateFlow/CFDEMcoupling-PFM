@@ -163,6 +163,12 @@ twoWayMany2Many::~twoWayMany2Many()
     delete lmp2foam_vec_;
     delete foam2lmp_vec_;
     delete foam2lmp_;
+
+    if (propsDict_.found("liggghtsEndOfRunPath"))
+    {
+        const fileName liggghtsEndOfRunPath(propsDict_.lookup("liggghtsEndOfRunPath"));
+        lmp->input->file(liggghtsEndOfRunPath.c_str());
+    }
     delete lmp;
 }
 
@@ -417,7 +423,7 @@ bool twoWayMany2Many::couple(int i)
         }
 
         double newNpart = liggghts_get_maxtag(lmp);
-        setNumberOfParticles(newNpart);
+        particleCloud_.setNumberOfParticles(newNpart);
 
         if (Npart_ != newNpart)
         {
@@ -430,13 +436,13 @@ bool twoWayMany2Many::couple(int i)
         firstRun_=false;
         particleCloud_.clockM().stop("CoupleSyncIDs()");
 
-        setNumberOfParticles(nlocal_foam_);
+        particleCloud_.setNumberOfParticles(nlocal_foam_);
 
         // re-allocate arrays of cloud
         particleCloud_.reAllocArrays();
 
-        setPositions(nlocal_foam_,pos_foam_);
-        setCellIDs(nlocal_foam_,cellID_foam_);
+        particleCloud_.setPositions(nlocal_foam_,pos_foam_);
+        particleCloud_.setCellIDs(nlocal_foam_,cellID_foam_);
 
         Info <<"Foam::twoWayMany2Many::couple(i) done." << endl;
     }

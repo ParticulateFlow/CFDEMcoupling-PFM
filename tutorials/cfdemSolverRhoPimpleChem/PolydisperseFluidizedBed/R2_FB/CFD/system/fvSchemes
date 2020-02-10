@@ -1,0 +1,83 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.3.0                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      fvSchemes;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+ddtSchemes
+{
+    default         Euler;
+}
+
+gradSchemes
+{
+    default         Gauss linear;
+    grad(p)         cellMDLimited leastSquares 0.5;
+    grad(U)         cellMDLimited leastSquares 0.5; //cellLimited Gauss linear 1; //
+    grad(h)         cellMDLimited leastSquares 0.5;
+    grad(e)         cellMDLimited leastSquares 0.5;
+}
+
+divSchemes
+{
+    default         Gauss linear;
+
+    div(phi,U)         Gauss limitedLinear 1; //Gauss linear; //Gauss limitedLinear 1; // //Gauss limitedLinearV 1; //
+    div(phid,p)        Gauss limitedLinear 1; //Gauss upwind; //Gauss limitedLinearV 1;
+    div(phi,K)         Gauss limitedLinear 1;
+    div(phi,h)         Gauss limitedLinear 1; //Gauss upwind;
+    div(phi,k)         Gauss limitedLinear 1; //Gauss upwind;
+    div(phi,epsilon)   Gauss limitedLinear 1; //Gauss upwind;
+    div(U)             Gauss limitedLinear 1;
+    div(phi,Yi_h)   Gauss multivariateSelection
+    {
+        CO limitedLinear01 1;
+        H2 limitedLinear01 1;
+        N2 limitedLinear01 1;
+        H2O limitedLinear01 1;
+        CO2 limitedLinear01 1;
+        h limitedLinear 1;
+        e limitedLinear 1;
+    }
+    // div((muEff*dev2(T(grad(U)))))        Gauss linear;
+    div((viscousTerm*dev2(grad(U).T())))    Gauss linear;
+    div((thermo:mu*dev(grad(U).T())))       Gauss linear;
+    div((nuEff*dev2(T(grad(U)))))           Gauss linear;
+    div(phi,T)      Gauss limitedLinear 1;
+}
+
+laplacianSchemes
+{
+    default         Gauss linear corrected; //Gauss linear orthogonal;
+}
+
+interpolationSchemes
+{
+    default         linear;
+    interpolate(U)  linear;
+}
+
+snGradSchemes
+{
+    default         corrected; //orthogonal;
+}
+
+fluxRequired
+{
+    default         no;
+    p               ;
+}
+
+
+// ************************************************************************* //

@@ -1,0 +1,75 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.3.x                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      fvSchemes;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+ddtSchemes
+{
+    default         Euler;
+}
+
+gradSchemes
+{
+    default         Gauss linear;
+}
+
+divSchemes
+{
+    default                         none;
+
+    div(phi,alpha.air)              Gauss vanLeer01;
+    div(phir,alpha.air)             Gauss vanLeer01;
+
+    "div\((alphaRhoPhi|alphaPhi|phi).*,U.*\)"      Gauss limitedLinearV 1;
+
+    "div\((alphaRhoPhi|alphaPhi).*,(h|e).*\)"  	Gauss limitedLinear 1;
+    "div\((alphaRhoPhi|alphaPhi).*,K.*\)"      	Gauss limitedLinear 1;
+    "div\(alphaPhi.*,p\)"           			Gauss limitedLinear 1;
+
+    "div\(phim,(k|epsilon)m\)"      				Gauss limitedLinear 1;
+    "div\((alphaRhoPhi|alphaPhi).*,(k|epsilon).*\)"	Gauss limitedLinear 1;
+    
+    div(((alpha.air*nuEff)*dev2(T(grad(U.air)))))			Gauss linear;
+    div(((alpha.air*nuEff.air)*dev2(T(grad(U.air)))))		Gauss linear;
+    div(((alpha.water*nuEff.water)*dev2(T(grad(U.water)))))	Gauss linear;
+    div(alphaPhi.air,thermo:rho.air)						Gauss linear;
+    div(alphaPhi.water,thermo:rho.water)					Gauss linear;
+
+    "div\(\(\(\(alpha.**thermo:rho.*\)*nuEff.*\)*dev2\(T\(grad\(U.*\)\)\)\)\)" Gauss linear;
+}
+
+laplacianSchemes
+{
+    default         Gauss linear uncorrected;
+}
+
+interpolationSchemes
+{
+    default         linear;
+}
+
+snGradSchemes
+{
+    default         uncorrected;
+}
+
+fluxRequired
+{
+    default         no;
+    p               ;
+}
+
+
+// ************************************************************************* //

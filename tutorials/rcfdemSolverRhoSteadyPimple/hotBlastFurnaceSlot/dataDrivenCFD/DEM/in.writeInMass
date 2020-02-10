@@ -1,0 +1,40 @@
+region tooHigh block -8.0 8.0 -1 1 26 30
+group tooHigh region tooHigh
+delete_atoms group tooHigh
+#run 0
+
+region uppermostPartial block -8.0 8.0 -1 1 25.6 26
+group uppermostPartial region uppermostPartial
+group uppermostPartialOre intersect uppermostPartial ore
+delete_atoms group uppermostPartialOre
+#run 0
+
+region upperMost1 block -5.0 5.0 -1 1 25.2 26
+group upperMost1 region upperMost1
+group insBlockCoke intersect upperMost1 coke
+
+region upperMost2 block -5.0 5.0 -1 1 24.65 25.8
+group upperMost2 region upperMost2
+group insBlockOre intersect upperMost2 ore
+
+variable nCin equal count(insBlockCoke)
+variable mCin equal mass(insBlockCoke)
+variable nTotinRef equal count(insBlockCoke)+count(insBlockOre)
+variable nTotin equal ${nTotinRef}
+
+print 'coke particles in insertion region ${nCin}' screen yes
+print 'coke mass in insertion region ${mCin}' screen yes
+print 'total number of particles in insertion region ${nTotin}' screen yes
+
+write_dump insBlockOre custom ../DEM/initOre id type radius mass density x y z
+write_dump insBlockCoke custom ../DEM/initCoke id type radius mass density x y z
+
+write_dump insBlockOre custom/vtk ../DEM/initOre.vtk id type radius mass density x y z
+write_dump insBlockCoke custom/vtk ../DEM/initCoke.vtk id type radius mass density x y z
+
+
+#group tooHigh region tooHigh
+#delete_atoms group tooHigh
+#run 0
+
+#variable nTotin equal count(insBlockCoke)+count(insBlockOre)

@@ -5,3 +5,5 @@
 log_*
 log.*
 *~
+
+lnInclude
