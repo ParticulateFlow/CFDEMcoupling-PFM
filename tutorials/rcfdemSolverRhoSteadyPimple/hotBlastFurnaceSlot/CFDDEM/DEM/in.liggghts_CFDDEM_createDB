@@ -1,0 +1,185 @@
+## material properties
+include ../DEM/DEMparameters
+
+
+variable dt equal 0.000025
+variable skin equal 0.0015
+
+
+
+# particle settling loop parameters
+variable vthre equal 0.01
+###############################################
+atom_style		granular
+atom_modify		map array
+communicate	single vel yes
+
+boundary		f p f
+newton			off
+units			si
+processors      1 1 8
+
+read_restart 		../DEM/liggghts.restart
+reset_timestep 0
+
+
+neighbor	0.001 bin
+neigh_modify	delay 0
+
+
+#Material properties required for new pair styles
+
+fix 		m1 all property/global youngsModulus peratomtype ${yM_C} ${yM_O} ${yM_W}
+fix 		m2 all property/global poissonsRatio peratomtype ${pR_C} ${pR_O} ${pR_W}
+fix 		m3 all property/global coefficientRestitution peratomtypepair 3 ${rest_C} ${rest_CO} ${rest_CW} ${rest_CO} ${rest_O} ${rest_WO} ${rest_CW} ${rest_WO} ${rest_W}
+fix 		m4 all property/global coefficientFriction peratomtypepair 3 ${fric_C} ${fric_CO} ${fric_CW} ${fric_CO} ${fric_O} ${fric_WO} ${fric_CW} ${fric_WO} ${fric_W}
+fix         	m5 all property/global coefficientRollingFriction peratomtypepair 3 ${roll_C} ${roll_CO} ${roll_CW} ${roll_CO} ${roll_O} ${roll_WO} ${roll_CW} ${roll_WO} ${roll_W}
+fix         	m6 all property/global characteristicVelocity scalar ${cV}
+
+fix 		ftco all property/global thermalConductivity peratomtype 15 15 15
+fix 		ftca all property/global thermalCapacity peratomtype 850 850 850
+fix             heattransfer all heat/gran initial_temperature 293
+
+#pair style
+pair_style gran model hertz tangential history rolling_friction cdt
+pair_coeff  * *
+
+#timestep, gravity
+timestep    ${dt}
+fix         gravi all gravity 9.81 vector 0.0 0.0 -1.0
+
+fix         bottom all mesh/surface file ../DEM/stl_files/surface_bottom.stl type 1
+fix         wall all mesh/surface file ../DEM/stl_files/surface_wall.stl type 3
+
+fix granwalls all wall/gran model hertz tangential history mesh n_meshes 2 meshes bottom wall
+
+group coke type 1
+group ore type 2
+
+fix         pts1 coke particletemplate/sphere 1 atom_type 1 density constant ${dens_C} radius constant ${rad_C}
+fix	    pdd1 coke particledistribution/discrete 1.0 1 pts1 1.0
+
+fix         pts2 ore particletemplate/sphere 2 atom_type 2 density constant ${dens_O} radius constant ${rad_O}
+fix	    pdd2 ore particledistribution/discrete 1.0 1 pts2 1.0
+
+
+fix	    fp all property/atom/polydispparcel effvolfactor ${poly_C} ${poly_O} 1.0
+
+###########
+# regions
+###########
+
+# raceways
+variable RWradFreeze equal 0.35
+region RW1Freeze cylinder x 0 0 ${RWradFreeze} -6.0 -4.0 
+region RW2Freeze cylinder x 0 0 ${RWradFreeze} 4.0 6.0
+region RW union 2 RW1Freeze RW2Freeze
+group RW dynamic all region RW every 100
+
+variable RWrad equal 0.4
+region RW1 cylinder x 0 0 ${RWrad} -6.0 -4.0 
+region RW2 cylinder x 0 0 ${RWrad} 4.0 6.0
+
+# deadman
+variable DMheight equal 3
+variable DMslope equal -0.8
+region DMwall1 plane 0 0 ${DMheight} 1 0 ${DMslope}
+region DMwall2 plane 0 0 ${DMheight} -1 0 ${DMslope}
+region DM intersect 2 DMwall1 DMwall2
+group DMcoke region DM
+
+delete_atoms region RW1
+delete_atoms region RW2
+
+###########
+# removal
+###########
+# raceways
+variable rCMass equal 500
+fix         delRW1 all remove nevery 1000 massrate ${rCMass} style delete seed 10007143 region RW1 atomtype 1 restart_read no restart_write no verbose no
+fix         delRW2 all remove nevery 1000 massrate ${rCMass} style delete seed 10007134 region RW2 atomtype 1 restart_read no restart_write no verbose no
+
+
+
+###############################################################################################################################
+#cfd coupling
+variable Ncouple equal 10
+variable Tin equal 293
+fix		cfd1 all couple/cfd couple_every 10 mpi
+fix		cfd2 all couple/cfd/force/implicit transfer_density no transfer_type yes transfer_property name effvolfactor type scalar-atom
+fix		cfd3 all couple/cfd/convection T0 293
+fix		cfd4 all couple/cfd/parttempfield T0 293
+fix		cfd5 all couple/cfd/deform
+
+# make sure particle outside CFD domain are initialized with reasonable temperature
+# this is executed at the beginning of each run 
+region outsideCFD block INF INF INF INF 26.0 INF units box
+variable NFixTemp equal ${Ncouple}+2
+fix eeTemp all execute ${NFixTemp} " set region outsideCFD property/atom Temp ${Tin} " once
+
+fix		integr all nve/sphere
+
+fix		limV all limit/vel 5.0
+fix		limV RW limit/vel 0.01
+
+
+#screen output
+compute		1 all erotate/sphere
+thermo_style	custom step atoms ke c_1 vol 
+thermo		10000
+thermo_modify	lost ignore norm no
+compute_modify	thermo_temp dynamic yes
+
+variable Ndump equal 40000
+dump 		myStl1 all stl  ${Ndump} ../DEM/post/dump_CFDDEMflow_DB*.stl
+dump		dmp1 all custom/vtk ${Ndump} ../DEM/post/dump*.CFDDEMflow_DB.vtk id type radius x y z vx vy vz fx fy fz mass
+
+run	1
+
+set group coke property/atom/polydispparcel effvolfactor ${poly_C}
+set group ore property/atom/polydispparcel effvolfactor ${poly_O}
+
+variable Nset equal 1000
+fix eeDM all execute ${Nset} "../DEM/in.DM" file
+
+
+region insRegTop1 block -4.61 4.61 -0.59 0.59 26.125 26.9 units box
+region insRegTop2 block -4.61 4.61 -0.59 0.59 26.9 27.525 units box
+region regTop block -4.61 4.61 -0.59 0.59 26.125 27.525 units box
+
+variable nTot equal count(all,regTop)
+variable nLower equal count(all,insRegTop1)
+
+variable time equal step*dt
+variable np equal count(all)
+variable nO equal count(ore)
+variable nC equal count(coke)
+variable zMax equal bound(all,zmax)
+fix printN all print 4000 "${time} ${np} ${nTot} ${nC} ${nO} ${zMax} ${zMaxSecHighCoke}" file ../DEM/Npart_createDB.txt title "#time   n_all   n_insertionreg n_coke n_ore z_max z_max_2"
+
+group secHighestCoke empty
+group secHighestOre empty
+group highestCoke empty
+group highestOre empty
+
+# ensure reasonable initialization
+group secHighestCoke union all secHighestCoke
+group highestCoke union all highestCoke
+variable zMaxSecHighCoke equal bound(secHighestCoke,zmax)
+
+dump		dmptest1 highestOre custom/vtk 200000 ../DEM/post/dump*.highOre.vtk id type radius x y z vx vy vz fx fy fz mass
+dump		dmptest2 highestCoke custom/vtk 200000 ../DEM/post/dump*.highCoke.vtk id type radius x y z vx vy vz fx fy fz mass
+
+variable Nins equal 1000
+variable counter loop 1000
+fix eeIns all execute ${Nins} "../DEM/in.insert" file conditional nTot 0 0.1
+
+# conditionally stop simulation
+variable tmin equal 20.0
+variable zmaxCFD equal 26.0
+variable zminCFD equal 25.8
+variable abort equal (v_time>=${tmin})&&(v_zMaxSecHighCoke<=${zmaxCFD})&&(v_zMaxSecHighCoke>=${zminCFD})
+fix printAbort all print 4000 "${time} ${zMax} ${zMaxSecHighCoke} ${abort}" file ../DEM/Nabort.txt title "#time   z_max z_max_2 abort"
+fix eeAbort all execute 1000 "../DEM/in.abort" file conditional abort 1 0.1
+
+restart 100000 restartA restartB

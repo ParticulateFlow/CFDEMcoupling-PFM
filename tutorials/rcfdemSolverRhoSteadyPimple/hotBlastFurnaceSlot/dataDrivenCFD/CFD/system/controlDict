@@ -1,0 +1,218 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.3.0                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+application     potentialFoam;
+
+startFrom       latestTime;
+
+startTime       0;
+
+stopAt          endTime;
+
+endTime         0;
+
+deltaT          0.25;
+
+writeControl    timeStep;
+
+writeInterval   3600;
+
+purgeWrite      0;
+
+writeFormat     ascii;
+
+writePrecision  6;
+
+writeCompression off;
+
+timeFormat      general;
+
+timePrecision   6;
+
+runTimeModifiable true;
+
+adjustTimeStep no;
+
+functions
+{
+/*
+massFlux
+{
+        // Load the library containing the 'coded' functionObject
+        libs ("libutilityFunctionObjects.so");
+
+        type coded;
+
+        // Name of on-the-fly generated functionObject
+        name weights;
+
+        codeOptions
+        #{
+            -I$(LIB_SRC)/finiteVolume/lnInclude \
+            -I$(LIB_SRC)/meshTools/lnInclude 
+        #};
+
+
+ codeExecute
+ #{
+
+   const volScalarField& voidfraction = mesh().lookupObject<volScalarField>("voidfraction");
+   const volScalarField& partRho = mesh().lookupObject<volScalarField>("partRho");
+   const volVectorField& Us = mesh().lookupObject<volVectorField>("Us");
+
+   static autoPtr<volVectorField> massFluxField;
+
+   if(!massFluxField.valid())
+   {
+      Info << "Creating massFluxField" << nl;
+
+      massFluxField.set
+      (
+         new volVectorField
+         (
+            IOobject
+            (
+               "massFluxField",
+               mesh().time().timeName(),
+               Us.mesh(),
+               IOobject::NO_READ,
+               IOobject::AUTO_WRITE
+            ),
+            (1.0-voidfraction)*partRho*Us
+         )
+      );
+   }
+
+   volVectorField &massFluxFieldRef = massFluxField();
+
+   massFluxFieldRef.checkIn();
+
+   massFluxFieldRef =  (1.0-voidfraction)*partRho*Us;
+ #};
+}
+*/
+
+    fieldAverage1
+    {
+        type            fieldAverage;
+        libs            ("libfieldFunctionObjects.so");
+        writeControl    writeTime;
+
+        fields
+        (
+            U
+            {
+                mean        on;
+                prime2Mean  off;
+                base        time;
+                window	    60.0001;
+            }
+	    Us
+            {
+                mean        on;
+                prime2Mean  off;
+                base        time;
+                window	    60.0001;
+            }
+	    voidfraction
+            {
+                mean        on;
+                prime2Mean  off;
+                base        time;
+                window	    60.0001;
+            }
+            partTemp
+            {
+                mean        on;
+                prime2Mean  off;
+                base        time;
+                window	    60.0001;
+            }
+            partTemp
+            {
+                mean        on;
+                prime2Mean  off;
+                base        time;
+                window	    60.0001;
+            }
+        );
+    }
+
+   probes1
+	{
+		type probes;
+
+		functionObjectLibs ("libsampling.so");
+
+		#include "probesDict";
+	} 
+
+        inflowL
+        {
+            type            surfaceRegion;
+            libs ("libfieldFunctionObjects.so");
+            writeControl   timeStep;
+            writeInterval   40;
+            log             true;
+            // Output field values as well
+            writeFields     false;
+            regionType      patch;
+            name            inletLeft;
+            operation       sum;//areaIntegrate;
+
+            fields
+            (
+                phi
+		rho
+		T
+            );
+        }
+
+        inflowR
+        {
+            $inflowL;
+            name      inletRight;
+        }
+
+        outflow
+        {
+            $inflowL;
+            name      top;
+        }
+
+  /*      inflowLDens
+        {
+            type            surfaceRegion;
+            libs ("libfieldFunctionObjects.so");
+            writeControl   timeStep;
+            writeInterval   10;
+            log             true;
+            // Output field values as well
+            writeFields     false;
+            regionType      patch;
+            name            inletLeft;
+            operation       areaIntegrate;
+
+            fields
+            (
+                rho
+            );
+        }
+*/
+}
+
+// ************************************************************************* //

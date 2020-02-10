@@ -1,0 +1,24 @@
+#remove out-of-CFD domain particles and uppermost, partial layer
+#write out uppermost complete layers
+
+delete_atoms group highestCoke
+delete_atoms group highestOre
+run 0
+
+write_dump secHighestOre custom ../DEM/initOre id type radius mass density x y z
+write_dump secHighestCoke custom ../DEM/initCoke id type radius mass density x y z
+
+write_dump secHighestOre custom/vtk ../DEM/initOre.vtk id type radius mass density x y z
+write_dump secHighestCoke custom/vtk ../DEM/initCoke.vtk id type radius mass density x y z
+
+write_restart  	../DEM/liggghts.restartCFDEM
+
+# exclude near-wall artifacts
+region centerReg block -4.0 4.0 -0.59 0.59 INF INF units box
+group center region centerReg
+group remainder subtract center secHighestOre secHighestCoke
+write_dump remainder custom/vtk ../DEM/remainder.vtk id type radius mass density x y z
+variable zInsLower equal bound(remainder,zmax)
+
+print 'variable zInsLower equal ${zInsLower}' screen yes
+print "variable zInsLower equal ${zInsLower}" file ../DEM/zInsLower

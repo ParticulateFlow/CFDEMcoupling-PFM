@@ -1,0 +1,76 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.3.0                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      fvOptions;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+source1
+{
+    type        limitTemperature;
+    active          yes;
+    limitTemperatureCoeffs
+    {
+        active          yes;
+        selectionMode   all;
+        Tmin     300;
+        Tmax     2800;
+    }
+}
+
+source1
+{
+    type        limitTemperature;
+    active          yes;
+    limitTemperatureCoeffs
+    {
+        active          yes;
+        selectionMode   all;
+        Tmin     300;
+        Tmax     2800;
+    }
+}
+
+/*
+RW_left
+{
+    type            fixedTemperatureConstraint;
+    active          yes;
+
+    fixedTemperatureConstraintCoeffs
+    {
+       // selectionMode   cellZone;
+       // cellZone        raceway;
+        selectionMode   cellSet;
+        cellSet         rw_left;
+        mode            uniform;
+        temperature     2600;
+    }
+}
+
+RW_right
+{
+    type            fixedTemperatureConstraint;
+    active          yes;
+
+    fixedTemperatureConstraintCoeffs
+    {
+       // selectionMode   cellZone;
+       // cellZone        raceway;
+        selectionMode   cellSet;
+        cellSet         rw_right;
+        mode            uniform;
+        temperature     2600;
+    }
+}
+*/
