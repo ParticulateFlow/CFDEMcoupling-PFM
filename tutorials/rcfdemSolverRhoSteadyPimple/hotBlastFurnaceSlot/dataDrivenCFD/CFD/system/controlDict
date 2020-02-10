@@ -49,63 +49,6 @@ adjustTimeStep no;
 
 functions
 {
-/*
-massFlux
-{
-        // Load the library containing the 'coded' functionObject
-        libs ("libutilityFunctionObjects.so");
-
-        type coded;
-
-        // Name of on-the-fly generated functionObject
-        name weights;
-
-        codeOptions
-        #{
-            -I$(LIB_SRC)/finiteVolume/lnInclude \
-            -I$(LIB_SRC)/meshTools/lnInclude 
-        #};
-
-
- codeExecute
- #{
-
-   const volScalarField& voidfraction = mesh().lookupObject<volScalarField>("voidfraction");
-   const volScalarField& partRho = mesh().lookupObject<volScalarField>("partRho");
-   const volVectorField& Us = mesh().lookupObject<volVectorField>("Us");
-
-   static autoPtr<volVectorField> massFluxField;
-
-   if(!massFluxField.valid())
-   {
-      Info << "Creating massFluxField" << nl;
-
-      massFluxField.set
-      (
-         new volVectorField
-         (
-            IOobject
-            (
-               "massFluxField",
-               mesh().time().timeName(),
-               Us.mesh(),
-               IOobject::NO_READ,
-               IOobject::AUTO_WRITE
-            ),
-            (1.0-voidfraction)*partRho*Us
-         )
-      );
-   }
-
-   volVectorField &massFluxFieldRef = massFluxField();
-
-   massFluxFieldRef.checkIn();
-
-   massFluxFieldRef =  (1.0-voidfraction)*partRho*Us;
- #};
-}
-*/
-
     fieldAverage1
     {
         type            fieldAverage;
@@ -163,7 +106,7 @@ massFlux
 
         inflowL
         {
-            type            surfaceRegion;
+            type            surfaceFieldValue;
             libs ("libfieldFunctionObjects.so");
             writeControl   timeStep;
             writeInterval   40;
@@ -193,26 +136,6 @@ massFlux
             $inflowL;
             name      top;
         }
-
-  /*      inflowLDens
-        {
-            type            surfaceRegion;
-            libs ("libfieldFunctionObjects.so");
-            writeControl   timeStep;
-            writeInterval   10;
-            log             true;
-            // Output field values as well
-            writeFields     false;
-            regionType      patch;
-            name            inletLeft;
-            operation       areaIntegrate;
-
-            fields
-            (
-                rho
-            );
-        }
-*/
 }
 
 // ************************************************************************* //

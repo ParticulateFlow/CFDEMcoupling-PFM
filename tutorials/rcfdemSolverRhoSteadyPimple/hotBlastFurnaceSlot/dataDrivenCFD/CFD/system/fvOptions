@@ -14,63 +14,32 @@ FoamFile
     object      fvOptions;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-source1
-{
-    type        limitTemperature;
-    active          yes;
-    limitTemperatureCoeffs
-    {
-        active          yes;
-        selectionMode   all;
-        Tmin     300;
-        Tmax     2800;
-    }
-}
-
-source1
-{
-    type        limitTemperature;
-    active          yes;
-    limitTemperatureCoeffs
-    {
-        active          yes;
-        selectionMode   all;
-        Tmin     300;
-        Tmax     2800;
-    }
-}
-
+// OF 4
 /*
-RW_left
+source1
 {
-    type            fixedTemperatureConstraint;
+    type        limitTemperature;
     active          yes;
-
-    fixedTemperatureConstraintCoeffs
+    limitTemperatureCoeffs
     {
-       // selectionMode   cellZone;
-       // cellZone        raceway;
-        selectionMode   cellSet;
-        cellSet         rw_left;
-        mode            uniform;
-        temperature     2600;
-    }
-}
-
-RW_right
-{
-    type            fixedTemperatureConstraint;
-    active          yes;
-
-    fixedTemperatureConstraintCoeffs
-    {
-       // selectionMode   cellZone;
-       // cellZone        raceway;
-        selectionMode   cellSet;
-        cellSet         rw_right;
-        mode            uniform;
-        temperature     2600;
+        active          yes;
+        selectionMode   all;
+        Tmin     300;
+        Tmax     2800;
     }
 }
 */
+
+// OF 6
+source1
+{
+    type        limitTemperature;
+    active          yes;
+    limitTemperatureCoeffs
+    {
+        active          yes;
+        selectionMode   all;
+        min     300;
+        max     2800;
+    }
+}

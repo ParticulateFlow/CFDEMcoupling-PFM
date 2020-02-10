@@ -100,9 +100,32 @@ functions
 	#include "probesDict";
     }
 
+// OF 4
+/*
     cellObj1
     {
         type            volRegion;
+        libs ("libfieldFunctionObjects.so");
+        enabled         true;
+        writeControl    timeStep;
+        writeInterval   400;
+        log             true;
+        writeFields     false;
+        regionType      cellZone;
+        name            topReg;
+        operation       volAverage;
+
+        fields
+        (
+            UsMean
+        );
+    }
+*/
+
+// OF 6
+    cellObj1
+    {
+        type            volFieldValue;
         libs ("libfieldFunctionObjects.so");
         enabled         true;
         writeControl    timeStep;

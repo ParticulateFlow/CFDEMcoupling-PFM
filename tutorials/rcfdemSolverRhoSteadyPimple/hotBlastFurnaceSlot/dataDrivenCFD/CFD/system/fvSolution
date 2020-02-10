@@ -77,25 +77,6 @@ PIMPLE
     pMax            pMax [ 1 -1 -2 0 0 ] 500000;
 
     UMax            UMax [ 0 1 -1 0 0 ] 250;
-
-    residualControl
-    {
-        U
-        {
-                tolerance  5e-3;
-                relTol      0;
-        }
-        p
-        {
-                tolerance  5e-3;
-                relTol      0;
-        }
-        e
-        {
-                tolerance  5e-3;
-                relTol      0;
-        }
-    }
 }
 
 PISO
