@@ -53,20 +53,9 @@ private:
 
     dictionary propsDict_;
 
-    word thermCondFieldName_;
-
-    volScalarField& thermCondField_;
-
     word voidfractionFieldName_;
 
     const volScalarField& voidfraction_;
-
-    word wallQFactorName_;
-
-    // ratio of half-cell-size and near-wall film
-    mutable volScalarField wallQFactor_;
-
-    bool hasWallQFactor_;
 
 public:
 
