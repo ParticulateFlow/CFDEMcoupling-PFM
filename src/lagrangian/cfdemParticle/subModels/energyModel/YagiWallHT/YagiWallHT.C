@@ -236,7 +236,8 @@ namespace Foam
             {
 	        if(tempField_.boundaryField().types()[patchi] == "fixedGradient")
 		{
-		    fixedGradientFvPatchField<scalar>& tempGradField(refCast<fixedGradientFvPatchField<scalar>>(tempField_.boundaryFieldRef()[patchi]));
+		    fixedGradientFvPatchField<scalar>& tempGradPatch(refCast<fixedGradientFvPatchField<scalar>>(tempField_.boundaryFieldRef()[patchi]));
+		    scalarField& tempGradField = tempGradPatch.gradient();
 
 		    forAll(curPatch, facei)
 		    {							
@@ -248,12 +249,16 @@ namespace Foam
 			scalar H = 0.2087 * (pow(ReField_[faceCelli]+SMALL, -0.20)) * CpField_[faceCelli] * magG / (pow(PrField_[faceCelli] , (2/3))+SMALL);
 
 			// get delta T
-			scalar deltaT = WallTemp_.boundaryField()[patchi][facei] - tempField_.boundaryField()[patchi][facei];
+			scalar deltaT = WallTemp_.boundaryField()[patchi][facei] - tempField_[faceCelli];
+
+			Info << "Gradbefore: " << tempGradField[facei] << endl;
 
 			// calculate heat flux
 			scalar heatFlux = H*deltaT;
 			scalar TGrad = -heatFlux/kfField_[faceCelli];
-			tempGradField.gradient()[facei] = TGrad;
+			tempGradField[facei] = TGrad;
+
+			Info << "Gradafter: " << tempGradField[facei] << endl;
 
 			Info << "####################" << endl;
 			Info << "G : " << magG << endl;
@@ -262,10 +267,12 @@ namespace Foam
 			Info << "Cp: " << CpField_[faceCelli] << endl;
 			Info << "kf: " << kfField_[faceCelli] << endl;
 			Info << "H : " << H << endl;
+			Info << "Twall: " << WallTemp_.boundaryField()[patchi][facei] << endl;
+			Info << "Tfluid: " << tempField_[faceCelli] << endl;
 			Info << "dT: " << deltaT << endl;
 			Info << "q': " << heatFlux << endl;
 			Info << "gradT: " << TGrad << endl;
-		    }
+		    }		    
 		}
 		else
 		{
@@ -273,6 +280,7 @@ namespace Foam
 		}
 		    
             }
+	    
         }
 
     // limit source term
