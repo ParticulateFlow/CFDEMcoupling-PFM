@@ -28,7 +28,6 @@ License
 #include "fvCFD.H"
 #include "cfdemCloudEnergy.H"
 #include "energyModel.H"
-#include "fixedGradientFvPatchFields.H"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -51,10 +50,12 @@ protected:
     bool verbose_;
 
     word QWallFluidName_;
-
+        
     volScalarField QWallFluid_;
 
-    volScalarField WallTempField_;
+    word wallTempName_;
+
+    volScalarField wallTemp_;
 
     volScalarField ReField_;
 
@@ -62,13 +63,13 @@ protected:
 
     word tempFieldName_;
 
-    volScalarField tempField_;
+    const volScalarField& tempField_;
 
     word voidfractionFieldName_;
 
     const volScalarField& voidfraction_;
 
-    scalar maxSource_;
+    scalar maxSource_;                           // max (limited) value of src field
 
     word velFieldName_;
 
@@ -81,10 +82,6 @@ protected:
     word densityFieldName_;
 
     const volScalarField& rho_;
-
-    word WallTempName_;
-
-    const volScalarField& WallTemp_;
 
     mutable double **partRe_;
 
@@ -123,7 +120,7 @@ public:
 
     // Member Functions
 
-        void addEnergyContribution(volScalarField&) const;
+    void addEnergyContribution(volScalarField&) const;
 
 	void addEnergyCoefficient(volScalarField&) const {}
 

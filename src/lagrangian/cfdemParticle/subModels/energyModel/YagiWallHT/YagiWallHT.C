@@ -48,27 +48,28 @@ namespace Foam
   QWallFluidName_(propsDict_.lookupOrDefault<word>("QWallFluidName","QWallFluid")),
   QWallFluid_
   (   IOobject
+      (
+          QWallFluidName_,
+          sm.mesh().time().timeName(),
+          sm.mesh(),
+          IOobject::READ_IF_PRESENT,
+          IOobject::AUTO_WRITE
+      ),
+      sm.mesh(),
+      dimensionedScalar("zero", dimensionSet(1,-1,-3,0,0,0,0), 0.0)
+  ),
+  wallTempName_(propsDict_.lookup("wallTempName")),
+  wallTemp_
+  (   IOobject
     (
-      QWallFluidName_,
+      wallTempName_,
       sm.mesh().time().timeName(),
       sm.mesh(),
       IOobject::READ_IF_PRESENT,
       IOobject::AUTO_WRITE
     ),
     sm.mesh(),
-    dimensionedScalar("zero", dimensionSet(1,-1,-3,0,0,0,0), 0.0)
-  ),
-  WallTempField_
-  (   IOobject
-    (
-      "WallTemp",
-      sm.mesh().time().timeName(),
-      sm.mesh(),
-      IOobject::READ_IF_PRESENT,
-      IOobject::NO_WRITE
-    ),
-    sm.mesh(),
-    dimensionedScalar("zero", dimensionSet(0,0,0,1,0,0,0), 0.0)      // should i fix the wall temp here if its constant or fix it in BC?
+    dimensionedScalar("zero", dimensionSet(0,0,0,1,0,0,0), 0.0)
   ),
   ReField_
   (   IOobject
@@ -94,7 +95,6 @@ namespace Foam
     sm.mesh(),
     dimensionedScalar("zero", dimensionSet(0,0,0,0,0,0,0), 0.0)
   ),
-
   tempFieldName_(propsDict_.lookupOrDefault<word>("tempFieldName","T")),
   tempField_(sm.mesh().lookupObject<volScalarField> (tempFieldName_)),
   voidfractionFieldName_(propsDict_.lookupOrDefault<word>("voidfractionFieldName","voidfraction")),
@@ -106,8 +106,6 @@ namespace Foam
   Us_(sm.mesh().lookupObject<volVectorField> (UsFieldName_)),
   densityFieldName_(propsDict_.lookupOrDefault<word>("densityFieldName","rho")),
   rho_(sm.mesh().lookupObject<volScalarField> (densityFieldName_)),
-  WallTempName_(propsDict_.lookup("WallTempName")),
-  WallTemp_(sm.mesh().lookupObject<volScalarField> (WallTempName_)),
   partRe_(NULL),
   multiphase_(propsDict_.lookupOrDefault<bool>("multiphase",false)),
   kfFieldName_(propsDict_.lookupOrDefault<word>("kfFieldName",voidfractionFieldName_)), // use voidfractionField as dummy to prevent lookup error when not using multiphase
@@ -119,8 +117,8 @@ namespace Foam
 
     if (propsDict_.found("maxSource"))
     {
-      maxSource_=readScalar(propsDict_.lookup ("maxSource"));
-      Info << "limiting eulerian source field to: " << maxSource_ << endl;
+        maxSource_=readScalar(propsDict_.lookup ("maxSource"));
+        Info << "limiting wall source field to: " << maxSource_ << endl;
     }
 
     if (verbose_)
@@ -130,6 +128,14 @@ namespace Foam
       ReField_.write();
       PrField_.write();
     }
+    
+    // currently it is detected if field was auto generated or defined
+    // improvement would be changing the type here automatically
+    forAll(wallTemp_.boundaryField(),patchI)
+        if(wallTemp_.boundaryField()[patchI].type()=="calculated")
+            FatalError <<"Scalar field:"<< wallTemp_.name() << " must be defined.\n" << abort(FatalError);
+
+    wallTemp_.writeOpt() = IOobject::AUTO_WRITE;
   }
 
   // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
@@ -157,9 +163,8 @@ namespace Foam
   {
     allocateMyArrays();
 
+    // reset Scalar field
     QWallFluid_.primitiveFieldRef() = 0.0;
-
-
 
     #ifdef compre
     const volScalarField mufField = particleCloud_.turbulence().mu();
@@ -167,25 +172,19 @@ namespace Foam
     const volScalarField mufField = particleCloud_.turbulence().nu()*rho_;
     #endif
 
-    // calc La based heat flux
-    scalar voidfraction(1);
-    vector Ufluid(0,0,0);
-    label cellI=0;
-    vector Us(0,0,0);
-    scalar ds(0);
-    scalar muf(0);
-    scalar magUr(0);
-    scalar Rep(0);
-
     interpolationCellPoint<scalar> voidfractionInterpolator_(voidfraction_);
     interpolationCellPoint<vector> UInterpolator_(U_);
     interpolationCellPoint<scalar> TInterpolator_(tempField_);
 
+    // calculate Rep
     for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)
     {
-      cellI = particleCloud_.cellIDs()[index][0];
+      label cellI = particleCloud_.cellIDs()[index][0];
       if(cellI >= 0)
       {
+        scalar voidfraction;
+        vector Ufluid;
+
         if(interpolation_)
         {
           vector position = particleCloud_.position(index);
@@ -199,14 +198,14 @@ namespace Foam
         }
 
         if (voidfraction < 0.01)
-        voidfraction = 0.01;
+          voidfraction = 0.01;
 
-        Us = particleCloud_.velocity(index);
-        magUr = mag(Ufluid - Us);
-        ds = 2.*particleCloud_.radius(index);
-        muf = mufField[cellI];
+        vector Us = particleCloud_.velocity(index);
+        scalar magUr = mag(Ufluid - Us);
+        scalar ds = 2.*particleCloud_.radius(index);
+        scalar muf = mufField[cellI];
 
-        Rep = ds * magUr * voidfraction * rho_[cellI]/ muf;
+        scalar Rep = ds * magUr * voidfraction * rho_[cellI]/ muf;
         partRe_[index][0] = Rep;
       }
     }
@@ -224,87 +223,94 @@ namespace Foam
 
     // calculate Pr field
     PrField_ = CpField_ * mufField / kfField_;
-    //    mass_flow_rate = magUr * rho_[cellI];
 
     const fvPatchList& patches = U_.mesh().boundary();
 
-        forAll(patches, patchi)
+    // calculate flux
+    forAll(patches, patchi)
+    {
+      const fvPatch& curPatch = patches[patchi];
+
+      if (wallTemp_.boundaryField().types()[patchi] == "fixedValue")
+      {
+        if(tempField_.boundaryField().types()[patchi] == "zeroGradient")
         {
-            const fvPatch& curPatch = patches[patchi];
+          
+          //fixedGradientFvPatchField<scalar>& tempGradPatch(refCast<fixedGradientFvPatchField<scalar>>(tempField_.boundaryFieldRef()[patchi]));
+          //scalarField& tempGradField = tempGradPatch.gradient();
 
-            if (WallTemp_.boundaryField().types()[patchi] == "fixedValue")
+          forAll(curPatch, facei)
+          {							
+            label faceCelli = curPatch.faceCells()[facei];
+            // calculate Urel
+            scalar magG = mag(U_[faceCelli]-Us_[faceCelli])*voidfraction_[faceCelli]*rho_[faceCelli];
+
+            // calculate H
+            scalar H = 0.2087 * (pow(ReField_[faceCelli]+SMALL, -0.20)) * CpField_[faceCelli] * magG / (pow(PrField_[faceCelli] , (2/3))+SMALL);
+
+            // get delta T (wall-fluid)
+            scalar deltaT = wallTemp_.boundaryField()[patchi][facei] - tempField_[faceCelli];
+
+            //Info << "Gradbefore: " << tempGradField[facei] << endl;
+
+            // calculate heat flux
+            scalar heatFlux = H*deltaT;
+            scalar area = curPatch.magSf()[facei];
+            QWallFluid_[faceCelli] += heatFlux * area;
+            //scalar TGrad = -heatFlux/kfField_[faceCelli];
+            //tempGradField[facei] = TGrad;
+
+            //Info << "Gradafter: " << tempGradField[facei] << endl;
+
+            if(particleCloud_.verbose() && facei >=0 && facei <2)
             {
-	        if(tempField_.boundaryField().types()[patchi] == "fixedGradient")
-		{
-		    fixedGradientFvPatchField<scalar>& tempGradPatch(refCast<fixedGradientFvPatchField<scalar>>(tempField_.boundaryFieldRef()[patchi]));
-		    scalarField& tempGradField = tempGradPatch.gradient();
-
-		    forAll(curPatch, facei)
-		    {							
-			label faceCelli = curPatch.faceCells()[facei];
-			// calculate Urel
-			scalar magG = mag(U_[faceCelli]-Us_[faceCelli])*voidfraction_[faceCelli]*rho_[faceCelli];
-
-			// calculate H
-			scalar H = 0.2087 * (pow(ReField_[faceCelli]+SMALL, -0.20)) * CpField_[faceCelli] * magG / (pow(PrField_[faceCelli] , (2/3))+SMALL);
-
-			// get delta T
-			scalar deltaT = WallTemp_.boundaryField()[patchi][facei] - tempField_[faceCelli];
-
-			Info << "Gradbefore: " << tempGradField[facei] << endl;
-
-			// calculate heat flux
-			scalar heatFlux = H*deltaT;
-			scalar TGrad = -heatFlux/kfField_[faceCelli];
-			tempGradField[facei] = TGrad;
-
-			Info << "Gradafter: " << tempGradField[facei] << endl;
-
-			Info << "####################" << endl;
-			Info << "G : " << magG << endl;
-			Info << "Re: " << ReField_[faceCelli] << endl;
-			Info << "Pr: " << PrField_[faceCelli] << endl;
-			Info << "Cp: " << CpField_[faceCelli] << endl;
-			Info << "kf: " << kfField_[faceCelli] << endl;
-			Info << "H : " << H << endl;
-			Info << "Twall: " << WallTemp_.boundaryField()[patchi][facei] << endl;
-			Info << "Tfluid: " << tempField_[faceCelli] << endl;
-			Info << "dT: " << deltaT << endl;
-			Info << "q': " << heatFlux << endl;
-			Info << "gradT: " << TGrad << endl;
-		    }		    
-		}
-		else
-		{
-		    FatalError << "YagiWallHT requires fixedGradient BC for temperature field" << endl;
-		}
-		    
+              Info << "####################" << endl;
+              Info << "cellID: " << faceCelli << endl;
+              Info << "G : " << magG << endl;
+              Info << "Re: " << ReField_[faceCelli] << endl;
+              Info << "Pr: " << PrField_[faceCelli] << endl;
+              Info << "Cp: " << CpField_[faceCelli] << endl;
+              Info << "kf: " << kfField_[faceCelli] << endl;
+              Info << "H : " << H << endl;
+              Info << "Twall: " << wallTemp_.boundaryField()[patchi][facei] << endl;
+              Info << "Tfluid: " << tempField_[faceCelli] << endl;
+              Info << "dT: " << deltaT << endl;
+              Info << "q: " << heatFlux << endl;
+              Info << "area: " << area << endl;
+              Info << "Q:" << QWallFluid_[faceCelli] << endl;
+              //Info << "gradT: " << TGrad << endl;
             }
-	    
+          }		    
         }
+        else
+        {
+            FatalError << "YagiWallHT requires zeroGradient BC for temperature field" << endl;
+        }		    
+      }	    
+    }
+
+    QWallFluid_.primitiveFieldRef() /= QWallFluid_.mesh().V();
 
     // limit source term
     forAll(QWallFluid_,cellI)
     {
-      scalar EuFieldInCell = QWallFluid_[cellI];
+        scalar EuFieldInCell = QWallFluid_[cellI];
 
-      if(mag(EuFieldInCell) > maxSource_ )
-      {
-        Pout << "limiting source term\n"  << endl  ;
-        QWallFluid_[cellI] = sign(EuFieldInCell) * maxSource_;
-      }
+        if(mag(EuFieldInCell) > maxSource_ )
+        {
+             Pout << "limiting source term\n"  << endl  ;
+             QWallFluid_[cellI] = sign(EuFieldInCell) * maxSource_;
+        }
     }
 
     QWallFluid_.correctBoundaryConditions();
 
-
   }
 
   void YagiWallHT::addEnergyContribution(volScalarField& Qsource) const
-  {
+{
     Qsource += QWallFluid_;
-  }
-
+}
 
   // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
