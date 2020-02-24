@@ -55,8 +55,8 @@ cfdemCloudIBmodified::cfdemCloudIBmodified
 )
 :
     cfdemCloud(mesh),
-    xmol_(NULL),
-    vmol_(NULL),
+    //xmol_(NULL),
+    //vmol_(NULL),
     pRefCell_(readLabel(mesh.solutionDict().subDict("PISO").lookup("pRefCell"))),
     pRefValue_(readScalar(mesh.solutionDict().subDict("PISO").lookup("pRefValue"))),
     haveEvolvedOnce_(false),
@@ -76,8 +76,8 @@ cfdemCloudIBmodified::cfdemCloudIBmodified
 
 cfdemCloudIBmodified::~cfdemCloudIBmodified()
 {
-    dataExchangeM().destroy(xmol_,3);
-    dataExchangeM().destroy(vmol_,3);
+  //  dataExchangeM().destroy(xmol_,3);
+  //  dataExchangeM().destroy(vmol_,3);
 }
 
 
@@ -85,8 +85,8 @@ cfdemCloudIBmodified::~cfdemCloudIBmodified()
 void cfdemCloudIBmodified::getDEMdata()
 {
     cfdemCloud::getDEMdata();
-    dataExchangeM().getData("x_mol","vector-atom",xmol_);
-    dataExchangeM().getData("v_mol","vector-atom",vmol_);
+   // dataExchangeM().getData("x_mol","vector-atom",xmol_);
+   // dataExchangeM().getData("v_mol","vector-atom",vmol_);
 }
 
 bool cfdemCloudIBmodified::reAllocArrays()
@@ -94,8 +94,8 @@ bool cfdemCloudIBmodified::reAllocArrays()
     if(cfdemCloud::reAllocArrays())
     {
         // get arrays of new length
-        dataExchangeM().allocateArray(xmol_,0.,3);
-        dataExchangeM().allocateArray(vmol_,0.,3);
+      //  dataExchangeM().allocateArray(xmol_,0.,3);
+      //  dataExchangeM().allocateArray(vmol_,0.,3);
         return true;
     }
     return false;
@@ -168,6 +168,23 @@ void cfdemCloudIBmodified::calcForcingTerm(volVectorField& Us)
         if(verbose_) Info << "- setVelocity(velocities_)" << endl;
         label cell = 0;
         vector uP(0,0,0);
+        for (int index = 0; index < numberOfParticles(); ++index){
+            for(int subCell = 0; subCell < voidFractionM().cellsPerParticle()[index][0]; subCell++)
+            {
+                cell = cellIDs()[index][subCell];
+
+                if(cell >=0){
+                    // calc particle velocity
+                    //for(int i=0;i<3;i++) rVec[i]=Us.mesh().C()[cell][i]-position(index)[i];
+                    for(int i=0;i<3;i++) uP[i] = velocities()[index][i];
+                    Us[cell] = (1-voidfractions_[index][subCell])*uP;
+                }
+            }
+        }
+
+
+        /*label cell = 0;
+        vector uP(0,0,0);
         vector rRel(0,0,0);
         vector vRel(0,0,0);
         vector angRel(0,0,0);
@@ -196,7 +213,7 @@ void cfdemCloudIBmodified::calcForcingTerm(volVectorField& Us)
             }
         }
 
-        if(verbose_) Info << "setVelocity done." << endl;
+        if(verbose_) Info << "setVelocity done." << endl;*/
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

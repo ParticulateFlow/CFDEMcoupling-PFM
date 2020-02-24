@@ -58,8 +58,8 @@ class cfdemCloudIBmodified
 {
 protected:
 
-    mutable double **xmol_;
-    mutable double **vmol_;
+  //  mutable double **xmol_;
+  //  mutable double **vmol_;
 
     label pRefCell_;
     scalar pRefValue_;
@@ -93,7 +93,7 @@ public:
         void calcForcingTerm(volVectorField&);
 
       // Access
-        inline double ** moleculeCOM() const
+    /*    inline double ** moleculeCOM() const
         {
             return xmol_;
         }
@@ -101,7 +101,7 @@ public:
         inline double ** moleculeVel() const
         {
             return vmol_;
-        }
+        }*/
 };
 
 

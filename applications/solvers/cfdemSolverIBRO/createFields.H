@@ -138,19 +138,6 @@
         dimensionedScalar("0", dimensionSet(0, 0, 0, 0, 0), 0.0)
     );
 
-    volScalarField viscosity
-    (
-        IOobject
-        (
-            "viscosity",
-            runTime.timeName(),
-            mesh,
-            IOobject::NO_READ,
-            IOobject::AUTO_WRITE
-        ),
-        turbulence->nu()
-    );
-
 //===========================
 
 #include "createMRF.H"

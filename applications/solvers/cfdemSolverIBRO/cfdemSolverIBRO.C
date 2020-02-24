@@ -114,10 +114,6 @@ int main(int argc, char *argv[])
         laminarTransport.correct();
         turbulence->correct();
 
-        /*Info << "particleCloud.calcVelocityCorrection() " << endl;
-        volScalarField voidfractionNext=mesh.lookupObject<volScalarField>("voidfractionNext");
-        particleCloud.calcVelocityCorrection(p,U,phiIB,voidfractionNext);*/
-
         runTime.write();
 
         Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
