@@ -43,19 +43,17 @@ class YagiWallHTImplicit
 {
 private:
     
-    word QPartFluidCoeffName_;
+    word QWallFluidCoeffName_;
         
-    volScalarField QPartFluidCoeff_;
+    volScalarField QWallFluidCoeff_;
 
     mutable double **partHeatFluxCoeff_;              // Lagrangian array
 
     void allocateMyArrays() const;
-    
-    void giveData(int);
-    
-    void heatFlux(label, scalar, scalar, scalar);
-    
-    void heatFluxCoeff(label, scalar, scalar);
+
+    virtual void heatFlux(label, scalar, scalar, scalar, scalar);
+
+    virtual void heatFluxCoeff(label, scalar, scalar);
        
 public:
 

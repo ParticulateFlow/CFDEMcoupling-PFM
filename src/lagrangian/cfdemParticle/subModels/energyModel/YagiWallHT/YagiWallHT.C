@@ -242,6 +242,7 @@ namespace Foam
           forAll(curPatch, facei)
           {							
             label faceCelli = curPatch.faceCells()[facei];
+
             // calculate Urel
             scalar magG = mag(U_[faceCelli]-Us_[faceCelli])*voidfraction_[faceCelli]*rho_[faceCelli];
 
@@ -249,14 +250,19 @@ namespace Foam
             scalar H = 0.2087 * (pow(ReField_[faceCelli]+SMALL, -0.20)) * CpField_[faceCelli] * magG / (pow(PrField_[faceCelli] , (2/3))+SMALL);
 
             // get delta T (wall-fluid)
-            scalar deltaT = wallTemp_.boundaryField()[patchi][facei] - tempField_[faceCelli];
+            scalar Twall  = wallTemp_.boundaryField()[patchi][facei];
+            scalar Tfluid = tempField_[faceCelli];
+            scalar deltaT = Twall - Tfluid;
 
             //Info << "Gradbefore: " << tempGradField[facei] << endl;
 
-            // calculate heat flux
-            scalar heatFlux = H*deltaT;
+            // get area
             scalar area = curPatch.magSf()[facei];
-            QWallFluid_[faceCelli] += heatFlux * area;
+
+            // calculate heat flux
+            heatFlux(faceCelli, H, area, Twall, Tfluid);
+            heatFluxCoeff(faceCelli, H, area);
+            
             //scalar TGrad = -heatFlux/kfField_[faceCelli];
             //tempGradField[facei] = TGrad;
 
@@ -272,12 +278,12 @@ namespace Foam
               Info << "Cp: " << CpField_[faceCelli] << endl;
               Info << "kf: " << kfField_[faceCelli] << endl;
               Info << "H : " << H << endl;
-              Info << "Twall: " << wallTemp_.boundaryField()[patchi][facei] << endl;
-              Info << "Tfluid: " << tempField_[faceCelli] << endl;
+              Info << "Twall: " << Twall << endl;
+              Info << "Tfluid: " << Tfluid << endl;
               Info << "dT: " << deltaT << endl;
-              Info << "q: " << heatFlux << endl;
+              Info << "q: " << H*deltaT << endl;
               Info << "area: " << area << endl;
-              Info << "Q:" << QWallFluid_[faceCelli] << endl;
+              Info << "Q:" << H*deltaT*area << endl;
               //Info << "gradT: " << TGrad << endl;
             }
           }		    
@@ -308,9 +314,19 @@ namespace Foam
   }
 
   void YagiWallHT::addEnergyContribution(volScalarField& Qsource) const
-{
+  {
     Qsource += QWallFluid_;
-}
+  }
+
+  void YagiWallHT::heatFlux(label faceCelli, scalar H, scalar area, scalar Twall, scalar Tfluid)
+  {
+    QWallFluid_[faceCelli] += H * area * (Twall - Tfluid);
+  }
+
+  void YagiWallHT::heatFluxCoeff(label faceCelli, scalar H, scalar area)
+  {
+    //no heat transfer coefficient in explicit model
+  }
 
   // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

@@ -42,11 +42,11 @@ YagiWallHTImplicit::YagiWallHTImplicit
 )
 :
     YagiWallHT(dict,sm),
-    QPartFluidCoeffName_(propsDict_.lookupOrDefault<word>("QPartFluidCoeffName","QPartFluidCoeff")),
-    QPartFluidCoeff_
+    QWallFluidCoeffName_(propsDict_.lookupOrDefault<word>("QWallFluidCoeffName","QWallFluidCoeff")),
+    QWallFluidCoeff_
     (   IOobject
         (
-            QPartFluidCoeffName_,
+            QWallFluidCoeffName_,
             sm.mesh().time().timeName(),
             sm.mesh(),
             IOobject::READ_IF_PRESENT,
@@ -84,76 +84,31 @@ void YagiWallHTImplicit::calcEnergyContribution()
 {
     allocateMyArrays();
 
+    QWallFluidCoeff_.primitiveFieldRef() = 0.0;
+
     YagiWallHT::calcEnergyContribution();
 
-    QPartFluidCoeff_.primitiveFieldRef() = 0.0;
+    QWallFluidCoeff_.primitiveFieldRef() /= -QWallFluidCoeff_.mesh().V();
 
-    particleCloud_.averagingM().setScalarSum
-    (
-        QPartFluidCoeff_,
-        partHeatFluxCoeff_,
-        particleCloud_.particleWeights(),
-        NULL
-    );
-
-    QPartFluidCoeff_.primitiveFieldRef() /= -QPartFluidCoeff_.mesh().V();
-
-//    QPartFluidCoeff_.correctBoundaryConditions();
+//    QWallFluidCoeff_.correctBoundaryConditions();
 
 }
 
 void YagiWallHTImplicit::addEnergyCoefficient(volScalarField& Qsource) const
 {
-    Qsource += QPartFluidCoeff_;
+    Qsource += QWallFluidCoeff_;
 }
 
-void YagiWallHTImplicit::heatFlux(label index, scalar h, scalar As, scalar Tfluid)
+void YagiWallHTImplicit::heatFlux(label faceCelli, scalar H, scalar area, scalar Twall, scalar Tfluid)
 {
-    partHeatFlux_[index][0] = -h * As * partTemp_[index][0];
+    QWallFluid_[faceCelli] += H * area * Twall;
 }
 
-void YagiWallHTImplicit::heatFluxCoeff(label index, scalar h, scalar As)
+void YagiWallHTImplicit::heatFluxCoeff(label faceCelli, scalar H, scalar area)
 {
-   partHeatFluxCoeff_[index][0] = h * As;
+    QWallFluidCoeff_[faceCelli] -= H * area;
 }
 
-void YagiWallHTImplicit::giveData(int call)
-{
-    if(call == 1)
-    {
-        //Info << "total convective particle-fluid heat flux [W] (Eulerian) = " << gSum(QPartFluid_*1.0*QPartFluid_.mesh().V()) << endl;
-
-        particleCloud_.dataExchangeM().giveData(partHeatFluxName_,"scalar-atom", partHeatFlux_);
-    }
-}
-
-void YagiWallHTImplicit::postFlow()
-{
-    label cellI;
-    scalar Tfluid(0.0);
-    scalar Tpart(0.0);
-    interpolationCellPoint<scalar> TInterpolator_(tempField_);
-
-    for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)
-    {
-            cellI = particleCloud_.cellIDs()[index][0];
-            if(cellI >= 0)
-            {
-                if(interpolation_)
-                {
-                    vector position = particleCloud_.position(index);
-                    Tfluid = TInterpolator_.interpolate(position,cellI);
-                }
-                else
-                    Tfluid = tempField_[cellI];
-
-                Tpart = partTemp_[index][0];
-                partHeatFlux_[index][0] = (Tfluid - Tpart) * partHeatFluxCoeff_[index][0];
-            }
-    }
-
-    giveData(1);
-}
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam

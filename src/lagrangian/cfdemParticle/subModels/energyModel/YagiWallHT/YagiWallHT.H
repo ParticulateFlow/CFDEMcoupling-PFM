@@ -97,6 +97,9 @@ protected:
 
     void allocateMyArrays() const;
 
+    virtual void heatFlux(label, scalar, scalar, scalar, scalar);
+
+    virtual void heatFluxCoeff(label, scalar, scalar);
 
 public:
 
