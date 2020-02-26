@@ -34,7 +34,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class heatTransferGunn Declaration
+                           Class YagiWallHT Declaration
 \*---------------------------------------------------------------------------*/
 
 class YagiWallHT
