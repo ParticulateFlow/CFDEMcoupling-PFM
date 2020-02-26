@@ -262,7 +262,7 @@ namespace Foam
 
             //Info << "Gradafter: " << tempGradField[facei] << endl;
 
-            if(particleCloud_.verbose() && facei >=0 && facei <2)
+            if(verbose_ && facei >=0 && facei <2)
             {
               Info << "####################" << endl;
               Info << "cellID: " << faceCelli << endl;
@@ -298,7 +298,7 @@ namespace Foam
 
         if(mag(EuFieldInCell) > maxSource_ )
         {
-             Pout << "limiting source term\n"  << endl  ;
+             Pout << "limiting source term"  << endl  ;
              QWallFluid_[cellI] = sign(EuFieldInCell) * maxSource_;
         }
     }
