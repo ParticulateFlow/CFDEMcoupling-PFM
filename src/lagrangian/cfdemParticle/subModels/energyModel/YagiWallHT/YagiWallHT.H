@@ -17,8 +17,8 @@ License
     Copyright (C) 2015- Thomas Lichtenegger, JKU Linz, Austria
 
     Description
-    Correlation for Nusselt number according to
-    Gunn, D. J. International Journal of Heat and Mass Transfer 21.4 (1978)
+    Correlation for wall-to-bed heat transfer according to
+    Yagi, S. A.I.Ch.E. Journal 5.1 (1959)
 
 \*---------------------------------------------------------------------------*/
 
