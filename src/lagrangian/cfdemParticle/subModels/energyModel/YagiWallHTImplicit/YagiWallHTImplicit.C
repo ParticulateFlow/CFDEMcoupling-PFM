@@ -88,7 +88,7 @@ void YagiWallHTImplicit::calcEnergyContribution()
 
     YagiWallHT::calcEnergyContribution();
 
-    QWallFluidCoeff_.primitiveFieldRef() /= -QWallFluidCoeff_.mesh().V();
+    QWallFluidCoeff_.primitiveFieldRef() /= QWallFluidCoeff_.mesh().V();
 
 //    QWallFluidCoeff_.correctBoundaryConditions();
 

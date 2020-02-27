@@ -235,9 +235,6 @@ namespace Foam
       {
         if(tempField_.boundaryField().types()[patchi] == "zeroGradient")
         {
-          
-          //fixedGradientFvPatchField<scalar>& tempGradPatch(refCast<fixedGradientFvPatchField<scalar>>(tempField_.boundaryFieldRef()[patchi]));
-          //scalarField& tempGradField = tempGradPatch.gradient();
 
           forAll(curPatch, facei)
           {							
@@ -247,14 +244,12 @@ namespace Foam
             scalar magG = mag(U_[faceCelli]-Us_[faceCelli])*voidfraction_[faceCelli]*rho_[faceCelli];
 
             // calculate H
-            scalar H = 0.2087 * (pow(ReField_[faceCelli]+SMALL, -0.20)) * CpField_[faceCelli] * magG / (pow(PrField_[faceCelli] , (2/3))+SMALL);
+            scalar H = 0.2087 * (pow(ReField_[faceCelli]+SMALL,-0.20)) * CpField_[faceCelli] * magG / (pow(PrField_[faceCelli],2/3) + SMALL);
 
             // get delta T (wall-fluid)
             scalar Twall  = wallTemp_.boundaryField()[patchi][facei];
             scalar Tfluid = tempField_[faceCelli];
             scalar deltaT = Twall - Tfluid;
-
-            //Info << "Gradbefore: " << tempGradField[facei] << endl;
 
             // get area
             scalar area = curPatch.magSf()[facei];
@@ -262,11 +257,6 @@ namespace Foam
             // calculate heat flux
             heatFlux(faceCelli, H, area, Twall, Tfluid);
             heatFluxCoeff(faceCelli, H, area);
-            
-            //scalar TGrad = -heatFlux/kfField_[faceCelli];
-            //tempGradField[facei] = TGrad;
-
-            //Info << "Gradafter: " << tempGradField[facei] << endl;
 
             if(verbose_ && facei >=0 && facei <2)
             {
@@ -284,7 +274,6 @@ namespace Foam
               Info << "q: " << H*deltaT << endl;
               Info << "area: " << area << endl;
               Info << "Q:" << H*deltaT*area << endl;
-              //Info << "gradT: " << TGrad << endl;
             }
           }		    
         }

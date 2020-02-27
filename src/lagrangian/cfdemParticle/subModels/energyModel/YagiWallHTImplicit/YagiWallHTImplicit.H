@@ -80,8 +80,6 @@ public:
 	void addEnergyCoefficient(volScalarField&) const;
 	
 	void calcEnergyContribution();
-	
-	void postFlow();
 
 };
 
