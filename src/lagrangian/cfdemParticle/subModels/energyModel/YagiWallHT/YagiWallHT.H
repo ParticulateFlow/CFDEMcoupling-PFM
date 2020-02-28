@@ -69,6 +69,8 @@ protected:
 
     const volScalarField& voidfraction_;
 
+    scalar voidfractionMax_;
+
     scalar maxSource_;                           // max (limited) value of src field
 
     word velFieldName_;

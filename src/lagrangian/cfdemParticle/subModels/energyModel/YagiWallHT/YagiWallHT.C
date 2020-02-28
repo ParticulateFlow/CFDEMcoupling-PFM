@@ -99,6 +99,7 @@ namespace Foam
   tempField_(sm.mesh().lookupObject<volScalarField> (tempFieldName_)),
   voidfractionFieldName_(propsDict_.lookupOrDefault<word>("voidfractionFieldName","voidfraction")),
   voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
+  voidfractionMax_(readScalar(propsDict_.lookup("voidfractionMax"))),
   maxSource_(1e30),
   velFieldName_(propsDict_.lookupOrDefault<word>("velFieldName","U")),
   U_(sm.mesh().lookupObject<volVectorField> (velFieldName_)),
@@ -244,7 +245,11 @@ namespace Foam
             scalar magG = mag(U_[faceCelli]-Us_[faceCelli])*voidfraction_[faceCelli]*rho_[faceCelli];
 
             // calculate H
-            scalar H = 0.2087 * (pow(ReField_[faceCelli]+SMALL,-0.20)) * CpField_[faceCelli] * magG / (pow(PrField_[faceCelli],2/3) + SMALL);
+            scalar H;
+            if (voidfraction_[faceCelli]<=voidfractionMax_)
+              H = 0.2087 * (pow(ReField_[faceCelli]+SMALL,-0.20)) * CpField_[faceCelli] * magG / (pow(PrField_[faceCelli],2/3) + SMALL);
+            else
+              H = 0;
 
             // get delta T (wall-fluid)
             scalar Twall  = wallTemp_.boundaryField()[patchi][facei];
