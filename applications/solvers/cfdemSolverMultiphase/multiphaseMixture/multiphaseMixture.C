@@ -55,13 +55,20 @@ Foam::multiphaseMixture::calcNu() const
 {
     PtrDictionary<phase>::const_iterator iter = phases_.begin();
 
+    // 1/nu
+    tmp<volScalarField> tnuInv = iter()/iter().nu();
+    volScalarField& nuInv = tnuInv.ref();
+
+    // nu
     tmp<volScalarField> tnu = iter()*iter().nu();
     volScalarField& nu = tnu.ref();
     
     for (++iter; iter != phases_.end(); ++iter)
     {
-        nu += iter()*iter().nu();
+        nuInv += iter()/iter().nu();
     }
+
+    nu = 1/nuInv;
     
     return tnu;
 }
