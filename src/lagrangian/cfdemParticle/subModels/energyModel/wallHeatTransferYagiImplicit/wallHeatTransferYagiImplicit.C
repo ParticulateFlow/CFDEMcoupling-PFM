@@ -99,14 +99,14 @@ void wallHeatTransferYagiImplicit::addEnergyCoefficient(volScalarField& Qsource)
     Qsource += QWallFluidCoeff_;
 }
 
-void wallHeatTransferYagiImplicit::heatFlux(label faceCelli, scalar h, scalar area, scalar Twall, scalar Tfluid)
+void wallHeatTransferYagiImplicit::heatFlux(label faceCelli, scalar H, scalar area, scalar Twall, scalar Tfluid)
 {
-    QWallFluid_[faceCelli] += h * area * Twall;
+    QWallFluid_[faceCelli] += H * area * Twall;
 }
 
-void wallHeatTransferYagiImplicit::heatFluxCoeff(label faceCelli, scalar h, scalar area)
+void wallHeatTransferYagiImplicit::heatFluxCoeff(label faceCelli, scalar H, scalar area)
 {
-    QWallFluidCoeff_[faceCelli] -= h * area;
+    QWallFluidCoeff_[faceCelli] -= H * area;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

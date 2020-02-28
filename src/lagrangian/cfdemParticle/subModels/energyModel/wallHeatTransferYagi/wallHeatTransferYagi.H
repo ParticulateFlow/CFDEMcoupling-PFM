@@ -22,8 +22,8 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef YagiWallHT_H
-#define YagiWallHT_H
+#ifndef wallHeatTransferYagi_H
+#define wallHeatTransferYagi_H
 
 #include "fvCFD.H"
 #include "cfdemCloudEnergy.H"
@@ -34,10 +34,10 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class YagiWallHT Declaration
+                           Class wallHeatTransferYagi Declaration
 \*---------------------------------------------------------------------------*/
 
-class YagiWallHT
+class wallHeatTransferYagi
 :
     public energyModel
 {
@@ -106,12 +106,12 @@ protected:
 public:
 
     //- Runtime type information
-    TypeName("YagiWallHT");
+    TypeName("wallHeatTransferYagi");
 
     // Constructors
 
         //- Construct from components
-        YagiWallHT
+        wallHeatTransferYagi
         (
             const dictionary& dict,
             cfdemCloudEnergy& sm
@@ -120,7 +120,7 @@ public:
 
     // Destructor
 
-        virtual ~YagiWallHT();
+        virtual ~wallHeatTransferYagi();
 
 
     // Member Functions

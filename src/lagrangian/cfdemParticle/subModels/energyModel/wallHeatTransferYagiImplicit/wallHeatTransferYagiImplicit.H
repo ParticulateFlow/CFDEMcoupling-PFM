@@ -22,24 +22,24 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef YagiWallHTImplicit_H
-#define YagiWallHTImplicit_H
+#ifndef wallHeatTransferYagiImplicit_H
+#define wallHeatTransferYagiImplicit_H
 
 #include "fvCFD.H"
 #include "cfdemCloudEnergy.H"
-#include "YagiWallHT.H"
+#include "wallHeatTransferYagi.H"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class YagiWallHTImplicit Declaration
+                           Class wallHeatTransferYagiImplicit Declaration
 \*---------------------------------------------------------------------------*/
 
-class YagiWallHTImplicit
+class wallHeatTransferYagiImplicit
 :
-    public YagiWallHT
+    public wallHeatTransferYagi
 {
 private:
     
@@ -58,12 +58,12 @@ private:
 public:
 
     //- Runtime type information
-    TypeName("YagiWallHTImplicit");
+    TypeName("wallHeatTransferYagiImplicit");
 
     // Constructors
 
         //- Construct from components
-        YagiWallHTImplicit
+        wallHeatTransferYagiImplicit
         (
             const dictionary& dict,
             cfdemCloudEnergy& sm
@@ -72,7 +72,7 @@ public:
 
     // Destructor
 
-        virtual ~YagiWallHTImplicit();
+        virtual ~wallHeatTransferYagiImplicit();
 
 
     // Member Functions

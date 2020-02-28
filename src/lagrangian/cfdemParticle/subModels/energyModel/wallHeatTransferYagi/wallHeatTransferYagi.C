@@ -244,12 +244,12 @@ namespace Foam
             // calculate Urel
             scalar magG = mag(U_[faceCelli]-Us_[faceCelli])*voidfraction_[faceCelli]*rho_[faceCelli];
 
-            // calculate h
-            scalar h;
+            // calculate H
+            scalar H;
             if (voidfraction_[faceCelli]<=voidfractionMax_)
-              h = 0.2087 * (pow(ReField_[faceCelli]+SMALL,-0.20)) * CpField_[faceCelli] * magG / (pow(PrField_[faceCelli],2/3) + SMALL);
+              H = 0.2087 * (pow(ReField_[faceCelli]+SMALL,-0.20)) * CpField_[faceCelli] * magG / (pow(PrField_[faceCelli],2/3) + SMALL);
             else
-              h = 0;
+              H = 0;
 
             // get delta T (wall-fluid)
             scalar Twall  = wallTemp_.boundaryField()[patchi][facei];
@@ -260,23 +260,25 @@ namespace Foam
             scalar area = curPatch.magSf()[facei];
 
             // calculate heat flux
-            heatFlux(faceCelli, h, area, Twall, Tfluid);
-            heatFluxCoeff(faceCelli, h, area);
+            heatFlux(faceCelli, H, area, Twall, Tfluid);
+            heatFluxCoeff(faceCelli, H, area);
 
             if(verbose_ && facei >=0 && facei <2)
             {
               Info << "####################" << endl;
-              Info << "cellID [-]   : " << faceCelli << endl;
-              Info << "G [kg/(m2s)] : " << magG << endl;
-              Info << "Re [-]       : " << ReField_[faceCelli] << endl;
-              Info << "Pr [-]       : " << PrField_[faceCelli] << endl;
-              Info << "Cp [J/(kgK)] : " << CpField_[faceCelli] << endl;
-              Info << "kf [J/(msK)] : " << kfField_[faceCelli] << endl;
-              Info << "h [J/(m2Ks)] : " << h << endl;
-              Info << "Twall [K]    : " << Twall << endl;
-              Info << "Tfluid [K]   : " << Tfluid << endl;
-              Info << "area [m2]    : " << area << endl;
-              Info << "Q [J/s]      : " << H*deltaT*area << endl;
+              Info << "cellID: " << faceCelli << endl;
+              Info << "G : " << magG << endl;
+              Info << "Re: " << ReField_[faceCelli] << endl;
+              Info << "Pr: " << PrField_[faceCelli] << endl;
+              Info << "Cp: " << CpField_[faceCelli] << endl;
+              Info << "kf: " << kfField_[faceCelli] << endl;
+              Info << "H : " << H << endl;
+              Info << "Twall: " << Twall << endl;
+              Info << "Tfluid: " << Tfluid << endl;
+              Info << "dT: " << deltaT << endl;
+              Info << "q: " << H*deltaT << endl;
+              Info << "area: " << area << endl;
+              Info << "Q:" << H*deltaT*area << endl;
             }
           }		    
         }
@@ -310,12 +312,12 @@ namespace Foam
     Qsource += QWallFluid_;
   }
 
-  void wallHeatTransferYagi::heatFlux(label faceCelli, scalar h, scalar area, scalar Twall, scalar Tfluid)
+  void wallHeatTransferYagi::heatFlux(label faceCelli, scalar H, scalar area, scalar Twall, scalar Tfluid)
   {
-    QWallFluid_[faceCelli] += h * area * (Twall - Tfluid);
+    QWallFluid_[faceCelli] += H * area * (Twall - Tfluid);
   }
 
-  void wallHeatTransferYagi::heatFluxCoeff(label faceCelli, scalar h, scalar area)
+  void wallHeatTransferYagi::heatFluxCoeff(label faceCelli, scalar H, scalar area)
   {
     //no heat transfer coefficient in explicit model
   }

@@ -32,8 +32,8 @@ $(energyModels)/energyModel/energyModel.C
 $(energyModels)/energyModel/newEnergyModel.C
 $(energyModels)/heatTransferGunn/heatTransferGunn.C
 $(energyModels)/heatTransferGunnImplicit/heatTransferGunnImplicit.C
-$(energyModels)/YagiWallHT/YagiWallHT.C
-$(energyModels)/YagiWallHTImplicit/YagiWallHTImplicit.C
+$(energyModels)/wallHeatTransferYagi/wallHeatTransferYagi.C
+$(energyModels)/wallHeatTransferYagiImplicit/wallHeatTransferYagiImplicit.C
 $(energyModels)/reactionHeat/reactionHeat.C
 
 $(thermCondModels)/thermCondModel/thermCondModel.C
