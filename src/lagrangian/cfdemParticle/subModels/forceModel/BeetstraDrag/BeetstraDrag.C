@@ -70,12 +70,7 @@ BeetstraDrag::BeetstraDrag
     k_(0.05),
     useGC_(false),
     usePC_(false)
-    polydisperse_(propsDict_.lookupOrDefault<bool>("polydisperse",false))
 {
-
-    if(polydisperse_)
-	Info << "Drag model: using polydisperse correction factor \n";
-
 
     //Append the field names to be probed
     particleCloud_.probeM().initialize(typeName, typeName+".logDat");
@@ -83,7 +78,6 @@ BeetstraDrag::BeetstraDrag
     particleCloud_.probeM().vectorFields_.append("Urel");
     particleCloud_.probeM().scalarFields_.append("Rep");
     particleCloud_.probeM().scalarFields_.append("voidfraction");
-    particleCloud_.probeM().scalarFields_.append("Fdrag");
     particleCloud_.probeM().scalarFields_.append("y_polydisperse");
     particleCloud_.probeM().writeHeader();
 
@@ -184,14 +178,12 @@ void BeetstraDrag::setForce() const
 
     scalar cg = typeCG_[0];
     label partType = 1;
-    scalar yi(0);
 
     vector dragExplicit(0,0,0);
     scalar dragCoefficient(0);
 
     interpolationCellPoint<scalar> voidfractionInterpolator_(voidfraction_);
     interpolationCellPoint<vector> UInterpolator_(U_);
-    interpolationCellPoint<scalar> dSauterInterpolator_(dSauterField_);
 
     #include "setupProbeModel.H"
 
@@ -233,7 +225,6 @@ void BeetstraDrag::setForce() const
                     scaleDia3 = cg*cg*cg;
                 }
 
-<<<<<<< HEAD
                 Us = particleCloud_.velocity(index);
                 Ur = Ufluid-Us;
                 magUr = mag(Ur);
@@ -253,14 +244,7 @@ void BeetstraDrag::setForce() const
                 dragCoefficient = F(voidfraction, Rep)
                                    *3*M_PI*nuf*rho*voidfraction
                                    *effDiameter(ds_scaled, cellI, index)
-                                   *scaleDia3*scaleDrag_;
-		if (polydisperse_)
-                {
-                    // Beetstra et. al (2007), Eq. (21)
-                    yi = ds_scaled/dSauter;
-                    dragCoefficient *= (voidfraction*yi + 0.064*voidfraction*yi*yi*yi);
-                }
-		
+                                   *scaleDia3*scaleDrag_;		
 
                 // calculate filtering corrections
                 if (useGC_)
@@ -314,8 +298,6 @@ void BeetstraDrag::setForce() const
                     vValues.append(Ur);
                     sValues.append(Rep);
                     sValues.append(voidfraction);
-                    sValues.append(Fdrag);
-                    sValues.append(yi);
                     particleCloud_.probeM().writeProbe(index, sValues, vValues);
                 }
             }

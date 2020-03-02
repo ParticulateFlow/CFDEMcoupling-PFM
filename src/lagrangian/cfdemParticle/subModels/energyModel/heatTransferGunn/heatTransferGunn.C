@@ -145,7 +145,7 @@ heatTransferGunn::heatTransferGunn
     partRe_(NULL),
     partNu_(NULL),
     scaleDia_(1.),
-    typeCG_(propsDict_.lookupOrDefault<scalarList>("coarseGrainingFactors",scalarList(1,1.0)))
+    typeCG_(propsDict_.lookupOrDefault<scalarList>("coarseGrainingFactors",scalarList(1,1.0))),
     multiphase_(propsDict_.lookupOrDefault<bool>("multiphase",false)),
     kfFieldName_(propsDict_.lookupOrDefault<word>("kfFieldName",voidfractionFieldName_)), // use voidfractionField as dummy to prevent lookup error when not using multiphase
     kfField_(sm.mesh().lookupObject<volScalarField> (kfFieldName_)),

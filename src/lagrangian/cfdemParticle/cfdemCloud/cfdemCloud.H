@@ -102,8 +102,6 @@ protected:
 
     const bool getParticleTypes_;
 
-    bool getParticleDensities_;
-
     bool getParticleAngVels_;
 
     scalar maxDEMForce_;

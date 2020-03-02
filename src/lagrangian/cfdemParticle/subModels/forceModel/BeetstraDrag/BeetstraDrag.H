@@ -102,8 +102,6 @@ protected:
 
     double h(double) const;
 
-    mutable bool polydisperse_;
-
 public:
 
     //- Runtime type information
