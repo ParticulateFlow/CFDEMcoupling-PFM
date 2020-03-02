@@ -102,6 +102,10 @@ protected:
 
     const bool getParticleTypes_;
 
+    bool getParticleDensities_;
+
+    bool getParticleAngVels_;
+
     scalar maxDEMForce_;
 
     const word modelType_;
@@ -133,6 +137,8 @@ protected:
     double **particleEffVolFactors_;
 
     int **particleTypes_;
+
+    double **particleAngVels_;
 
     double **particleWeights_;
 
@@ -351,7 +357,11 @@ public:
        virtual inline int ** particleTypes() const;
        virtual inline label particleType(label index) const;
 
-       //access to the particle's rotation and torque data
+       inline bool getParticleAngVels() const;
+       virtual inline double ** particleAngVels() const;
+       virtual vector particleAngVel(label index) const; 
+
+       //access to the particle's and torque data
        virtual inline double ** DEMTorques() const {return NULL;}
        virtual inline double ** omegaArray() const {return NULL;}
        virtual vector omega(int) const {return vector::zero;}

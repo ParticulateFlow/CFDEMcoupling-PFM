@@ -6,3 +6,4 @@ cfdemSolverIB/dir
 cfdemSolverPisoScalar/dir
 cfdemSolverRhoPimpleChem/dir
 cfdemSolverMultiphase/dir
+cfdemSolverMultiphaseScalar/dir

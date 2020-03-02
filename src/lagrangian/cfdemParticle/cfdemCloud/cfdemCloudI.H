@@ -268,6 +268,27 @@ inline label cfdemCloud::particleType(label index) const
     }
 }
 
+inline bool cfdemCloud::getParticleAngVels() const
+{
+    return getParticleAngVels_;
+}
+	  
+inline double ** cfdemCloud::particleAngVels() const
+{
+    return particleAngVels_;
+}
+
+inline vector cfdemCloud::particleAngVel(label index) const
+{
+    if(!getParticleAngVels_) return vector::zero;
+    else
+    {
+    	vector angVel;
+    	for(int i=0;i<3;i++) angVel[i] = particleAngVels_[index][i];
+        return angVel;
+    }
+}
+
 inline int cfdemCloud::numberOfParticles() const
 {
     return numberOfParticles_;

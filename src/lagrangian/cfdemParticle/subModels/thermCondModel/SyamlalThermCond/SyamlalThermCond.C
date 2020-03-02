@@ -67,7 +67,12 @@ SyamlalThermCond::SyamlalThermCond
         sm.mesh(),
         dimensionedScalar("zero", dimensionSet(0,0,0,0,0,0,0), 1.0)
     ),
-    hasWallQFactor_(false)
+    hasWallQFactor_(false),
+    multiphase_(propsDict_.lookupOrDefault<bool>("multiphase",false)),
+    kfFieldName_(propsDict_.lookupOrDefault<word>("kfFieldName",voidfractionFieldName_)), // use voidfractionField as dummy to prevent lookup error when not using multiphase
+    kfField_(sm.mesh().lookupObject<volScalarField> (kfFieldName_)),
+    CpFieldName_(propsDict_.lookupOrDefault<word>("CpFieldName",voidfractionFieldName_)), // use voidfractionField as dummy to prevent lookup error when not using multiphase
+    CpField_(sm.mesh().lookupObject<volScalarField> (CpFieldName_))
 {
     if (wallQFactor_.headerOk())
     {
@@ -106,12 +111,17 @@ tmp<volScalarField> SyamlalThermCond::thermCond() const
 
     volScalarField& svf = tvf.ref();
 
-
     forAll(svf,cellI)
     {
-        if (1-voidfraction_[cellI] < SMALL) svf[cellI] = kf0_.value();
+        scalar kf;
+        if (multiphase_)
+	    kf = kfField_[cellI];
+        else
+	    kf = kf0_.value();
+      
+        if (1-voidfraction_[cellI] < SMALL) svf[cellI] = kf;
         else if (voidfraction_[cellI] < SMALL) svf[cellI] = 0.0;
-        else svf[cellI] = (1-sqrt(1-voidfraction_[cellI]+SMALL)) / (voidfraction_[cellI]) * kf0_.value();
+        else svf[cellI] = (1-sqrt(1-voidfraction_[cellI]+SMALL)) / (voidfraction_[cellI]) * kf;
     }
 
     // if a wallQFactor field is present, use it to scale heat transport through a patch
@@ -127,7 +137,10 @@ tmp<volScalarField> SyamlalThermCond::thermCond() const
 
 tmp<volScalarField> SyamlalThermCond::thermDiff() const
 {
-    return thermCond()/(rho_*Cp_);
+	if (multiphase_)
+		return thermCond()/(rho_*CpField_);
+	else
+		return thermCond()/(rho_*Cp_);
 }
 
 

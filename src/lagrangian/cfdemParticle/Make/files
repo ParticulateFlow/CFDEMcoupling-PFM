@@ -41,6 +41,8 @@ $(energyModels)/energyModel/energyModel.C
 $(energyModels)/energyModel/newEnergyModel.C
 $(energyModels)/heatTransferGunn/heatTransferGunn.C
 $(energyModels)/heatTransferGunnPartField/heatTransferGunnPartField.C
+$(energyModels)/wallHeatTransferYagi/wallHeatTransferYagi.C
+$(energyModels)/wallHeatTransferYagiImplicit/wallHeatTransferYagiImplicit.C
 $(energyModels)/reactionHeat/reactionHeat.C
 
 $(thermCondModels)/thermCondModel/thermCondModel.C
@@ -65,6 +67,7 @@ $(forceModels)/KochHillDrag/KochHillDrag.C
 $(forceModels)/KochHillRWDrag/KochHillRWDrag.C
 $(forceModels)/LaEuScalarTemp/LaEuScalarTemp.C
 $(forceModels)/virtualMassForce/virtualMassForce.C
+$(forceModels)/ParmarBassetForce/ParmarBassetForce.C
 $(forceModels)/gradPForce/gradPForce.C
 $(forceModels)/viscForce/viscForce.C
 $(forceModels)/MeiLift/MeiLift.C
@@ -174,5 +177,6 @@ $(smoothingModels)/smoothingModel/newSmoothingModel.C
 $(smoothingModels)/noSmoothing/noSmoothing.C
 $(smoothingModels)/constDiffSmoothing/constDiffSmoothing.C
 $(smoothingModels)/temporalSmoothing/temporalSmoothing.C
+$(smoothingModels)/constDiffAndTemporalSmoothing/constDiffAndTemporalSmoothing.C
 
 LIB = $(CFDEM_LIB_DIR)/lib$(CFDEM_LIB_NAME)
