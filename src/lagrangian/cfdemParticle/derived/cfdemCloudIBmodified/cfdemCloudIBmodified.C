@@ -177,7 +177,7 @@ void cfdemCloudIBmodified::calcForcingTerm(volVectorField& Us)
                     // calc particle velocity
                     //for(int i=0;i<3;i++) rVec[i]=Us.mesh().C()[cell][i]-position(index)[i];
                     for(int i=0;i<3;i++) uP[i] = velocities()[index][i];
-                    Us[cell] = uP;//(1-voidfractions_[index][subCell])*uP;
+                    Us[cell] = (1-voidfractions_[index][subCell])*uP;
                 }
             }
         }
