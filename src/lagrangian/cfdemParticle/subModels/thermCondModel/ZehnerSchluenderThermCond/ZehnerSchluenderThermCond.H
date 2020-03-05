@@ -71,6 +71,14 @@ private:
 
     bool hasWallQFactor_;
 
+	word kfFieldName_;
+
+    const volScalarField& kfField_;
+
+    word CpFieldName_;
+
+    const volScalarField& CpField_;
+
     void allocateMyArrays() const;
 
     void calcPartKsField() const;
