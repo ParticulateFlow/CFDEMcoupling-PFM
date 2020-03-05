@@ -92,6 +92,8 @@ protected:
 
     const bool ignore_;
 
+	const bool multiphase_;
+
     bool allowCFDsubTimestep_;
 
     const bool limitDEMForces_;
@@ -297,6 +299,8 @@ public:
        inline bool solveFlow() const;
 
        inline bool verbose() const;
+
+	   inline bool multiphase() const;
 
        inline const IOdictionary& couplingProperties() const;
 

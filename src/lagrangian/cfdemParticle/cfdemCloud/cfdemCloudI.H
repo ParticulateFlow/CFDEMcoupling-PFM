@@ -95,6 +95,11 @@ inline bool cfdemCloud::verbose() const
     return verbose_;
 }
 
+inline bool cfdemCloud::multiphase() const
+{
+    return multiphase_;
+}
+
 inline const IOdictionary& cfdemCloud::couplingProperties() const
 {
     return couplingProperties_;

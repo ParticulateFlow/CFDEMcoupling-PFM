@@ -122,7 +122,6 @@ wallHeatTransferYagi::wallHeatTransferYagi
     densityFieldName_(propsDict_.lookupOrDefault<word>("densityFieldName","rho")),
     rho_(sm.mesh().lookupObject<volScalarField> (densityFieldName_)),
     partRe_(NULL),
-    multiphase_(propsDict_.lookupOrDefault<bool>("multiphase",false)),
     kfFieldName_(propsDict_.lookupOrDefault<word>("kfFieldName",voidfractionFieldName_)), // use voidfractionField as dummy to prevent lookup error when not using multiphase
     kfField_(sm.mesh().lookupObject<volScalarField> (kfFieldName_)),
     CpFieldName_(propsDict_.lookupOrDefault<word>("CpFieldName",voidfractionFieldName_)), // use voidfractionField as dummy to prevent lookup error when not using multiphase
@@ -244,7 +243,10 @@ void wallHeatTransferYagi::calcEnergyContribution()
     );
 
     // calculate Pr field
-    PrField_ = CpField_ * mufField / kfField_;
+    if (particleCloud_.multiphase())
+        PrField_ = CpField_ * mufField / kfField_;
+    else
+        PrField_ = Cp_ * mufField / kf0_;    
 
     const fvPatchList& patches = U_.mesh().boundary();
 
@@ -289,8 +291,6 @@ void wallHeatTransferYagi::calcEnergyContribution()
                         Info << "G : " << magG << endl;
                         Info << "Re: " << ReField_[faceCelli] << endl;
                         Info << "Pr: " << PrField_[faceCelli] << endl;
-                        Info << "Cp: " << CpField_[faceCelli] << endl;
-                        Info << "kf: " << kfField_[faceCelli] << endl;
                         Info << "H : " << H << endl;
                         Info << "Twall: " << Twall << endl;
                         Info << "Tfluid: " << Tfluid << endl;

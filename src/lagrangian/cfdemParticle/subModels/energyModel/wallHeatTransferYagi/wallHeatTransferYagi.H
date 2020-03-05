@@ -93,8 +93,6 @@ protected:
 
     mutable double **partRe_;
 
-    bool multiphase_;
-
     word kfFieldName_;
 
     const volScalarField& kfField_;

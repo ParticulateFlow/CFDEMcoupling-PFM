@@ -68,8 +68,6 @@ private:
 
     bool hasWallQFactor_;
 
-    bool multiphase_;
-
     word kfFieldName_;
 
     const volScalarField& kfField_;
