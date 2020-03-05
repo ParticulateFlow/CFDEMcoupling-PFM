@@ -49,9 +49,15 @@ protected:
 
     bool verbose_;
 
+    bool implicit_;
+
     word QWallFluidName_;
         
     volScalarField QWallFluid_;
+
+    word QWallFluidCoeffName_;
+        
+    volScalarField QWallFluidCoeff_;
 
     word wallTempName_;
 
@@ -101,8 +107,6 @@ protected:
 
     virtual void heatFlux(label, scalar, scalar, scalar, scalar);
 
-    virtual void heatFluxCoeff(label, scalar, scalar);
-
 public:
 
     //- Runtime type information
@@ -127,7 +131,7 @@ public:
 
     void addEnergyContribution(volScalarField&) const;
 
-	void addEnergyCoefficient(volScalarField&) const {}
+	void addEnergyCoefficient(volScalarField&) const;
 
 	void calcEnergyContribution();
 };

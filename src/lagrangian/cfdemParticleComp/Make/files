@@ -41,7 +41,6 @@ $(energyModels)/energyModel/newEnergyModel.C
 $(energyModels)/heatTransferGunn/heatTransferGunn.C
 $(energyModels)/heatTransferGunnPartField/heatTransferGunnPartField.C
 $(energyModels)/wallHeatTransferYagi/wallHeatTransferYagi.C
-$(energyModels)/wallHeatTransferYagiImplicit/wallHeatTransferYagiImplicit.C
 $(energyModels)/reactionHeat/reactionHeat.C
 
 $(thermCondModels)/thermCondModel/thermCondModel.C

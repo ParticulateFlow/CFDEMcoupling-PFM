@@ -45,6 +45,7 @@ namespace Foam
   propsDict_(dict.subDict(typeName + "Props")),
   interpolation_(propsDict_.lookupOrDefault<bool>("interpolation",false)),
   verbose_(propsDict_.lookupOrDefault<bool>("verbose",false)),
+  implicit_(propsDict_.lookupOrDefault<bool>("implicit",true)),
   QWallFluidName_(propsDict_.lookupOrDefault<word>("QWallFluidName","QWallFluid")),
   QWallFluid_
   (   IOobject
@@ -57,6 +58,19 @@ namespace Foam
       ),
       sm.mesh(),
       dimensionedScalar("zero", dimensionSet(1,-1,-3,0,0,0,0), 0.0)
+  ),
+  QWallFluidCoeffName_(propsDict_.lookupOrDefault<word>("QWallFluidCoeffName","QWallFluidCoeff")),
+  QWallFluidCoeff_
+  (   IOobject
+      (
+          QWallFluidCoeffName_,
+          sm.mesh().time().timeName(),
+          sm.mesh(),
+          IOobject::READ_IF_PRESENT,
+          IOobject::AUTO_WRITE
+      ),
+      sm.mesh(),
+      dimensionedScalar("zero", dimensionSet(1,-1,-3,-1,0,0,0), 0.0)
   ),
   wallTempName_(propsDict_.lookup("wallTempName")),
   wallTemp_
@@ -122,6 +136,11 @@ namespace Foam
         Info << "limiting wall source field to: " << maxSource_ << endl;
     }
 
+    if (!implicit_)
+    {
+        QWallFluidCoeff_.writeOpt() = IOobject::NO_WRITE;
+    }
+
     if (verbose_)
     {
       ReField_.writeOpt() = IOobject::AUTO_WRITE;
@@ -166,6 +185,8 @@ namespace Foam
 
     // reset Scalar field
     QWallFluid_.primitiveFieldRef() = 0.0;
+	if (implicit_)
+		QWallFluidCoeff_.primitiveFieldRef() = 0.0;
 
     #ifdef compre
     const volScalarField mufField = particleCloud_.turbulence().mu();
@@ -261,7 +282,6 @@ namespace Foam
 
             // calculate heat flux
             heatFlux(faceCelli, H, area, Twall, Tfluid);
-            heatFluxCoeff(faceCelli, H, area);
 
             if(verbose_ && facei >=0 && facei <2)
             {
@@ -290,10 +310,14 @@ namespace Foam
     }
 
     QWallFluid_.primitiveFieldRef() /= QWallFluid_.mesh().V();
+	if(implicit_)
+		QWallFluidCoeff_.primitiveFieldRef() /= QWallFluidCoeff_.mesh().V();
 
-    // limit source term
-    forAll(QWallFluid_,cellI)
+    // limit source term in explicit treatment
+    if(!implicit_)
     {
+      forAll(QWallFluid_,cellI)
+      {
         scalar EuFieldInCell = QWallFluid_[cellI];
 
         if(mag(EuFieldInCell) > maxSource_ )
@@ -301,6 +325,7 @@ namespace Foam
              Pout << "limiting source term"  << endl  ;
              QWallFluid_[cellI] = sign(EuFieldInCell) * maxSource_;
         }
+      }
     }
 
     QWallFluid_.correctBoundaryConditions();
@@ -312,14 +337,25 @@ namespace Foam
     Qsource += QWallFluid_;
   }
 
-  void wallHeatTransferYagi::heatFlux(label faceCelli, scalar H, scalar area, scalar Twall, scalar Tfluid)
+  void wallHeatTransferYagi::addEnergyCoefficient(volScalarField& Qcoeff) const
   {
-    QWallFluid_[faceCelli] += H * area * (Twall - Tfluid);
+    if(implicit_)
+    {
+        Qcoeff += QWallFluidCoeff_;
+    }
   }
 
-  void wallHeatTransferYagi::heatFluxCoeff(label faceCelli, scalar H, scalar area)
+  void wallHeatTransferYagi::heatFlux(label faceCelli, scalar H, scalar area, scalar Twall, scalar Tfluid)
   {
-    //no heat transfer coefficient in explicit model
+    if(!implicit_)
+    {
+      QWallFluid_[faceCelli] += H * area * (Twall - Tfluid);
+    }
+    else
+    {
+      QWallFluid_[faceCelli]      += H * area * Twall;
+      QWallFluidCoeff_[faceCelli] -= H * area;
+    }
   }
 
   // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
