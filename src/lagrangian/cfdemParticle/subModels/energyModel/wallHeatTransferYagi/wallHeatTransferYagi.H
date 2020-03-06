@@ -93,14 +93,6 @@ protected:
 
     mutable double **partRe_;
 
-    word kfFieldName_;
-
-    const volScalarField& kfField_;
-
-    word CpFieldName_;
-
-    const volScalarField& CpField_;
-
     void allocateMyArrays() const;
 
     virtual void heatFlux(label, scalar, scalar, scalar, scalar);

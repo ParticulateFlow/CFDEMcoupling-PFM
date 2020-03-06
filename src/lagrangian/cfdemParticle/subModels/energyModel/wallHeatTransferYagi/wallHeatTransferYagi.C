@@ -121,11 +121,7 @@ wallHeatTransferYagi::wallHeatTransferYagi
     Us_(sm.mesh().lookupObject<volVectorField> (UsFieldName_)),
     densityFieldName_(propsDict_.lookupOrDefault<word>("densityFieldName","rho")),
     rho_(sm.mesh().lookupObject<volScalarField> (densityFieldName_)),
-    partRe_(NULL),
-    kfFieldName_(propsDict_.lookupOrDefault<word>("kfFieldName",voidfractionFieldName_)), // use voidfractionField as dummy to prevent lookup error when not using multiphase
-    kfField_(sm.mesh().lookupObject<volScalarField> (kfFieldName_)),
-    CpFieldName_(propsDict_.lookupOrDefault<word>("CpFieldName",voidfractionFieldName_)), // use voidfractionField as dummy to prevent lookup error when not using multiphase
-    CpField_(sm.mesh().lookupObject<volScalarField> (CpFieldName_))
+    partRe_(NULL)
 {
     allocateMyArrays();
 
@@ -193,6 +189,9 @@ void wallHeatTransferYagi::calcEnergyContribution()
     const volScalarField mufField = particleCloud_.turbulence().nu()*rho_;
     #endif
 
+	const volScalarField& CpField_ = CpField();
+	const volScalarField& kf0Field_ = kf0Field();
+
     interpolationCellPoint<scalar> voidfractionInterpolator_(voidfraction_);
     interpolationCellPoint<vector> UInterpolator_(U_);
     interpolationCellPoint<scalar> TInterpolator_(tempField_);
@@ -243,10 +242,7 @@ void wallHeatTransferYagi::calcEnergyContribution()
     );
 
     // calculate Pr field
-    if (particleCloud_.multiphase())
-        PrField_ = CpField_ * mufField / kfField_;
-    else
-        PrField_ = Cp_ * mufField / kf0_;    
+	PrField_ = CpField_ * mufField / kf0Field_;         
 
     const fvPatchList& patches = U_.mesh().boundary();
 
@@ -288,9 +284,12 @@ void wallHeatTransferYagi::calcEnergyContribution()
                     {
                         Info << "####################" << endl;
                         Info << "cellID: " << faceCelli << endl;
+						Info << "kf: " << kf0Field_[faceCelli] << endl;
+						Info << "Cp: " << CpField_[faceCelli] << endl;
+						Info << "mu: " << mufField[faceCelli] << endl;
+						Info << "Pr: " << PrField_[faceCelli] << endl;
                         Info << "G : " << magG << endl;
                         Info << "Re: " << ReField_[faceCelli] << endl;
-                        Info << "Pr: " << PrField_[faceCelli] << endl;
                         Info << "H : " << H << endl;
                         Info << "Twall: " << Twall << endl;
                         Info << "Tfluid: " << Tfluid << endl;

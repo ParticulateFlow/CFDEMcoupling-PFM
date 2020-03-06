@@ -55,15 +55,65 @@ energyModel::energyModel
             IOobject::NO_WRITE
         )
     ),
-    kf0_
+	kf0Field_
     (
-        dimensionedScalar(transportProperties_.lookup("kf")).value()
+        IOobject
+        (
+            "kf0",
+            sm.mesh().time().timeName(),
+            sm.mesh(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        sm.mesh(),
+        dimensionedScalar("zero", dimensionSet(1,1,-3,-1,0,0,0), 0.)
     ),
-    Cp_
+	CpField_
     (
-        dimensionedScalar(transportProperties_.lookup("Cp")).value()
+        IOobject
+        (
+            "Cp",
+            sm.mesh().time().timeName(),
+            sm.mesh(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        sm.mesh(),
+        dimensionedScalar("zero", dimensionSet(0,2,-2,-1,0,0,0), 0.)
     )
-{}
+{
+	// build constant fields for single phase case
+	if (!particleCloud_.multiphase())
+	{
+		kf0Field_ = volScalarField
+        (
+            IOobject
+            (
+                "kf0",
+                particleCloud_.mesh().time().timeName(),
+                particleCloud_.mesh(),
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+            ),
+            particleCloud_.mesh(),
+            dimensionedScalar(transportProperties_.lookup("kf"))
+        );
+
+		CpField_ = volScalarField
+        (
+            IOobject
+            (
+                "Cp",
+                particleCloud_.mesh().time().timeName(),
+                particleCloud_.mesh(),
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+            ),
+            particleCloud_.mesh(),
+            dimensionedScalar(transportProperties_.lookup("Cp"))
+        );
+	}
+}
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
@@ -72,9 +122,28 @@ energyModel::~energyModel()
 
 // * * * * * * * * * * * * * * * * Member Fct  * * * * * * * * * * * * * * * //
 
-scalar energyModel::Cp() const
+const volScalarField& energyModel::kf0Field() const
 {
-    return Cp_;
+	if (particleCloud_.multiphase())
+	{
+		return particleCloud_.mesh().lookupObject<volScalarField>("kf");
+	}
+	else
+	{
+		return kf0Field_;
+	}
+}
+
+const volScalarField& energyModel::CpField() const
+{
+	if (particleCloud_.multiphase())
+	{
+		return particleCloud_.mesh().lookupObject<volScalarField>("Cp");
+	}
+	else
+	{
+		return CpField_;
+	}
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

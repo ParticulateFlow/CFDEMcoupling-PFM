@@ -68,14 +68,6 @@ private:
 
     bool hasWallQFactor_;
 
-    word kfFieldName_;
-
-    const volScalarField& kfField_;
-
-    word CpFieldName_;
-
-    const volScalarField& CpField_;
-
 public:
 
     //- Runtime type information

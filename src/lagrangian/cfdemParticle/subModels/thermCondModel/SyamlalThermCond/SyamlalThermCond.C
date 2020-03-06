@@ -67,11 +67,7 @@ SyamlalThermCond::SyamlalThermCond
         sm.mesh(),
         dimensionedScalar("zero", dimensionSet(0,0,0,0,0,0,0), 1.0)
     ),
-    hasWallQFactor_(false),
-    kfFieldName_(propsDict_.lookupOrDefault<word>("kfFieldName",voidfractionFieldName_)), // use voidfractionField as dummy to prevent lookup error when not using multiphase
-    kfField_(sm.mesh().lookupObject<volScalarField> (kfFieldName_)),
-    CpFieldName_(propsDict_.lookupOrDefault<word>("CpFieldName",voidfractionFieldName_)), // use voidfractionField as dummy to prevent lookup error when not using multiphase
-    CpField_(sm.mesh().lookupObject<volScalarField> (CpFieldName_))
+    hasWallQFactor_(false)
 {
     if (wallQFactor_.headerOk())
     {
@@ -91,6 +87,8 @@ SyamlalThermCond::~SyamlalThermCond()
 
 tmp<volScalarField> SyamlalThermCond::thermCond() const
 {
+	const volScalarField& kf0Field_ = kf0Field();
+
     tmp<volScalarField> tvf
     (
         new volScalarField
@@ -112,11 +110,7 @@ tmp<volScalarField> SyamlalThermCond::thermCond() const
 
     forAll(svf,cellI)
     {
-        scalar kf0;
-        if (particleCloud_.multiphase())
-	    	kf0 = kfField_[cellI];
-        else
-	    	kf0 = kf0_.value();
+        scalar kf0 = kf0Field_[cellI];
       
         if (1-voidfraction_[cellI] < SMALL) svf[cellI] = kf0;
         else if (voidfraction_[cellI] < SMALL) svf[cellI] = 0.0;
@@ -136,10 +130,7 @@ tmp<volScalarField> SyamlalThermCond::thermCond() const
 
 tmp<volScalarField> SyamlalThermCond::thermDiff() const
 {
-	if (particleCloud_.multiphase())
-		return thermCond()/(rho_*CpField_);
-	else
-		return thermCond()/(rho_*Cp_);
+	return thermCond()/(rho_*CpField_);
 }
 
 

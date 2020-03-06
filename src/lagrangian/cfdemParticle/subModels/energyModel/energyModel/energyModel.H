@@ -46,9 +46,9 @@ protected:
 
         IOdictionary transportProperties_;
 
-        scalar kf0_;                                // fluid thermal conductivity [W/(m*K)]
-
-        scalar Cp_;                                 // specific heat capacity [W*s/(kg*K)]
+		mutable volScalarField kf0Field_;
+		
+		mutable volScalarField CpField_;
 
 public:
 
@@ -107,9 +107,9 @@ public:
 
         virtual void solve() {}
 
-        scalar Cp() const;
+		const volScalarField& kf0Field() const;
 
-
+		const volScalarField& CpField() const;
 };
 
 

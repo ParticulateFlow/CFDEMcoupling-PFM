@@ -58,11 +58,65 @@ thermCondModel::thermCondModel
             IOobject::NO_WRITE
         )
     ),
-    kf0_(transportProperties_.lookup("kf")),
-    Cp_(transportProperties_.lookup("Cp"))
-//      kf0_(readScalar(transportProperties_.lookup("kf"))),
-//      Cp_(readScalar(transportProperties_.lookup("Cp")))
-{}
+	kf0Field_
+    (
+        IOobject
+        (
+            "kf0",
+            sm.mesh().time().timeName(),
+            sm.mesh(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        sm.mesh(),
+        dimensionedScalar("zero", dimensionSet(1,1,-3,-1,0,0,0), 0.)
+    ),
+	CpField_
+    (
+        IOobject
+        (
+            "Cp",
+            sm.mesh().time().timeName(),
+            sm.mesh(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        sm.mesh(),
+        dimensionedScalar("zero", dimensionSet(0,2,-2,-1,0,0,0), 0.)
+    )
+{
+	// build constant fields for single phase case
+	if (!particleCloud_.multiphase())
+	{
+		kf0Field_ = volScalarField
+        (
+            IOobject
+            (
+                "kf0",
+                particleCloud_.mesh().time().timeName(),
+                particleCloud_.mesh(),
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+            ),
+            particleCloud_.mesh(),
+            dimensionedScalar(transportProperties_.lookup("kf"))
+        );
+
+		CpField_ = volScalarField
+        (
+            IOobject
+            (
+                "Cp",
+                particleCloud_.mesh().time().timeName(),
+                particleCloud_.mesh(),
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+            ),
+            particleCloud_.mesh(),
+            dimensionedScalar(transportProperties_.lookup("Cp"))
+        );
+	}
+}
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
@@ -70,6 +124,31 @@ thermCondModel::thermCondModel
 thermCondModel::~thermCondModel()
 {}
 
+// * * * * * * * * * * * * * * * * Member Fct  * * * * * * * * * * * * * * * //
+
+const volScalarField& thermCondModel::kf0Field() const
+{
+	if (particleCloud_.multiphase())
+	{
+		return particleCloud_.mesh().lookupObject<volScalarField>("kf");
+	}
+	else
+	{
+		return kf0Field_;
+	}
+}
+
+const volScalarField& thermCondModel::CpField() const
+{
+	if (particleCloud_.multiphase())
+	{
+		return particleCloud_.mesh().lookupObject<volScalarField>("Cp");
+	}
+	else
+	{
+		return CpField_;
+	}
+}
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

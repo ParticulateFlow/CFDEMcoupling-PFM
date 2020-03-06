@@ -55,10 +55,9 @@ protected:
 
         IOdictionary transportProperties_;
 
-        dimensionedScalar kf0_;
-
-        dimensionedScalar Cp_;
-
+		mutable volScalarField kf0Field_;
+		
+		mutable volScalarField CpField_;
 
 public:
 
@@ -109,6 +108,10 @@ public:
         virtual tmp<volScalarField> thermCond() const = 0;
 
         virtual tmp<volScalarField> thermDiff() const = 0;
+
+		const volScalarField& kf0Field() const;
+
+		const volScalarField& CpField() const;
 
 };
 

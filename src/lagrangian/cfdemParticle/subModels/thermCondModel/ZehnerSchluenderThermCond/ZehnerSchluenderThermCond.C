@@ -81,11 +81,7 @@ ZehnerSchluenderThermCond::ZehnerSchluenderThermCond
         sm.mesh(),
         dimensionedScalar("zero", dimensionSet(0,0,0,0,0,0,0), 1.0)
     ),
-    hasWallQFactor_(false),
-	kfFieldName_(propsDict_.lookupOrDefault<word>("kfFieldName",voidfractionFieldName_)), // use voidfractionField as dummy to prevent lookup error when not using multiphase
-    kfField_(sm.mesh().lookupObject<volScalarField> (kfFieldName_)),
-    CpFieldName_(propsDict_.lookupOrDefault<word>("CpFieldName",voidfractionFieldName_)), // use voidfractionField as dummy to prevent lookup error when not using multiphase
-    CpField_(sm.mesh().lookupObject<volScalarField> (CpFieldName_))
+    hasWallQFactor_(false)
 {
     if (typeKs_[0] < 0.0)
     {
@@ -124,6 +120,8 @@ void ZehnerSchluenderThermCond::allocateMyArrays() const
 
 tmp<volScalarField> ZehnerSchluenderThermCond::thermCond() const
 {
+	const volScalarField& kf0Field_ = kf0Field();
+
     tmp<volScalarField> tvf
     (
         new volScalarField
@@ -159,11 +157,7 @@ tmp<volScalarField> ZehnerSchluenderThermCond::thermCond() const
         if(voidfraction > 1.0 - SMALL || partKsField_[cellI] < SMALL) svf[cellI] = 0.0;
         else
         {
-			scalar kf0;
-        	if (particleCloud_.multiphase())
-	    		kf0 = kfField_[cellI];
-        	else
-	    		kf0 = kf0_.value();
+			scalar kf0 = kf0Field_[cellI];
 
             A = partKsField_[cellI]/kf0;
             B = 1.25 * Foam::pow((1 - voidfraction) / voidfraction, 1.11);

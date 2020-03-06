@@ -145,11 +145,7 @@ heatTransferGunn::heatTransferGunn
     partRe_(NULL),
     partNu_(NULL),
     scaleDia_(1.),
-    typeCG_(propsDict_.lookupOrDefault<scalarList>("coarseGrainingFactors",scalarList(1,1.0))),
-    kfFieldName_(propsDict_.lookupOrDefault<word>("kfFieldName",voidfractionFieldName_)), // use voidfractionField as dummy to prevent lookup error when not using multiphase
-    kfField_(sm.mesh().lookupObject<volScalarField> (kfFieldName_)),
-    CpFieldName_(propsDict_.lookupOrDefault<word>("CpFieldName",voidfractionFieldName_)), // use voidfractionField as dummy to prevent lookup error when not using multiphase
-    CpField_(sm.mesh().lookupObject<volScalarField> (CpFieldName_))
+    typeCG_(propsDict_.lookupOrDefault<scalarList>("coarseGrainingFactors",scalarList(1,1.0)))
 {
     allocateMyArrays();
 
@@ -277,6 +273,9 @@ void heatTransferGunn::calcEnergyContribution()
        const volScalarField mufField = particleCloud_.turbulence().nu()*rho_;
     #endif
 
+	const volScalarField& CpField_ = CpField();
+	const volScalarField& kf0Field_ = kf0Field();
+
     if (typeCG_.size()>1 || typeCG_[0] > 1)
     {
         Info << "heatTransferGunn using scale = " << typeCG_ << endl;
@@ -348,18 +347,15 @@ void heatTransferGunn::calcEnergyContribution()
 
                 Rep = ds_scaled * magUr * voidfraction * rho_[cellI]/ muf;
 
-                if(particleCloud_.multiphase())
-                {
-                	kf0_ = kfField_[cellI];
-                	Cp_  = CpField_[cellI];
-                }
+				scalar kf0 = kf0Field_[cellI];
+				scalar Cp  = CpField_[cellI];
 
-                Pr = max(SMALL, Cp_ * muf / kf0_);
+                Pr = max(SMALL, Cp * muf / kf0);
 
                 Nup = Nusselt(voidfraction, Rep, Pr);
 
                 Tsum += partTemp_[index][0];
-                scalar h = kf0_ * Nup / ds_scaled;
+                scalar h = kf0 * Nup / ds_scaled;
                 scalar As = ds_scaled * ds_scaled * M_PI; // surface area of sphere
 
                 // calc convective heat flux [W]
@@ -375,8 +371,8 @@ void heatTransferGunn::calcEnergyContribution()
                 {
                     Pout << "partHeatFlux = " << partHeatFlux_[index][0] << endl;
                     Pout << "magUr = " << magUr << endl;
-                    Pout << "kf0 = " << kf0_ << endl;
-                    Pout << "Cp = " << Cp_ << endl;
+                    Pout << "kf0 = " << kf0 << endl;
+                    Pout << "Cp = " << Cp << endl;
                     Pout << "rho = " << rho_[cellI] << endl;
                     Pout << "h = " << h << endl;
                     Pout << "ds = " << ds << endl;
