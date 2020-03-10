@@ -190,6 +190,75 @@ volScalarField keff
     dimensionedScalar("zero", dimensionSet(1,1,-3,-1,0,0,0), 0.0)
 );
 
+Info<< "Reading/creating concentration fields\n" << endl;
+volScalarField C
+(
+    IOobject
+    (
+        "C",
+        runTime.timeName(),
+        mesh,
+        IOobject::MUST_READ,
+        IOobject::AUTO_WRITE
+    ),
+    mesh
+);
+
+volScalarField Csource
+(
+    IOobject
+    (
+        "Csource",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::AUTO_WRITE
+    ),
+    mesh,
+    dimensionedScalar("zero", dimensionSet(1,-3,-1,0,0,0,0), 0.0)
+);
+
+volScalarField CCoeff
+(
+    IOobject
+    (
+        "Csource",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::AUTO_WRITE
+    ),
+    mesh,
+    dimensionedScalar("zero", dimensionSet(0,0,-1,0,0,0,0), 0.0)
+);
+
+
+volScalarField D
+(
+    IOobject
+    (
+        "D",
+        runTime.timeName(),
+        mesh,
+        IOobject::READ_IF_PRESENT,
+        IOobject::AUTO_WRITE
+    ),
+    mixture.D()
+);
+
+volScalarField Cs
+(
+    IOobject
+    (
+        "Cs",
+        runTime.timeName(),
+        mesh,
+        IOobject::READ_IF_PRESENT,
+        IOobject::AUTO_WRITE
+    ),
+    mixture.Cs()
+);
+
 
 //========================
 

@@ -259,6 +259,12 @@ public:
         //- Return the thermal conductivity
         tmp<volScalarField> kf() const;
 
+        //- Return the diffusion coefficient
+        tmp<volScalarField> D() const;
+
+        //- Return the solubility
+        tmp<volScalarField> Cs() const;
+
         tmp<surfaceScalarField> surfaceTensionForce() const
         {
             return surfaceTensionForce_;

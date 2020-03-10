@@ -62,6 +62,8 @@ class phase
         dimensionedScalar rho_;
         dimensionedScalar Cp_;
         dimensionedScalar kf_;
+        dimensionedScalar D_;
+        dimensionedScalar Cs_;
 
 public:
 
@@ -153,6 +155,18 @@ public:
         {
             return kf_;
         }
+
+         //- Return const-access to phase1 diffusion coefficient
+        const dimensionedScalar& D() const
+        {
+            return D_;
+        }
+
+        //- Return const-access to phase1 solubility
+        const dimensionedScalar& Cs() const
+        {
+            return Cs_;
+        } 
 
         //- Correct the phase properties
         void correct();

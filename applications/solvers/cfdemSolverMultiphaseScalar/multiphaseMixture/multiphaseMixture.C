@@ -416,6 +416,45 @@ Foam::multiphaseMixture::kf() const
     return tkf;
 }
 
+Foam::tmp<Foam::volScalarField>
+Foam::multiphaseMixture::D() const
+{
+    PtrDictionary<phase>::const_iterator iter = phases_.begin();
+
+    // 1/D
+    tmp<volScalarField> tDInv = iter()/iter().D();
+    volScalarField& DInv = tDInv.ref();
+
+    // D
+    tmp<volScalarField> tD = iter()*iter().D();
+    volScalarField& D = tD.ref();
+
+    for (++iter; iter != phases_.end(); ++iter)
+    {
+      DInv += iter()/iter().D();
+    }
+
+    D = 1/DInv;
+    return tD;
+}
+
+Foam::tmp<Foam::volScalarField>
+Foam::multiphaseMixture::Cs() const
+{
+    PtrDictionary<phase>::const_iterator iter = phases_.begin();
+
+    // Cs
+    tmp<volScalarField> tCs = iter()*iter().Cs();
+    volScalarField& Cs = tCs.ref();
+
+    for (++iter; iter != phases_.end(); ++iter)
+    {
+        Cs += iter()*iter().Cs();
+    }
+
+    return tCs;
+}
+
 void Foam::multiphaseMixture::solve()
 {
     correct();

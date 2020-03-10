@@ -61,7 +61,9 @@ Foam::phase::phase
     ),
     rho_("rho", dimDensity, phaseDict_),
     Cp_("Cp", (dimSpecificHeatCapacity), phaseDict_),
-    kf_("kf", (dimPower/dimLength/dimTemperature), phaseDict_)
+    kf_("kf", (dimPower/dimLength/dimTemperature), phaseDict_),
+    D_("D", dimViscosity, phaseDict_),
+    Cs_("Cs", dimDensity, phaseDict_)
 {}
 
 
@@ -86,6 +88,8 @@ bool Foam::phase::read(const dictionary& phaseDict)
 
     phaseDict_.lookup("Cp") >> Cp_;
     phaseDict_.lookup("kf") >> kf_;
+    phaseDict_.lookup("D") >> D_;
+    phaseDict_.lookup("Cs") >> Cs_;
 
     if (nuModel_->read(phaseDict_))
     {
