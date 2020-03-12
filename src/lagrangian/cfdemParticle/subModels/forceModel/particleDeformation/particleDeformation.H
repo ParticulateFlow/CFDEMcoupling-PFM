@@ -58,17 +58,20 @@ private:
 
     mutable autoPtr<volScalarField> refField_;
 
-    label partType_;
+    labelList partTypes_;
 
-    scalar lowerBound_;
+    scalarList lowerBounds_;
 
-    scalar upperBound_;
+    scalarList upperBounds_;
 
     mutable double **partDeformations_;
+
+    label getListIndex(label) const;
 
     void allocateMyArrays() const;
 
     void init() const;
+
 
 public:
 
