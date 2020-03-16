@@ -122,14 +122,6 @@ pdCorrelation::pdCorrelation
         sm.mesh(),
         dimensionedScalar("zero", dimless, 0)
     ),
-    typeCG_
-    (
-        propsDict_.lookupOrDefault
-        (
-            "coarseGrainingFactors",
-            scalarList(1, sm.cg())
-        )
-    ),
     particleDensities_
     (
         propsDict_.lookupOrDefault
@@ -138,6 +130,15 @@ pdCorrelation::pdCorrelation
             scalarList(1, -1.)
         )
     ),
+    typeCG_
+    (
+        propsDict_.lookupOrDefault
+        (
+            "coarseGrainingFactors",
+            scalarList(1, sm.cg())
+        )
+    ),
+    maxTypeCG_(typeCG_.size()),
     constantCG_(typeCG_.size() < 2),
     CG_(!constantCG_ || typeCG_[0] > 1. + SMALL),
     runOnWriteOnly_(propsDict_.lookupOrDefault("runOnWriteOnly", false))
@@ -222,6 +223,10 @@ void pdCorrelation::setForce() const
             typei = particleCloud_.particleTypes()[pi][0] - 1;
             rhop  = densityFromList ? particleDensities_[typei]
                                     : particleCloud_.particleDensity(pi);
+            if (!constantCG_ && typei >= maxTypeCG_)
+            {
+                FatalError<< "Too few coarse-graining factors provided." << abort(FatalError);
+            }
             cg    = constantCG_     ? typeCG_[0] : typeCG_[typei];
         }
 
