@@ -150,7 +150,8 @@ heatTransferGunn::heatTransferGunn
     partRe_(NULL),
     partNu_(NULL),
     scaleDia_(1.),
-    typeCG_(propsDict_.lookupOrDefault<scalarList>("coarseGrainingFactors",scalarList(1,1.0)))
+    typeCG_(propsDict_.lookupOrDefault<scalarList>("coarseGrainingFactors",scalarList(1,1.0))),
+    maxTypeCG_(typeCG_.size())
 {
     allocateMyArrays();
 
@@ -209,7 +210,10 @@ heatTransferGunn::heatTransferGunn
         scaleDia_=scalar(readScalar(propsDict_.lookup("scale")));
         typeCG_[0] = scaleDia_;
     }
-    else if (typeCG_.size()>1) multiTypes_ = true;
+    else if (typeCG_.size()>1)
+    {
+        multiTypes_ = true;
+    }
 
     if (initPartTemp_ && !partTempField_.headerOk())
     {
@@ -340,6 +344,10 @@ void heatTransferGunn::calcEnergyContribution()
                 if (multiTypes_)
                 {
                     partType = particleCloud_.particleType(index);
+                    if (partType > maxTypeCG_)
+                    {
+                        FatalError<< "Too few coarse-graining factors provided." << abort(FatalError);
+                    }
                     cg = typeCG_[partType - 1];
                     scaleDia3 = cg*cg*cg;
                 }

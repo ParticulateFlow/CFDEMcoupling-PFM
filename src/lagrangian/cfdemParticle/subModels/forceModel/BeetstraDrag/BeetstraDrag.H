@@ -64,9 +64,11 @@ protected:
 
     const volVectorField& UsField_;
 
-    mutable scalar scaleDia_;
+    mutable label maxTypeCG_;
 
-    mutable scalarList typeCG_;
+    scalarList typeCG_;
+
+    mutable scalar scaleDia_;
 
     mutable scalar scaleDrag_;
 

@@ -125,6 +125,8 @@ protected:
 
     scalarList typeCG_;
 
+    const label maxTypeCG_;
+
     void allocateMyArrays() const;
 
     void partTempField();
