@@ -66,7 +66,7 @@ protected:
 
     mutable label maxTypeCG_;
 
-    scalarList typeCG_;
+    mutable scalarList typeCG_;
 
     mutable scalar scaleDia_;
 
