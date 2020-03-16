@@ -89,7 +89,7 @@ particleDeformation::particleDeformation
 
     if (partTypes_.size() != lowerBounds_.size() || partTypes_.size() != upperBounds_.size())
     {
-        FatalError << "Inconsistent number of particle types and/or bounds provided." << endl;
+        FatalError << "Inconsistent number of particle types and/or bounds provided." << abort(FatalError);
     }
 
     Info << "partTypes: " << partTypes_ << endl;
