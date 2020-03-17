@@ -469,7 +469,7 @@ Foam::multiphaseMixture::diffusionCorrection() const
             IOobject::NO_WRITE
         ),
         mesh_,
-        dimensionedVector("zero", dimless, vector(0.0,0.0,0.0))
+        dimensionedVector("zero", dimless/dimLength, vector(0.0,0.0,0.0))
     );
 
 	volScalarField denominator
@@ -488,19 +488,18 @@ Foam::multiphaseMixture::diffusionCorrection() const
 
 	PtrDictionary<phase>::const_iterator iter = phases_.begin();
 
-	phase alpha1 = iter();
+	const phase& alpha1 = iter();
 
     for (++iter; iter != phases_.end(); ++iter)
     {
-        phase alpha2 = iter();
-		scalar He = alpha1.Cs().value() / alpha2.Cs().value();
-		Info << He << endl;
+        const phase& alpha2 = iter();
+		scalar He = alpha1.Cs().value() / (alpha2.Cs().value() + SMALL);
 
-		//numerator.ref() += (1/He - 1) * fvc::grad(alpha2);
-		//denominator.ref() = alpha2 * (1/He - 1);
+		numerator   += (1/He - 1) * fvc::grad(alpha2);
+		denominator += alpha2 * (1/He - 1);
     }
 
-	tmp<volVectorField> correction = numerator/(denominator+1);
+	tmp<volVectorField> correction = numerator / (denominator + 1 + SMALL);
 
 	return correction;
 }
