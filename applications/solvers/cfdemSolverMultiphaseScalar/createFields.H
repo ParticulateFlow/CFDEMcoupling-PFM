@@ -259,6 +259,19 @@ volScalarField Cs
     mixture.Cs()
 );
 
+volVectorField diffusionCorrection
+(
+	IOobject
+	(
+		"diffusionCorrection",
+		runTime.timeName(),
+		mesh,
+		IOobject::NO_READ,
+		IOobject::AUTO_WRITE
+	),
+	mixture.diffusionCorrection()
+);
+
 
 //========================
 

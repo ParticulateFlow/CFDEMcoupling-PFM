@@ -455,6 +455,56 @@ Foam::multiphaseMixture::Cs() const
     return tCs;
 }
 
+Foam::tmp<Foam::volVectorField>
+Foam::multiphaseMixture::diffusionCorrection() const
+{
+	volVectorField numerator
+    (
+        IOobject
+        (
+            "numerator",
+            mesh_.time().timeName(),
+            mesh_,
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        mesh_,
+        dimensionedVector("zero", dimless, vector(0.0,0.0,0.0))
+    );
+
+	volScalarField denominator
+    (
+        IOobject
+        (
+            "denominator",
+            mesh_.time().timeName(),
+            mesh_,
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        mesh_,
+        dimensionedScalar("zero", dimless, 0.0)
+    );
+
+	PtrDictionary<phase>::const_iterator iter = phases_.begin();
+
+	phase alpha1 = iter();
+
+    for (++iter; iter != phases_.end(); ++iter)
+    {
+        phase alpha2 = iter();
+		scalar He = alpha1.Cs().value() / alpha2.Cs().value();
+		Info << He << endl;
+
+		//numerator.ref() += (1/He - 1) * fvc::grad(alpha2);
+		//denominator.ref() = alpha2 * (1/He - 1);
+    }
+
+	tmp<volVectorField> correction = numerator/(denominator+1);
+
+	return correction;
+}
+
 void Foam::multiphaseMixture::solve()
 {
     correct();

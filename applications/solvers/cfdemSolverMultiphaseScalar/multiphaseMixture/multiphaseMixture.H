@@ -265,6 +265,9 @@ public:
         //- Return the solubility
         tmp<volScalarField> Cs() const;
 
+		//- Return the diffusion correction term
+		tmp<volVectorField> diffusionCorrection() const;
+
         tmp<surfaceScalarField> surfaceTensionForce() const
         {
             return surfaceTensionForce_;
