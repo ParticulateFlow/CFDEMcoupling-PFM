@@ -266,7 +266,7 @@ public:
         tmp<volScalarField> Cs() const;
 
 		//- Return the diffusion correction term
-		tmp<volVectorField> diffusionCorrection() const;
+		tmp<surfaceScalarField> diffusionCorrection() const;
 
         tmp<surfaceScalarField> surfaceTensionForce() const
         {

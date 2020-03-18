@@ -259,7 +259,7 @@ volScalarField Cs
     mixture.Cs()
 );
 
-volVectorField diffusionCorrection
+surfaceScalarField diffusionCorrection
 (
 	IOobject
 	(
@@ -271,7 +271,6 @@ volVectorField diffusionCorrection
 	),
 	mixture.diffusionCorrection()
 );
-
 
 //========================
 

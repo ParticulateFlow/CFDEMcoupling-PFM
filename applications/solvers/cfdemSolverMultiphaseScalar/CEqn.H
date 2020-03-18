@@ -13,7 +13,7 @@
 	 	fvm::ddt(voidfraction,C)
 		+ fvm::div(phi,C)
 	 	- fvm::laplacian(D*voidfraction,C)
-		//+ fvm::div(fvc::interpolate(D*voidfraction*diffusionCorrection) & mesh.Sf(), C)
+		+ fvm::div(fvc::interpolate(D*voidfraction)*diffusionCorrection*mesh.magSf(), C)
          ==
 	 Csource + fvm::Sp(CCoeff,C)
         );
@@ -21,9 +21,6 @@
         CEqn.relax();
         fvOptions.constrain(CEqn);
         CEqn.solve();
-
-		//diffusiveFlux = fvc::laplacian(D*voidfraction,C);
-		//correctionFlux = fvc::div(D*voidfraction*diffusionCorrection*C);
 
         particleCloud.clockM().start(31,"postFlow");
         particleCloud.postFlow();

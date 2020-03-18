@@ -455,10 +455,11 @@ Foam::multiphaseMixture::Cs() const
     return tCs;
 }
 
-Foam::tmp<Foam::volVectorField>
+Foam::tmp<Foam::surfaceScalarField>
 Foam::multiphaseMixture::diffusionCorrection() const
 {
-	volVectorField numerator
+	
+	surfaceScalarField numerator
     (
         IOobject
         (
@@ -469,10 +470,10 @@ Foam::multiphaseMixture::diffusionCorrection() const
             IOobject::NO_WRITE
         ),
         mesh_,
-        dimensionedVector("zero", dimless/dimLength, vector(0.0,0.0,0.0))
+        dimensionedScalar("zero", dimless/dimLength, 0.0)
     );
 
-	volScalarField denominator
+	surfaceScalarField denominator
     (
         IOobject
         (
@@ -485,22 +486,34 @@ Foam::multiphaseMixture::diffusionCorrection() const
         mesh_,
         dimensionedScalar("zero", dimless, 0.0)
     );
-
+	
 	PtrDictionary<phase>::const_iterator iter = phases_.begin();
-
 	const phase& alpha1 = iter();
 
-    for (++iter; iter != phases_.end(); ++iter)
+	for (++iter; iter != phases_.end(); ++iter)
     {
         const phase& alpha2 = iter();
 		scalar He = alpha1.Cs().value() / (alpha2.Cs().value() + SMALL);
 
-		numerator   += (1/He - 1) * fvc::grad(alpha2);
-		denominator += alpha2 * (1/He - 1);
+		numerator   += (1/He - 1) * fvc::snGrad(alpha2);
+		denominator += fvc::interpolate(alpha2) * (1/He - 1);
     }
 
-	tmp<volVectorField> correction = numerator / (denominator + 1 + SMALL);
+	tmp<surfaceScalarField> correction = numerator / (denominator + 1 + SMALL);
+	
+	/*
+	PtrDictionary<phase>::const_iterator iter = phases_.begin();
 
+	const phase& alphaL = iter();
+	++iter;
+	const phase& alphaG = iter();
+	scalar He = alphaG.Cs().value() / (alphaL.Cs().value() + SMALL);
+
+	surfaceScalarField gradAlphaL = fvc::snGrad(alphaL);
+	surfaceScalarField surfAlphaL = fvc::interpolate(alphaL);
+
+	tmp<surfaceScalarField> correction = (1-He)/(surfAlphaL + He*(1-surfAlphaL) + 10*SMALL) * gradAlphaL;
+	*/
 	return correction;
 }
 
