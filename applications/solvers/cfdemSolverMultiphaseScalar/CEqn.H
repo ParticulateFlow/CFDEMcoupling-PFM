@@ -1,8 +1,7 @@
         // get mixture properties
-        D  = mixture.D();
 		Cs  = mixture.Cs();
 		diffusionCorrection = mixture.diffusionCorrection();
-        //keff=particleCloud.thermCondM().thermCond(); 
+        Deff=particleCloud.diffCoeffM().diffCoeff(); 
 
         // get scalar source from DEM        
         //particleCloud.energyContributions(Qsource);
@@ -12,8 +11,8 @@
         (
 	 	fvm::ddt(voidfraction,C)
 		+ fvm::div(phi,C)
-	 	- fvm::laplacian(D*voidfraction,C)
-		+ fvm::div(fvc::interpolate(D*voidfraction)*diffusionCorrection*mesh.magSf(), C)
+	 	- fvm::laplacian(Deff*voidfraction,C)
+		+ fvm::div(fvc::interpolate(Deff*voidfraction)*diffusionCorrection*mesh.magSf(), C)
          ==
 	 Csource + fvm::Sp(CCoeff,C)
         );

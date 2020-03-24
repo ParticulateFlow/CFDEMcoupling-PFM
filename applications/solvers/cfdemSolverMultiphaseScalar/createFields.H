@@ -246,6 +246,20 @@ volScalarField D
     mixture.D()
 );
 
+volScalarField Deff
+(
+    IOobject
+    (
+        "Deff",
+        runTime.timeName(),
+        mesh,
+        IOobject::READ_IF_PRESENT,
+        IOobject::AUTO_WRITE
+    ),
+	mesh,
+    dimensionedScalar("zero", dimensionSet(0,2,-1,0,0,0,0), 0.0)
+);
+
 volScalarField Cs
 (
     IOobject

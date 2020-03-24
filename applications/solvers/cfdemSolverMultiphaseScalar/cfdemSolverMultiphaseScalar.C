@@ -42,6 +42,7 @@ Description
 #include "smoothingModel.H"
 #include "forceModel.H"
 #include "thermCondModel.H"
+#include "diffCoeffModel.H"
 #include "energyModel.H"
 
 
