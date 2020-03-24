@@ -21,6 +21,7 @@ License
 #include "cfdemCloudEnergy.H"
 #include "energyModel.H"
 #include "thermCondModel.H"
+#include "diffCoeffModel.H"
 #include "chemistryModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -46,6 +47,14 @@ cfdemCloudEnergy::cfdemCloudEnergy
     thermCondModel_
     (
         thermCondModel::New
+        (
+            couplingProperties_,
+            *this
+        )
+    ),
+    diffCoeffModel_
+    (
+        diffCoeffModel::New
         (
             couplingProperties_,
             *this
@@ -138,6 +147,11 @@ const thermCondModel& cfdemCloudEnergy::thermCondM()
 {
     return thermCondModel_;
 }
+
+const diffCoeffModel& cfdemCloudEnergy::diffCoeffM()
+{
+    return diffCoeffModel_;
+}  
 
 void cfdemCloudEnergy::energyContributions(volScalarField& Qsource)
 {

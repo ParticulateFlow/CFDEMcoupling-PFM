@@ -5,6 +5,7 @@ forceModels = subModels/forceModel
 forceSubModels = subModels/forceModel/forceSubModels
 forceModelsMS = subModels/forceModelMS
 thermCondModels = subModels/thermCondModel
+diffCoeffModels = subModels/diffCoeffModel
 chemistryModels = subModels/chemistryModel
 IOModels = subModels/IOModel
 voidFractionModels = subModels/voidFractionModel
@@ -49,6 +50,11 @@ $(thermCondModels)/thermCondModel/newThermCondModel.C
 $(thermCondModels)/SyamlalThermCond/SyamlalThermCond.C
 $(thermCondModels)/ZehnerSchluenderThermCond/ZehnerSchluenderThermCond.C
 $(thermCondModels)/noTherm/noThermCond.C
+
+$(diffCoeffModels)/diffCoeffModel/diffCoeffModel.C
+$(diffCoeffModels)/diffCoeffModel/newDiffCoeffModel.C
+$(diffCoeffModels)/SyamlalDiffCoeff/SyamlalDiffCoeff.C
+$(diffCoeffModels)/noDiff/noDiffCoeff.C
 
 $(forceModels)/forceModel/forceModel.C
 $(forceModels)/forceModel/newForceModel.C
