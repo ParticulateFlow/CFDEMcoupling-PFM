@@ -204,11 +204,11 @@ volScalarField C
     mesh
 );
 
-volScalarField Csource
+volScalarField Sm
 (
     IOobject
     (
-        "Csource",
+        "Sm",
         runTime.timeName(),
         mesh,
         IOobject::NO_READ,
@@ -218,11 +218,11 @@ volScalarField Csource
     dimensionedScalar("zero", dimensionSet(1,-3,-1,0,0,0,0), 0.0)
 );
 
-volScalarField CCoeff
+volScalarField Smi
 (
     IOobject
     (
-        "Csource",
+        "Smi",
         runTime.timeName(),
         mesh,
         IOobject::NO_READ,

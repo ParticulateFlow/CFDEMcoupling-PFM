@@ -44,6 +44,7 @@ Description
 #include "thermCondModel.H"
 #include "diffCoeffModel.H"
 #include "energyModel.H"
+#include "massTransferModel.H"
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

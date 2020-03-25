@@ -1,11 +1,11 @@
         // get mixture properties
-		Cs  = mixture.Cs();
-		diffusionCorrection = mixture.diffusionCorrection();
+	Cs  = mixture.Cs();
+        diffusionCorrection = mixture.diffusionCorrection();
         Deff=particleCloud.diffCoeffM().diffCoeff(); 
 
         // get scalar source from DEM        
-        //particleCloud.energyContributions(Qsource);
-        //particleCloud.energyCoefficients(QCoeff);
+        particleCloud.massContributions(Sm);
+        particleCloud.massCoefficients(Smi);
 
         fvScalarMatrix CEqn
         (
@@ -14,7 +14,7 @@
 	 	- fvm::laplacian(Deff*voidfraction,C)
 		+ fvm::div(fvc::interpolate(Deff*voidfraction)*diffusionCorrection*mesh.magSf(), C)
          ==
-	 Csource + fvm::Sp(CCoeff,C)
+	 Sm + fvm::Sp(Smi,C)
         );
 
         CEqn.relax();

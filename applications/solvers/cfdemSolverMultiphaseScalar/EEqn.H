@@ -1,6 +1,6 @@
         // get mixture properties
         Cp  = mixture.Cp();
-		kf  = mixture.kf();
+	kf  = mixture.kf();
         keff=particleCloud.thermCondM().thermCond(); 
 
         // get scalar source from DEM        
