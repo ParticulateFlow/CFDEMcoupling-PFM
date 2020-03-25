@@ -1,6 +1,7 @@
 cfdemCloud = cfdemCloud
 cfdTools = cfdTools
 energyModels = subModels/energyModel
+massTransferModels = subModels/massTransferModel
 forceModels = subModels/forceModel
 forceSubModels = subModels/forceModel/forceSubModels
 forceModelsMS = subModels/forceModelMS
@@ -44,6 +45,10 @@ $(energyModels)/heatTransferGunn/heatTransferGunn.C
 $(energyModels)/heatTransferGunnPartField/heatTransferGunnPartField.C
 $(energyModels)/wallHeatTransferYagi/wallHeatTransferYagi.C
 $(energyModels)/reactionHeat/reactionHeat.C
+
+$(massTransferModels)/massTransferModel/massTransferModel.C
+$(massTransferModels)/massTransferModel/newMassTransferModel.C
+$(massTransferModels)/massTransferGunn/massTransferGunn.C
 
 $(thermCondModels)/thermCondModel/thermCondModel.C
 $(thermCondModels)/thermCondModel/newThermCondModel.C

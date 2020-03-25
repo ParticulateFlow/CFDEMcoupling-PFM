@@ -3,6 +3,7 @@ cfdemCloud = $(path)/cfdemCloud
 derived = $(path)/derived
 cfdTools = $(path)/cfdTools
 energyModels = $(path)/subModels/energyModel
+massTransferModels = $(path)/subModels/massTransferModel
 forceModels = $(path)/subModels/forceModel
 forceSubModels = $(path)/subModels/forceModel/forceSubModels
 thermCondModels = $(path)/subModels/thermCondModel
@@ -43,6 +44,10 @@ $(energyModels)/heatTransferGunn/heatTransferGunn.C
 $(energyModels)/heatTransferGunnPartField/heatTransferGunnPartField.C
 $(energyModels)/wallHeatTransferYagi/wallHeatTransferYagi.C
 $(energyModels)/reactionHeat/reactionHeat.C
+
+$(massTransferModels)/massTransferModel/massTransferModel.C
+$(massTransferModels)/massTransferModel/newMassTransferModel.C
+$(massTransferModels)/massTransferGunn/massTransferGunn.C
 
 $(thermCondModels)/thermCondModel/thermCondModel.C
 $(thermCondModels)/thermCondModel/newThermCondModel.C

@@ -18,26 +18,45 @@ License
 
 \*---------------------------------------------------------------------------*/
 
+#include "error.H"
+
+#include "massTransferModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-inline const wordList& cfdemCloudEnergy::energyModels() const
-{
-    return energyModels_;
-}
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-inline const wordList& cfdemCloudEnergy::massTransferModels() const
+autoPtr<massTransferModel> massTransferModel::New
+(
+    const dictionary& dict,
+    cfdemCloudEnergy& sm,
+    word massTransferType
+)
 {
-    return massTransferModels_;
-}
+    Info<< "Selecting massTransferModel "
+         << massTransferType << endl;
 
-inline const wordList& cfdemCloudEnergy::chemistryModels() const
-{
-    return chemistryModels_;
+    dictionaryConstructorTable::iterator cstrIter =
+        dictionaryConstructorTablePtr_->find(massTransferType);
+
+    if (cstrIter == dictionaryConstructorTablePtr_->end())
+    {
+        FatalError
+            << "massTransferModel::New(const dictionary&, const spray&) : "
+            << endl
+            << "    unknown massTransferModelType type "
+            << massTransferType
+            << ", constructor not in hash table" << endl << endl
+            << "    Valid massTransferModel types are :"
+            << endl;
+        Info<< dictionaryConstructorTablePtr_->toc()
+            << abort(FatalError);
+    }
+
+    return autoPtr<massTransferModel>(cstrIter()(dict,sm));
 }
 
 
