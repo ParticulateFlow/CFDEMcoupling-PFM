@@ -74,32 +74,7 @@ massTransferGunn::massTransferGunn
         ),
         sm.mesh(),
         dimensionedScalar("zero", dimensionSet(0,0,-1,0,0,0,0), 0.0)
-    ),/*
-    partTempField_
-    (   IOobject
-        (
-            "partTemp",
-            sm.mesh().time().timeName(),
-            sm.mesh(),
-            IOobject::READ_IF_PRESENT,
-            IOobject::NO_WRITE
-        ),
-        sm.mesh(),
-        dimensionedScalar("zero", dimensionSet(0,0,0,1,0,0,0), 0.0),
-        "zeroGradient"
     ),
-    partRelTempField_
-    (   IOobject
-        (
-            "particleRelTemp",
-            sm.mesh().time().timeName(),
-            sm.mesh(),
-            IOobject::NO_READ,
-            IOobject::NO_WRITE
-        ),
-        sm.mesh(),
-        dimensionedScalar("zero", dimensionSet(0,0,0,0,0,0,0), 0.0)
-    ),*/
     ReField_
     (   IOobject
         (
@@ -124,10 +99,6 @@ massTransferGunn::massTransferGunn
         sm.mesh(),
         dimensionedScalar("zero", dimensionSet(0,0,0,0,0,0,0), 0.0)
     ),
-    //partRefTemp_("partRefTemp", dimensionSet(0,0,0,1,0,0,0), 0.0),
-    //calcPartTempField_(propsDict_.lookupOrDefault<bool>("calcPartTempField",false)),
-    //calcPartTempAve_(propsDict_.lookupOrDefault<bool>("calcPartTempAve",false)),
-    //partTempAve_(0.0),
     concFieldName_(propsDict_.lookupOrDefault<word>("concFieldName","C")),
     concField_(sm.mesh().lookupObject<volScalarField> (concFieldName_)),
 	satConcFieldName_(propsDict_.lookupOrDefault<word>("satConcFieldName","Cs")),
@@ -139,9 +110,8 @@ massTransferGunn::massTransferGunn
     U_(sm.mesh().lookupObject<volVectorField> (velFieldName_)),
     densityFieldName_(propsDict_.lookupOrDefault<word>("densityFieldName","rho")),
     rho_(sm.mesh().lookupObject<volScalarField> (densityFieldName_)),
-    //partTempName_(propsDict_.lookup("partTempName")),
-    //partTemp_(NULL),
-    //partMassFluxName_(propsDict_.lookup("partMassFluxName")),
+	coupleDEM_(propsDict_.lookupOrDefault<bool>("coupleDEM",false)),
+    partMassFluxName_(propsDict_.lookupOrDefault<word>("partMassFluxName","convectiveMassFlux")),
     partMassFlux_(NULL),
     partMassFluxCoeff_(NULL),
     partRe_(NULL),
@@ -156,20 +126,6 @@ massTransferGunn::massTransferGunn
         maxSource_=readScalar(propsDict_.lookup ("maxSource"));
         Info << "limiting eulerian source field to: " << maxSource_ << endl;
     }
-
-    /*if (calcPartTempField_)
-    {
-        calcPartTempAve_ = true;
-        if (propsDict_.found("partRefTemp"))
-        {
-            partRefTemp_.value()=readScalar(propsDict_.lookup ("partRefTemp"));
-        }
-        partTempField_.writeOpt() = IOobject::AUTO_WRITE;
-        partRelTempField_.writeOpt() = IOobject::AUTO_WRITE;
-        partTempField_.write();
-        partRelTempField_.write();
-        Info <<  "Particle temperature field activated." << endl;
-    }*/
 
     if (!implicit_)
     {
@@ -202,14 +158,19 @@ massTransferGunn::massTransferGunn
 
 massTransferGunn::~massTransferGunn()
 {
-    //particleCloud_.dataExchangeM().destroy(partTemp_,1);
     particleCloud_.dataExchangeM().destroy(partMassFlux_,1);
-    particleCloud_.dataExchangeM().destroy(partRe_,1);
-    particleCloud_.dataExchangeM().destroy(partSh_,1);
+
     if (implicit_)
     {
         particleCloud_.dataExchangeM().destroy(partMassFluxCoeff_,1);
     }
+
+		if(verbose_)
+	{
+    	particleCloud_.dataExchangeM().destroy(partRe_,1);
+    	particleCloud_.dataExchangeM().destroy(partSh_,1);
+	}
+
 }
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
@@ -217,7 +178,7 @@ void massTransferGunn::allocateMyArrays() const
 {
     // get memory for 2d arrays
     double initVal=0.0;
-    //particleCloud_.dataExchangeM().allocateArray(partTemp_,initVal,1);  // field/initVal/with/lenghtFromLigghts
+
     particleCloud_.dataExchangeM().allocateArray(partMassFlux_,initVal,1);
     if(implicit_)
     {
@@ -241,35 +202,11 @@ void massTransferGunn::calcMassContribution()
     // reset Scalar field
     SPartFluid_.primitiveFieldRef() = 0.0;
 
-    // get DEM data
-    //particleCloud_.dataExchangeM().getData(partTempName_,"scalar-atom",partTemp_);
-
     if(particleCloud_.cg() > 1.)
     {
         scaleDia_ = particleCloud_.cg();
         Info << "Mass Transfer Gunn is using scale from liggghts cg = " << scaleDia_ << endl;
     }
-
-	/*
-    if(calcPartTempField_)
-    {
-        partTempField_.primitiveFieldRef() = 0.0;
-        particleCloud_.averagingM().resetWeightFields();
-        particleCloud_.averagingM().setScalarAverage
-        (
-            partTempField_,
-            partTemp_,
-            particleCloud_.particleWeights(),
-            particleCloud_.averagingM().UsWeightField(),
-            NULL
-        );
-
-        volScalarField sumTp (particleCloud_.averagingM().UsWeightField() * partTempField_);
-        dimensionedScalar aveTemp("aveTemp",dimensionSet(0,0,0,1,0,0,0), gSum(sumTp) / particleCloud_.numberOfParticles());
-        partRelTempField_ = (partTempField_ - aveTemp) / (aveTemp - partRefTemp_);
-        Info << "massTransferGunn: average part. temp = " << aveTemp.value() << endl;
-    }
-	*/
 
     #ifdef compre
        const volScalarField mufField = particleCloud_.turbulence().mu();
@@ -306,7 +243,6 @@ void massTransferGunn::calcMassContribution()
     scalar Rep(0);
     scalar Sc(0);
     scalar Shp(0);
-    //scalar Tsum(0.0);
 
     scalar cg = typeCG_[0];
     label partType = 1;
@@ -350,7 +286,7 @@ void massTransferGunn::calcMassContribution()
                 // calc relative velocity
                 Us = particleCloud_.velocity(index);
                 magUr = mag(Ufluid - Us);
-                ds = 2.*particleCloud_.radius(index);
+				ds = 2.*particleCloud_.radius(index);
                 ds_scaled = ds/cg;
                 muf = mufField[cellI];
 				rhof = rho_[cellI];
@@ -364,7 +300,6 @@ void massTransferGunn::calcMassContribution()
 
                 Shp = Sherwood(voidfraction, Rep, Sc);
 
-                //Tsum += partTemp_[index][0];
                 scalar h = D0 * Shp / ds_scaled;
                 scalar As = ds_scaled * ds_scaled * M_PI; // surface area of sphere
 
@@ -393,24 +328,11 @@ void massTransferGunn::calcMassContribution()
                     Pout << "Sc = " << Sc << endl;
                     Pout << "Shp = " << Shp << endl;
                     Pout << "voidfraction = " << voidfraction << endl;
-                    //Pout << "partTemp_[index][0] = " << partTemp_[index][0] << endl;
                     Pout << "Cfluid = " << Cfluid << endl;
 					Pout << "Csfluid = " << Csfluid << endl;
                 }
             }
     }
-
-	/*
-    // gather particle temperature sums and obtain average
-    if(calcPartTempAve_)
-    {
-        reduce(Tsum, sumOp<scalar>());
-        partTempAve_ = Tsum / particleCloud_.numberOfParticles();
-        Info << "mean particle temperature = " << partTempAve_ << endl;
-    }
-	*/
-
-    //if(calcPartTempField_) partTempField();
 
     particleCloud_.averagingM().setScalarSum
     (
@@ -480,8 +402,6 @@ void massTransferGunn::calcMassContribution()
 
     volScalarField minParticleWeights = particleCloud_.averagingM().UsWeightField();
     Info << "Minimum Particle Weight " << gMin(minParticleWeights) << endl;
-    //Info << "Minimum Particle Temperature: " << gMin(partTempField_) << endl;
-    //Info << "Maximum Particle Temperature: " << gMax(partTempField_) << endl;
     Info << "Minimum Fluid Concentration: " << gMin(concField_) << endl;
     Info << "Maximum Fluid Concentration: " << gMax(concField_) << endl;
 }
@@ -532,68 +452,48 @@ void massTransferGunn::giveData()
 {
     Info << "total convective particle-fluid mass flux [kg/s] (Eulerian) = " << gSum(SPartFluid_*1.0*SPartFluid_.mesh().V()) << endl;
 
-    //particleCloud_.dataExchangeM().giveData(partMassFluxName_,"scalar-atom", partMassFlux_);
+    particleCloud_.dataExchangeM().giveData(partMassFluxName_,"scalar-atom", partMassFlux_);
 }
 
 void massTransferGunn::postFlow()
 {
-	/*
-    if(implicit_)
-    {
-        label cellI;
-        scalar Tfluid(0.0);
-        scalar Tpart(0.0);
-        interpolationCellPoint<scalar> TInterpolator_(tempField_);
+    // send mass flux to DEM
+	if (coupleDEM_)
+	{
+		if(implicit_)
+		{
+			label cellI;
+			scalar Cfluid(0.0);
+			scalar Csfluid(0.0);
+			interpolationCellPoint<scalar> CInterpolator_(concField_);
+			interpolationCellPoint<scalar> CsInterpolator_(satConcField_);
 
-        for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)
-        {
-                cellI = particleCloud_.cellIDs()[index][0];
-                if(cellI >= 0)
-                {
-                    if(interpolation_)
-                    {
-                        vector position = particleCloud_.position(index);
-                        Tfluid = TInterpolator_.interpolate(position,cellI);
-                    }
-                    else
-                    {
-                        Tfluid = tempField_[cellI];
-                    }
+			for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)
+			{
+				cellI = particleCloud_.cellIDs()[index][0];
+				if(cellI >= 0)
+				{
+					if(interpolation_)
+					{
+						vector position = particleCloud_.position(index);
+						Cfluid = CInterpolator_.interpolate(position,cellI);
+						Csfluid = CsInterpolator_.interpolate(position,cellI);
+					}
+					else
+					{
+						Cfluid = concField_[cellI];
+						Csfluid = satConcField_[cellI];
+					}
 
-                    Tpart = partTemp_[index][0];
-                    partMassFlux_[index][0] = (Tfluid - Tpart) * partMassFluxCoeff_[index][0];
-                }
-        }
-    }
-    giveData();
-	*/
+					partMassFlux_[index][0] = (Cfluid - Csfluid) * partMassFluxCoeff_[index][0];
+				}
+			}
+		}
+
+		giveData();
+	}
 }
 
-/*
-scalar massTransferGunn::aveTpart() const
-{
-    return partTempAve_;
-}
-*/
-
-/*
-void massTransferGunn::partTempField()
-{
-    partTempField_.primitiveFieldRef() = 0.0;
-    particleCloud_.averagingM().resetWeightFields();
-    particleCloud_.averagingM().setScalarAverage
-    (
-        partTempField_,
-        partTemp_,
-        particleCloud_.particleWeights(),
-        particleCloud_.averagingM().UsWeightField(),
-        NULL
-    );
-
-    dimensionedScalar aveTemp("aveTemp",dimensionSet(0,0,0,1,0,0,0), partTempAve_);
-    partRelTempField_ = (partTempField_ - aveTemp) / (aveTemp - partRefTemp_);
-}
-*/
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam

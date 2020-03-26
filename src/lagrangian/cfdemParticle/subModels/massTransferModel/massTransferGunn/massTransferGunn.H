@@ -106,7 +106,9 @@ protected:
 
     //mutable double **partTemp_;
 
-    //word partMassFluxName_;
+	bool coupleDEM_;
+
+    word partMassFluxName_;
 
     mutable double **partMassFlux_;
 
