@@ -250,7 +250,6 @@ void massTransferGunn::calcMassContribution()
     interpolationCellPoint<scalar> voidfractionInterpolator_(voidfraction_);
     interpolationCellPoint<vector> UInterpolator_(U_);
     interpolationCellPoint<scalar> CInterpolator_(concField_);
-	interpolationCellPoint<scalar> CsInterpolator_(satConcField_);
 
     for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)
     {
@@ -263,14 +262,12 @@ void massTransferGunn::calcMassContribution()
                     voidfraction = voidfractionInterpolator_.interpolate(position,cellI);
                     Ufluid = UInterpolator_.interpolate(position,cellI);
                     Cfluid = CInterpolator_.interpolate(position,cellI);
-					Csfluid = CsInterpolator_.interpolate(position,cellI);
                 }
                 else
                 {
                     voidfraction = voidfraction_[cellI];
                     Ufluid = U_[cellI];
                     Cfluid = concField_[cellI];
-					Csfluid = satConcField_[cellI];
                 }
 
                 if (voidfraction < 0.01)
@@ -290,6 +287,7 @@ void massTransferGunn::calcMassContribution()
                 ds_scaled = ds/cg;
                 muf = mufField[cellI];
 				rhof = rho_[cellI];
+				Csfluid = satConcField_[cellI];
 
                 Rep = ds_scaled * magUr * voidfraction * rhof/ muf;
 
@@ -466,7 +464,6 @@ void massTransferGunn::postFlow()
 			scalar Cfluid(0.0);
 			scalar Csfluid(0.0);
 			interpolationCellPoint<scalar> CInterpolator_(concField_);
-			interpolationCellPoint<scalar> CsInterpolator_(satConcField_);
 
 			for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)
 			{
@@ -477,14 +474,13 @@ void massTransferGunn::postFlow()
 					{
 						vector position = particleCloud_.position(index);
 						Cfluid = CInterpolator_.interpolate(position,cellI);
-						Csfluid = CsInterpolator_.interpolate(position,cellI);
 					}
 					else
 					{
-						Cfluid = concField_[cellI];
-						Csfluid = satConcField_[cellI];
+						Cfluid = concField_[cellI];						
 					}
 
+					Csfluid = satConcField_[cellI];
 					partMassFlux_[index][0] = (Cfluid - Csfluid) * partMassFluxCoeff_[index][0];
 				}
 			}
