@@ -214,7 +214,6 @@ void massTransferGunn::calcMassContribution()
        const volScalarField mufField = particleCloud_.turbulence().nu()*rho_;
     #endif
 
-	const volScalarField& CsField_ = CsField();
 	const volScalarField& D0Field_ = D0Field();
 
     if (typeCG_.size()>1 || typeCG_[0] > 1)
@@ -292,7 +291,6 @@ void massTransferGunn::calcMassContribution()
                 Rep = ds_scaled * magUr * voidfraction * rhof/ muf;
 
 				scalar D0 = D0Field_[cellI];
-				scalar Cs  = CsField_[cellI];
 
                 Sc = max(SMALL, muf / (rhof*D0));
 
@@ -315,7 +313,6 @@ void massTransferGunn::calcMassContribution()
                     Pout << "partMassFlux = " << partMassFlux_[index][0] << endl;
                     Pout << "magUr = " << magUr << endl;
                     Pout << "D0 = " << D0 << endl;
-                    Pout << "Cs = " << Cs << endl;
                     Pout << "rho = " << rhof << endl;
                     Pout << "h = " << h << endl;
                     Pout << "ds = " << ds << endl;
@@ -462,7 +459,6 @@ void massTransferGunn::postFlow()
 		{
 			label cellI;
 			scalar Cfluid(0.0);
-			scalar Csfluid(0.0);
 			interpolationCellPoint<scalar> CInterpolator_(concField_);
 
 			for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)
@@ -480,8 +476,13 @@ void massTransferGunn::postFlow()
 						Cfluid = concField_[cellI];						
 					}
 
-					Csfluid = satConcField_[cellI];
-					partMassFlux_[index][0] = (Cfluid - Csfluid) * partMassFluxCoeff_[index][0];
+					partMassFlux_[index][0] += Cfluid * partMassFluxCoeff_[index][0];
+
+					if(verbose_ && index >=0 && index <2)
+					{
+						Pout << "partMassFlux = " << partMassFlux_[index][0] << endl;
+						Pout << "Cfluid = " << Cfluid << endl;
+                	}
 				}
 			}
 		}
