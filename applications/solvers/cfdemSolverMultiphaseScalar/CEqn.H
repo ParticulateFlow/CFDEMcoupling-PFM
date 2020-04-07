@@ -20,7 +20,3 @@
         CEqn.relax();
         fvOptions.constrain(CEqn);
         CEqn.solve();
-
-        particleCloud.clockM().start(31,"postFlow");
-        particleCloud.postFlow();
-        particleCloud.clockM().stop("postFlow");

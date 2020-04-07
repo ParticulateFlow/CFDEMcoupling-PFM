@@ -137,6 +137,10 @@ int main(int argc, char *argv[])
             Info << "skipping flow solution." << endl;
         }
 
+        particleCloud.clockM().start(31,"postFlow");
+        particleCloud.postFlow();
+        particleCloud.clockM().stop("postFlow");	
+
         runTime.write();
 
         Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
