@@ -20,6 +20,7 @@ License
 #include "particleDeformation.H"
 #include "addToRunTimeSelectionTable.H"
 #include "dataExchangeModel.H"
+#include "OFstream.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -52,6 +53,10 @@ particleDeformation::particleDeformation
     initialExec_(true),
     refFieldName_(propsDict_.lookup("refFieldName")),
     refField_(),
+    defaultDeformCellsName_(propsDict_.lookupOrDefault<word>("defaultDeformCellsName","none")),
+    defaultDeformCells_(),
+    existDefaultDeformCells_(false),
+    defaultDeformation_(propsDict_.lookupOrDefault<scalar>("defaultDeformation",1.0)),
     partTypes_(propsDict_.lookupOrDefault<labelList>("partTypes",labelList(1,-1))),
     lowerBounds_(propsDict_.lookupOrDefault<scalarList>("lowerBounds",scalarList(1,-1.0))),
     upperBounds_(propsDict_.lookupOrDefault<scalarList>("upperBounds",scalarList(1,-1.0))),
@@ -70,6 +75,19 @@ particleDeformation::particleDeformation
     forceSubM(0).readSwitches();
 
     particleCloud_.checkCG(false);
+
+    if(defaultDeformCellsName_ != "none")
+    {
+       defaultDeformCells_.set(new cellSet(particleCloud_.mesh(),defaultDeformCellsName_));
+       existDefaultDeformCells_ = true;
+       Info << "particleDeformation: default deformation of " << defaultDeformation_ << " in cellSet " << defaultDeformCells_().name() <<
+        " with " << defaultDeformCells_().size() << " cells." << endl;
+       if (defaultDeformation_ < 0.0 || defaultDeformation_ > 1.0)
+       {
+           defaultDeformation_ = min(max(defaultDeformation_,0.0),1.0);
+           Info << "Resetting defaultDeformation to range [0;1]" << endl;
+       }
+    }
 
     // check if only single value instead of list was provided
     if (propsDict_.found("partType"))
@@ -112,6 +130,12 @@ void particleDeformation::allocateMyArrays() const
     double initVal = 0.0;
     particleCloud_.dataExchangeM().allocateArray(partDeformations_,initVal,1);
 }
+
+bool particleDeformation::defaultDeformCell(label cell) const
+{
+    if (!existDefaultDeformCells_) return false;
+    else return defaultDeformCells_()[cell];
+}
 // * * * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * * //
 
 void particleDeformation::setForce() const
@@ -128,7 +152,7 @@ void particleDeformation::setForce() const
     label partType = -1;
     scalar refFieldValue = 0.0;
     scalar deformationDegree = 0.0;
-   
+
     interpolationCellPoint<scalar> refFieldInterpolator_(refField_());
 
     for(int index = 0; index < particleCloud_.numberOfParticles(); ++index)
@@ -138,27 +162,34 @@ void particleDeformation::setForce() const
         label listIndex = getListIndex(partType);
         if (cellI >= 0 && listIndex >= 0)
         {
-            if (forceSubM(0).interpolation())
+            if (defaultDeformCell(cellI))
             {
-                vector position = particleCloud_.position(index);
-                refFieldValue = refFieldInterpolator_.interpolate(position,cellI);
+                deformationDegree = defaultDeformation_;
             }
             else
             {
-                refFieldValue = refField_()[cellI];
-            }
+                if (forceSubM(0).interpolation())
+                {
+                    vector position = particleCloud_.position(index);
+                    refFieldValue = refFieldInterpolator_.interpolate(position,cellI);
+                }
+                else
+                {
+                    refFieldValue = refField_()[cellI];
+                }
 
-            if (refFieldValue <= lowerBounds_[listIndex])
-            {
-                deformationDegree = 0.0;
-            }
-            else if (refFieldValue >= upperBounds_[listIndex])
-            {
-                deformationDegree = 1.0;
-            }
-            else
-            {
-                deformationDegree = (refFieldValue - lowerBounds_[listIndex]) / (upperBounds_[listIndex] - lowerBounds_[listIndex]);
+                if (refFieldValue <= lowerBounds_[listIndex])
+                {
+                    deformationDegree = 0.0;
+                }
+                else if (refFieldValue >= upperBounds_[listIndex])
+                {
+                    deformationDegree = 1.0;
+                }
+                else
+                {
+                    deformationDegree = (refFieldValue - lowerBounds_[listIndex]) / (upperBounds_[listIndex] - lowerBounds_[listIndex]);
+                }
             }
 
             partDeformations_[index][0] = deformationDegree;
