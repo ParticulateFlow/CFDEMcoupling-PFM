@@ -11,7 +11,7 @@
         (
 	 rho*Cp*(fvm::ddt(voidfraction,T)
 		 + fvm::div(phi,T))
-	 - fvc::div(keff*voidfraction*fvc::grad(T))
+	 - fvm::laplacian(keff*voidfraction,T)
          ==
 	 Qsource + fvm::Sp(QCoeff,T)
         );
