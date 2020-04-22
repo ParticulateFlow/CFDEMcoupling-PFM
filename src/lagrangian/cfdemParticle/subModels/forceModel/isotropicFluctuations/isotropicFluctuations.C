@@ -82,6 +82,7 @@ isotropicFluctuations::isotropicFluctuations
         sm.mesh(),
         dimensionedScalar("D0", dimensionSet(0,0,0,0,0,0,0), D0_)
     ),
+    maxDisplacement_(propsDict_.lookupOrDefault<scalar>("maxDisplacement", -1.0)),
     dtDEM_(particleCloud_.dataExchangeM().DEMts()),
     ranGen_(clock::getTime()+pid())
 {
@@ -126,6 +127,9 @@ void isotropicFluctuations::setForce() const
     interpolationCellPoint<scalar> voidfractionInterpolator_(voidfraction_);
     interpolationCellPoint<scalar> voidfractionRecInterpolator_(voidfractionRec_);
 
+    scalar maxVel = maxDisplacement_ / dtDEM_;
+    scalar magFlucU = 0.0;
+
     for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
     {
             cellI = particleCloud_.cellIDs()[index][0];
@@ -157,7 +161,15 @@ void isotropicFluctuations::setForce() const
                     if(deltaVoidfrac>0)
                     {
                         D = D0Field_[cellI];
-                        flucU=unitFlucDir()*fluctuationMag(relVolfractionExcess,D);
+                        magFlucU = fluctuationMag(relVolfractionExcess,D);
+                        if (maxVel > 0.0 && magFlucU > maxVel)
+                        {
+                            flucU=unitFlucDir()*maxVel;
+                        }
+                        else
+                        {
+                            flucU=unitFlucDir()*fluctuationMag(relVolfractionExcess,D);
+                        }
                     }
 
                     // write particle based data to global array
