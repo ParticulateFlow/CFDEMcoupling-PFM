@@ -15,20 +15,6 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-/*
-source1
-{
-    type            temperatureLimitsConstraint;
-    selectionMode   all;
-    active          true;
-
-        temperatureLimitsConstraintCoeffs
-        {
-            Tmin     288;
-            Tmax     298;
-        }
-}
-*/
 source1
 {
     type        limitTemperature;
@@ -37,7 +23,9 @@ source1
     {
         active          yes;
         selectionMode   all;
-        min     288;
-        max     298;
+        Tmin     288; // OF4
+        Tmax     298; // OF4
+        min      $Tmin; // OF5,OF6
+        max      $Tmax; // OF5,OF6
     }
 }
