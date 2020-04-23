@@ -90,8 +90,6 @@ protected:
 
     bool usePC_;
 
-    virtual void adaptVoidfraction(double&, label) const {}
-
     virtual scalar effDiameter(double d, label cellI, label index) const {return d;}
 
     virtual scalar meanSauterDiameter(double d, label cellI) const {return d;}

@@ -68,6 +68,18 @@ twoWayMPI::twoWayMPI
 :
     dataExchangeModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
+    DEMVariableNames_(propsDict_.lookupOrDefault<wordList>("DEMVariables",wordList(0))),
+    DEMVariables_
+    (
+        IOobject
+        (
+            "DEMVariables",
+            sm.mesh().time().timeName(),
+            sm.mesh(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+         )
+    ),
     lmp(NULL)
 {
     Info << "Starting up LIGGGHTS for first time execution" << endl;
@@ -100,7 +112,30 @@ twoWayMPI::~twoWayMPI()
     delete lmp;
 }
 
+
+// * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
+
+void twoWayMPI::updateDEMVariables()
+{
+    scalar variablevalue = 0.0;
+    word variablename("");
+    DEMVariables_.clear();
+    for (label i=0; i<DEMVariableNames_.size(); i++)
+    {
+        variablename = DEMVariableNames_[i];
+        variablevalue = DEMVariableValue(variablename);
+        DEMVariables_.append(variablevalue);
+    }
+}
+
+double twoWayMPI::DEMVariableValue(word variablename)
+{
+    return liggghts_get_variable(lmp,variablename.c_str());
+}
+
+
 // * * * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * * //
+
 void twoWayMPI::getData
 (
     word name,
@@ -355,6 +390,9 @@ bool twoWayMPI::couple(int i)
         particleCloud_.clockM().start(4,"LIGGGHTS_reallocArrays");
         particleCloud_.reAllocArrays();
         particleCloud_.clockM().stop("LIGGGHTS_reallocArrays");
+
+        // retrieve DEM variables if present
+        updateDEMVariables();
     }
 
     return coupleNow;

@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
         particleCloud.clockM().start(2,"Coupling");
         bool hasEvolved = particleCloud.evolve(voidfraction,Us,U);
 
-        if(hasEvolved)
+        if(hasEvolved && smoothenForces)
         {
             particleCloud.smoothingM().smoothen(particleCloud.forceM(0).impParticleForces());
         }

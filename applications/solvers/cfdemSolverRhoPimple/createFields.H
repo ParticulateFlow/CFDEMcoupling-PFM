@@ -177,6 +177,17 @@ Info<< "Reading thermophysical properties\n" << endl;
         )
     );
 
+    bool smoothenForces
+    (
+        pimple.dict().lookupOrDefault<bool>
+        (
+            "smoothenForces",
+            false
+        )
+    );
+    if (smoothenForces) Info << "Smoothening implicit particle forces.\n" << endl;
+    else Info << "Not smoothening implicit particle forces.\n" << endl;
+
     Info<< "Creating turbulence model\n" << endl;
     autoPtr<compressible::turbulenceModel> turbulence
     (

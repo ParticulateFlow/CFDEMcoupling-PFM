@@ -218,8 +218,6 @@ void BeetstraDrag::setForce() const
                     voidfraction = voidfraction_[cellI];
                     Ufluid = U_[cellI];
                 }
-                // in case a fines phase is present, void fraction needs to be adapted
-                adaptVoidfraction(voidfraction, cellI);
 
                 if (multiTypes_)
                 {
