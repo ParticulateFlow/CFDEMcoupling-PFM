@@ -48,6 +48,7 @@ FinesFields::FinesFields
     clogKin_(propsDict_.lookupOrDefault<bool>("kineticClogging",false)),
     clogStick_(propsDict_.lookupOrDefault<bool>("stickyClogging",false)),
     movingBed_(propsDict_.lookupOrDefault<bool>("movingBed",true)),
+    useDepositionLength_(false),
     fluxFieldName_(propsDict_.lookupOrDefault<word>("fluxFieldName","phi")),
     phi_(sm.mesh().lookupObject<surfaceScalarField> (fluxFieldName_)),
     velFieldName_(propsDict_.lookupOrDefault<word>("velFieldName","U")),
@@ -226,12 +227,13 @@ FinesFields::FinesFields
     alphaMinClog_(propsDict_.lookupOrDefault<scalar>("alphaMinClog",0.3)),
     critVoidfraction_(propsDict_.lookupOrDefault<scalar>("critVoidfraction", 0.05)),
     deltaT_(voidfraction_.mesh().time().deltaTValue()),
-    depositionLength_(readScalar(propsDict_.lookup ("depositionLength"))),
+    depositionLength_(0.0),
     exponent_(-1.33),
     nCrit_(0.0),
     poresizeWidth_(0.0),
     prefactor_(10.5),
     ratioHydraulicPore_(1.5),
+    tauDeposition_(0.0),
     tauRelease_(readScalar(propsDict_.lookup ("tauRelease"))),
     uBindHigh_(propsDict_.lookupOrDefault<scalar>("uBindHigh",0.0)),
     uBindLow_(propsDict_.lookupOrDefault<scalar>("uBindLow",0.0)),
@@ -305,6 +307,25 @@ FinesFields::FinesFields
             )
         );
 
+    }
+
+    if (propsDict_.found("depositionLength") && propsDict_.found("tauDeposition"))
+    {
+        FatalError <<"You cannot specify both a deposition length and time.\n" << abort(FatalError);
+    }
+    else if (propsDict_.found("depositionLength"))
+    {
+        depositionLength_ = readScalar(propsDict_.lookup ("depositionLength"));
+        useDepositionLength_ = true;
+    }
+    else if (propsDict_.found("tauDeposition"))
+    {
+        tauDeposition_ = readScalar(propsDict_.lookup ("tauDeposition"));
+        useDepositionLength_ = false;
+    }
+    else
+    {
+        FatalError <<"Specify either a deposition length or time.\n" << abort(FatalError);
     }
 
     if (verbose_)
@@ -428,7 +449,14 @@ void FinesFields::calcSource()
         // volume to occupy available
         else
         {
-            tauDeposition = depositionLength_ / max(mag(U_[cellI]),uMin_);
+            if (useDepositionLength_)
+            {
+                tauDeposition = depositionLength_ / max(mag(U_[cellI]),uMin_);
+            }
+            else
+            {
+                tauDeposition = tauDeposition_;
+            }
             if (tauDeposition < 4.0*deltaT_) tauDeposition = 4.0*deltaT_; // do not deposit all dyn hold-up within less than 3 time steps
             Sds_[cellI] = alphaDyn_[cellI] / tauDeposition;
         }

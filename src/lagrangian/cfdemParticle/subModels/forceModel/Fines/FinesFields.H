@@ -52,6 +52,8 @@ private:
 
     bool movingBed_;
 
+    bool useDepositionLength_;
+
     word fluxFieldName_;
 
     const surfaceScalarField& phi_;
@@ -137,6 +139,8 @@ private:
     scalar prefactor_;
 
     scalar ratioHydraulicPore_;
+
+    scalar tauDeposition_;
 
     scalar tauRelease_;
 
