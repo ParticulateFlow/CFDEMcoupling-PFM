@@ -265,7 +265,7 @@ void wallHeatTransferYagi::calcEnergyContribution()
                     // calculate H
                     scalar H;
                     if (voidfraction_[faceCelli]<=voidfractionMax_)
-                        H = 0.2087 * (pow(ReField_[faceCelli]+SMALL,-0.20)) * CpField_[faceCelli] * magG / (pow(PrField_[faceCelli],2/3) + SMALL);
+                        H = 0.2087 * pow(ReField_[faceCelli]+SMALL,-0.20) * CpField_[faceCelli] * magG * pow(PrField_[faceCelli]+SMALL,(-2./3.));
                     else
                         H = 0;
 
