@@ -83,10 +83,6 @@ protected:
 
     const volVectorField& U_;
 
-    word UsFieldName_;
-
-    const volVectorField& Us_;
-
     word densityFieldName_;
 
     const volScalarField& rho_;

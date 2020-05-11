@@ -117,8 +117,6 @@ wallHeatTransferYagi::wallHeatTransferYagi
     maxSource_(1e30),
     velFieldName_(propsDict_.lookupOrDefault<word>("velFieldName","U")),
     U_(sm.mesh().lookupObject<volVectorField> (velFieldName_)),
-    UsFieldName_(propsDict_.lookup("granVelFieldName")),
-    Us_(sm.mesh().lookupObject<volVectorField> (UsFieldName_)),
     densityFieldName_(propsDict_.lookupOrDefault<word>("densityFieldName","rho")),
     rho_(sm.mesh().lookupObject<volScalarField> (densityFieldName_)),
     partRe_(NULL)
@@ -220,12 +218,11 @@ void wallHeatTransferYagi::calcEnergyContribution()
             if (voidfraction < 0.01)
                 voidfraction = 0.01;
 
-            vector Us = particleCloud_.velocity(index);
-            scalar magUr = mag(Ufluid - Us);
+            scalar magU = mag(Ufluid);
             scalar ds = 2.*particleCloud_.radius(index);
             scalar muf = mufField[cellI];
 
-            scalar Rep = ds * magUr * voidfraction * rho_[cellI]/ muf;
+            scalar Rep = ds * magU * voidfraction * rho_[cellI]/ muf;
             partRe_[index][0] = Rep;
         }
     }
@@ -260,7 +257,7 @@ void wallHeatTransferYagi::calcEnergyContribution()
                     label faceCelli = curPatch.faceCells()[facei];
 
                     // calculate Urel
-                    scalar magG = mag(U_[faceCelli]-Us_[faceCelli])*voidfraction_[faceCelli]*rho_[faceCelli];
+                    scalar magG = magU_[faceCelli]*voidfraction_[faceCelli]*rho_[faceCelli];
 
                     // calculate H
                     scalar H;
