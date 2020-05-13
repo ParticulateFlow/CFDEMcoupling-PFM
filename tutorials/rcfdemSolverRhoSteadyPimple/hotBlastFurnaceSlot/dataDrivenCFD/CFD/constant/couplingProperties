@@ -26,13 +26,13 @@ FoamFile
 //===========================================================================//
 // sub-models & settings
 
-modelType "A"; // A or B
+modelType "A";
 
 couplingInterval 1;
 
 voidFractionModel divided;
 
-locateModel engine;//turboEngineM2M;//
+locateModel engine;
 
 meshMotionModel noMeshMotion;
 
@@ -40,12 +40,11 @@ regionModel allRegion;
 
 IOModel "off";
 
-dataExchangeModel twoWayMPI;//twoWayM2M;//twoWayFiles;//oneWayVTK;//
-//dataExchangeModel twoWayMany2Many;
+dataExchangeModel twoWayMPI;
 
-averagingModel dense;//dilute;//
+averagingModel dense;
 
-clockModel standardClock;//off;
+clockModel standardClock;
 
 smoothingModel off;
 
@@ -77,7 +76,6 @@ energyModels
 thermCondModel SyamlalThermCond;
 
 chemistryModels ();
-//chemistryModel off;
 
 turbulenceModelType "turbulenceProperties";
 
@@ -123,12 +121,12 @@ BeetstraDragProps
     densityFieldName "rho";
     voidfractionFieldName "voidfractionRec";
     phi 1;
-    coarseGrainingFactors (4.0 10.0);
+    coarseGrainingFactors (4.0 6.0 10.0 20.0);
 }
 
 dSauterProps
 {
-    coarseGrainingFactors (4.0 10.0);
+    coarseGrainingFactors (4.0 6.0 10.0 20.0);
 }
 
 freeStreamingProps
@@ -137,7 +135,7 @@ freeStreamingProps
     // density can be chosen arbitrarily
     particleDensity 667;
     ballisticVelLimit 0.0;
-    scalingFactor 250.09045;
+    scalingFactor 102.09885;
     interpolation true;
 }
 
@@ -146,6 +144,7 @@ isotropicFluctuationsProps
     critVoidfraction 1.1;
     D0 5e-4;
     measureDiff true;
+    maxDisplacement 0.05;
     ignoreCellsName "aboveCZ";
 }
 
@@ -161,10 +160,11 @@ directedDiffusiveRelaxationProps
 particleDeformationProps
 {
     refFieldName "partTempRef";
-    partType 2;
+    partTypes (3 4);
+    defaultDeformCellsName "noOreReg";
 // same as Huo et al. (2017)
-    lowerBound 1475;
-    upperBound 1675;
+    lowerBounds (1475 1475);
+    upperBounds (1675 1675);
 }
 
 heatTransferRanzMarshallProps
@@ -175,8 +175,7 @@ heatTransferRanzMarshallProps
     partRefTemp 293;
     interpolation false;
     voidfractionFieldName "voidfractionRec";
-    coarseGrainingFactors (4.0 10.0);
-    verbose true;
+    coarseGrainingFactors (4.0 6.0 10.0 20.0);
     initPartTemp true;
     Tmin 293;
     Tmax 3000;
@@ -187,7 +186,7 @@ heatTransferGranConductionProps
 {
     prescribedVoidfractionFieldName "voidfractionRec";
 // data taken from Hou et al. Powder Technology 314 (2017)
-    thermalConductivities (1.7 80.0);
+    thermalConductivities (1.7 1.7 80.0 80.0);
     calcTotalHeatFlux true;
 }
 
@@ -211,13 +210,12 @@ dividedProps
 {
     alphaMin -20;
     scaleUpVol 1.0;
-    weight 1.0;//1.06; //1.33;
+    weight 1.0;
     verbose;
 }
 
 twoWayMPIProps
 {
-    maxNumberOfParticles 50000;
     liggghtsPath "../DEM/in.liggghts_dataDrivenCFD";
     liggghtsEndOfRunPath "../DEM/in.final";
 }

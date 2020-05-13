@@ -33,7 +33,6 @@ if [ ${latestTime} -ne "0" ]
 then
   typeset -i currIndex=$(cat "../../runIndex")
   mv postProcessing postProcessing_${currIndex}
-  mv clockData clockData_${currIndex}
   cd ../DEM
   mv post post_${currIndex}
   mkdir post

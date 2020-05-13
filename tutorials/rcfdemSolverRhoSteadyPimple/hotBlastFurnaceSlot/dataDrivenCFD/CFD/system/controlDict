@@ -23,7 +23,7 @@ startTime       0;
 
 stopAt          endTime;
 
-endTime         0;
+endTime         18000;
 
 deltaT          0.25;
 
@@ -85,13 +85,6 @@ functions
                 base        time;
                 window	    60.0001;
             }
-            partTemp
-            {
-                mean        on;
-                prime2Mean  off;
-                base        time;
-                window	    60.0001;
-            }
         );
     }
 
@@ -111,11 +104,10 @@ functions
             writeControl   timeStep;
             writeInterval   40;
             log             true;
-            // Output field values as well
             writeFields     false;
             regionType      patch;
             name            inletLeft;
-            operation       sum;//areaIntegrate;
+            operation       sum;
 
             fields
             (

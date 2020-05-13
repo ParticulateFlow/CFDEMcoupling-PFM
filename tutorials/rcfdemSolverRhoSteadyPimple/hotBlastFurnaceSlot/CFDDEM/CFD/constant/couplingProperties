@@ -26,13 +26,13 @@ FoamFile
 //===========================================================================//
 // sub-models & settings
 
-modelType "A"; // A or B
+modelType "A";
 
 couplingInterval 10;
 
 voidFractionModel divided;
 
-locateModel engine;//turboEngineM2M;//
+locateModel engine;
 
 meshMotionModel noMeshMotion;
 
@@ -40,12 +40,11 @@ regionModel allRegion;
 
 IOModel "off";
 
-dataExchangeModel twoWayMPI;//twoWayM2M;//twoWayFiles;//oneWayVTK;//
-//dataExchangeModel twoWayMany2Many;
+dataExchangeModel twoWayMPI;
 
-averagingModel dense;//dilute;//
+averagingModel dense;
 
-clockModel standardClock;//off;
+clockModel standardClock;
 
 smoothingModel off;
 
@@ -76,14 +75,7 @@ chemistryModels ();
 
 turbulenceModelType "turbulenceProperties";
 
-/*liggghtsCommandModels
-(
-   execute
-);
-*/
-
 getParticleTypes true;
-//getParticleTypeField true;
 getParticleDensities false;
 getParticleEffVolFactors true;
 //===========================================================================//
@@ -118,21 +110,22 @@ BeetstraDragProps
     densityFieldName "rho";
     voidfractionFieldName "voidfraction";
     phi 1;
-    coarseGrainingFactors (4.0 10.0);
+    coarseGrainingFactors (4.0 6.0 10.0 20.0);
 }
 
 dSauterProps
 {
-    coarseGrainingFactors (4.0 10.0);
+    coarseGrainingFactors (4.0 6.0 10.0 20.0);
 }
 
 particleDeformationProps
 {
     refFieldName "partTempRef";
-    partType 2;
+    partTypes (3 4);
+    defaultDeformCellsName "noOreReg";
 // same as Huo et al. (2017)
-    lowerBound 1475;
-    upperBound 1675;
+    lowerBounds (1475 1475);
+    upperBounds (1675 1675);
 }
 
 heatTransferRanzMarshallProps
@@ -140,7 +133,7 @@ heatTransferRanzMarshallProps
     partTempName "Temp";
     partHeatFluxName "convectiveHeatFlux";
     calcPartTempField false;
-    coarseGrainingFactors (4.0 10.0);
+    coarseGrainingFactors (4.0 6.0 10.0 20.0);
     partRefTemp 293;
     interpolation false;
     NusseltScalingFactor 0.1;
@@ -174,8 +167,7 @@ dividedProps
 
 twoWayMPIProps
 {
-    maxNumberOfParticles 50000;
-    liggghtsPath "../DEM/in.liggghts_CFDDEM_createDB";
+    liggghtsPath "../DEM/in.liggghts_CFDDEM";
     liggghtsEndOfRunPath "../DEM/in.final";
 }
 

@@ -1,15 +1,16 @@
-./Allclean
-cd constant/polyMesh
-m4 -P blockMeshDict_slot.m4 > blockMeshDict
-cd ../..
+./Allclean.sh
+cd system
+m4 -P ../../../CFDDEM/CFD/system/blockMeshDict_slot.m4 > blockMeshDict
+cd ..
 blockMesh
-mirrorMesh
+mirrorMesh -overwrite
 
 topoSet -dict system/topoSetDict
 createPatch -overwrite
 rm -r 0
 cp -r orig.0/ 0
 
-#foamToSurface surface.stl
-#surfaceSplitByPatch surface.stl
-#mv surface_*.stl stl_files/
+setsToZones -noFlipMap
+
+setFields
+decomposePar -force

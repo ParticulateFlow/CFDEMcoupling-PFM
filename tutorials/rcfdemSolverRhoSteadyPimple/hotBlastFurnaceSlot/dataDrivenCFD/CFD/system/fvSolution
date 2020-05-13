@@ -21,7 +21,7 @@ solvers
     {
         solver          PCG;
         preconditioner  DIC;
-        tolerance       1e-8;
+        tolerance       1e-7;
         relTol          1e-1;
     }
 
@@ -67,7 +67,7 @@ solvers
 PIMPLE
 {
     momentumPredictor yes;
-    nOuterCorrectors 20;
+    nOuterCorrectors 10;
     nCorrectors     1;
     nNonOrthogonalCorrectors 0;
     rhoMin          rhoMin [ 1 -3 0 0 0 ] 0.3;

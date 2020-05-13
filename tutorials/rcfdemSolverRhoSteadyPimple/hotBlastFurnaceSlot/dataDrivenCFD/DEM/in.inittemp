@@ -1,3 +1,0 @@
-group lCZ region CZ
-set group lCZ property/atom Temp 2700.
-group lCZ clear
