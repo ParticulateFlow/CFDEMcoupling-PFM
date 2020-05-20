@@ -257,7 +257,7 @@ void wallHeatTransferYagi::calcEnergyContribution()
                     label faceCelli = curPatch.faceCells()[facei];
 
                     // calculate Urel
-                    scalar magG = magU_[faceCelli]*voidfraction_[faceCelli]*rho_[faceCelli];
+                    scalar magG = mag(U_[faceCelli])*voidfraction_[faceCelli]*rho_[faceCelli];
 
                     // calculate H
                     scalar H;
