@@ -96,6 +96,8 @@ protected:
 
     const bool limitDEMForces_;
 
+    const bool phaseInForces_;
+
     const bool getParticleDensities_;
 
     const bool getParticleEffVolFactors_;
@@ -103,6 +105,8 @@ protected:
     const bool getParticleTypes_;
 
     scalar maxDEMForce_;
+
+    scalar phaseInForcesTime_;
 
     const word modelType_;
 
