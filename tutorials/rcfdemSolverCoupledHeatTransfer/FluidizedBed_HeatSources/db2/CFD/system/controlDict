@@ -19,19 +19,19 @@ application     pisoFoam;
 
 startFrom       startTime;
 
-startTime 	0;
+startTime       0.0;
 
 stopAt          endTime;
 
-endTime         800.0;
+endTime         5.0;
 
-deltaT          0.00025;
+deltaT          0.00005;
 
 writeControl    timeStep;
 
-writeInterval   100000000;
+writeInterval   1000000;
 
-purgeWrite      0;
+purgeWrite      2;
 
 writeFormat     ascii;
 
@@ -59,132 +59,76 @@ functions
 
         fields
         (
+            U
+            {
+                mean        on;
+                prime2Mean  off;
+                base        time;
+                window	    0.0025;
+            }
 	    Us
             {
                 mean        on;
                 prime2Mean  off;
                 base        time;
-                window	    10.0001;
+                window	    0.0025;
             }
-	    voidfractionRec
+	    voidfraction
             {
                 mean        on;
                 prime2Mean  off;
                 base        time;
-                window	    10.0001;
+                window	    0.0025;
             }
-            voidfraction
+	    rho
             {
                 mean        on;
                 prime2Mean  off;
                 base        time;
-                window	    10.0001;
+                window	    0.0025;
             }
-	    rhoRec
+            p
             {
                 mean        on;
                 prime2Mean  off;
                 base        time;
-                window	    10.0001;
+                window	    0.0025;
             }
-	    phiS
+	    phi
             {
                 mean        on;
                 prime2Mean  off;
                 base        time;
-                window	    10.0001;
+                window	    0.0025;
             }
 	    NuField
             {
                 mean        on;
                 prime2Mean  off;
                 base        time;
-                window	    10.0001;
-            }
-            addSource
-            {
-                mean        on;
-                prime2Mean  off;
-                base        time;
-                window	    10.0001;
-            }
-            T
-            {
-                mean        on;
-                prime2Mean  off;
-                base        time;
-                window	    10.0001;
-            }
-            particleTemp
-            {
-                mean        on;
-                prime2Mean  off;
-                base        time;
-                window	    10.0001;
+                window	    0.0025;
             }
         );
     }
-
 
     fieldOutput
     {
         type writeObjects;
         functionObjectLibs ( "libutilityFunctionObjects.so" );
         exclusiveWriting     true;
-        objects ("rhoRecMean" "voidfraction" "voidfractionRec" "voidfractionMean" "voidfractionRecMean" "addSourceMean" "phiSMean" "TMean" "T" "particleTemp" "particleTempMean");
+        objects ("rhoMean" "pMean" "UMean" "UsMean" "voidfractionMean" "phiMean" "NuFieldMean");
         writeControl timeStep;
-        writeInterval       40000;
+        writeInterval       100;
     }
 
-    probes1
-    {
-	type probes;
+	probes1
+	{
+		type probes;
 
-	functionObjectLibs ("libsampling.so");
+		functionObjectLibs ("libsampling.so");
 
-	#include "probesDict";
-    }
-
-    weights
-    {
-        // Load the library containing the 'coded' functionObject
-        libs ("libutilityFunctionObjects.so");
-
-        type coded;
-
-        // Name of on-the-fly generated functionObject
-        name weights;
-
-        codeOptions
-        #{
-            -I$(LIB_SRC)/finiteVolume/lnInclude \
-            -I$(LIB_SRC)/meshTools/lnInclude 
-        #};
-
-        codeExecute
-        #{
-            IOdictionary& weightDict(const_cast<IOdictionary&>(mesh().lookupObject<IOdictionary>("weightDict")));
-
-            // assume linear increase of inlet velocity from 0.4 to 0.9 within N seconds
-            scalar rampStart = 300.0;
-            scalar rampDuration = 300.0;
-            scalar currTime = mesh().time().timeOutputValue();
-
-            scalar w0 = 1.0;
-            if(currTime <= rampStart) w0 = 1.0;
-            else w0 = max(1.0 - (currTime-rampStart)/rampDuration,0.0);
-
-            scalarList newWeights(2);
-            newWeights[0] = w0;
-            newWeights[1] = 1-w0;
-/*
-            scalarList newWeights(1);
-            newWeights[0] = 1.0;
-*/
-            weightDict.set("weights",newWeights); 
-        #};
-    }
-
+		#include "probesDict";
+	}
 }
 
 // ************************************************************************* //

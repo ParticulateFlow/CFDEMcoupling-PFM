@@ -102,6 +102,7 @@ isotropicFluctuationsProps
     critVoidfraction 0.98;
     D0 1e-4;
     measureDiff true;
+    ignoreCellsName "bottomRegion";
 }
 
 evaluateFluctuationsProps
