@@ -187,7 +187,7 @@ void wallHeatTransferYagi::calcEnergyContribution()
     const volScalarField mufField = particleCloud_.turbulence().nu()*rho_;
     #endif
 
-	const volScalarField& CpField_ = CpField();
+	const volScalarField& CpField_  = CpField();
 	const volScalarField& kf0Field_ = kf0Field();
 
     interpolationCellPoint<scalar> voidfractionInterpolator_(voidfraction_);
@@ -218,11 +218,10 @@ void wallHeatTransferYagi::calcEnergyContribution()
             if (voidfraction < 0.01)
                 voidfraction = 0.01;
 
-            scalar magU = mag(Ufluid);
+            scalar magG = mag(Ufluid) * voidfraction * rho_[cellI];
             scalar ds = 2.*particleCloud_.radius(index);
-            scalar muf = mufField[cellI];
 
-            scalar Rep = ds * magU * voidfraction * rho_[cellI]/ muf;
+            scalar Rep = ds * magG / mufField[cellI]; // definition according to Yagi
             partRe_[index][0] = Rep;
         }
     }
@@ -260,40 +259,42 @@ void wallHeatTransferYagi::calcEnergyContribution()
                     scalar magG = mag(U_[faceCelli])*voidfraction_[faceCelli]*rho_[faceCelli];
 
                     // calculate H
-                    scalar H;
+                    scalar JH;
                     if (voidfraction_[faceCelli]<=voidfractionMax_)
-                        H = 0.2087 * pow(ReField_[faceCelli]+SMALL,-0.20) * CpField_[faceCelli] * magG * pow(PrField_[faceCelli]+SMALL,(-2./3.));
+                        JH = 0.20 * pow(ReField_[faceCelli]+SMALL,-0.20); // Yagi eq. 6a
                     else
-                        H = 0;
+                        JH = 0;
+
+					scalar h = JH * CpField_[faceCelli] * magG / pow(PrField_[faceCelli],0.666);
 
                     // get delta T (wall-fluid)
                     scalar Twall  = wallTemp_.boundaryField()[patchi][facei];
                     scalar Tfluid = tempField_[faceCelli];
-                    scalar deltaT = Twall - Tfluid;
 
                     // get area
                     scalar area = curPatch.magSf()[facei];
 
                     // calculate heat flux
-                    heatFlux(faceCelli, H, area, Twall, Tfluid);
+                    heatFlux(faceCelli, h, area, Twall, Tfluid);
 
                     if(verbose_ && facei >=0 && facei <2)
                     {
+						scalar deltaT = Twall - Tfluid;
                         Info << "####################" << endl;
                         Info << "cellID: " << faceCelli << endl;
-						Info << "kf: " << kf0Field_[faceCelli] << endl;
-						Info << "Cp: " << CpField_[faceCelli] << endl;
-						Info << "mu: " << mufField[faceCelli] << endl;
+						Info << "kf: " << kf0Field_[faceCelli] << " J/msK" << endl;
+						Info << "Cp: " << CpField_[faceCelli] << " J/kgK" << endl;
+						Info << "mu: " << mufField[faceCelli] << " Pa s" << endl;
 						Info << "Pr: " << PrField_[faceCelli] << endl;
-                        Info << "G : " << magG << endl;
+                        Info << "G : " << magG << " kg/m2s" << endl;
                         Info << "Re: " << ReField_[faceCelli] << endl;
-                        Info << "H : " << H << endl;
-                        Info << "Twall: " << Twall << endl;
-                        Info << "Tfluid: " << Tfluid << endl;
-                        Info << "dT: " << deltaT << endl;
-                        Info << "q: " << H*deltaT << endl;
-                        Info << "area: " << area << endl;
-                        Info << "Q:" << H*deltaT*area << endl;
+                        Info << "h : " << h << " J/m2sK" << endl;
+                        Info << "Tw: " << Twall << " K" << endl;
+                        Info << "Tf: " << Tfluid << " K" << endl;
+                        Info << "dT: " << deltaT << " K" << endl;
+                        Info << "q : " << h*deltaT << " J/m2s" << endl;
+                        Info << "A : " << area << " m2" << endl;
+                        Info << "Q : " << h*deltaT*area << " J/s" << endl;
                     }
                 }		    
             }
@@ -339,16 +340,16 @@ void wallHeatTransferYagi::addEnergyCoefficient(volScalarField& Qcoeff) const
     }
 }
 
-void wallHeatTransferYagi::heatFlux(label faceCelli, scalar H, scalar area, scalar Twall, scalar Tfluid)
+void wallHeatTransferYagi::heatFlux(label faceCelli, scalar h, scalar area, scalar Twall, scalar Tfluid)
 {
     if(!implicit_)
     {
-        QWallFluid_[faceCelli] += H * area * (Twall - Tfluid);
+        QWallFluid_[faceCelli] += h * area * (Twall - Tfluid);
     }
     else
     {
-        QWallFluid_[faceCelli]      += H * area * Twall;
-        QWallFluidCoeff_[faceCelli] -= H * area;
+        QWallFluid_[faceCelli]      += h * area * Twall;
+        QWallFluidCoeff_[faceCelli] -= h * area;
     }
 }
 
