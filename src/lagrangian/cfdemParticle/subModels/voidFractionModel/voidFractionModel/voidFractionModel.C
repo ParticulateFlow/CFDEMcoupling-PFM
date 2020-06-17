@@ -94,6 +94,48 @@ voidFractionModel::voidFractionModel
 }
 
 
+// Construct from components, specifiy initial value of fields
+voidFractionModel::voidFractionModel
+(
+    const dictionary& dict,
+    cfdemCloud& sm,
+    const scalar initVoidfraction
+)
+:
+    dict_(dict),
+    particleCloud_(sm),
+    voidfractionPrev_
+    (   IOobject
+        (
+            "voidfractionPrev",
+            sm.mesh().time().timeName(),
+            sm.mesh(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        sm.mesh(),
+        dimensionedScalar("zero", dimensionSet(0,0,0,0,0), initVoidfraction)
+    ),
+    voidfractionNext_
+    (   IOobject
+        (
+            "voidfractionNext",
+            sm.mesh().time().timeName(),
+            sm.mesh(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        sm.mesh(),
+        dimensionedScalar("zero", dimensionSet(0,0,0,0,0), initVoidfraction)
+    ),
+    cellsPerParticle_(NULL),
+    maxCellsPerParticle_(1),
+    weight_(1.),
+    porosity_(1.)
+{
+    particleCloud_.dataExchangeM().allocateArray(cellsPerParticle_,1,1);
+}
+
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 voidFractionModel::~voidFractionModel()

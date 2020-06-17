@@ -1,0 +1,137 @@
+# Pour granular particles into chute container, then induce flow
+
+###############################################
+# variables
+
+# material parameters
+
+variable partDens	equal	2500
+variable partRad	equal	0.001
+
+
+# particle-particle properties
+variable knPP		equal	7000
+variable ktPP		equal	2248.9
+variable gnPP		equal	2005.2
+variable gtPP		equal	20854
+variable muPP		equal	0.1
+variable rfPP		equal	0.125
+
+
+# particle-wall properties
+# wall 1 = sapphire glass
+# wall 2 = aluminium
+variable knPW		equal	v_knPP
+variable ktPW		equal	v_ktPP
+variable gnPW		equal	v_gnPP/sqrt(2.0)
+variable gtPW		equal	v_gtPP/sqrt(2.0)
+variable muPW1		equal	0.3
+variable muPW2		equal	0.3
+variable rfPW1		equal	0.125
+variable rfPW2		equal	0.125
+
+variable A equal 0.15*0.024
+variable h equal 0.3
+variable Vp equal 4*3.1415/3*${partRad}*${partRad}*${partRad}
+variable Ntot equal ${A}*${h}*0.65/${Vp}
+variable Nrate equal ${Ntot}/10
+
+
+variable dt equal 0.0000025
+variable skin equal 0.001
+
+# particle settling loop parameters
+variable vthre equal 0.0005
+###############################################
+
+atom_style		granular
+atom_modify		map array
+communicate	single vel yes
+
+boundary		f f f
+newton			off
+units			si
+processors      1 1 4
+
+region		reg block -0.075 0.075 -0.012 0.012 0.0 0.6 units box
+create_box	3 reg
+
+neighbor	${skin} bin
+neigh_modify	delay 0 exclude type 1 1
+
+#Material properties required for new pair styles
+
+fix 		m1 all property/global kn peratomtypepair 3 ${knPP} ${knPW} ${knPW} ${knPW} 0 0 ${knPW} 0 0
+fix 		m2 all property/global kt peratomtypepair 3 ${ktPP} ${ktPW} ${ktPW} ${ktPW} 0 0 ${ktPW} 0 0
+fix 		m3 all property/global gamman peratomtypepair 3 ${gnPP} ${gnPW} ${gnPW} ${gnPW} 0 0 ${gnPW} 0 0
+fix 		m4 all property/global gammat peratomtypepair 3 ${gtPP} ${gtPW} ${gtPW} ${gtPW} 0 0 ${gtPW} 0 0
+fix 		m5 all property/global coefficientFriction peratomtypepair 3 ${muPP} ${muPW1} ${muPW2} ${muPW1} 0 0 ${muPW2} 0 0
+fix 		m6 all property/global coefficientRollingFriction peratomtypepair 3 ${rfPP} ${rfPW1} ${rfPW2} ${rfPW1} 0 0 ${rfPW2} 0 0
+
+#pair style
+pair_style gran model hooke/stiffness tangential history rolling_friction cdt
+pair_coeff  * *
+
+#timestep, gravity
+timestep    ${dt}
+fix         gravi all gravity 9.81 vector 0.0 0.0 -1.0
+
+fix         container all mesh/surface file stl_files/mesh.stl type 2
+
+fix granwalls all wall/gran model hooke/stiffness tangential history mesh n_meshes 1 meshes container
+fix plug all wall/gran model hooke/stiffness tangential history rolling_friction cdt primitive type 2 zplane 0.0
+
+
+fix         pts1 all particletemplate/sphere 1 atom_type 1 density constant ${partDens} radius constant ${partRad}
+fix	    pdd1 all particledistribution/discrete 1.0 1 pts1 1.0
+
+region      insReg block -0.075 0.075 -0.012 0.012 0.0 0.5 units box
+
+fix ins_pack_dense all insert/pack/dense seed 123 region insReg distributiontemplate pdd1 volumefraction_region 0.53 
+
+
+
+fix             loadBalancing all balance 10000 z 10 1.05
+
+fix             integr all nve/sphere
+
+#screen output
+compute         1 all erotate/sphere
+thermo_style    custom step atoms ke c_1 vol
+thermo          1000
+thermo_modify   lost ignore norm no
+compute_modify  thermo_temp dynamic yes
+
+dump        dmp all custom/vtk 40000 post/dump*.filling.vtk id type type x y z ix iy iz vx vy vz fx fy fz omegax omegay omegaz radius
+
+run         200000
+
+write_restart  	liggghts.restart_predel
+
+region      delReg block -0.075 0.075 -0.012 0.012 ${h} 0.6 units box
+
+run         1 every 1 "delete_atoms region delReg"
+
+#======================================================================
+#- settling
+
+variable vcmx equal vcm(all,x)
+variable vcmy equal vcm(all,y)
+variable vcmz equal vcm(all,z)
+
+variable vave equal sqrt(v_vcmx*v_vcmx+v_vcmy*v_vcmy+v_vcmz*v_vcmz)
+print ${vave}
+
+label loop
+  print "-----> Checking Velocity..."
+  if "${vave}<${vthre}" then "jump in.liggghts_init endloop"
+  print "-----> v ave ${vave}, v threshold ${vthre}, continuing run"  
+
+  run 20000
+jump in.liggghts_init loop
+
+label endloop
+#======================================================================
+
+
+write_restart  	liggghts.restart

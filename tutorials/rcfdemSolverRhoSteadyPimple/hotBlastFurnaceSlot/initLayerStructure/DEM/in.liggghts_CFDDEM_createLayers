@@ -1,0 +1,163 @@
+## material properties
+include ../DEM/DEMparameters
+
+
+variable dt equal 0.000025
+variable skin equal 0.0015
+
+
+
+# particle settling loop parameters
+variable vthre equal 0.01
+###############################################
+atom_style		granular
+atom_modify		map array
+communicate	single vel yes
+
+boundary		f p f
+newton			off
+units			si
+processors      1 1 8
+
+read_restart 		../DEM/liggghts.restart_fill
+reset_timestep 0
+
+
+neighbor	0.001 bin
+neigh_modify	delay 0
+
+
+#Material properties required for new pair styles
+
+fix 		m1 all property/global youngsModulus peratomtype ${yM_C} ${yM_O} ${yM_W}
+fix 		m2 all property/global poissonsRatio peratomtype ${pR_C} ${pR_O} ${pR_W}
+fix 		m3 all property/global coefficientRestitution peratomtypepair 3 ${rest_C} ${rest_CO} ${rest_CW} ${rest_CO} ${rest_O} ${rest_WO} ${rest_CW} ${rest_WO} ${rest_W}
+fix 		m4 all property/global coefficientFriction peratomtypepair 3 ${fric_C} ${fric_CO} ${fric_CW} ${fric_CO} ${fric_O} ${fric_WO} ${fric_CW} ${fric_WO} ${fric_W}
+fix         	m5 all property/global coefficientRollingFriction peratomtypepair 3 ${roll_C} ${roll_CO} ${roll_CW} ${roll_CO} ${roll_O} ${roll_WO} ${roll_CW} ${roll_WO} ${roll_W}
+fix         	m6 all property/global characteristicVelocity scalar ${cV}
+
+fix 		ftco all property/global thermalConductivity peratomtype 15 15 15
+fix 		ftca all property/global thermalCapacity peratomtype 850 850 850
+fix             heattransfer all heat/gran initial_temperature 293
+
+#pair style
+pair_style gran model hertz tangential history rolling_friction cdt
+pair_coeff  * *
+
+#timestep, gravity
+timestep    ${dt}
+fix         gravi all gravity 9.81 vector 0.0 0.0 -1.0
+
+fix         bottom all mesh/surface file ../DEM/stl_files/surface_bottom.stl type 1
+fix         wall all mesh/surface file ../DEM/stl_files/surface_wall.stl type 3
+
+fix granwalls all wall/gran model hertz tangential history mesh n_meshes 2 meshes bottom wall
+
+group coke type 1
+group ore type 2
+
+fix         pts1 coke particletemplate/sphere 1 atom_type 1 density constant ${dens_C} radius constant ${rad_C}
+fix	    pdd1 coke particledistribution/discrete 1.0 1 pts1 1.0
+
+fix         pts2 ore particletemplate/sphere 2 atom_type 2 density constant ${dens_O} radius constant ${rad_O}
+fix	    pdd2 ore particledistribution/discrete 1.0 1 pts2 1.0
+
+
+fix	    fp all property/atom/polydispparcel effvolfactor ${poly_C} ${poly_O} 1.0
+
+###########
+# regions
+###########
+
+# raceways
+variable RWradFreeze equal 0.35
+region RW1Freeze cylinder x 0 0 ${RWradFreeze} -6.0 -4.0 
+region RW2Freeze cylinder x 0 0 ${RWradFreeze} 4.0 6.0
+region RW union 2 RW1Freeze RW2Freeze
+group RW dynamic all region RW every 100
+
+variable RWrad equal 0.4
+region RW1 cylinder x 0 0 ${RWrad} -6.0 -4.0 
+region RW2 cylinder x 0 0 ${RWrad} 4.0 6.0
+
+# deadman
+variable DMheight equal 3
+variable DMslope equal -0.8
+region DMwall1 plane 0 0 ${DMheight} 1 0 ${DMslope}
+region DMwall2 plane 0 0 ${DMheight} -1 0 ${DMslope}
+region DM intersect 2 DMwall1 DMwall2
+group DMcoke region DM
+
+delete_atoms region RW1
+delete_atoms region RW2
+
+###########
+# removal
+###########
+# raceways
+variable rCMass equal 500
+fix         delRW1 all remove nevery 1000 massrate ${rCMass} style delete seed 10007143 region RW1 atomtype 1 verbose no
+fix         delRW2 all remove nevery 1000 massrate ${rCMass} style delete seed 10007134 region RW2 atomtype 1 verbose no
+
+
+# mass sink in bottom region
+region delRegBottom block -7 7 -0.59 0.59 -1 0 units box
+region testForOreRegion block -7 7 -0.59 0.59 -2 5.5 units box
+variable oreInTestRegion equal count(ore,testForOreRegion)
+variable massBottomRemoval equal v_oreInTestRegion==0
+variable delMassBottom equal 7500*v_massBottomRemoval
+fix         delBottom all remove nevery 1000 massratevariable delMassBottom style delete seed 10007132 region delRegBottom atomtype 1 verbose no
+fix eeDelBot all execute 4000 " print 'massBottomRemoval = ${massBottomRemoval}' screen yes "
+
+
+###############################################################################################################################
+#cfd coupling
+fix		cfd1 all couple/cfd couple_every 10 mpi
+fix		cfd2 all couple/cfd/force/implicit transfer_density no transfer_type yes transfer_property name effvolfactor type scalar-atom
+fix		cfd3 all couple/cfd/convection T0 293
+fix		cfd4 all couple/cfd/parttempfield T0 293
+fix		cfd5 all couple/cfd/deform
+
+fix		integr all nve/sphere
+
+fix		limV all limit/vel 10.0
+fix		limV RW limit/vel 0.01
+
+
+#screen output
+compute		1 all erotate/sphere
+thermo_style	custom step atoms ke c_1 vol 
+thermo		10000
+thermo_modify	lost ignore norm no
+compute_modify	thermo_temp dynamic yes
+
+variable time equal step*dt
+variable np equal count(all)
+fix printN all print 4000 "${time} ${np}" file ../DEM/Npart_CFDDEMflow.txt title "#time   n_p"
+
+
+
+dump 		myStl1 all stl  200000 ../DEM/post/dump_CFDDEMflow_layers*.stl
+dump		dmp1 all custom/vtk 200000 ../DEM/post/dump*.CFDDEMflow_layers.vtk id type radius x y z vx vy vz fx fy fz mass
+
+run	1
+
+set group coke property/atom/polydispparcel effvolfactor ${poly_C}
+set group ore property/atom/polydispparcel effvolfactor ${poly_O}
+
+variable Nset equal 1000
+include ../DEM/in.DM
+
+region insRegTop1 block -4.61 4.61 -0.59 0.59 26.125 26.9 units box
+region insRegTop2 block -4.61 4.61 -0.59 0.59 26.9 27.525 units box
+region regTop block -4.61 4.61 -0.59 0.59 26.125 27.525 units box
+
+variable nTot equal count(all,regTop)
+variable nLower equal count(all,insRegTop1)
+
+fix ins2 coke insert/pack/dense seed 125 region insRegTop2 distributiontemplate pdd1 volumefraction_region 0.56 insert_every 1000 target_variable nTot 0 0.1
+
+fix ins1 ore insert/pack/dense seed 124 region insRegTop1 distributiontemplate pdd2 volumefraction_region 0.56 insert_every 1000 target_variable nLower 0 0.1
+
+
+restart 200000 ../DEM/restart.A ../DEM/restart.B

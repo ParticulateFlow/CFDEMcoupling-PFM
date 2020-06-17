@@ -106,6 +106,8 @@ cfdemCloud::cfdemCloud
     particleWeights_(NULL),
     particleVolumes_(NULL),
     particleV_(NULL),
+    particleConvVel_(NULL),
+    particleFlucVel_(NULL),
     numberOfParticles_(0),
     d32_(-1),
     numberOfParticlesChanged_(false),
@@ -387,6 +389,8 @@ cfdemCloud::~cfdemCloud()
     dataExchangeM().destroy(particleWeights_,1);
     dataExchangeM().destroy(particleVolumes_,1);
     dataExchangeM().destroy(particleV_,1);
+    dataExchangeM().destroy(particleConvVel_,3);
+    dataExchangeM().destroy(particleFlucVel_,3);
     if(getParticleDensities_) dataExchangeM().destroy(particleDensities_,1);
     if(getParticleEffVolFactors_) dataExchangeM().destroy(particleEffVolFactors_,1);
     if(getParticleTypes_) dataExchangeM().destroy(particleTypes_,1);
@@ -444,6 +448,8 @@ void cfdemCloud::findCells()
 void cfdemCloud::setForces()
 {
     resetArray(fluidVel_,numberOfParticles(),3);
+    resetArray(particleConvVel_,numberOfParticles(),3);
+    resetArray(particleFlucVel_,numberOfParticles(),3);
     resetArray(impForces_,numberOfParticles(),3);
     resetArray(expForces_,numberOfParticles(),3);
     resetArray(DEMForces_,numberOfParticles(),3);
@@ -523,7 +529,7 @@ void cfdemCloud::checkCG(bool ok)
     if(!ok) cgOK_ = ok;
 }
 
-void cfdemCloud::setPos(double**& pos)
+void cfdemCloud::setPos(const double *const * pos)
 {
     for(int index = 0; index <  numberOfParticles(); ++index)
     {
@@ -554,11 +560,6 @@ vector cfdemCloud::velocity(int index) const
 vector cfdemCloud::expForce(int index) const
 {
     return vector(DEMForces()[index][0],DEMForces()[index][1],DEMForces()[index][2]);
-}
-
-vector cfdemCloud::fluidVel(int index) const
-{
-    return vector(fluidVels()[index][0],fluidVels()[index][1],fluidVels()[index][2]);
 }
 
 const forceModel& cfdemCloud::forceM(int i)
@@ -743,6 +744,8 @@ bool cfdemCloud::reAllocArrays()
         dataExchangeM().allocateArray(velocities_,0.,3);
         dataExchangeM().allocateArray(fluidVel_,0.,3);
         dataExchangeM().allocateArray(fAcc_,0.,3);
+        dataExchangeM().allocateArray(particleConvVel_,0.,3);
+        dataExchangeM().allocateArray(particleFlucVel_,0.,3);
         dataExchangeM().allocateArray(impForces_,0.,3);
         dataExchangeM().allocateArray(expForces_,0.,3);
         dataExchangeM().allocateArray(DEMForces_,0.,3);

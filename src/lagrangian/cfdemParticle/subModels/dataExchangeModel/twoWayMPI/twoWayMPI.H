@@ -41,27 +41,16 @@ SourceFiles
 #ifndef twoWayMPI_H
 #define twoWayMPI_H
 
+#include <mpi.h>
+
 #include "dataExchangeModel.H"
-#include "liggghtsCommandModel.H"
-#include "OFstream.H"
-#include <sys/stat.h>
-#include "pair.h"
-#include "force.h"
-#include "forceModel.H"
+#include "scalarIOList.H"
 
 //=================================//
 //LAMMPS/LIGGGHTS
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <mpi.h>
 #include <lammps.h>         // these are LAMMPS include files
-#include <input.h>
-#include <atom.h>
-#include <library.h>
-#include <error.h>
-#include <library_cfd_coupling.h>
-#include <update.h>
+#include <pair.h>
+#include <force.h>
 //=================================//
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -83,7 +72,14 @@ private:
     dictionary propsDict_;
     MPI_Comm comm_liggghts;
 
+    wordList DEMVariableNames_;
+
+    scalarIOList DEMVariables_; 
+
   // private member functions
+    double DEMVariableValue(word);
+
+    void updateDEMVariables();
 
 protected:
     LAMMPS_NS::LAMMPS *lmp;
@@ -157,7 +153,6 @@ public:
         int getNumberOfClumps() const;
         int getNumberOfTypes() const;
         double* getTypeVol() const;
-
 
         scalar getCG() const { return lmp->force->cg(); }
 };

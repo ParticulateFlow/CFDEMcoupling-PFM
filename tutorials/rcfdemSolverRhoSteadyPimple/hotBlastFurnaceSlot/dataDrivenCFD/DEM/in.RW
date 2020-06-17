@@ -1,0 +1,18 @@
+# remove particles from RW region
+
+# according to log file: 2235.678 kg coke / 2560 steps = 3.5 kg / sec
+
+#variable massRWremove equal 1.747
+
+region cokeRefRegion block INF INF INF INF INF 2
+variable npLRegRef equal count(coke,cokeRefRegion)
+variable npLReg equal ${npLRegRef}
+print 'npLRegRef = ${npLRegRef}, npLReg = ${npLReg}' screen yes
+
+variable tau equal 5 #100 #1000
+variable Nupdate equal 5
+variable mPart equal 2.28
+variable massRWremove1 equal 0.5*${mPart}*(v_npLRegRef-${npLReg})/${tau}
+variable massRWremove equal ((v_massRWremove1>0)-1e-10)*v_massRWremove1
+print 'massRWremove = ${massRWremove}, npLRegRef = ${npLRegRef}' screen yes
+fix deleteRWs all remove nevery 10 massratevariable massRWremove style delete seed 10007143 region RWs atomtype 1

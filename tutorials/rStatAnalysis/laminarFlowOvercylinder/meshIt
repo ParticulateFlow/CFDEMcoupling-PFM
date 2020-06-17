@@ -1,0 +1,6 @@
+#!/bin/bash
+
+blockMesh 2>&1 | tee log.blockMesh 2>&1
+
+# renumber the mesh
+renumberMesh -overwrite 2>&1 | tee log.renumberMesh 2>&1

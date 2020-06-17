@@ -68,7 +68,7 @@ twoWayFiles::twoWayFiles
     maxNumberOfParticles_ = readScalar(propsDict_.lookup("maxNumberOfParticles"));
 
     // give max nr of particles to cloud (corrected later)
-    setNumberOfParticles(maxNumberOfParticles_);
+    particleCloud_.setNumberOfParticles(maxNumberOfParticles_);
 }
 
 
@@ -134,7 +134,7 @@ void twoWayFiles::getData
     /*if(name != "outRegion1" && name != "inRegion1")*/ *inputPtr >> numberOfParticles;
 
     // give nr of particles to cloud
-    setNumberOfParticles(numberOfParticles);
+    particleCloud_.setNumberOfParticles(numberOfParticles);
 
     // re-allocate arrays of cloud
     particleCloud_.reAllocArrays();

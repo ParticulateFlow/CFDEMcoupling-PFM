@@ -1,0 +1,2 @@
+Run using:
+m4 -P blockMeshDict.m4 > blockMeshDict

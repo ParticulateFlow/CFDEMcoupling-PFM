@@ -58,8 +58,9 @@ private:
 
     mutable volScalarField cg3Field_;
 
-    const scalarList typeCG_;
     const scalarList particleDensities_;
+    const scalarList typeCG_;
+    const label maxTypeCG_;
     const Switch     constantCG_;
     const Switch     CG_;
     const Switch     runOnWriteOnly_;

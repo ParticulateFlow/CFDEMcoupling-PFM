@@ -1,0 +1,3 @@
+rSmoother.C
+
+EXE=$(CFDEM_APP_DIR)/rSmoother

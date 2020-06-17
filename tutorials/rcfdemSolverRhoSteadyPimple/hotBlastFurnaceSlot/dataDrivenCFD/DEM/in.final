@@ -1,0 +1,2 @@
+print 'latestTimeStep = ${currStep}' screen yes
+print "variable latestTimeStep equal ${currStep}" file ../DEM/latestTimeStep

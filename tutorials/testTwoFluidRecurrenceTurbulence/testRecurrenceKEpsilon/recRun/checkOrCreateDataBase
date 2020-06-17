@@ -1,0 +1,51 @@
+#!/bin/bash
+cd ${0%/*} || exit 1    # Run from this directory
+
+
+echo ""
+
+if [[ -L dataBase ]] && [[ ! -a dataBase ]];
+then 
+    echo "./dataBase is a broken symlink"
+    echo "   ... clearing ./dataBase"
+
+    rm dataBase
+fi
+
+if [ -e dataBase ];
+then
+    echo "dataBase exists"
+else
+    echo "no local dataBase found"
+    echo "   ... looking for parent dataBase"
+    
+    if [ -e ../dataBase ];
+    then
+        echo "parent dataBase exists"
+    else
+        echo "parent dataBase not found"
+        echo "   ... looking for source data"
+        
+        if [ -e ../init ];
+        then
+            echo "init case exists"
+            echo "   ... creating dataBase"
+            
+            cd ../init
+            ./createDataBase
+            cd ../recRunA
+            
+        else
+            echo "no init case found"
+            
+            exit 666
+        fi
+    fi
+    
+    echo "   ... linking to dataBase"
+    ln -s ../dataBase dataBase
+fi
+
+echo ""
+
+#------------------------------------------------------------------------------

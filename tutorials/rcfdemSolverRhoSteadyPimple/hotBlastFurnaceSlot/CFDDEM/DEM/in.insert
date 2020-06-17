@@ -1,0 +1,19 @@
+print 'Performing insertion number ${counter}.' screen yes
+
+group secHighestCoke clear
+group secHighestOre clear
+group secHighestCoke union secHighestCoke highestCoke
+group secHighestOre union secHighestOre highestOre
+
+group highestCoke clear
+group highestOre clear
+
+if "${counter} > 1" then "unfix ins${counter}C"
+if "${counter} > 1" then "unfix ins${counter}O"
+
+next counter
+
+fix ins${counter}C highestCoke insert/pack/dense seed 125 region insRegTop2 distributiontemplate pdd1 volumefraction_region 0.56
+fix ins${counter}O highestOre insert/pack/dense seed 124 region insRegTop1 distributiontemplate pdd2 volumefraction_region 0.56
+
+run 0
