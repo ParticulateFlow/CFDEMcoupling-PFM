@@ -68,6 +68,7 @@ int main(int argc, char *argv[])
     scalar startTime(readScalar(displacementProperties.lookup("startTime")));
     std::string filepath=string(displacementProperties.lookup("filepath"));
     std::string fileext=string(displacementProperties.lookupOrDefault<string>("fileextension",""));
+    bool fillEmptyCells=bool(displacementProperties.lookupOrDefault<bool>("fillEmptyCells",true));
 
     label dumpIndex1 = dumpIndexStart;
     label dumpIndex2 = dumpIndex1 + dumpIndexIncrement;
@@ -118,7 +119,7 @@ int main(int argc, char *argv[])
         std::string filename2 = ss.str();
 
         if (access( filename1.c_str(), F_OK ) == -1 || access( filename2.c_str(), F_OK ) == -1) break;
-    
+
         Info << "\nReading" << endl;
         Info << "\t" << filename1 << endl;
         Info << "\t" << filename2 << endl;
@@ -130,8 +131,8 @@ int main(int argc, char *argv[])
         labelPairList pairs;
         findPairs(indices1,indices2,pairs);
 
-    // average particle displacements and their variance
-        Info << "\nBinning particle displacements on mesh." << endl;
+        // average particle displacements and their variance
+        Info << "Binning particle displacements on mesh." << endl;
         labelList particlesInCell(mesh.nCells(), 0);
         vector position, displacement;
         label line1, line2;
@@ -156,7 +157,7 @@ int main(int argc, char *argv[])
             }
         }
 
-        Info << "\nInterpolating empty cells." << endl;
+
         for (label cellJ = 0; cellJ<particlesInCell.size(); cellJ++)
         {
             if (particlesInCell[cellJ] > 0)
@@ -171,8 +172,13 @@ int main(int argc, char *argv[])
             }
         }
 
+
         // interpolate values for empty cells
-        interpolateCellValues(mesh,nNeighMin,particlesInCell,Us,UsDirectedVariance);
+        if (fillEmptyCells)
+        {
+            Info << "Interpolating empty cells." << endl;
+            interpolateCellValues(mesh,nNeighMin,particlesInCell,Us,UsDirectedVariance);
+        }
 
         dumpIndex1 = dumpIndex2;
         dumpIndex2 = dumpIndex1 + dumpIndexIncrement;
