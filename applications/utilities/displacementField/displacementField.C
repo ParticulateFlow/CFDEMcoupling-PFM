@@ -77,7 +77,7 @@ int main(int argc, char *argv[])
     (
         IOobject
         (
-            "Us",
+            "UDisp",
             runTime.timeName(),
             mesh,
             IOobject::NO_READ,
@@ -91,7 +91,7 @@ int main(int argc, char *argv[])
     (
         IOobject
         (
-            "UsDirectedVariance",
+            "UDispDirectedVariance",
             runTime.timeName(),
             mesh,
             IOobject::NO_READ,

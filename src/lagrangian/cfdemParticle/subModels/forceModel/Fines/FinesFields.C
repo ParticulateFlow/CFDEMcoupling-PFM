@@ -224,7 +224,7 @@ FinesFields::FinesFields
     g_("g",dimensionSet(0,1,-2,0,0),vector(0,0,-9.81)),
     alphaDynMax_(0.1),
     alphaMax_(propsDict_.lookupOrDefault<scalar>("alphaMax",0.95)),
-    alphaMinClog_(propsDict_.lookupOrDefault<scalar>("alphaMinClog",0.3)),
+    alphaMinClog_(propsDict_.lookupOrDefault<scalar>("alphaMinClog",0.1)),
     critVoidfraction_(propsDict_.lookupOrDefault<scalar>("critVoidfraction", 0.05)),
     deltaT_(voidfraction_.mesh().time().deltaTValue()),
     depositionLength_(0.0),
@@ -412,7 +412,7 @@ void FinesFields::calcSource()
     {
         fKin = 0.0;
         fStick = 0.0;
-        if (clogKin_ && alphaP_[cellI] > alphaMinClog_) // no kinetic cloggig in dilute regions
+        if (clogKin_ && alphaP_[cellI] > alphaMinClog_) // no cloggig in dilute regions
         {
             // calculate everything in units auf dSauter
             critpore = nCrit_*dFine_.value()/dSauter_[cellI];
@@ -428,7 +428,7 @@ void FinesFields::calcSource()
             else if (fKin > 1.0) fKin = 1.0;
         }
 
-        if (clogStick_)
+        if (clogStick_ && alphaP_[cellI] > alphaMinClog_) // no cloggig in dilute regions
         {
             magU = mag(uReconstructed_()[cellI]); // use U reconstructed from phi to suppress oscillations at interfaces
            // fStick = 1.0 / ( 1.0 + magU/uBind_) * alphaP_[cellI] / 0.65;
