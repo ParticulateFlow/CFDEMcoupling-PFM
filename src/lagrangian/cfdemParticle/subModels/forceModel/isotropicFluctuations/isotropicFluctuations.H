@@ -1,6 +1,6 @@
 /*---------------------------------------------------------------------------*\
     CFDEMcoupling academic - Open Source CFD-DEM coupling
-    
+
     Contributing authors:
     Thomas Lichtenegger
     Copyright (C) 2015- Johannes Kepler University, Linz
@@ -46,24 +46,24 @@ class isotropicFluctuations
 {
 protected:
     dictionary propsDict_;
-    
+
     bool interpolate_;
-    
+
     bool measureDiff_;
-    
+
     mutable OFstream recErrorFile_;
 
     // ignore fluctuations in region
     word ignoreCellsName_;
 
     autoPtr<cellSet> ignoreCells_;
-    
+
     bool existIgnoreCells_;
 
     word voidfractionFieldName_;
-    
+
     const volScalarField& voidfraction_;
-    
+
     word voidfractionRecFieldName_;
 
     const volScalarField& voidfractionRec_;
@@ -75,6 +75,8 @@ protected:
     word D0FieldName_;
 
     volScalarField D0Field_;
+
+    scalar maxDisplacement_;
 
     const scalar dtDEM_;
 

@@ -56,6 +56,7 @@ dSauter::dSauter
     multiTypes_(false),
     d2_(NULL),
     d3_(NULL),
+    maxTypeCG_(1),
     typeCG_(propsDict_.lookupOrDefault<scalarList>("coarseGrainingFactors",scalarList(1,1.0))),
     d2Field_
     (   IOobject
@@ -95,7 +96,11 @@ dSauter::dSauter
         "zeroGradient"
     )
 {
-    if (typeCG_.size()>1) multiTypes_ = true;
+    if (typeCG_.size()>1)
+    {
+        multiTypes_ = true;
+        maxTypeCG_ = typeCG_.size();
+    }
     allocateMyArrays();
     dSauter_.write();
 
@@ -153,6 +158,10 @@ void dSauter::setForce() const
             if (multiTypes_) 
             {
                 partType = particleCloud_.particleType(index);
+                if (partType > maxTypeCG_)
+                {
+                    FatalError<< "Too few coarse-graining factors provided." << abort(FatalError);
+                }
                 cg = typeCG_[partType - 1];
             }
             ds = particleCloud_.d(index);

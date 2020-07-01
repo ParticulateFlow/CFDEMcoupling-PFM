@@ -136,82 +136,14 @@ functions
         writeInterval       40000;
     }
 
-	probes1
-	{
-		type probes;
+    probes1
+    {
+	type probes;
 
-		functionObjectLibs ("libsampling.so");
+	functionObjectLibs ("libsampling.so");
 
-		#include "probesDict";
-	}
-/*
-fieldMinMax1
-{
-    type            fieldMinMax;
-    libs            ("libfieldFunctionObjects.so");
-    writeControl    timeStep;
-    writeInterval   20;
-
-    fields          (voidfraction);
-}
-*/
-        fluxprobe
-        {
-            type            surfaceRegion;
-            libs ("libfieldFunctionObjects.so");
-            writeControl    timeStep;
-            writeInterval   100;
-            log             true;
-            writeFields     false;
-            regionType      faceZone;
-            name            fzcenter;
-            operation       sum;
-
-            fields
-            (
-                phiRec
-            );
-        }
-
-
-        inflow
-        {
-            type            surfaceRegion;
-            libs ("libfieldFunctionObjects.so");
-            writeControl   timeStep;
-            writeInterval   100;
-            log             true;
-            // Output field values as well
-            writeFields     false;
-            regionType      patch;
-            name            inlet;
-            operation       sum;//areaIntegrate;
-
-            fields
-            (
-                phiRec
-            );
-        }
-
-        outflow
-        {
-            $inflow;
-            name      outlet;
-        }
-
-        throughflow0
-        {
-            $inflow;
-            regionType    faceZone;
-            name          fz0;
-        }
-
-        throughflow1
-        {
-            $inflow;
-            regionType    faceZone;
-            name          fz1;
-        }
+	#include "probesDict";
+    }
 
     weights
     {

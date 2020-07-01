@@ -49,6 +49,8 @@ private:
     
     mutable double **d3_;
 
+    label maxTypeCG_;
+
     scalarList typeCG_;
     
     mutable volScalarField d2Field_;

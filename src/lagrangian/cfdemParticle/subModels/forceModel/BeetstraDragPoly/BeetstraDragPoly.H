@@ -52,8 +52,6 @@ protected:
 
     volScalarField* dSauter_;
 
-    void adaptVoidfraction(double&, label) const;
-
     scalar effDiameter(double, label, label) const;
     
     scalar meanSauterDiameter(double, label) const;

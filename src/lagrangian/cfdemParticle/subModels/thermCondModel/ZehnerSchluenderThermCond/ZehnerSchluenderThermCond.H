@@ -66,13 +66,6 @@ private:
 
     mutable double **partKs_;
 
-    word wallQFactorName_;
-
-    // ratio of half-cell-size and near-wall film
-    mutable volScalarField wallQFactor_;
-
-    bool hasWallQFactor_;
-
     void allocateMyArrays() const;
 
     void calcPartKsField() const;

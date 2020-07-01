@@ -59,19 +59,15 @@ BeetstraDragPoly::BeetstraDragPoly
     {
         dFine_ = readScalar(propsDict_.lookup("dFine"));
         volScalarField& alphaP(const_cast<volScalarField&>(sm.mesh().lookupObject<volScalarField> ("alphaP")));
-     //   alphaP_.set(&alphaP);
         alphaP_ = &alphaP;
         volScalarField& alphaSt(const_cast<volScalarField&>(sm.mesh().lookupObject<volScalarField> ("alphaSt")));
-     //   alphaSt_.set(&alphaSt);
         alphaSt_ = &alphaSt;
         volScalarField& dSauter(const_cast<volScalarField&>(sm.mesh().lookupObject<volScalarField> ("dSauterMix")));
-//        dSauter_.set(&dSauter);
         dSauter_ = &dSauter;
     }
     else
     {
         volScalarField& dSauter(const_cast<volScalarField&>(sm.mesh().lookupObject<volScalarField> ("dSauter")));
-  //      dSauter_.set(&dSauter);
         dSauter_ = &dSauter;
     }
 }
@@ -84,13 +80,6 @@ BeetstraDragPoly::~BeetstraDragPoly()
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-
-void BeetstraDragPoly::adaptVoidfraction(double& voidfraction, label cellI) const
-{
-    if (fines_) voidfraction -= (*alphaSt_)[cellI];
-    if (voidfraction < minVoidfraction_) voidfraction = minVoidfraction_;
-}
-
 scalar BeetstraDragPoly::effDiameter(double d, label cellI, label index) const
 {
     scalar dS = (*dSauter_)[cellI];
