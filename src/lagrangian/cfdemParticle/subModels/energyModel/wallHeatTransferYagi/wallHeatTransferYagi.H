@@ -45,8 +45,6 @@ protected:
 
     dictionary propsDict_;
 
-    bool interpolation_;
-
     bool verbose_;
 
     bool implicit_;
@@ -62,6 +60,12 @@ protected:
     word wallTempName_;
 
     volScalarField wallTemp_;
+
+	volScalarField dpField_;
+
+	volVectorField GField_;
+
+	volScalarField magGField_;
 
     volScalarField ReField_;
 
@@ -87,7 +91,7 @@ protected:
 
     const volScalarField& rho_;
 
-    mutable double **partRe_;
+    mutable double **dpArray_;
 
     void allocateMyArrays() const;
 

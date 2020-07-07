@@ -43,7 +43,6 @@ wallHeatTransferYagi::wallHeatTransferYagi
 :
     energyModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
-    interpolation_(propsDict_.lookupOrDefault<bool>("interpolation",false)),
     verbose_(propsDict_.lookupOrDefault<bool>("verbose",false)),
     implicit_(propsDict_.lookupOrDefault<bool>("implicit",true)),
     QWallFluidName_(propsDict_.lookupOrDefault<word>("QWallFluidName","QWallFluid")),
@@ -85,6 +84,42 @@ wallHeatTransferYagi::wallHeatTransferYagi
         sm.mesh(),
         dimensionedScalar("zero", dimensionSet(0,0,0,1,0,0,0), 0.0)
     ),
+	dpField_
+    (   IOobject
+        (
+        "dpField",
+        sm.mesh().time().timeName(),
+        sm.mesh(),
+        IOobject::NO_READ,
+        IOobject::NO_WRITE
+        ),
+        sm.mesh(),
+        dimensionedScalar("zero", dimensionSet(0,1,0,0,0,0,0), 0.0)
+    ),
+	GField_
+    (   IOobject
+        (
+        "GField",
+        sm.mesh().time().timeName(),
+        sm.mesh(),
+        IOobject::NO_READ,
+        IOobject::NO_WRITE
+        ),
+        sm.mesh(),
+        dimensionedVector("zero", dimensionSet(1,-2,-1,0,0,0,0), vector(0.0, 0.0, 0.0))
+    ),
+	magGField_
+    (   IOobject
+        (
+        "magGField",
+        sm.mesh().time().timeName(),
+        sm.mesh(),
+        IOobject::NO_READ,
+        IOobject::NO_WRITE
+        ),
+        sm.mesh(),
+        dimensionedScalar("zero", dimensionSet(1,-2,-1,0,0,0,0), 0.0)
+    ),
     ReField_
     (   IOobject
         (
@@ -119,7 +154,7 @@ wallHeatTransferYagi::wallHeatTransferYagi
     U_(sm.mesh().lookupObject<volVectorField> (velFieldName_)),
     densityFieldName_(propsDict_.lookupOrDefault<word>("densityFieldName","rho")),
     rho_(sm.mesh().lookupObject<volScalarField> (densityFieldName_)),
-    partRe_(NULL)
+    dpArray_(NULL)
 {
     allocateMyArrays();
 
@@ -136,8 +171,15 @@ wallHeatTransferYagi::wallHeatTransferYagi
 
     if (verbose_)
     {
+		dpField_.writeOpt() = IOobject::AUTO_WRITE;
+        GField_.writeOpt() = IOobject::AUTO_WRITE;
+		magGField_.writeOpt() = IOobject::AUTO_WRITE;
         ReField_.writeOpt() = IOobject::AUTO_WRITE;
         PrField_.writeOpt() = IOobject::AUTO_WRITE;
+
+		dpField_.write();
+        GField_.write();
+		magGField_.write();
         ReField_.write();
         PrField_.write();
     }
@@ -155,7 +197,7 @@ wallHeatTransferYagi::wallHeatTransferYagi
 
 wallHeatTransferYagi::~wallHeatTransferYagi()
 {
-    particleCloud_.dataExchangeM().destroy(partRe_,1);
+    particleCloud_.dataExchangeM().destroy(dpArray_,1);
 }
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
@@ -166,7 +208,7 @@ void wallHeatTransferYagi::allocateMyArrays() const
 
     if(verbose_)
     {
-        particleCloud_.dataExchangeM().allocateArray(partRe_,initVal,1);
+        particleCloud_.dataExchangeM().allocateArray(dpArray_,initVal,1);
     }
 }
 
@@ -190,54 +232,36 @@ void wallHeatTransferYagi::calcEnergyContribution()
 	const volScalarField& CpField_  = CpField();
 	const volScalarField& kf0Field_ = kf0Field();
 
-    interpolationCellPoint<scalar> voidfractionInterpolator_(voidfraction_);
-    interpolationCellPoint<vector> UInterpolator_(U_);
-    interpolationCellPoint<scalar> TInterpolator_(tempField_);
-
-    // calculate Rep
+    // calculate mean dp
     for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)
     {
         label cellI = particleCloud_.cellIDs()[index][0];
         if(cellI >= 0)
         {
-            scalar voidfraction;
-            vector Ufluid;
-
-            if(interpolation_)
-            {
-                vector position = particleCloud_.position(index);
-                voidfraction = voidfractionInterpolator_.interpolate(position,cellI);
-                Ufluid = UInterpolator_.interpolate(position,cellI);
-            }
-            else
-            {
-                voidfraction = voidfraction_[cellI];
-                Ufluid = U_[cellI];
-            }
-
-            if (voidfraction < 0.01)
-                voidfraction = 0.01;
-
-            scalar magG = mag(Ufluid) * voidfraction * rho_[cellI];
             scalar ds = 2.*particleCloud_.radius(index);
-
-            scalar Rep = ds * magG / mufField[cellI]; // definition according to Yagi
-            partRe_[index][0] = Rep;
+            dpArray_[index][0] = ds;
         }
     }
 
-    // calculate Rep field
+    // calculate mean dp field
     particleCloud_.averagingM().resetWeightFields();
     particleCloud_.averagingM().setScalarAverage
     (
-        ReField_,
-        partRe_,
+        dpField_,
+        dpArray_,
         particleCloud_.particleWeights(),
         particleCloud_.averagingM().UsWeightField(),
         NULL
     );
 
-    // calculate Pr field
+    // calculate G field (superficial mass velocity)
+	GField_ = U_*voidfraction_*rho_;
+	magGField_ = mag(GField_);
+
+	// calculate Re field
+	ReField_ = dpField_ * magGField_ / mufField;
+
+	// calculate Pr field
 	PrField_ = CpField_ * mufField / kf0Field_;         
 
     const fvPatchList& patches = U_.mesh().boundary();
@@ -255,9 +279,6 @@ void wallHeatTransferYagi::calcEnergyContribution()
                 {							
                     label faceCelli = curPatch.faceCells()[facei];
 
-                    // calculate Urel
-                    scalar magG = mag(U_[faceCelli])*voidfraction_[faceCelli]*rho_[faceCelli];
-
                     // calculate H
                     scalar JH;
                     if (voidfraction_[faceCelli]<=voidfractionMax_)
@@ -265,7 +286,7 @@ void wallHeatTransferYagi::calcEnergyContribution()
                     else
                         JH = 0;
 
-					scalar h = JH * CpField_[faceCelli] * magG / pow(PrField_[faceCelli],0.666);
+					scalar h = JH * CpField_[faceCelli] * magGField_[faceCelli] / (pow(PrField_[faceCelli],0.666) + SMALL);
 
                     // get delta T (wall-fluid)
                     scalar Twall  = wallTemp_.boundaryField()[patchi][facei];
@@ -284,10 +305,16 @@ void wallHeatTransferYagi::calcEnergyContribution()
                         Info << "cellID: " << faceCelli << endl;
 						Info << "kf: " << kf0Field_[faceCelli] << " J/msK" << endl;
 						Info << "Cp: " << CpField_[faceCelli] << " J/kgK" << endl;
+						Info << "ro: " << rho_[faceCelli] << " kg/m3" << endl;
 						Info << "mu: " << mufField[faceCelli] << " Pa s" << endl;
-						Info << "Pr: " << PrField_[faceCelli] << endl;
-                        Info << "G : " << magG << " kg/m2s" << endl;
+						Info << "dp: " << dpField_[faceCelli] << " m" << endl;
+						Info << "ep: " << voidfraction_[faceCelli] << endl;
+						Info << "U : " << U_[faceCelli] << " m/s" << endl;
+						Info << "G : " << GField_[faceCelli] << " kg/m2s" << endl;
+                        Info << "mG: " << magGField_[faceCelli] << " kg/m2s" << endl;
                         Info << "Re: " << ReField_[faceCelli] << endl;
+						Info << "Pr: " << PrField_[faceCelli] << endl;
+						Info << "JH: " << JH << endl;
                         Info << "h : " << h << " J/m2sK" << endl;
                         Info << "Tw: " << Twall << " K" << endl;
                         Info << "Tf: " << Tfluid << " K" << endl;
