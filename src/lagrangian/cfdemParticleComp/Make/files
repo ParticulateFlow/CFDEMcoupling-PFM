@@ -35,6 +35,7 @@ $(chemistryModels)/noChemistry/noChemistry.C
 $(chemistryModels)/diffusionCoefficients/diffusionCoefficients.C
 $(chemistryModels)/massTransferCoeff/massTransferCoeff.C
 $(chemistryModels)/reactantPerParticle/reactantPerParticle.C
+$(chemistryModels)/initMultiLayers/initMultiLayers.C
 
 $(energyModels)/energyModel/energyModel.C
 $(energyModels)/energyModel/newEnergyModel.C
