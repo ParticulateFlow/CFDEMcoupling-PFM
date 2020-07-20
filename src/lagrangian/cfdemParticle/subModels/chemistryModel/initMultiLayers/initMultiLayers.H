@@ -74,7 +74,7 @@ private:
 
     void init();
 
-    void readDump(std::string, labelList &, vectorList &, vectorList &);
+    void readDump(std::string, label, labelList &, vectorList &, vectorList &);
 
     label findNearestCellWithValue(label, volScalarField &) const;
 

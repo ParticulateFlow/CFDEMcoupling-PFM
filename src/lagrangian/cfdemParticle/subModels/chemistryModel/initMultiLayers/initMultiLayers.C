@@ -113,7 +113,7 @@ void initMultiLayers::init()
         }
         Info << "\nReading" << endl;
         Info << "\t" << filename << endl;
-        readDump(filename, indices, positions, relradii);
+        readDump(filename, type, indices, positions, relradii);
 
         Info << "Binning particle displacements on mesh." << endl;
         volScalarField particlesInCell
@@ -251,13 +251,13 @@ label initMultiLayers::getListIndex(label testElement) const
     return -1;
 }
 
-void initMultiLayers::readDump(std::string filename, labelList &indices, vectorList &positions, vectorList &relradii)
+void initMultiLayers::readDump(std::string filename, label type, labelList &indices, vectorList &positions, vectorList &relradii)
 {
     #include <fstream>
 
     const label leadingLines = 9;
     label lineCounter = 0;
-    label partIndex;
+    label partIndex, partType;
     scalar x, y, z;
     scalar r0 = 1.0;
     scalar r1 = 1.0;
@@ -274,7 +274,11 @@ void initMultiLayers::readDump(std::string filename, labelList &indices, vectorL
     {
         if (lineCounter >= leadingLines)
         {
-            sscanf(str.c_str(), "%d %lf %lf %lf %lf %lf %lf %lf", &partIndex, &x, &y, &z, &r0, &r1, &r2, &r3);
+            sscanf(str.c_str(), "%d %d %lf %lf %lf %lf %lf %lf %lf", &partIndex, &partType, &x, &y, &z, &r0, &r1, &r2, &r3);
+            if (partType != type)
+            {
+                FatalError<< "Particle of type " << partType << " detected in " << filename << abort(FatalError);
+            }
             indices.append(partIndex);
             positions.append(vector(x,y,z));
             relradii.append(vector(r1,r2,r3));
