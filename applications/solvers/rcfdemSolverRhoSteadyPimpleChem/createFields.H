@@ -24,15 +24,15 @@ Info<< "Reading thermophysical properties\n" << endl;
     volScalarField W(thermo.W());
 #endif
 
-    bool propagateInertSpecie = true;
+    bool propagateInertSpecie(thermo.lookupOrDefault<bool>("propagateInertSpecie",true));
 
-    const word inertSpecie(thermo.lookup("inertSpecie"));
+    const word inertSpecie(thermo.lookupOrDefault<word>("inertSpecie","none"));
 
     const scalar inertLowerBound(thermo.lookupOrDefault<scalar>("inertLowerBound",0.0));
 
     const scalar inertUpperBound(thermo.lookupOrDefault<scalar>("inertUpperBound",1.0));
 
-    if (!composition.contains(inertSpecie))
+    if (!composition.contains(inertSpecie) && inertSpecie != "none")
     {
         FatalErrorIn(args.executable())
             << "Specified inert specie '" << inertSpecie << "' not found in "
