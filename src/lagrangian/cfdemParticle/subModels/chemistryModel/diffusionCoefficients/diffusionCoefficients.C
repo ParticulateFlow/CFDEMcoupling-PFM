@@ -165,8 +165,7 @@ void diffusionCoefficient::execute()
     scalar Texp(0);
     scalar dBinary_(0);
     scalar Xnegative(0);
-
-    List<scalar> TotalFraction_(diffusantGasNames_.size(),Zero);
+    scalar TotalFraction(0.0);
 
     // defining interpolators for T and Pressure
     interpolationCellPoint <scalar> TInterpolator_(tempField_);
@@ -207,7 +206,7 @@ void diffusionCoefficient::execute()
 
             for (int j=0; j<diffusantGasNames_.size(); j++)
             {
-                TotalFraction_[j] = 0.0;
+                TotalFraction = 0.0;
                 dBinary_ = 0.0;
 
                 for (int i=0; i < speciesNames_.size(); i++)
@@ -236,16 +235,10 @@ void diffusionCoefficient::execute()
                                 Info << "Xdiffusant for " << diffusantGasNames_[j] << " : " << Xdiffusant_[j][cellI] << nl << endl;
                             }
 
-                            TotalFraction_[j] += X_[i][cellI] / dBinary_;
+                            TotalFraction += X_[i][cellI] / dBinary_;
 
                             if (verbose_)
-                                Info << "Total Fraction = " << TotalFraction_[j] << nl << endl;
-
-                            // pass on dCoeff values to array
-                            if (TotalFraction_[j] < VSMALL)
-                                diffusionCoefficients_[j][index][0] = VSMALL;
-                            else
-                                diffusionCoefficients_[j][index][0] = (1.0 - Xdiffusant_[j][cellI]) / TotalFraction_[j];
+                                Info << "Total Fraction = " << TotalFraction << nl << endl;
                         }
                         else
                         {
@@ -256,6 +249,12 @@ void diffusionCoefficient::execute()
                         }
                     }
                 }
+
+                // pass on dCoeff values to array
+                if (TotalFraction < VSMALL)
+                    diffusionCoefficients_[j][index][0] = VSMALL;
+                else
+                    diffusionCoefficients_[j][index][0] = (1.0 - Xdiffusant_[j][cellI]) / TotalFraction;
 
                 if(verbose_)
                     Info << "diffusionCoefficient of species " << diffusantGasNames_[j] << " = " << diffusionCoefficients_[j][index][0] << endl;
