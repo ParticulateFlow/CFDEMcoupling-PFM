@@ -261,9 +261,9 @@ void trilinearVoidFraction::setvoidFraction(double** const& mask,double**& voidf
             // find x,y,z
             // TODO changes needed here when generalized for quader cells
             offsetOrigin = particleCloud_.mesh().C()[i000] - (partPos + posShift);
-            x = mag(offsetOrigin[0]) / cellLength_;
-            y = mag(offsetOrigin[1]) / cellLength_;
-            z = mag(offsetOrigin[2]) / cellLength_;
+            x = std::min(1.0, mag(offsetOrigin[0]) / cellLength_);
+            y = std::min(1.0, mag(offsetOrigin[1]) / cellLength_);
+            z = std::min(1.0, mag(offsetOrigin[2]) / cellLength_);
 
             // calculate the mapping coeffs
             C000 = (1 - x) * (1 - y) * (1 - z);
