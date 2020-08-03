@@ -69,7 +69,9 @@ volWeightedAverage::volWeightedAverage
     vectorFieldNames_(propsDict_.lookup("vectorFieldNames")),
     upperThreshold_(readScalar(propsDict_.lookup("upperThreshold"))),
     lowerThreshold_(readScalar(propsDict_.lookup("lowerThreshold"))),
-    verbose_(propsDict_.found("verbose"))
+    verbose_(propsDict_.found("verbose")),
+    writeToFile_(propsDict_.lookupOrDefault<Switch>("writeToFile", false)),
+    filePtr_()
 {
     // create vol weighted average scalar fields
     scalarFields_.setSize(scalarFieldNames_.size());
@@ -124,6 +126,13 @@ volWeightedAverage::volWeightedAverage
             )
         );
     }
+
+    // create the path and output file
+    if(writeToFile_)
+    {
+        fileName path(particleCloud_.IOM().createTimeDir("postProcessing/volWeightedAverage"));
+        filePtr_ = new OFstream(path/"volWeightedAverage.txt");
+    }
 }
 
 
@@ -140,6 +149,8 @@ void volWeightedAverage::setForce() const
     if(mesh_.time().value() >= startTime_)
     {
         if(verbose_) Info << "volWeightedAverage.C - setForce()" << endl;
+
+        if(writeToFile_) filePtr_() << mesh_.time().value() << " ";
 
         for (int i=0;i < scalarFieldNames_.size(); i++)
         {
@@ -184,6 +195,8 @@ void volWeightedAverage::setForce() const
                      << ",\n considering cells where the field < " << upperThreshold_
                      << ", and > " << lowerThreshold_ << endl;
             }
+
+            if(writeToFile_) filePtr_() << volWeightedAverage << " ";
         }
 
         for (int i=0;i < vectorFieldNames_.size(); i++)
@@ -225,7 +238,11 @@ void volWeightedAverage::setForce() const
                      << ",\n considering cells where the mag(field) < " << upperThreshold_
                      << ", and > " << lowerThreshold_ << endl;
             }
+
+            if(writeToFile_) filePtr_() << volWeightedAverage << " ";
         }
+
+        if(writeToFile_) filePtr_() << endl;
     }// end if time >= startTime_
 }
 
