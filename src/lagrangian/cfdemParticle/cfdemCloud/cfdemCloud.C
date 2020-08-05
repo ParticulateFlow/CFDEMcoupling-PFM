@@ -160,6 +160,8 @@ cfdemCloud::cfdemCloud
             turbulenceModelType_
         )
     ),
+    intParticleProperties(8),
+    doubleParticleProperties(8),
     dataExchangeModel_
     (
         dataExchangeModel::New
@@ -402,6 +404,25 @@ cfdemCloud::~cfdemCloud()
     if(getParticleDensities_) dataExchangeM().destroy(particleDensities_,1);
     if(getParticleEffVolFactors_) dataExchangeM().destroy(particleEffVolFactors_,1);
     if(getParticleTypes_) dataExchangeM().destroy(particleTypes_,1);
+
+    for
+    (
+        HashTable<int**>::iterator iter = intParticleProperties.begin();
+        iter != intParticleProperties.end();
+        ++iter
+    )
+    {
+        dataExchangeM().destroy(*iter,-1);
+    }
+    for
+    (
+        HashTable<double**>::iterator iter = doubleParticleProperties.begin();
+        iter != doubleParticleProperties.end();
+        ++iter
+    )
+    {
+        dataExchangeM().destroy(*iter,-1);
+    }
 }
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //

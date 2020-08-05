@@ -403,5 +403,40 @@ inline const turbulenceModel& cfdemCloud::turbulence() const
     return turbulence_;
 }
 
+template<typename T>
+void cfdemCloud::registerParticleVectorProperty(const word& property)
+{
+    FatalError << "Trying to register particle vector property of unsupported type" << endl;
+}
+
+template<> inline
+void cfdemCloud::registerParticleVectorProperty<int>(const word& property)
+{
+    intParticleProperties.insert(property, (int**)NULL);
+}
+
+template<> inline
+void cfdemCloud::registerParticleVectorProperty<double>(const word& property)
+{
+    doubleParticleProperties.insert(property, (double**)NULL);
+}
+
+
+template<typename T>
+T**& cfdemCloud::getParticleVectorPropertyRef(const word& property)
+{
+    return getParticleVectorPropertyImpl(property, (T**)NULL);
+}
+
+inline int**& cfdemCloud::getParticleVectorPropertyImpl(const word& property, int**)
+{
+    return intParticleProperties[property];
+}
+
+inline double**& cfdemCloud::getParticleVectorPropertyImpl(const word& property, double**)
+{
+    return doubleParticleProperties[property];
+}
+
 }
 // ************************************************************************* //

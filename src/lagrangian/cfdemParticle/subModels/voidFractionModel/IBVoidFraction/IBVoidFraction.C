@@ -100,13 +100,13 @@ void IBVoidFraction::setvoidFraction(double** const& mask,double**& voidfraction
         //if(mask[index][0])
         //{
             //reset
-            for (int subcell=0; subcell < cellsPerParticle_[index][0]; subcell++)
+            for (int subcell=0; subcell < cellsPerParticle()[index][0]; subcell++)
             {
                 particleWeights[index][subcell] = 0.0;
                 particleVolumes[index][subcell] = 0.0;
             }
 
-            cellsPerParticle_[index][0]=1;
+            cellsPerParticle()[index][0]=1;
             particleV[index][0]=0;
 
             //collecting data
@@ -266,7 +266,7 @@ void IBVoidFraction::setvoidFraction(double** const& mask,double**& voidfraction
                 }
                 else if (hashSetLength > 0)
                 {
-                    cellsPerParticle_[index][0]=hashSetLength;
+                    cellsPerParticle()[index][0]=hashSetLength;
                     hashSett.erase(particleCenterCellID);
 
                     for (label i=0; i < hashSetLength-1; i++)
@@ -281,7 +281,7 @@ void IBVoidFraction::setvoidFraction(double** const& mask,double**& voidfraction
 
     for (label index=0; index < particleCloud_.numberOfParticles(); index++)
     {
-        for (label subcell=0; subcell < cellsPerParticle_[index][0]; subcell++)
+        for (label subcell=0; subcell < cellsPerParticle()[index][0]; subcell++)
         {
             label cellID = particleCloud_.cellIDs()[index][subcell];
 

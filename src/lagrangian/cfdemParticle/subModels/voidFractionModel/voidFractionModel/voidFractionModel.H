@@ -69,7 +69,6 @@ protected:
 
         volScalarField voidfractionNext_;
 
-        int ** cellsPerParticle_;
 
         int maxCellsPerParticle_;
 

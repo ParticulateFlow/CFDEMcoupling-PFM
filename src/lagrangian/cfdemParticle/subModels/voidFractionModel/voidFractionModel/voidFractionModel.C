@@ -84,12 +84,11 @@ voidFractionModel::voidFractionModel
         /*sm.mesh(),
         dimensionedScalar("zero", dimensionSet(0,0,0,0,0), 1)*/
     ),
-    cellsPerParticle_(NULL),
     maxCellsPerParticle_(1),
     weight_(1.),
     porosity_(1.)
 {
-    particleCloud_.dataExchangeM().allocateArray(cellsPerParticle_,1,1);
+    particleCloud_.registerParticleVectorProperty<int>("cellsPerParticle");
     if (particleCloud_.getParticleEffVolFactors()) multiWeights_ = true;
 }
 
@@ -128,19 +127,17 @@ voidFractionModel::voidFractionModel
         sm.mesh(),
         dimensionedScalar("zero", dimensionSet(0,0,0,0,0), initVoidfraction)
     ),
-    cellsPerParticle_(NULL),
     maxCellsPerParticle_(1),
     weight_(1.),
     porosity_(1.)
 {
-    particleCloud_.dataExchangeM().allocateArray(cellsPerParticle_,1,1);
+    particleCloud_.registerParticleVectorProperty<int>("cellsPerParticle");
 }
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 voidFractionModel::~voidFractionModel()
 {
-    particleCloud_.dataExchangeM().destroy(cellsPerParticle_,1);
 }
 
 // * * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * * //
@@ -162,7 +159,7 @@ void voidFractionModel::resetVoidFractions()
 
 int** const& voidFractionModel::cellsPerParticle() const
 {
-    return cellsPerParticle_;
+    return particleCloud_.getParticleVectorPropertyRef<int>("cellsPerParticle");
 }
 
 int voidFractionModel::maxCellsPerParticle() const
@@ -175,7 +172,8 @@ void voidFractionModel::reAllocArrays()
     if(particleCloud_.numberOfParticlesChanged())
     {
         // get arrays of new length
-        particleCloud_.dataExchangeM().allocateArray(cellsPerParticle_,1,1);
+        particleCloud_.dataExchangeM().allocateArray(
+                    particleCloud_.getParticleVectorPropertyRef<int>("cellsPerParticle"),1,1);
     }
 }
 
@@ -184,7 +182,8 @@ void voidFractionModel::reAllocArrays(int nP)
     if(particleCloud_.numberOfParticlesChanged())
     {
         // get arrays of new length
-        particleCloud_.dataExchangeM().allocateArray(cellsPerParticle_,1,1,nP);
+        particleCloud_.dataExchangeM().allocateArray(
+                    particleCloud_.getParticleVectorPropertyRef<int>("cellsPerParticle"),1,1,nP);
     }
 }
 

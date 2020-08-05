@@ -180,14 +180,14 @@ void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfra
         //{
             // reset
 
-            for (int subcell=0; subcell < cellsPerParticle_[index][0]; subcell++)
+            for (int subcell=0; subcell < cellsPerParticle()[index][0]; subcell++)
             {
                 particleWeights[index][subcell] = 0.;
                 particleVolumes[index][subcell] = 0.;
             }
             particleV[index][0] = 0.;
 
-            cellsPerParticle_[index][0] = 1;
+            cellsPerParticle()[index][0] = 1;
             position = particleCloud_.position(index);
             cellID = particleCloud_.cellIDs()[index][0];
             radius = particleCloud_.radius(index);
@@ -270,7 +270,7 @@ void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfra
     for(int index=0; index < particleCloud_.numberOfParticles(); index++)
     {
         {
-            for (int subcell=0; subcell < cellsPerParticle_[index][0]; subcell++)
+            for (int subcell=0; subcell < cellsPerParticle()[index][0]; subcell++)
             {
                 label cellID = particleCloud_.cellIDs()[index][subcell];
 

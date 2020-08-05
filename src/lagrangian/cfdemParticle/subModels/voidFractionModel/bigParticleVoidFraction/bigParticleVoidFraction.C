@@ -102,12 +102,12 @@ void bigParticleVoidFraction::setvoidFraction(double** const& mask,double**& voi
         //if(mask[index][0])
         //{
             //reset
-            for(int subcell=0;subcell<cellsPerParticle_[index][0];subcell++)
+            for(int subcell=0;subcell<cellsPerParticle()[index][0];subcell++)
             {
                 particleWeights[index][subcell]=0;
                 particleVolumes[index][subcell]=0;
             }
-            cellsPerParticle_[index][0]=1;
+            cellsPerParticle()[index][0]=1;
             particleV[index][0]=0;
 
             //collecting data
@@ -137,7 +137,7 @@ void bigParticleVoidFraction::setvoidFraction(double** const& mask,double**& voi
                 }
                 else if (hashSetLength > 0)
                 {
-                    cellsPerParticle_[index][0]=hashSetLength;
+                    cellsPerParticle()[index][0]=hashSetLength;
 
                     //making sure that the cell containing the center is the first subcell
                     particleCloud_.cellIDs()[index][0]=particleCenterCellID;
@@ -190,7 +190,7 @@ void bigParticleVoidFraction::setvoidFraction(double** const& mask,double**& voi
     //bringing eulerian field to particle array
     for(label index=0; index< particleCloud_.numberOfParticles(); index++)
     {
-        for(label subcell=0;subcell<cellsPerParticle_[index][0];subcell++)
+        for(label subcell=0;subcell<cellsPerParticle()[index][0];subcell++)
         {
             label cellID = particleCloud_.cellIDs()[index][subcell];
 

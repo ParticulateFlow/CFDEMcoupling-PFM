@@ -188,6 +188,9 @@ protected:
 
     const turbulenceModel& turbulence_;
 
+    HashTable<int**>        intParticleProperties;
+    HashTable<double**>     doubleParticleProperties;
+
     autoPtr<dataExchangeModel> dataExchangeModel_;
 
     PtrList<forceModel> forceModel_;
@@ -443,6 +446,14 @@ public:
         void otherForces(volVectorField&);
 
         bool checkPeriodicCells() const { return checkPeriodicCells_; }
+
+        template<typename T>
+        void registerParticleVectorProperty(const word& property);
+        template<typename T>
+        T**& getParticleVectorPropertyRef(const word& property);
+protected:
+        virtual int**& getParticleVectorPropertyImpl(const word& property, int**);
+        virtual double**& getParticleVectorPropertyImpl(const word& property, double**);
 };
 
 
