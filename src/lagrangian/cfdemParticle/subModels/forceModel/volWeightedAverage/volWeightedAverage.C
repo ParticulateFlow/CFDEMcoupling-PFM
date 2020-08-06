@@ -131,7 +131,7 @@ volWeightedAverage::volWeightedAverage
     if(writeToFile_)
     {
         fileName path(particleCloud_.IOM().createTimeDir("postProcessing/volWeightedAverage"));
-        filePtr_ = new OFstream(path/"volWeightedAverage.txt");
+        filePtr_.set(new OFstream(path/"volWeightedAverage.txt"));
     }
 }
 

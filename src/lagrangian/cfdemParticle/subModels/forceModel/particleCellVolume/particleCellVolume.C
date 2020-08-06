@@ -102,7 +102,7 @@ particleCellVolume::particleCellVolume
     if(writeToFile_)
     {
         fileName path(particleCloud_.IOM().createTimeDir("postProcessing/particleCellVolume"));
-        filePtr_ = new OFstream(path/"particleCellVolume.txt");
+        filePtr_.set(new OFstream(path/"particleCellVolume.txt"));
         filePtr_() << "# time | total particle volume in cells | total volume of cells with particles | average volume fraction | min(voidfraction) | max(voidfraction)" << endl;
     }
 }

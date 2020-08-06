@@ -54,7 +54,11 @@ FinesFields::FinesFields
     velFieldName_(propsDict_.lookupOrDefault<word>("velFieldName","U")),
     U_(sm.mesh().lookupObject<volVectorField> (velFieldName_)),
     voidfractionFieldName_(propsDict_.lookupOrDefault<word>("voidfractionFieldName","voidfraction")),
+#if OPENFOAM_VERSION_MAJOR < 5
+    voidfraction_(const_cast<volScalarField&>(sm.mesh().lookupObject<volScalarField>(voidfractionFieldName_))),
+#else
     voidfraction_(sm.mesh().lookupObjectRef<volScalarField> (voidfractionFieldName_)),
+#endif
     UsFieldName_(propsDict_.lookupOrDefault<word>("granVelFieldName","Us")),
     UsField_(sm.mesh().lookupObject<volVectorField> (UsFieldName_)),
     pFieldName_(propsDict_.lookupOrDefault<word>("pFieldName","p")),
