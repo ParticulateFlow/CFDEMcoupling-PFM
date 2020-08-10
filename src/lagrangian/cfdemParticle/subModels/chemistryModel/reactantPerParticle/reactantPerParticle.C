@@ -57,7 +57,6 @@ reactantPerParticle::reactantPerParticle
     propsDict_(dict.subDict(typeName + "Props")),
     mesh_(sm.mesh()),
     verbose_(propsDict_.lookupOrDefault<bool>("verbose",false)),
-    reactantPerParticle_(NULL),
     voidfractionFieldName_(propsDict_.lookupOrDefault<word>("voidfractionFieldName","voidfraction")),
     voidfraction_(sm.mesh().lookupObject<volScalarField>(voidfractionFieldName_)),
     particlesPerCell_
@@ -76,30 +75,21 @@ reactantPerParticle::reactantPerParticle
     Nevery_(propsDict_.lookupOrDefault<label>("Nevery",1))
 {
     particleCloud_.checkCG(false);
-    allocateMyArrays();
+    particleCloud_.registerParticleProperty<double**>("reactantPerParticle");
 }
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 reactantPerParticle::~reactantPerParticle()
 {
-    particleCloud_.dataExchangeM().destroy(reactantPerParticle_,1);
 }
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
-void reactantPerParticle::allocateMyArrays() const
-{
-    double initVal=0.0;
-    if (particleCloud_.dataExchangeM().maxNumberOfParticles() > 0)
-    {
-        // get memory for 2d arrays
-        particleCloud_.dataExchangeM().allocateArray(reactantPerParticle_,initVal,1,"nparticles");
-    }
-}
 
 void reactantPerParticle::reAllocMyArrays() const
 {
     double initVal=0.0;
+    double**& reactantPerParticle_ = particleCloud_.getParticlePropertyRef<double**>("reactantPerParticle");
     particleCloud_.dataExchangeM().allocateArray(reactantPerParticle_,initVal,1);
 }
 
@@ -121,6 +111,7 @@ void reactantPerParticle::execute()
     scalar voidfraction(1);
     scalar cellvolume(0.0);
     scalar particlesPerCell(1.0);
+    double**& reactantPerParticle_ = particleCloud_.getParticlePropertyRef<double**>("reactantPerParticle");
 
     // first create particles per cell field
     for (int index=0; index<particleCloud_.numberOfParticles(); ++index)
@@ -147,10 +138,10 @@ void reactantPerParticle::execute()
         if (verbose_) Info << "reactantPerParticle_" << reactantPerParticle_[index][0] << endl;
     }
 
-        // give DEM data
-        particleCloud_.dataExchangeM().giveData("reactantPerParticle", "scalar-atom", reactantPerParticle_);
+    // give DEM data
+    particleCloud_.dataExchangeM().giveData("reactantPerParticle", "scalar-atom", reactantPerParticle_);
 
-        Info << "give data done" << endl;
+    Info << "give data done" << endl;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -71,15 +71,17 @@ diffusionCoefficient::diffusionCoefficient
     pressureFieldName_(propsDict_.lookupOrDefault<word>("pressureFieldName","p")),
     P_(sm.mesh().lookupObject<volScalarField>(pressureFieldName_)),
     partPressureName_(propsDict_.lookupOrDefault<word>("partPressureName","partP")),
-    partPressure_(NULL),
     X_(speciesNames_.size()),
     diffusantGasNames_(propsDict_.lookup("diffusantGasNames")),
-    diffusionCoefficients_(diffusantGasNames_.size(),NULL),
     Xdiffusant_(diffusantGasNames_.size()),
     initialized_(false)
 {
     particleCloud_.checkCG(false);
-    allocateMyArrays();
+    particleCloud_.registerParticleProperty<double**>("partPressure");
+    for (int i=0; i<diffusantGasNames_.size(); i++)
+    {
+        particleCloud_.registerParticleProperty<double**>(diffusantGasNames_[i]);
+    }
     createCoeffs();
     molWeightTable();
 }
@@ -88,35 +90,17 @@ diffusionCoefficient::diffusionCoefficient
 
 diffusionCoefficient::~diffusionCoefficient()
 {
-    particleCloud_.dataExchangeM().destroy(partPressure_,1);
-    for (int i=0; i<diffusantGasNames_.size(); i++) particleCloud_.dataExchangeM().destroy(diffusionCoefficients_[i],1);
-
-    coeffs.clearStorage();
-    molWeight.clearStorage();
 }
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
 
-void diffusionCoefficient::allocateMyArrays() const
-{
-    double initVal=0.0;
-    if (particleCloud_.dataExchangeM().maxNumberOfParticles() > 0)
-    {
-        particleCloud_.dataExchangeM().allocateArray(partPressure_,initVal,1,"nparticles");
-        for (int i=0; i<diffusantGasNames_.size(); i++)
-        {
-            particleCloud_.dataExchangeM().allocateArray(diffusionCoefficients_[i],initVal,1,"nparticles");
-        }
-    }
-}
-
 void diffusionCoefficient::reAllocMyArrays() const
 {
     double initVal=0.0;
-    particleCloud_.dataExchangeM().allocateArray(partPressure_,initVal,1,"nparticles");
+    particleCloud_.dataExchangeM().allocateArray(particleCloud_.getParticlePropertyRef<double**>("partPressure"),initVal,1);
     for (int i=0; i<diffusantGasNames_.size(); i++)
     {
-        particleCloud_.dataExchangeM().allocateArray(diffusionCoefficients_[i],initVal,1);
+        particleCloud_.dataExchangeM().allocateArray(particleCloud_.getParticlePropertyRef<double**>(diffusantGasNames_[i]),initVal,1);
     }
 }
 
@@ -172,6 +156,8 @@ void diffusionCoefficient::execute()
     interpolationCellPoint <scalar> TInterpolator_(tempField_);
     interpolationCellPoint <scalar> PInterpolator_(P_);
 
+    double**& partPressure_ = particleCloud_.getParticlePropertyRef<double**>("partPressure");
+
     for (int index=0; index<particleCloud_.numberOfParticles(); ++index)
     {
         cellI = particleCloud_.cellIDs()[index][0];
@@ -207,6 +193,7 @@ void diffusionCoefficient::execute()
 
             for (int j=0; j<diffusantGasNames_.size(); j++)
             {
+                double**& diffusionCoefficients_ = particleCloud_.getParticlePropertyRef<double**>(diffusantGasNames_[j]);
                 TotalFraction_[j] = 0.0;
                 dBinary_ = 0.0;
 
@@ -243,9 +230,9 @@ void diffusionCoefficient::execute()
 
                             // pass on dCoeff values to array
                             if (TotalFraction_[j] < VSMALL)
-                                diffusionCoefficients_[j][index][0] = VSMALL;
+                                diffusionCoefficients_[index][0] = VSMALL;
                             else
-                                diffusionCoefficients_[j][index][0] = (1.0 - Xdiffusant_[j][cellI]) / TotalFraction_[j];
+                                diffusionCoefficients_[index][0] = (1.0 - Xdiffusant_[j][cellI]) / TotalFraction_[j];
                         }
                         else
                         {
@@ -258,7 +245,7 @@ void diffusionCoefficient::execute()
                 }
 
                 if(verbose_)
-                    Info << "diffusionCoefficient of species " << diffusantGasNames_[j] << " = " << diffusionCoefficients_[j][index][0] << endl;
+                    Info << "diffusionCoefficient of species " << diffusantGasNames_[j] << " = " << diffusionCoefficients_[index][0] << endl;
             }
         }
     }
@@ -268,7 +255,8 @@ void diffusionCoefficient::execute()
     for (int j=0; j<diffusantGasNames_.size(); j++)
     {
         word pushName = diffusantGasNames_[j] + "_diffCoeff";
-        particleCloud_.dataExchangeM().giveData(pushName,"scalar-atom",diffusionCoefficients_[j]);
+        double**& diffusionCoefficients_ = particleCloud_.getParticlePropertyRef<double**>(diffusantGasNames_[j]);
+        particleCloud_.dataExchangeM().giveData(pushName,"scalar-atom",diffusionCoefficients_);
     }
 
     Info << "give data done" << endl;

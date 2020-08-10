@@ -70,13 +70,7 @@ private:
 
     word partNuName_;
 
-    mutable double **partNu_;
-
     word partReynolds_;
-
-    mutable double **partRe_;
-
-    void allocateMyArrays() const;
 
     mutable scalar scaleDia_;
 

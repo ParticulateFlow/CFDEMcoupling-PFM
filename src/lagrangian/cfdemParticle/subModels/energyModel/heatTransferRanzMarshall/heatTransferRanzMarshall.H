@@ -109,17 +109,7 @@ protected:
 
     word partTempName_;
 
-    mutable double **partTemp_;
-
     word partHeatFluxName_;
-
-    mutable double **partHeatFlux_;
-
-    mutable double **partHeatFluxCoeff_;
-
-    mutable double **partRe_;
-
-    mutable double **partNu_;
 
     mutable scalar scaleDia_;
 
@@ -163,11 +153,11 @@ public:
 
         void addEnergyContribution(volScalarField&) const;
 
-	void addEnergyCoefficient(volScalarField&) const;
+        void addEnergyCoefficient(volScalarField&) const;
 
-	void calcEnergyContribution();
+        void calcEnergyContribution();
 
-	void postFlow();
+        void postFlow();
 };
 
 

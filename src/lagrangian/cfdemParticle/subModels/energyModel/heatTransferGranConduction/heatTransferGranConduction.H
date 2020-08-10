@@ -74,11 +74,7 @@ protected:
 
     word partHeatFluxName_;
 
-    mutable double **partHeatFlux_;
-
     scalarList typePartThermCond_;
-
-    mutable double **partThermCond_;
 
     void allocateMyArrays() const;
 
@@ -118,9 +114,9 @@ public:
 
         void addEnergyCoefficient(volScalarField&) const {}
 
-	void calcEnergyContribution();
+        void calcEnergyContribution();
 
-	void postFlow();
+        void postFlow();
 
 };
 

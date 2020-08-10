@@ -68,10 +68,6 @@ private:
 
     UPtrList<volScalarField> X_;
 
-    mutable List<double**> molarFractions_;
-
-    mutable List<double**> changeOfSpeciesMass_;
-
     PtrList<volScalarField> changeOfSpeciesMassFields_;
 
     volScalarField changeOfGasMassField_;
@@ -82,21 +78,15 @@ private:
 
     word partTempName_;
 
-    mutable double **partTemp_;                    // gas temperature at particle positions
-
     word densityFieldName_;
 
     const volScalarField& rho_;
 
     word partRhoName_;
 
-    mutable double **partRho_;                     // gas density at particle positions
-
     word voidfractionFieldName_;
 
     const volScalarField& voidfraction_;
-
-    void allocateMyArrays() const;
 
     // total mole field
     word molarConcFieldName_;
@@ -104,8 +94,6 @@ private:
     const volScalarField& molarConc_;
 
     word partMolarConcName_;
-
-    mutable double **partMolarConc_;
 
     label loopCounter_;
 

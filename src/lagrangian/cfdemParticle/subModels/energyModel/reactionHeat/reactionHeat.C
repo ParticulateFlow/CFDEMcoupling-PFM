@@ -50,7 +50,6 @@ reactionHeat::reactionHeat
     mesh_(sm.mesh()),
     maxSource_(1e30),
     reactionHeatName_(propsDict_.lookupOrDefault<word>("reactionHeatName","reactionHeat")),
-    reactionHeat_(NULL),
     reactionHeatField_
     (
         IOobject
@@ -65,7 +64,7 @@ reactionHeat::reactionHeat
         dimensionedScalar("zero", dimensionSet(1,-1,-3,0,0,0,0),0.0)
     )
 {
-    allocateMyArrays();
+    particleCloud_.registerParticleProperty<double**>(reactionHeatName_);
 
     if(propsDict_.found("maxsource"))
     {
@@ -79,7 +78,6 @@ reactionHeat::reactionHeat
 
 reactionHeat::~reactionHeat()
 {
-    particleCloud_.dataExchangeM().destroy(reactionHeat_,1);
 }
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
@@ -87,6 +85,7 @@ void reactionHeat::allocateMyArrays() const
 {
     // get memory for 2d arrays
     double initVal=0.0;
+    double**& reactionHeat_ = particleCloud_.getParticlePropertyRef<double**>(reactionHeatName_);
     particleCloud_.dataExchangeM().allocateArray(reactionHeat_,initVal,1);
 }
 
@@ -96,6 +95,7 @@ void reactionHeat::calcEnergyContribution()
 {
    // realloc the arrays
     allocateMyArrays();
+    double**& reactionHeat_ = particleCloud_.getParticlePropertyRef<double**>(reactionHeatName_);
 
     particleCloud_.dataExchangeM().getData(reactionHeatName_,"scalar-atom",reactionHeat_);
 

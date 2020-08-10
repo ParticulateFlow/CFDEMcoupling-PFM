@@ -142,17 +142,22 @@ heatTransferRanzMarshall::heatTransferRanzMarshall
     densityFieldName_(propsDict_.lookupOrDefault<word>("densityFieldName","rho")),
     rho_(sm.mesh().lookupObject<volScalarField> (densityFieldName_)),
     partTempName_(propsDict_.lookup("partTempName")),
-    partTemp_(NULL),
     partHeatFluxName_(propsDict_.lookupOrDefault<word>("partHeatFluxName","convectiveHeatFlux")),
-    partHeatFlux_(NULL),
-    partHeatFluxCoeff_(NULL),
-    partRe_(NULL),
-    partNu_(NULL),
     scaleDia_(1.),
     typeCG_(propsDict_.lookupOrDefault<scalarList>("coarseGrainingFactors",scalarList(1,1.0))),
     maxTypeCG_(typeCG_.size())
 {
-    allocateMyArrays();
+    particleCloud_.registerParticleProperty<double**>(partTempName_);
+    particleCloud_.registerParticleProperty<double**>(partHeatFluxName_);
+    if (implicit_)
+    {
+        particleCloud_.registerParticleProperty<double**>("partHeatFluxCoeff");
+    }
+    if(verbose_)
+    {
+        particleCloud_.registerParticleProperty<double**>("partRe");
+        particleCloud_.registerParticleProperty<double**>("partNu");
+    }
 
     if (propsDict_.found("NusseltScalingFactor"))
     {
@@ -225,14 +230,6 @@ heatTransferRanzMarshall::heatTransferRanzMarshall
 
 heatTransferRanzMarshall::~heatTransferRanzMarshall()
 {
-    particleCloud_.dataExchangeM().destroy(partTemp_,1);
-    particleCloud_.dataExchangeM().destroy(partHeatFlux_,1);
-    particleCloud_.dataExchangeM().destroy(partRe_,1);
-    particleCloud_.dataExchangeM().destroy(partNu_,1);
-    if (implicit_)
-    {
-        particleCloud_.dataExchangeM().destroy(partHeatFluxCoeff_,1);
-    }
 }
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
@@ -240,15 +237,22 @@ void heatTransferRanzMarshall::allocateMyArrays() const
 {
     // get memory for 2d arrays
     double initVal=0.0;
+    double**& partTemp_ = particleCloud_.getParticlePropertyRef<double**>(partTempName_);
+    double**& partHeatFlux_ = particleCloud_.getParticlePropertyRef<double**>(partHeatFluxName_);
+
     particleCloud_.dataExchangeM().allocateArray(partTemp_,initVal,1);  // field/initVal/with/lenghtFromLigghts
     particleCloud_.dataExchangeM().allocateArray(partHeatFlux_,initVal,1);
+
     if(implicit_)
     {
+        double**& partHeatFluxCoeff_ = particleCloud_.getParticlePropertyRef<double**>("partHeatFluxCoeff");
         particleCloud_.dataExchangeM().allocateArray(partHeatFluxCoeff_,initVal,1);
     }
 
     if(verbose_)
     {
+        double**& partRe_ = particleCloud_.getParticlePropertyRef<double**>("partRe");
+        double**& partNu_ = particleCloud_.getParticlePropertyRef<double**>("partNu");
         particleCloud_.dataExchangeM().allocateArray(partRe_,initVal,1);
         particleCloud_.dataExchangeM().allocateArray(partNu_,initVal,1);
     }
@@ -260,6 +264,8 @@ void heatTransferRanzMarshall::calcEnergyContribution()
 {
    // realloc the arrays
     allocateMyArrays();
+    double**& partTemp_ = particleCloud_.getParticlePropertyRef<double**>(partTempName_);
+    double**& partHeatFlux_ = particleCloud_.getParticlePropertyRef<double**>(partHeatFluxName_);
 
     // reset Scalar field
     QPartFluid_.primitiveFieldRef() = 0.0;
@@ -387,6 +393,8 @@ void heatTransferRanzMarshall::calcEnergyContribution()
 
                 if(verbose_)
                 {
+                    double**& partRe_ = particleCloud_.getParticlePropertyRef<double**>("partRe");
+                    double**& partNu_ = particleCloud_.getParticlePropertyRef<double**>("partNu");
                     partRe_[index][0] = Rep;
                     partNu_[index][0] = Nup;
                 }
@@ -427,6 +435,7 @@ void heatTransferRanzMarshall::calcEnergyContribution()
 
     if(implicit_)
     {
+        double**& partHeatFluxCoeff_ = particleCloud_.getParticlePropertyRef<double**>("partHeatFluxCoeff");
         QPartFluidCoeff_.primitiveFieldRef() = 0.0;
 
         particleCloud_.averagingM().setScalarSum
@@ -442,6 +451,8 @@ void heatTransferRanzMarshall::calcEnergyContribution()
 
     if(verbose_)
     {
+        double**& partRe_ = particleCloud_.getParticlePropertyRef<double**>("partRe");
+        double**& partNu_ = particleCloud_.getParticlePropertyRef<double**>("partNu");
         ReField_.primitiveFieldRef() = 0.0;
         NuField_.primitiveFieldRef() = 0.0;
         particleCloud_.averagingM().resetWeightFields();
@@ -503,8 +514,10 @@ scalar heatTransferRanzMarshall::Nusselt(scalar voidfraction, scalar Rep, scalar
 void heatTransferRanzMarshall::heatFlux(label index, scalar h, scalar As, scalar Tfluid, scalar cg3)
 {
     scalar hAs = h * As * cg3;
+    double**& partTemp_ = particleCloud_.getParticlePropertyRef<double**>(partTempName_);
+    double**& partHeatFlux_ = particleCloud_.getParticlePropertyRef<double**>(partHeatFluxName_);
 
-    if (particleCloud_.getParticleEffVolFactors()) 
+    if (particleCloud_.getParticleEffVolFactors())
     {
         scalar effVolFac = particleCloud_.particleEffVolFactor(index);
         hAs *= effVolFac;
@@ -517,6 +530,7 @@ void heatTransferRanzMarshall::heatFlux(label index, scalar h, scalar As, scalar
     }
     else
     {
+        double**& partHeatFluxCoeff_ = particleCloud_.getParticlePropertyRef<double**>("partHeatFluxCoeff");
         partHeatFluxCoeff_[index][0] = hAs;
     }
 }
@@ -529,6 +543,7 @@ void heatTransferRanzMarshall::giveData()
         reduce(totalHeatFlux_, sumOp<scalar>());
         Info << "total convective particle-fluid heat flux [W] = " << totalHeatFlux_ << endl;
     }
+    double**& partHeatFlux_ = particleCloud_.getParticlePropertyRef<double**>(partHeatFluxName_);
     particleCloud_.dataExchangeM().giveData(partHeatFluxName_,"scalar-atom", partHeatFlux_);
 }
 
@@ -540,6 +555,9 @@ void heatTransferRanzMarshall::postFlow()
         scalar Tfluid(0.0);
         scalar Tpart(0.0);
         interpolationCellPoint<scalar> TInterpolator_(tempField_);
+        double**& partTemp_ = particleCloud_.getParticlePropertyRef<double**>(partTempName_);
+        double**& partHeatFlux_ = particleCloud_.getParticlePropertyRef<double**>(partHeatFluxName_);
+        double**& partHeatFluxCoeff_ = particleCloud_.getParticlePropertyRef<double**>("partHeatFluxCoeff");
 
         totalHeatFlux_ = 0.0;
 
@@ -573,6 +591,7 @@ void heatTransferRanzMarshall::postFlow()
 
 void heatTransferRanzMarshall::partTempField()
 {
+        double**& partTemp_ = particleCloud_.getParticlePropertyRef<double**>(partTempName_);
         partTempField_.primitiveFieldRef() = 0.0;
         particleCloud_.averagingM().resetWeightFields();
         particleCloud_.averagingM().setScalarAverage
@@ -595,6 +614,8 @@ void heatTransferRanzMarshall::initPartTemp()
 {
     label cellI = 0;
     scalar T = 0.0;
+    double**& partTemp_ = particleCloud_.getParticlePropertyRef<double**>(partTempName_);
+
     for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)
     {
         cellI = particleCloud_.cellIDs()[index][0];

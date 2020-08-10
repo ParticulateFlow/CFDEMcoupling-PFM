@@ -110,17 +110,7 @@ protected:
 
     word partTempName_;
 
-    mutable double **partTemp_;
-
     word partHeatFluxName_;
-
-    mutable double **partHeatFlux_;
-
-    mutable double **partHeatFluxCoeff_;
-
-    mutable double **partRe_;
-
-    mutable double **partNu_;
 
     mutable scalar scaleDia_;
 

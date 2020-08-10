@@ -56,15 +56,11 @@ private:
 
     bool verbose_;
 
-    mutable double **reactantPerParticle_;
-
     word voidfractionFieldName_;
 
     const volScalarField& voidfraction_;
 
     mutable volScalarField particlesPerCell_;
-
-    void allocateMyArrays() const;
 
     label loopCounter_;
 
