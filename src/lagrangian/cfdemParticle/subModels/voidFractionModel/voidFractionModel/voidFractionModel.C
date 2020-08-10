@@ -88,7 +88,7 @@ voidFractionModel::voidFractionModel
     weight_(1.),
     porosity_(1.)
 {
-    particleCloud_.registerParticleVectorProperty<int>("cellsPerParticle");
+    particleCloud_.registerParticleProperty<int**>("cellsPerParticle");
     if (particleCloud_.getParticleEffVolFactors()) multiWeights_ = true;
 }
 
@@ -131,7 +131,7 @@ voidFractionModel::voidFractionModel
     weight_(1.),
     porosity_(1.)
 {
-    particleCloud_.registerParticleVectorProperty<int>("cellsPerParticle");
+    particleCloud_.registerParticleProperty<int**>("cellsPerParticle");
 }
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
@@ -159,7 +159,7 @@ void voidFractionModel::resetVoidFractions()
 
 int** const& voidFractionModel::cellsPerParticle() const
 {
-    return particleCloud_.getParticleVectorPropertyRef<int>("cellsPerParticle");
+    return particleCloud_.getParticlePropertyRef<int**>("cellsPerParticle");
 }
 
 int voidFractionModel::maxCellsPerParticle() const
@@ -172,8 +172,7 @@ void voidFractionModel::reAllocArrays()
     if(particleCloud_.numberOfParticlesChanged())
     {
         // get arrays of new length
-        particleCloud_.dataExchangeM().allocateArray(
-                    particleCloud_.getParticleVectorPropertyRef<int>("cellsPerParticle"),1,1);
+        particleCloud_.dataExchangeM().allocateArray(particleCloud_.getParticlePropertyRef<int**>("cellsPerParticle"),1,1);
     }
 }
 
@@ -182,8 +181,7 @@ void voidFractionModel::reAllocArrays(int nP)
     if(particleCloud_.numberOfParticlesChanged())
     {
         // get arrays of new length
-        particleCloud_.dataExchangeM().allocateArray(
-                    particleCloud_.getParticleVectorPropertyRef<int>("cellsPerParticle"),1,1,nP);
+        particleCloud_.dataExchangeM().allocateArray(particleCloud_.getParticlePropertyRef<int**>("cellsPerParticle"),1,1,nP);
     }
 }
 

@@ -160,8 +160,7 @@ cfdemCloud::cfdemCloud
             turbulenceModelType_
         )
     ),
-    intParticleProperties(8),
-    doubleParticleProperties(8),
+    particlePropertyTable(32),
     dataExchangeModel_
     (
         dataExchangeModel::New
@@ -407,21 +406,18 @@ cfdemCloud::~cfdemCloud()
 
     for
     (
-        HashTable<int**>::iterator iter = intParticleProperties.begin();
-        iter != intParticleProperties.end();
+        HashTable<particleProperty>::iterator iter = particlePropertyTable.begin();
+        iter != particlePropertyTable.end();
         ++iter
     )
     {
-        dataExchangeM().destroy(*iter,-1);
-    }
-    for
-    (
-        HashTable<double**>::iterator iter = doubleParticleProperties.begin();
-        iter != doubleParticleProperties.end();
-        ++iter
-    )
-    {
-        dataExchangeM().destroy(*iter,-1);
+        if ((*(iter().ti)) == typeid(int**)) {
+            dataExchangeM().destroy(iter().ref<int**>(),-1);
+        } else if ((*(iter().ti)) == typeid(double**)) {
+            dataExchangeM().destroy(iter().ref<double**>(),-1);
+        } else {
+            FatalError << "Trying to destroy property of type " << iter().ti->name() << endl;
+        }
     }
 }
 

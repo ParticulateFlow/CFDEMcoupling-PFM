@@ -403,39 +403,27 @@ inline const turbulenceModel& cfdemCloud::turbulence() const
     return turbulence_;
 }
 
-template<typename T>
-void cfdemCloud::registerParticleVectorProperty(const word& property)
-{
-    FatalError << "Trying to register particle vector property of unsupported type" << endl;
-}
-
-template<> inline
-void cfdemCloud::registerParticleVectorProperty<int>(const word& property)
-{
-    intParticleProperties.insert(property, (int**)NULL);
-}
-
-template<> inline
-void cfdemCloud::registerParticleVectorProperty<double>(const word& property)
-{
-    doubleParticleProperties.insert(property, (double**)NULL);
-}
-
 
 template<typename T>
-T**& cfdemCloud::getParticleVectorPropertyRef(const word& property)
+void cfdemCloud::registerParticleProperty(const word& property)
 {
-    return getParticleVectorPropertyImpl(property, (T**)NULL);
+    particlePropertyTable.insert(property,{NULL,&typeid(T)});
 }
 
-inline int**& cfdemCloud::getParticleVectorPropertyImpl(const word& property, int**)
+template<typename T>
+T& cfdemCloud::getParticlePropertyRef(const word& property)
 {
-    return intParticleProperties[property];
+    return getParticlePropertyImpl(property, static_cast<T>(0));
 }
 
-inline double**& cfdemCloud::getParticleVectorPropertyImpl(const word& property, double**)
+inline int**& cfdemCloud::getParticlePropertyImpl(const word& property, int**)
 {
-    return doubleParticleProperties[property];
+    return particlePropertyTable[property].ref<int**>();
+}
+
+inline double**& cfdemCloud::getParticlePropertyImpl(const word& property, double**)
+{
+    return particlePropertyTable[property].ref<double**>();
 }
 
 }

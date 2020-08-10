@@ -45,6 +45,7 @@ SourceFiles
 // choose version
 #include "OFversion.H"
 #include <vector>
+#include <typeinfo>
 
 #include "fvCFD.H"
 #include "IFstream.H"
@@ -188,8 +189,17 @@ protected:
 
     const turbulenceModel& turbulence_;
 
-    HashTable<int**>        intParticleProperties;
-    HashTable<double**>     doubleParticleProperties;
+    struct particleProperty {
+        void** property;
+        const std::type_info* ti;
+        template<typename T>
+        T& ref() {
+          if (*ti == typeid(T)) return *reinterpret_cast<T*>(&property);
+          else throw std::bad_cast();
+        }
+    };
+
+    HashTable<particleProperty> particlePropertyTable;
 
     autoPtr<dataExchangeModel> dataExchangeModel_;
 
@@ -448,12 +458,12 @@ public:
         bool checkPeriodicCells() const { return checkPeriodicCells_; }
 
         template<typename T>
-        void registerParticleVectorProperty(const word& property);
+        void registerParticleProperty(const word& property);
         template<typename T>
-        T**& getParticleVectorPropertyRef(const word& property);
+        T& getParticlePropertyRef(const word& property);
 protected:
-        virtual int**& getParticleVectorPropertyImpl(const word& property, int**);
-        virtual double**& getParticleVectorPropertyImpl(const word& property, double**);
+        virtual int**& getParticlePropertyImpl(const word& property, int**);
+        virtual double**& getParticlePropertyImpl(const word& property, double**);
 };
 
 
