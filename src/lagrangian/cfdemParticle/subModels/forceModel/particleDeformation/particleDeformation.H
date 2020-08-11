@@ -74,8 +74,6 @@ private:
 
     scalarList upperBounds_;
 
-    mutable double **partDeformations_;
-
     label getListIndex(label) const;
 
     void allocateMyArrays() const;

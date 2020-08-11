@@ -69,16 +69,10 @@ virtualMassForce::virtualMassForce
     U_(sm.mesh().lookupObject<volVectorField> (velFieldName_)),
     phiFieldName_(propsDict_.lookup("phiFieldName")),
     phi_(sm.mesh().lookupObject<surfaceScalarField> (phiFieldName_)),
-    UrelOld_(NULL),
     splitUrelCalculation_(propsDict_.lookupOrDefault<bool>("splitUrelCalculation",false)),
     Cadd_(0.5)
 {
-
-    if (particleCloud_.dataExchangeM().maxNumberOfParticles() > 0)
-    {
-        // get memory for 2d array
-        particleCloud_.dataExchangeM().allocateArray(UrelOld_,NOTONCPU,3);
-    }
+    particleCloud_.registerParticleProperty<double**>("UrelOld");
 
     // init force sub model
     setForceSubModels(propsDict_);
@@ -117,15 +111,14 @@ virtualMassForce::virtualMassForce
 
 virtualMassForce::~virtualMassForce()
 {
-    particleCloud_.dataExchangeM().destroy(UrelOld_,3);
 }
-
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 void virtualMassForce::setForce() const
 {
     reAllocArrays();
+    double**& UrelOld_ = particleCloud_.getParticlePropertyRef<double**>("UrelOld");
 
     scalar dt = U_.mesh().time().deltaT().value();
 
@@ -239,6 +232,7 @@ void Foam::virtualMassForce::reAllocArrays() const
     if(particleCloud_.numberOfParticlesChanged())
     {
         Pout << "virtualMassForce::reAllocArrays..." << endl;
+        double**& UrelOld_ = particleCloud_.getParticlePropertyRef<double**>("UrelOld");
         particleCloud_.dataExchangeM().allocateArray(UrelOld_,NOTONCPU,3);
     }
 }

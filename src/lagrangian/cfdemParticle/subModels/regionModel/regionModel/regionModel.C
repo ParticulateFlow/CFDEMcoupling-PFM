@@ -51,6 +51,8 @@ void regionModel::reAllocArrays() const
     if(particleCloud_.numberOfParticlesChanged())
     {
         // get arrays of new length
+        double**& inRegion_ = particleCloud_.getParticlePropertyRef<double**>("inRegion");
+        double**& outRegion_ = particleCloud_.getParticlePropertyRef<double**>("outRegion");
         particleCloud_.dataExchangeM().allocateArray(inRegion_,1.,1);
         particleCloud_.dataExchangeM().allocateArray(outRegion_,1.,1);
     }
@@ -66,16 +68,10 @@ regionModel::regionModel
 )
 :
     dict_(dict),
-    particleCloud_(sm),
-    inRegion_(NULL),
-    outRegion_(NULL)
+    particleCloud_(sm)
 {
-    if (particleCloud_.dataExchangeM().maxNumberOfParticles() > 0)
-    {
-        // get memory for 2d arrays
-        particleCloud_.dataExchangeM().allocateArray(inRegion_,1.,1);
-        particleCloud_.dataExchangeM().allocateArray(outRegion_,1.,1);
-    }
+    particleCloud_.registerParticleProperty<double**>("inRegion");
+    particleCloud_.registerParticleProperty<double**>("outRegion");
 }
 
 
@@ -83,8 +79,6 @@ regionModel::regionModel
 
 regionModel::~regionModel()
 {
-    particleCloud_.dataExchangeM().destroy(inRegion_,1);
-    particleCloud_.dataExchangeM().destroy(outRegion_,1);
 }
 
 

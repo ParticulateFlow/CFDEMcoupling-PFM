@@ -43,8 +43,6 @@ private:
 
     dictionary propsDict_;
 
-    mutable double **vfluc_;
-
     word UsFieldName_;
 
     const volVectorField& UsField_;

@@ -45,12 +45,6 @@ private:
 
     dictionary propsDict_;
 
-    mutable double **d_;
-    mutable double **p_;
-    mutable double **d2_;
-    mutable double **pd_;
-    mutable double **cg3_;
-
     mutable volScalarField dField_;
     mutable volVectorField pField_;
     mutable volScalarField d2Field_;

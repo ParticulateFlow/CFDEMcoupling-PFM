@@ -64,8 +64,6 @@ private:
 
     scalarList typeKs_;
 
-    mutable double **partKs_;
-
     void allocateMyArrays() const;
 
     void calcPartKsField() const;

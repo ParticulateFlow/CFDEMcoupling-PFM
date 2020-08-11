@@ -89,10 +89,6 @@ private:
 
     const bool randomTauE_;
 
-    mutable double **partTime_;                // Lagrangian array
-
-    mutable double **partUfluct_;              // Lagrangian array
-
     mutable Random RanGen_;
 
 public:

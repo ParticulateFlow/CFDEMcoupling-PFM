@@ -53,7 +53,6 @@ granKineticEnergy::granKineticEnergy
 :
     forceModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
-    vfluc_(NULL),
     UsFieldName_(propsDict_.lookup("granVelFieldName")),
     UsField_(sm.mesh().lookupObject<volVectorField> (UsFieldName_)),
     granKineticEnergy_
@@ -70,7 +69,7 @@ granKineticEnergy::granKineticEnergy
         "zeroGradient"
     )
 {
-    allocateMyArrays();
+    particleCloud_.registerParticleProperty<double**>("vfluc_mag");
     granKineticEnergy_.write();
 
 
@@ -82,7 +81,6 @@ granKineticEnergy::granKineticEnergy
 
 granKineticEnergy::~granKineticEnergy()
 {
-    particleCloud_.dataExchangeM().destroy(vfluc_,1);
 }
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
@@ -90,6 +88,7 @@ void granKineticEnergy::allocateMyArrays() const
 {
     // get memory for 2d arrays
     double initVal = 0.0;
+    double**& vfluc_ = particleCloud_.getParticlePropertyRef<double**>("vfluc_mag");
     particleCloud_.dataExchangeM().allocateArray(vfluc_,initVal,1);
 }
 // * * * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * * //
@@ -97,6 +96,7 @@ void granKineticEnergy::allocateMyArrays() const
 void granKineticEnergy::setForce() const
 {
     allocateMyArrays();
+    double**& vfluc_ = particleCloud_.getParticlePropertyRef<double**>("vfluc_mag");
 
     label cellI = 0;
     vector velfluc(0,0,0);

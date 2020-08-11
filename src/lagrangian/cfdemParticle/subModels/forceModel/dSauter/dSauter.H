@@ -45,18 +45,14 @@ private:
 
     bool multiTypes_;
 
-    mutable double **d2_;
-    
-    mutable double **d3_;
-
     label maxTypeCG_;
 
     scalarList typeCG_;
-    
+
     mutable volScalarField d2Field_;
-    
+
     mutable volScalarField d3Field_;
-    
+
     mutable volScalarField dSauter_;
 
     void allocateMyArrays() const;
