@@ -74,6 +74,11 @@ public:
     (
             const fvMesh& mesh
     );
+    //- Construct from mesh and a list of recProperties
+    recBase
+    (
+            const fvMesh& mesh, const word recDictName_
+    );
 
     //- Destructor
     virtual ~recBase();
