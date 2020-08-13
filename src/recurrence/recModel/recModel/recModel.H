@@ -224,6 +224,7 @@ public:
     }
 
     virtual void updateRecFields() = 0;
+    virtual label currentTimeIndex() const = 0;
 
     virtual void writeRecMatrix() const = 0;
 

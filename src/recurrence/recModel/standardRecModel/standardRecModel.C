@@ -63,6 +63,7 @@ standardRecModel::standardRecModel
     cumulativeNumRecFields_(),
     totNumRecFields_(0),
     storeAveragedFields_(propsDict_.lookupOrDefault<bool>("storeAveragedFields",false)),
+    checkTimeStep_(propsDict_.lookupOrDefault<bool>("checkTimeStep",true)),
     recurrenceMatrix_(1,scalar(-1.0)),
     timeIndexList_(),
     timeValueList_(),
@@ -127,7 +128,11 @@ standardRecModel::standardRecModel
 
     // check if time steps in databases are consistent
     // if no initial number of time steps has been specified, create path for full runtime immediately
-    recTimeStep_ = checkTimeStep();
+    if(checkTimeStep_)
+    {
+        recTimeStep_ = checkTimeStep();
+    }
+
     if(totRecSteps_ < 0)
     {
         totRecSteps_ = 1 + static_cast<label>( (endTime_-startTime_) / recTimeStep_ );
@@ -736,6 +741,10 @@ void standardRecModel::updateRecFields()
     }
 }
 
+label standardRecModel::currentTimeIndex() const
+{
+    return virtualTimeIndex;
+}
 
 void standardRecModel::writeRecMatrix() const
 {
