@@ -46,17 +46,6 @@ defineRunTimeSelectionTable(regionModel, dictionary);
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void regionModel::reAllocArrays() const
-{
-    if(particleCloud_.numberOfParticlesChanged())
-    {
-        // get arrays of new length
-        double**& inRegion_ = particleCloud_.getParticlePropertyRef<double**>("inRegion");
-        double**& outRegion_ = particleCloud_.getParticlePropertyRef<double**>("outRegion");
-        particleCloud_.dataExchangeM().allocateArray(inRegion_,1.,1);
-        particleCloud_.dataExchangeM().allocateArray(outRegion_,1.,1);
-    }
-}
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
@@ -70,8 +59,8 @@ regionModel::regionModel
     dict_(dict),
     particleCloud_(sm)
 {
-    particleCloud_.registerParticleProperty<double**>("inRegion");
-    particleCloud_.registerParticleProperty<double**>("outRegion");
+    particleCloud_.registerParticleProperty<double**>("inRegion",1,1.0);
+    particleCloud_.registerParticleProperty<double**>("outRegion",1,1.0);
 }
 
 

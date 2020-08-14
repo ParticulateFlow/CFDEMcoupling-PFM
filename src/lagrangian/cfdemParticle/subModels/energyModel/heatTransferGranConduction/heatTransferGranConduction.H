@@ -76,8 +76,6 @@ protected:
 
     scalarList typePartThermCond_;
 
-    void allocateMyArrays() const;
-
     void calcPartEffThermCond();
 
     void calcPartThermCond();

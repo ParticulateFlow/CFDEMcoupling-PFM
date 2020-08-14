@@ -797,9 +797,60 @@ bool cfdemCloud::reAllocArrays()
         if(getParticleDensities_) dataExchangeM().allocateArray(particleDensities_,0.,1);
         if(getParticleEffVolFactors_) dataExchangeM().allocateArray(particleEffVolFactors_,0.,1);
         if(getParticleTypes_) dataExchangeM().allocateArray(particleTypes_,0,1);
+
+        for
+        (
+            HashTable<particleProperty>::iterator iter = particlePropertyTable.begin();
+            iter != particlePropertyTable.end();
+            ++iter
+        )
+        {
+            if (iter().size > 0) {
+                ///Info << "!! about to realloc property of type " << iter().ti->name() << endl;
+                if ((*(iter().ti)) == typeid(int**)) {
+                    dataExchangeM().allocateArray(iter().ref<int**>(),iter().initVal,iter().size);
+                } else if ((*(iter().ti)) == typeid(double**)) {
+                    dataExchangeM().allocateArray(iter().ref<double**>(),iter().initVal,iter().size);
+                } else {
+                    FatalError << "Trying to realloc property of type " << iter().ti->name() << endl;
+                }
+            }
+        }
+
         arraysReallocated_ = true;
         return true;
     }
+    else
+    {
+        for
+        (
+            HashTable<particleProperty>::iterator iter = particlePropertyTable.begin();
+            iter != particlePropertyTable.end();
+            ++iter
+        )
+        {
+            if (iter().size > 0) {
+                if ((*(iter().ti)) == typeid(int**)) {
+                    int**& property = iter().ref<int**>();
+                    for (int index=0; index<numberOfParticles(); ++index) {
+                        for (int icomponent=0; icomponent<iter().size; ++icomponent) {
+                            property[index][icomponent] = iter().initVal;
+                        }
+                    }
+                } else if ((*(iter().ti)) == typeid(double**)) {
+                    double**& property = iter().ref<double**>();
+                    for (int index=0; index<numberOfParticles(); ++index) {
+                        for (int icomponent=0; icomponent<iter().size; ++icomponent) {
+                            property[index][icomponent] = iter().initVal;
+                        }
+                    }
+                } else {
+                    FatalError << "Trying to reset property of type " << iter().ti->name() << endl;
+                }
+            }
+        }
+    }
+
     return false;
 }
 

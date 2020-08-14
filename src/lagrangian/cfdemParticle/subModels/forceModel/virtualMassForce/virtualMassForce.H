@@ -98,8 +98,6 @@ public:
 
     // Member Functions
         void setForce() const;
-
-        void reAllocArrays() const;
 };
 
 

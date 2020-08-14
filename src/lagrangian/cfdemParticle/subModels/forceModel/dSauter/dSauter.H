@@ -55,8 +55,6 @@ private:
 
     mutable volScalarField dSauter_;
 
-    void allocateMyArrays() const;
-
 public:
 
     //- Runtime type information

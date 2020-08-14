@@ -59,8 +59,6 @@ private:
     const Switch     CG_;
     const Switch     runOnWriteOnly_;
 
-    void allocateMyArrays() const;
-
 public:
 
     //- Runtime type information

@@ -163,10 +163,6 @@ public:
 
         int maxCellsPerParticle() const;
 
-        void reAllocArrays();
-
-        void reAllocArrays(int nP);  //force number of particles during reallocation, for CFD offline-use
-
         virtual void setParticleType(label type) const {}
 
         virtual bool checkParticleType(label) const { return true; } //consider all particles by default

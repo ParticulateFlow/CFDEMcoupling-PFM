@@ -77,10 +77,10 @@ diffusionCoefficient::diffusionCoefficient
     initialized_(false)
 {
     particleCloud_.checkCG(false);
-    particleCloud_.registerParticleProperty<double**>("partPressure");
+    particleCloud_.registerParticleProperty<double**>("partPressure",1);
     for (int i=0; i<diffusantGasNames_.size(); i++)
     {
-        particleCloud_.registerParticleProperty<double**>(diffusantGasNames_[i]);
+        particleCloud_.registerParticleProperty<double**>(diffusantGasNames_[i],1);
     }
     createCoeffs();
     molWeightTable();
@@ -94,15 +94,6 @@ diffusionCoefficient::~diffusionCoefficient()
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
 
-void diffusionCoefficient::reAllocMyArrays() const
-{
-    double initVal=0.0;
-    particleCloud_.dataExchangeM().allocateArray(particleCloud_.getParticlePropertyRef<double**>("partPressure"),initVal,1);
-    for (int i=0; i<diffusantGasNames_.size(); i++)
-    {
-        particleCloud_.dataExchangeM().allocateArray(particleCloud_.getParticlePropertyRef<double**>(diffusantGasNames_[i]),initVal,1);
-    }
-}
 
 void diffusionCoefficient::init()
 {
@@ -139,9 +130,6 @@ void diffusionCoefficient::execute()
     {
         init();
     }
-
-    // realloc the arrays
-    reAllocMyArrays();
 
     label  cellI=0;
     scalar Tfluid(0);

@@ -84,7 +84,7 @@ potentialRelaxation::potentialRelaxation
     ignoreDirection_(propsDict_.lookupOrDefault<vector>("ignoreDirection",vector::zero)),
     ignorePoint_(propsDict_.lookupOrDefault<vector>("ignorePoint",vector::zero))
 {
-    particleCloud_.registerParticleProperty<double**>("vfluc");
+    particleCloud_.registerParticleProperty<double**>("vfluc",3);
 
     if(ignoreReg_)
     {
@@ -106,13 +106,6 @@ potentialRelaxation::~potentialRelaxation()
 
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
-void potentialRelaxation::allocateMyArrays() const
-{
-    // get memory for 2d arrays
-    double initVal=0.0;
-    double**& vfluc_ = particleCloud_.getParticlePropertyRef<double**>("vfluc");
-    particleCloud_.dataExchangeM().allocateArray(vfluc_,initVal,3);
-}
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
@@ -124,8 +117,6 @@ void potentialRelaxation::setForce() const
 
   // volVectorField relaxStream = DField_ * fvc::grad(voidfraction_ - voidfractionRec_);
 
-     // realloc the arrays
-    allocateMyArrays();
     double**& vfluc_ = particleCloud_.getParticlePropertyRef<double**>("vfluc");
 
     vector position(0,0,0);

@@ -117,8 +117,6 @@ protected:
 
     const label maxTypeCG_;
 
-    void allocateMyArrays() const;
-
     void partTempField();
 
     scalar Nusselt(scalar, scalar, scalar) const;

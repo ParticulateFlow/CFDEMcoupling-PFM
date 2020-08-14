@@ -91,8 +91,6 @@ void IBVoidFraction::setvoidFraction(double** const& mask,double**& voidfraction
 {
     const boundBox& globalBb = particleCloud_.mesh().bounds();
 
-    reAllocArrays();
-
     voidfractionNext_.ref() = 1.0;
 
     for (int index=0; index < particleCloud_.numberOfParticles(); index++)

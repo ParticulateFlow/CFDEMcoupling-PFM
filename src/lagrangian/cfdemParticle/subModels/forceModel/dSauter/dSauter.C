@@ -100,8 +100,8 @@ dSauter::dSauter
         maxTypeCG_ = typeCG_.size();
     }
 
-    particleCloud_.registerParticleProperty<double**>("d2");
-    particleCloud_.registerParticleProperty<double**>("d3");
+    particleCloud_.registerParticleProperty<double**>("d2",1);
+    particleCloud_.registerParticleProperty<double**>("d3",1);
 
     dSauter_.write();
 
@@ -118,15 +118,6 @@ dSauter::~dSauter()
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
 
-void dSauter::allocateMyArrays() const
-{
-    // get memory for 2d arrays
-    double initVal = 0.0;
-    double**& d2_ = particleCloud_.getParticlePropertyRef<double**>("d2");
-    double**& d3_ = particleCloud_.getParticlePropertyRef<double**>("d3");
-    particleCloud_.dataExchangeM().allocateArray(d2_,initVal,1);  // field/initVal/with/lenghtFromLigghts
-    particleCloud_.dataExchangeM().allocateArray(d3_,initVal,1);
-}
 
 // * * * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * * //
 
@@ -137,7 +128,6 @@ void dSauter::setForce() const
         Info << "dSauter using CG factor(s) = " << typeCG_ << endl;
     }
 
-    allocateMyArrays();
     double**& d2_ = particleCloud_.getParticlePropertyRef<double**>("d2");
     double**& d3_ = particleCloud_.getParticlePropertyRef<double**>("d3");
 

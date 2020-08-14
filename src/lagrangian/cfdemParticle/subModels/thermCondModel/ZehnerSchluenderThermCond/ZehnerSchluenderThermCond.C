@@ -63,7 +63,7 @@ ZehnerSchluenderThermCond::ZehnerSchluenderThermCond
 
     if (typeKs_.size() > 1)
     {
-        particleCloud_.registerParticleProperty<double**>("partKs");
+        particleCloud_.registerParticleProperty<double**>("partKs",1);
     }
     else
     {
@@ -76,14 +76,6 @@ ZehnerSchluenderThermCond::ZehnerSchluenderThermCond
 
 ZehnerSchluenderThermCond::~ZehnerSchluenderThermCond()
 {
-}
-
-
-void ZehnerSchluenderThermCond::allocateMyArrays() const
-{
-    double initVal=0.0;
-    double**& partKs_ = particleCloud_.getParticlePropertyRef<double**>("partKs");
-    particleCloud_.dataExchangeM().allocateArray(partKs_,initVal,1);
 }
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
@@ -135,7 +127,6 @@ void ZehnerSchluenderThermCond::calcPartKsField() const
         FatalError << "ZehnerSchluenderThermCond needs data for more than one type, but types are not communicated." << abort(FatalError);
     }
 
-    allocateMyArrays();
     double**& partKs_ = particleCloud_.getParticlePropertyRef<double**>("partKs");
     label cellI=0;
     label partType = 0;

@@ -76,8 +76,6 @@ private:
 
     label getListIndex(label) const;
 
-    void allocateMyArrays() const;
-
     void init() const;
 
     bool defaultDeformCell(label) const;

@@ -146,11 +146,11 @@ pdCorrelation::pdCorrelation
                   << abort(FatalError);
     }
 
-    particleCloud_.registerParticleProperty<double**>("d");
-    particleCloud_.registerParticleProperty<double**>("p");
-    particleCloud_.registerParticleProperty<double**>("d2");
-    particleCloud_.registerParticleProperty<double**>("pd");
-    particleCloud_.registerParticleProperty<double**>("cg3");
+    particleCloud_.registerParticleProperty<double**>("d",1);
+    particleCloud_.registerParticleProperty<double**>("p",3);
+    particleCloud_.registerParticleProperty<double**>("d2",1);
+    particleCloud_.registerParticleProperty<double**>("pd",3);
+    particleCloud_.registerParticleProperty<double**>("cg3",1);
 
     dField_.write();
     pdField_.write();
@@ -167,22 +167,6 @@ pdCorrelation::~pdCorrelation()
 }
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
-void pdCorrelation::allocateMyArrays() const
-{
-    // get memory for 2d arrays
-    double initVal = 0.0;
-    double**& d_ = particleCloud_.getParticlePropertyRef<double**>("d");
-    double**& p_ = particleCloud_.getParticlePropertyRef<double**>("p");
-    double**& d2_ = particleCloud_.getParticlePropertyRef<double**>("d2");
-    double**& pd_ = particleCloud_.getParticlePropertyRef<double**>("pd");
-    double**& cg3_ = particleCloud_.getParticlePropertyRef<double**>("cg3");
-
-    particleCloud_.dataExchangeM().allocateArray(d_,  initVal, 1);
-    particleCloud_.dataExchangeM().allocateArray(p_,  initVal, 3);
-    particleCloud_.dataExchangeM().allocateArray(d2_, initVal, 1);
-    particleCloud_.dataExchangeM().allocateArray(pd_, initVal, 3);
-    particleCloud_.dataExchangeM().allocateArray(cg3_, initVal, 1);
-}
 // * * * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * * //
 
 void pdCorrelation::setForce() const
@@ -191,7 +175,6 @@ void pdCorrelation::setForce() const
 
     if (runOnWriteOnly_ && !mesh.write()) return; // skip if it's not write time
 
-    allocateMyArrays();
     double**& d_ = particleCloud_.getParticlePropertyRef<double**>("d");
     double**& p_ = particleCloud_.getParticlePropertyRef<double**>("p");
     double**& d2_ = particleCloud_.getParticlePropertyRef<double**>("d2");

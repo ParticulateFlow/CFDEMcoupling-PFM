@@ -80,8 +80,6 @@ centreVoidFraction::~centreVoidFraction()
 
 void centreVoidFraction::setvoidFraction(double** const& mask,double**& voidfractions,double**& particleWeights,double**& particleVolumes,double**& particleV)
 {
-    reAllocArrays();
-
     scalar radius(-1);
     scalar volume(0);
     scalar cellVol(0);

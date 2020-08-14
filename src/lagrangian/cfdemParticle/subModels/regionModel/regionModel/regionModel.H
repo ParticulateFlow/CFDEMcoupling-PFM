@@ -113,8 +113,6 @@ public:
 
         virtual void resetVolFields(volVectorField&) const = 0;
 
-        void reAllocArrays() const;
-
 };
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

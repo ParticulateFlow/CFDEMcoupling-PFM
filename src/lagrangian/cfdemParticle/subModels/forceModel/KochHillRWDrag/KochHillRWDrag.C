@@ -97,8 +97,8 @@ KochHillRWDrag::KochHillRWDrag
     if (propsDict_.found("rhoP"))
         rhoP_= readScalar(propsDict_.lookup("rhoP"));
 
-    particleCloud_.registerParticleProperty<double**>("partTime");
-    particleCloud_.registerParticleProperty<double**>("partUfluct");
+    particleCloud_.registerParticleProperty<double**>("partTime",1);
+    particleCloud_.registerParticleProperty<double**>("partUfluct",3);
 }
 
 
@@ -112,10 +112,6 @@ KochHillRWDrag::~KochHillRWDrag()
 
 void KochHillRWDrag::setForce() const
 {
-
-    // realloc the arrays
-    reAllocArrays();
-
     if (scale_ > 1.0)
     {
         Info << "KochHillRW using scale = " << scale_ << endl;
@@ -369,19 +365,6 @@ void KochHillRWDrag::setForce() const
             // write particle based data to global array
             forceSubM(0).partToArray(index,drag,dragExplicit,Ufluid,dragCoefficient);
         //}
-    }
-}
-
-
-void KochHillRWDrag::reAllocArrays() const
-{
-    if (particleCloud_.numberOfParticlesChanged())
-    {
-        double**& partTime_ = particleCloud_.getParticlePropertyRef<double**>("partTime");
-        double**& partUfluct_ = particleCloud_.getParticlePropertyRef<double**>("partUfluct");
-
-        particleCloud_.dataExchangeM().allocateArray(partTime_,0.0,1);  // field/initVal/with/lenghtFromLigghts
-        particleCloud_.dataExchangeM().allocateArray(partUfluct_,0.0,3);
     }
 }
 

@@ -69,7 +69,7 @@ granKineticEnergy::granKineticEnergy
         "zeroGradient"
     )
 {
-    particleCloud_.registerParticleProperty<double**>("vfluc_mag");
+    particleCloud_.registerParticleProperty<double**>("vfluc_mag",1);
     granKineticEnergy_.write();
 
 
@@ -84,18 +84,10 @@ granKineticEnergy::~granKineticEnergy()
 }
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
-void granKineticEnergy::allocateMyArrays() const
-{
-    // get memory for 2d arrays
-    double initVal = 0.0;
-    double**& vfluc_ = particleCloud_.getParticlePropertyRef<double**>("vfluc_mag");
-    particleCloud_.dataExchangeM().allocateArray(vfluc_,initVal,1);
-}
 // * * * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * * //
 
 void granKineticEnergy::setForce() const
 {
-    allocateMyArrays();
     double**& vfluc_ = particleCloud_.getParticlePropertyRef<double**>("vfluc_mag");
 
     label cellI = 0;

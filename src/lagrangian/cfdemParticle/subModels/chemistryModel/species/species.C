@@ -103,14 +103,14 @@ species::species
     initialized_(false)
 {
     particleCloud_.checkCG(false);
-    particleCloud_.registerParticleProperty<double**>(partTempName_);
-    particleCloud_.registerParticleProperty<double**>(partRhoName_);
-    particleCloud_.registerParticleProperty<double**>(partMolarConcName_);
+    particleCloud_.registerParticleProperty<double**>(partTempName_,1);
+    particleCloud_.registerParticleProperty<double**>(partRhoName_,1);
+    particleCloud_.registerParticleProperty<double**>(partMolarConcName_,1);
 
     for (int i=0; i<speciesNames_.size(); i++)
     {
-        particleCloud_.registerParticleProperty<double**>("X_"+speciesNames_[i]);
-        particleCloud_.registerParticleProperty<double**>("Modified_"+speciesNames_[i]);
+        particleCloud_.registerParticleProperty<double**>("X_"+speciesNames_[i],1);
+        particleCloud_.registerParticleProperty<double**>("Modified_"+speciesNames_[i],1);
     }
 }
 
@@ -121,26 +121,6 @@ species::~species()
 }
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
-
-void species::reAllocMyArrays() const
-{
-    double initVal=0.0;
-    double**& partRho_ = particleCloud_.getParticlePropertyRef<double**>(partRhoName_);
-    double**& partTemp_ = particleCloud_.getParticlePropertyRef<double**>(partTempName_);
-    double**& partMolarConc_ = particleCloud_.getParticlePropertyRef<double**>(partMolarConcName_);
-
-    particleCloud_.dataExchangeM().allocateArray(partRho_,initVal,1);
-    particleCloud_.dataExchangeM().allocateArray(partTemp_,initVal,1);
-    particleCloud_.dataExchangeM().allocateArray(partMolarConc_,initVal,1);
-
-    for (int i=0; i<speciesNames_.size(); i++)
-    {
-        double**& molarFractions_ = particleCloud_.getParticlePropertyRef<double**>("X_"+speciesNames_[i]);
-        double**& changeOfSpeciesMass_ = particleCloud_.getParticlePropertyRef<double**>("Modified_"+speciesNames_[i]);
-        particleCloud_.dataExchangeM().allocateArray(molarFractions_,initVal,1);
-        particleCloud_.dataExchangeM().allocateArray(changeOfSpeciesMass_,initVal,1);
-    }
-}
 
 void species::init()
 {
@@ -203,8 +183,6 @@ void species::execute()
     {
         return;
     }
-    // realloc the arrays
-    reAllocMyArrays();
 
     // get X_i, T, rho at particle positions
     label  cellI = 0;

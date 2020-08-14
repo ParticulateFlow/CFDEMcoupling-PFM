@@ -61,7 +61,7 @@ particleDeformation::particleDeformation
     lowerBounds_(propsDict_.lookupOrDefault<scalarList>("lowerBounds",scalarList(1,-1.0))),
     upperBounds_(propsDict_.lookupOrDefault<scalarList>("upperBounds",scalarList(1,-1.0)))
 {
-    particleCloud_.registerParticleProperty<double**>("partDeformations");
+    particleCloud_.registerParticleProperty<double**>("partDeformations",1);
 
     // init force sub model
     setForceSubModels(propsDict_);
@@ -122,13 +122,6 @@ particleDeformation::~particleDeformation()
 }
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
-void particleDeformation::allocateMyArrays() const
-{
-    // get memory for 2d arrays
-    double initVal = 0.0;
-    double**& partDeformations_ = particleCloud_.getParticlePropertyRef<double**>("partDeformations");
-    particleCloud_.dataExchangeM().allocateArray(partDeformations_,initVal,1);
-}
 
 bool particleDeformation::defaultDeformCell(label cell) const
 {
@@ -144,8 +137,7 @@ void particleDeformation::setForce() const
         init();
         initialExec_ = false;
     }
-    // realloc the arrays
-    allocateMyArrays();
+
     double**& partDeformations_ = particleCloud_.getParticlePropertyRef<double**>("partDeformations");
 
     label cellI = 0;

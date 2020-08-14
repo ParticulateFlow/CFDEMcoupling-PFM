@@ -192,6 +192,8 @@ protected:
     struct particleProperty {
         void** property;
         const std::type_info* ti;
+        int size;
+        double initVal;
         template<typename T>
         T& ref() {
           if (*ti == typeid(T)) return *reinterpret_cast<T*>(&property);
@@ -458,7 +460,7 @@ public:
         bool checkPeriodicCells() const { return checkPeriodicCells_; }
 
         template<typename T>
-        void registerParticleProperty(const word& property);
+        void registerParticleProperty(const word& property, int size=0, double initVal=0.0);
         template<typename T>
         T& getParticlePropertyRef(const word& property);
 protected:

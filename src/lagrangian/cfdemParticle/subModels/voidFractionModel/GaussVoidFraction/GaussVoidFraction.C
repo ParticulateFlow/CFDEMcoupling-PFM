@@ -89,8 +89,6 @@ GaussVoidFraction::~GaussVoidFraction()
 
 void GaussVoidFraction::setvoidFraction(double** const& mask,double**& voidfractions,double**& particleWeights,double**& particleVolumes,double**& particleV)
 {
-    reAllocArrays();
-
     voidfractionNext_.ref()=1;
 
     scalar radius(-1);

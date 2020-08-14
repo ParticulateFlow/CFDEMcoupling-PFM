@@ -69,8 +69,7 @@ dividedVoidFraction::dividedVoidFraction
     alphaMin_(readScalar(propsDict_.lookup("alphaMin"))),
     alphaLimited_(0),
     tooMuch_(0.0),
-    interpolation_(propsDict_.found("interpolation")),
-    cfdemUseOnly_(propsDict_.lookupOrDefault<bool>("cfdemUseOnly", false))
+    interpolation_(propsDict_.found("interpolation"))
 {
     maxCellsPerParticle_ = numberOfMarkerPoints;
 
@@ -158,10 +157,6 @@ dividedVoidFraction::~dividedVoidFraction()
 
 void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfractions,double**& particleWeights,double**& particleVolumes, double**& particleV)
 {
-    if (cfdemUseOnly_)
-        reAllocArrays(particleCloud_.numberOfParticles());
-    else
-        reAllocArrays();
 
     vector position(0.,0.,0.);
     label cellID = -1;

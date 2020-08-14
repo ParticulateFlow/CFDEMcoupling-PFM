@@ -72,7 +72,7 @@ virtualMassForce::virtualMassForce
     splitUrelCalculation_(propsDict_.lookupOrDefault<bool>("splitUrelCalculation",false)),
     Cadd_(0.5)
 {
-    particleCloud_.registerParticleProperty<double**>("UrelOld");
+    particleCloud_.registerParticleProperty<double**>("UrelOld",3,NOTONCPU);
 
     // init force sub model
     setForceSubModels(propsDict_);
@@ -117,7 +117,6 @@ virtualMassForce::~virtualMassForce()
 
 void virtualMassForce::setForce() const
 {
-    reAllocArrays();
     double**& UrelOld_ = particleCloud_.getParticlePropertyRef<double**>("UrelOld");
 
     scalar dt = U_.mesh().time().deltaT().value();
@@ -225,18 +224,6 @@ void virtualMassForce::setForce() const
             forceSubM(0).partToArray(index,virtualMassForce,vector::zero);
     }
 }
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-void Foam::virtualMassForce::reAllocArrays() const
-{
-    if(particleCloud_.numberOfParticlesChanged())
-    {
-        Pout << "virtualMassForce::reAllocArrays..." << endl;
-        double**& UrelOld_ = particleCloud_.getParticlePropertyRef<double**>("UrelOld");
-        particleCloud_.dataExchangeM().allocateArray(UrelOld_,NOTONCPU,3);
-    }
-}
-
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

@@ -67,8 +67,8 @@ massTransferCoeff::massTransferCoeff
     scaleDia_(1)
 {
     particleCloud_.checkCG(true);
-    particleCloud_.registerParticleProperty<double**>(partNuName_);
-    particleCloud_.registerParticleProperty<double**>(partReynolds_);
+    particleCloud_.registerParticleProperty<double**>(partNuName_,1);
+    particleCloud_.registerParticleProperty<double**>(partReynolds_,1);
 }
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
@@ -79,20 +79,10 @@ massTransferCoeff::~massTransferCoeff()
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
 
-void massTransferCoeff::reAllocMyArrays() const
-{
-    double initVal=0.0;
-    particleCloud_.dataExchangeM().allocateArray(particleCloud_.getParticlePropertyRef<double**>(partNuName_),initVal,1);
-    particleCloud_.dataExchangeM().allocateArray(particleCloud_.getParticlePropertyRef<double**>(partReynolds_),initVal,1);
-}
-
 // * * * * * * * * * * * * * * * * Member Fct  * * * * * * * * * * * * * * * //
 
 void massTransferCoeff::execute()
 {
-    // realloc the arrays
-    reAllocMyArrays();
-
     #ifdef compre
         const volScalarField nufField = particleCloud_.turbulence().mu()/rho_;
     #else

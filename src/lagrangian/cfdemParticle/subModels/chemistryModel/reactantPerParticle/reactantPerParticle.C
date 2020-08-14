@@ -75,7 +75,7 @@ reactantPerParticle::reactantPerParticle
     Nevery_(propsDict_.lookupOrDefault<label>("Nevery",1))
 {
     particleCloud_.checkCG(false);
-    particleCloud_.registerParticleProperty<double**>("reactantPerParticle");
+    particleCloud_.registerParticleProperty<double**>("reactantPerParticle",1);
 }
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
@@ -86,13 +86,6 @@ reactantPerParticle::~reactantPerParticle()
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
 
-void reactantPerParticle::reAllocMyArrays() const
-{
-    double initVal=0.0;
-    double**& reactantPerParticle_ = particleCloud_.getParticlePropertyRef<double**>("reactantPerParticle");
-    particleCloud_.dataExchangeM().allocateArray(reactantPerParticle_,initVal,1);
-}
-
 // * * * * * * * * * * * * * * * * Member Fct  * * * * * * * * * * * * * * * //
 
 void reactantPerParticle::execute()
@@ -102,8 +95,6 @@ void reactantPerParticle::execute()
     {
         return;
     }
-    // realloc the arrays
-    reAllocMyArrays();
 
     particlesPerCell_ *= 0.0;
 

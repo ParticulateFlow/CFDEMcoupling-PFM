@@ -58,8 +58,6 @@ protected:
 
     volScalarField reactionHeatField_;
 
-    void allocateMyArrays() const;
-
 public:
 
     //- Runtime type information

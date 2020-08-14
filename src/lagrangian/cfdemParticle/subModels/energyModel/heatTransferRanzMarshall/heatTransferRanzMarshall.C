@@ -147,16 +147,16 @@ heatTransferRanzMarshall::heatTransferRanzMarshall
     typeCG_(propsDict_.lookupOrDefault<scalarList>("coarseGrainingFactors",scalarList(1,1.0))),
     maxTypeCG_(typeCG_.size())
 {
-    particleCloud_.registerParticleProperty<double**>(partTempName_);
-    particleCloud_.registerParticleProperty<double**>(partHeatFluxName_);
+    particleCloud_.registerParticleProperty<double**>(partTempName_,1);
+    particleCloud_.registerParticleProperty<double**>(partHeatFluxName_,1);
     if (implicit_)
     {
-        particleCloud_.registerParticleProperty<double**>("partHeatFluxCoeff");
+        particleCloud_.registerParticleProperty<double**>("partHeatFluxCoeff",1);
     }
     if(verbose_)
     {
-        particleCloud_.registerParticleProperty<double**>("partRe");
-        particleCloud_.registerParticleProperty<double**>("partNu");
+        particleCloud_.registerParticleProperty<double**>("partRe",1);
+        particleCloud_.registerParticleProperty<double**>("partNu",1);
     }
 
     if (propsDict_.found("NusseltScalingFactor"))
@@ -233,37 +233,11 @@ heatTransferRanzMarshall::~heatTransferRanzMarshall()
 }
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
-void heatTransferRanzMarshall::allocateMyArrays() const
-{
-    // get memory for 2d arrays
-    double initVal=0.0;
-    double**& partTemp_ = particleCloud_.getParticlePropertyRef<double**>(partTempName_);
-    double**& partHeatFlux_ = particleCloud_.getParticlePropertyRef<double**>(partHeatFluxName_);
-
-    particleCloud_.dataExchangeM().allocateArray(partTemp_,initVal,1);  // field/initVal/with/lenghtFromLigghts
-    particleCloud_.dataExchangeM().allocateArray(partHeatFlux_,initVal,1);
-
-    if(implicit_)
-    {
-        double**& partHeatFluxCoeff_ = particleCloud_.getParticlePropertyRef<double**>("partHeatFluxCoeff");
-        particleCloud_.dataExchangeM().allocateArray(partHeatFluxCoeff_,initVal,1);
-    }
-
-    if(verbose_)
-    {
-        double**& partRe_ = particleCloud_.getParticlePropertyRef<double**>("partRe");
-        double**& partNu_ = particleCloud_.getParticlePropertyRef<double**>("partNu");
-        particleCloud_.dataExchangeM().allocateArray(partRe_,initVal,1);
-        particleCloud_.dataExchangeM().allocateArray(partNu_,initVal,1);
-    }
-}
 
 // * * * * * * * * * * * * * * * * Member Fct  * * * * * * * * * * * * * * * //
 
 void heatTransferRanzMarshall::calcEnergyContribution()
 {
-   // realloc the arrays
-    allocateMyArrays();
     double**& partTemp_ = particleCloud_.getParticlePropertyRef<double**>(partTempName_);
     double**& partHeatFlux_ = particleCloud_.getParticlePropertyRef<double**>(partHeatFluxName_);
 

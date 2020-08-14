@@ -49,8 +49,6 @@ private:
 
     mutable volScalarField granKineticEnergy_;
 
-    void allocateMyArrays() const;
-
 public:
 
     //- Runtime type information

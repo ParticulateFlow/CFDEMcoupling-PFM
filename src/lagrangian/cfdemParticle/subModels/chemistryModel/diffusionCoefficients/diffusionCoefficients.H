@@ -120,8 +120,6 @@ private:
 
     // Member Functions
         void execute();
-
-        void reAllocMyArrays() const;
 };
 
 

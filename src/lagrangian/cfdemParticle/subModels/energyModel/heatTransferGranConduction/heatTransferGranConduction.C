@@ -97,8 +97,8 @@ heatTransferGranConduction::heatTransferGranConduction
     partHeatFluxName_(propsDict_.lookupOrDefault<word>("partHeatFluxName","conductiveHeatFlux")),
     typePartThermCond_(propsDict_.lookupOrDefault<scalarList>("thermalConductivities",scalarList(1,-1.0)))
 {
-    particleCloud_.registerParticleProperty<double**>(partHeatFluxName_);
-    particleCloud_.registerParticleProperty<double**>("partThermCond");
+    particleCloud_.registerParticleProperty<double**>(partHeatFluxName_,1);
+    particleCloud_.registerParticleProperty<double**>("partThermCond",1);
 
     if (typePartThermCond_[0] < 0.0)
     {
@@ -130,23 +130,10 @@ heatTransferGranConduction::~heatTransferGranConduction()
 }
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
-void heatTransferGranConduction::allocateMyArrays() const
-{
-    // get memory for 2d arrays
-    double initVal=0.0;
-    double**& partHeatFlux_ = particleCloud_.getParticlePropertyRef<double**>(partHeatFluxName_);
-    double**& partThermCond_ = particleCloud_.getParticlePropertyRef<double**>("partThermCond");
-
-    particleCloud_.dataExchangeM().allocateArray(partHeatFlux_,initVal,1);
-    particleCloud_.dataExchangeM().allocateArray(partThermCond_,initVal,1);
-}
 // * * * * * * * * * * * * * * * * Member Fct  * * * * * * * * * * * * * * * //
 
 void heatTransferGranConduction::calcEnergyContribution()
 {
-   // realloc the arrays
-    allocateMyArrays();
-
     calcPartEffThermCond();
 
     QPartPart_ = fvc::laplacian(partEffThermCondField_,partTempField_);

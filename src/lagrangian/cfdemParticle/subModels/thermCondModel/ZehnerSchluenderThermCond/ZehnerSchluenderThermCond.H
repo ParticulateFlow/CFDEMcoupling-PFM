@@ -64,8 +64,6 @@ private:
 
     scalarList typeKs_;
 
-    void allocateMyArrays() const;
-
     void calcPartKsField() const;
 
 public:

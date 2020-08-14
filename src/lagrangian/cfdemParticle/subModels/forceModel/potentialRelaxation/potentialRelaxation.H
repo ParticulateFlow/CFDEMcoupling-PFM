@@ -78,8 +78,6 @@ private:
 
     vector ignorePoint_;
 
-    void allocateMyArrays() const;
-
     void relax(scalar, scalar) const;
 
 public:
