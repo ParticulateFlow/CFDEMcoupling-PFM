@@ -12,3 +12,4 @@ cfdemSolverIB/dir
 cfdemSolverPisoScalar/dir
 cfdemSolverRhoPimpleChem/dir
 cfdemSolverMultiphase/dir
+rctfSpeciesTransport/dir
