@@ -97,8 +97,8 @@ KochHillRWDrag::KochHillRWDrag
     if (propsDict_.found("rhoP"))
         rhoP_= readScalar(propsDict_.lookup("rhoP"));
 
-    particleCloud_.registerParticleProperty<double**>("partTime",1);
-    particleCloud_.registerParticleProperty<double**>("partUfluct",3);
+    particleCloud_.registerParticleProperty<double**>("partTime",1,0.0,false);
+    particleCloud_.registerParticleProperty<double**>("partUfluct",3,0.0,false);
 }
 
 

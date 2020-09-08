@@ -405,9 +405,9 @@ inline const turbulenceModel& cfdemCloud::turbulence() const
 
 
 template<typename T>
-void cfdemCloud::registerParticleProperty(const word& property, int size, double initVal)
+void cfdemCloud::registerParticleProperty(const word& property, int size, double initVal, bool reset)
 {
-    particlePropertyTable.insert(property,{NULL,&typeid(T),size,initVal});
+    particlePropertyTable.insert(property,{NULL,&typeid(T),size,initVal,reset});
 }
 
 template<typename T>

@@ -72,7 +72,7 @@ virtualMassForce::virtualMassForce
     splitUrelCalculation_(propsDict_.lookupOrDefault<bool>("splitUrelCalculation",false)),
     Cadd_(0.5)
 {
-    particleCloud_.registerParticleProperty<double**>("UrelOld",3,NOTONCPU);
+    particleCloud_.registerParticleProperty<double**>("UrelOld",3,NOTONCPU,false);
 
     // init force sub model
     setForceSubModels(propsDict_);

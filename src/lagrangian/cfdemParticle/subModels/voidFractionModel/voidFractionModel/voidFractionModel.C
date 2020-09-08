@@ -88,7 +88,7 @@ voidFractionModel::voidFractionModel
     weight_(1.),
     porosity_(1.)
 {
-    particleCloud_.registerParticleProperty<int**>("cellsPerParticle",1,1.0);
+    particleCloud_.registerParticleProperty<int**>("cellsPerParticle",1,1.0,false);
     if (particleCloud_.getParticleEffVolFactors()) multiWeights_ = true;
 }
 
@@ -131,7 +131,7 @@ voidFractionModel::voidFractionModel
     weight_(1.),
     porosity_(1.)
 {
-    particleCloud_.registerParticleProperty<int**>("cellsPerParticle",1,1.0);
+    particleCloud_.registerParticleProperty<int**>("cellsPerParticle",1,1.0,false);
 }
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //

@@ -59,8 +59,8 @@ regionModel::regionModel
     dict_(dict),
     particleCloud_(sm)
 {
-    particleCloud_.registerParticleProperty<double**>("inRegion",1,1.0);
-    particleCloud_.registerParticleProperty<double**>("outRegion",1,1.0);
+    particleCloud_.registerParticleProperty<double**>("inRegion",1,1.0,false);
+    particleCloud_.registerParticleProperty<double**>("outRegion",1,1.0,false);
 }
 
 
