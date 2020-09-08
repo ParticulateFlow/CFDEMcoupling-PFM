@@ -829,7 +829,7 @@ bool cfdemCloud::reAllocArrays()
             ++iter
         )
         {
-            if (iter().size > 0) {
+            if (iter().size > 0 && iter().initVal == 0.0) {
                 if ((*(iter().ti)) == typeid(int**)) {
                     int**& property = iter().ref<int**>();
                     for (int index=0; index<numberOfParticles(); ++index) {
