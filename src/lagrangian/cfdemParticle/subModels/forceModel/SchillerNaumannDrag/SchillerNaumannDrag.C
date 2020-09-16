@@ -87,7 +87,7 @@ SchillerNaumannDrag::SchillerNaumannDrag
     // read those switches defined above, if provided in dict
     forceSubM(0).readSwitches();
 
-    particleCloud_.checkCG(false);
+    particleCloud_.checkCG(true);
 
     if (propsDict_.found("scale"))
         scaleDia_ = scalar(readScalar(propsDict_.lookup("scale")));
@@ -151,7 +151,7 @@ void SchillerNaumannDrag::setForce() const
                     Cd = max(0.44,24.0/Rep*(1.0+0.15*pow(Rep,0.687)));
 
                     // calc particle's drag
-                    drag = 0.125*Cd*rho*M_PI*ds*ds_scaled*magUr*Ur;
+                    drag = 0.125*Cd*rho*M_PI*ds*ds*scaleDia_*magUr*Ur*scaleDrag_;
 
                     if (modelType_=="B")
                         drag /= voidfraction;
