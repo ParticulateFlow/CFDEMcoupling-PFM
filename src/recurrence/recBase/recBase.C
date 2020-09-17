@@ -83,14 +83,20 @@ recBase::recBase
     ),
     couplingSubStep_(recProperties_.lookupOrDefault<label>("couplingSubStep",0))
 {
-  recModel_        ->  readFieldSeries();
-  recNorm_         ->  computeRecMatrix();
-  recPath_         ->  getRecPath();
+    recModel_        ->  readFieldSeries();
+    if (!recStatAnalysis_->suppressMatrixAndPath())
+    {
+        recNorm_         ->  computeRecMatrix();
+        recPath_         ->  getRecPath();
+    }
 
-  recModel_        ->  init();
-
-  recModel_        ->  writeRecMatrix();
-  recModel_        ->  writeRecPath();
+    recModel_        ->  init();
+  
+    if (!recStatAnalysis_->suppressMatrixAndPath())
+    {
+        recModel_        ->  writeRecMatrix();
+        recModel_        ->  writeRecPath();
+    }
 }
 recBase::recBase
 (

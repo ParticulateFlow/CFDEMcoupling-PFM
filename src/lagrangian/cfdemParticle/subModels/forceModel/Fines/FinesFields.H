@@ -46,6 +46,18 @@ private:
 
     bool verbose_;
 
+    bool clogKin_;
+
+    bool clogStick_;
+
+    bool movingBed_;
+
+    bool useDepositionLength_;
+
+    word fluxFieldName_;
+
+    const surfaceScalarField& phi_;
+
     word velFieldName_;
 
     const volVectorField& U_;
@@ -90,10 +102,11 @@ private:
 
     volScalarField Sds_;
 
-    //volVectorField massFluxDyn_;
     surfaceScalarField massFluxDyn_;
 
     volVectorField uDyn_;
+
+    autoPtr<volVectorField> uReconstructed_; // velocity field can show oscillations at porosity steps
 
     dimensionedScalar dFine_;
 
@@ -109,9 +122,13 @@ private:
 
     scalar alphaMax_;
 
+    scalar alphaMinClog_;
+
     scalar critVoidfraction_;
 
-    scalar depRate_;
+    scalar deltaT_;
+
+    scalar depositionLength_;
 
     scalar exponent_;
 
@@ -122,6 +139,16 @@ private:
     scalar prefactor_;
 
     scalar ratioHydraulicPore_;
+
+    scalar tauDeposition_;
+
+    scalar tauRelease_;
+
+    scalar uBindHigh_;
+
+    scalar uBindLow_;
+
+    scalar uMin_;
 
     void calcSource();
 
@@ -142,6 +169,8 @@ private:
     void updateFroude();
 
     void updateUDyn();
+
+    void updateUReconstructed();
 
 public:
 

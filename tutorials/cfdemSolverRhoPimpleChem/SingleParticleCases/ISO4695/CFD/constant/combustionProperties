@@ -15,11 +15,14 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-combustionModel   noCombustion<rhoThermoCombustion>; //PaSR<rhoChemistryCombustion>;  //PaSR<psiChemistryCombustion>;
+// OF5 -> OF6: noCombustion<> -> none (template parameters are no longer required)
+//combustionModel   noCombustion<rhoThermoCombustion>; //PaSR<rhoChemistryCombustion>;  //PaSR<psiChemistryCombustion>;
+combustionModel  none; // OF6
 
 active  false; //true;
 
-noCombustionCoeffs
+//noCombustionCoeffs
+noneCoeffs
 {
 }
 

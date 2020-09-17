@@ -55,21 +55,7 @@ ZehnerSchluenderThermCond::ZehnerSchluenderThermCond
     voidfractionFieldName_(propsDict_.lookupOrDefault<word>("voidfractionFieldName","voidfraction")),
     voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
     typeKs_(propsDict_.lookupOrDefault<scalarList>("thermalConductivities",scalarList(1,-1.0))),
-    partKs_(NULL),
-    wallQFactorName_(propsDict_.lookupOrDefault<word>("wallQFactorName","wallQFactor")),
-    wallQFactor_
-    (   IOobject
-        (
-            wallQFactorName_,
-            sm.mesh().time().timeName(),
-            sm.mesh(),
-            IOobject::READ_IF_PRESENT,
-            IOobject::AUTO_WRITE
-        ),
-        sm.mesh(),
-        dimensionedScalar("zero", dimensionSet(0,0,0,0,0,0,0), 1.0)
-    ),
-    hasWallQFactor_(false)
+    partKs_(NULL)
 {
     if (typeKs_[0] < 0.0)
     {
@@ -80,12 +66,6 @@ ZehnerSchluenderThermCond::ZehnerSchluenderThermCond
     else
     {
         partKsField_ *= typeKs_[0];
-    }
-
-    if (wallQFactor_.headerOk())
-    {
-        Info << "Found field for scaling wall heat flux.\n" << endl;
-        hasWallQFactor_ = true;
     }
 }
 

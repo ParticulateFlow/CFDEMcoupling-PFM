@@ -51,6 +51,8 @@ heatTransferGunn::heatTransferGunn
     implicit_(propsDict_.lookupOrDefault<bool>("implicit",true)),
     calcTotalHeatFlux_(propsDict_.lookupOrDefault<bool>("calcTotalHeatFlux",true)),
     initPartTemp_(propsDict_.lookupOrDefault<bool>("initPartTemp",false)),
+    Tmin_(propsDict_.lookupOrDefault<scalar>("Tmin",0.0)),
+    Tmax_(propsDict_.lookupOrDefault<scalar>("Tmax",1e6)),
     totalHeatFlux_(0.0),
     NusseltScalingFactor_(1.0),
     QPartFluidName_(propsDict_.lookupOrDefault<word>("QPartFluidName","QPartFluid")),
@@ -148,7 +150,8 @@ heatTransferGunn::heatTransferGunn
     partRe_(NULL),
     partNu_(NULL),
     scaleDia_(1.),
-    typeCG_(propsDict_.lookupOrDefault<scalarList>("coarseGrainingFactors",scalarList(1,1.0)))
+    typeCG_(propsDict_.lookupOrDefault<scalarList>("coarseGrainingFactors",scalarList(1,1.0))),
+    maxTypeCG_(typeCG_.size())
 {
     allocateMyArrays();
 
@@ -207,7 +210,10 @@ heatTransferGunn::heatTransferGunn
         scaleDia_=scalar(readScalar(propsDict_.lookup("scale")));
         typeCG_[0] = scaleDia_;
     }
-    else if (typeCG_.size()>1) multiTypes_ = true;
+    else if (typeCG_.size()>1)
+    {
+        multiTypes_ = true;
+    }
 
     if (initPartTemp_ && !partTempField_.headerOk())
     {
@@ -338,6 +344,10 @@ void heatTransferGunn::calcEnergyContribution()
                 if (multiTypes_)
                 {
                     partType = particleCloud_.particleType(index);
+                    if (partType > maxTypeCG_)
+                    {
+                        FatalError<< "Too few coarse-graining factors provided." << abort(FatalError);
+                    }
                     cg = typeCG_[partType - 1];
                     scaleDia3 = cg*cg*cg;
                 }
@@ -596,12 +606,22 @@ void heatTransferGunn::partTempField()
 void heatTransferGunn::initPartTemp()
 {
     label cellI = 0;
+    scalar T = 0.0;
     for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)
     {
         cellI = particleCloud_.cellIDs()[index][0];
         if(cellI >= 0)
         {
-            partTemp_[index][0] = partTempField_[cellI];
+            T = partTempField_[cellI];
+            if (T < Tmin_)
+            {
+                T = Tmin_;
+            }
+            else if (T > Tmax_)
+            {
+                T = Tmax_;
+            }
+            partTemp_[index][0] = T;
         }
     }
 }

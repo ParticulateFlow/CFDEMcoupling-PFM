@@ -208,6 +208,8 @@ public:
         template <typename T>
         void extractCollected(T*&, T**&, int width=1) const;
 
+        int getNumberOfParticles() const;
+
         scalar getCG() const { return lmp->force->cg(); }
 };
 

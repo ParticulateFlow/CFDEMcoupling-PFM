@@ -44,6 +44,7 @@ SourceFiles
 #include <mpi.h>
 
 #include "dataExchangeModel.H"
+#include "scalarIOList.H"
 
 //=================================//
 //LAMMPS/LIGGGHTS
@@ -71,7 +72,14 @@ private:
     dictionary propsDict_;
     MPI_Comm comm_liggghts;
 
+    wordList DEMVariableNames_;
+
+    scalarIOList DEMVariables_; 
+
   // private member functions
+    double DEMVariableValue(word);
+
+    void updateDEMVariables();
 
 protected:
     LAMMPS_NS::LAMMPS *lmp;
@@ -145,7 +153,6 @@ public:
         int getNumberOfClumps() const;
         int getNumberOfTypes() const;
         double* getTypeVol() const;
-
 
         scalar getCG() const { return lmp->force->cg(); }
 };

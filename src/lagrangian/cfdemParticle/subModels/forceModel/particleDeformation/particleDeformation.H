@@ -34,7 +34,8 @@ SourceFiles
 #include "forceModel.H"
 #include "averagingModel.H"
 #include "interpolationCellPoint.H"
-
+#include "autoPtr.H"
+#include "cellSet.H"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -58,17 +59,30 @@ private:
 
     mutable autoPtr<volScalarField> refField_;
 
-    label partType_;
+    // default deformation in region
+    word defaultDeformCellsName_;
 
-    scalar lowerBound_;
+    autoPtr<cellSet> defaultDeformCells_;
 
-    scalar upperBound_;
+    bool existDefaultDeformCells_;
+
+    scalar defaultDeformation_;
+
+    labelList partTypes_;
+
+    scalarList lowerBounds_;
+
+    scalarList upperBounds_;
 
     mutable double **partDeformations_;
+
+    label getListIndex(label) const;
 
     void allocateMyArrays() const;
 
     void init() const;
+
+    bool defaultDeformCell(label) const;
 
 public:
 

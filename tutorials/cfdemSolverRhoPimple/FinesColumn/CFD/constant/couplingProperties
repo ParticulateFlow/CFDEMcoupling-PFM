@@ -38,7 +38,7 @@ meshMotionModel noMeshMotion;
 
 regionModel allRegion;
 
-IOModel "basicIO";
+IOModel "off";
 
 dataExchangeModel twoWayMPI;//twoWayM2M;//twoWayFiles;//oneWayVTK;//
 
@@ -55,7 +55,7 @@ forceModels
     dSauter
     Fines
     FanningDynFines
-    ErgunStatFines
+    BeetstraDragPoly
     gradPForce
     viscForce
 );
@@ -140,13 +140,14 @@ viscForceProps
     interpolation;
 }
 
-ErgunStatFinesProps
+BeetstraDragProps
 {
+    fines true;
+    dFine 0.000388;
     velFieldName "U";
     granVelFieldName "Us";
     densityFieldName "rho";
     voidfractionFieldName "voidfraction";
-    phi 1;
 }
 
 FanningDynFinesProps
@@ -207,7 +208,7 @@ dividedProps
 {
     alphaMin 0.25;
     scaleUpVol 1.0;
-    weight 1.0; //1.33;
+    weight 1.0;
     verbose;
 }
 

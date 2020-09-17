@@ -60,6 +60,10 @@ protected:
 
     bool initPartTemp_;
 
+    scalar Tmin_;
+
+    scalar Tmax_;
+
     scalar totalHeatFlux_;
 
     scalar NusseltScalingFactor_;
@@ -121,6 +125,8 @@ protected:
     mutable scalar scaleDia_;
 
     scalarList typeCG_;
+
+    const label maxTypeCG_;
 
     void allocateMyArrays() const;
 

@@ -20,6 +20,7 @@ License
 #include "particleDeformation.H"
 #include "addToRunTimeSelectionTable.H"
 #include "dataExchangeModel.H"
+#include "OFstream.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -52,9 +53,13 @@ particleDeformation::particleDeformation
     initialExec_(true),
     refFieldName_(propsDict_.lookup("refFieldName")),
     refField_(),
-    partType_(propsDict_.lookupOrDefault<label>("partType",0)),
-    lowerBound_(readScalar(propsDict_.lookup ("lowerBound"))),
-    upperBound_(readScalar(propsDict_.lookup ("upperBound"))),
+    defaultDeformCellsName_(propsDict_.lookupOrDefault<word>("defaultDeformCellsName","none")),
+    defaultDeformCells_(),
+    existDefaultDeformCells_(false),
+    defaultDeformation_(propsDict_.lookupOrDefault<scalar>("defaultDeformation",1.0)),
+    partTypes_(propsDict_.lookupOrDefault<labelList>("partTypes",labelList(1,-1))),
+    lowerBounds_(propsDict_.lookupOrDefault<scalarList>("lowerBounds",scalarList(1,-1.0))),
+    upperBounds_(propsDict_.lookupOrDefault<scalarList>("upperBounds",scalarList(1,-1.0))),
     partDeformations_(NULL)
 {
     allocateMyArrays();
@@ -70,6 +75,44 @@ particleDeformation::particleDeformation
     forceSubM(0).readSwitches();
 
     particleCloud_.checkCG(false);
+
+    if(defaultDeformCellsName_ != "none")
+    {
+       defaultDeformCells_.set(new cellSet(particleCloud_.mesh(),defaultDeformCellsName_));
+       existDefaultDeformCells_ = true;
+       Info << "particleDeformation: default deformation of " << defaultDeformation_ << " in cellSet " << defaultDeformCells_().name() <<
+        " with " << defaultDeformCells_().size() << " cells." << endl;
+       if (defaultDeformation_ < 0.0 || defaultDeformation_ > 1.0)
+       {
+           defaultDeformation_ = min(max(defaultDeformation_,0.0),1.0);
+           Info << "Resetting defaultDeformation to range [0;1]" << endl;
+       }
+    }
+
+    // check if only single value instead of list was provided
+    if (propsDict_.found("partType"))
+    {
+        partTypes_[0] = readLabel(propsDict_.lookup("partType"));
+    }
+
+    if (propsDict_.found("lowerBound"))
+    {
+        lowerBounds_[0] = readScalar(propsDict_.lookup("lowerBound"));
+    }
+
+    if (propsDict_.found("upperBound"))
+    {
+        upperBounds_[0] = readScalar(propsDict_.lookup("upperBound"));
+    }
+
+    if (partTypes_.size() != lowerBounds_.size() || partTypes_.size() != upperBounds_.size())
+    {
+        FatalError << "Inconsistent number of particle types and/or bounds provided." << abort(FatalError);
+    }
+
+    Info << "partTypes: " << partTypes_ << endl;
+    Info << "lowerBounds: " << lowerBounds_ << endl;
+    Info << "upperBounds: " << upperBounds_ << endl;
 }
 
 
@@ -87,6 +130,12 @@ void particleDeformation::allocateMyArrays() const
     double initVal = 0.0;
     particleCloud_.dataExchangeM().allocateArray(partDeformations_,initVal,1);
 }
+
+bool particleDeformation::defaultDeformCell(label cell) const
+{
+    if (!existDefaultDeformCells_) return false;
+    else return defaultDeformCells_()[cell];
+}
 // * * * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * * //
 
 void particleDeformation::setForce() const
@@ -103,36 +152,44 @@ void particleDeformation::setForce() const
     label partType = -1;
     scalar refFieldValue = 0.0;
     scalar deformationDegree = 0.0;
-   
+
     interpolationCellPoint<scalar> refFieldInterpolator_(refField_());
 
     for(int index = 0; index < particleCloud_.numberOfParticles(); ++index)
     {
         cellI = particleCloud_.cellIDs()[index][0];
         partType = particleCloud_.particleType(index);
-        if (cellI >= 0 && partType == partType_)
+        label listIndex = getListIndex(partType);
+        if (cellI >= 0 && listIndex >= 0)
         {
-            if (forceSubM(0).interpolation())
+            if (defaultDeformCell(cellI))
             {
-                vector position = particleCloud_.position(index);
-                refFieldValue = refFieldInterpolator_.interpolate(position,cellI);
+                deformationDegree = defaultDeformation_;
             }
             else
             {
-                refFieldValue = refField_()[cellI];
-            }
+                if (forceSubM(0).interpolation())
+                {
+                    vector position = particleCloud_.position(index);
+                    refFieldValue = refFieldInterpolator_.interpolate(position,cellI);
+                }
+                else
+                {
+                    refFieldValue = refField_()[cellI];
+                }
 
-            if (refFieldValue <= lowerBound_)
-            {
-                deformationDegree = 0.0;
-            }
-            else if (refFieldValue >= upperBound_)
-            {
-                deformationDegree = 1.0;
-            }
-            else
-            {
-                deformationDegree = (refFieldValue - lowerBound_) / (upperBound_ - lowerBound_);
+                if (refFieldValue <= lowerBounds_[listIndex])
+                {
+                    deformationDegree = 0.0;
+                }
+                else if (refFieldValue >= upperBounds_[listIndex])
+                {
+                    deformationDegree = 1.0;
+                }
+                else
+                {
+                    deformationDegree = (refFieldValue - lowerBounds_[listIndex]) / (upperBounds_[listIndex] - lowerBounds_[listIndex]);
+                }
             }
 
             partDeformations_[index][0] = deformationDegree;
@@ -155,7 +212,6 @@ void particleDeformation::init() const
     // check if ref field with corresponding name has been read by some other class or if it needs to be newly created
     if (particleCloud_.mesh().foundObject<volScalarField> (refFieldName_))
     {
-   //     volScalarField& refField(particleCloud_.mesh().lookupObject<volScalarField> (refFieldName_));
         volScalarField& refField(const_cast<volScalarField&>(particleCloud_.mesh().lookupObject<volScalarField> (refFieldName_)));
         refField_.set(&refField);
     }
@@ -179,6 +235,15 @@ void particleDeformation::init() const
             )
         );
     }
+}
+
+label particleDeformation::getListIndex(label testElement) const
+{
+    for(label ind = 0; ind<partTypes_.size(); ind++)
+    {
+        if (partTypes_[ind] == testElement) return ind;
+    }
+    return -1;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

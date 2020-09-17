@@ -242,6 +242,11 @@ twoWayOne2One::~twoWayOne2One()
     destroy(prev_cell_ids_);
     destroy(dbl_cell_ids_);
 
+    if (propsDict_.found("liggghtsEndOfRunPath"))
+    {
+        const fileName liggghtsEndOfRunPath(propsDict_.lookup("liggghtsEndOfRunPath"));
+        lmp->input->file(liggghtsEndOfRunPath.c_str());
+    }
     delete lmp;
 }
 
@@ -961,6 +966,10 @@ void twoWayOne2One::extractCollected(T*& src, T**& dst, int width) const
     }
 }
 
+int twoWayOne2One::getNumberOfParticles() const
+{
+    return particleCloud_.numberOfParticles();
+}
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

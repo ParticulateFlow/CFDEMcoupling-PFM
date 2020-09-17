@@ -22,11 +22,14 @@ particleCellVolumeProps
     lowerThreshold scalar2;
     startTime      scalar3;
     verbose;
+    writeToFile    switch1;
 \} :pre
 
 {scalar1} = only cells with a field value (magnitude) lower than this upper threshold are considered :l
 {scalar2} = only cells with a field value (magnitude) greater than this lower threshold are considered :l
 {scalar3} = (optional, default 0) start time of volume calculation and output :l
+{verbose} = (optional, default false) keyword only (mostly used for debugging) :l
+{switch1} = (optional, default false) switch for file output :l
 :ule
 
 [Examples:]

@@ -1,0 +1,42 @@
+## material properties
+include ../DEM/DEMparameters
+
+
+###############################################
+atom_style		granular
+atom_modify		map array
+communicate	single vel yes
+
+boundary		f p f
+newton			off
+units			si
+processors      1 1 8
+
+read_restart 		../DEM/liggghts.restart
+include ../DEM/latestTimeStep
+reset_timestep ${latestTimeStep}
+
+neighbor	${skin} bin
+neigh_modify	delay 0
+neigh_modify	exclude type 1 1
+neigh_modify	exclude type 1 2
+neigh_modify	exclude type 1 3
+neigh_modify	exclude type 1 4
+neigh_modify	exclude type 2 2
+neigh_modify	exclude type 2 3
+neigh_modify	exclude type 2 4
+neigh_modify	exclude type 3 3
+neigh_modify	exclude type 3 4
+neigh_modify	exclude type 4 4
+
+timestep    ${dt}
+
+include ../DEM/in.material_settings
+include ../../CFDDEM/DEM/in.regions
+include ../DEM/in.coupling_integration
+include ../DEM/in.output
+include ../../CFDDEM/DEM/in.set_polydisp
+include ../DEM/in.RW
+include ../DEM/in.cleanup
+include ../DEM/in.insertion_setup
+include ../DEM/in.monitor

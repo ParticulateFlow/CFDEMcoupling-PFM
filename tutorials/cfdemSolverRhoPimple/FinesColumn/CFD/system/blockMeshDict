@@ -13,7 +13,7 @@ FoamFile
     object      blockMeshDict;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-#include "../../geometry"
+#include "../geometry"
 convertToMeters 1;
 
 vertices #codeStream

@@ -20,7 +20,7 @@ In the CFDEMcoupling repository take a look at the file
 src/lagrangian/cfdemParticle/cfdTools/versionInfo.H :pre
 
 to find out the latest tested version of LIGGGHTS and OpenFOAM that work with
-CFDEMcoupling. As of this writing the version of OpenFOAM to be used is 4.x.
+CFDEMcoupling. As of this writing the version of OpenFOAM to be used is 6.
 
 You can then basically follow the instructions at
 "openfoam.org"_https://openfoam.org/download/source/, cloning OpenFOAM from the
@@ -29,11 +29,11 @@ git repository.
 cd $HOME
 mkdir OpenFOAM
 cd OpenFOAM
-git clone https://github.com/OpenFOAM/OpenFOAM-4.x.git :pre
+git clone https://github.com/OpenFOAM/OpenFOAM-6.git :pre
 
 Clone the corresponding third party packages to the OpenFOAM folder.
 
-git clone https://github.com/OpenFOAM/ThirdParty-4.x.git :pre
+git clone https://github.com/OpenFOAM/ThirdParty-6.git :pre
 
 Switch to root user with sudo
 
@@ -42,9 +42,8 @@ sudo su - :pre
 Install dependent packages required for OpenFOAM on Ubuntu by executing the
 following commands:
 
-apt-get install build-essential flex bison cmake zlib1g-dev libboost-system-dev libboost-thread-dev libopenmpi-dev openmpi-bin gnuplot libreadline-dev libncurses-dev libxt-dev
-apt-get install qt4-dev-tools libqt4-dev libqt4-opengl-dev freeglut3-dev libqtwebkit-dev
-apt-get install libcgal-dev :pre
+apt-get install build-essential flex bison git-core cmake zlib1g-dev libboost-system-dev libboost-thread-dev libopenmpi-dev openmpi-bin gnuplot libreadline-dev libncurses-dev libxt-dev
+apt-get install libqt5x11extras5-dev libxt-dev qt5-default qttools5-dev curl :pre
 
 2.1.2 Setup the environment :h5
 
@@ -56,7 +55,7 @@ gedit ~/.bashrc :pre
 
 and add the following lines:
 
-source $HOME/OpenFOAM/OpenFOAM-4.x/etc/bashrc
+source $HOME/OpenFOAM/OpenFOAM-6/etc/bashrc
 export WM_NCOMPPROCS=4 :pre
 
 Save the file and reload it:
@@ -67,7 +66,7 @@ source ~/.bashrc :pre
 
 [Additional check]
 
-Open ~/OpenFOAM/OpenFOAM-4.x/etc/bashrc and make sure that {WM_MPLIB} is set
+Open ~/OpenFOAM/OpenFOAM-6/etc/bashrc and make sure that {WM_MPLIB} is set
 correctly:
 
 export WM_MPLIB=SYSTEMOPENMPI :pre
@@ -89,7 +88,7 @@ cd $WM_THIRD_PARTY_DIR
 
 Paraview is a third-party software provided for graphical post-processing in
 OpenFOAM. Its compilation is automated using a script called makeParaView in the
-ThirdParty-4.x directory.
+ThirdParty-6 directory.
 
 Before installing Paraview, check the version of cmake that is installed on the
 system. This can be done by typing

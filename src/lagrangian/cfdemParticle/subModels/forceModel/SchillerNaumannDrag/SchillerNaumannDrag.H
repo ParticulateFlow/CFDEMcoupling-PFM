@@ -66,6 +66,10 @@ private:
 
     const volVectorField& U_;
 
+    mutable scalar scaleDia_;
+
+    mutable scalar scaleDrag_;
+
 public:
 
     //- Runtime type information

@@ -50,31 +50,9 @@ SyamlalThermCond::SyamlalThermCond
 :
     thermCondModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
-    thermCondFieldName_(propsDict_.lookupOrDefault<word>("thermCondFieldName","thCond")),
-    thermCondField_(const_cast<volScalarField&>(sm.mesh().lookupObject<volScalarField> (thermCondFieldName_))),
     voidfractionFieldName_(propsDict_.lookupOrDefault<word>("voidfractionFieldName","voidfraction")),
-    voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
-    wallQFactorName_(propsDict_.lookupOrDefault<word>("wallQFactorName","wallQFactor")),
-    wallQFactor_
-    (   IOobject
-        (
-            wallQFactorName_,
-            sm.mesh().time().timeName(),
-            sm.mesh(),
-            IOobject::READ_IF_PRESENT,
-            IOobject::AUTO_WRITE
-        ),
-        sm.mesh(),
-        dimensionedScalar("zero", dimensionSet(0,0,0,0,0,0,0), 1.0)
-    ),
-    hasWallQFactor_(false)
-{
-    if (wallQFactor_.headerOk())
-    {
-        Info << "Found field for scaling wall heat flux.\n" << endl;
-        hasWallQFactor_ = true;
-    }
-}
+    voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_))
+{}
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
@@ -95,13 +73,7 @@ void SyamlalThermCond::calcThermCond()
 
     thermCondField_.correctBoundaryConditions();
 
-    // if a wallQFactor field is present, use it to scale heat transport through a patch
-    if (hasWallQFactor_)
-    {
-        wallQFactor_.correctBoundaryConditions();
-        forAll(wallQFactor_.boundaryField(), patchi)
-            thermCondField_.boundaryFieldRef()[patchi] *= wallQFactor_.boundaryField()[patchi];
-    }
+    calcBoundaryCorrections();
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

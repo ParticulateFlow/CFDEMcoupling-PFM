@@ -57,6 +57,12 @@ protected:
 
     bool calcTotalHeatFlux_;
 
+    bool initPartTemp_;
+
+    scalar Tmin_;
+
+    scalar Tmax_;
+
     scalar totalHeatFlux_;
 
     scalar NusseltScalingFactor_;
@@ -119,6 +125,8 @@ protected:
 
     scalarList typeCG_;
 
+    const label maxTypeCG_;
+
     void allocateMyArrays() const;
 
     void partTempField();
@@ -128,6 +136,8 @@ protected:
     virtual void giveData();
 
     virtual void heatFlux(label, scalar, scalar, scalar, scalar cg3 = 1.0);
+
+    virtual void initPartTemp();
 
 public:
 

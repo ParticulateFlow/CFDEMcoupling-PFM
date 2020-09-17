@@ -49,6 +49,9 @@ heatTransferRanzMarshall::heatTransferRanzMarshall
     verbose_(propsDict_.lookupOrDefault<bool>("verbose",false)),
     implicit_(propsDict_.lookupOrDefault<bool>("implicit",true)),
     calcTotalHeatFlux_(propsDict_.lookupOrDefault<bool>("calcTotalHeatFlux",true)),
+    initPartTemp_(propsDict_.lookupOrDefault<bool>("initPartTemp",false)),
+    Tmin_(propsDict_.lookupOrDefault<scalar>("Tmin",0.0)),
+    Tmax_(propsDict_.lookupOrDefault<scalar>("Tmax",1e6)),
     totalHeatFlux_(0.0),
     NusseltScalingFactor_(1.0),
     QPartFluidName_(propsDict_.lookupOrDefault<word>("QPartFluidName","QPartFluid")),
@@ -146,7 +149,8 @@ heatTransferRanzMarshall::heatTransferRanzMarshall
     partRe_(NULL),
     partNu_(NULL),
     scaleDia_(1.),
-    typeCG_(propsDict_.lookupOrDefault<scalarList>("coarseGrainingFactors",scalarList(1,1.0)))
+    typeCG_(propsDict_.lookupOrDefault<scalarList>("coarseGrainingFactors",scalarList(1,1.0))),
+    maxTypeCG_(typeCG_.size())
 {
     allocateMyArrays();
 
@@ -205,7 +209,15 @@ heatTransferRanzMarshall::heatTransferRanzMarshall
         scaleDia_=scalar(readScalar(propsDict_.lookup("scale")));
         typeCG_[0] = scaleDia_;
     }
-    else if (typeCG_.size()>1) multiTypes_ = true;
+    else if (typeCG_.size()>1)
+    {
+        multiTypes_ = true;
+    }
+
+    if (initPartTemp_ && !partTempField_.headerOk())
+    {
+        FatalError <<"Trying to initialize particle temperatures, but no field found.\n" << abort(FatalError);
+    }
 }
 
 
@@ -252,8 +264,18 @@ void heatTransferRanzMarshall::calcEnergyContribution()
     // reset Scalar field
     QPartFluid_.primitiveFieldRef() = 0.0;
 
-    // get DEM data
-    particleCloud_.dataExchangeM().getData(partTempName_,"scalar-atom",partTemp_);
+    if (initPartTemp_)
+    {
+        // if particle temperatures are to be initialized from field, do a one-time push to DEM
+        initPartTemp();
+        particleCloud_.dataExchangeM().giveData("Temp","scalar-atom", partTemp_);
+        initPartTemp_ = false;
+    }
+    else
+    {
+        // get DEM data
+        particleCloud_.dataExchangeM().getData(partTempName_,"scalar-atom",partTemp_);
+    }
 
     #ifdef compre
        const volScalarField mufField = particleCloud_.turbulence().mu();
@@ -322,6 +344,10 @@ void heatTransferRanzMarshall::calcEnergyContribution()
                 if (multiTypes_)
                 {
                     partType = particleCloud_.particleType(index);
+                    if (partType > maxTypeCG_)
+                    {
+                        FatalError<< "Too few coarse-graining factors provided." << abort(FatalError);
+                    }
                     cg = typeCG_[partType - 1];
                     scaleDia3 = cg*cg*cg;
                 }
@@ -563,6 +589,29 @@ void heatTransferRanzMarshall::partTempField()
         partRelTempField_ = (partTempField_ - partTempAve_) / denom;
 
         Info << "heatTransferRanzMarshall: average part. temp = " << partTempAve_.value() << endl;
+}
+
+void heatTransferRanzMarshall::initPartTemp()
+{
+    label cellI = 0;
+    scalar T = 0.0;
+    for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)
+    {
+        cellI = particleCloud_.cellIDs()[index][0];
+        if(cellI >= 0)
+        {
+            T = partTempField_[cellI];
+            if (T < Tmin_)
+            {
+                T = Tmin_;
+            }
+            else if (T > Tmax_)
+            {
+                T = Tmax_;
+            }
+            partTemp_[index][0] = T;
+        }
+    }
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

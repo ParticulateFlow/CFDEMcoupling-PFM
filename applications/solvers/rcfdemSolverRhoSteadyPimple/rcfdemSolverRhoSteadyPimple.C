@@ -69,15 +69,15 @@ int main(int argc, char *argv[])
     #include "createFvOptions.H"
 
     // create cfdemCloud
-  //  #include "readGravitationalAcceleration.H"
+    //#include "readGravitationalAcceleration.H"
     cfdemCloudRec<cfdemCloudEnergy> particleCloud(mesh);
     #include "checkModelType.H"
     recBase recurrenceBase(mesh);
     #include "updateFields.H"
 
     turbulence->validate();
-  //        #include "compressibleCourantNo.H"
-  //  #include "setInitialDeltaT.H"
+    //#include "compressibleCourantNo.H"
+    //#include "setInitialDeltaT.H"
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -108,8 +108,8 @@ int main(int argc, char *argv[])
         particleCloud.clockM().start(2,"Coupling");
         bool hasEvolved = particleCloud.evolve(voidfraction,Us,U);
 
-//voidfraction = voidfractionRec;
-//Us = UsRec;
+        //voidfraction = voidfractionRec;
+        //Us = UsRec;
 
         if(hasEvolved)
         {
@@ -137,7 +137,11 @@ int main(int argc, char *argv[])
             while (pimple.loop())
             {
                 // if needed, perform drag update here
+#if OPENFOAM_VERSION_MAJOR < 6
                 if (pimple.nCorrPIMPLE() <= 1)
+#else
+                if (pimple.nCorrPimple() <= 1)
+#endif
                 {
                     #include "rhoEqn.H"
                 }

@@ -59,7 +59,7 @@ functions
 
         volInt
 	{
-        	type            volRegion;
+        	type            volFieldValue;
 	 	functionObjectLibs ("libfieldFunctionObjects.so");
 		writeControl   timeStep;
                 log             true;
@@ -76,7 +76,7 @@ functions
 
         inflow
         {
-            type            surfaceRegion;
+            type            surfaceFieldValue;
             libs ("libfieldFunctionObjects.so");
             writeControl   timeStep;
             log             true;
