@@ -190,11 +190,11 @@ protected:
     const turbulenceModel& turbulence_;
 
     struct particleProperty {
-        void** property;
-        const std::type_info* ti;
-        int size;
-        double initVal;
-        bool reset;
+        void** property;            // pointer to per-particle data; memory deallocation by cfdemCloud
+        const std::type_info* ti;   // type of particle data (int**, double**)
+        int size;                   // size of single particle data; memory allocation by cfdemCloud if size > 0
+        double initVal;             // initial property value
+        bool reset;                 // if true, data is reset to initial value every coupling step
         template<typename T>
         T& ref() {
           if (*ti == typeid(T)) return *reinterpret_cast<T*>(&property);
@@ -202,7 +202,7 @@ protected:
         }
     };
 
-    HashTable<particleProperty> particlePropertyTable;
+    HashTable<particleProperty> particlePropertyTable; // table of registered per-particle properties
 
     autoPtr<dataExchangeModel> dataExchangeModel_;
 
