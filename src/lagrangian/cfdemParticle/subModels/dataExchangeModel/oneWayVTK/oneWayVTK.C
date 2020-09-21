@@ -84,8 +84,8 @@ oneWayVTK::~oneWayVTK()
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 void oneWayVTK::getData
 (
-    word name,
-    word type,
+    const word& name,
+    const word& type,
     double ** const& field,
     label step
 ) const
@@ -194,8 +194,8 @@ void oneWayVTK::getData
 
 void oneWayVTK::giveData
 (
-    word name,
-    word type,
+    const word& name,
+    const word& type,
     double ** const& field,
     const char* datatype
 ) const
