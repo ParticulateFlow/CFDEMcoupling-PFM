@@ -68,9 +68,9 @@ private:
 
     const volScalarField& rho_;
 
-    word partNuName_;
+    const word partNuName_;
 
-    word partReynolds_;
+    const word partReName_;
 
     mutable scalar scaleDia_;
 

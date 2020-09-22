@@ -77,7 +77,7 @@ diffusionCoefficient::diffusionCoefficient
     initialized_(false)
 {
     particleCloud_.checkCG(false);
-    particleCloud_.registerParticleProperty<double**>("partPressure",1);
+    particleCloud_.registerParticleProperty<double**>(partPressureName_,1);
     for (int i=0; i<diffusantGasNames_.size(); i++)
     {
         particleCloud_.registerParticleProperty<double**>(diffusantGasNames_[i],1);
@@ -144,7 +144,7 @@ void diffusionCoefficient::execute()
     interpolationCellPoint <scalar> TInterpolator_(tempField_);
     interpolationCellPoint <scalar> PInterpolator_(P_);
 
-    double**& partPressure_ = particleCloud_.getParticlePropertyRef<double**>("partPressure");
+    double**& partPressure_ = particleCloud_.getParticlePropertyRef<double**>(partPressureName_);
 
     for (int index=0; index<particleCloud_.numberOfParticles(); ++index)
     {

@@ -53,6 +53,7 @@ granKineticEnergy::granKineticEnergy
 :
     forceModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
+    vflucRegName_(typeName + "vfluc_mag"),
     UsFieldName_(propsDict_.lookup("granVelFieldName")),
     UsField_(sm.mesh().lookupObject<volVectorField> (UsFieldName_)),
     granKineticEnergy_
@@ -69,7 +70,7 @@ granKineticEnergy::granKineticEnergy
         "zeroGradient"
     )
 {
-    particleCloud_.registerParticleProperty<double**>("vfluc_mag",1);
+    particleCloud_.registerParticleProperty<double**>(vflucRegName_,1);
     granKineticEnergy_.write();
 
 
@@ -88,7 +89,7 @@ granKineticEnergy::~granKineticEnergy()
 
 void granKineticEnergy::setForce() const
 {
-    double**& vfluc_ = particleCloud_.getParticlePropertyRef<double**>("vfluc_mag");
+    double**& vfluc_ = particleCloud_.getParticlePropertyRef<double**>(vflucRegName_);
 
     label cellI = 0;
     vector velfluc(0,0,0);

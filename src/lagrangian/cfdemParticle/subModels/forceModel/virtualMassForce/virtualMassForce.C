@@ -69,10 +69,11 @@ virtualMassForce::virtualMassForce
     U_(sm.mesh().lookupObject<volVectorField> (velFieldName_)),
     phiFieldName_(propsDict_.lookup("phiFieldName")),
     phi_(sm.mesh().lookupObject<surfaceScalarField> (phiFieldName_)),
+    UrelOldRegName_(typeName + "UrelOld"),
     splitUrelCalculation_(propsDict_.lookupOrDefault<bool>("splitUrelCalculation",false)),
     Cadd_(0.5)
 {
-    particleCloud_.registerParticleProperty<double**>("UrelOld",3,NOTONCPU,false);
+    particleCloud_.registerParticleProperty<double**>(UrelOldRegName_,3,NOTONCPU,false);
 
     // init force sub model
     setForceSubModels(propsDict_);
@@ -117,7 +118,7 @@ virtualMassForce::~virtualMassForce()
 
 void virtualMassForce::setForce() const
 {
-    double**& UrelOld_ = particleCloud_.getParticlePropertyRef<double**>("UrelOld");
+    double**& UrelOld_ = particleCloud_.getParticlePropertyRef<double**>(UrelOldRegName_);
 
     scalar dt = U_.mesh().time().deltaT().value();
 

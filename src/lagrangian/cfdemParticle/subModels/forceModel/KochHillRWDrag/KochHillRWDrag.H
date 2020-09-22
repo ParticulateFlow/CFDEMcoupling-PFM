@@ -89,6 +89,10 @@ private:
 
     const bool randomTauE_;
 
+    const word partTimeRegName_;
+
+    const word partUfluctRegName_;
+
     mutable Random RanGen_;
 
 public:

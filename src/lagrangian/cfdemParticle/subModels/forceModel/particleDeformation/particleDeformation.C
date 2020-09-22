@@ -59,9 +59,10 @@ particleDeformation::particleDeformation
     defaultDeformation_(propsDict_.lookupOrDefault<scalar>("defaultDeformation",1.0)),
     partTypes_(propsDict_.lookupOrDefault<labelList>("partTypes",labelList(1,-1))),
     lowerBounds_(propsDict_.lookupOrDefault<scalarList>("lowerBounds",scalarList(1,-1.0))),
-    upperBounds_(propsDict_.lookupOrDefault<scalarList>("upperBounds",scalarList(1,-1.0)))
+    upperBounds_(propsDict_.lookupOrDefault<scalarList>("upperBounds",scalarList(1,-1.0))),
+    partDeformationsName_("partDeformations")
 {
-    particleCloud_.registerParticleProperty<double**>("partDeformations",1);
+    particleCloud_.registerParticleProperty<double**>(partDeformationsName_,1);
 
     // init force sub model
     setForceSubModels(propsDict_);
@@ -138,7 +139,7 @@ void particleDeformation::setForce() const
         initialExec_ = false;
     }
 
-    double**& partDeformations_ = particleCloud_.getParticlePropertyRef<double**>("partDeformations");
+    double**& partDeformations_ = particleCloud_.getParticlePropertyRef<double**>(partDeformationsName_);
 
     label cellI = 0;
     label partType = -1;
@@ -196,7 +197,7 @@ void particleDeformation::setForce() const
     }
 
     // give DEM data
-    particleCloud_.dataExchangeM().giveData("partDeformations","scalar-atom", partDeformations_);
+    particleCloud_.dataExchangeM().giveData(partDeformationsName_,"scalar-atom", partDeformations_);
 }
 
 void particleDeformation::init() const

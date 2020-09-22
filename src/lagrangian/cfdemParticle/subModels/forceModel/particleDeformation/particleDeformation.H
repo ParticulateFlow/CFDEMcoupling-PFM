@@ -74,6 +74,8 @@ private:
 
     scalarList upperBounds_;
 
+    const word partDeformationsName_;
+
     label getListIndex(label) const;
 
     void init() const;

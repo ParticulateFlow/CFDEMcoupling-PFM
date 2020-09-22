@@ -64,6 +64,8 @@ private:
 
     scalarList typeKs_;
 
+    const word partKsRegName_;
+
     void calcPartKsField() const;
 
 public:

@@ -84,11 +84,12 @@ voidFractionModel::voidFractionModel
         /*sm.mesh(),
         dimensionedScalar("zero", dimensionSet(0,0,0,0,0), 1)*/
     ),
+    partCellsRegName_("cellsPerParticle"),
     maxCellsPerParticle_(1),
     weight_(1.),
     porosity_(1.)
 {
-    particleCloud_.registerParticleProperty<int**>("cellsPerParticle",1,1.0,false);
+    particleCloud_.registerParticleProperty<int**>(partCellsRegName_,1,1.0,false);
     if (particleCloud_.getParticleEffVolFactors()) multiWeights_ = true;
 }
 
@@ -127,11 +128,12 @@ voidFractionModel::voidFractionModel
         sm.mesh(),
         dimensionedScalar("zero", dimensionSet(0,0,0,0,0), initVoidfraction)
     ),
+    partCellsRegName_("cellsPerParticle"),
     maxCellsPerParticle_(1),
     weight_(1.),
     porosity_(1.)
 {
-    particleCloud_.registerParticleProperty<int**>("cellsPerParticle",1,1.0,false);
+    particleCloud_.registerParticleProperty<int**>(partCellsRegName_,1,1.0,false);
 }
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
@@ -159,7 +161,7 @@ void voidFractionModel::resetVoidFractions()
 
 int** const& voidFractionModel::cellsPerParticle() const
 {
-    return particleCloud_.getParticlePropertyRef<int**>("cellsPerParticle");
+    return particleCloud_.getParticlePropertyRef<int**>(partCellsRegName_);
 }
 
 int voidFractionModel::maxCellsPerParticle() const

@@ -95,10 +95,11 @@ heatTransferGranConduction::heatTransferGranConduction
     voidfractionFieldName_(propsDict_.lookupOrDefault<word>("voidfractionFieldName","voidfraction")),
     voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
     partHeatFluxName_(propsDict_.lookupOrDefault<word>("partHeatFluxName","conductiveHeatFlux")),
-    typePartThermCond_(propsDict_.lookupOrDefault<scalarList>("thermalConductivities",scalarList(1,-1.0)))
+    typePartThermCond_(propsDict_.lookupOrDefault<scalarList>("thermalConductivities",scalarList(1,-1.0))),
+    partThermCondRegName_(typeName + "partThermCond")
 {
     particleCloud_.registerParticleProperty<double**>(partHeatFluxName_,1);
-    particleCloud_.registerParticleProperty<double**>("partThermCond",1);
+    particleCloud_.registerParticleProperty<double**>(partThermCondRegName_,1);
 
     if (typePartThermCond_[0] < 0.0)
     {
@@ -188,7 +189,7 @@ void heatTransferGranConduction::calcPartThermCond()
 {
     label cellI=0;
     label partType = 1;
-    double**& partThermCond_ = particleCloud_.getParticlePropertyRef<double**>("partThermCond");
+    double**& partThermCond_ = particleCloud_.getParticlePropertyRef<double**>(partThermCondRegName_);
 
     for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)
     {

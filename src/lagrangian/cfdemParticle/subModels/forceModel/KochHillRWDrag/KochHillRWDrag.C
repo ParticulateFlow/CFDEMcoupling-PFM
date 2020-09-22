@@ -74,6 +74,8 @@ KochHillRWDrag::KochHillRWDrag
     interpolation_(propsDict_.found("interpolation")),
     scale_(1.),
     randomTauE_(propsDict_.found("randomTauE")),
+    partTimeRegName_(typeName + "partTime"),
+    partUfluctRegName_(typeName + "partUfluct"),
     RanGen_(label(0))
 {
 
@@ -97,8 +99,8 @@ KochHillRWDrag::KochHillRWDrag
     if (propsDict_.found("rhoP"))
         rhoP_= readScalar(propsDict_.lookup("rhoP"));
 
-    particleCloud_.registerParticleProperty<double**>("partTime",1,0.0,false);
-    particleCloud_.registerParticleProperty<double**>("partUfluct",3,0.0,false);
+    particleCloud_.registerParticleProperty<double**>(partTimeRegName_,1,0.0,false);
+    particleCloud_.registerParticleProperty<double**>(partUfluctRegName_,3,0.0,false);
 }
 
 
@@ -173,8 +175,8 @@ void KochHillRWDrag::setForce() const
     interpolationCellPoint<scalar> voidfractionInterpolator_(voidfraction_);
     interpolationCellPoint<vector> UInterpolator_(U_);
 
-    double**& partTime_ = particleCloud_.getParticlePropertyRef<double**>("partTime");
-    double**& partUfluct_ = particleCloud_.getParticlePropertyRef<double**>("partUfluct");
+    double**& partTime_ = particleCloud_.getParticlePropertyRef<double**>(partTimeRegName_);
+    double**& partUfluct_ = particleCloud_.getParticlePropertyRef<double**>(partUfluctRegName_);
 
     //Info << "RW-TEST: We are in setForce() at t = " << t << endl; // TEST-Output
 

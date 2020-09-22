@@ -43,7 +43,9 @@ private:
 
     dictionary propsDict_;
 
-    word UsFieldName_;
+    const word vflucRegName_;
+
+    const word UsFieldName_;
 
     const volVectorField& UsField_;
 

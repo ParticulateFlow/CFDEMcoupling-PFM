@@ -57,6 +57,7 @@ reactantPerParticle::reactantPerParticle
     propsDict_(dict.subDict(typeName + "Props")),
     mesh_(sm.mesh()),
     verbose_(propsDict_.lookupOrDefault<bool>("verbose",false)),
+    partReactantName_("reactantPerParticle"),
     voidfractionFieldName_(propsDict_.lookupOrDefault<word>("voidfractionFieldName","voidfraction")),
     voidfraction_(sm.mesh().lookupObject<volScalarField>(voidfractionFieldName_)),
     particlesPerCell_
@@ -75,7 +76,7 @@ reactantPerParticle::reactantPerParticle
     Nevery_(propsDict_.lookupOrDefault<label>("Nevery",1))
 {
     particleCloud_.checkCG(false);
-    particleCloud_.registerParticleProperty<double**>("reactantPerParticle",1);
+    particleCloud_.registerParticleProperty<double**>(partReactantName_,1);
 }
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
@@ -102,7 +103,7 @@ void reactantPerParticle::execute()
     scalar voidfraction(1);
     scalar cellvolume(0.0);
     scalar particlesPerCell(1.0);
-    double**& reactantPerParticle_ = particleCloud_.getParticlePropertyRef<double**>("reactantPerParticle");
+    double**& reactantPerParticle_ = particleCloud_.getParticlePropertyRef<double**>(partReactantName_);
 
     // first create particles per cell field
     for (int index=0; index<particleCloud_.numberOfParticles(); ++index)
@@ -130,7 +131,7 @@ void reactantPerParticle::execute()
     }
 
     // give DEM data
-    particleCloud_.dataExchangeM().giveData("reactantPerParticle", "scalar-atom", reactantPerParticle_);
+    particleCloud_.dataExchangeM().giveData(partReactantName_, "scalar-atom", reactantPerParticle_);
 
     Info << "give data done" << endl;
 }

@@ -111,6 +111,12 @@ protected:
 
     word partHeatFluxName_;
 
+    const word partHeatFluxCoeffRegName_;
+
+    const word partReRegName_;
+
+    const word partNuRegName_;
+
     mutable scalar scaleDia_;
 
     scalarList typeCG_;

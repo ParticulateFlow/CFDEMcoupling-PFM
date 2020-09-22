@@ -78,6 +78,8 @@ private:
 
     vector ignorePoint_;
 
+    const word vflucName_;
+
     void relax(scalar, scalar) const;
 
 public:

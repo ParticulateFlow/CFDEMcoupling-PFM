@@ -45,6 +45,10 @@ private:
 
     bool multiTypes_;
 
+    const word d2RegName_;
+
+    const word d3RegName_;
+
     label maxTypeCG_;
 
     scalarList typeCG_;

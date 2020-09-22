@@ -54,7 +54,8 @@ ZehnerSchluenderThermCond::ZehnerSchluenderThermCond
     partKsField_(const_cast<volScalarField&>(sm.mesh().lookupObject<volScalarField> (partKsFieldName_))),
     voidfractionFieldName_(propsDict_.lookupOrDefault<word>("voidfractionFieldName","voidfraction")),
     voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
-    typeKs_(propsDict_.lookupOrDefault<scalarList>("thermalConductivities",scalarList(1,-1.0)))
+    typeKs_(propsDict_.lookupOrDefault<scalarList>("thermalConductivities",scalarList(1,-1.0))),
+    partKsRegName_(typeName + "partKs")
 {
     if (typeKs_[0] < 0.0)
     {
@@ -63,7 +64,7 @@ ZehnerSchluenderThermCond::ZehnerSchluenderThermCond
 
     if (typeKs_.size() > 1)
     {
-        particleCloud_.registerParticleProperty<double**>("partKs",1);
+        particleCloud_.registerParticleProperty<double**>(partKsRegName_,1);
     }
     else
     {
@@ -127,7 +128,7 @@ void ZehnerSchluenderThermCond::calcPartKsField() const
         FatalError << "ZehnerSchluenderThermCond needs data for more than one type, but types are not communicated." << abort(FatalError);
     }
 
-    double**& partKs_ = particleCloud_.getParticlePropertyRef<double**>("partKs");
+    double**& partKs_ = particleCloud_.getParticlePropertyRef<double**>(partKsRegName_);
     label cellI=0;
     label partType = 0;
     for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)

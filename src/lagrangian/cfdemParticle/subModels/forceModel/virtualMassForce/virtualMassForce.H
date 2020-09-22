@@ -71,6 +71,8 @@ private:
 
     const surfaceScalarField& phi_;
 
+    const word UrelOldRegName_;
+
     const bool splitUrelCalculation_;      //indicator to split calculation of Urel between CFDEM and LIGGGHTS
                                            //requires the integration fix to take dv/dt into account!
 

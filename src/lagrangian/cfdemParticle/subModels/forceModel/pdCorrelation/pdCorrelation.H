@@ -45,6 +45,12 @@ private:
 
     dictionary propsDict_;
 
+    const word dRegName_;
+    const word pRegName_;
+    const word d2RegName_;
+    const word pdRegName_;
+    const word cg3RegName_;
+
     mutable volScalarField dField_;
     mutable volVectorField pField_;
     mutable volScalarField d2Field_;

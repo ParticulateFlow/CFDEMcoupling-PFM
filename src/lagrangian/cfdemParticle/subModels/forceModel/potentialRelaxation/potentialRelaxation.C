@@ -82,9 +82,10 @@ potentialRelaxation::potentialRelaxation
     dt_(particleCloud_.dataExchangeM().DEMts()),
     ignoreReg_(propsDict_.lookupOrDefault<bool>("ignoreRegion",false)),
     ignoreDirection_(propsDict_.lookupOrDefault<vector>("ignoreDirection",vector::zero)),
-    ignorePoint_(propsDict_.lookupOrDefault<vector>("ignorePoint",vector::zero))
+    ignorePoint_(propsDict_.lookupOrDefault<vector>("ignorePoint",vector::zero)),
+    vflucName_("vfluc")
 {
-    particleCloud_.registerParticleProperty<double**>("vfluc",3);
+    particleCloud_.registerParticleProperty<double**>(vflucName_,3);
 
     if(ignoreReg_)
     {
@@ -117,7 +118,7 @@ void potentialRelaxation::setForce() const
 
   // volVectorField relaxStream = DField_ * fvc::grad(voidfraction_ - voidfractionRec_);
 
-    double**& vfluc_ = particleCloud_.getParticlePropertyRef<double**>("vfluc");
+    double**& vfluc_ = particleCloud_.getParticlePropertyRef<double**>(vflucName_);
 
     vector position(0,0,0);
     scalar voidfraction(0.0);
@@ -174,7 +175,7 @@ void potentialRelaxation::setForce() const
             }
     }
 
-    particleCloud_.dataExchangeM().giveData("vfluc","vector-atom", vfluc_);
+    particleCloud_.dataExchangeM().giveData(vflucName_,"vector-atom", vfluc_);
 
     if (measureDiff_)
     {

@@ -69,6 +69,8 @@ protected:
 
         volScalarField voidfractionNext_;
 
+        const word partCellsRegName_;
+
         int maxCellsPerParticle_;
 
         scalar weight_;

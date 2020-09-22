@@ -54,6 +54,8 @@ dSauter::dSauter
     forceModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
     multiTypes_(false),
+    d2RegName_(typeName + "d2"),
+    d3RegName_(typeName + "d3"),
     maxTypeCG_(1),
     typeCG_(propsDict_.lookupOrDefault<scalarList>("coarseGrainingFactors",scalarList(1,1.0))),
     d2Field_
@@ -100,8 +102,8 @@ dSauter::dSauter
         maxTypeCG_ = typeCG_.size();
     }
 
-    particleCloud_.registerParticleProperty<double**>("d2",1);
-    particleCloud_.registerParticleProperty<double**>("d3",1);
+    particleCloud_.registerParticleProperty<double**>(d2RegName_,1);
+    particleCloud_.registerParticleProperty<double**>(d3RegName_,1);
 
     dSauter_.write();
 
@@ -128,8 +130,8 @@ void dSauter::setForce() const
         Info << "dSauter using CG factor(s) = " << typeCG_ << endl;
     }
 
-    double**& d2_ = particleCloud_.getParticlePropertyRef<double**>("d2");
-    double**& d3_ = particleCloud_.getParticlePropertyRef<double**>("d3");
+    double**& d2_ = particleCloud_.getParticlePropertyRef<double**>(d2RegName_);
+    double**& d3_ = particleCloud_.getParticlePropertyRef<double**>(d3RegName_);
 
     label cellI = 0;
     label partType = 1;

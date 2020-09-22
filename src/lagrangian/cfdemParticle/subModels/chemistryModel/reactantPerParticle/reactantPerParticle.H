@@ -56,7 +56,9 @@ private:
 
     bool verbose_;
 
-    word voidfractionFieldName_;
+    const word partReactantName_;
+
+    const word voidfractionFieldName_;
 
     const volScalarField& voidfraction_;
 

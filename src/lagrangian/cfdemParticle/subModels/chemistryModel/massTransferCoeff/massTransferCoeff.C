@@ -63,12 +63,12 @@ massTransferCoeff::massTransferCoeff
     densityFieldName_(propsDict_.lookupOrDefault<word>("densityFieldName","rho")),
     rho_(sm.mesh().lookupObject<volScalarField> (densityFieldName_)),
     partNuName_(propsDict_.lookupOrDefault<word>("partViscos","partNu")),
-    partReynolds_(propsDict_.lookupOrDefault<word>("partReynolds","partRe")),
+    partReName_(propsDict_.lookupOrDefault<word>("partReynolds","partRe")),
     scaleDia_(1)
 {
     particleCloud_.checkCG(true);
     particleCloud_.registerParticleProperty<double**>(partNuName_,1);
-    particleCloud_.registerParticleProperty<double**>(partReynolds_,1);
+    particleCloud_.registerParticleProperty<double**>(partReName_,1);
 }
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
@@ -115,7 +115,7 @@ void massTransferCoeff::execute()
     interpolationCellPoint <scalar> voidfractionInterpolator_(voidfraction_);
 
     double**& partNu_ = particleCloud_.getParticlePropertyRef<double**>(partNuName_);
-    double**& partRe_ = particleCloud_.getParticlePropertyRef<double**>(partReynolds_);
+    double**& partRe_ = particleCloud_.getParticlePropertyRef<double**>(partReName_);
 
     for (int index=0; index<particleCloud_.numberOfParticles(); ++index)
     {
@@ -173,7 +173,7 @@ void massTransferCoeff::execute()
 
     // give DEM data
     particleCloud_.dataExchangeM().giveData(partNuName_, "scalar-atom", partNu_);
-    particleCloud_.dataExchangeM().giveData(partReynolds_, "scalar-atom", partRe_);
+    particleCloud_.dataExchangeM().giveData(partReName_, "scalar-atom", partRe_);
 
     Info << "give data done" << endl;
 }

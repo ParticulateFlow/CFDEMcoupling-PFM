@@ -55,6 +55,11 @@ pdCorrelation::pdCorrelation
 :
     forceModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
+    dRegName_(typeName + "d"),
+    pRegName_(typeName + "p"),
+    d2RegName_(typeName + "d2"),
+    pdRegName_(typeName + "pd"),
+    cg3RegName_(typeName + "cg3"),
     dField_
     (   IOobject
         (
@@ -146,11 +151,11 @@ pdCorrelation::pdCorrelation
                   << abort(FatalError);
     }
 
-    particleCloud_.registerParticleProperty<double**>("d",1);
-    particleCloud_.registerParticleProperty<double**>("p",3);
-    particleCloud_.registerParticleProperty<double**>("d2",1);
-    particleCloud_.registerParticleProperty<double**>("pd",3);
-    particleCloud_.registerParticleProperty<double**>("cg3",1);
+    particleCloud_.registerParticleProperty<double**>(dRegName_,1);
+    particleCloud_.registerParticleProperty<double**>(pRegName_,3);
+    particleCloud_.registerParticleProperty<double**>(d2RegName_,1);
+    particleCloud_.registerParticleProperty<double**>(pdRegName_,3);
+    particleCloud_.registerParticleProperty<double**>(cg3RegName_,1);
 
     dField_.write();
     pdField_.write();
@@ -175,11 +180,11 @@ void pdCorrelation::setForce() const
 
     if (runOnWriteOnly_ && !mesh.write()) return; // skip if it's not write time
 
-    double**& d_ = particleCloud_.getParticlePropertyRef<double**>("d");
-    double**& p_ = particleCloud_.getParticlePropertyRef<double**>("p");
-    double**& d2_ = particleCloud_.getParticlePropertyRef<double**>("d2");
-    double**& pd_ = particleCloud_.getParticlePropertyRef<double**>("pd");
-    double**& cg3_ = particleCloud_.getParticlePropertyRef<double**>("cg3");
+    double**& d_ = particleCloud_.getParticlePropertyRef<double**>(dRegName_);
+    double**& p_ = particleCloud_.getParticlePropertyRef<double**>(pRegName_);
+    double**& d2_ = particleCloud_.getParticlePropertyRef<double**>(d2RegName_);
+    double**& pd_ = particleCloud_.getParticlePropertyRef<double**>(pdRegName_);
+    double**& cg3_ = particleCloud_.getParticlePropertyRef<double**>(cg3RegName_);
 
     const Switch densityFromList
     (

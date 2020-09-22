@@ -76,6 +76,8 @@ protected:
 
     scalarList typePartThermCond_;
 
+    const word partThermCondRegName_;
+
     void calcPartEffThermCond();
 
     void calcPartThermCond();
