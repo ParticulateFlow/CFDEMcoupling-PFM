@@ -56,15 +56,15 @@ private:
 
     const fvMesh& mesh_;
 
-    word velFieldName_;
+    const word velFieldName_;
 
     const volVectorField& U_;
 
-    word voidfractionFieldName_;
+    const word voidfractionFieldName_;
 
     const volScalarField& voidfraction_;
 
-    word densityFieldName_;
+    const word densityFieldName_;
 
     const volScalarField& rho_;
 

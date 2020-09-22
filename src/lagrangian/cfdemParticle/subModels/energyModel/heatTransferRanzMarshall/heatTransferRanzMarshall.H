@@ -67,11 +67,11 @@ protected:
 
     scalar NusseltScalingFactor_;
 
-    word QPartFluidName_;
+    const word QPartFluidName_;
 
     volScalarField QPartFluid_;
 
-    word QPartFluidCoeffName_;
+    const word QPartFluidCoeffName_;
 
     volScalarField QPartFluidCoeff_;
 
@@ -89,27 +89,27 @@ protected:
 
     dimensionedScalar partTempAve_;
 
-    word tempFieldName_;
+    const word tempFieldName_;
 
     const volScalarField& tempField_;            // ref to temperature field
 
-    word voidfractionFieldName_;
+    const word voidfractionFieldName_;
 
     const volScalarField& voidfraction_;    // ref to voidfraction field
 
     scalar maxSource_;                           // max (limited) value of src field
 
-    word velFieldName_;
+    const word velFieldName_;
 
     const volVectorField& U_;
 
-    word densityFieldName_;
+    const word densityFieldName_;
 
     const volScalarField& rho_;
 
-    word partTempName_;
+    const word partTempName_;
 
-    word partHeatFluxName_;
+    const word partHeatFluxName_;
 
     const word partHeatFluxCoeffRegName_;
 

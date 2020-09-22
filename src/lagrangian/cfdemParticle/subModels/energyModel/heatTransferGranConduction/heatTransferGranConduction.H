@@ -54,7 +54,7 @@ protected:
 
     scalar totalHeatFlux_;
 
-    word QPartPartName_;
+    const word QPartPartName_;
 
     volScalarField QPartPart_;
 
@@ -64,15 +64,15 @@ protected:
 
     const volScalarField& partTempField_;
 
-    word prescribedVoidfractionFieldName_;
+    const word prescribedVoidfractionFieldName_;
 
     const volScalarField& prescribedVoidfraction_;
 
-    word voidfractionFieldName_;
+    const word voidfractionFieldName_;
 
     const volScalarField& voidfraction_;
 
-    word partHeatFluxName_;
+    const word partHeatFluxName_;
 
     scalarList typePartThermCond_;
 

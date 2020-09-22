@@ -72,28 +72,28 @@ private:
 
     volScalarField changeOfGasMassField_;
 
-    word tempFieldName_;
+    const word tempFieldName_;
 
     const volScalarField& tempField_;              // ref to gas temperature field
 
-    word partTempName_;
+    const word partTempName_;
 
-    word densityFieldName_;
+    const word densityFieldName_;
 
     const volScalarField& rho_;
 
-    word partRhoName_;
+    const word partRhoName_;
 
-    word voidfractionFieldName_;
+    const word voidfractionFieldName_;
 
     const volScalarField& voidfraction_;
 
     // total mole field
-    word molarConcFieldName_;
+    const word molarConcFieldName_;
 
     const volScalarField& molarConc_;
 
-    word partMolarConcName_;
+    const word partMolarConcName_;
 
     label loopCounter_;
 

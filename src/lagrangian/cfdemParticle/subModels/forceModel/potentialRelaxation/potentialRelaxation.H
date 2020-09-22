@@ -51,11 +51,11 @@ private:
 
     mutable OFstream recErrorFile_;
 
-    word voidfractionFieldName_;
+    const word voidfractionFieldName_;
 
     const volScalarField& voidfraction_;
 
-    word voidfractionRecFieldName_;
+    const word voidfractionRecFieldName_;
 
     const volScalarField& voidfractionRec_;
 
