@@ -18,7 +18,6 @@ This section lists all CFDEMcoupling solvers alphabetically.
 rStatAnalysis,
 rcfdemSolverBase,
 rcfdemSolverCoupledHeattransfer,
-rcfdemSolverHeattransfer,
 rcfdemSolverRhoSteadyPimple,
 recSolverTurbTransport,
 rtfmSolverSpecies,

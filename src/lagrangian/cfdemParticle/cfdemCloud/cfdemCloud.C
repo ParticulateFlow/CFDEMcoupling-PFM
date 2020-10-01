@@ -84,10 +84,12 @@ cfdemCloud::cfdemCloud
     ignore_(couplingProperties_.found("ignore")),
     allowCFDsubTimestep_(true),
     limitDEMForces_(couplingProperties_.found("limitDEMForces")),
+    phaseInForces_(couplingProperties_.found("phaseInForcesTime")),
     getParticleDensities_(couplingProperties_.lookupOrDefault<bool>("getParticleDensities",false)),
     getParticleEffVolFactors_(couplingProperties_.lookupOrDefault<bool>("getParticleEffVolFactors",false)),
     getParticleTypes_(couplingProperties_.lookupOrDefault<bool>("getParticleTypes",false)),
     maxDEMForce_(0.),
+    phaseInForcesTime_(couplingProperties_.lookupOrDefault<scalar>("phaseInForcesTime",0.0)),
     modelType_(couplingProperties_.lookup("modelType")),
     positions_(NULL),
     velocities_(NULL),
@@ -368,6 +370,12 @@ cfdemCloud::cfdemCloud
         if (verbose_) Info << "nPatchesNonCyclic=" << nPatchesNonCyclic << ", nPatchesCyclic=" << nPatchesCyclic << endl;
         Warning << "Periodic handing is disabled because the domain is not fully periodic!\n" << endl;
     }
+
+    // check if phasing-in time existing and is meaningful
+    if (phaseInForces_ && phaseInForcesTime_ < SMALL)
+    {
+        FatalError << "phasing-in time too small" << endl;
+    }
 }
 
 // * * * * * * * * * * * * * * * * Destructors  * * * * * * * * * * * * * * //
@@ -467,6 +475,19 @@ void cfdemCloud::setForces()
               for(int i=0;i<3;i++) DEMForces_[index][i] *= maxDEMForce_/F;
         }
         Info << "largest particle-fluid interaction on particle: " << maxF << endl;
+    }
+
+    if (phaseInForces_)
+    {
+        scalar tfrac = (mesh_.time().timeOutputValue()-mesh_.time().startTime().value())/phaseInForcesTime_;
+        if (tfrac <= 1.0)
+        {
+            for (int index = 0;index <  numberOfParticles(); ++index)
+            {
+                for(int i=0;i<3;i++) DEMForces_[index][i] *= tfrac;
+                Cds_[index][0] *= tfrac;
+            }
+        }
     }
 }
 

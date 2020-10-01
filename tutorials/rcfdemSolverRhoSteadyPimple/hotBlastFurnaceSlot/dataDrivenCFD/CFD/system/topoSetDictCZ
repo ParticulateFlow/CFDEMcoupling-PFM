@@ -24,7 +24,7 @@ actions
     sourceInfo
     {
         field       "partTempRef";
-        min         1530;
+        min         1675;
         max         10000;
     }
   }
@@ -36,7 +36,7 @@ actions
     source  boxToCell;
     sourceInfo
     {
-      box (-8 -1 -2) (8 1 4);
+      box (-8 -1 -2) (8 1 3);
     }
   }
 

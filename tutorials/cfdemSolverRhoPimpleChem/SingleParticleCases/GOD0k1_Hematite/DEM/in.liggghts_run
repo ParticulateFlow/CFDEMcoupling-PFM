@@ -65,20 +65,13 @@ fix     k0_CO all property/atom k0_cfd5 vector yes no no 17 25 2700
 fix     Ea_CO all property/atom Ea_cfd5 vector yes no no 69488 73674 113859
 
 # particle porosity/tortuosity/pore diameter
-fix     porosity        all property/atom   porosity_       vector yes no no 0.65 0.31 0.16 0.15
-fix     tortuosity      all property/global tortuosity_     scalar 3
-fix     pore_diameter   all property/global pore_diameter_  scalar 5.5e-7
+fix     porosity        all property/global porosity_all        vector 0.65 0.31 0.16 0.15
+fix     tortuosity      all property/global tortuosity_all      scalar 3
+fix     pore_diameter   all property/global pore_diameter_all   scalar 5.5e-7
+fix     layerDensities  all property/global density_all         vector 7870. 5740. 5170. 5240.
 
 # define layer properties
 fix     LayerRelRadii all property/atom relRadii vector yes no no  1.0 0.998 0.995 0.98
-
-### define fix for mass layer - initial testing
-fix     LayerMasses all property/atom massLayer vector yes no no 0. 0. 0. 0.
-fix     LayerDensities all property/global density_all vector 7870. 5740. 5170. 5240.
-
-## define fix for rho_eff and fracRed - initialize as zero
-fix     fracRed all property/atom fracRed_all vector yes no no 0. 0. 0.
-fix     rhoeff all property/atom rhoeff vector yes no no 0. 0. 0. 0.
 
 ###############
 # Write data into files for post-processing

@@ -8,7 +8,7 @@ symmetrizer -dict "symmetrizerPropertiesPost"
 
 cd ../../dataDrivenCFD/CFD
 
-typeset -i currIndex=$(cat "../../runIndex") 
+typeset -i currIndex=$(cat "../../runIndex")
 mv dataBase dataBase_${currIndex}
 mkdir dataBase
 mkdir dataBase/0
@@ -47,6 +47,7 @@ mv ../../CFDDEM/DEM/liggghts.restartCFDEM ../../CFDDEM/DEM/liggghts.restart
 cp ../../CFDDEM/DEM/liggghts.restart ../DEM/liggghts.restart
 cp ../../CFDDEM/DEM/initOre ../DEM/initOre
 cp ../../CFDDEM/DEM/initCoke ../DEM/initCoke
+cp ../../CFDDEM/DEM/initFineMix ../DEM/initFineMix
 
 let "currIndex += 1"
 echo ${currIndex}

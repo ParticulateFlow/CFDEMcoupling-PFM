@@ -1,7 +1,7 @@
 import os
 import shutil
 
-with open('CFDDEM/CFD/postProcessing/cellObj1/0/volRegion.dat', 'r') as f:
+with open('CFDDEM/CFD/postProcessing/cellObj1/0/volFieldValue.dat', 'r') as f:
     for line in f:
         if line.startswith('#'): 
             continue

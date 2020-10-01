@@ -1,18 +1,30 @@
+#################################
 # remove particles from RW region
-
-# according to log file: 2235.678 kg coke / 2560 steps = 3.5 kg / sec
-
-#variable massRWremove equal 1.747
+#################################
 
 region cokeRefRegion block INF INF INF INF INF 2
-variable npLRegRef equal count(coke,cokeRefRegion)
-variable npLReg equal ${npLRegRef}
-print 'npLRegRef = ${npLRegRef}, npLReg = ${npLReg}' screen yes
+variable Nremove equal 10
+variable tau equal ${dt}*${Nremove}
 
-variable tau equal 5 #100 #1000
-variable Nupdate equal 5
-variable mPart equal 2.28
-variable massRWremove1 equal 0.5*${mPart}*(v_npLRegRef-${npLReg})/${tau}
-variable massRWremove equal ((v_massRWremove1>0)-1e-10)*v_massRWremove1
-print 'massRWremove = ${massRWremove}, npLRegRef = ${npLRegRef}' screen yes
-fix deleteRWs all remove nevery 10 massratevariable massRWremove style delete seed 10007143 region RWs atomtype 1
+# coke
+
+variable nCokeRWRef equal count(coke,cokeRefRegion)
+variable nCokeRW equal ${nCokeRWRef}
+
+variable mCokePart equal 2.2
+variable massCokeRWremove1 equal ${mCokePart}*(v_nCokeRWRef-${nCokeRW})/${tau}
+variable massCokeRWremove equal ((v_massCokeRWremove1>0)-1e-10)*v_massCokeRWremove1
+fix deleteCokeRWs all remove nevery ${Nremove} massratevariable massCokeRWremove style delete seed 10007143 region RWs restart_read no integrated_error no atomtype 1
+
+# fine coke
+
+variable nFineCokeRWRef equal count(finecoke,cokeRefRegion)
+variable nFineCokeRW equal ${nFineCokeRWRef}
+
+variable mFineCokePart equal 0.8
+variable massFineCokeRWremove1 equal ${mFineCokePart}*(v_nFineCokeRWRef-${nFineCokeRW})/${tau}
+variable massFineCokeRWremove equal ((v_massFineCokeRWremove1>0)-1e-10)*v_massFineCokeRWremove1
+fix deleteFineCokeRWs all remove nevery ${Nremove} massratevariable massFineCokeRWremove style delete seed 10007144 region RWs restart_read no integrated_error no atomtype 2
+
+# remove excess of fine coke outside of RWs
+fix deleteFineCokeHearth all remove nevery ${Nremove} massratevariable massFineCokeRWremove style delete seed 10007145 region cokeRefRegion restart_read no integrated_error no atomtype 2

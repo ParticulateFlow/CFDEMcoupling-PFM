@@ -2,18 +2,25 @@ print 'Performing insertion number ${counter}.' screen yes
 
 group secHighestCoke clear
 group secHighestOre clear
+group secHighestFineMix clear
 group secHighestCoke union secHighestCoke highestCoke
 group secHighestOre union secHighestOre highestOre
+group secHighestFineMix union secHighestFineMix highestFineMix
 
 group highestCoke clear
 group highestOre clear
+group highestFineMix clear
 
 if "${counter} > 1" then "unfix ins${counter}C"
 if "${counter} > 1" then "unfix ins${counter}O"
+if "${counter} > 1" then "unfix ins${counter}O1"
+if "${counter} > 1" then "unfix ins${counter}O2"
 
 next counter
 
 fix ins${counter}C highestCoke insert/pack/dense seed 125 region insRegTop2 distributiontemplate pdd1 volumefraction_region 0.56
-fix ins${counter}O highestOre insert/pack/dense seed 124 region insRegTop1 distributiontemplate pdd2 volumefraction_region 0.56
+fix ins${counter}O highestOre insert/pack/dense seed 124 region insRegTop1b distributiontemplate pdd2 volumefraction_region 0.56
+fix ins${counter}O1 highestFineMix insert/pack/dense seed 123 region insRegTop1a distributiontemplate pdd3 volumefraction_region 0.56
+fix ins${counter}O2 highestFineMix insert/pack/dense seed 122 region insRegTop1c distributiontemplate pdd3 volumefraction_region 0.56
 
 run 0

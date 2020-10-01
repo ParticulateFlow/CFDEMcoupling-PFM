@@ -1,13 +1,39 @@
 rm runIndex
+
 cd CFDDEM/CFD
 rm -r proc*
-rm -r 0
+rm -r [0-9]*
+rm -r postProcessing
+rm -r dynamicCode
+rm -r clockData
+rm *.log
+rm log.*
+
 cd ../DEM
 rm -r post*
+rm -r monitor
+rm init*
 mkdir post
-rm liggghts.restart
+mkdir monitor
+rm liggghts.restart*
+rm restart.*
 
 cd ../../dataDrivenCFD/CFD
 rm -r proc*
-rm -r 0
-rm ../DEM/temp_ave.txt
+rm -r [0-9]*
+rm -r postProcessing
+rm -r dynamicCode
+rm -r clockData
+rm -r dataBase*
+rm recurrence*
+rm *.log
+rm log.*
+
+cd ../DEM
+rm -r post*
+rm -r monitor
+rm init*
+mkdir post
+mkdir monitor
+rm liggghts.restart*
+rm restart.*

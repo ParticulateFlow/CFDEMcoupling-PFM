@@ -74,6 +74,10 @@ private:
 
     const Switch verbose_;
 
+    const Switch writeToFile_;
+
+    mutable autoPtr<OFstream> filePtr_;
+
 public:
 
     //- Runtime type information

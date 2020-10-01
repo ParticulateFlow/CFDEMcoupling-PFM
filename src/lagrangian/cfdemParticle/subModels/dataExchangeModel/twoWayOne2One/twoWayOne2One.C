@@ -966,6 +966,10 @@ void twoWayOne2One::extractCollected(T*& src, T**& dst, int width) const
     }
 }
 
+int twoWayOne2One::getNumberOfParticles() const
+{
+    return particleCloud_.numberOfParticles();
+}
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

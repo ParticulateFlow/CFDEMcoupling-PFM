@@ -1,0 +1,137 @@
+/*---------------------------------------------------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.4                                   |
+|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+
+    root            "";
+    case            "";
+    instance        "";
+    local           "";
+
+    class           dictionary;
+    object          couplingProperties;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+//===========================================================================//
+// sub-models & settings
+
+solveFlow off;
+
+useDDTvoidfraction;
+
+modelType B;
+
+couplingInterval 100;
+
+voidFractionModel trilinear;
+
+locateModel engine;
+
+meshMotionModel noMeshMotion;
+
+IOModel basicIO;
+
+probeModel off;
+
+dataExchangeModel twoWayMPI;
+
+averagingModel dense;
+
+clockModel off;
+
+smoothingModel off;
+
+forceModels
+(
+    DiFeliceDrag
+    Archimedes
+    noDrag
+    particleCellVolume
+    volWeightedAverage
+);
+
+momCoupleModels
+(
+    implicitCouple
+);
+
+turbulenceModelType "turbulenceProperties";
+
+//===========================================================================//
+// sub-model properties
+
+noDragProps
+{
+}
+
+particleCellVolumeProps
+{
+    upperThreshold 1e20;
+    lowerThreshold 0.;
+    verbose true;
+    writeToFile true;
+}
+
+volWeightedAverageProps
+{
+    scalarFieldNames
+    (
+        ddtVoidfraction
+    );
+    vectorFieldNames
+    (
+    );
+    upperThreshold 1e20;
+    lowerThreshold 0;
+    writeToFile true;
+    verbose true;
+}
+
+implicitCoupleProps
+{
+    velFieldName "U";
+    granVelFieldName "Us";
+    voidfractionFieldName "voidfraction";
+}
+
+DiFeliceDragProps
+{
+    velFieldName "U";
+    voidfractionFieldName "voidfraction";
+    granVelFieldName "Us";
+    verbose false;
+}
+
+ArchimedesProps
+{
+    densityFieldName "rho";
+    gravityFieldName "g";
+}
+
+twoWayMPIProps
+{
+    liggghtsPath "../DEM/in.liggghts_run";
+}
+
+trilinearProps
+{
+    alphaMin 0.3; // unused!
+}
+
+engineProps
+{
+    treeSearch true;
+}
+
+// ************************************************************************* //

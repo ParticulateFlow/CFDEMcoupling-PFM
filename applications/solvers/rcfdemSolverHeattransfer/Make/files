@@ -1,3 +1,0 @@
-rcfdemSolverHeattransfer.C
-
-EXE=$(CFDEM_APP_DIR)/rcfdemSolverHeattransfer
