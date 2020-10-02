@@ -60,10 +60,6 @@ protected:
 
         cfdemCloud& particleCloud_;
 
-        mutable double **inRegion_;
-
-        mutable double **outRegion_;
-
 public:
 
     friend class voidFractionModel;
@@ -116,13 +112,6 @@ public:
         virtual void expandRegion(volVectorField&) const = 0;
 
         virtual void resetVolFields(volVectorField&) const = 0;
-
-        void reAllocArrays() const;
-
-    // Access
-        inline double ** const& inRegion()const{ return inRegion_; };
-
-        inline double ** const& outRegion()const { return outRegion_; };
 
 };
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

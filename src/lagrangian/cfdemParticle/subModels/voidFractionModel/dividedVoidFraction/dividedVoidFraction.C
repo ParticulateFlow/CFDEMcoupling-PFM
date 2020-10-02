@@ -69,8 +69,7 @@ dividedVoidFraction::dividedVoidFraction
     alphaMin_(readScalar(propsDict_.lookup("alphaMin"))),
     alphaLimited_(0),
     tooMuch_(0.0),
-    interpolation_(propsDict_.found("interpolation")),
-    cfdemUseOnly_(propsDict_.lookupOrDefault<bool>("cfdemUseOnly", false))
+    interpolation_(propsDict_.found("interpolation"))
 {
     maxCellsPerParticle_ = numberOfMarkerPoints;
 
@@ -158,10 +157,6 @@ dividedVoidFraction::~dividedVoidFraction()
 
 void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfractions,double**& particleWeights,double**& particleVolumes, double**& particleV)
 {
-    if (cfdemUseOnly_)
-        reAllocArrays(particleCloud_.numberOfParticles());
-    else
-        reAllocArrays();
 
     vector position(0.,0.,0.);
     label cellID = -1;
@@ -180,14 +175,14 @@ void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfra
         //{
             // reset
 
-            for (int subcell=0; subcell < cellsPerParticle_[index][0]; subcell++)
+            for (int subcell=0; subcell < cellsPerParticle()[index][0]; subcell++)
             {
                 particleWeights[index][subcell] = 0.;
                 particleVolumes[index][subcell] = 0.;
             }
             particleV[index][0] = 0.;
 
-            cellsPerParticle_[index][0] = 1;
+            cellsPerParticle()[index][0] = 1;
             position = particleCloud_.position(index);
             cellID = particleCloud_.cellIDs()[index][0];
             radius = particleCloud_.radius(index);
@@ -270,7 +265,7 @@ void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfra
     for(int index=0; index < particleCloud_.numberOfParticles(); index++)
     {
         {
-            for (int subcell=0; subcell < cellsPerParticle_[index][0]; subcell++)
+            for (int subcell=0; subcell < cellsPerParticle()[index][0]; subcell++)
             {
                 label cellID = particleCloud_.cellIDs()[index][subcell];
 

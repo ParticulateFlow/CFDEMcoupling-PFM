@@ -54,7 +54,7 @@ protected:
 
     scalar totalHeatFlux_;
 
-    word QPartPartName_;
+    const word QPartPartName_;
 
     volScalarField QPartPart_;
 
@@ -64,23 +64,19 @@ protected:
 
     const volScalarField& partTempField_;
 
-    word prescribedVoidfractionFieldName_;
+    const word prescribedVoidfractionFieldName_;
 
     const volScalarField& prescribedVoidfraction_;
 
-    word voidfractionFieldName_;
+    const word voidfractionFieldName_;
 
     const volScalarField& voidfraction_;
 
-    word partHeatFluxName_;
-
-    mutable double **partHeatFlux_;
+    const word partHeatFluxName_;
 
     scalarList typePartThermCond_;
 
-    mutable double **partThermCond_;
-
-    void allocateMyArrays() const;
+    const word partThermCondRegName_;
 
     void calcPartEffThermCond();
 
@@ -118,9 +114,9 @@ public:
 
         void addEnergyCoefficient(volScalarField&) const {}
 
-	void calcEnergyContribution();
+        void calcEnergyContribution();
 
-	void postFlow();
+        void postFlow();
 
 };
 

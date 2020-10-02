@@ -71,14 +71,10 @@ LaEuScalarTemp::LaEuScalarTemp
     velFieldName_(propsDict_.lookup("velFieldName")),
     U_(sm.mesh().lookupObject<volVectorField> (velFieldName_)),
     partTempName_(propsDict_.lookup("partTempName")),
-    partTemp_(NULL),
     partHeatFluxName_(propsDict_.lookup("partHeatFluxName")),
-    partHeatFlux_(NULL),
     lambda_(readScalar(propsDict_.lookup("lambda"))),
     Cp_(readScalar(propsDict_.lookup("Cp")))
 {
-    allocateMyArrays();
-
     if (propsDict_.found("maxSource"))
     {
         maxSource_=readScalar(propsDict_.lookup ("maxSource"));
@@ -96,8 +92,10 @@ LaEuScalarTemp::LaEuScalarTemp
     // read those switches defined above, if provided in dict
     forceSubM(0).readSwitches();
 
-
     particleCloud_.checkCG(false);
+
+    particleCloud_.registerParticleProperty<double**>(partTempName_);
+    particleCloud_.registerParticleProperty<double**>(partHeatFluxName_);
 }
 
 
@@ -105,8 +103,6 @@ LaEuScalarTemp::LaEuScalarTemp
 
 LaEuScalarTemp::~LaEuScalarTemp()
 {
-    particleCloud_.dataExchangeM().destroy(partTemp_,1);
-    particleCloud_.dataExchangeM().destroy(partHeatFlux_,1);
 }
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
@@ -114,6 +110,9 @@ void LaEuScalarTemp::allocateMyArrays() const
 {
     // get memory for 2d arrays
     double initVal = 0.0;
+    double**& partTemp_ = particleCloud_.getParticlePropertyRef<double**>(partTempName_);
+    double**& partHeatFlux_ = particleCloud_.getParticlePropertyRef<double**>(partHeatFluxName_);
+
     particleCloud_.dataExchangeM().allocateArray(partTemp_,initVal,1);  // field/initVal/with/lenghtFromLigghts
     particleCloud_.dataExchangeM().allocateArray(partHeatFlux_,initVal,1);
 }
@@ -128,6 +127,8 @@ void LaEuScalarTemp::manipulateScalarField(volScalarField& EuField) const
 {
     // realloc the arrays
     allocateMyArrays();
+    double**& partTemp_ = particleCloud_.getParticlePropertyRef<double**>(partTempName_);
+    double**& partHeatFlux_ = particleCloud_.getParticlePropertyRef<double**>(partHeatFluxName_);
 
     // reset Scalar field
     EuField.primitiveFieldRef() = 0.0;

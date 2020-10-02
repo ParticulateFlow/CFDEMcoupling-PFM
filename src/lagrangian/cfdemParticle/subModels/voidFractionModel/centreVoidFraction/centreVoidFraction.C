@@ -80,8 +80,6 @@ centreVoidFraction::~centreVoidFraction()
 
 void centreVoidFraction::setvoidFraction(double** const& mask,double**& voidfractions,double**& particleWeights,double**& particleVolumes,double**& particleV)
 {
-    reAllocArrays();
-
     scalar radius(-1);
     scalar volume(0);
     scalar cellVol(0);
@@ -93,7 +91,7 @@ void centreVoidFraction::setvoidFraction(double** const& mask,double**& voidfrac
         //{
             // reset
             particleWeights[index][0]=0;
-            cellsPerParticle_[index][0]=1;
+            cellsPerParticle()[index][0]=1;
 
             label cellI = particleCloud_.cellIDs()[index][0];
 
@@ -128,9 +126,9 @@ void centreVoidFraction::setvoidFraction(double** const& mask,double**& voidfrac
                 if (index==0)
                 {
                     Info << "centre cellI = " << cellI << endl;
-                    Info << "cellsPerParticle_=" << cellsPerParticle_[index][0] << endl;
+                    Info << "cellsPerParticle =" << cellsPerParticle()[index][0] << endl;
 
-                    for(int i=0;i<cellsPerParticle_[index][0];i++)
+                    for(int i=0;i<cellsPerParticle()[index][0];i++)
                     {
                        if(i==0)Info << "cellids, voidfractions, particleWeights, : \n";
                        Info << particleCloud_.cellIDs()[index][i] << " ," << endl;

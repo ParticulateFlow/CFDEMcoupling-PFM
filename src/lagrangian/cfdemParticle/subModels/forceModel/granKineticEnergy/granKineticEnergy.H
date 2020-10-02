@@ -43,15 +43,13 @@ private:
 
     dictionary propsDict_;
 
-    mutable double **vfluc_;
+    const word vflucRegName_;
 
-    word UsFieldName_;
+    const word UsFieldName_;
 
     const volVectorField& UsField_;
 
     mutable volScalarField granKineticEnergy_;
-
-    void allocateMyArrays() const;
 
 public:
 

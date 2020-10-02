@@ -45,6 +45,7 @@ SourceFiles
 // choose version
 #include "OFversion.H"
 #include <vector>
+#include <typeinfo>
 
 #include "fvCFD.H"
 #include "IFstream.H"
@@ -187,6 +188,21 @@ protected:
     Switch checkPeriodicCells_;
 
     const turbulenceModel& turbulence_;
+
+    struct particleProperty {
+        void** property;            // pointer to per-particle data; memory deallocation by cfdemCloud
+        const std::type_info* ti;   // type of particle data (int**, double**)
+        int size;                   // size of single particle data; memory allocation by cfdemCloud if size > 0
+        double initVal;             // initial property value
+        bool reset;                 // if true, data is reset to initial value every coupling step
+        template<typename T>
+        T& ref() {
+          if (*ti == typeid(T)) return *reinterpret_cast<T*>(&property);
+          else throw std::bad_cast();
+        }
+    };
+
+    HashTable<particleProperty> particlePropertyTable; // table of registered per-particle properties
 
     autoPtr<dataExchangeModel> dataExchangeModel_;
 
@@ -443,6 +459,14 @@ public:
         void otherForces(volVectorField&);
 
         bool checkPeriodicCells() const { return checkPeriodicCells_; }
+
+        template<typename T>
+        void registerParticleProperty(const word& property, int size=0, double initVal=0.0, bool reset=true);
+        template<typename T>
+        T& getParticlePropertyRef(const word& property);
+protected:
+        virtual int**& getParticlePropertyImpl(const word& property, int**);
+        virtual double**& getParticlePropertyImpl(const word& property, double**);
 };
 
 

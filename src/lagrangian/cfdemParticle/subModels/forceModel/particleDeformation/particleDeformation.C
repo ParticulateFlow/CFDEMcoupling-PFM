@@ -60,9 +60,9 @@ particleDeformation::particleDeformation
     partTypes_(propsDict_.lookupOrDefault<labelList>("partTypes",labelList(1,-1))),
     lowerBounds_(propsDict_.lookupOrDefault<scalarList>("lowerBounds",scalarList(1,-1.0))),
     upperBounds_(propsDict_.lookupOrDefault<scalarList>("upperBounds",scalarList(1,-1.0))),
-    partDeformations_(NULL)
+    partDeformationsName_("partDeformations")
 {
-    allocateMyArrays();
+    particleCloud_.registerParticleProperty<double**>(partDeformationsName_,1);
 
     // init force sub model
     setForceSubModels(propsDict_);
@@ -120,16 +120,9 @@ particleDeformation::particleDeformation
 
 particleDeformation::~particleDeformation()
 {
-    particleCloud_.dataExchangeM().destroy(partDeformations_,1);
 }
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
-void particleDeformation::allocateMyArrays() const
-{
-    // get memory for 2d arrays
-    double initVal = 0.0;
-    particleCloud_.dataExchangeM().allocateArray(partDeformations_,initVal,1);
-}
 
 bool particleDeformation::defaultDeformCell(label cell) const
 {
@@ -145,8 +138,8 @@ void particleDeformation::setForce() const
         init();
         initialExec_ = false;
     }
-    // realloc the arrays
-    allocateMyArrays();
+
+    double**& partDeformations_ = particleCloud_.getParticlePropertyRef<double**>(partDeformationsName_);
 
     label cellI = 0;
     label partType = -1;
@@ -204,7 +197,7 @@ void particleDeformation::setForce() const
     }
 
     // give DEM data
-    particleCloud_.dataExchangeM().giveData("partDeformations","scalar-atom", partDeformations_);
+    particleCloud_.dataExchangeM().giveData(partDeformationsName_,"scalar-atom", partDeformations_);
 }
 
 void particleDeformation::init() const

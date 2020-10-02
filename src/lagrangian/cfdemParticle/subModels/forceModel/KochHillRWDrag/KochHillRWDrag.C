@@ -74,8 +74,8 @@ KochHillRWDrag::KochHillRWDrag
     interpolation_(propsDict_.found("interpolation")),
     scale_(1.),
     randomTauE_(propsDict_.found("randomTauE")),
-    partTime_(NULL),
-    partUfluct_(NULL),
+    partTimeRegName_(typeName + "partTime"),
+    partUfluctRegName_(typeName + "partUfluct"),
     RanGen_(label(0))
 {
 
@@ -99,16 +99,8 @@ KochHillRWDrag::KochHillRWDrag
     if (propsDict_.found("rhoP"))
         rhoP_= readScalar(propsDict_.lookup("rhoP"));
 
-
-//    if (particleCloud_.dataExchangeM().maxNumberOfParticles() > 0)
-//    {
-        //allocate memory
-        particleCloud_.dataExchangeM().allocateArray(partTime_,0.,1);
-        particleCloud_.dataExchangeM().allocateArray(partUfluct_,0.,3);
-//    }
-
-    //Pout << "RW-TEST: maxNumberOfParticles() == " << particleCloud_.dataExchangeM().maxNumberOfParticles() << endl; // TEST-Output
-
+    particleCloud_.registerParticleProperty<double**>(partTimeRegName_,1,0.0,false);
+    particleCloud_.registerParticleProperty<double**>(partUfluctRegName_,3,0.0,false);
 }
 
 
@@ -116,18 +108,12 @@ KochHillRWDrag::KochHillRWDrag
 
 KochHillRWDrag::~KochHillRWDrag()
 {
-    particleCloud_.dataExchangeM().destroy(partTime_, 1);
-    particleCloud_.dataExchangeM().destroy(partUfluct_, 3);
 }
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 void KochHillRWDrag::setForce() const
 {
-
-    // realloc the arrays
-    reAllocArrays();
-
     if (scale_ > 1.0)
     {
         Info << "KochHillRW using scale = " << scale_ << endl;
@@ -188,6 +174,9 @@ void KochHillRWDrag::setForce() const
 
     interpolationCellPoint<scalar> voidfractionInterpolator_(voidfraction_);
     interpolationCellPoint<vector> UInterpolator_(U_);
+
+    double**& partTime_ = particleCloud_.getParticlePropertyRef<double**>(partTimeRegName_);
+    double**& partUfluct_ = particleCloud_.getParticlePropertyRef<double**>(partUfluctRegName_);
 
     //Info << "RW-TEST: We are in setForce() at t = " << t << endl; // TEST-Output
 
@@ -378,16 +367,6 @@ void KochHillRWDrag::setForce() const
             // write particle based data to global array
             forceSubM(0).partToArray(index,drag,dragExplicit,Ufluid,dragCoefficient);
         //}
-    }
-}
-
-
-void KochHillRWDrag::reAllocArrays() const
-{
-    if (particleCloud_.numberOfParticlesChanged())
-    {
-        particleCloud_.dataExchangeM().allocateArray(partTime_,0.0,1);  // field/initVal/with/lenghtFromLigghts
-        particleCloud_.dataExchangeM().allocateArray(partUfluct_,0.0,3);
     }
 }
 
