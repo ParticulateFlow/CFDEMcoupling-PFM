@@ -64,6 +64,8 @@ private:
 
     labelList partTypes_;
 
+    vector defaultRelRadii_;
+
     mutable double** relRadii_;
 
     std::string filepath_;
@@ -72,7 +74,7 @@ private:
 
     bool initialized_;
 
-    void init();
+    bool init();
 
     void readDump(std::string, label, labelList &, vectorList &, vectorList &);
 

@@ -59,6 +59,7 @@ initMultiLayers::initMultiLayers
     maxNumLayers_(0),
     numLayers_(propsDict_.lookupOrDefault<labelList>("numLayers",labelList(1,-1))),
     partTypes_(propsDict_.lookupOrDefault<labelList>("partTypes",labelList(1,-1))),
+    relRadii_(NULL),
     filepath_(string(propsDict_.lookup("filepath"))),
     initialized_(false)
 {
@@ -70,6 +71,7 @@ initMultiLayers::initMultiLayers
     {
         FatalError<< "Currently, not more than four layers are supported." << abort(FatalError);
     }
+    defaultRelRadii_ = vector(0.998, 0.995, 0.98);
     particleCloud_.checkCG(false);
     allocateMyArrays();
 }
@@ -85,15 +87,12 @@ initMultiLayers::~initMultiLayers()
 
 void initMultiLayers::allocateMyArrays() const
 {
-    double initVal=1.0;
-    if (particleCloud_.dataExchangeM().maxNumberOfParticles() > 0)
-    {
-        particleCloud_.dataExchangeM().allocateArray(relRadii_,initVal,maxNumLayers_,"nparticles");
-    }
+    double initVal=0.0;
+    particleCloud_.dataExchangeM().allocateArray(relRadii_,initVal,maxNumLayers_);
 }
 
 
-void initMultiLayers::init()
+bool initMultiLayers::init()
 {
     // for all types of particles
     for(label types=0; types<partTypes_.size(); types++)
@@ -109,13 +108,15 @@ void initMultiLayers::init()
 
         if (access( filename.c_str(), F_OK ) == -1)
         {
-            FatalError<< "Data file " << filename << "not found." << abort(FatalError);
+            Info << "initMultiLayers: Data file " << filename << "not found. No initialisation of layer radii possible." << endl;
+            return false;
         }
         Info << "\nReading" << endl;
         Info << "\t" << filename << endl;
         readDump(filename, type, indices, positions, relradii);
 
-        Info << "Binning particle displacements on mesh." << endl;
+        Info << "Binning particle displacements on mesh for type " << type << endl;
+
         volScalarField particlesInCell
         (
             IOobject
@@ -145,7 +146,7 @@ void initMultiLayers::init()
                 IOobject::NO_WRITE
             ),
             mesh_,
-            dimensionedVector("zero", dimensionSet(0,0,0,0,0), vector(0.998, 0.995, 0.98))
+            dimensionedVector("zero", dimensionSet(0,0,0,0,0), vector::zero)
         );
 
         label cellI = -1;
@@ -175,6 +176,7 @@ void initMultiLayers::init()
         label cellKoccupied = -1;
         label partType = -1;
         label listIndex = -1;
+        vector relRadiiLoopVar = vector::zero;
         for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)
         {
             cellK = particleCloud_.cellIDs()[index][0];
@@ -184,12 +186,24 @@ void initMultiLayers::init()
                 // look for the nearest occupied cell
                 cellKoccupied = findNearestCellWithValue(cellK, particlesInCell);
                 listIndex = getListIndex(partType);
+                if (cellKoccupied >= 0)
+                {
+                    relRadiiLoopVar = relRadiiField[cellKoccupied];
+                }
+                else
+                {
+                    relRadiiLoopVar = defaultRelRadii_;
+                }
                 relRadii_[index][0] = 1.0;
-                for (label i=1;i<numLayers_[listIndex];i++) relRadii_[index][i] = relRadiiField[cellKoccupied].component(i-1);
+                for (label i=1;i<numLayers_[listIndex];i++)
+                {
+                    relRadii_[index][i] = relRadiiLoopVar.component(i-1);
+                }
             }
         }
         relRadiiField.write();
-    }   
+    }
+    return true;
 }
 
 // * * * * * * * * * * * * * * * * Member Fct  * * * * * * * * * * * * * * * //
@@ -198,8 +212,11 @@ void initMultiLayers::execute()
 {
     if(!initialized_)
     {
-        init();
-        particleCloud_.dataExchangeM().giveData("relRadii","vector-atom", relRadii_);
+        allocateMyArrays();
+        if (init())
+        {
+            particleCloud_.dataExchangeM().giveData("relRadii","vector-atom", relRadii_);
+        }
         initialized_ = true;
     }
 }
@@ -234,8 +251,8 @@ label initMultiLayers::findNearestCellWithValue(label refCell, volScalarField &p
             }
         }
 
-        // if all cells have been searched and none was occupied, return refCell; assumes that reasonable default values have been set
-        if (newNeighbors.size() == 0) return refCell;
+        // if all cells have been searched and none was occupied, return -1; assumes that reasonable default value is available
+        if (newNeighbors.size() == 0) return -1;
         recentNeighbors.clear();
         recentNeighbors = newNeighbors;
         newNeighbors.clear();
@@ -248,6 +265,8 @@ label initMultiLayers::getListIndex(label testElement) const
     {
         if (partTypes_[ind] == testElement) return ind;
     }
+    // testing
+    Pout << "Cannot find list index for element " << testElement << endl;
     return -1;
 }
 
