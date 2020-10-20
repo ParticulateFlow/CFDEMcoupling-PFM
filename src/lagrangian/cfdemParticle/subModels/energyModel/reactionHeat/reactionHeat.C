@@ -63,9 +63,15 @@ reactionHeat::reactionHeat
         ),
         mesh_,
         dimensionedScalar("zero", dimensionSet(1,-1,-3,0,0,0,0),0.0)
-    )
+    ),
+    loopCounter_(-1),
+    Nevery_(propsDict_.lookupOrDefault<label>("Nevery",1)),
+    couplingTimestep_(0.0)
 {
     allocateMyArrays();
+    scalar dtDEM = particleCloud_.dataExchangeM().DEMts();
+    scalar dtCFD = mesh_.time().deltaTValue();
+    couplingTimestep_ = max(dtDEM,dtCFD);
 
     if(propsDict_.found("maxsource"))
     {
@@ -94,6 +100,12 @@ void reactionHeat::allocateMyArrays() const
 
 void reactionHeat::calcEnergyContribution()
 {
+    loopCounter_++;
+    if (loopCounter_ % Nevery_ != 0)
+    {
+        return;
+    }
+
    // realloc the arrays
     allocateMyArrays();
 
@@ -118,7 +130,7 @@ void reactionHeat::calcEnergyContribution()
         NULL
     );
 
-    reactionHeatField_.primitiveFieldRef() /= (reactionHeatField_.mesh().V());
+    reactionHeatField_.primitiveFieldRef() /= (reactionHeatField_.mesh().V() * Nevery_ * couplingTimestep_);
 
     forAll(reactionHeatField_,cellI)
     {
@@ -128,6 +140,12 @@ void reactionHeat::calcEnergyContribution()
         {
             reactionHeatField_[cellI] = sign(EuFieldInCell) * maxSource_;
         }
+    }
+
+    if (verbose_)
+    {
+        Info << "reaction heat per unit time = "
+                     << gSum(reactionHeatField_*1.0*reactionHeatField_.mesh().V()) << endl;
     }
 
     reactionHeatField_.correctBoundaryConditions();

@@ -111,6 +111,8 @@ private:
 
     label Nevery_;
 
+    scalar couplingTimestep_;
+
     scalar massSourceCurr_;
 
     scalar massSourceTot_;
