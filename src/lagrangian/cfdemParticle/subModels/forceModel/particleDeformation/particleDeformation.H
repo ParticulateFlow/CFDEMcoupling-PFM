@@ -59,6 +59,10 @@ private:
 
     mutable autoPtr<volScalarField> refField_;
 
+    word voidfractionFieldName_;
+
+    volScalarField& voidfraction_;
+
     // default deformation in region
     word defaultDeformCellsName_;
 
@@ -67,6 +71,12 @@ private:
     bool existDefaultDeformCells_;
 
     scalar defaultDeformation_;
+
+    bool existBackgroundVoidage_;
+
+    scalar backgroundVoidage_;
+
+    scalar backgroundRef_;
 
     labelList partTypes_;
 

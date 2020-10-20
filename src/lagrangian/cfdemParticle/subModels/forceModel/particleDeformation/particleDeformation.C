@@ -53,10 +53,15 @@ particleDeformation::particleDeformation
     initialExec_(true),
     refFieldName_(propsDict_.lookup("refFieldName")),
     refField_(),
+    voidfractionFieldName_(propsDict_.lookupOrDefault<word>("voidfractionFieldName","voidfraction")),
+    voidfraction_(sm.mesh().lookupObjectRef<volScalarField> (voidfractionFieldName_)),
     defaultDeformCellsName_(propsDict_.lookupOrDefault<word>("defaultDeformCellsName","none")),
     defaultDeformCells_(),
     existDefaultDeformCells_(false),
     defaultDeformation_(propsDict_.lookupOrDefault<scalar>("defaultDeformation",1.0)),
+    existBackgroundVoidage_(false),
+    backgroundVoidage_(propsDict_.lookupOrDefault<scalar>("backgroundVoidage",-1.0)),
+    backgroundRef_(propsDict_.lookupOrDefault<scalar>("backgroundRef",0.35)),
     partTypes_(propsDict_.lookupOrDefault<labelList>("partTypes",labelList(1,-1))),
     lowerBounds_(propsDict_.lookupOrDefault<scalarList>("lowerBounds",scalarList(1,-1.0))),
     upperBounds_(propsDict_.lookupOrDefault<scalarList>("upperBounds",scalarList(1,-1.0))),
@@ -87,6 +92,11 @@ particleDeformation::particleDeformation
            defaultDeformation_ = min(max(defaultDeformation_,0.0),1.0);
            Info << "Resetting defaultDeformation to range [0;1]" << endl;
        }
+    }
+
+    if (backgroundVoidage_ <= 1.0 && backgroundVoidage_ >= 0.01)
+    {
+        existBackgroundVoidage_ = true;
     }
 
     // check if only single value instead of list was provided
@@ -193,6 +203,11 @@ void particleDeformation::setForce() const
             }
 
             partDeformations_[index][0] = deformationDegree;
+
+            if (existBackgroundVoidage_ && deformationDegree > 0.1)
+            {
+                voidfraction_[cellI] = backgroundRef_ + deformationDegree * (backgroundVoidage_ - backgroundRef_);
+            }
 
 
             if(forceSubM(0).verbose() && index >= 0 && index < 2)
