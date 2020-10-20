@@ -3,6 +3,9 @@ rho = max(rho, rhoMin);
 rho = min(rho, rhoMax);
 rho.relax();
 
+if (stepcounter%nEveryFlow==0)
+{
+
 volScalarField rAU(1.0/UEqn.A());
 surfaceScalarField rhorAUf("rhorAUf", fvc::interpolate(rhoeps*rAU));
 if (modelType=="A")
@@ -89,3 +92,5 @@ else
 U.correctBoundaryConditions();
 fvOptions.correct(U);
 K = 0.5*magSqr(U);
+
+}

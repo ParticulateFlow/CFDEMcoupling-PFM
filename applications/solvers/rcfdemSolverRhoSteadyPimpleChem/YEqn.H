@@ -30,13 +30,11 @@ tmp<fv::convectionScheme<scalar> > mvConvection
 
             fvScalarMatrix YiEqn
             (
-                //fvm::ddt(rhoeps, Yi)
-              //+
                 mvConvection->fvmDiv(phi, Yi)
               - fvm::laplacian(voidfractionRec*turbulence->muEff(), Yi)
               ==
                 combustion->R(Yi)
-              + particleCloud.chemistryM(0).Smi(i)
+              + particleCloud.chemistryM(0).Smi(i)*p/p.prevIter()
               + fvOptions(rho, Yi)
             );
 
@@ -45,6 +43,8 @@ tmp<fv::convectionScheme<scalar> > mvConvection
             fvOptions.constrain(YiEqn);
 
             YiEqn.solve(mesh.solver("Yi"));
+
+            Yi.relax();
 
             fvOptions.correct(Yi);
 

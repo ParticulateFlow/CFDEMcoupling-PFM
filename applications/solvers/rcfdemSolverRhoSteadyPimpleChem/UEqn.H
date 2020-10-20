@@ -1,7 +1,7 @@
 // Solve the Momentum equation
 particleCloud.otherForces(fOther);
 
-tmp<fvVectorMatrix> tUEqn
+fvVectorMatrix UEqn
 (
     fvm::div(phi, U)
   + particleCloud.divVoidfractionTau(U, voidfractionRec)
@@ -10,24 +10,26 @@ tmp<fvVectorMatrix> tUEqn
  ==
     fvOptions(rho, U)
 );
-fvVectorMatrix& UEqn = tUEqn.ref();
 
-UEqn.relax();
-
-fvOptions.constrain(UEqn);
-
-if (modelType=="B" || modelType=="Bfull")
+if (stepcounter%nEveryFlow==0)
 {
-    solve(UEqn == -fvc::grad(p)+ Ksl*UsRec);
+    UEqn.relax();
+
+    fvOptions.constrain(UEqn);
+
+    if (modelType=="B" || modelType=="Bfull")
+    {
+        solve(UEqn == -fvc::grad(p)+ Ksl*UsRec);
+    }
+    else
+    {
+        solve(UEqn == -voidfractionRec*fvc::grad(p)+ Ksl*UsRec);
+    }
+
+
+    #include "limitU.H"
+
+    fvOptions.correct(U);
+
+    K = 0.5*magSqr(U);
 }
-else
-{
-    solve(UEqn == -voidfractionRec*fvc::grad(p)+ Ksl*UsRec);
-}
-
-//U.relax();
-#include "limitU.H"
-
-fvOptions.correct(U);
-
-K = 0.5*magSqr(U);

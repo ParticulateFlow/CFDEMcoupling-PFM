@@ -95,7 +95,7 @@ int main(int argc, char *argv[])
 
     const IOdictionary& couplingProps = particleCloud.couplingProperties();
     label nEveryFlow(couplingProps.lookupOrDefault<label>("nEveryFlow",1));
-    Info << "Solving flow equations every " << nEveryFlow << " steps.\n" << endl;
+    Info << "Solving flow equations for U and p every " << nEveryFlow << " steps.\n" << endl;
     label stepcounter = 0;
 
     Info<< "\nStarting time loop\n" << endl;
@@ -103,6 +103,7 @@ int main(int argc, char *argv[])
     scalar m(0.0);
     scalar m0(0.0);
     label counter(0);
+    p.storePrevIter();
 
     while (runTime.run())
     {
@@ -144,39 +145,38 @@ int main(int argc, char *argv[])
 
         particleCloud.clockM().start(26,"Flow");
         volScalarField rhoeps("rhoeps",rho*voidfractionRec);
-        if (stepcounter%nEveryFlow==0)
+
+        while (pimple.loop())
         {
-            while (pimple.loop())
-            {
-                // if needed, perform drag update here
+            // if needed, perform drag update here
 #if OPENFOAM_VERSION_MAJOR < 6
-                if (pimple.nCorrPIMPLE() <= 1)
+            if (pimple.nCorrPIMPLE() <= 1)
 #else
-                if (pimple.nCorrPimple() <= 1)
+            if (pimple.nCorrPimple() <= 1)
 #endif
-                {
-                    #include "rhoEqn.H"
-                }
+            {
+                #include "rhoEqn.H"
+            }
 
-                // --- Pressure-velocity PIMPLE corrector loop
+            // --- Pressure-velocity PIMPLE corrector loop
 
-                #include "UEqn.H"
-                #include "YEqn.H"
-                #include "EEqn.H"
 
-                // --- Pressure corrector loop
-                while (pimple.correct())
-                {
-                    // besides this pEqn, OF offers a "pimple consistent"-option
-                    #include "molConc.H"
-                    #include "pEqn.H"
-                    rhoeps=rho*voidfractionRec;
-                }
+            #include "UEqn.H"
+            #include "EEqn.H"
 
-                if (pimple.turbCorr())
-                {
-                    turbulence->correct();
-                }
+            // --- Pressure corrector loop
+            while (pimple.correct())
+            {
+                // besides this pEqn, OF offers a "pimple consistent"-option
+                #include "molConc.H"
+                #include "pEqn.H"
+                rhoeps=rho*voidfractionRec;
+            }
+            #include "YEqn.H"
+
+            if (pimple.turbCorr())
+            {
+                turbulence->correct();
             }
         }
 
