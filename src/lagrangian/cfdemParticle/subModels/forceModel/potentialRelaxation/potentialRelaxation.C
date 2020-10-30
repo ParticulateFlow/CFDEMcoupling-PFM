@@ -1,6 +1,6 @@
 /*---------------------------------------------------------------------------*\
     CFDEMcoupling academic - Open Source CFD-DEM coupling
-    
+
     Contributing authors:
     Thomas Lichtenegger
     Copyright (C) 2015- Johannes Kepler University, Linz
@@ -83,10 +83,10 @@ potentialRelaxation::potentialRelaxation
     ignoreReg_(propsDict_.lookupOrDefault<bool>("ignoreRegion",false)),
     ignoreDirection_(propsDict_.lookupOrDefault<vector>("ignoreDirection",vector::zero)),
     ignorePoint_(propsDict_.lookupOrDefault<vector>("ignorePoint",vector::zero)),
-    vfluc_(NULL)
+    vflucName_("vfluc")
 {
-    allocateMyArrays();
-    
+    particleCloud_.registerParticleProperty<double**>(vflucName_,3);
+
     if(ignoreReg_)
     {
         if(mag(ignoreDirection_) < SMALL)
@@ -103,48 +103,39 @@ potentialRelaxation::potentialRelaxation
 
 potentialRelaxation::~potentialRelaxation()
 {
-    delete vfluc_;
 }
 
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
-void potentialRelaxation::allocateMyArrays() const
-{
-    // get memory for 2d arrays
-    double initVal=0.0;
-    particleCloud_.dataExchangeM().allocateArray(vfluc_,initVal,3); 
-}
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 void potentialRelaxation::setForce() const
 {
-
     relax(D0_,D1_);
-    
+
     volVectorField relaxStream = -fvc::grad(correctedField_);
-    
+
   // volVectorField relaxStream = DField_ * fvc::grad(voidfraction_ - voidfractionRec_);
-    
-     // realloc the arrays
-    allocateMyArrays();
-    
+
+    double**& vfluc_ = particleCloud_.getParticlePropertyRef<double**>(vflucName_);
+
     vector position(0,0,0);
     scalar voidfraction(0.0);
     vector flucU(0,0,0);
     label cellI=0;
-   
+
     interpolationCellPoint<scalar> voidfractionInterpolator_(voidfraction_);
     interpolationCellPoint<vector> relaxStreamInterpolator_(relaxStream);
-    
+
     scalar dtDEM = particleCloud_.dataExchangeM().DEMts();
     scalar dtCFD = voidfraction_.mesh().time().deltaTValue();
-    
+
     // if DEM time step > CFD time step, scale velocity down
     scalar timeFac = 1.0;
     if (dtDEM > dtCFD) timeFac = dtCFD / dtDEM;
 
-    
+
     for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
     {
             cellI = particleCloud_.cellIDs()[index][0];
@@ -164,18 +155,18 @@ void potentialRelaxation::setForce() const
                     {
                       position = particleCloud_.position(index);
                       voidfraction = voidfractionInterpolator_.interpolate(position,cellI);
-                      flucU = relaxStreamInterpolator_.interpolate(position,cellI);      
+                      flucU = relaxStreamInterpolator_.interpolate(position,cellI);
                     }
                     else
                     {
                         voidfraction = voidfraction_[cellI];
                         flucU = relaxStream[cellI];
                     }
-                    
+
                     if (voidfraction > 1.0-SMALL) voidfraction = 1.0 - SMALL;
                     flucU /= (1-voidfraction);
-		    flucU *= timeFac;
-                    // write particle based data to global array 
+                    flucU *= timeFac;
+                    // write particle based data to global array
                     for(int i = 0; i < 3; i++)
                     {
                         vfluc_[index][i]=flucU[i];
@@ -183,13 +174,13 @@ void potentialRelaxation::setForce() const
                 }
             }
     }
-    
-    particleCloud_.dataExchangeM().giveData("vfluc","vector-atom", vfluc_);
-    
+
+    particleCloud_.dataExchangeM().giveData(vflucName_,"vector-atom", vfluc_);
+
     if (measureDiff_)
     {
         dimensionedScalar diff( fvc::domainIntegrate( sqr( voidfraction_ - voidfractionRec_ ) ) );
-        scalar t = particleCloud_.mesh().time().timeOutputValue(); 
+        scalar t = particleCloud_.mesh().time().timeOutputValue();
         recErrorFile_ << t << "\t" << diff.value() << endl;
     }
 }
@@ -198,12 +189,12 @@ void potentialRelaxation::relax(scalar D0, scalar D1) const
 {
     volScalarField src0 = voidfraction_ - voidfractionRec_;
     volScalarField src1 = voidfraction_ - voidfractionRec_;
-    
+
     forAll(src1, cellI)
     {
         if(src1[cellI] > 0.0) src1[cellI] = 0.0;
     }
-    
+
     solve
     (
         fvm::laplacian(correctedField_)

@@ -80,7 +80,7 @@ twoWayFiles::~twoWayFiles()
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
 
-fileName twoWayFiles::getFilePath(word& name, bool in) const
+fileName twoWayFiles::getFilePath(const word& name, bool in) const
 {
     char timeStep[40];
 
@@ -100,7 +100,7 @@ fileName twoWayFiles::getFilePath(word& name, bool in) const
     return particleFilePathOld;
 }
 
-void twoWayFiles::renameFilePath(fileName& particleFilePathOld,word& name) const
+void twoWayFiles::renameFilePath(const fileName& particleFilePathOld, const word& name) const
 {
     char timeStep[40];
 
@@ -116,8 +116,8 @@ void twoWayFiles::renameFilePath(fileName& particleFilePathOld,word& name) const
 // * * * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * * //
 void twoWayFiles::getData
 (
-    word name,
-    word type,
+    const word& name,
+    const word& type,
     double ** const& field,
     label step
 ) const
@@ -164,8 +164,8 @@ void twoWayFiles::getData
 
 void twoWayFiles::giveData
 (
-    word name,
-    word type,
+    const word& name,
+    const word& type,
     double ** const& field,
     const char* datatype
 ) const

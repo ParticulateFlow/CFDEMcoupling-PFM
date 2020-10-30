@@ -56,8 +56,6 @@ protected:
 
     word reactionHeatName_;
 
-    mutable double **reactionHeat_;
-
     volScalarField reactionHeatField_;
 
     label loopCounter_;
@@ -65,8 +63,6 @@ protected:
     label Nevery_;
 
     scalar couplingTimestep_;
-
-    void allocateMyArrays() const;
 
 public:
 

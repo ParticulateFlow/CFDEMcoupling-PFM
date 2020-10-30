@@ -403,5 +403,28 @@ inline const turbulenceModel& cfdemCloud::turbulence() const
     return turbulence_;
 }
 
+
+template<typename T>
+void cfdemCloud::registerParticleProperty(const word& property, int size, double initVal, bool reset)
+{
+    particlePropertyTable.insert(property,{NULL,&typeid(T),size,initVal,reset});
+}
+
+template<typename T>
+T& cfdemCloud::getParticlePropertyRef(const word& property)
+{
+    return getParticlePropertyImpl(property, static_cast<T>(0));
+}
+
+inline int**& cfdemCloud::getParticlePropertyImpl(const word& property, int**)
+{
+    return particlePropertyTable[property].ref<int**>();
+}
+
+inline double**& cfdemCloud::getParticlePropertyImpl(const word& property, double**)
+{
+    return particlePropertyTable[property].ref<double**>();
+}
+
 }
 // ************************************************************************* //

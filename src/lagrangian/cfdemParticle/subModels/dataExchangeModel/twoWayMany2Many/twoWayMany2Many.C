@@ -178,8 +178,8 @@ twoWayMany2Many::~twoWayMany2Many()
 // * * * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * * //
 void twoWayMany2Many::getData
 (
-    word name,
-    word type,
+    const word& name,
+    const word& type,
     double ** const& field,
     label /*step*/
 ) const
@@ -231,8 +231,8 @@ void twoWayMany2Many::getData
 
 void twoWayMany2Many::getData
 (
-    word name,
-    word type,
+    const word& name,
+    const word& type,
     int ** const& field,
     label /*step*/
 ) const
@@ -242,8 +242,8 @@ void twoWayMany2Many::getData
 
 void twoWayMany2Many::giveData
 (
-    word name,
-    word type,
+    const word& name,
+    const word& type,
     double ** const& field,
     const char* /*datatype*/
 ) const

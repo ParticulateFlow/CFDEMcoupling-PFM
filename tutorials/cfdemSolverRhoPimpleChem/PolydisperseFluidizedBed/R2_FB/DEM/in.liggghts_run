@@ -81,21 +81,13 @@ fix     k0_H2 ore property/atom k0_cfd6 vector yes no no 30 23 160
 fix     Ea_H2 ore property/atom Ea_cfd6 vector yes no no 63627 85000 105908
 
 # particle parameters
-fix     porosity        ore property/atom   porosity_       vector yes no no 0.61 0.34 0.19 0.17
-fix     tortuosity      ore property/global tortuosity_     scalar 3
-fix     pore_diameter   ore property/global pore_diameter_  scalar 1.e-7
-
+fix     porosity        ore property/global porosity_ore        vector 0.61 0.34 0.19 0.17
+fix     tortuosity      ore property/global tortuosity_ore      scalar 3
+fix     pore_diameter   ore property/global pore_diameter_ore   scalar 1.e-7
+fix     layerDensities  ore property/global density_ore         vector 7870. 5740. 5170. 5240.
 
 # define layer properties
 fix     LayerRelRadii ore property/atom relRadii vector yes no no  1.0 0.998 0.995 0.98
-
-### define fix for mass layer - initial testing
-fix     LayerMasses ore property/atom massLayer vector yes no no 0. 0. 0. 0.
-fix     LayerDensities ore property/global density_ore vector 7870. 5740. 5170. 5240.
-
-## define fix for rho_eff and fracRed - initialize as zero
-fix     fracRed ore property/atom fracRed_ore vector yes no no 0. 0. 0.
-fix     rhoeff  ore property/atom rhoeff      vector yes no no 0. 0. 0. 0.
 
 ###############
 # Write data into files for post-processing

@@ -129,31 +129,31 @@ public:
         template <typename T>
         void getData
         (
-            word name,
-            word type,
+            const word& name,
+            const word& type,
             T ** const& field
         ) const { getData(name,type,field,couplingStep_-1); }
 
         virtual void getData
         (
-            word name,
-            word type,
+            const word& name,
+            const word& type,
             double ** const& field,
             label step
         ) const = 0;
 
         virtual void getData
         (
-            word name,
-            word type,
+            const word& name,
+            const word& type,
             int ** const& field,
             label step
         ) const = 0;
 
         virtual void giveData
         (
-            word name,
-            word type,
+            const word& name,
+            const word& type,
             double ** const& field,
             const char* datatype="double"
         ) const = 0;

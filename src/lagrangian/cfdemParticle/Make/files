@@ -43,7 +43,7 @@ $(energyModels)/energyModel/energyModel.C
 $(energyModels)/energyModel/newEnergyModel.C
 $(energyModels)/heatTransferGunn/heatTransferGunn.C
 $(energyModels)/heatTransferRanzMarshall/heatTransferRanzMarshall.C
-$(energyModels)/heatTransferGranConduction/heatTransferGranConduction.C
+$(energyModels)/heatTransferInterGrain/heatTransferInterGrain.C
 $(energyModels)/reactionHeat/reactionHeat.C
 
 $(thermCondModels)/thermCondModel/thermCondModel.C

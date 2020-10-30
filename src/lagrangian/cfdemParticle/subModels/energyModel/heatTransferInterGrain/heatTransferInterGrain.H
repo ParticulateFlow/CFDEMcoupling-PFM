@@ -19,12 +19,16 @@ License
     Description
     heat transfer from granular conduction according to the
     Effective Medium Theory discussed e.g. by
-    Carson et al. Int. J. Heat Mass Transfer 48 (2005)
+    Carson et al. Int. J. Heat Mass Transfer 48 (2005) 2150–2158
+    optional radiative contribution according to
+    G. Breitbach, H. Barthels. Nucl. Technol. 49 (1980) 392–399
+    as discussed in
+    Qian et al. Int. J. Heat Mass Transf. 127 (2018) 573–584
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef heatTransferGranConduction_H
-#define heatTransferGranConduction_H
+#ifndef heatTransferInterGrain_H
+#define heatTransferInterGrain_H
 
 #include "fvCFD.H"
 #include "cfdemCloudEnergy.H"
@@ -35,10 +39,10 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class heatTransferGranConduction Declaration
+                           Class heatTransferInterGrain Declaration
 \*---------------------------------------------------------------------------*/
 
-class heatTransferGranConduction
+class heatTransferInterGrain
 :
     public energyModel
 {
@@ -52,9 +56,13 @@ protected:
 
     bool calcTotalHeatFlux_;
 
+    bool radiativeHeatTransfer_;
+
     scalar totalHeatFlux_;
 
-    word QPartPartName_;
+    word partTempName_;
+
+    const word QPartPartName_;
 
     volScalarField QPartPart_;
 
@@ -62,29 +70,41 @@ protected:
 
     volScalarField partThermCondField_;
 
+    volScalarField partThermRadField_;
+
     const volScalarField& partTempField_;
 
-    word prescribedVoidfractionFieldName_;
+    const word prescribedVoidfractionFieldName_;
 
     const volScalarField& prescribedVoidfraction_;
 
-    word voidfractionFieldName_;
+    const word voidfractionFieldName_;
 
     const volScalarField& voidfraction_;
 
-    word partHeatFluxName_;
+    scalarList typeCG_;
 
-    mutable double **partHeatFlux_;
+    const label maxTypeCG_;
+
+    const word partHeatFluxName_;
 
     scalarList typePartThermCond_;
 
-    mutable double **partThermCond_;
+    const word partThermCondRegName_;
 
-    void allocateMyArrays() const;
+    const word partThermRadRegName_;
+
+    const scalar StefanBoltzmannConst_;
+
+    scalarList typePartEmissivity_;
 
     void calcPartEffThermCond();
 
     void calcPartThermCond();
+
+    void calcPartThermRad();
+
+    scalar FE(scalar, scalar, scalar);
 
     virtual void giveData();
 
@@ -95,12 +115,12 @@ protected:
 public:
 
     //- Runtime type information
-    TypeName("heatTransferGranConduction");
+    TypeName("heatTransferInterGrain");
 
     // Constructors
 
         //- Construct from components
-        heatTransferGranConduction
+        heatTransferInterGrain
         (
             const dictionary& dict,
             cfdemCloudEnergy& sm
@@ -109,7 +129,7 @@ public:
 
     // Destructor
 
-        virtual ~heatTransferGranConduction();
+        virtual ~heatTransferInterGrain();
 
 
     // Member Functions
@@ -118,9 +138,9 @@ public:
 
         void addEnergyCoefficient(volScalarField&) const {}
 
-	void calcEnergyContribution();
+        void calcEnergyContribution();
 
-	void postFlow();
+        void postFlow();
 
 };
 

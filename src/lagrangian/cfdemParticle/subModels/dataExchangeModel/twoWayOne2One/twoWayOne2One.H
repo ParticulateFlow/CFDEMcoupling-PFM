@@ -152,24 +152,24 @@ public:
     // Member Functions
         void getData
         (
-            word name,
-            word type,
+            const word& name,
+            const word& type,
             double ** const& field,
             label step
         ) const;
 
         void getData
         (
-            word name,
-            word type,
+            const word& name,
+            const word& type,
             int ** const& field,
             label step
         ) const;
 
         void giveData
         (
-            word name,
-            word type,
+            const word& name,
+            const word& type,
             double ** const& field,
             const char* datatype
         ) const;
@@ -207,6 +207,8 @@ public:
         void extractCollected(T*&, T*&, int width=1) const;
         template <typename T>
         void extractCollected(T*&, T**&, int width=1) const;
+
+        int getNumberOfParticles() const;
 
         scalar getCG() const { return lmp->force->cg(); }
 };

@@ -56,15 +56,13 @@ private:
 
     bool verbose_;
 
-    mutable double **reactantPerParticle_;
+    const word partReactantName_;
 
-    word voidfractionFieldName_;
+    const word voidfractionFieldName_;
 
     const volScalarField& voidfraction_;
 
     mutable volScalarField particlesPerCell_;
-
-    void allocateMyArrays() const;
 
     label loopCounter_;
 
@@ -90,8 +88,6 @@ public:
 
     // Member Functions
         void execute();
-
-        void reAllocMyArrays() const;
 
 };
 

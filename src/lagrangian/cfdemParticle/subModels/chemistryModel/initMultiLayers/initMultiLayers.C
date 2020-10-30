@@ -201,7 +201,7 @@ bool initMultiLayers::init()
                 }
             }
         }
-        relRadiiField.write();
+        if (verbose_) relRadiiField.write();
     }
     return true;
 }

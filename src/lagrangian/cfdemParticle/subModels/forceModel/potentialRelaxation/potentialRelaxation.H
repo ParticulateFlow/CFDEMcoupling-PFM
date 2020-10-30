@@ -1,6 +1,6 @@
 /*---------------------------------------------------------------------------*\
     CFDEMcoupling academic - Open Source CFD-DEM coupling
-    
+
     Contributing authors:
     Thomas Lichtenegger
     Copyright (C) 2015- Johannes Kepler University, Linz
@@ -44,44 +44,42 @@ class potentialRelaxation
 {
 private:
     dictionary propsDict_;
-    
+
     bool interpolate_;
-    
+
     bool measureDiff_;
-    
+
     mutable OFstream recErrorFile_;
-    
-    word voidfractionFieldName_;
-    
+
+    const word voidfractionFieldName_;
+
     const volScalarField& voidfraction_;
-    
-    word voidfractionRecFieldName_;
-    
+
+    const word voidfractionRecFieldName_;
+
     const volScalarField& voidfractionRec_;
-    
+
     scalar critVoidfraction_;
-    
+
     scalar D0_;
-    
+
     scalar D1_;
-    
+
     mutable volScalarField correctedField_;
-    
+
     const scalar dt_;
-    
+
     // ignore particles in cells below plane given with ref point and normal vector
     // normal vector points towards region where fluctuations are permitted
-    
-    bool ignoreReg_;
-    
-    vector ignoreDirection_;
-    
-    vector ignorePoint_;
-    
-    mutable double **vfluc_;              // Lagrangian array
 
-    void allocateMyArrays() const;
-    
+    bool ignoreReg_;
+
+    vector ignoreDirection_;
+
+    vector ignorePoint_;
+
+    const word vflucName_;
+
     void relax(scalar, scalar) const;
 
 public:

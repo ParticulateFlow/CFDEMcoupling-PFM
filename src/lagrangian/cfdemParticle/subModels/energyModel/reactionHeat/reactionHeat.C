@@ -50,7 +50,6 @@ reactionHeat::reactionHeat
     mesh_(sm.mesh()),
     maxSource_(1e30),
     reactionHeatName_(propsDict_.lookupOrDefault<word>("reactionHeatName","reactionHeat")),
-    reactionHeat_(NULL),
     reactionHeatField_
     (
         IOobject
@@ -68,10 +67,11 @@ reactionHeat::reactionHeat
     Nevery_(propsDict_.lookupOrDefault<label>("Nevery",1)),
     couplingTimestep_(0.0)
 {
-    allocateMyArrays();
     scalar dtDEM = particleCloud_.dataExchangeM().DEMts();
     scalar dtCFD = mesh_.time().deltaTValue();
     couplingTimestep_ = max(dtDEM,dtCFD);
+
+    particleCloud_.registerParticleProperty<double**>(reactionHeatName_,1);
 
     if(propsDict_.found("maxsource"))
     {
@@ -85,16 +85,9 @@ reactionHeat::reactionHeat
 
 reactionHeat::~reactionHeat()
 {
-    particleCloud_.dataExchangeM().destroy(reactionHeat_,1);
 }
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
-void reactionHeat::allocateMyArrays() const
-{
-    // get memory for 2d arrays
-    double initVal=0.0;
-    particleCloud_.dataExchangeM().allocateArray(reactionHeat_,initVal,1);
-}
 
 // * * * * * * * * * * * * * * * * Member Fct  * * * * * * * * * * * * * * * //
 
@@ -106,8 +99,7 @@ void reactionHeat::calcEnergyContribution()
         return;
     }
 
-   // realloc the arrays
-    allocateMyArrays();
+    double**& reactionHeat_ = particleCloud_.getParticlePropertyRef<double**>(reactionHeatName_);
 
     particleCloud_.dataExchangeM().getData(reactionHeatName_,"scalar-atom",reactionHeat_);
 
