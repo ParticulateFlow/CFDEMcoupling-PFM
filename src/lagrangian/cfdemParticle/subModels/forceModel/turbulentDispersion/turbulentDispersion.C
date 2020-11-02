@@ -73,8 +73,6 @@ turbulentDispersion::turbulentDispersion
         sm.mesh(),
         dimensionedScalar("zero", dimensionSet(0,0,0,0,0,0,0), 0.0)
     ),
-    turbKinetcEnergyFieldName_(propsDict_.lookupOrDefault<word>("turbKinetcEnergyFieldName","k")),
-    turbKinetcEnergy_(sm.mesh().lookupObject<volScalarField> (turbKinetcEnergyFieldName_)),
     minTurbKinetcEnergy_(propsDict_.lookupOrDefault<scalar>("minTurbKinetcEnergy", 0.0)),
     voidfractionFieldName_(propsDict_.lookupOrDefault<word>("voidfractionFieldName","voidfraction")),
     voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
@@ -130,13 +128,15 @@ bool turbulentDispersion::ignoreCell(label cell) const
 
 void turbulentDispersion::setForce() const
 {
+    const volScalarField turbKinetcEnergy(particleCloud_.turbulence().k());
+
     vector position(0,0,0);
     scalar k = 0.0;
 
     vector flucU(0,0,0);
     label cellI = 0;
 
-    interpolationCellPoint<scalar> turbKinetcEnergyInterpolator_(turbKinetcEnergy_);
+    interpolationCellPoint<scalar> turbKinetcEnergyInterpolator_(turbKinetcEnergy);
 
     for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
     {
@@ -156,7 +156,7 @@ void turbulentDispersion::setForce() const
                 }
                 else
                 {
-                    k = turbKinetcEnergy_[cellI];
+                    k = turbKinetcEnergy[cellI];
                 }
 
                 if (k < minTurbKinetcEnergy_) k = minTurbKinetcEnergy_;
@@ -175,7 +175,7 @@ void turbulentDispersion::setForce() const
                 }
             }
         }
-    }   
+    }
 }
 
 vector turbulentDispersion::unitFlucDir() const

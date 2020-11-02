@@ -58,10 +58,6 @@ protected:
 
     mutable volScalarField wallIndicatorField_;
 
-    word turbKinetcEnergyFieldName_;
-
-    const volScalarField& turbKinetcEnergy_;
-
     scalar minTurbKinetcEnergy_;
 
     word voidfractionFieldName_;
