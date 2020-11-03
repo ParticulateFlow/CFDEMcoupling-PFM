@@ -49,6 +49,8 @@ protected:
 
     bool interpolate_;
 
+    const fvMesh& mesh_;
+
     // ignore fluctuations in region
     word ignoreCellsName_;
 

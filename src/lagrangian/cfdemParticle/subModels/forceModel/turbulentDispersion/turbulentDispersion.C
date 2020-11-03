@@ -58,6 +58,7 @@ turbulentDispersion::turbulentDispersion
     forceModel(dict,sm),
     propsDict_(dict.subDict(type + "Props")),
     interpolate_(propsDict_.lookupOrDefault<bool>("interpolation", false)),
+    mesh_(sm.mesh()),
     ignoreCellsName_(propsDict_.lookupOrDefault<word>("ignoreCellsName","none")),
     ignoreCells_(),
     existIgnoreCells_(true),
@@ -88,17 +89,39 @@ turbulentDispersion::turbulentDispersion
     else existIgnoreCells_ = false;
 
     // define a field to indicate if a cell is next to boundary
-    // label cellI = -1;
-    // // set wall indicator field
-    // const fvMesh& mesh = sm.mesh();  
-    // forAll(mesh.boundary(),patchI)
-    // {
-    //     forAll(mesh.boundary()[patchI], faceI)
-    //     {
-    //         cellI = patch().faceCells()[faceI];
-    //         wallIndicatorField_[cellI] = 1.0;
-    //     }
-    // }
+     label cellI = -1;
+    // set wall indicator field
+Info << "Setting wall indicator field." << endl;
+     forAll(mesh_.boundary(),patchI)
+     {
+         word patchName = mesh_.boundary()[patchI].name();
+         if (patchName.rfind("procBoundary",0) == 0) continue;
+Info << "patch = " << mesh_.boundary()[patchI].name() << endl;
+         forAll(mesh_.boundary()[patchI], faceI)
+         {
+             cellI = mesh_.boundary()[patchI].faceCells()[faceI];
+             wallIndicatorField_[cellI] = 1.0;
+
+// testing
+                    label patchID = -1;
+                    label faceind = -1;
+                    const cell& faces = mesh_.cells()[cellI];
+Pout << "cellI = " << cellI << " has faces = " << faces << endl;
+                    forAll (faces, faceJ)        // loop over all faces in cellI
+                    {
+                        faceind = faces[faceJ];
+                        patchID = mesh_.boundaryMesh().whichPatch(faceind);
+                        if (patchID < 0) continue;
+                        vector faceINormal = mesh_.Sf()[faceind] / mesh_.magSf()[faceind] ;
+      //                  Pout << " faceind = " << faceind << "at " << mesh_.C()[cellI] << ", faceINormal = " << faceINormal << endl ;
+                    }
+
+// testing done
+
+         }
+     }
+
+wallIndicatorField_.write();
 
     // make sure this is the last force model in list so that fluid velocity does not get overwritten
     label numLastForceModel = sm.nrForceModels();
@@ -165,9 +188,19 @@ void turbulentDispersion::setForce() const
 
                 // if particles are pushed through walls, the velocity fluctuations may be regulated here
                 // check if cell is adjacent to wall and invert corresponding component
-                // if (wallIndicatorField_[cellI] > 0.5)
-                // {
-                // }
+                label patchID = -1;
+                if (wallIndicatorField_[cellI] > 0.5)
+                {
+                    const cell& faces = mesh_.cells()[cellI];
+                    forAll (faces, faceI)        // loop over all faces in cellI
+                    {
+                        patchID = mesh_.boundaryMesh().whichPatch(faceI);
+                        if (patchID < 0) continue;
+
+                        vector faceINormal = mesh_.Sf()[faceI] / mesh_.magSf()[faceI] ;
+                        Info << " faceI = " << faceI << "at " << mesh_.C()[cellI] << ", faceINormal = " << faceINormal << endl ;
+                    }
+                }
 
                 for(int j=0;j<3;j++)
                 {
