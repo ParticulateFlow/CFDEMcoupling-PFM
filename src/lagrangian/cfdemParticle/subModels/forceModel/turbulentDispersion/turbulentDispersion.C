@@ -90,38 +90,17 @@ turbulentDispersion::turbulentDispersion
 
     // define a field to indicate if a cell is next to boundary
      label cellI = -1;
-    // set wall indicator field
-Info << "Setting wall indicator field." << endl;
      forAll(mesh_.boundary(),patchI)
      {
          word patchName = mesh_.boundary()[patchI].name();
-         if (patchName.rfind("procBoundary",0) == 0) continue;
-Info << "patch = " << mesh_.boundary()[patchI].name() << endl;
+         if (patchName.rfind("procB",0) == 0) continue;
+
          forAll(mesh_.boundary()[patchI], faceI)
          {
              cellI = mesh_.boundary()[patchI].faceCells()[faceI];
              wallIndicatorField_[cellI] = 1.0;
-
-// testing
-                    label patchID = -1;
-                    label faceind = -1;
-                    const cell& faces = mesh_.cells()[cellI];
-Pout << "cellI = " << cellI << " has faces = " << faces << endl;
-                    forAll (faces, faceJ)        // loop over all faces in cellI
-                    {
-                        faceind = faces[faceJ];
-                        patchID = mesh_.boundaryMesh().whichPatch(faceind);
-                        if (patchID < 0) continue;
-                        vector faceINormal = mesh_.Sf()[faceind] / mesh_.magSf()[faceind] ;
-      //                  Pout << " faceind = " << faceind << "at " << mesh_.C()[cellI] << ", faceINormal = " << faceINormal << endl ;
-                    }
-
-// testing done
-
          }
      }
-
-wallIndicatorField_.write();
 
     // make sure this is the last force model in list so that fluid velocity does not get overwritten
     label numLastForceModel = sm.nrForceModels();
@@ -153,23 +132,25 @@ void turbulentDispersion::setForce() const
 {
     const volScalarField turbKinetcEnergy(particleCloud_.turbulence().k());
 
-    vector position(0,0,0);
+    label cellI = -1;
+    label patchID = -1;
+    label faceIGlobal = -1;
+    scalar flucProjection = 0.0;
     scalar k = 0.0;
-
-    vector flucU(0,0,0);
-    label cellI = 0;
+    vector faceINormal = vector::zero;
+    vector flucU = vector::zero;
+    vector position = vector::zero;
+    word patchName("");
 
     interpolationCellPoint<scalar> turbKinetcEnergyInterpolator_(turbKinetcEnergy);
 
     for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
     {
         cellI = particleCloud_.cellIDs()[index][0];
-        flucU = vector(0,0,0);
-        k=0.0;
-
         if (cellI > -1 && !ignoreCell(cellI))
         {
             // particles in dilute regions follow fluid without fluctuations
+
             if (voidfraction_[cellI] < critVoidfraction_)
             {
                 if (interpolate_)
@@ -186,19 +167,24 @@ void turbulentDispersion::setForce() const
 
                 flucU=unitFlucDir()*Foam::sqrt(2.0*k);
 
-                // if particles are pushed through walls, the velocity fluctuations may be regulated here
-                // check if cell is adjacent to wall and invert corresponding component
-                label patchID = -1;
+                // prevent particles being pushed through walls by regulating velocity fluctuations
+                // check if cell is adjacent to wall and remove corresponding components
                 if (wallIndicatorField_[cellI] > 0.5)
                 {
                     const cell& faces = mesh_.cells()[cellI];
-                    forAll (faces, faceI)        // loop over all faces in cellI
+                    forAll (faces, faceI)
                     {
-                        patchID = mesh_.boundaryMesh().whichPatch(faceI);
+                        faceIGlobal = faces[faceI];
+                        patchID = mesh_.boundaryMesh().whichPatch(faceIGlobal);
                         if (patchID < 0) continue;
+                        patchName = mesh_.boundary()[patchID].name();
 
-                        vector faceINormal = mesh_.Sf()[faceI] / mesh_.magSf()[faceI] ;
-                        Info << " faceI = " << faceI << "at " << mesh_.C()[cellI] << ", faceINormal = " << faceINormal << endl ;
+                        if (patchName.rfind("procB",0) == 0) continue;
+
+                        faceINormal = mesh_.Sf()[faceIGlobal];
+                        faceINormal /= mag(faceINormal);
+                        flucProjection = faceINormal&flucU;
+                        if (flucProjection > 0.0) flucU -= flucProjection*faceINormal;
                     }
                 }
 
