@@ -74,16 +74,13 @@ turbulentDispersion::turbulentDispersion
         sm.mesh(),
         dimensionedScalar("zero", dimensionSet(0,0,0,0,0,0,0), 0.0)
     ),
-    minTurbKineticEnergy_(propsDict_.lookupOrDefault<scalar>("minTurbKineticEnergy", 0.0)),
-    turbKineticEnergyFieldName_(propsDict_.lookupOrDefault<word>("turbKineticEnergyFieldName","")),
-    turbKineticEnergy_(NULL),
-    existTurbKineticEnergyInObjReg_(false),
+    minTurbKinetcEnergy_(propsDict_.lookupOrDefault<scalar>("minTurbKinetcEnergy", 0.0)),
     voidfractionFieldName_(propsDict_.lookupOrDefault<word>("voidfractionFieldName","voidfraction")),
     voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
     critVoidfraction_(propsDict_.lookupOrDefault<scalar>("critVoidfraction", 0.9)),
     ranGen_(clock::getTime()+pid())
 {
-    if (ignoreCellsName_ != "none")
+    if(ignoreCellsName_ != "none")
     {
        ignoreCells_.set(new cellSet(particleCloud_.mesh(),ignoreCellsName_));
        Info << type << ": ignoring fluctuations in cellSet " << ignoreCells_().name() <<
@@ -93,7 +90,7 @@ turbulentDispersion::turbulentDispersion
 
     // define a field to indicate if a cell is next to boundary
      label cellI = -1;
-     forAll (mesh_.boundary(),patchI)
+     forAll(mesh_.boundary(),patchI)
      {
          word patchName = mesh_.boundary()[patchI].name();
          if (patchName.rfind("procB",0) == 0) continue;
@@ -104,29 +101,6 @@ turbulentDispersion::turbulentDispersion
              wallIndicatorField_[cellI] = 1.0;
          }
      }
-
-    if (turbKineticEnergyFieldName_ != "")
-    {
-        existTurbKineticEnergyInObjReg_ = true;
-        volScalarField& k(const_cast<volScalarField&>(sm.mesh().lookupObject<volScalarField> (turbKineticEnergyFieldName_)));
-        turbKineticEnergy_ = &k;
-    }
-    else
-    {
-        turbKineticEnergy_ = new volScalarField
-        (
-            IOobject
-            (
-                "turbKinEnergy",
-                mesh_.time().timeName(),
-                mesh_,
-                IOobject::NO_READ,
-                IOobject::NO_WRITE
-            ),
-            mesh_,
-            dimensionedScalar("zero", dimensionSet(0,2,-2,0,0), 0)
-        );
-    }
 
     // make sure this is the last force model in list so that fluid velocity does not get overwritten
     label numLastForceModel = sm.nrForceModels();
@@ -142,7 +116,6 @@ turbulentDispersion::turbulentDispersion
 
 turbulentDispersion::~turbulentDispersion()
 {
-    if (!existTurbKineticEnergyInObjReg_) delete turbKineticEnergy_;
 }
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
@@ -157,10 +130,7 @@ bool turbulentDispersion::ignoreCell(label cell) const
 
 void turbulentDispersion::setForce() const
 {
-    if (!existTurbKineticEnergyInObjReg_)
-    {
-        *turbKineticEnergy_ = particleCloud_.turbulence().k()();
-    }
+    const volScalarField turbKinetcEnergy(particleCloud_.turbulence().k());
 
     label cellI = -1;
     label patchID = -1;
@@ -172,7 +142,7 @@ void turbulentDispersion::setForce() const
     vector position = vector::zero;
     word patchName("");
 
-    interpolationCellPoint<scalar> turbKineticEnergyInterpolator_(*turbKineticEnergy_);
+    interpolationCellPoint<scalar> turbKinetcEnergyInterpolator_(turbKinetcEnergy);
 
     for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
     {
@@ -186,14 +156,14 @@ void turbulentDispersion::setForce() const
                 if (interpolate_)
                 {
                     position = particleCloud_.position(index);
-                    k = turbKineticEnergyInterpolator_.interpolate(position,cellI);
+                    k = turbKinetcEnergyInterpolator_.interpolate(position,cellI);
                 }
                 else
                 {
-                    k = (*turbKineticEnergy_)[cellI];
+                    k = turbKinetcEnergy[cellI];
                 }
 
-                if (k < minTurbKineticEnergy_) k = minTurbKineticEnergy_;
+                if (k < minTurbKinetcEnergy_) k = minTurbKinetcEnergy_;
 
                 flucU=unitFlucDir()*Foam::sqrt(2.0*k);
 

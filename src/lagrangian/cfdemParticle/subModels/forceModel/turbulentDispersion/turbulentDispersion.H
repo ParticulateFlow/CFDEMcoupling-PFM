@@ -60,13 +60,7 @@ protected:
 
     mutable volScalarField wallIndicatorField_;
 
-    scalar minTurbKineticEnergy_;
-
-    word turbKineticEnergyFieldName_;
-
-    volScalarField* turbKineticEnergy_;
-
-    bool existTurbKineticEnergyInObjReg_;
+    scalar minTurbKinetcEnergy_;
 
     word voidfractionFieldName_;
 
