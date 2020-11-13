@@ -82,6 +82,7 @@ $(forceModels)/Fines/FanningDynFines.C
 $(forceModels)/Fines/ErgunStatFines.C
 $(forceModels)/granKineticEnergy/granKineticEnergy.C
 $(forceModels)/particleDeformation/particleDeformation.C
+$(forceModels)/turbulentDispersion/turbulentDispersion.C
 
 $(forceSubModels)/forceSubModel/newForceSubModel.C
 $(forceSubModels)/forceSubModel/forceSubModel.C

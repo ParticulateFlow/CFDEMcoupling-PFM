@@ -74,8 +74,6 @@ private:
 
         const bool interpolation_;
 
-        const bool cfdemUseOnly_;
-
         vector offsets[numberOfMarkerPoints];
 
         virtual inline scalar Vp(int index, scalar radius, scalar scaleVol) const

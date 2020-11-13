@@ -22,12 +22,14 @@ License
     along with CFDEMcoupling academic.  If not, see <http://www.gnu.org/licenses/>.
 \*---------------------------------------------------------------------------*/
 
-#ifndef potentialRelaxation_H
-#define potentialRelaxation_H
+#ifndef turbulentDispersion_H
+#define turbulentDispersion_H
 
 #include "forceModel.H"
 #include "interpolationCellPoint.H"
 #include "Random.H"
+#include "autoPtr.H"
+#include "cellSet.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -35,71 +37,62 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class potentialRelaxation Declaration
+                           Class turbulentDispersion Declaration
 \*---------------------------------------------------------------------------*/
 
-class potentialRelaxation
+class turbulentDispersion
 :
     public forceModel
 {
-private:
+protected:
     dictionary propsDict_;
 
     bool interpolate_;
 
-    bool measureDiff_;
+    const fvMesh& mesh_;
 
-    mutable OFstream recErrorFile_;
+    // ignore fluctuations in region
+    word ignoreCellsName_;
 
-    const word voidfractionFieldName_;
+    autoPtr<cellSet> ignoreCells_;
+
+    bool existIgnoreCells_;
+
+    mutable volScalarField wallIndicatorField_;
+
+    scalar minTurbKinetcEnergy_;
+
+    word voidfractionFieldName_;
 
     const volScalarField& voidfraction_;
 
-    const word voidfractionRecFieldName_;
-
-    const volScalarField& voidfractionRec_;
-
     scalar critVoidfraction_;
 
-    scalar D0_;
+    virtual vector unitFlucDir() const;
 
-    scalar D1_;
+    mutable Random ranGen_;
 
-    mutable volScalarField correctedField_;
-
-    const scalar dt_;
-
-    // ignore particles in cells below plane given with ref point and normal vector
-    // normal vector points towards region where fluctuations are permitted
-
-    bool ignoreReg_;
-
-    vector ignoreDirection_;
-
-    vector ignorePoint_;
-
-    const word vflucName_;
-
-    void relax(scalar, scalar) const;
+    bool ignoreCell(label) const;
 
 public:
 
     //- Runtime type information
-    TypeName("potentialRelaxation");
+    TypeName("turbulentDispersion");
 
 
     // Constructors
 
         //- Construct from components
-        potentialRelaxation
+        turbulentDispersion
         (
             const dictionary& dict,
-            cfdemCloud& sm
+            cfdemCloud& sm,
+            word type = "turbulentDispersion"
         );
 
     // Destructor
 
-        ~potentialRelaxation();
+        ~turbulentDispersion();
 
 
     // Member Functions

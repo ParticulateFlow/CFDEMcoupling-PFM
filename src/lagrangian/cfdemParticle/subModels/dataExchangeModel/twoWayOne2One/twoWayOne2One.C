@@ -253,8 +253,8 @@ twoWayOne2One::~twoWayOne2One()
 // * * * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * * //
 void twoWayOne2One::getData
 (
-    word name,
-    word type,
+    const word& name,
+    const word& type,
     double ** const& field,
     label /*step*/
 ) const
@@ -361,8 +361,8 @@ void twoWayOne2One::getData
 
 void twoWayOne2One::getData
 (
-    word name,
-    word type,
+    const word& name,
+    const word& type,
     int ** const& field,
     label /*step*/
 ) const
@@ -383,8 +383,8 @@ void twoWayOne2One::getData
 
 void twoWayOne2One::giveData
 (
-    word name,
-    word type,
+    const word& name,
+    const word& type,
     double ** const& field,
     const char* datatype
 ) const

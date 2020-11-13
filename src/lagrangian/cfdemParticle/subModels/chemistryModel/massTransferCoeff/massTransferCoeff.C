@@ -63,51 +63,26 @@ massTransferCoeff::massTransferCoeff
     densityFieldName_(propsDict_.lookupOrDefault<word>("densityFieldName","rho")),
     rho_(sm.mesh().lookupObject<volScalarField> (densityFieldName_)),
     partNuName_(propsDict_.lookupOrDefault<word>("partViscos","partNu")),
-    partNu_(NULL),
-    partReynolds_(propsDict_.lookupOrDefault<word>("partReynolds","partRe")),
-    partRe_(NULL),
+    partReName_(propsDict_.lookupOrDefault<word>("partReynolds","partRe")),
     scaleDia_(1)
 {
     particleCloud_.checkCG(true);
-    allocateMyArrays();
+    particleCloud_.registerParticleProperty<double**>(partNuName_,1);
+    particleCloud_.registerParticleProperty<double**>(partReName_,1);
 }
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 massTransferCoeff::~massTransferCoeff()
 {
-    int nP_ = particleCloud_.numberOfParticles();
-
-    particleCloud_.dataExchangeM().destroy(partNu_,nP_);
-    particleCloud_.dataExchangeM().destroy(partRe_,nP_);
 }
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
-void massTransferCoeff::allocateMyArrays() const
-{
-    double initVal=0.0;
-    if (particleCloud_.dataExchangeM().maxNumberOfParticles() > 0)
-    {
-        // get memory for 2d arrays
-        particleCloud_.dataExchangeM().allocateArray(partNu_,initVal,1,"nparticles");
-        particleCloud_.dataExchangeM().allocateArray(partRe_,initVal,1,"nparticles");
-    }
-}
-
-void massTransferCoeff::reAllocMyArrays() const
-{
-    double initVal=0.0;
-    particleCloud_.dataExchangeM().allocateArray(partNu_,initVal,1);
-    particleCloud_.dataExchangeM().allocateArray(partRe_,initVal,1);
-}
 
 // * * * * * * * * * * * * * * * * Member Fct  * * * * * * * * * * * * * * * //
 
 void massTransferCoeff::execute()
 {
-    // realloc the arrays
-    reAllocMyArrays();
-
     #ifdef compre
         const volScalarField nufField = particleCloud_.turbulence().mu()/rho_;
     #else
@@ -138,6 +113,9 @@ void massTransferCoeff::execute()
     // defining interpolators for U, voidfraction
     interpolationCellPoint <vector> UluidInterpolator_(U_);
     interpolationCellPoint <scalar> voidfractionInterpolator_(voidfraction_);
+
+    double**& partNu_ = particleCloud_.getParticlePropertyRef<double**>(partNuName_);
+    double**& partRe_ = particleCloud_.getParticlePropertyRef<double**>(partReName_);
 
     for (int index=0; index<particleCloud_.numberOfParticles(); ++index)
     {
@@ -195,7 +173,7 @@ void massTransferCoeff::execute()
 
     // give DEM data
     particleCloud_.dataExchangeM().giveData(partNuName_, "scalar-atom", partNu_);
-    particleCloud_.dataExchangeM().giveData(partReynolds_, "scalar-atom", partRe_);
+    particleCloud_.dataExchangeM().giveData(partReName_, "scalar-atom", partRe_);
 
     Info << "give data done" << endl;
 }

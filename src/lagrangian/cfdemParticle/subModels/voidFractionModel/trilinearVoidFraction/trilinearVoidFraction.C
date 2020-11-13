@@ -90,8 +90,6 @@ trilinearVoidFraction::~trilinearVoidFraction()
 
 void trilinearVoidFraction::setvoidFraction(double** const& mask,double**& voidfractions,double**& particleWeights,double**& particleVolumes,double**& particleV)
 {
-    reAllocArrays();
-
     scalar radius(-1.);
     scalar volume(0.);
     scalar scaleVol = weight();
@@ -131,7 +129,7 @@ void trilinearVoidFraction::setvoidFraction(double** const& mask,double**& voidf
     for(int index = 0; index < particleCloud_.numberOfParticles(); ++index)
     {
         // reset
-        cellsPerParticle_[index][0] = 8;
+        cellsPerParticle()[index][0] = 8;
         //TODO do we need to set particleVolumes, particleV?
         // ===
 
