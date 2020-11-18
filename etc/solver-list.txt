@@ -1,5 +1,6 @@
 rcfdemSolverRhoSteadyPimple/dir
 rcfdemSolverCoupledHeattransfer/dir
+rcfdemSolverForcedTracers/dir
 rStatAnalysis/dir
 rcfdemSolverBase/dir
 rtfmSolverSpecies/dir
