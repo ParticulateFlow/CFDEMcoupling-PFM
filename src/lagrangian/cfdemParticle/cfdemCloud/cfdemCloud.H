@@ -291,6 +291,8 @@ public:
 
        label liggghtsCommandModelIndex(const word&) const;
 
+       inline void scaleForce(int, scalar);
+
        inline void setCG(double);
 
        inline scalar cg() const;

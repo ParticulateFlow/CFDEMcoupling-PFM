@@ -86,6 +86,22 @@ private:
 
     const word partDeformationsName_;
 
+    // control functionality
+
+    bool controlForceOnDefPart_;
+
+    word controlFieldName_;
+
+    mutable volScalarField* controlField_;
+
+    vector controlPoint_;
+
+    label controlCell_;
+
+    scalar controlTargetValue_;
+
+    scalar controlCouplingStrength_;
+
     label getListIndex(label) const;
 
     void init() const;

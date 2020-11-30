@@ -89,6 +89,15 @@ inline bool cfdemCloud::treatVoidCellsAsExplicitForce() const
     return treatVoidCellsAsExplicitForce_;
 }
 
+inline void cfdemCloud::scaleForce(int index, scalar factor)
+{
+    for (int i=0; i<3; ++i)
+    {
+        expForces_[index][i] *= factor;
+        impForces_[index][i] *= factor;
+    }
+}
+
 inline scalar cfdemCloud::cg() const
 {
     return cg_;

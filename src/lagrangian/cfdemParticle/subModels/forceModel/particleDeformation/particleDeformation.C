@@ -65,7 +65,14 @@ particleDeformation::particleDeformation
     partTypes_(propsDict_.lookupOrDefault<labelList>("partTypes",labelList(1,-1))),
     lowerBounds_(propsDict_.lookupOrDefault<scalarList>("lowerBounds",scalarList(1,-1.0))),
     upperBounds_(propsDict_.lookupOrDefault<scalarList>("upperBounds",scalarList(1,-1.0))),
-    partDeformationsName_("partDeformations")
+    partDeformationsName_("partDeformations"),
+    controlForceOnDefPart_(propsDict_.lookupOrDefault<bool>("controlForceOnDefPart",false)),
+    controlFieldName_(propsDict_.lookupOrDefault<word>("controlFieldName","")),
+    controlField_(NULL),
+    controlPoint_(propsDict_.lookupOrDefault<vector>("controlPoint",vector::zero)),
+    controlCell_(-1),
+    controlTargetValue_(propsDict_.lookupOrDefault<scalar>("controlTargetValue",0.0)),
+    controlCouplingStrength_(propsDict_.lookupOrDefault<scalar>("controlCouplingStrength",0.0))
 {
     particleCloud_.registerParticleProperty<double**>(partDeformationsName_,1);
 
@@ -123,6 +130,11 @@ particleDeformation::particleDeformation
     Info << "partTypes: " << partTypes_ << endl;
     Info << "lowerBounds: " << lowerBounds_ << endl;
     Info << "upperBounds: " << upperBounds_ << endl;
+
+    if (controlForceOnDefPart_)
+    {
+        controlCell_ = sm.mesh().findCell(controlPoint_);
+    }
 }
 
 
@@ -147,6 +159,16 @@ void particleDeformation::setForce() const
     {
         init();
         initialExec_ = false;
+    }
+
+    scalar controlCurrValue = 0.0;
+    scalar scaleFactor = 0.0;
+    if (controlForceOnDefPart_)
+    {
+        controlCurrValue = (*controlField_)[controlCell_];
+        reduce(controlCurrValue, sumOp<scalar>());
+        scaleFactor = 1.0 + controlCouplingStrength_ * (controlTargetValue_ - controlCurrValue);
+        Info << "particleDeformation: scaleFactor = " << scaleFactor << endl;
     }
 
     double**& partDeformations_ = particleCloud_.getParticlePropertyRef<double**>(partDeformationsName_);
@@ -202,6 +224,10 @@ void particleDeformation::setForce() const
                 voidfraction_[cellI] = backgroundRef_ + deformationDegree * (backgroundVoidage_ - backgroundRef_);
             }
 
+            if (controlForceOnDefPart_)
+            {
+                particleCloud_.scaleForce(index,scaleFactor);
+            }
 
             if(forceSubM(0).verbose() && index >= 0 && index < 2)
             {
@@ -242,6 +268,12 @@ void particleDeformation::init() const
                 particleCloud_.mesh()
             )
         );
+    }
+
+    if (controlForceOnDefPart_)
+    {
+        volScalarField& controlField(const_cast<volScalarField&>(particleCloud_.mesh().lookupObject<volScalarField> (controlFieldName_)));
+        controlField_ = &controlField;
     }
 }
 
