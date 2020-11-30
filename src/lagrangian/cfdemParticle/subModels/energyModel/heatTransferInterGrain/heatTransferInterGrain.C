@@ -157,7 +157,9 @@ heatTransferInterGrain::heatTransferInterGrain
     if (verbose_)
     {
         QPartPart_.writeOpt() = IOobject::AUTO_WRITE;
+        partEffThermCondField_.writeOpt() = IOobject::AUTO_WRITE;
         QPartPart_.write();
+        partEffThermCondField_.write();
     }
 }
 
@@ -308,11 +310,15 @@ void heatTransferInterGrain::calcPartThermRad()
                     scaleCond = cg*cg*cg;
                 }
                 ds = 2.*particleCloud_.radius(index)/cg;
+                // make sure reasonable values are used
                 Tp = partTemp_[index][0];
+                if (Tp < TMin) Tp = TMin;
+                voidfraction = prescribedVoidfraction_[cellI];
+                if (voidfraction < voidfracMin) voidfraction = voidfracMin;
+                else if (voidfraction > voidfracMax) voidfraction = voidfracMax;
+
                 prefac = 4.0*StefanBoltzmannConst_*ds*Tp*Tp*Tp;
                 L = partThermCond_[index][0]/prefac;
-                voidfraction = prescribedVoidfraction_[cellI];
-
                 // LIGGGGHTS counts types 1, 2, ..., C++ array starts at 0
                 partThermRad_[index][0] = prefac*FE(voidfraction,typePartEmissivity_[partType - 1],L)*scaleCond;
             }

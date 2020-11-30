@@ -94,6 +94,12 @@ protected:
 
     const word partThermRadRegName_;
 
+    const scalar TMin = 10.0;
+
+    const scalar voidfracMax = 0.95;
+
+    const scalar voidfracMin = 0.05;
+
     const scalar StefanBoltzmannConst_;
 
     scalarList typePartEmissivity_;
