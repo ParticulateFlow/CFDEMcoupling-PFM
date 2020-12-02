@@ -1,0 +1,8 @@
+#########
+# removal
+#########
+
+# raceways
+variable rCMass equal 200
+fix         delRW1 all remove nevery 1000 massrate ${rCMass} style delete seed 10007143 region RW1 verbose no restart_read no
+fix         delRW2 all remove nevery 1000 massrate ${rCMass} style delete seed 10007134 region RW2 verbose no restart_read no

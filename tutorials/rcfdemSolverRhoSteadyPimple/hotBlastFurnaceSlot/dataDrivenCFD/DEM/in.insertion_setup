@@ -1,0 +1,9 @@
+#################
+# insertion setup
+#################
+
+include ../../CFDDEM/DEM/zInsLower
+region regTop block -4.61 4.61 -0.59 0.59 ${zInsLower} 26.1 units box
+variable nTot equal count(all,regTop)
+variable Nins equal 100
+fix eeIns all execute ${Nins} "../DEM/in.insert" file conditional nTot 0 0.1
