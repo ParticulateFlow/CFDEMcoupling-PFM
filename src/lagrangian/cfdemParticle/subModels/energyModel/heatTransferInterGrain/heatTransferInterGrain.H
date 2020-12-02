@@ -104,6 +104,8 @@ protected:
 
     scalarList typePartEmissivity_;
 
+    scalar kMax_;
+
     void calcPartEffThermCond();
 
     void calcPartThermCond();

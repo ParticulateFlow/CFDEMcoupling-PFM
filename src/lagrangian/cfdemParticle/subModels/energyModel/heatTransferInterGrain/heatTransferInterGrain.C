@@ -118,7 +118,8 @@ heatTransferInterGrain::heatTransferInterGrain
     partThermCondRegName_(typeName + "partThermCond"),
     partThermRadRegName_(typeName + "partThermRad"),
     StefanBoltzmannConst_(5.67e-8),
-    typePartEmissivity_(propsDict_.lookupOrDefault<scalarList>("thermalEmissivities",scalarList(1,-1.0)))
+    typePartEmissivity_(propsDict_.lookupOrDefault<scalarList>("thermalEmissivities",scalarList(1,-1.0))),
+    kMax_(propsDict_.lookupOrDefault<scalar>("kMax",-1.0))
 
 {
     particleCloud_.registerParticleProperty<double**>(partHeatFluxName_,1);
@@ -176,6 +177,12 @@ heatTransferInterGrain::~heatTransferInterGrain()
 void heatTransferInterGrain::calcEnergyContribution()
 {
     calcPartEffThermCond();
+
+    if (kMax_ > 0.0)
+    {
+        dimensionedScalar kMax("kMax",dimensionSet(1,1,-3,-1,0,0,0),kMax_);
+        partEffThermCondField_ = min(partEffThermCondField_,kMax);
+    }
 
     QPartPart_ = fvc::laplacian(partEffThermCondField_,partTempField_);
 
