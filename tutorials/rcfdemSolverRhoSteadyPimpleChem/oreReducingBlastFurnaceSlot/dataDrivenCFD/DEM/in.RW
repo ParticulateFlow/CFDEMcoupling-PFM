@@ -1,0 +1,30 @@
+#################################
+# remove particles from RW region
+#################################
+
+region cokeRefRegion block INF INF INF INF INF 2
+variable Nremove equal 10
+variable tau equal ${dt}*${Nremove}
+
+# coke
+
+variable nCokeRWRef equal count(coke,cokeRefRegion)
+variable nCokeRW equal ${nCokeRWRef}
+
+variable mCokePart equal 2.2
+variable massCokeRWremove1 equal ${mCokePart}*(v_nCokeRWRef-${nCokeRW})/${tau}
+variable massCokeRWremove equal ((v_massCokeRWremove1>0)-1e-10)*v_massCokeRWremove1
+fix deleteCokeRWs all remove nevery ${Nremove} massratevariable massCokeRWremove style delete seed 10007143 region RWs restart_read no integrated_error no atomtype 1
+
+# fine coke
+
+variable nFineCokeRWRef equal count(finecoke,cokeRefRegion)
+variable nFineCokeRW equal ${nFineCokeRWRef}
+
+variable mFineCokePart equal 0.8
+variable massFineCokeRWremove1 equal ${mFineCokePart}*(v_nFineCokeRWRef-${nFineCokeRW})/${tau}
+variable massFineCokeRWremove equal ((v_massFineCokeRWremove1>0)-1e-10)*v_massFineCokeRWremove1
+fix deleteFineCokeRWs all remove nevery ${Nremove} massratevariable massFineCokeRWremove style delete seed 10007144 region RWs restart_read no integrated_error no atomtype 2
+
+# remove excess of fine coke outside of RWs
+fix deleteFineCokeHearth all remove nevery ${Nremove} massratevariable massFineCokeRWremove style delete seed 10007145 region cokeRefRegion restart_read no integrated_error no atomtype 2

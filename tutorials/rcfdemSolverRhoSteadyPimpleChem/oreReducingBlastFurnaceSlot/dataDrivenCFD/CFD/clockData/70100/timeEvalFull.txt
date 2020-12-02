@@ -1,0 +1,21 @@
+Name	avgdeltaT	maxdeltaT	nOfRuns	level	parentNr	parentName
+Global	2.000262e+04	2.000813e+04	7599	0	0	
+Coupling	9.133604e+03	9.139640e+03	7599	1	1	Global
+LIGGGHTS	5.932862e+02	5.943900e+02	7599	2	2	Coupling
+LIGGGHTS_reallocArrays	1.074418e+03	1.100920e+03	7599	2	2	Coupling
+resetVolFields	8.791250e+00	9.090000e+00	7599	2	2	Coupling
+getDEMdata	4.816612e+02	5.087500e+02	7599	2	2	Coupling
+findCell	4.191100e+02	4.405800e+02	7599	2	2	Coupling
+setvoidFraction	1.528626e+03	1.775810e+03	7599	2	2	Coupling
+setAverages	2.401037e+02	7.375300e+02	7599	2	2	Coupling
+setForce	1.683154e+03	1.827660e+03	7599	2	2	Coupling
+setParticleForceField	2.250637e+02	2.575100e+02	7599	2	2	Coupling
+giveDEMdata	2.413963e+02	2.723100e+02	7599	2	2	Coupling
+interpolateEulerFields	6.665375e+01	1.575200e+02	7599	2	2	Coupling
+dumpDEMdata	8.750000e-03	2.000000e-02	7599	2	2	Coupling
+Flow	1.071779e+04	1.071829e+04	7599	1	1	Global
+calcEnergyContributions	8.478262e+02	8.499600e+02	7599	2	2	Coupling
+speciesExecute	1.705444e+03	1.706900e+03	7599	2	2	Coupling
+Y	2.624964e+03	2.627590e+03	37995	2	15	Flow
+postFlow	1.495850e+02	1.503200e+02	45594	1	1	Global
+ReadFields	1.125000e-02	4.000000e-02	7599	1	1	Global

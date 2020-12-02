@@ -1,0 +1,22 @@
+Time Evaluation for Processor Nr.4
+Name	deltaT	nOfRuns	level	parentNr	parentName
+Global	1.921602e+04	9199	0	0	
+Coupling	8.576320e+03	9199	1	1	Global
+LIGGGHTS	7.047200e+02	9199	2	2	Coupling
+LIGGGHTS_reallocArrays	5.878500e+02	9199	2	2	Coupling
+resetVolFields	6.560000e+00	9199	2	2	Coupling
+getDEMdata	2.927800e+02	9199	2	2	Coupling
+findCell	4.677000e+02	9199	2	2	Coupling
+setvoidFraction	1.942810e+03	9199	2	2	Coupling
+setAverages	3.646300e+02	9199	2	2	Coupling
+setForce	1.485430e+03	9199	2	2	Coupling
+setParticleForceField	2.507600e+02	9199	2	2	Coupling
+giveDEMdata	1.574700e+02	9199	2	2	Coupling
+interpolateEulerFields	1.592000e+01	9199	2	2	Coupling
+dumpDEMdata	1.000000e-02	9199	2	2	Coupling
+Flow	1.053977e+04	9199	1	1	Global
+calcEnergyContributions	8.822700e+02	9199	2	2	Coupling
+speciesExecute	1.403730e+03	9199	2	2	Coupling
+Y	2.387010e+03	45995	2	15	Flow
+postFlow	9.830000e+01	55194	1	1	Global
+ReadFields	0.000000e+00	9199	1	1	Global

@@ -1,0 +1,57 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.6                                   |
+|   \\  /    A nd           | Web:      http://www.OpenFOAM.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    object      T;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 0 0 1 0 0 0];
+
+internalField   uniform 293;
+
+boundaryField
+{
+    top
+    {
+        type            zeroGradient;
+    }
+
+    bottom
+    {
+        // mimics heat flux through lower hearth region
+        type            fixedValue;
+        value		uniform 298;
+    }
+
+    wall
+    {
+        type            fixedValue;
+        value		uniform 298;
+    }
+
+    inner
+    {
+        type            zeroGradient;
+    }
+    inletLeft
+    {
+        type            fixedValue;
+        value		uniform 1500;
+    }
+    inletRight
+    {
+        type            fixedValue;
+        value		uniform 1500;
+    }
+}
+
+// ************************************************************************* //

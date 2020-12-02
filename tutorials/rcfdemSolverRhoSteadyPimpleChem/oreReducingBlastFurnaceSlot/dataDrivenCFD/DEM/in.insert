@@ -1,0 +1,21 @@
+print 'Performing insertion number ${counter} of this subcycle.' screen yes
+
+read_dump ../DEM/initOre 0 x y z radius mass density bruteadd yes retaintimestep yes exactstep no
+read_dump ../DEM/initCoke 0 x y z radius mass density bruteadd yes retaintimestep yes exactstep no
+read_dump ../DEM/initFineMix 0 x y z radius mass density bruteadd yes retaintimestep yes exactstep no
+
+group coke type 1
+group finecoke type 2
+group ore type 3
+group fineore type 4
+
+# only need to update one reaction fix per group
+fix_update chem0
+fix_update chem1
+fix_update chem2
+fix_update chem4
+
+next counter
+# aborts after Ninssub insertion events
+if "${counter} > ${Ninssub}" then 'print " " file ../CFD/REINIT'
+if "${counter} > ${Ninssub}" then 'print " " file ../CFD/ABORT'
