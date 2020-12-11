@@ -82,6 +82,8 @@ protected:
 
     scalarList intervalWeightsCumulative_;
 
+    Random ranGen;
+
 
 public:
 
