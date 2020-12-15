@@ -22,6 +22,7 @@ License
 #include "error.H"
 #include "heatTransferInterGrain.H"
 #include "addToRunTimeSelectionTable.H"
+#include "fvCFD.H"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -46,6 +47,7 @@ heatTransferInterGrain::heatTransferInterGrain
     propsDict_(dict.subDict(typeName + "Props")),
     multiTypes_(false),
     verbose_(propsDict_.lookupOrDefault<bool>("verbose",false)),
+    implicit_(propsDict_.lookupOrDefault<bool>("implicit",false)),
     calcTotalHeatFlux_(propsDict_.lookupOrDefault<bool>("calcTotalHeatFlux",false)),
     radiativeHeatTransfer_(propsDict_.lookupOrDefault<bool>("radiativeHeatTransfer",false)),
     totalHeatFlux_(0.0),
@@ -92,6 +94,20 @@ heatTransferInterGrain::heatTransferInterGrain
         dimensionedScalar("one", dimensionSet(1, 1, -3, -1,0,0,0), 1.0),
         "zeroGradient"
     ),
+    partThermCapField_
+    (
+        IOobject
+        (
+            "partThermCapField",
+            sm.mesh().time().timeName(),
+            sm.mesh(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        sm.mesh(),
+        dimensionedScalar("zero", dimensionSet(1,-1,-2,-1,0,0,0), 0.0),
+        "zeroGradient"
+    ),
     partThermRadField_
     (
         IOobject
@@ -116,6 +132,8 @@ heatTransferInterGrain::heatTransferInterGrain
     partHeatFluxName_(propsDict_.lookupOrDefault<word>("partHeatFluxName","conductiveHeatFlux")),
     typePartThermCond_(propsDict_.lookupOrDefault<scalarList>("thermalConductivities",scalarList(1,-1.0))),
     partThermCondRegName_(typeName + "partThermCond"),
+    typePartThermCap_(propsDict_.lookupOrDefault<scalarList>("thermalCapacities",scalarList(1,-1.0))),
+    partThermCapRegName_(typeName + "partThermCap"),
     partThermRadRegName_(typeName + "partThermRad"),
     StefanBoltzmannConst_(5.67e-8),
     typePartEmissivity_(propsDict_.lookupOrDefault<scalarList>("thermalEmissivities",scalarList(1,-1.0))),
@@ -162,6 +180,15 @@ heatTransferInterGrain::heatTransferInterGrain
         QPartPart_.write();
         partEffThermCondField_.write();
     }
+
+    if (implicit_)
+    {
+        particleCloud_.registerParticleProperty<double**>(partThermCapRegName_,1);
+        if (typePartThermCap_[0] < 0.0)
+        {
+            FatalError << "heatTransferInterGrain: provide list of thermal capacities." << abort(FatalError);
+        }
+    }
 }
 
 
@@ -184,7 +211,57 @@ void heatTransferInterGrain::calcEnergyContribution()
         partEffThermCondField_ = min(partEffThermCondField_,kMax);
     }
 
-    QPartPart_ = fvc::laplacian(partEffThermCondField_,partTempField_);
+    if (!implicit_)
+    {
+        QPartPart_ = fvc::laplacian(partEffThermCondField_,partTempField_);
+    }
+    else
+    {
+        double**& partThermCap_ = particleCloud_.getParticlePropertyRef<double**>(partThermCapRegName_);
+        label cellI = -1;
+        label partType = -1;
+        for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)
+        {
+            cellI = particleCloud_.cellIDs()[index][0];
+            if (cellI >= 0)
+            {
+                if (multiTypes_)
+                {
+                    partType = particleCloud_.particleType(index);
+                }
+                // LIGGGGHTS counts types 1, 2, ..., C++ array starts at 0
+                partThermCap_[index][0] = typePartThermCap_[partType - 1] * particleCloud_.particleDensity(index);
+            }
+        }
+
+        partThermCapField_.primitiveFieldRef() = 0.0;
+        particleCloud_.averagingM().resetWeightFields();
+        particleCloud_.averagingM().setScalarAverage
+        (
+            partThermCapField_,
+            partThermCap_,
+            particleCloud_.particleWeights(),
+            particleCloud_.averagingM().UsWeightField(),
+            NULL
+        );
+
+        partThermCapField_ *= (1.0 - voidfraction_);
+        dimensionedScalar CMin(dimensionedScalar("CMin",dimensionSet(1,-1,-2,-1,0,0,0),SMALL));
+        partThermCapField_ = max(partThermCapField_, CMin);
+        partThermCapField_.oldTime() = partThermCapField_;
+
+        volScalarField partTempField(partTempField_);
+        partTempField.oldTime() = partTempField;
+        fvScalarMatrix TpEqn
+        (
+            fvm::ddt(partThermCapField_,partTempField)
+            ==
+            fvm::laplacian(partEffThermCondField_,partTempField)
+        );
+
+        TpEqn.solve();
+        QPartPart_ = fvc::laplacian(partEffThermCondField_,partTempField);
+    }
 
     label cellI=0;
     scalar partVolume(0);

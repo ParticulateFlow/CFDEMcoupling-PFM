@@ -54,6 +54,8 @@ protected:
 
     bool verbose_;
 
+    bool implicit_;
+
     bool calcTotalHeatFlux_;
 
     bool radiativeHeatTransfer_;
@@ -69,6 +71,8 @@ protected:
     volScalarField partEffThermCondField_;
 
     volScalarField partThermCondField_;
+
+    volScalarField partThermCapField_;
 
     volScalarField partThermRadField_;
 
@@ -91,6 +95,10 @@ protected:
     scalarList typePartThermCond_;
 
     const word partThermCondRegName_;
+
+    scalarList typePartThermCap_;
+
+    const word partThermCapRegName_;
 
     const word partThermRadRegName_;
 
