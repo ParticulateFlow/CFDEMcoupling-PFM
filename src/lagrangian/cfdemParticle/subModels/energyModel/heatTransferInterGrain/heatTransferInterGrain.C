@@ -177,8 +177,14 @@ heatTransferInterGrain::heatTransferInterGrain
     {
         QPartPart_.writeOpt() = IOobject::AUTO_WRITE;
         partEffThermCondField_.writeOpt() = IOobject::AUTO_WRITE;
+        partThermCondField_.writeOpt() = IOobject::AUTO_WRITE;
+        partThermCapField_.writeOpt() = IOobject::AUTO_WRITE;
+        partThermRadField_.writeOpt() = IOobject::AUTO_WRITE;
         QPartPart_.write();
         partEffThermCondField_.write();
+        partThermCondField_.write();
+        partThermCapField_.write();
+        partThermRadField_.write();
     }
 
     if (implicit_)
@@ -370,7 +376,6 @@ void heatTransferInterGrain::calcPartThermRad()
     scalar ds = 0.0;
     scalar L = 0.0;
     scalar prefac = 0.0;
-    scalar scaleCond = cg*cg*cg;
     scalar Tp = 0.0;
     scalar voidfraction = 0.0;
 
@@ -391,7 +396,6 @@ void heatTransferInterGrain::calcPartThermRad()
                         FatalError<< "Too few coarse-graining factors provided." << abort(FatalError);
                     }
                     cg = typeCG_[partType - 1];
-                    scaleCond = cg*cg*cg;
                 }
                 ds = 2.*particleCloud_.radius(index)/cg;
                 // make sure reasonable values are used
@@ -404,7 +408,7 @@ void heatTransferInterGrain::calcPartThermRad()
                 prefac = 4.0*StefanBoltzmannConst_*ds*Tp*Tp*Tp;
                 L = partThermCond_[index][0]/prefac;
                 // LIGGGGHTS counts types 1, 2, ..., C++ array starts at 0
-                partThermRad_[index][0] = prefac*FE(voidfraction,typePartEmissivity_[partType - 1],L)*scaleCond;
+                partThermRad_[index][0] = prefac*FE(voidfraction,typePartEmissivity_[partType - 1],L);
             }
     }
 
