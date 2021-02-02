@@ -132,7 +132,7 @@ gradPForceSmooth::gradPForceSmooth
     particleCloud_.probeM().scalarFields_.append("rho");
     particleCloud_.probeM().writeHeader();
     
-    pSmooth_ = p_;
+    //pSmooth_ = p_;
    }
 
 
