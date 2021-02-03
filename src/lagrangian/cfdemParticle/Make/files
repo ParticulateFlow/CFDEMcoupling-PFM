@@ -92,6 +92,7 @@ $(forceModels)/surfaceTensionForce/surfaceTensionForce.C
 $(forceModels)/gradPForceSmooth/gradPForceSmooth.C
 $(forceModels)/particleDeformation/particleDeformation.C
 $(forceModels)/turbulentDispersion/turbulentDispersion.C
+$(forceModels)/terminalVelocity/terminalVelocity.C
 
 $(forceModelsMS)/forceModelMS/forceModelMS.C
 $(forceModelsMS)/forceModelMS/newForceModelMS.C
