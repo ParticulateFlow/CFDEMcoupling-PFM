@@ -37,11 +37,19 @@
             "URec",
             runTime.timeName(),
             mesh,
-            IOobject::MUST_READ,
-            IOobject::AUTO_WRITE
+            IOobject::READ_IF_PRESENT,
+            IOobject::NO_WRITE
         ),
-        mesh
+        mesh,
+        dimensionedVector("URec", dimensionSet(0, 1, -1, 0, 0), vector::zero)
     );
+
+    bool updateURec = false;
+    if (URec.headerOk())
+    {
+        updateURec = true;
+        URec.writeOpt() = IOobject::AUTO_WRITE;
+    }
 
     volScalarField voidfractionRec
     (
@@ -50,11 +58,19 @@
             "voidfractionRec",
             runTime.timeName(),
             mesh,
-            IOobject::MUST_READ,
-            IOobject::AUTO_WRITE
+            IOobject::READ_IF_PRESENT,
+            IOobject::NO_WRITE
         ),
-        mesh
+        mesh,
+        dimensionedScalar("voidfractionRec", dimensionSet(0, 0, 0, 0, 0), 1.0)
     );
+
+    bool updateVoidfractionRec = false;
+    if (voidfractionRec.headerOk())
+    {
+        updateVoidfractionRec = true;
+        voidfractionRec.writeOpt() = IOobject::AUTO_WRITE;
+    }
 
     volVectorField UsRec
     (
@@ -63,11 +79,19 @@
             "UsRec",
             runTime.timeName(),
             mesh,
-            IOobject::MUST_READ,
+            IOobject::READ_IF_PRESENT,
             IOobject::AUTO_WRITE
         ),
-        mesh
+        mesh,
+        dimensionedVector("URec", dimensionSet(0, 1, -1, 0, 0), vector::zero)
     );
+
+    bool updateUsRec = false;
+    if (UsRec.headerOk())
+    {
+        updateUsRec = true;
+        UsRec.writeOpt() = IOobject::AUTO_WRITE;
+    }
 
     // calculated fields
     Info << "\nCreating fields subject to calculation\n" << endl;
@@ -78,7 +102,7 @@
             "voidfraction",
             runTime.timeName(),
             mesh,
-            IOobject::NO_READ,
+            IOobject::READ_IF_PRESENT,
             IOobject::AUTO_WRITE
         ),
         voidfractionRec
@@ -91,7 +115,7 @@
             "Us",
             runTime.timeName(),
             mesh,
-            IOobject::NO_READ,
+            IOobject::READ_IF_PRESENT,
             IOobject::AUTO_WRITE
         ),
         UsRec
@@ -111,11 +135,18 @@
             runTime.timeName(),
             mesh,
             IOobject::READ_IF_PRESENT,
-            IOobject::AUTO_WRITE
+            IOobject::NO_WRITE
         ),
         linearInterpolate(URec*voidfractionRec) & mesh.Sf()
     );
-    phiRec.write();
+
+    bool updatePhiRec = false;
+    if (phiRec.headerOk())
+    {
+        updatePhiRec = true;
+        phiRec.writeOpt() = IOobject::AUTO_WRITE;
+        phiRec.write();
+    }
 
     singlePhaseTransportModel laminarTransport(URec, phiRec);
 
