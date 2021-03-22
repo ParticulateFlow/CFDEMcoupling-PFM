@@ -49,7 +49,8 @@ heatTransferGranConduction::heatTransferGranConduction
     totalHeatFlux_(0.0),
     QPartPartName_(propsDict_.lookupOrDefault<word>("QPartPartName","QPartPart")),
     QPartPart_
-    (   IOobject
+    (
+        IOobject
         (
             QPartPartName_,
             sm.mesh().time().timeName(),
@@ -72,7 +73,7 @@ heatTransferGranConduction::heatTransferGranConduction
         ),
         sm.mesh(),
         dimensionedScalar("one", dimensionSet(1, 1, -3, -1,0,0,0), 1.0),
-	"zeroGradient"
+        "zeroGradient"
     ),
     partThermCondField_
     (
@@ -86,7 +87,7 @@ heatTransferGranConduction::heatTransferGranConduction
         ),
         sm.mesh(),
         dimensionedScalar("one", dimensionSet(1, 1, -3, -1,0,0,0), 1.0),
-	"zeroGradient"
+        "zeroGradient"
     ),
     partTempField_(sm.mesh().lookupObject<volScalarField>("partTemp")),
     prescribedVoidfractionFieldName_(propsDict_.lookupOrDefault<word>("prescribedVoidfractionFieldName","voidfraction")),
@@ -94,11 +95,11 @@ heatTransferGranConduction::heatTransferGranConduction
     voidfractionFieldName_(propsDict_.lookupOrDefault<word>("voidfractionFieldName","voidfraction")),
     voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
     partHeatFluxName_(propsDict_.lookupOrDefault<word>("partHeatFluxName","conductiveHeatFlux")),
-    partHeatFlux_(NULL),
     typePartThermCond_(propsDict_.lookupOrDefault<scalarList>("thermalConductivities",scalarList(1,-1.0))),
-    partThermCond_(NULL)
+    partThermCondRegName_(typeName + "partThermCond")
 {
-    allocateMyArrays();
+    particleCloud_.registerParticleProperty<double**>(partHeatFluxName_,1);
+    particleCloud_.registerParticleProperty<double**>(partThermCondRegName_,1);
 
     if (typePartThermCond_[0] < 0.0)
     {
@@ -127,25 +128,13 @@ heatTransferGranConduction::heatTransferGranConduction
 
 heatTransferGranConduction::~heatTransferGranConduction()
 {
-    particleCloud_.dataExchangeM().destroy(partHeatFlux_,1);
-    particleCloud_.dataExchangeM().destroy(partThermCond_,1);
 }
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
-void heatTransferGranConduction::allocateMyArrays() const
-{
-    // get memory for 2d arrays
-    double initVal=0.0;
-    particleCloud_.dataExchangeM().allocateArray(partHeatFlux_,initVal,1);
-    particleCloud_.dataExchangeM().allocateArray(partThermCond_,initVal,1);
-}
 // * * * * * * * * * * * * * * * * Member Fct  * * * * * * * * * * * * * * * //
 
 void heatTransferGranConduction::calcEnergyContribution()
 {
-   // realloc the arrays
-    allocateMyArrays();
-
     calcPartEffThermCond();
 
     QPartPart_ = fvc::laplacian(partEffThermCondField_,partTempField_);
@@ -156,6 +145,7 @@ void heatTransferGranConduction::calcEnergyContribution()
     scalar voidfraction(1);
 
     totalHeatFlux_ = 0.0;
+    double**& partHeatFlux_ = particleCloud_.getParticlePropertyRef<double**>(partHeatFluxName_);
 
     for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)
     {
@@ -199,6 +189,8 @@ void heatTransferGranConduction::calcPartThermCond()
 {
     label cellI=0;
     label partType = 1;
+    double**& partThermCond_ = particleCloud_.getParticlePropertyRef<double**>(partThermCondRegName_);
+
     for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)
     {
             cellI = particleCloud_.cellIDs()[index][0];
@@ -227,7 +219,8 @@ void heatTransferGranConduction::calcPartThermCond()
 
 void heatTransferGranConduction::heatFlux(label index, scalar vol, scalar voidfraction, scalar QPartPart)
 {
-        partHeatFlux_[index][0] = vol * QPartPart / (1.0 - voidfraction) ;
+    double**& partHeatFlux_ = particleCloud_.getParticlePropertyRef<double**>(partHeatFluxName_);
+    partHeatFlux_[index][0] = vol * QPartPart / (1.0 - voidfraction) ;
 }
 
 void heatTransferGranConduction::giveData()
@@ -238,6 +231,7 @@ void heatTransferGranConduction::giveData()
         Info << "total conductive particle-particle heat flux [W] (Eulerian) = " << totalHeatFlux_ << endl;
     }
 
+    double**& partHeatFlux_ = particleCloud_.getParticlePropertyRef<double**>(partHeatFluxName_);
     particleCloud_.dataExchangeM().giveData(partHeatFluxName_,"scalar-atom", partHeatFlux_);
 }
 

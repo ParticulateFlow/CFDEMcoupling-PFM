@@ -138,8 +138,8 @@ double twoWayMPI::DEMVariableValue(word variablename)
 
 void twoWayMPI::getData
 (
-    word name,
-    word type,
+    const word& name,
+    const word& type,
     double ** const& field,
     label /*step*/
 ) const
@@ -149,8 +149,8 @@ void twoWayMPI::getData
 
 void twoWayMPI::getData
 (
-    word name,
-    word type,
+    const word& name,
+    const word& type,
     int ** const& field,
     label /*step*/
 ) const
@@ -160,8 +160,8 @@ void twoWayMPI::getData
 
 void twoWayMPI::giveData
 (
-    word name,
-    word type,
+    const word& name,
+    const word& type,
     double ** const& field,
     const char* datatype
 ) const

@@ -54,19 +54,17 @@ private:
 
     dictionary propsDict_;
 
-    word partKsFieldName_;
+    const word partKsFieldName_;
 
     volScalarField& partKsField_;
 
-    word voidfractionFieldName_;
+    const word voidfractionFieldName_;
 
     const volScalarField& voidfraction_;
 
     scalarList typeKs_;
 
-    mutable double **partKs_;
-
-    void allocateMyArrays() const;
+    const word partKsRegName_;
 
     void calcPartKsField() const;
 

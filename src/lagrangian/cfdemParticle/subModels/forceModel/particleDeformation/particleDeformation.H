@@ -55,12 +55,12 @@ private:
 
     mutable bool initialExec_;
 
-    word refFieldName_;
+    const word refFieldName_;
 
     mutable autoPtr<volScalarField> refField_;
 
     // default deformation in region
-    word defaultDeformCellsName_;
+    const word defaultDeformCellsName_;
 
     autoPtr<cellSet> defaultDeformCells_;
 
@@ -74,11 +74,9 @@ private:
 
     scalarList upperBounds_;
 
-    mutable double **partDeformations_;
+    const word partDeformationsName_;
 
     label getListIndex(label) const;
-
-    void allocateMyArrays() const;
 
     void init() const;
 

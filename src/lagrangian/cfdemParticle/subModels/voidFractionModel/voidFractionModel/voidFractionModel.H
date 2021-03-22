@@ -69,7 +69,7 @@ protected:
 
         volScalarField voidfractionNext_;
 
-        int ** cellsPerParticle_;
+        const word partCellsRegName_;
 
         int maxCellsPerParticle_;
 
@@ -164,10 +164,6 @@ public:
         int** const& cellsPerParticle() const;
 
         int maxCellsPerParticle() const;
-
-        void reAllocArrays();
-
-        void reAllocArrays(int nP);  //force number of particles during reallocation, for CFD offline-use
 
         virtual void setParticleType(label type) const {}
 

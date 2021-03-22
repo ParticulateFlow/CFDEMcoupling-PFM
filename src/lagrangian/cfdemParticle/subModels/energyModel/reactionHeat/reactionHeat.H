@@ -56,11 +56,7 @@ protected:
 
     word reactionHeatName_;
 
-    mutable double **reactionHeat_;
-
     volScalarField reactionHeatField_;
-
-    void allocateMyArrays() const;
 
 public:
 

@@ -84,12 +84,12 @@ voidFractionModel::voidFractionModel
         /*sm.mesh(),
         dimensionedScalar("zero", dimensionSet(0,0,0,0,0), 1)*/
     ),
-    cellsPerParticle_(NULL),
+    partCellsRegName_("cellsPerParticle"),
     maxCellsPerParticle_(1),
     weight_(1.),
     porosity_(1.)
 {
-    particleCloud_.dataExchangeM().allocateArray(cellsPerParticle_,1,1);
+    particleCloud_.registerParticleProperty<int**>(partCellsRegName_,1,1.0,false);
     if (particleCloud_.getParticleEffVolFactors()) multiWeights_ = true;
 }
 
@@ -128,19 +128,18 @@ voidFractionModel::voidFractionModel
         sm.mesh(),
         dimensionedScalar("zero", dimensionSet(0,0,0,0,0), initVoidfraction)
     ),
-    cellsPerParticle_(NULL),
+    partCellsRegName_("cellsPerParticle"),
     maxCellsPerParticle_(1),
     weight_(1.),
     porosity_(1.)
 {
-    particleCloud_.dataExchangeM().allocateArray(cellsPerParticle_,1,1);
+    particleCloud_.registerParticleProperty<int**>(partCellsRegName_,1,1.0,false);
 }
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 voidFractionModel::~voidFractionModel()
 {
-    particleCloud_.dataExchangeM().destroy(cellsPerParticle_,1);
 }
 
 // * * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * * //
@@ -162,30 +161,12 @@ void voidFractionModel::resetVoidFractions()
 
 int** const& voidFractionModel::cellsPerParticle() const
 {
-    return cellsPerParticle_;
+    return particleCloud_.getParticlePropertyRef<int**>(partCellsRegName_);
 }
 
 int voidFractionModel::maxCellsPerParticle() const
 {
     return maxCellsPerParticle_;
-}
-
-void voidFractionModel::reAllocArrays()
-{
-    if(particleCloud_.numberOfParticlesChanged())
-    {
-        // get arrays of new length
-        particleCloud_.dataExchangeM().allocateArray(cellsPerParticle_,1,1);
-    }
-}
-
-void voidFractionModel::reAllocArrays(int nP)
-{
-    if(particleCloud_.numberOfParticlesChanged())
-    {
-        // get arrays of new length
-        particleCloud_.dataExchangeM().allocateArray(cellsPerParticle_,1,1,nP);
-    }
 }
 
 scalar voidFractionModel::pointInParticle(int index, const vector& positionCenter, const vector& point, double scale) const

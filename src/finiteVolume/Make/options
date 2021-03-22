@@ -4,7 +4,8 @@ EXE_INC = \
     -I$(LIB_SRC)/finiteVolume/lnInclude \
     -Wno-old-style-cast \
     -Wno-unused-result \
-    -Wno-literal-suffix
+    -Wno-literal-suffix \
+    -Wno-deprecated-copy
 
 LIB_LIBS = \
     -lOpenFOAM \
