@@ -12,6 +12,7 @@ EXE_INC = \
     -I$(CFDEM_SRC_DIR)/lagrangian/cfdemParticle/cfdTools \
     -I$(CFDEM_SRC_DIR)/recurrence/lnInclude \
     -I$(CFDEM_SRC_DIR)/lagrangian/cfdemParticle/derived/cfdemCloudRec \
+    -Wno-deprecated-copy
 
 EXE_LIBS = \
     -L$(CFDEM_LIB_DIR)\
