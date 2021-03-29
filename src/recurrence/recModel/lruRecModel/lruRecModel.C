@@ -24,7 +24,7 @@ License
 
 #include "error.H"
 #include "Random.H"
-#include "gerhardsRecModel.H"
+#include "lruRecModel.H"
 #include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -34,12 +34,12 @@ namespace Foam
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-defineTypeNameAndDebug(gerhardsRecModel, 0);
+defineTypeNameAndDebug(lruRecModel, 0);
 
 addToRunTimeSelectionTable
 (
     recModel,
-    gerhardsRecModel,
+    lruRecModel,
     dictionary
 );
 
@@ -47,7 +47,7 @@ addToRunTimeSelectionTable
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 // Construct from components
-gerhardsRecModel::gerhardsRecModel
+lruRecModel::lruRecModel
 (
     const dictionary& dict,
     recBase& base
@@ -161,12 +161,12 @@ gerhardsRecModel::gerhardsRecModel
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-gerhardsRecModel::~gerhardsRecModel()
+lruRecModel::~lruRecModel()
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-scalar gerhardsRecModel::checkTimeStep()
+scalar lruRecModel::checkTimeStep()
 {
    // check time step of provided data
     scalar dtCur(0.0);
@@ -242,7 +242,7 @@ scalar gerhardsRecModel::checkTimeStep()
     return dtCur;
 }
 
-void gerhardsRecModel::readFieldSeries()
+void lruRecModel::readFieldSeries()
 {
     Info << "Checking all " << numRecFields() << " fields\n" << endl;
 
@@ -497,7 +497,7 @@ void gerhardsRecModel::readFieldSeries()
 }
 
 
-void gerhardsRecModel::readTimeSeries()
+void lruRecModel::readTimeSeries()
 {
     bool firsttime = true;
     // fill the data structure for the time indices
@@ -567,7 +567,7 @@ void gerhardsRecModel::readTimeSeries()
 
 
 
-void gerhardsRecModel::fetchStateForDataBase(label index)
+void lruRecModel::fetchStateForDataBase(label index)
 {
     if (verboseVerbose_)
     {
@@ -617,7 +617,7 @@ void gerhardsRecModel::fetchStateForDataBase(label index)
 }
 
 
-void gerhardsRecModel::updateStorageUsageList(label index)
+void lruRecModel::updateStorageUsageList(label index)
 {
     if (verboseVerbose_)
     {
@@ -652,7 +652,7 @@ void gerhardsRecModel::updateStorageUsageList(label index)
 }
 
 
-void gerhardsRecModel::readNewSnapshot(label index, label oldIndex)
+void lruRecModel::readNewSnapshot(label index, label oldIndex)
 {
     if (verboseVerbose_)
     {
@@ -764,19 +764,19 @@ void gerhardsRecModel::readNewSnapshot(label index, label oldIndex)
 
 
 
-void gerhardsRecModel::exportVolScalarField(word fieldname, volScalarField& field)
+void lruRecModel::exportVolScalarField(word fieldname, volScalarField& field)
 {
     field = exportVolScalarField(fieldname, virtualTimeIndex);
 }
 
 
-void gerhardsRecModel::exportVolVectorField(word fieldname, volVectorField& field)
+void lruRecModel::exportVolVectorField(word fieldname, volVectorField& field)
 {
     field = exportVolVectorField(fieldname, virtualTimeIndex);
 }
 
 
-void gerhardsRecModel::exportSurfaceScalarField(word fieldname, surfaceScalarField& field)
+void lruRecModel::exportSurfaceScalarField(word fieldname, surfaceScalarField& field)
 {
     field = exportSurfaceScalarField(fieldname, virtualTimeIndex);
 }
@@ -784,7 +784,7 @@ void gerhardsRecModel::exportSurfaceScalarField(word fieldname, surfaceScalarFie
 
 
 
-const volScalarField& gerhardsRecModel::exportVolScalarField(word fieldname, label index)
+const volScalarField& lruRecModel::exportVolScalarField(word fieldname, label index)
 {
     const label fieldI = getVolScalarFieldIndex(fieldname, index);
 
@@ -814,7 +814,7 @@ const volScalarField& gerhardsRecModel::exportVolScalarField(word fieldname, lab
 
 
 
-const volVectorField& gerhardsRecModel::exportVolVectorField(word fieldname, label index)
+const volVectorField& lruRecModel::exportVolVectorField(word fieldname, label index)
 {
     const label fieldI = getVolVectorFieldIndex(fieldname, index);
 
@@ -843,7 +843,7 @@ const volVectorField& gerhardsRecModel::exportVolVectorField(word fieldname, lab
     return volVectorFieldList_[fieldI][storageIndex_[index]];
 }
 
-const surfaceScalarField& gerhardsRecModel::exportSurfaceScalarField(word fieldname, label index)
+const surfaceScalarField& lruRecModel::exportSurfaceScalarField(word fieldname, label index)
 {
     const label fieldI = getSurfaceScalarFieldIndex(fieldname, index);
 
@@ -867,21 +867,21 @@ const surfaceScalarField& gerhardsRecModel::exportSurfaceScalarField(word fieldn
 }
 
 
-PtrList<volScalarField>& gerhardsRecModel::exportVolScalarFieldList(word fieldname)
+PtrList<volScalarField>& lruRecModel::exportVolScalarFieldList(word fieldname)
 {
     const label fieldI = getVolScalarFieldIndex(fieldname);
 
     return volScalarFieldList_[fieldI];
 }
 
-PtrList<volVectorField>& gerhardsRecModel::exportVolVectorFieldList(word fieldname)
+PtrList<volVectorField>& lruRecModel::exportVolVectorFieldList(word fieldname)
 {
     const label fieldI = getVolVectorFieldIndex(fieldname);
 
     return volVectorFieldList_[fieldI];
 }
 
-PtrList<surfaceScalarField>& gerhardsRecModel::exportSurfaceScalarFieldList(word fieldname)
+PtrList<surfaceScalarField>& lruRecModel::exportSurfaceScalarFieldList(word fieldname)
 {
     const label fieldI = getSurfaceScalarFieldIndex(fieldname);
 
@@ -890,40 +890,40 @@ PtrList<surfaceScalarField>& gerhardsRecModel::exportSurfaceScalarFieldList(word
 
 
 
-SymmetricSquareMatrix<scalar>& gerhardsRecModel::recurrenceMatrix()
+SymmetricSquareMatrix<scalar>& lruRecModel::recurrenceMatrix()
 {
     return recurrenceMatrix_;
 }
 
 
-const HashTable<label,word>& gerhardsRecModel::timeIndexList() const
+const HashTable<label,word>& lruRecModel::timeIndexList() const
 {
     return timeIndexList_;
 }
 
 
-label gerhardsRecModel::lowerSeqLim() const
+label lruRecModel::lowerSeqLim() const
 {
     return lowerSeqLim_;
 }
 
-label gerhardsRecModel::upperSeqLim() const
+label lruRecModel::upperSeqLim() const
 {
     return upperSeqLim_;
 }
 
 
-label gerhardsRecModel::numRecFields() const
+label lruRecModel::numRecFields() const
 {
     return numRecFields_;
 }
 
-label gerhardsRecModel::numDataBaseFields() const
+label lruRecModel::numDataBaseFields() const
 {
     return numDataBaseFields_;
 }
 
-void gerhardsRecModel::updateRecFields()
+void lruRecModel::updateRecFields()
 {
     virtualTimeIndex=virtualTimeIndexNext;
     virtualTimeIndexNext++;
@@ -942,7 +942,7 @@ void gerhardsRecModel::updateRecFields()
 }
 
 
-void gerhardsRecModel::writeRecMatrix() const
+void lruRecModel::writeRecMatrix() const
 {
     if (writeRecMat_)
     {
@@ -958,7 +958,7 @@ void gerhardsRecModel::writeRecMatrix() const
 
 
 
-Switch gerhardsRecModel::checkSkipZero()
+Switch lruRecModel::checkSkipZero()
 {
     if (skipZero_)
     {
@@ -983,7 +983,7 @@ Switch gerhardsRecModel::checkSkipZero()
 
 
 
-// tmp<surfaceScalarField> gerhardsRecModel::exportAveragedSurfaceScalarField(word fieldname, scalar threshold, label index)
+// tmp<surfaceScalarField> lruRecModel::exportAveragedSurfaceScalarField(word fieldname, scalar threshold, label index)
 // {
 //     label timeIndex;
 //     if (index < 0)
@@ -1021,7 +1021,7 @@ Switch gerhardsRecModel::checkSkipZero()
 //     return tAveragedSurfaceScalarField;
 // }
 
-void gerhardsRecModel::exportAveragedVolVectorField(volVectorField& smoothfield, word fieldname, scalar threshold, label index) const
+void lruRecModel::exportAveragedVolVectorField(volVectorField& smoothfield, word fieldname, scalar threshold, label index) const
 {
     label timeIndex;
     if (index < 0)
