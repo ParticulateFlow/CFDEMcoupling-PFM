@@ -28,7 +28,7 @@ FoamFile
 
 
 //recModel standardRecModel;
-recModel gerhardsRecModel;
+recModel lruRecModel;
 
 verbose false;
 
@@ -64,7 +64,7 @@ standardRecModelProps
     skipZero    on;
 }
 
-gerhardsRecModelProps
+lruRecModelProps
 {
     dataBase    ".";
     

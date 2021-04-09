@@ -24,11 +24,11 @@ License
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-inline Foam::label Foam::gerhardsRecModel::getVolScalarFieldIndex(word fieldname, label index) const
+inline Foam::label Foam::lruRecModel::getVolScalarFieldIndex(word fieldname, label index) const
 {
     if(index < 0 || index > numRecFields_ - 1)
     {
-        FatalError<<"gerhardsRecModel: Index out of bounds for volScalarField with name "
+        FatalError<<"lruRecModel: Index out of bounds for volScalarField with name "
             << fieldname << abort(FatalError);
     }
 
@@ -44,18 +44,18 @@ inline Foam::label Foam::gerhardsRecModel::getVolScalarFieldIndex(word fieldname
 
     if (fieldI == -1)
     {
-        FatalError<<"gerhardsRecModel: Could not find volScalarField with name "
+        FatalError<<"lruRecModel: Could not find volScalarField with name "
             << fieldname << abort(FatalError);
     }
 
     return fieldI;
 }
 
-inline Foam::label Foam::gerhardsRecModel::getVolVectorFieldIndex(word fieldname, label index) const
+inline Foam::label Foam::lruRecModel::getVolVectorFieldIndex(word fieldname, label index) const
 {
     if(index < 0 || index > numRecFields_ - 1)
     {
-        FatalError<<"gerhardsRecModel: Index out of bounds for volVectorField with name "
+        FatalError<<"lruRecModel: Index out of bounds for volVectorField with name "
             << fieldname << abort(FatalError);
     }
 
@@ -71,18 +71,18 @@ inline Foam::label Foam::gerhardsRecModel::getVolVectorFieldIndex(word fieldname
 
     if (fieldI == -1)
     {
-        FatalError<<"gerhardsRecModel: Could not find volVectorField with name "
+        FatalError<<"lruRecModel: Could not find volVectorField with name "
             << fieldname << abort(FatalError);
     }
 
     return fieldI;
 }
 
-inline Foam::label Foam::gerhardsRecModel::getSurfaceScalarFieldIndex(word fieldname, label index) const
+inline Foam::label Foam::lruRecModel::getSurfaceScalarFieldIndex(word fieldname, label index) const
 {
     if(index < 0 || index > numRecFields_ - 1)
     {
-        FatalError<<"gerhardsRecModel: Index out of bounds for surfaceScalarField with name "
+        FatalError<<"lruRecModel: Index out of bounds for surfaceScalarField with name "
             << fieldname << abort(FatalError);
     }
 
@@ -98,7 +98,7 @@ inline Foam::label Foam::gerhardsRecModel::getSurfaceScalarFieldIndex(word field
 
     if (fieldI == -1)
     {
-        FatalError<<"gerhardsRecModel: Could not find surfaceScalarField with name "
+        FatalError<<"lruRecModel: Could not find surfaceScalarField with name "
             << fieldname << abort(FatalError);
     }
 
