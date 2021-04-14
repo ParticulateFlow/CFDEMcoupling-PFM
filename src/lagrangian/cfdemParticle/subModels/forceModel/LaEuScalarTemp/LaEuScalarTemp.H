@@ -81,11 +81,7 @@ private:
 
     word partTempName_;
 
-    mutable double **partTemp_;                  // Lagrangian array
-
     word partHeatFluxName_;
-
-    mutable double **partHeatFlux_;              // Lagrangian array
 
     scalar lambda_;                              // fluid thermal conductivity [W/(m*K)]
 

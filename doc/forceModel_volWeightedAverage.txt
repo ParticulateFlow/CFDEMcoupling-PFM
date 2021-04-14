@@ -30,6 +30,7 @@ volWeightedAverageProps
     upperThreshold     scalar1;
     lowerThreshold     scalar2;
     verbose;
+    writeToFile        switch1;
 \} :pre
 
 {time} = (optional, default 0.) time to start the averaging :ulb,l
@@ -38,6 +39,7 @@ volWeightedAverageProps
 {scalar1} = only cells with a field value (magnitude) lower than this upper threshold are considered :l
 {scalar2} = only cells with a field value (magnitude) greater than this lower threshold are considered :l
 {verbose} = (optional, default false) keyword only (mostly used for debugging) :l
+{switch1} = (optional, default false) switch for file output :l
 :ule
 
 [Examples:]

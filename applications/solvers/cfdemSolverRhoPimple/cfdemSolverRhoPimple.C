@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
         particleCloud.clockM().start(2,"Coupling");
         bool hasEvolved = particleCloud.evolve(voidfraction,Us,U);
 
-        if(hasEvolved)
+        if(hasEvolved && smoothenForces)
         {
             particleCloud.smoothingM().smoothen(particleCloud.forceM(0).impParticleForces());
         }
@@ -113,7 +113,11 @@ int main(int argc, char *argv[])
 
         particleCloud.clockM().start(26,"Flow");
 
+#if OPENFOAM_VERSION_MAJOR < 6
         if (pimple.nCorrPIMPLE() <= 1)
+#else
+        if (pimple.nCorrPimple() <= 1)
+#endif
         {
             #include "rhoEqn.H"
         }

@@ -1,0 +1,190 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.3.0                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+application     pisoFoam;
+
+startFrom       startTime;
+
+startTime 	0;
+
+stopAt          endTime;
+
+endTime         800.0;
+
+deltaT          0.00025;
+
+writeControl    timeStep;
+
+writeInterval   100000000;
+
+purgeWrite      0;
+
+writeFormat     ascii;
+
+writePrecision  6;
+
+writeCompression off;
+
+timeFormat      general;
+
+timePrecision   6;
+
+runTimeModifiable true;
+
+libs (
+      
+     );
+
+functions
+{
+    fieldAverage1
+    {
+        type            fieldAverage;
+        libs            ("libfieldFunctionObjects.so");
+        writeControl    writeTime;
+
+        fields
+        (
+	    Us
+            {
+                mean        on;
+                prime2Mean  off;
+                base        time;
+                window	    10.0001;
+            }
+	    voidfractionRec
+            {
+                mean        on;
+                prime2Mean  off;
+                base        time;
+                window	    10.0001;
+            }
+            voidfraction
+            {
+                mean        on;
+                prime2Mean  off;
+                base        time;
+                window	    10.0001;
+            }
+	    rhoRec
+            {
+                mean        on;
+                prime2Mean  off;
+                base        time;
+                window	    10.0001;
+            }
+	    phiS
+            {
+                mean        on;
+                prime2Mean  off;
+                base        time;
+                window	    10.0001;
+            }
+	    NuField
+            {
+                mean        on;
+                prime2Mean  off;
+                base        time;
+                window	    10.0001;
+            }
+            addSource
+            {
+                mean        on;
+                prime2Mean  off;
+                base        time;
+                window	    10.0001;
+            }
+            T
+            {
+                mean        on;
+                prime2Mean  off;
+                base        time;
+                window	    10.0001;
+            }
+            particleTemp
+            {
+                mean        on;
+                prime2Mean  off;
+                base        time;
+                window	    10.0001;
+            }
+        );
+    }
+
+
+    fieldOutput
+    {
+        type writeObjects;
+        functionObjectLibs ( "libutilityFunctionObjects.so" );
+        exclusiveWriting     true;
+        objects ("rhoRecMean" "voidfraction" "voidfractionRec" "voidfractionMean" "voidfractionRecMean" "addSourceMean" "phiSMean" "TMean" "T" "particleTemp" "particleTempMean");
+        writeControl timeStep;
+        writeInterval       40000;
+    }
+
+    probes1
+    {
+	type probes;
+
+	functionObjectLibs ("libsampling.so");
+
+	#include "probesDict";
+    }
+
+    weights
+    {
+        // Load the library containing the 'coded' functionObject
+        libs ("libutilityFunctionObjects.so");
+
+        type coded;
+
+        // Name of on-the-fly generated functionObject
+        name weights;
+
+        codeOptions
+        #{
+            -I$(LIB_SRC)/finiteVolume/lnInclude \
+            -I$(LIB_SRC)/meshTools/lnInclude 
+        #};
+
+        codeExecute
+        #{
+            IOdictionary& weightDict(const_cast<IOdictionary&>(mesh().lookupObject<IOdictionary>("weightDict")));
+
+            // assume linear increase of inlet velocity from 0.4 to 0.9 within N seconds
+            scalar rampStart = 300.0;
+            scalar rampDuration = 300.0;
+            scalar currTime = mesh().time().timeOutputValue();
+
+            scalar w0 = 1.0;
+            if(currTime <= rampStart) w0 = 1.0;
+            else w0 = max(1.0 - (currTime-rampStart)/rampDuration,0.0);
+
+            scalarList newWeights(2);
+            newWeights[0] = w0;
+            newWeights[1] = 1-w0;
+/*
+            scalarList newWeights(1);
+            newWeights[0] = 1.0;
+*/
+            weightDict.set("weights",newWeights); 
+        #};
+    }
+
+}
+
+// ************************************************************************* //

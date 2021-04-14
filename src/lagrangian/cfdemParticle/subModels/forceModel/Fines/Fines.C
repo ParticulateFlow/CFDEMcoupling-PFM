@@ -50,6 +50,11 @@ Fines::Fines
     forceModel(dict,sm),
     finesFields_(dict,sm)
 {
+    // safety check: fines should be first force model in list because they correct the voidfraction field
+    if (particleCloud_.forceModels()[0] != "dSauter" || particleCloud_.forceModels()[1] != "Fines")
+    {
+        FatalError <<"Force models dSauter and Fines need to be first in list.\n" << abort(FatalError);
+    }
 }
 
 

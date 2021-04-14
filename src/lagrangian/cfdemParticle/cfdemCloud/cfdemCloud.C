@@ -84,10 +84,12 @@ cfdemCloud::cfdemCloud
     ignore_(couplingProperties_.found("ignore")),
     allowCFDsubTimestep_(true),
     limitDEMForces_(couplingProperties_.found("limitDEMForces")),
+    phaseInForces_(couplingProperties_.found("phaseInForcesTime")),
     getParticleDensities_(couplingProperties_.lookupOrDefault<bool>("getParticleDensities",false)),
     getParticleEffVolFactors_(couplingProperties_.lookupOrDefault<bool>("getParticleEffVolFactors",false)),
     getParticleTypes_(couplingProperties_.lookupOrDefault<bool>("getParticleTypes",false)),
     maxDEMForce_(0.),
+    phaseInForcesTime_(couplingProperties_.lookupOrDefault<scalar>("phaseInForcesTime",0.0)),
     modelType_(couplingProperties_.lookup("modelType")),
     positions_(NULL),
     velocities_(NULL),
@@ -106,6 +108,8 @@ cfdemCloud::cfdemCloud
     particleWeights_(NULL),
     particleVolumes_(NULL),
     particleV_(NULL),
+    particleConvVel_(NULL),
+    particleFlucVel_(NULL),
     numberOfParticles_(0),
     d32_(-1),
     numberOfParticlesChanged_(false),
@@ -156,6 +160,7 @@ cfdemCloud::cfdemCloud
             turbulenceModelType_
         )
     ),
+    particlePropertyTable(32),
     dataExchangeModel_
     (
         dataExchangeModel::New
@@ -366,6 +371,12 @@ cfdemCloud::cfdemCloud
         if (verbose_) Info << "nPatchesNonCyclic=" << nPatchesNonCyclic << ", nPatchesCyclic=" << nPatchesCyclic << endl;
         Warning << "Periodic handing is disabled because the domain is not fully periodic!\n" << endl;
     }
+
+    // check if phasing-in time existing and is meaningful
+    if (phaseInForces_ && phaseInForcesTime_ < SMALL)
+    {
+        FatalError << "phasing-in time too small" << endl;
+    }
 }
 
 // * * * * * * * * * * * * * * * * Destructors  * * * * * * * * * * * * * * //
@@ -387,9 +398,27 @@ cfdemCloud::~cfdemCloud()
     dataExchangeM().destroy(particleWeights_,1);
     dataExchangeM().destroy(particleVolumes_,1);
     dataExchangeM().destroy(particleV_,1);
+    dataExchangeM().destroy(particleConvVel_,3);
+    dataExchangeM().destroy(particleFlucVel_,3);
     if(getParticleDensities_) dataExchangeM().destroy(particleDensities_,1);
     if(getParticleEffVolFactors_) dataExchangeM().destroy(particleEffVolFactors_,1);
     if(getParticleTypes_) dataExchangeM().destroy(particleTypes_,1);
+
+    for
+    (
+        HashTable<particleProperty>::iterator iter = particlePropertyTable.begin();
+        iter != particlePropertyTable.end();
+        ++iter
+    )
+    {
+        if ((*(iter().ti)) == typeid(int**)) {
+            dataExchangeM().destroy(iter().ref<int**>(),-1);
+        } else if ((*(iter().ti)) == typeid(double**)) {
+            dataExchangeM().destroy(iter().ref<double**>(),-1);
+        } else {
+            FatalError << "Trying to destroy property of type " << iter().ti->name() << endl;
+        }
+    }
 }
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
@@ -444,6 +473,8 @@ void cfdemCloud::findCells()
 void cfdemCloud::setForces()
 {
     resetArray(fluidVel_,numberOfParticles(),3);
+    resetArray(particleConvVel_,numberOfParticles(),3);
+    resetArray(particleFlucVel_,numberOfParticles(),3);
     resetArray(impForces_,numberOfParticles(),3);
     resetArray(expForces_,numberOfParticles(),3);
     resetArray(DEMForces_,numberOfParticles(),3);
@@ -461,6 +492,19 @@ void cfdemCloud::setForces()
               for(int i=0;i<3;i++) DEMForces_[index][i] *= maxDEMForce_/F;
         }
         Info << "largest particle-fluid interaction on particle: " << maxF << endl;
+    }
+
+    if (phaseInForces_)
+    {
+        scalar tfrac = (mesh_.time().timeOutputValue()-mesh_.time().startTime().value())/phaseInForcesTime_;
+        if (tfrac <= 1.0)
+        {
+            for (int index = 0;index <  numberOfParticles(); ++index)
+            {
+                for(int i=0;i<3;i++) DEMForces_[index][i] *= tfrac;
+                Cds_[index][0] *= tfrac;
+            }
+        }
     }
 }
 
@@ -523,7 +567,7 @@ void cfdemCloud::checkCG(bool ok)
     if(!ok) cgOK_ = ok;
 }
 
-void cfdemCloud::setPos(double**& pos)
+void cfdemCloud::setPos(const double *const * pos)
 {
     for(int index = 0; index <  numberOfParticles(); ++index)
     {
@@ -554,11 +598,6 @@ vector cfdemCloud::velocity(int index) const
 vector cfdemCloud::expForce(int index) const
 {
     return vector(DEMForces()[index][0],DEMForces()[index][1],DEMForces()[index][2]);
-}
-
-vector cfdemCloud::fluidVel(int index) const
-{
-    return vector(fluidVels()[index][0],fluidVels()[index][1],fluidVels()[index][2]);
 }
 
 const forceModel& cfdemCloud::forceM(int i)
@@ -743,6 +782,8 @@ bool cfdemCloud::reAllocArrays()
         dataExchangeM().allocateArray(velocities_,0.,3);
         dataExchangeM().allocateArray(fluidVel_,0.,3);
         dataExchangeM().allocateArray(fAcc_,0.,3);
+        dataExchangeM().allocateArray(particleConvVel_,0.,3);
+        dataExchangeM().allocateArray(particleFlucVel_,0.,3);
         dataExchangeM().allocateArray(impForces_,0.,3);
         dataExchangeM().allocateArray(expForces_,0.,3);
         dataExchangeM().allocateArray(DEMForces_,0.,3);
@@ -756,9 +797,60 @@ bool cfdemCloud::reAllocArrays()
         if(getParticleDensities_) dataExchangeM().allocateArray(particleDensities_,0.,1);
         if(getParticleEffVolFactors_) dataExchangeM().allocateArray(particleEffVolFactors_,0.,1);
         if(getParticleTypes_) dataExchangeM().allocateArray(particleTypes_,0,1);
+
+        for
+        (
+            HashTable<particleProperty>::iterator iter = particlePropertyTable.begin();
+            iter != particlePropertyTable.end();
+            ++iter
+        )
+        {
+            if (iter().size > 0) {
+                ///Info << "!! about to realloc property of type " << iter().ti->name() << endl;
+                if ((*(iter().ti)) == typeid(int**)) {
+                    dataExchangeM().allocateArray(iter().ref<int**>(),iter().initVal,iter().size);
+                } else if ((*(iter().ti)) == typeid(double**)) {
+                    dataExchangeM().allocateArray(iter().ref<double**>(),iter().initVal,iter().size);
+                } else {
+                    FatalError << "Trying to realloc property of type " << iter().ti->name() << endl;
+                }
+            }
+        }
+
         arraysReallocated_ = true;
         return true;
     }
+    else
+    {
+        for
+        (
+            HashTable<particleProperty>::iterator iter = particlePropertyTable.begin();
+            iter != particlePropertyTable.end();
+            ++iter
+        )
+        {
+            if (iter().size > 0 && iter().reset) {
+                if ((*(iter().ti)) == typeid(int**)) {
+                    int**& property = iter().ref<int**>();
+                    for (int index=0; index<numberOfParticles(); ++index) {
+                        for (int icomponent=0; icomponent<iter().size; ++icomponent) {
+                            property[index][icomponent] = iter().initVal;
+                        }
+                    }
+                } else if ((*(iter().ti)) == typeid(double**)) {
+                    double**& property = iter().ref<double**>();
+                    for (int index=0; index<numberOfParticles(); ++index) {
+                        for (int icomponent=0; icomponent<iter().size; ++icomponent) {
+                            property[index][icomponent] = iter().initVal;
+                        }
+                    }
+                } else {
+                    FatalError << "Trying to reset property of type " << iter().ti->name() << endl;
+                }
+            }
+        }
+    }
+
     return false;
 }
 

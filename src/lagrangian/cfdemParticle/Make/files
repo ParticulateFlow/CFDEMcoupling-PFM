@@ -1,5 +1,6 @@
 cfdemCloud = cfdemCloud
 cfdTools = cfdTools
+recModels = subModels/recModel
 energyModels = subModels/energyModel
 forceModels = subModels/forceModel
 forceSubModels = subModels/forceModel/forceSubModels
@@ -40,7 +41,8 @@ $(chemistryModels)/reactantPerParticle/reactantPerParticle.C
 $(energyModels)/energyModel/energyModel.C
 $(energyModels)/energyModel/newEnergyModel.C
 $(energyModels)/heatTransferGunn/heatTransferGunn.C
-$(energyModels)/heatTransferGunnPartField/heatTransferGunnPartField.C
+$(energyModels)/heatTransferRanzMarshall/heatTransferRanzMarshall.C
+$(energyModels)/heatTransferGranConduction/heatTransferGranConduction.C
 $(energyModels)/reactionHeat/reactionHeat.C
 
 $(thermCondModels)/thermCondModel/thermCondModel.C
@@ -71,6 +73,12 @@ $(forceModels)/MeiLift/MeiLift.C
 $(forceModels)/particleCellVolume/particleCellVolume.C
 $(forceModels)/fieldTimeAverage/fieldTimeAverage.C
 $(forceModels)/volWeightedAverage/volWeightedAverage.C
+$(forceModels)/deactivateForce/deactivateForce.C
+$(forceModels)/freeStreaming/freeStreaming.C
+$(forceModels)/isotropicFluctuations/isotropicFluctuations.C
+$(forceModels)/evaluateFluctuations/evaluateFluctuations.C
+$(forceModels)/directedDiffusiveRelaxation/directedDiffusiveRelaxation.C
+$(forceModels)/potentialRelaxation/potentialRelaxation.C
 $(forceModels)/BeetstraDrag/BeetstraDrag.C
 $(forceModels)/BeetstraDragPoly/BeetstraDragPoly.C
 $(forceModels)/dSauter/dSauter.C
@@ -82,6 +90,8 @@ $(forceModels)/granKineticEnergy/granKineticEnergy.C
 $(forceModels)/pdCorrelation/pdCorrelation.C
 $(forceModels)/surfaceTensionForce/surfaceTensionForce.C
 $(forceModels)/gradPForceSmooth/gradPForceSmooth.C
+$(forceModels)/particleDeformation/particleDeformation.C
+$(forceModels)/turbulentDispersion/turbulentDispersion.C
 
 $(forceModelsMS)/forceModelMS/forceModelMS.C
 $(forceModelsMS)/forceModelMS/newForceModelMS.C
@@ -119,6 +129,7 @@ $(voidFractionModels)/dividedVoidFractionMS/dividedVoidFractionMS.C
 $(voidFractionModels)/bigParticleVoidFraction/bigParticleVoidFraction.C
 $(voidFractionModels)/GaussVoidFraction/GaussVoidFraction.C
 $(voidFractionModels)/IBVoidFraction/IBVoidFraction.C
+$(voidFractionModels)/noVoidFraction/noVoidFraction.C
 $(voidFractionModels)/trilinearVoidFraction/trilinearVoidFraction.C
 
 $(locateModels)/locateModel/locateModel.C
@@ -138,6 +149,7 @@ $(momCoupleModels)/momCoupleModel/newMomCoupleModel.C
 $(momCoupleModels)/explicitCouple/explicitCouple.C
 $(momCoupleModels)/implicitCouple/implicitCouple.C
 $(momCoupleModels)/noCouple/noCouple.C
+$(momCoupleModels)/deactivateCouple/deactivateCouple.C
 
 $(regionModels)/regionModel/regionModel.C
 $(regionModels)/regionModel/newRegionModel.C
@@ -156,6 +168,7 @@ $(averagingModels)/averagingModel/averagingModel.C
 $(averagingModels)/averagingModel/newAveragingModel.C
 $(averagingModels)/dilute/dilute.C
 $(averagingModels)/dense/dense.C
+$(averagingModels)/noAveraging/noAveraging.C
 
 $(clockModels)/clockModel/clockModel.C
 $(clockModels)/clockModel/newClockModel.C

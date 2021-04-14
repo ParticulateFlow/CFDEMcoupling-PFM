@@ -56,27 +56,21 @@ private:
 
     const fvMesh& mesh_;
 
-    word velFieldName_;
+    const word velFieldName_;
 
     const volVectorField& U_;
 
-    word voidfractionFieldName_;
+    const word voidfractionFieldName_;
 
     const volScalarField& voidfraction_;
 
-    word densityFieldName_;
+    const word densityFieldName_;
 
     const volScalarField& rho_;
 
-    word partNuName_;
+    const word partNuName_;
 
-    mutable double **partNu_;
-
-    word partReynolds_;
-
-    mutable double **partRe_;
-
-    void allocateMyArrays() const;
+    const word partReName_;
 
     mutable scalar scaleDia_;
 
@@ -100,8 +94,6 @@ public:
 
     // Member Functions
         void execute();
-
-        void reAllocMyArrays() const;
 
 };
 

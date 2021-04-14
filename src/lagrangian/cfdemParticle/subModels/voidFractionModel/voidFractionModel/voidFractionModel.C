@@ -84,21 +84,62 @@ voidFractionModel::voidFractionModel
         /*sm.mesh(),
         dimensionedScalar("zero", dimensionSet(0,0,0,0,0), 1)*/
     ),
-    cellsPerParticle_(NULL),
+    partCellsRegName_("cellsPerParticle"),
     maxCellsPerParticle_(1),
     weight_(1.),
     porosity_(1.)
 {
-    particleCloud_.dataExchangeM().allocateArray(cellsPerParticle_,1,1);
+    particleCloud_.registerParticleProperty<int**>(partCellsRegName_,1,1.0,false);
     if (particleCloud_.getParticleEffVolFactors()) multiWeights_ = true;
 }
 
+
+// Construct from components, specifiy initial value of fields
+voidFractionModel::voidFractionModel
+(
+    const dictionary& dict,
+    cfdemCloud& sm,
+    const scalar initVoidfraction
+)
+:
+    dict_(dict),
+    particleCloud_(sm),
+    voidfractionPrev_
+    (   IOobject
+        (
+            "voidfractionPrev",
+            sm.mesh().time().timeName(),
+            sm.mesh(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        sm.mesh(),
+        dimensionedScalar("zero", dimensionSet(0,0,0,0,0), initVoidfraction)
+    ),
+    voidfractionNext_
+    (   IOobject
+        (
+            "voidfractionNext",
+            sm.mesh().time().timeName(),
+            sm.mesh(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        sm.mesh(),
+        dimensionedScalar("zero", dimensionSet(0,0,0,0,0), initVoidfraction)
+    ),
+    partCellsRegName_("cellsPerParticle"),
+    maxCellsPerParticle_(1),
+    weight_(1.),
+    porosity_(1.)
+{
+    particleCloud_.registerParticleProperty<int**>(partCellsRegName_,1,1.0,false);
+}
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 voidFractionModel::~voidFractionModel()
 {
-    particleCloud_.dataExchangeM().destroy(cellsPerParticle_,1);
 }
 
 // * * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * * //
@@ -120,30 +161,12 @@ void voidFractionModel::resetVoidFractions()
 
 int** const& voidFractionModel::cellsPerParticle() const
 {
-    return cellsPerParticle_;
+    return particleCloud_.getParticlePropertyRef<int**>(partCellsRegName_);
 }
 
 int voidFractionModel::maxCellsPerParticle() const
 {
     return maxCellsPerParticle_;
-}
-
-void voidFractionModel::reAllocArrays()
-{
-    if(particleCloud_.numberOfParticlesChanged())
-    {
-        // get arrays of new length
-        particleCloud_.dataExchangeM().allocateArray(cellsPerParticle_,1,1);
-    }
-}
-
-void voidFractionModel::reAllocArrays(int nP)
-{
-    if(particleCloud_.numberOfParticlesChanged())
-    {
-        // get arrays of new length
-        particleCloud_.dataExchangeM().allocateArray(cellsPerParticle_,1,1,nP);
-    }
 }
 
 scalar voidFractionModel::pointInParticle(int index, const vector& positionCenter, const vector& point, double scale) const

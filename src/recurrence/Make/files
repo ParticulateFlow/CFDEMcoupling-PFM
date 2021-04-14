@@ -1,0 +1,26 @@
+recBase/recBase.C
+recModel/recModel/recModel.C
+recModel/recModel/newRecModel.C
+recModel/standardRecModel/standardRecModel.C
+recNorm/recNorm/recNorm.C
+recNorm/recNorm/newRecNorm.C
+recNorm/diffNorm/diffNorm.C
+recNorm/absDiffNorm/absDiffNorm.C
+recNorm/EuclideanNorm/EuclideanNorm.C
+recNorm/maxNorm/maxNorm.C
+recNorm/readNorm/readNorm.C
+recNorm/sqrDiffNorm/sqrDiffNorm.C
+recNorm/noRecNorm/noRecNorm.C
+recPath/recPath/recPath.C
+recPath/simpleRandomPath/simpleRandomPath.C
+recPath/recPath/newRecPath.C
+recPath/noPath/noPath.C
+recPath/MarkovPath/MarkovPath.C
+recPath/predefinedPath/predefinedPath.C
+recStatAnalysis/recStatAnalysis/recStatAnalysis.C
+recStatAnalysis/recStatAnalysis/newRecStatAnalysis.C
+recStatAnalysis/noRecStatAnalysis/noRecStatAnalysis.C
+recStatAnalysis/standardRecStatAnalysis/standardRecStatAnalysis.C
+recStatAnalysis/autocorrelation/autocorrelation.C
+
+LIB = $(CFDEM_LIB_DIR)/librecurrence

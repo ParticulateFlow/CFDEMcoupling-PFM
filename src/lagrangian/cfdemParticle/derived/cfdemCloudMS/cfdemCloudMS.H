@@ -95,7 +95,6 @@ private:
 // Private member functions
     void getDEMdata();
     void giveDEMdata();
-    void setNumberOfParticles(int);
     void findCells();
     void setForces();
     void setParticleForceField();
@@ -117,6 +116,8 @@ public:
 
     // Member Functions
       // Access
+       void setNumberOfParticles(int);
+
        inline label body(int) const;
 
        inline double particleVolume(int) const;

@@ -1,0 +1,80 @@
+/*---------------------------------------------------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.4                                   |
+|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+
+    root            "";
+    case            "";
+    instance        "";
+    local           "";
+
+    class           dictionary;
+    object          recProperties;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+//===========================================================================//
+// sub-models & settings
+
+
+recModel standardRecModel;
+
+//verbose true;
+
+recNorm sqrDiffNorm;
+
+recPath simpleRandomPath;
+
+//recStatAnalysis off;//standardRecStatAnalysis;
+
+volScalarFields
+(
+    alpha.air
+);
+
+volVectorFields
+(
+    U.water
+);
+
+surfaceScalarFields
+(
+);
+
+
+
+
+//===========================================================================//
+// sub-model properties
+
+standardRecModelProps
+{
+    dataBase    ".";
+}
+
+sqrDiffNormProps
+{
+  normConstant -1.0;
+  fieldType "volScalarField";
+  fieldName "alpha.air";
+}
+
+simpleRandomPathProps
+{
+}
+
+noRecStatAnalysis
+{
+}
+
+// ************************************************************************* //

@@ -45,33 +45,19 @@ Contributing authors
 #ifndef twoWayOne2One_H
 #define twoWayOne2One_H
 
+#include <mpi.h>
+
 #include "dataExchangeModel.H"
-#include "liggghtsCommandModel.H"
-#include "OFstream.H"
-#include <sys/stat.h>
-#include "pair.h"
-#include "force.h"
-#include "forceModel.H"
 #include "one2one.H"
 
-#include "meshSearch.H"
+#include <treeBoundBox.H>
 
 //=================================//
 //LAMMPS/LIGGGHTS
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <mpi.h>
-#include <lammps.h>         // these are LAMMPS include files
-#include <input.h>
-#include <atom.h>
-#include <memory.h>
-#include <library.h>
-#include <library_cfd_coupling.h>
-#include <update.h>
-#include <comm.h>
-#include <fix.h>
-#include <fix_property_atom.h>
+#include <lammps.h>          // these are LAMMPS include files
+#include <pair.h>
+#include <force.h>
+#include <fix_property_atom.h> /// needed
 //=================================//
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -115,9 +101,13 @@ private:
 
     Switch    staticProcMap_;
     Switch    cellIdComm_;
+    double*   prev_cell_ids_;
+    double**  dbl_cell_ids_;
     LAMMPS_NS::FixPropertyAtom* my_prev_cell_ids_fix_;
 
-    treeBoundBox       thisFoamBox_;
+    const scalar      boundBoxMargin_;
+
+    treeBoundBox      thisFoamBox_;
 
     Switch            verbose_;
 
@@ -162,24 +152,24 @@ public:
     // Member Functions
         void getData
         (
-            word name,
-            word type,
+            const word& name,
+            const word& type,
             double ** const& field,
             label step
         ) const;
 
         void getData
         (
-            word name,
-            word type,
+            const word& name,
+            const word& type,
             int ** const& field,
             label step
         ) const;
 
         void giveData
         (
-            word name,
-            word type,
+            const word& name,
+            const word& type,
             double ** const& field,
             const char* datatype
         ) const;
@@ -217,6 +207,8 @@ public:
         void extractCollected(T*&, T*&, int width=1) const;
         template <typename T>
         void extractCollected(T*&, T**&, int width=1) const;
+
+        int getNumberOfParticles() const;
 
         scalar getCG() const { return lmp->force->cg(); }
 };

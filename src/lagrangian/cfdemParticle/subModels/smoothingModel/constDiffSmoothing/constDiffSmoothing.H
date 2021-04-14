@@ -60,11 +60,25 @@ class constDiffSmoothing
 private:
 
     dictionary propsDict_;
+
     const scalar lowerLimit_;
+
     const scalar upperLimit_;
-    const dimensionedScalar smoothingLength_;
-    dimensionedScalar smoothingLengthReferenceField_;
-    mutable dimensionedScalar DT_;
+
+    const scalar smoothingLength_;
+
+    const scalar smoothingLengthReference_;
+
+    word smoothingLengthFieldName_;
+
+    mutable volScalarField smoothingLengthField_;
+
+    word smoothingLengthReferenceFieldName_;
+
+    mutable volScalarField smoothingLengthReferenceField_;
+
+    mutable volScalarField DT_;
+
     const bool verbose_;
 
 public:

@@ -18,7 +18,7 @@ SourceFiles
     pdCorrelation.C
 
 Contributing Author
-    2018    Paul Kieckhefen, TUHH 
+    2018    Paul Kieckhefen, TUHH
 \*---------------------------------------------------------------------------*/
 
 #include "error.H"
@@ -55,11 +55,11 @@ pdCorrelation::pdCorrelation
 :
     forceModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
-    d_(nullptr),
-    p_(nullptr),
-    d2_(nullptr),
-    pd_(nullptr),
-    cg3_(nullptr),
+    dRegName_(typeName + "d"),
+    pRegName_(typeName + "p"),
+    d2RegName_(typeName + "d2"),
+    pdRegName_(typeName + "pd"),
+    cg3RegName_(typeName + "cg3"),
     dField_
     (   IOobject
         (
@@ -122,14 +122,6 @@ pdCorrelation::pdCorrelation
         sm.mesh(),
         dimensionedScalar("zero", dimless, 0)
     ),
-    typeCG_
-    (
-        propsDict_.lookupOrDefault
-        (
-            "coarseGrainingFactors",
-            scalarList(1, sm.cg())
-        )
-    ),
     particleDensities_
     (
         propsDict_.lookupOrDefault
@@ -138,6 +130,15 @@ pdCorrelation::pdCorrelation
             scalarList(1, -1.)
         )
     ),
+    typeCG_
+    (
+        propsDict_.lookupOrDefault
+        (
+            "coarseGrainingFactors",
+            scalarList(1, sm.cg())
+        )
+    ),
+    maxTypeCG_(typeCG_.size()),
     constantCG_(typeCG_.size() < 2),
     CG_(!constantCG_ || typeCG_[0] > 1. + SMALL),
     runOnWriteOnly_(propsDict_.lookupOrDefault("runOnWriteOnly", false))
@@ -150,7 +151,11 @@ pdCorrelation::pdCorrelation
                   << abort(FatalError);
     }
 
-    allocateMyArrays();
+    particleCloud_.registerParticleProperty<double**>(dRegName_,1);
+    particleCloud_.registerParticleProperty<double**>(pRegName_,3);
+    particleCloud_.registerParticleProperty<double**>(d2RegName_,1);
+    particleCloud_.registerParticleProperty<double**>(pdRegName_,3);
+    particleCloud_.registerParticleProperty<double**>(cg3RegName_,1);
 
     dField_.write();
     pdField_.write();
@@ -164,24 +169,9 @@ pdCorrelation::pdCorrelation
 
 pdCorrelation::~pdCorrelation()
 {
-    particleCloud_.dataExchangeM().destroy(cg3_, 1);
-    particleCloud_.dataExchangeM().destroy(d_,  1);
-    particleCloud_.dataExchangeM().destroy(p_,  3);
-    particleCloud_.dataExchangeM().destroy(d2_, 1);
-    particleCloud_.dataExchangeM().destroy(pd_, 3);
 }
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
-void pdCorrelation::allocateMyArrays() const
-{
-    // get memory for 2d arrays
-    double initVal = 0.0;
-    particleCloud_.dataExchangeM().allocateArray(d_,  initVal, 1);
-    particleCloud_.dataExchangeM().allocateArray(p_,  initVal, 3);
-    particleCloud_.dataExchangeM().allocateArray(d2_, initVal, 1);
-    particleCloud_.dataExchangeM().allocateArray(pd_, initVal, 3);
-    particleCloud_.dataExchangeM().allocateArray(cg3_, initVal, 1);
-}
 // * * * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * * //
 
 void pdCorrelation::setForce() const
@@ -190,7 +180,11 @@ void pdCorrelation::setForce() const
 
     if (runOnWriteOnly_ && !mesh.write()) return; // skip if it's not write time
 
-    allocateMyArrays();
+    double**& d_ = particleCloud_.getParticlePropertyRef<double**>(dRegName_);
+    double**& p_ = particleCloud_.getParticlePropertyRef<double**>(pRegName_);
+    double**& d2_ = particleCloud_.getParticlePropertyRef<double**>(d2RegName_);
+    double**& pd_ = particleCloud_.getParticlePropertyRef<double**>(pdRegName_);
+    double**& cg3_ = particleCloud_.getParticlePropertyRef<double**>(cg3RegName_);
 
     const Switch densityFromList
     (
@@ -222,6 +216,10 @@ void pdCorrelation::setForce() const
             typei = particleCloud_.particleTypes()[pi][0] - 1;
             rhop  = densityFromList ? particleDensities_[typei]
                                     : particleCloud_.particleDensity(pi);
+            if (!constantCG_ && typei >= maxTypeCG_)
+            {
+                FatalError<< "Too few coarse-graining factors provided." << abort(FatalError);
+            }
             cg    = constantCG_     ? typeCG_[0] : typeCG_[typei];
         }
 

@@ -145,7 +145,8 @@ functions
 
     globalMassFrac
     {
-        type            volRegion;
+        //type            volRegion; // OF4
+        type            volFieldValue; // OF5,OF6
         libs ("libfieldFunctionObjects.so");
         writeControl    timeStep;//outputTime;
         writeInterval   1;
@@ -167,7 +168,8 @@ functions
 
     globalMass
     {
-        type            volRegion;
+        //type            volRegion; // OF4
+        type            volFieldValue; // OF5,OF6
         libs ("libfieldFunctionObjects.so");
         writeControl   timeStep;//outputTime;
         writeInterval   1;
@@ -185,7 +187,8 @@ functions
 
     inflow_GasSpecies
     {
-        type            surfaceRegion;
+        //type            surfaceRegion; // OF4
+        type            surfaceFieldValue; // OF5,OF6
         libs ("libfieldFunctionObjects.so");
         writeControl    timeStep;
         writeInterval   100;
@@ -208,7 +211,8 @@ functions
 
     inflow_phi
     {
-        type            surfaceRegion;
+        //type            surfaceRegion; // OF4
+        type            surfaceFieldValue; // OF5,OF6
         libs ("libfieldFunctionObjects.so");
         writeControl   timeStep;
         writeInterval   100;
@@ -227,7 +231,8 @@ functions
 
     inflow_U
     {
-        type            surfaceRegion;
+        //type            surfaceRegion; // OF4
+        type            surfaceFieldValue; // OF5,OF6
         libs ("libfieldFunctionObjects.so");
         writeControl    timeStep;
         writeInterval   100;

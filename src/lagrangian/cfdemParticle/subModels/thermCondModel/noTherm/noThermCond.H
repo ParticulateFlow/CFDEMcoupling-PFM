@@ -76,9 +76,6 @@ public:
 
         ~noThermCond();
 
-    // Member Functions
-        tmp<volScalarField> thermCond() const;
-        tmp<volScalarField> thermDiff() const;
 };
 
 
