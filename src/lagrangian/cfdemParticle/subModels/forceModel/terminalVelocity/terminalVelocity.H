@@ -28,6 +28,8 @@ License
 #include "forceModel.H"
 #include "interpolationCellPoint.H"
 #include "cellSet.H"
+#include "recBase.H"
+#include "recModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -58,7 +60,17 @@ private:
 
     word turbDissipationRateFieldName_;
 
+    word turbKineticEnergyFieldName_;
+
+    word recurrenceBaseName_;
+
+    volScalarField* turbKineticEnergy_;
+
     volScalarField* turbDissipationRate_;
+
+    mutable volScalarField delta;
+
+    mutable volScalarField wallIndicatorField_;
 
     bool existturbDissipationRateInObjReg_;
 
@@ -73,6 +85,10 @@ private:
     int risingVelDir_;
 
     bool ignoreCell(label) const;
+
+    void updateEpsilon() const;
+
+    recBase* recurrenceBase_;
 
 public:
 
