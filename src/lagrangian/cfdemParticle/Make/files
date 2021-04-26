@@ -93,6 +93,7 @@ $(forceModels)/gradPForceSmooth/gradPForceSmooth.C
 $(forceModels)/particleDeformation/particleDeformation.C
 $(forceModels)/turbulentDispersion/turbulentDispersion.C
 $(forceModels)/terminalVelocity/terminalVelocity.C
+$(forceModels)/turbulentVelocityFluctuations/turbulentVelocityFluctuations.C
 
 $(forceModelsMS)/forceModelMS/forceModelMS.C
 $(forceModelsMS)/forceModelMS/newForceModelMS.C
@@ -109,6 +110,7 @@ $(otherForceModels)/otherForceModel/newOtherForceModel.C
 $(otherForceModels)/gravity/gravity.C
 $(otherForceModels)/weightSecondaryPhase/weightSecondaryPhase.C
 $(otherForceModels)/expParticleForces/expParticleForces.C
+$(otherForceModels)/secondaryPhaseInducedBuoyancy/secondaryPhaseInducedBuoyancy.C
 
 $(probeModels)/probeModel/probeModel.C
 $(probeModels)/probeModel/newProbeModel.C

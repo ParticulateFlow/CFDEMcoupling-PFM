@@ -22,8 +22,8 @@ License
     along with CFDEMcoupling academic.  If not, see <http://www.gnu.org/licenses/>.
 \*---------------------------------------------------------------------------*/
 
-#ifndef turbulentDispersion_H
-#define turbulentDispersion_H
+#ifndef turbulentVelocityFluctuations_H
+#define turbulentVelocityFluctuations_H
 
 #include "forceModel.H"
 #include "interpolationCellPoint.H"
@@ -37,10 +37,10 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class turbulentDispersion Declaration
+                           Class turbulentVelocityFluctuations Declaration
 \*---------------------------------------------------------------------------*/
 
-class turbulentDispersion
+class turbulentVelocityFluctuations
 :
     public forceModel
 {
@@ -60,9 +60,13 @@ protected:
 
     mutable volScalarField wallIndicatorField_;
 
-    scalar dt_;
+    scalar minTurbKineticEnergy_;
 
-    scalar turbulentSchmidtNumber_;
+    word turbKineticEnergyFieldName_;
+
+    volScalarField* turbKineticEnergy_;
+
+    bool existTurbKineticEnergyInObjReg_;
 
     word voidfractionFieldName_;
 
@@ -79,22 +83,22 @@ protected:
 public:
 
     //- Runtime type information
-    TypeName("turbulentDispersion");
+    TypeName("turbulentVelocityFluctuations");
 
 
     // Constructors
 
         //- Construct from components
-        turbulentDispersion
+        turbulentVelocityFluctuations
         (
             const dictionary& dict,
             cfdemCloud& sm,
-            word type = "turbulentDispersion"
+            word type = "turbulentVelocityFluctuations"
         );
 
     // Destructor
 
-        ~turbulentDispersion();
+        ~turbulentVelocityFluctuations();
 
 
     // Member Functions

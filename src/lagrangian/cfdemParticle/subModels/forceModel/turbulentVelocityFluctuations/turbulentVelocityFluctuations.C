@@ -24,7 +24,7 @@ License
 
 #include "error.H"
 
-#include "turbulentDispersion.H"
+#include "turbulentVelocityFluctuations.H"
 #include "addToRunTimeSelectionTable.H"
 #include "OFstream.H"
 
@@ -35,12 +35,12 @@ namespace Foam
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-defineTypeNameAndDebug(turbulentDispersion, 0);
+defineTypeNameAndDebug(turbulentVelocityFluctuations, 0);
 
 addToRunTimeSelectionTable
 (
     forceModel,
-    turbulentDispersion,
+    turbulentVelocityFluctuations,
     dictionary
 );
 
@@ -48,7 +48,7 @@ addToRunTimeSelectionTable
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 // Construct from components
-turbulentDispersion::turbulentDispersion
+turbulentVelocityFluctuations::turbulentVelocityFluctuations
 (
     const dictionary& dict,
     cfdemCloud& sm,
@@ -74,7 +74,10 @@ turbulentDispersion::turbulentDispersion
         sm.mesh(),
         dimensionedScalar("zero", dimensionSet(0,0,0,0,0,0,0), 0.0)
     ),
-    turbulentSchmidtNumber_(readScalar(propsDict_.lookup("turbulentSchmidtNumber"))),
+    minTurbKineticEnergy_(propsDict_.lookupOrDefault<scalar>("minTurbKineticEnergy", 0.0)),
+    turbKineticEnergyFieldName_(propsDict_.lookupOrDefault<word>("turbKineticEnergyFieldName","")),
+    turbKineticEnergy_(NULL),
+    existTurbKineticEnergyInObjReg_(false),
     voidfractionFieldName_(propsDict_.lookupOrDefault<word>("voidfractionFieldName","voidfraction")),
     voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
     critVoidfraction_(propsDict_.lookupOrDefault<scalar>("critVoidfraction", 0.9)),
@@ -102,22 +105,49 @@ turbulentDispersion::turbulentDispersion
          }
      }
 
-    scalar dtCFD = voidfraction_.mesh().time().deltaTValue();
-    scalar dtDEM = particleCloud_.dataExchangeM().DEMts();
-    // if CFD step is larger than DEM step, a corresponding number of DEM steps is taken to reach the CFD step;
-    // if DEM step is larger than CFD step, no update occurs so that full DEM step needs to be taken
-    dt_ = max(dtCFD, dtDEM);
+    if (turbKineticEnergyFieldName_ != "")
+    {
+        existTurbKineticEnergyInObjReg_ = true;
+        volScalarField& k(const_cast<volScalarField&>(sm.mesh().lookupObject<volScalarField> (turbKineticEnergyFieldName_)));
+        turbKineticEnergy_ = &k;
+    }
+    else
+    {
+        turbKineticEnergy_ = new volScalarField
+        (
+            IOobject
+            (
+                "turbKinEnergy",
+                mesh_.time().timeName(),
+                mesh_,
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+            ),
+            mesh_,
+            dimensionedScalar("zero", dimensionSet(0,2,-2,0,0), 0)
+        );
+    }
+
+    // make sure this is the last force model in list so that fluid velocity does not get overwritten
+    label numLastForceModel = sm.nrForceModels();
+    word lastForceModel = sm.forceModels()[numLastForceModel-1];
+    if (lastForceModel != "turbulentVelocityFluctuations")
+    {
+        FatalError <<"Force model 'turbulentVelocityFluctuations' needs to be last in list!\n" << abort(FatalError);
+    }
 }
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-turbulentDispersion::~turbulentDispersion()
-{}
+turbulentVelocityFluctuations::~turbulentVelocityFluctuations()
+{
+    if (!existTurbKineticEnergyInObjReg_) delete turbKineticEnergy_;
+}
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
 
-bool turbulentDispersion::ignoreCell(label cell) const
+bool turbulentVelocityFluctuations::ignoreCell(label cell) const
 {
     if (!existIgnoreCells_) return false;
     else return ignoreCells_()[cell];
@@ -125,21 +155,24 @@ bool turbulentDispersion::ignoreCell(label cell) const
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void turbulentDispersion::setForce() const
+void turbulentVelocityFluctuations::setForce() const
 {
-    volScalarField nut = particleCloud_.turbulence().nut()();
+    if (!existTurbKineticEnergyInObjReg_)
+    {
+        *turbKineticEnergy_ = particleCloud_.turbulence().k()();
+    }
 
     label cellI = -1;
     label patchID = -1;
     label faceIGlobal = -1;
     scalar flucProjection = 0.0;
-    scalar D = 0.0;
+    scalar k = 0.0;
     vector faceINormal = vector::zero;
     vector flucU = vector::zero;
     vector position = vector::zero;
     word patchName("");
 
-    interpolationCellPoint<scalar> nutInterpolator_(nut);
+    interpolationCellPoint<scalar> turbKineticEnergyInterpolator_(*turbKineticEnergy_);
 
     for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
     {
@@ -153,14 +186,16 @@ void turbulentDispersion::setForce() const
                 if (interpolate_)
                 {
                     position = particleCloud_.position(index);
-                    D = nutInterpolator_.interpolate(position,cellI) / turbulentSchmidtNumber_;
+                    k = turbKineticEnergyInterpolator_.interpolate(position,cellI);
                 }
                 else
                 {
-                    D = nut[cellI] / turbulentSchmidtNumber_;
+                    k = (*turbKineticEnergy_)[cellI];
                 }
 
-                flucU=unitFlucDir()*Foam::sqrt(6.0*D/dt_);
+                if (k < minTurbKineticEnergy_) k = minTurbKineticEnergy_;
+
+                flucU=unitFlucDir()*Foam::sqrt(2.0*k);
 
                 // prevent particles being pushed through walls by regulating velocity fluctuations
                 // check if cell is adjacent to wall and remove corresponding components
@@ -185,14 +220,14 @@ void turbulentDispersion::setForce() const
 
                 for(int j=0;j<3;j++)
                 {
-                    particleCloud_.particleFlucVels()[index][j] += flucU[j];
+                    particleCloud_.fluidVels()[index][j] += flucU[j];
                 }
             }
         }
     }
 }
 
-vector turbulentDispersion::unitFlucDir() const
+vector turbulentVelocityFluctuations::unitFlucDir() const
 {
     // unit random vector
     // algorithm according to:
