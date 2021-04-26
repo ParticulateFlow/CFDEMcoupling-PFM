@@ -46,6 +46,8 @@ class recStatAnalysis;
 \*---------------------------------------------------------------------------*/
 
 class recBase
+ :
+  public regIOobject
 {
 
 protected:
@@ -64,6 +66,7 @@ protected:
 
     // in case of substepping: couple passive quantity at this substep
     label couplingSubStep_;
+
 
 public:
 
@@ -98,6 +101,12 @@ public:
     void updateRecFields();
 
     label couplingSubStep() const;
+
+   // Dummy function for regIOobject
+    bool writeData(Ostream&) const
+    {
+        return true;
+    }
 
 };
 

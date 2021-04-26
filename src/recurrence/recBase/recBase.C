@@ -37,6 +37,18 @@ recBase::recBase
     const fvMesh& mesh
 )
 :
+  regIOobject
+  (
+      IOobject
+      (
+          "recurrenceBase",
+          mesh.time().timeName(),
+          mesh,
+          IOobject::NO_READ,
+          IOobject::NO_WRITE,
+          true
+      )
+  ),
     mesh_(mesh),
     recProperties_
     (
@@ -83,6 +95,7 @@ recBase::recBase
     ),
     couplingSubStep_(recProperties_.lookupOrDefault<label>("couplingSubStep",0))
 {
+
     recModel_        ->  readFieldSeries();
     if (!recStatAnalysis_->suppressMatrixAndPath())
     {
@@ -103,6 +116,18 @@ recBase::recBase
     const fvMesh& mesh,const word recDictName_
 )
 :
+     regIOobject
+  (
+      IOobject
+      (
+          "recurrenceBase",
+          mesh.time().timeName(),
+          mesh,
+          IOobject::NO_READ,
+          IOobject::NO_WRITE,
+          true
+      )
+  ),
     mesh_(mesh),
     recProperties_
     (
@@ -158,6 +183,8 @@ recBase::recBase
   recModel_        ->  writeRecMatrix();
   recModel_        ->  writeRecPath();
 }
+
+
 
 // * * * * * * * * * * * * * * * * Destructors  * * * * * * * * * * * * * * //
 recBase::~recBase()
