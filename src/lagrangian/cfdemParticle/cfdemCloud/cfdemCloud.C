@@ -88,6 +88,8 @@ cfdemCloud::cfdemCloud
     getParticleDensities_(couplingProperties_.lookupOrDefault<bool>("getParticleDensities",false)),
     getParticleEffVolFactors_(couplingProperties_.lookupOrDefault<bool>("getParticleEffVolFactors",false)),
     getParticleTypes_(couplingProperties_.lookupOrDefault<bool>("getParticleTypes",false)),
+    streamingMode_(couplingProperties_.lookupOrDefault<bool>("streamingMode",false)),
+    streamingFluc_(couplingProperties_.lookupOrDefault<bool>("streamingFluc",false)),
     maxDEMForce_(0.),
     phaseInForcesTime_(couplingProperties_.lookupOrDefault<scalar>("phaseInForcesTime",0.0)),
     modelType_(couplingProperties_.lookup("modelType")),
@@ -438,15 +440,26 @@ void cfdemCloud::getDEMdata()
 
 void cfdemCloud::giveDEMdata()
 {
-    if(forceM(0).coupleForce())
+    if (forceM(0).coupleForce())
     {
-        dataExchangeM().giveData("dragforce","vector-atom",DEMForces_);
-
-        if(impDEMdrag_)
+        if (!streamingMode_)
         {
-            if(verbose_) Info << "sending Ksl and uf" << endl;
-            dataExchangeM().giveData("Ksl","scalar-atom",Cds_);
-            dataExchangeM().giveData("uf","vector-atom",fluidVel_);
+            dataExchangeM().giveData("dragforce","vector-atom",DEMForces_);
+
+            if (impDEMdrag_)
+            {
+                if (verbose_) Info << "sending Ksl and uf" << endl;
+                dataExchangeM().giveData("Ksl","scalar-atom",Cds_);
+                dataExchangeM().giveData("uf","vector-atom",fluidVel_);
+            }
+        }
+        else
+        {
+            dataExchangeM().giveData("vrec","vector-atom",particleConvVel_);
+            if (streamingFluc_)
+            {
+                dataExchangeM().giveData("vfluc","vector-atom",particleFlucVel_);
+            }
         }
     }
     if(verbose_) Info << "giveDEMdata done." << endl;
