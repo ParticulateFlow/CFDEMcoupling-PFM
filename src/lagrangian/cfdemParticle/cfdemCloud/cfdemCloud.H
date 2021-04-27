@@ -95,6 +95,8 @@ protected:
 
     bool allowCFDsubTimestep_;
 
+    const bool modelCheck_;
+
     const bool limitDEMForces_;
 
     const bool phaseInForces_;
@@ -308,6 +310,8 @@ public:
        inline bool treatVoidCellsAsExplicitForce() const;
 
        inline bool ignore() const;
+
+       inline bool modelCheck() const;
 
        inline const fvMesh& mesh() const;
 

@@ -83,6 +83,7 @@ cfdemCloud::cfdemCloud
     verbose_(couplingProperties_.found("verbose")),
     ignore_(couplingProperties_.found("ignore")),
     allowCFDsubTimestep_(true),
+    modelCheck_(couplingProperties_.lookupOrDefault<bool>("modelCheck",true)),
     limitDEMForces_(couplingProperties_.found("limitDEMForces")),
     phaseInForces_(couplingProperties_.found("phaseInForcesTime")),
     getParticleDensities_(couplingProperties_.lookupOrDefault<bool>("getParticleDensities",false)),
