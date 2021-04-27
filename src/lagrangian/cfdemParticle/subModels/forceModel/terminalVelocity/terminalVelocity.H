@@ -1,6 +1,6 @@
 /*---------------------------------------------------------------------------*\
     CFDEMcoupling academic - Open Source CFD-DEM coupling
-    
+
     Contributing authors:
     Thomas Lichtenegger, Sanaz Abbasi
     Copyright (C) 2015- Johannes Kepler University, Linz
@@ -58,35 +58,37 @@ private:
 
     bool existIgnoreCells_;
 
-    word turbDissipationRateFieldName_;
+//    word turbDissipationRateFieldName_;
 
-    word turbKineticEnergyFieldName_;
+//    word turbKineticEnergyFieldName_;
 
 //    word recurrenceBaseName_;
 
-    volScalarField* turbKineticEnergy_;
+//    volScalarField* turbKineticEnergy_;
 
-    volScalarField* turbDissipationRate_;
+//    volScalarField* turbDissipationRate_;
 
-    mutable volScalarField delta;
+//    mutable volScalarField delta;
 
     mutable volScalarField wallIndicatorField_;
 
-    bool existturbDissipationRateInObjReg_;
+//    bool existturbDissipationRateInObjReg_;
 
-    scalar liquidViscosity_;
+//    scalar liquidViscosity_;
 
     // drag reduction factor in turbulent flow
-    scalar dragReductionFactor_;
+//    scalar dragReductionFactor_;
 
     // terminal rising velocity of the bubble in the resting liquid
-    scalar terminalVel_;
+    vector terminalVel_;
 
-    int risingVelDir_;
+    word gravityFieldName_;
+
+    const uniformDimensionedVectorField& g_;    // ref to gravity
 
     bool ignoreCell(label) const;
 
-    void updateEpsilon() const;
+//    void updateEpsilon() const;
 
 //    recBase* recurrenceBase_;
 
