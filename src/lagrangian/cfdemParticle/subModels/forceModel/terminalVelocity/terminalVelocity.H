@@ -28,8 +28,8 @@ License
 #include "forceModel.H"
 #include "interpolationCellPoint.H"
 #include "cellSet.H"
-#include "recBase.H"
-#include "recModel.H"
+//#include "recBase.H"
+//#include "recModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -46,7 +46,7 @@ class terminalVelocity
 {
 private:
     dictionary propsDict_;
-    
+
     bool interpolate_;
 
     const fvMesh& mesh_;
@@ -62,7 +62,7 @@ private:
 
     word turbKineticEnergyFieldName_;
 
-    word recurrenceBaseName_;
+//    word recurrenceBaseName_;
 
     volScalarField* turbKineticEnergy_;
 
@@ -88,7 +88,7 @@ private:
 
     void updateEpsilon() const;
 
-    recBase* recurrenceBase_;
+//    recBase* recurrenceBase_;
 
 public:
 

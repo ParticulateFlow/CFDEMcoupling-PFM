@@ -108,6 +108,11 @@ inline bool cfdemCloud::ignore() const
     return ignore_;
 }
 
+inline bool cfdemCloud::modelCheck() const
+{
+    return modelCheck_;
+}
+
 inline const fvMesh& cfdemCloud::mesh() const
 {
     return mesh_;

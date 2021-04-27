@@ -1,6 +1,6 @@
 /*---------------------------------------------------------------------------*\
     CFDEMcoupling academic - Open Source CFD-DEM coupling
-    
+
     Contributing authors:
     Thomas Lichtenegger, Sanaz Abbasi
     Copyright (C) 2015- Johannes Kepler University, Linz
@@ -65,8 +65,8 @@ terminalVelocity::terminalVelocity
     turbDissipationRateFieldName_(propsDict_.lookupOrDefault<word>("turbDissipationRateFieldName","")),
     turbKineticEnergy_(NULL),
     turbDissipationRate_(NULL),
-    recurrenceBaseName_(propsDict_.lookupOrDefault<word>("recurrenceBaseName","")),
-    recurrenceBase_(NULL),
+//    recurrenceBaseName_(propsDict_.lookupOrDefault<word>("recurrenceBaseName","")),
+//    recurrenceBase_(NULL),
     existturbDissipationRateInObjReg_(false),
     delta(  IOobject
                 (
@@ -98,11 +98,12 @@ terminalVelocity::terminalVelocity
     if(ignoreCellsName_ != "none")
     {
        ignoreCells_.set(new cellSet(particleCloud_.mesh(),ignoreCellsName_));
-       Info << "isotropicFluctuations: ignoring rising velocity in cellSet " << ignoreCells_().name() <<
+       Info << "terminalVelocity: ignoring rising velocity in cellSet " << ignoreCells_().name() <<
         " with " << ignoreCells_().size() << " cells." << endl;
     }
     else existIgnoreCells_ = false;
 
+/*
     if (recurrenceBaseName_ != "")
     {
         Info << "creating the recBase pointer" << endl;
@@ -110,7 +111,7 @@ terminalVelocity::terminalVelocity
         recurrenceBase_ = &rBase_;
         existturbDissipationRateInObjReg_ = true;
     }
-
+*/
        turbDissipationRate_ = new volScalarField
         (
             IOobject
@@ -156,7 +157,7 @@ terminalVelocity::terminalVelocity
                 wallIndicatorField_[cellI] = 1.0;
             }
         }
-  
+
 }
 
 
@@ -266,7 +267,6 @@ void terminalVelocity::setForce() const
                 Pout << "rising velocity = " << Urising << endl;
             }
     }
-   
 }
 
 void terminalVelocity::updateEpsilon() const
@@ -276,7 +276,7 @@ void terminalVelocity::updateEpsilon() const
         Info << "epsilon is calculated from the turbulence model. " << endl;
         *turbDissipationRate_ = particleCloud_.turbulence().epsilon()();
     }
-
+/*
     else if (recurrenceBaseName_ != "")
     {
          Info << "updating epsilon from the database. " << endl;
@@ -294,11 +294,11 @@ void terminalVelocity::updateEpsilon() const
              *turbDissipationRate_ = 1.048*Foam::pow(*turbKineticEnergy_,1.5)/delta;
          }
      }
-     else
+    else
     {
         FatalError <<"turbulent dissipation enery must be calculated either from the turbulence model or recurrence dataBase!\n" << abort(FatalError);
     }
-
+*/
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

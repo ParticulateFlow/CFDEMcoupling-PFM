@@ -21,7 +21,6 @@ EXE_INC = \
     -I$(CFDEM_LIGGGHTS_SRC_DIR) \
     -I$(CFDEM_M2MLIB_PATH) \
     -I$(CFDEM_SRC_DIR)/cfdTools \
-    -I$(CFDEM_SRC_DIR)/recurrence/lnInclude \
     -Wno-old-style-cast \
     -Wno-unused-result \
     -Wno-literal-suffix
@@ -34,7 +33,6 @@ LIB_LIBS = \
     -lincompressibleTurbulenceModels \
     -lmeshTools \
     -llagrangian \
-    -lrecurrence \
     -lmpi_cxx \
     -Wl,-rpath,$(CFDEM_LIGGGHTS_BIN_DIR) \
     -L$(CFDEM_LIGGGHTS_BIN_DIR) \
