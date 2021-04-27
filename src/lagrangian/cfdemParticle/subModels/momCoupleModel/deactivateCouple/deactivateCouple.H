@@ -42,6 +42,9 @@ class deactivateCouple
 {
 private:
 
+    volVectorField fEmpty_;
+
+    volScalarField KslEmpty_;
 
 public:
 
@@ -65,6 +68,10 @@ public:
 
     // Member Functions
         void resetMomSourceField();
+
+        tmp<volVectorField> expMomSource();
+
+        tmp<volScalarField> impMomSource();
 };
 
 
