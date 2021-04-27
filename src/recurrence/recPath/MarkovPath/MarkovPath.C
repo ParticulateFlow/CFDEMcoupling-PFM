@@ -66,7 +66,8 @@ MarkovPath::MarkovPath
     intervalSizesCumulative_(numIntervals_),
     Pjump_(0.0),
     intervalWeights_(propsDict_.lookupOrDefault<scalarList>("intervalWeights",scalarList(numIntervals_,1.0))),
-    intervalWeightsCumulative_(intervalWeights_)
+    intervalWeightsCumulative_(intervalWeights_),
+    ranGen(clock::getTime()+pid())
 {
     for(int i=0;i<numIntervals_;i++)
     {
@@ -150,7 +151,6 @@ void MarkovPath::computeRecPath()
 
 void MarkovPath::extendPath()
 {
-    Random ranGen(clock::getTime()+pid());
 
     SymmetricSquareMatrix<scalar>& recurrenceMatrix( base_.recM().recurrenceMatrix() );
 

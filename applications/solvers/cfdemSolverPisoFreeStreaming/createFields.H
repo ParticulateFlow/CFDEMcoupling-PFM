@@ -31,36 +31,6 @@
 // particle interaction modelling
 //===============================
 
-    Info<< "\nReading momentum exchange field Ksl\n" << endl;
-    volScalarField Ksl
-    (
-        IOobject
-        (
-            "Ksl",
-            runTime.timeName(),
-            mesh,
-            IOobject::MUST_READ,
-            IOobject::AUTO_WRITE
-        ),
-        mesh
-        //dimensionedScalar("0", dimensionSet(1, -3, -1, 0, 0), 1.0)
-    );
-
-    Info<< "\nCreating body force field\n" << endl;
-    volVectorField fOther
-    (
-        IOobject
-        (
-            "fOther",
-            runTime.timeName(),
-            mesh,
-            IOobject::NO_READ,
-            IOobject::NO_WRITE
-        ),
-        mesh,
-        dimensionedVector("zero", dimensionSet(1,-2,-2,0,0,0,0), vector::zero)
-    );
-
     Info<< "\nReading voidfraction field voidfraction = (Vgas/Vparticle)\n" << endl;
     volScalarField voidfraction
     (
@@ -75,7 +45,7 @@
         mesh
     );
 
-    Info<< "\nCreating dummy density field rho\n" << endl;
+    Info<< "\nCreating density field rho\n" << endl;
     volScalarField rho
     (
         IOobject
@@ -86,8 +56,7 @@
             IOobject::MUST_READ,
             IOobject::AUTO_WRITE
         ),
-        mesh//,
-        //dimensionedScalar("0", dimensionSet(1, -3, 0, 0, 0), 1.0)
+        mesh
     );
 
     Info<< "Reading particle velocity field Us\n" << endl;
@@ -120,7 +89,7 @@ surfaceScalarField phi
         IOobject::READ_IF_PRESENT,
         IOobject::AUTO_WRITE
     ),
-    linearInterpolate(U*voidfraction) & mesh.Sf()
+    linearInterpolate(U) & mesh.Sf()
 );
 #endif
 

@@ -21,95 +21,93 @@ License
     You should have received a copy of the GNU General Public License
     along with CFDEMcoupling academic.  If not, see <http://www.gnu.org/licenses/>.
 \*---------------------------------------------------------------------------*/
-#ifndef recBase_H
-#define recBase_H
 
-// choose version
-#include <vector>
+#ifndef turbulentDispersion_H
+#define turbulentDispersion_H
 
-#include "fvCFD.H"
-#include "IFstream.H"
+#include "forceModel.H"
+#include "interpolationCellPoint.H"
+#include "Random.H"
+#include "autoPtr.H"
+#include "cellSet.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-// forward declarations
-class recModel;
-class recNorm;
-class recPath;
-class recStatAnalysis;
-
 /*---------------------------------------------------------------------------*\
-                           Class recBase Declaration
+                           Class turbulentDispersion Declaration
 \*---------------------------------------------------------------------------*/
 
-class recBase
- :
-  public regIOobject
+class turbulentDispersion
+:
+    public forceModel
 {
-
 protected:
+    dictionary propsDict_;
+
+    bool interpolate_;
 
     const fvMesh& mesh_;
 
-    IOdictionary recProperties_;
+    // ignore fluctuations in region
+    word ignoreCellsName_;
 
-    autoPtr<recModel> recModel_;
+    autoPtr<cellSet> ignoreCells_;
 
-    autoPtr<recNorm> recNorm_;
+    bool existIgnoreCells_;
 
-    autoPtr<recPath> recPath_;
+    mutable volScalarField wallIndicatorField_;
 
-    autoPtr<recStatAnalysis> recStatAnalysis_;
+    scalar dt_;
 
-    // in case of substepping: couple passive quantity at this substep
-    label couplingSubStep_;
+    scalar turbulentSchmidtNumber_;
 
+    word voidfractionFieldName_;
+
+    const volScalarField& voidfraction_;
+
+    scalar critVoidfraction_;
+
+    virtual vector unitFlucDir() const;
+
+    mutable Random ranGen_;
+
+    bool ignoreCell(label) const;
 
 public:
 
-      // Constructors
+    //- Runtime type information
+    TypeName("turbulentDispersion");
 
-    //- Construct from mesh and a list of particles
-    recBase
-    (
-            const fvMesh& mesh
-    );
-    //- Construct from mesh and a list of recProperties
-    recBase
-    (
-            const fvMesh& mesh, const word recDictName_
-    );
 
-    //- Destructor
-    virtual ~recBase();
+    // Constructors
 
-    // public Member Functions
+        //- Construct from components
+        turbulentDispersion
+        (
+            const dictionary& dict,
+            cfdemCloud& sm,
+            word type = "turbulentDispersion"
+        );
 
-    const fvMesh& mesh() const;
+    // Destructor
 
-    recModel& recM();
+        ~turbulentDispersion();
 
-    recPath& recP();
 
-    recStatAnalysis& recStatA();
-
-    void extendPath();
-
-    void updateRecFields();
-
-    label couplingSubStep() const;
-
-   // Dummy function for regIOobject
-    bool writeData(Ostream&) const
-    {
-        return true;
-    }
-
+    // Member Functions
+        void setForce() const;
 };
 
-}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #endif
+
+// ************************************************************************* //

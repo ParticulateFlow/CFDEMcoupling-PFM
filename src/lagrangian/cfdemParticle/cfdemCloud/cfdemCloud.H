@@ -105,6 +105,10 @@ protected:
 
     const bool getParticleTypes_;
 
+    const bool streamingMode_;
+
+    const bool streamingFluc_;
+
     scalar maxDEMForce_;
 
     scalar phaseInForcesTime_;

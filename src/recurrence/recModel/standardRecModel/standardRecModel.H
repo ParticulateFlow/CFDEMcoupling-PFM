@@ -61,6 +61,7 @@ protected:
     label totNumRecFields_;
     
     bool storeAveragedFields_;
+    bool checkTimeStep_;
 
     // matrix that contains the recurrence ERROR
     SymmetricSquareMatrix<scalar> recurrenceMatrix_;
@@ -151,6 +152,7 @@ public:
     label numDataBaseFields() const;
     
     void updateRecFields();
+    label currentTimeIndex() const;
     
     void writeRecMatrix() const;
 	
