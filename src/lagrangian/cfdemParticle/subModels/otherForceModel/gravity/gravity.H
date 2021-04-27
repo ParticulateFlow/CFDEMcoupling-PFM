@@ -54,7 +54,9 @@ protected:
 
         const volScalarField& rhoG_;
 
-        const dimensionedVector g_;
+        word gravityFieldName_;
+
+        const uniformDimensionedVectorField& g_;    // ref to gravity
 
 public:
 

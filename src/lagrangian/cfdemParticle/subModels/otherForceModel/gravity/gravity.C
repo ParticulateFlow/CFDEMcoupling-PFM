@@ -47,7 +47,8 @@ gravity::gravity
     voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
     rhoGFieldName_(propsDict_.lookupOrDefault<word>("rhoGFieldName","rho")),
     rhoG_(sm.mesh().lookupObject<volScalarField> (rhoGFieldName_)),
-    g_("g",dimensionSet(0,1,-2,0,0),vector(0,0,-9.81))
+    gravityFieldName_(propsDict_.lookupOrDefault<word>("gravityFieldName","g")),
+    g_(sm.mesh().lookupObject<uniformDimensionedVectorField> (gravityFieldName_))
 {}
 
 

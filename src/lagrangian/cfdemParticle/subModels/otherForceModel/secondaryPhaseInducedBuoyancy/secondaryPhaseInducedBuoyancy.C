@@ -46,12 +46,11 @@ secondaryPhaseInducedBuoyancy::secondaryPhaseInducedBuoyancy
     voidfractionFieldName_(propsDict_.lookupOrDefault<word>("voidfractionFieldName","voidfraction")),
     voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
     diffRho_("diffRho",dimensionSet(1,-3,0,0,0),0.0),
-    g_("g",dimensionSet(0,1,-2,0,0),vector(0,0,-9.81))
+    gravityFieldName_(propsDict_.lookupOrDefault<word>("gravityFieldName","g")),
+    g_(sm.mesh().lookupObject<uniformDimensionedVectorField> (gravityFieldName_))
 {
-    if (propsDict_.found("diffRho"))
-        diffRho_.value()=readScalar(propsDict_.lookup ("diffRho"));
-    else
-        FatalError <<"Please specify density difference of the phases.\n" << abort(FatalError);
+    // density difference of fluid and secondary phase
+    diffRho_.value()=readScalar(propsDict_.lookup ("diffRho"));
 }
 
 
