@@ -95,6 +95,14 @@ terminalVelocity::terminalVelocity
     gravityFieldName_(propsDict_.lookupOrDefault<word>("gravityFieldName","g")),
     g_(sm.mesh().lookupObject<uniformDimensionedVectorField> (gravityFieldName_))
 {
+    // init force sub model
+    setForceSubModels(propsDict_);
+    // define switches which can be read from dict
+    forceSubM(0).setSwitchesList(SW_VERBOSE,true); // activate search for verbose switch
+// TODO: remove bool interpolate for this class, let forceSubModel do this
+//    forceSubM(0).setSwitchesList(SW_INTERPOLATION,true); // activate search for interpolate switch
+    forceSubM(0).readSwitches();
+
     scalar terminalVelMagnitude(propsDict_.lookupOrDefault<scalar>("terminalVelocity", 0.0));
     terminalVel_ = -terminalVelMagnitude * g_.value() / mag(g_.value());
 
@@ -263,7 +271,7 @@ void terminalVelocity::setForce() const
 
 	    }
 
-            if (index >0 && index <2)
+            if (forceSubM(0).verbose() && index >0 && index <2)
             {
                 Pout << "cellI = " << cellI << endl;
                 Pout << "index = " << index << endl;
