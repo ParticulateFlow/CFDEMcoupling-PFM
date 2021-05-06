@@ -70,6 +70,10 @@ protected:
 
     mutable volScalarField wallIndicatorField_;
 
+    mutable volScalarField delta_;
+
+    scalar Ck_;
+
     scalar dt_;
 
     scalar turbulentSchmidtNumber_;

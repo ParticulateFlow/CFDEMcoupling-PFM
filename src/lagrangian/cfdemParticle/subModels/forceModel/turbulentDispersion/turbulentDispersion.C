@@ -90,10 +90,23 @@ turbulentDispersion::turbulentDispersion
         sm.mesh(),
         dimensionedScalar("zero", dimensionSet(0,0,0,0,0,0,0), 0.0)
     ),
+    delta_
+    (   IOobject
+        (
+            "delta",
+            sm.mesh().time().timeName(),
+            sm.mesh(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        sm.mesh(),
+        dimensionedScalar("delta", dimLength, 1.0)
+    ),
     turbulentSchmidtNumber_(readScalar(propsDict_.lookup("turbulentSchmidtNumber"))),
     voidfractionFieldName_(propsDict_.lookupOrDefault<word>("voidfractionFieldName","voidfraction")),
     voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
     critVoidfraction_(propsDict_.lookupOrDefault<scalar>("critVoidfraction", 0.9)),
+    Ck_(propsDict_.lookupOrDefault<scalar>("turbKineticEnergyCoeff", 0.094)),
     ranGen_(clock::getTime()+pid())
 {
     if (ignoreCellsName_ != "none")
@@ -107,6 +120,11 @@ turbulentDispersion::turbulentDispersion
     if (usePreCalcNut_ && usePreCalcK_)
     {
         FatalError<< "Cannot use precalculated nut and k at the same time. Choose one." << abort(FatalError);
+    }
+
+    if (usePreCalcK_)
+    {
+        delta_.primitiveFieldRef()=Foam::pow(mesh_.V(),1.0/3.0);
     }
 
     // define a field to indicate if a cell is next to boundary
@@ -160,11 +178,7 @@ void turbulentDispersion::setForce() const
     else
     {
         volScalarField& kRef (const_cast<volScalarField&>(mesh_.lookupObject<volScalarField> (kName_)));
-    // TODO: write function to calculate nut from k
-    //       make Ck_ member variable to be specified by user
-    //       best way to obtain delta? cbrt of cell volumes?
-
-    //    nut_ = ... Ck_ * delta * sqrt(kRef);
+        nut_ = Ck_ * delta_ * sqrt(kRef);
     }
 
     label cellI = -1;
