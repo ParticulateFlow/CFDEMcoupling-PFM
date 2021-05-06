@@ -62,6 +62,22 @@ turbulentDispersion::turbulentDispersion
     ignoreCellsName_(propsDict_.lookupOrDefault<word>("ignoreCellsName","none")),
     ignoreCells_(),
     existIgnoreCells_(true),
+    usePreCalcNut_(propsDict_.lookupOrDefault<bool>("usePreCalcNut",false)),
+    nutName_(propsDict_.lookupOrDefault<word>("nutName","nut")),
+    usePreCalcK_(propsDict_.lookupOrDefault<bool>("usePreCalcK",false)),
+    kName_(propsDict_.lookupOrDefault<word>("kName","k")),
+    nut_
+    (   IOobject
+        (
+            "nuTurb",
+            sm.mesh().time().timeName(),
+            sm.mesh(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        sm.mesh(),
+        dimensionedScalar("zero", dimensionSet(0,2,-1,0,0,0,0), 0.0)
+    ),
     wallIndicatorField_
     (   IOobject
         (
@@ -87,6 +103,11 @@ turbulentDispersion::turbulentDispersion
         " with " << ignoreCells_().size() << " cells." << endl;
     }
     else existIgnoreCells_ = false;
+
+    if (usePreCalcNut_ && usePreCalcK_)
+    {
+        FatalError<< "Cannot use precalculated nut and k at the same time. Choose one." << abort(FatalError);
+    }
 
     // define a field to indicate if a cell is next to boundary
      label cellI = -1;
@@ -127,7 +148,24 @@ bool turbulentDispersion::ignoreCell(label cell) const
 
 void turbulentDispersion::setForce() const
 {
-    volScalarField nut = particleCloud_.turbulence().nut()();
+    if (!usePreCalcNut_ && !usePreCalcK_)
+    {
+        nut_ = particleCloud_.turbulence().nut()();
+    }
+    else if (usePreCalcNut_)
+    {
+        volScalarField& nutRef (const_cast<volScalarField&>(mesh_.lookupObject<volScalarField> (nutName_)));
+        nut_ = nutRef;
+    }
+    else
+    {
+        volScalarField& kRef (const_cast<volScalarField&>(mesh_.lookupObject<volScalarField> (kName_)));
+    // TODO: write function to calculate nut from k
+    //       make Ck_ member variable to be specified by user
+    //       best way to obtain delta? cbrt of cell volumes?
+
+    //    nut_ = ... Ck_ * delta * sqrt(kRef);
+    }
 
     label cellI = -1;
     label patchID = -1;
@@ -139,9 +177,9 @@ void turbulentDispersion::setForce() const
     vector position = vector::zero;
     word patchName("");
 
-    interpolationCellPoint<scalar> nutInterpolator_(nut);
+    interpolationCellPoint<scalar> nutInterpolator_(nut_);
 
-    for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
+    for(int index = 0; index < particleCloud_.numberOfParticles(); ++index)
     {
         cellI = particleCloud_.cellIDs()[index][0];
         if (cellI > -1 && !ignoreCell(cellI))
@@ -157,7 +195,7 @@ void turbulentDispersion::setForce() const
                 }
                 else
                 {
-                    D = nut[cellI] / turbulentSchmidtNumber_;
+                    D = nut_[cellI] / turbulentSchmidtNumber_;
                 }
 
                 flucU=unitFlucDir()*Foam::sqrt(6.0*D/dt_);
