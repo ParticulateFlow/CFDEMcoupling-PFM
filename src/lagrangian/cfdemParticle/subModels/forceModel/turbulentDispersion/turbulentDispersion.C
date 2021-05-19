@@ -198,47 +198,44 @@ void turbulentDispersion::setForce() const
         cellI = particleCloud_.cellIDs()[index][0];
         if (cellI > -1 && !ignoreCell(cellI))
         {
-            // particles in dilute regions follow fluid without fluctuations
-
-            if (voidfraction_[cellI] < critVoidfraction_)
+            if (interpolate_)
             {
-                if (interpolate_)
+                position = particleCloud_.position(index);
+                D = nutInterpolator_.interpolate(position,cellI) / turbulentSchmidtNumber_;
+            }
+            else
+            {
+                D = nut_[cellI] / turbulentSchmidtNumber_;
+            }
+
+            // include concentration dependence on the diffusivity at this point if necessary
+
+            flucU=unitFlucDir()*Foam::sqrt(6.0*D/dt_);
+
+            // prevent particles being pushed through walls by regulating velocity fluctuations
+            // check if cell is adjacent to wall and remove corresponding components
+            if (wallIndicatorField_[cellI] > 0.5)
+            {
+                const cell& faces = mesh_.cells()[cellI];
+                forAll (faces, faceI)
                 {
-                    position = particleCloud_.position(index);
-                    D = nutInterpolator_.interpolate(position,cellI) / turbulentSchmidtNumber_;
+                    faceIGlobal = faces[faceI];
+                    patchID = mesh_.boundaryMesh().whichPatch(faceIGlobal);
+                    if (patchID < 0) continue;
+                    patchName = mesh_.boundary()[patchID].name();
+
+                    if (patchName.rfind("procB",0) == 0) continue;
+
+                    faceINormal = mesh_.Sf()[faceIGlobal];
+                    faceINormal /= mag(faceINormal);
+                    flucProjection = faceINormal&flucU;
+                    if (flucProjection > 0.0) flucU -= flucProjection*faceINormal;
                 }
-                else
-                {
-                    D = nut_[cellI] / turbulentSchmidtNumber_;
-                }
+            }
 
-                flucU=unitFlucDir()*Foam::sqrt(6.0*D/dt_);
-
-                // prevent particles being pushed through walls by regulating velocity fluctuations
-                // check if cell is adjacent to wall and remove corresponding components
-                if (wallIndicatorField_[cellI] > 0.5)
-                {
-                    const cell& faces = mesh_.cells()[cellI];
-                    forAll (faces, faceI)
-                    {
-                        faceIGlobal = faces[faceI];
-                        patchID = mesh_.boundaryMesh().whichPatch(faceIGlobal);
-                        if (patchID < 0) continue;
-                        patchName = mesh_.boundary()[patchID].name();
-
-                        if (patchName.rfind("procB",0) == 0) continue;
-
-                        faceINormal = mesh_.Sf()[faceIGlobal];
-                        faceINormal /= mag(faceINormal);
-                        flucProjection = faceINormal&flucU;
-                        if (flucProjection > 0.0) flucU -= flucProjection*faceINormal;
-                    }
-                }
-
-                for(int j=0;j<3;j++)
-                {
-                    particleCloud_.particleFlucVels()[index][j] += flucU[j];
-                }
+            for(int j=0;j<3;j++)
+            {
+                particleCloud_.particleFlucVels()[index][j] += flucU[j];
             }
         }
     }

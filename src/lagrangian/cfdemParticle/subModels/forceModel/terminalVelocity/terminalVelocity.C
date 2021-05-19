@@ -64,10 +64,11 @@ terminalVelocity::terminalVelocity
 //    turbKineticEnergyFieldName_(propsDict_.lookupOrDefault<word>("turbKineticEnergyFieldName","")),
 //    turbDissipationRateFieldName_(propsDict_.lookupOrDefault<word>("turbDissipationRateFieldName","")),
 //    turbKineticEnergy_(NULL),
-//    turbDissipationRate_(NULL),
+    turbDissipationRate_(NULL),
 //    recurrenceBaseName_(propsDict_.lookupOrDefault<word>("recurrenceBaseName","")),
 //    recurrenceBase_(NULL),
-//    existturbDissipationRateInObjReg_(false),
+    existturbDissipationRateInObjReg_(false),
+    turbulenceCorrection_(propsDict_.lookupOrDefault<bool>("turbulenceCorrection",false)),
 //    delta(  IOobject
 //                (
 //                      "delta",
@@ -90,8 +91,8 @@ terminalVelocity::terminalVelocity
         sm.mesh(),
         dimensionedScalar("zero", dimensionSet(0,0,0,0,0,0,0), 0.0)
     ),
-//    liquidViscosity_(propsDict_.lookupOrDefault<scalar>("liquidViscosity", 1.0)),
-//    dragReductionFactor_(propsDict_.lookupOrDefault<scalar>("dragReductionFactor", 0.0)),
+    liquidViscosity_(propsDict_.lookupOrDefault<scalar>("liquidViscosity", 1.0)),
+    dragReductionFactor_(propsDict_.lookupOrDefault<scalar>("dragReductionFactor", 0.0)),
     gravityFieldName_(propsDict_.lookupOrDefault<word>("gravityFieldName","g")),
     g_(sm.mesh().lookupObject<uniformDimensionedVectorField> (gravityFieldName_))
 {
@@ -122,7 +123,7 @@ terminalVelocity::terminalVelocity
         recurrenceBase_ = &rBase_;
         existturbDissipationRateInObjReg_ = true;
     }
-
+*/
        turbDissipationRate_ = new volScalarField
         (
             IOobject
@@ -136,7 +137,7 @@ terminalVelocity::terminalVelocity
             mesh_,
             dimensionedScalar("zero", dimensionSet(0,2,-3,0,0), 0)
         );
-
+/*
        if (turbKineticEnergyFieldName_ != "")
        {
            turbKineticEnergy_ = new volScalarField
@@ -176,7 +177,7 @@ terminalVelocity::terminalVelocity
 
 terminalVelocity::~terminalVelocity()
 {
-  //      if (!existturbDissipationRateInObjReg_) delete turbDissipationRate_;
+        if (!existturbDissipationRateInObjReg_) delete turbDissipationRate_;
 }
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
@@ -191,13 +192,15 @@ bool terminalVelocity::ignoreCell(label cell) const
 
 void terminalVelocity::setForce() const
 {
- //   updateEpsilon();
+    updateEpsilon();
 
     vector position(0,0,0);
  //   scalar Urising=0.0;
     label cellI=-1;
     scalar radius=0.0;
-//    scalar epsilon=0.0;
+    scalar epsilon=0.0;
+    scalar dLambda = 0.0;
+    scalar velReductionFactor = 0.0;
     vector Uparticle(0,0,0);
 
     label patchID = -1;
@@ -206,7 +209,7 @@ void terminalVelocity::setForce() const
     vector faceINormal = vector::zero;
     word patchName("");
 
-  //  interpolationCellPoint<scalar> turbDissipationRateInterpolator_(*turbDissipationRate_);
+    interpolationCellPoint<scalar> turbDissipationRateInterpolator_(*turbDissipationRate_);
     for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
     {
             cellI = particleCloud_.cellIDs()[index][0];
@@ -217,20 +220,23 @@ void terminalVelocity::setForce() const
                 if (interpolate_)
                 {
                     position = particleCloud_.position(index);
-//                    epsilon = turbDissipationRateInterpolator_.interpolate(position,cellI);
+                    epsilon = turbDissipationRateInterpolator_.interpolate(position,cellI);
                 }
                 else
                 {
-//                    epsilon = (*turbDissipationRate_)[cellI];
+                    epsilon = (*turbDissipationRate_)[cellI];
                 }
 
                     position = particleCloud_.position(index);
                     radius = particleCloud_.radius(index);
 
+                if (turbulenceCorrection_)
+                {
                     // d * kolmogorov length scale
-//                    scalar dLambda = 2*radius*pow(epsilon,0.25)/pow(liquidViscosity_,0.75);
-
-//                    Urising = terminalVel_ / Foam::sqrt(1+(dragReductionFactor_*pow(dLambda,3)) );
+                    dLambda = 2*radius*pow(epsilon,0.25)/pow(liquidViscosity_,0.75);
+                    velReductionFactor = Foam::sqrt( 1 + ( dragReductionFactor_*pow(dLambda,3)));
+                    terminalVel_ =  terminalVel_ / velReductionFactor;
+                }
 //                    particleCloud_.particleConvVels()[index][] += Urising_;
 
                     // read the new particle velocity
@@ -267,21 +273,19 @@ void terminalVelocity::setForce() const
                             }
                         }
                     }
-
-
 	    }
 
             if (forceSubM(0).verbose() && index >0 && index <2)
             {
                 Pout << "cellI = " << cellI << endl;
                 Pout << "index = " << index << endl;
-//                Pout << "epsilon = " << epsilon << endl;
+                Pout << "epsilon = " << epsilon << endl;
                 Pout << "rising velocity = " << terminalVel_ << endl;
             }
     }
 }
 
-/*
+
 void terminalVelocity::updateEpsilon() const
 {
     if (!existturbDissipationRateInObjReg_)
@@ -289,7 +293,7 @@ void terminalVelocity::updateEpsilon() const
         Info << "epsilon is calculated from the turbulence model. " << endl;
         *turbDissipationRate_ = particleCloud_.turbulence().epsilon()();
     }
-
+/*
     else if (recurrenceBaseName_ != "")
     {
          Info << "updating epsilon from the database. " << endl;
@@ -311,8 +315,9 @@ void terminalVelocity::updateEpsilon() const
     {
         FatalError <<"turbulent dissipation enery must be calculated either from the turbulence model or recurrence dataBase!\n" << abort(FatalError);
     }
-}
 */
+}
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
