@@ -66,21 +66,23 @@ private:
 
 //    volScalarField* turbKineticEnergy_;
 
-//    volScalarField* turbDissipationRate_;
+    volScalarField* turbDissipationRate_;
 
 //    mutable volScalarField delta;
 
     mutable volScalarField wallIndicatorField_;
 
-//    bool existturbDissipationRateInObjReg_;
+    bool existturbDissipationRateInObjReg_;
 
-//    scalar liquidViscosity_;
+    bool turbulenceCorrection_;
+
+    scalar liquidViscosity_;
 
     // drag reduction factor in turbulent flow
-//    scalar dragReductionFactor_;
+    scalar dragReductionFactor_;
 
     // terminal rising velocity of the bubble in the resting liquid
-    vector terminalVel_;
+    mutable vector terminalVel_;
 
     word gravityFieldName_;
 
@@ -88,7 +90,7 @@ private:
 
     bool ignoreCell(label) const;
 
-//    void updateEpsilon() const;
+    void updateEpsilon() const;
 
 //    recBase* recurrenceBase_;
 

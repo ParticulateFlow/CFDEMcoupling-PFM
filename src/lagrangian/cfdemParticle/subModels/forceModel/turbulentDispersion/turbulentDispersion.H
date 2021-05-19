@@ -58,7 +58,21 @@ protected:
 
     bool existIgnoreCells_;
 
+    bool usePreCalcNut_;
+
+    word nutName_;
+
+    bool usePreCalcK_;
+
+    word kName_;
+
+    mutable volScalarField nut_;
+
     mutable volScalarField wallIndicatorField_;
+
+    mutable volScalarField delta_;
+
+    scalar Ck_;
 
     scalar dt_;
 

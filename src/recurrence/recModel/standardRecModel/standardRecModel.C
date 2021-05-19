@@ -201,6 +201,24 @@ void standardRecModel::init()
 {
     recModel::init();
 
+    const objectRegistry& objReg = base_.mesh().thisDb();
+
+    for(int j=0; j<volScalarFieldNames_.size(); j++)
+    {
+        objReg.checkIn(volScalarFieldList_[j][virtualTimeIndex]);
+    }
+
+    for(int j=0; j<volVectorFieldNames_.size(); j++)
+    {
+        objReg.checkIn(volVectorFieldList_[j][virtualTimeIndex]);
+    }
+
+    for(int j=0; j<surfaceScalarFieldNames_.size(); j++)
+    {
+        objReg.checkIn(surfaceScalarFieldList_[j][virtualTimeIndex]);
+    }
+
+
     for(int i = 0; i < numDataBases_; i++)
     {
         if (virtualTimeIndex < cumulativeNumRecFields_[i])
@@ -704,6 +722,27 @@ label standardRecModel::numDataBaseFields() const
 
 void standardRecModel::updateRecFields()
 {
+    // make fields of upcoming virtualTimeIndex available in object registry
+    const objectRegistry& objReg = base_.mesh().thisDb();
+
+    for(int j=0; j<volScalarFieldNames_.size(); j++)
+    {
+        objReg.checkOut(volScalarFieldList_[j][virtualTimeIndex]);
+        objReg.checkIn(volScalarFieldList_[j][virtualTimeIndexNext]);
+    }
+
+    for(int j=0; j<volVectorFieldNames_.size(); j++)
+    {
+        objReg.checkOut(volVectorFieldList_[j][virtualTimeIndex]);
+        objReg.checkIn(volVectorFieldList_[j][virtualTimeIndexNext]);
+    }
+
+    for(int j=0; j<surfaceScalarFieldNames_.size(); j++)
+    {
+        objReg.checkOut(surfaceScalarFieldList_[j][virtualTimeIndex]);
+        objReg.checkIn(surfaceScalarFieldList_[j][virtualTimeIndexNext]);
+    }
+
     virtualTimeIndex = virtualTimeIndexNext;
     virtualTimeIndexNext++;
 

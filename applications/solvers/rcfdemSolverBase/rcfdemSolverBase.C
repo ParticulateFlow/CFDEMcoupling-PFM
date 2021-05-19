@@ -59,6 +59,8 @@ int main(int argc, char *argv[])
     #include "createFields.H"
     #include "createFvOptions.H"
 
+    #include "readGravitationalAcceleration.H"
+
     cfdemCloudRec<cfdemCloud> particleCloud(mesh);
     recBase recurrenceBase(mesh);
 

@@ -62,6 +62,22 @@ turbulentDispersion::turbulentDispersion
     ignoreCellsName_(propsDict_.lookupOrDefault<word>("ignoreCellsName","none")),
     ignoreCells_(),
     existIgnoreCells_(true),
+    usePreCalcNut_(propsDict_.lookupOrDefault<bool>("usePreCalcNut",false)),
+    nutName_(propsDict_.lookupOrDefault<word>("nutName","nut")),
+    usePreCalcK_(propsDict_.lookupOrDefault<bool>("usePreCalcK",false)),
+    kName_(propsDict_.lookupOrDefault<word>("kName","k")),
+    nut_
+    (   IOobject
+        (
+            "nuTurb",
+            sm.mesh().time().timeName(),
+            sm.mesh(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        sm.mesh(),
+        dimensionedScalar("zero", dimensionSet(0,2,-1,0,0,0,0), 0.0)
+    ),
     wallIndicatorField_
     (   IOobject
         (
@@ -74,10 +90,23 @@ turbulentDispersion::turbulentDispersion
         sm.mesh(),
         dimensionedScalar("zero", dimensionSet(0,0,0,0,0,0,0), 0.0)
     ),
+    delta_
+    (   IOobject
+        (
+            "delta",
+            sm.mesh().time().timeName(),
+            sm.mesh(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        sm.mesh(),
+        dimensionedScalar("delta", dimLength, 1.0)
+    ),
     turbulentSchmidtNumber_(readScalar(propsDict_.lookup("turbulentSchmidtNumber"))),
     voidfractionFieldName_(propsDict_.lookupOrDefault<word>("voidfractionFieldName","voidfraction")),
     voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
     critVoidfraction_(propsDict_.lookupOrDefault<scalar>("critVoidfraction", 0.9)),
+    Ck_(propsDict_.lookupOrDefault<scalar>("turbKineticEnergyCoeff", 0.094)),
     ranGen_(clock::getTime()+pid())
 {
     if (ignoreCellsName_ != "none")
@@ -87,6 +116,16 @@ turbulentDispersion::turbulentDispersion
         " with " << ignoreCells_().size() << " cells." << endl;
     }
     else existIgnoreCells_ = false;
+
+    if (usePreCalcNut_ && usePreCalcK_)
+    {
+        FatalError<< "Cannot use precalculated nut and k at the same time. Choose one." << abort(FatalError);
+    }
+
+    if (usePreCalcK_)
+    {
+        delta_.primitiveFieldRef()=Foam::pow(mesh_.V(),1.0/3.0);
+    }
 
     // define a field to indicate if a cell is next to boundary
      label cellI = -1;
@@ -127,7 +166,20 @@ bool turbulentDispersion::ignoreCell(label cell) const
 
 void turbulentDispersion::setForce() const
 {
-    volScalarField nut = particleCloud_.turbulence().nut()();
+    if (!usePreCalcNut_ && !usePreCalcK_)
+    {
+        nut_ = particleCloud_.turbulence().nut()();
+    }
+    else if (usePreCalcNut_)
+    {
+        volScalarField& nutRef (const_cast<volScalarField&>(mesh_.lookupObject<volScalarField> (nutName_)));
+        nut_ = nutRef;
+    }
+    else
+    {
+        volScalarField& kRef (const_cast<volScalarField&>(mesh_.lookupObject<volScalarField> (kName_)));
+        nut_ = Ck_ * delta_ * sqrt(kRef);
+    }
 
     label cellI = -1;
     label patchID = -1;
@@ -139,54 +191,51 @@ void turbulentDispersion::setForce() const
     vector position = vector::zero;
     word patchName("");
 
-    interpolationCellPoint<scalar> nutInterpolator_(nut);
+    interpolationCellPoint<scalar> nutInterpolator_(nut_);
 
-    for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
+    for(int index = 0; index < particleCloud_.numberOfParticles(); ++index)
     {
         cellI = particleCloud_.cellIDs()[index][0];
         if (cellI > -1 && !ignoreCell(cellI))
         {
-            // particles in dilute regions follow fluid without fluctuations
-
-            if (voidfraction_[cellI] < critVoidfraction_)
+            if (interpolate_)
             {
-                if (interpolate_)
+                position = particleCloud_.position(index);
+                D = nutInterpolator_.interpolate(position,cellI) / turbulentSchmidtNumber_;
+            }
+            else
+            {
+                D = nut_[cellI] / turbulentSchmidtNumber_;
+            }
+
+            // include concentration dependence on the diffusivity at this point if necessary
+
+            flucU=unitFlucDir()*Foam::sqrt(6.0*D/dt_);
+
+            // prevent particles being pushed through walls by regulating velocity fluctuations
+            // check if cell is adjacent to wall and remove corresponding components
+            if (wallIndicatorField_[cellI] > 0.5)
+            {
+                const cell& faces = mesh_.cells()[cellI];
+                forAll (faces, faceI)
                 {
-                    position = particleCloud_.position(index);
-                    D = nutInterpolator_.interpolate(position,cellI) / turbulentSchmidtNumber_;
+                    faceIGlobal = faces[faceI];
+                    patchID = mesh_.boundaryMesh().whichPatch(faceIGlobal);
+                    if (patchID < 0) continue;
+                    patchName = mesh_.boundary()[patchID].name();
+
+                    if (patchName.rfind("procB",0) == 0) continue;
+
+                    faceINormal = mesh_.Sf()[faceIGlobal];
+                    faceINormal /= mag(faceINormal);
+                    flucProjection = faceINormal&flucU;
+                    if (flucProjection > 0.0) flucU -= flucProjection*faceINormal;
                 }
-                else
-                {
-                    D = nut[cellI] / turbulentSchmidtNumber_;
-                }
+            }
 
-                flucU=unitFlucDir()*Foam::sqrt(6.0*D/dt_);
-
-                // prevent particles being pushed through walls by regulating velocity fluctuations
-                // check if cell is adjacent to wall and remove corresponding components
-                if (wallIndicatorField_[cellI] > 0.5)
-                {
-                    const cell& faces = mesh_.cells()[cellI];
-                    forAll (faces, faceI)
-                    {
-                        faceIGlobal = faces[faceI];
-                        patchID = mesh_.boundaryMesh().whichPatch(faceIGlobal);
-                        if (patchID < 0) continue;
-                        patchName = mesh_.boundary()[patchID].name();
-
-                        if (patchName.rfind("procB",0) == 0) continue;
-
-                        faceINormal = mesh_.Sf()[faceIGlobal];
-                        faceINormal /= mag(faceINormal);
-                        flucProjection = faceINormal&flucU;
-                        if (flucProjection > 0.0) flucU -= flucProjection*faceINormal;
-                    }
-                }
-
-                for(int j=0;j<3;j++)
-                {
-                    particleCloud_.particleFlucVels()[index][j] += flucU[j];
-                }
+            for(int j=0;j<3;j++)
+            {
+                particleCloud_.particleFlucVels()[index][j] += flucU[j];
             }
         }
     }
