@@ -66,12 +66,6 @@ int main(int argc, char *argv[])
     instantList timeDirs(recTime.times());
     recTime.setTime(timeDirs[0],0);
 
-    #include "readFields.H"
-
-    Info << fieldName << endl;
-
-    volScalarField transformedField = origField;
-
     scalar t;
 
     label shiftedTimeI = 0;
@@ -95,37 +89,94 @@ int main(int argc, char *argv[])
     label cellI_transformed = -1;
     forAll(timeDirs, timeI)
     {
-
        recTime.setTime(timeDirs[timeI], timeI);
        t = recTime.value();
        if(t < startTime) continue;
        if(t > endTime) continue;
        Info << "time = " << t << ", time index = " << timeI << endl;
 
-       #include "readFields.H"
-
-       forAll(transformedField, cellI)
+       // volScalarFields
+       for (int sf = 0; sf < volScalarFieldNames.size(); sf++)
        {
-           vector position = mesh.C()[cellI];
-           vector transformedPosition = 2 * ((refPoint - position) & refDirection) * refDirection / (refDirection & refDirection) + position;
-           cellI_transformed = mesh.findCell(transformedPosition);
-           if(cellI_transformed < 0)
+           word fieldName = volScalarFieldNames[sf];
+           volScalarField origField
+           (
+               IOobject
+               (
+                    fieldName,
+                    recTime.timePath(),
+                    mesh,
+                    IOobject::MUST_READ,
+                    IOobject::NO_WRITE
+               ),
+                mesh
+           );
+
+           volScalarField transformedField = origField;
+
+           forAll(transformedField, cellI)
            {
-               Info << "Couldn't find transformed cell. Stopping." << endl;
-               return 0;
+               vector position = mesh.C()[cellI];
+               vector transformedPosition = 2 * ((refPoint - position) & refDirection) * refDirection / (refDirection & refDirection) + position;
+               cellI_transformed = mesh.findCell(transformedPosition);
+               if(cellI_transformed < 0)
+               {
+                   Info << "Couldn't find transformed cell. Stopping." << endl;
+                   return 0;
+               }
+
+               scalar value = origField[cellI_transformed];
+               scalar transformedValue = value;
+
+               transformedField[cellI] = transformedValue;
            }
 
-           scalar value = origField[cellI_transformed];
-           scalar transformedValue = value;
-
-           transformedField[cellI] = transformedValue;
+           runTime.setTime(recTime.value() + origTimeRange + dt, timeI + shift);
+           Info << "creating transformed field " << fieldName << " for time = " << recTime.value() + origTimeRange + dt << endl;
+           transformedField.write();
        }
 
-       shiftedTimeI = timeI + shift;
-       t = recTime.value() + origTimeRange + dt;
-       runTime.setTime(t, shiftedTimeI);
-       Info << "creating transformed fields for time = " << t << ", time index = " << shiftedTimeI << endl;
-       transformedField.write();
+
+       // volVectorFields
+       for (int vf = 0; vf < volVectorFieldNames.size(); vf++)
+       {
+           word fieldName = volVectorFieldNames[vf];
+           volVectorField origField
+           (
+               IOobject
+               (
+                    fieldName,
+                    recTime.timePath(),
+                    mesh,
+                    IOobject::MUST_READ,
+                    IOobject::NO_WRITE
+               ),
+                mesh
+           );
+
+           volVectorField transformedField = origField;
+
+           forAll(transformedField, cellI)
+           {
+               vector position = mesh.C()[cellI];
+               vector transformedPosition = 2 * ((refPoint - position) & refDirection) * refDirection / (refDirection & refDirection) + position;
+               cellI_transformed = mesh.findCell(transformedPosition);
+               if(cellI_transformed < 0)
+               {
+                   Info << "Couldn't find transformed cell. Stopping." << endl;
+                   return 0;
+               }
+
+               vector value = origField[cellI_transformed];
+               vector transformedValue = -2 * (value & refDirection) * refDirection / (refDirection & refDirection) + value;
+
+               transformedField[cellI] = transformedValue;
+           }
+
+           runTime.setTime(recTime.value() + origTimeRange + dt, timeI + shift);
+           Info << "creating transformed field " << fieldName << " for time = " << recTime.value() + origTimeRange + dt << endl;
+           transformedField.write();
+        }
     }
 
     Info << "\nEnd" << endl;

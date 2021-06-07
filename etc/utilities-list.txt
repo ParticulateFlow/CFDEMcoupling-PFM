@@ -1,4 +1,3 @@
 cfdemPostproc/dir
 rSmoother/dir
-rBaseMirror/rBaseMirrorScalar/dir
-rBaseMirror/rBaseMirrorVec/dir
+rBaseMirror/rBaseMirror/dir

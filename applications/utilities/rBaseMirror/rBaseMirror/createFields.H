@@ -13,5 +13,7 @@
     vector refPoint(mirrorProperties.lookup("refPoint"));
     vector refDirection(mirrorProperties.lookup("refDirection"));
 
-    word fieldName(mirrorProperties.lookup("fieldName"));
     word dataBaseName(mirrorProperties.lookup("dataBaseName"));
+
+    const wordList volScalarFieldNames(mirrorProperties.lookup("volScalarFields"));
+    const wordList volVectorFieldNames(mirrorProperties.lookup("volVectorFields"));
