@@ -20,13 +20,13 @@ internalField   uniform 0;
 
 boundaryField
 {
-    inlet      
+    inlet
     {
         type            fixedValue;
-	value		$internalField;
+        value           $internalField;
     }
 
-    channelWall      
+    channelWall
     {
         type            zeroGradient;
     }
@@ -34,10 +34,10 @@ boundaryField
     outlet
     {
         type            fixedValue;
-	value		$internalField;
+        value           $internalField;
     }
 
-    frontAndBack    
+    frontAndBack
     {
         type            empty;
     }

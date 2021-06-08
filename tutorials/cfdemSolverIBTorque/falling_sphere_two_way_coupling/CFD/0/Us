@@ -23,20 +23,23 @@ boundaryField
 {
     inlet
     {
-	type		zeroGradient;        
+        type            zeroGradient;
     }
+
     outlet
-    {
-	type		zeroGradient;        	
-    }
-    channelWall      
     {
         type            zeroGradient;
     }
+
+    channelWall
+    {
+        type            zeroGradient;
+    }
+
     frontAndBack
     {
         type            zeroGradient;
-    }  
+    }
 }
 
 

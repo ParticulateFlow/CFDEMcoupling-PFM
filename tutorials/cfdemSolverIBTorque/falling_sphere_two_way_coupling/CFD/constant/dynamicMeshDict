@@ -15,25 +15,6 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dynamicFvMesh       staticFvMesh;// dynamicRefineFvMesh;//
-
-dynamicRefineFvMeshCoeffs
-{
-    refineInterval  1;//refine every refineInterval timesteps
-    field           interFace;
-    lowerRefineLevel 0.1;
-    upperRefineLevel 0.9;
-    unrefineLevel   10;
-    nBufferLayers   1;
-    maxRefinement   1;//maximum refinement level (starts from 0)
-    maxCells        1000000;
-    correctFluxes
-    (
-        (phi    U)
-        (phi_0  U)
-    );
-    dumpLevel       false;
-}
-
+dynamicFvMesh       staticFvMesh;
 
 // ************************************************************************* //

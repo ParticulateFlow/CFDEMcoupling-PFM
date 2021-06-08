@@ -1,9 +1,9 @@
 #!/bin/bash
 
 #===================================================================#
-# allrun script for testcase as part of test routine
-# run settlingTest
-# Christoph Goniva - July. 2011, mod by Alice Hager - July 2011
+# allrun script for testcase
+# run falling_sphere_two_way_coupling
+# Achuth N. Balachandran Nair - Oct. 2018
 #===================================================================#
 
 source $CFDEM_PROJECT_DIR/etc/functions.sh

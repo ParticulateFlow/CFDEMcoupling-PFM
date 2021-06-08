@@ -36,15 +36,15 @@ couplingInterval 10;
 
 depth 0;
 
-voidFractionModel IB;//bigParticle;//centre; //
+voidFractionModel IB;
 
-locateModel engineIB;//standard;//
+locateModel engineIB;
 
 meshMotionModel noMeshMotion;
 
 regionModel allRegion;
 
-dataExchangeModel twoWayMPI;//twoWayFiles;
+dataExchangeModel twoWayMPI;
 
 IOModel basicIO;
 
@@ -87,15 +87,8 @@ ArchimedesIBProps
     voidfractionFieldName "voidfractionNext";
 }
 
-twoWayFilesProps
-{
-    maxNumberOfParticles 10000;
-    DEMts 0.00003;
-}
-
 twoWayMPIProps
 {
-    maxNumberOfParticles 10100;
     liggghtsPath "../DEM/in.liggghts_run";
 }
 
@@ -104,23 +97,6 @@ IBProps
     maxCellsPerParticle 20000;
     alphaMin 0.30;
     scaleUpVol 1.0;
-}
-
-bigParticleProps
-{
-    maxCellsPerParticle 1000;
-    alphaMin 0.30;
-    scaleUpVol 1.0;
-}
-centreProps
-{
-    alphaMin 0.30;
-}
-
-dividedProps
-{
-    alphaMin 0.05;
-    scaleUpVol 1.2;
 }
 
 engineIBProps

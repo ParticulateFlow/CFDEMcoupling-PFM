@@ -16,25 +16,25 @@ FoamFile
 
 dimensions      [0 1 -1 0 0 0 0];
 
-internalField   uniform (0 0 0);	//velocity in micrometres per second
+internalField   uniform (0 0 0);
 
 boundaryField
 {
-    inlet   
+    inlet
     {
         type            fixedValue;
-	value		$internalField;
-    } 
-	
-    channelWall      
+        value           $internalField;
+    }
+
+    channelWall
     {
         type            zeroGradient;
     }
 
-    outlet      
+    outlet
     {
         type            fixedValue;
-	value		$internalField;
+        value           $internalField;
     }
 }
 

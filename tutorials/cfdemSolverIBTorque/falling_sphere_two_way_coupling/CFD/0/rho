@@ -10,7 +10,7 @@ FoamFile
     version     2.0;
     format      ascii;
     class       volScalarField;
-    object      phiIB;
+    object      rho;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -20,12 +20,12 @@ internalField   uniform 1;
 
 boundaryField
 {
-    inlet      
+    inlet
     {
         type            zeroGradient;
     }
 
-    channelWall      
+    channelWall
     {
         type            zeroGradient;
     }

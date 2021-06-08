@@ -1,73 +1,73 @@
-#echo both
+
 log         ../DEM/log.liggghts
 thermo_log  ../DEM/post/thermo.txt
 
-variable	deltat equal 5e-05
+variable    deltat equal 5e-05
 
-atom_style	sphere
-atom_modify	map array sort 0 0
-boundary	m m m
-newton		off
+atom_style  sphere
+atom_modify map array sort 0 0
+boundary    m m m
+newton      off
 
-communicate	single vel yes
-processors	1 4 1
+communicate single vel yes
+processors  1 4 1
 
-units		si
+units       si
 
-region		reg block 0 0.025 0 0.1 0 0.025  units box
-create_box	1 reg
+region      reg block 0 0.025 0 0.1 0 0.025  units box
+create_box  1 reg
 
-neighbor	0.1 bin
-neigh_modify	delay 0 binsize 0.01 
+neighbor    0.1 bin
+neigh_modify delay 0 binsize 0.01
 
-#Material properties required for granular pair styles
+# material properties required for granular pair styles
+fix m1 all property/global youngsModulus peratomtype 5e05
+fix m2 all property/global poissonsRatio peratomtype 0.45
+fix m3 all property/global coefficientRestitution peratomtypepair 1 0.3
+fix m4 all property/global coefficientFriction peratomtypepair 1 0.5
 
-fix 		m1 all property/global youngsModulus peratomtype 5e05
-fix 		m2 all property/global poissonsRatio peratomtype 0.45
-fix 		m3 all property/global coefficientRestitution peratomtypepair 1 0.3
-fix 		m4 all property/global coefficientFriction peratomtypepair 1 0.5
+# pair style
+pair_style  gran model hertz tangential history
+pair_coeff  * *
 
-#pair style
-pair_style gran model hertz tangential history #Hertzian without cohesion
-pair_coeff	* *
+timestep    ${deltat}
 
-timestep	${deltat}
-fix		gravi all gravity 9.81 vector 0.0 -1.0 0.0
+fix gravi all gravity 9.81 vector 0.0 -1.0 0.0
 
-#walls
-fix xwall1 all wall/gran model hertz tangential history primitive type 1  xplane 0.
+# walls
+fix xwall1 all wall/gran model hertz tangential history primitive type 1  xplane 0.0
 fix xwall2 all wall/gran model hertz tangential history primitive type 1  xplane 0.025
-fix zwall1 all wall/gran model hertz tangential history primitive type 1  zplane 0.
+fix zwall1 all wall/gran model hertz tangential history primitive type 1  zplane 0.0
 fix zwall2 all wall/gran model hertz tangential history primitive type 1  zplane 0.025
-fix ywall1 all wall/gran model hertz tangential history primitive type 1  yplane 0.
+fix ywall1 all wall/gran model hertz tangential history primitive type 1  yplane 0.0
 fix ywall2 all wall/gran model hertz tangential history primitive type 1  yplane 0.1
 
 # cfd coupling
-fix     	cfd  all couple/cfd couple_every 10 mpi
-fix     	cfd2 all couple/cfd/force
+fix cfd  all couple/cfd couple_every 10 mpi
+fix cfd2 all couple/cfd/force
 
 # create atoms for simulation
 create_atoms 1 single 0.0125 0.075 0.0125 units box
 set atom 1 diameter 0.01 density 1.1 vx 0 vy 0 vz 0 omegaz 10
 
 
-# Setting the angular velocities to print out
-variable	omega1 equal omegax[1]
-variable	omega2 equal omegay[1]
-variable	omega3 equal omegaz[1]
+# getting the angular velocities to print out
+variable omega1 equal omegax[1]
+variable omega2 equal omegay[1]
+variable omega3 equal omegaz[1]
 
-# Setting the particle position to print out
-variable	x1 equal x[1]
-variable	y1 equal y[1]
-variable	z1 equal z[1]
+# getting the particle position to print out
+variable x1 equal x[1]
+variable y1 equal y[1]
+variable z1 equal z[1]
 
-variable        time equal step*dt
+variable time equal step*dt
 
-fix		extra1 all print 10 "${time} ${x1} ${y1} ${z1}" file ../DEM/position.txt screen no
-fix		extra2 all print 10 "${time} ${omega1} ${omega2} ${omega3}" file ../DEM/angular_velocity.txt screen no
+fix extra1 all print 10 "${time} ${x1} ${y1} ${z1}" file ../DEM/post/position.txt screen no
+fix extra2 all print 10 "${time} ${omega1} ${omega2} ${omega3}" file ../DEM/post/angular_velocity.txt screen no
 
-#integrator for multisphere rigid bodies
-fix		integr all nve/sphere
+# integrator
+fix integr all nve/sphere
 
 # screen output
 compute         rke all erotate/sphere
@@ -77,11 +77,12 @@ thermo_modify   lost ignore norm no
 compute_modify  thermo_temp dynamic yes
 
 # insert the first particles so that dump is not empty
-dump            dmp1 all custom 100 ../DEM/post/dump.liggghts_run id type x y z vx vy vz omegax omegay omegaz radius fx fy fz
+dump dmp1 all custom 100 ../DEM/post/dump.liggghts_run id type x y z vx vy vz &
+     omegax omegay omegaz radius fx fy fz
 
 #force : f_couple_cfd[0] f_couple_cfd[1] f_couple_cfd[2]
 #node : f_couple_cfd[6]
 #cell id : f_couple_cfd[7]
 
-run             1
+run     1
 

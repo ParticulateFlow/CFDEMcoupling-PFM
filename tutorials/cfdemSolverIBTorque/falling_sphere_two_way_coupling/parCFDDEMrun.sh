@@ -1,9 +1,9 @@
 #!/bin/bash
 
 #===================================================================#
-# allrun script for testcase as part of test routine
-# run settlingTest CFD part
-# Christoph Goniva - Feb. 2011
+# CFDDEMrun script for testcase
+# run falling_sphere_two_way_coupling
+# Achuth N. Balachandran Nair - Oct. 2018
 #===================================================================#
 
 #- source CFDEM env vars
@@ -69,7 +69,6 @@ cd $casePath/CFD
 cleanCase
 rm -r $casePath/CFD/clockData
 rm $casePath/DEM/post/*.*
-#rm -r $casePath/DEM/post/restart/*.*
 #- preserve post directory
 touch $casePath/DEM/post/.gitignore
 echo "done"

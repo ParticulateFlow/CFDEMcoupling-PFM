@@ -15,7 +15,7 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-application     cfdemSolverIB;
+application     cfdemSolverIBTorque;
 
 startFrom       startTime;
 
@@ -27,9 +27,9 @@ endTime         0.5;
 
 deltaT          0.0005;
 
-writeControl    adjustableRunTime;//timeStep;//
+writeControl    adjustableRunTime;
 
-writeInterval   0.005;//
+writeInterval   0.005;
 
 purgeWrite      0;
 
@@ -43,7 +43,7 @@ timeFormat      general;
 
 timePrecision   6;
 
-runTimeModifiable off;//yes;
+runTimeModifiable off;
 
 adjustTimeStep  no;
 
