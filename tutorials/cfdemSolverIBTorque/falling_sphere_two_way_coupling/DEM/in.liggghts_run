@@ -46,7 +46,7 @@ fix ywall2 all wall/gran model hertz tangential history primitive type 1  yplane
 fix cfd  all couple/cfd couple_every 10 mpi
 fix cfd2 all couple/cfd/force
 
-# create atoms for simulation
+# create atom
 create_atoms 1 single 0.0125 0.075 0.0125 units box
 set atom 1 diameter 0.01 density 1.1 vx 0 vy 0 vz 0 omegaz 10
 
@@ -74,7 +74,7 @@ compute         rke all erotate/sphere
 thermo_style    custom step atoms ke c_rke vol
 thermo          1000
 thermo_modify   lost ignore norm no
-compute_modify  thermo_temp dynamic yes
+compute_modify  thermo_temp dynamic no extra 0
 
 # insert the first particles so that dump is not empty
 dump dmp1 all custom 100 ../DEM/post/dump.liggghts_run id type x y z vx vy vz &
