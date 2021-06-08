@@ -55,13 +55,10 @@ cfdemCloudIBmodified::cfdemCloudIBmodified
 )
 :
     cfdemCloud(mesh),
-    //xmol_(NULL),
-    //vmol_(NULL),
     pRefCell_(readLabel(mesh.solutionDict().subDict("PISO").lookup("pRefCell"))),
     pRefValue_(readScalar(mesh.solutionDict().subDict("PISO").lookup("pRefValue"))),
     haveEvolvedOnce_(false),
     skipLagrangeToEulerMapping_(false)
-
 {
 
     if(this->couplingProperties().found("skipLagrangeToEulerMapping"))
@@ -76,30 +73,10 @@ cfdemCloudIBmodified::cfdemCloudIBmodified
 
 cfdemCloudIBmodified::~cfdemCloudIBmodified()
 {
-  //  dataExchangeM().destroy(xmol_,3);
-  //  dataExchangeM().destroy(vmol_,3);
 }
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-void cfdemCloudIBmodified::getDEMdata()
-{
-    cfdemCloud::getDEMdata();
-   // dataExchangeM().getData("x_mol","vector-atom",xmol_);
-   // dataExchangeM().getData("v_mol","vector-atom",vmol_);
-}
-
-bool cfdemCloudIBmodified::reAllocArrays()
-{
-    if(cfdemCloud::reAllocArrays())
-    {
-        // get arrays of new length
-      //  dataExchangeM().allocateArray(xmol_,0.,3);
-      //  dataExchangeM().allocateArray(vmol_,0.,3);
-        return true;
-    }
-    return false;
-}
 
 bool cfdemCloudIBmodified::evolve()
 {
@@ -113,8 +90,6 @@ bool cfdemCloudIBmodified::evolve()
         dataExchangeM().couple(0);
         doCouple=true;
 
-//        Info << "skipLagrangeToEulerMapping_: " << skipLagrangeToEulerMapping_
-//             << " haveEvolvedOnce_: " << haveEvolvedOnce_ << endl;
         if(!skipLagrangeToEulerMapping_ || !haveEvolvedOnce_)
         {
           if(verbose_) Info << "- getDEMdata()" << endl;
@@ -154,8 +129,6 @@ bool cfdemCloudIBmodified::evolve()
     }
     Info << "evolve done." << endl;
 
-    //if(verbose_)    #include "debugInfo.H";
-
     // do particle IO
     IOM().dumpDEMdata();
 
@@ -175,45 +148,11 @@ void cfdemCloudIBmodified::calcForcingTerm(volVectorField& Us)
 
                 if(cell >=0){
                     // calc particle velocity
-                    //for(int i=0;i<3;i++) rVec[i]=Us.mesh().C()[cell][i]-position(index)[i];
                     for(int i=0;i<3;i++) uP[i] = velocities()[index][i];
                     Us[cell] = (1-voidfractions_[index][subCell])*uP;
                 }
             }
         }
-
-
-        /*label cell = 0;
-        vector uP(0,0,0);
-        vector rRel(0,0,0);
-        vector vRel(0,0,0);
-        vector angRel(0,0,0);
-        vector rCell(0,0,0);
-        vector vCell(0,0,0);
-        for (int index = 0; index < numberOfParticles(); ++index){
-            for(int subCell = 0; subCell < voidFractionM().cellsPerParticle()[index][0]; subCell++)
-            {
-                cell = cellIDs()[index][subCell];
-
-                if(cell >=0){
-                    // calc particle velocity
-                    for(int i=0;i<3;i++) rRel[i]=position(index)[i]-moleculeCOM()[index][i];
-
-                    // capture the relative velocity from DEM side
-                    for(int i=0;i<3;i++) vRel[i]=moleculeVel()[index][i];
-                    double r = magSqr(rRel);
-                    angRel = (rRel^vRel)/r;
-
-                    // calc cell distance from molecule com and setting gammaFactor for vCell calc
-                    for(int i=0;i<3;i++) rCell[i]=Us.mesh().C()[cell][i]-moleculeCOM()[index][i];
-                    vCell=angRel^rCell;
-                    for(int i=0;i<3;i++) uP[i] = velocities()[index][i]+vCell[i];
-                    Us[cell] = (1-voidfractions_[index][subCell])*uP;
-                }
-            }
-        }
-
-        if(verbose_) Info << "setVelocity done." << endl;*/
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

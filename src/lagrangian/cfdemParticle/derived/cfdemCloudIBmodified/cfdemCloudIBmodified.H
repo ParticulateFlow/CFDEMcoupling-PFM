@@ -58,9 +58,6 @@ class cfdemCloudIBmodified
 {
 protected:
 
-  //  mutable double **xmol_;
-  //  mutable double **vmol_;
-
     label pRefCell_;
     scalar pRefValue_;
 
@@ -81,27 +78,11 @@ public:
 
         ~cfdemCloudIBmodified();
 
-
     // Member Functions
-        void getDEMdata();
 
-        bool reAllocArrays();
-
-    // Modification
         bool evolve();
 
         void calcForcingTerm(volVectorField&);
-
-      // Access
-    /*    inline double ** moleculeCOM() const
-        {
-            return xmol_;
-        }
-
-        inline double ** moleculeVel() const
-        {
-            return vmol_;
-        }*/
 };
 
 
