@@ -137,22 +137,23 @@ bool cfdemCloudIBmodified::evolve()
 
 void cfdemCloudIBmodified::calcForcingTerm(volVectorField& Us)
 {
-        // set particle velocity field
-        if(verbose_) Info << "- setVelocity(velocities_)" << endl;
-        label cell = 0;
-        vector uP(0,0,0);
-        for (int index = 0; index < numberOfParticles(); ++index){
-            for(int subCell = 0; subCell < voidFractionM().cellsPerParticle()[index][0]; subCell++)
+    // set particle velocity field
+    if(verbose_) Info << "- setVelocity(velocities_)" << endl;
+    label cell = 0;
+    vector uP(0,0,0);
+    for (int index = 0; index < numberOfParticles(); ++index)
+    {
+        for (int subCell = 0; subCell < voidFractionM().cellsPerParticle()[index][0]; subCell++)
+        {
+            cell = cellIDs()[index][subCell];
+            if (cell >= 0)
             {
-                cell = cellIDs()[index][subCell];
-
-                if(cell >=0){
-                    // calc particle velocity
-                    for(int i=0;i<3;i++) uP[i] = velocities()[index][i];
-                    Us[cell] = (1-voidfractions_[index][subCell])*uP;
-                }
+                // calc particle velocity
+                for(int i=0;i<3;i++) uP[i] = velocities()[index][i];
+                Us[cell] = (1-voidfractions_[index][subCell])*uP;
             }
         }
+    }
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
