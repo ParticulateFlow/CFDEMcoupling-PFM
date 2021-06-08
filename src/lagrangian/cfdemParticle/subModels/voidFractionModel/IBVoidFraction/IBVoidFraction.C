@@ -169,7 +169,7 @@ void IBVoidFraction::setvoidFraction(double** const& mask,double**& voidfraction
                             scalar lambda = segmentParticleIntersection(index, minPeriodicParticlePos, vertexPosition, cellCentrePosition);
                             voidfractionNext_[particleCenterCellID] -= ratio * lambda;
                         }
-                     }
+                    }
                 } //end particle partially overlapping with cell
 
                 //generating list with cell and subcells
