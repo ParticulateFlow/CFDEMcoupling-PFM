@@ -62,7 +62,7 @@ protected:
     label pRefCell_;
     scalar pRefValue_;
 
-    mutable double **DEMTorques_;
+    double **DEMTorques_;
 
     mutable bool haveEvolvedOnce_;
     mutable bool skipLagrangeToEulerMapping_;
