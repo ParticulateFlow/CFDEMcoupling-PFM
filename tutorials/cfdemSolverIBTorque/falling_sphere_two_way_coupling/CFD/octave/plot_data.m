@@ -3,10 +3,10 @@ clc;
 
 %% Script to plot the angular velocities and the particle positions
 
-A = importdata('DEM/angular_velocity_no_coupling.txt',' ',1);
-B = importdata('DEM/position_no_coupling.txt',' ',1);
-C = importdata('DEM/angular_velocity.txt',' ',1);
-D = importdata('DEM/position.txt',' ',1);
+A = importdata('../../DEM/post/angular_velocity_no_coupling.txt',' ',1);
+B = importdata('../../DEM/post/position_no_coupling.txt',' ',1);
+C = importdata('../../DEM/post/angular_velocity.txt',' ',1);
+D = importdata('../../DEM/post/position.txt',' ',1);
 
 pos1 = B.data();
 omega1 = A.data();

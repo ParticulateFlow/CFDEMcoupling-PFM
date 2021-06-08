@@ -23,7 +23,7 @@ nrProcs="4"
 machineFileName="none"   # yourMachinefileName | none
 debugMode="off"          # on | off| strict
 testHarnessPath="$CFDEM_TEST_HARNESS_PATH"
-runOctave="true"
+runOctave="false"
 postproc="false"
 #--------------------------------------------------------------------------------#
 
@@ -60,7 +60,7 @@ if [ $postproc == "true" ]
 fi
 
 #- copy log file to test harness
-cp ../../$logfileName $testHarnessPath
+cp $casePath/$logfileName $testHarnessPath
 
 #- clean up case
 echo "deleting data at: $casePath"
