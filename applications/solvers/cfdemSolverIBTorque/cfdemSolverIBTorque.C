@@ -29,7 +29,7 @@ Application
 
 Description
     Transient solver for incompressible flow.
-    The code is an evolution of the solver pisoFoam in OpenFOAM(R) 1.6, 
+    The code is an evolution of the solver pisoFoam in OpenFOAM(R) 1.6,
     where additional functionality for CFD-DEM coupling using immersed body
     (fictitious domain) method is added.
 Contributions
@@ -42,7 +42,7 @@ Contributions
 #include "turbulentTransportModel.H"
 #include "pisoControl.H"
 
-#include "cfdemCloudIBmodified.H"
+#include "cfdemCloudIB.H"
 #include "implicitCouple.H"
 
 #include "averagingModel.H"
@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
 
     // create cfdemCloud
     #include "readGravitationalAcceleration.H"
-    cfdemCloudIBmodified particleCloud(mesh);
+    cfdemCloudIB particleCloud(mesh);
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
