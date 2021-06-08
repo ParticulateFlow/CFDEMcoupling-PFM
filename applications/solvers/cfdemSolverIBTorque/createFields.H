@@ -26,9 +26,8 @@
         ),
         mesh
     );
-    //mod by alice
-    Info<< "Reading physical velocity field U" << endl;
-    Info<< "Note: only if voidfraction at boundary is 1, U is superficial velocity!!!\n" << endl;
+
+    Info<< "Reading particle velocity field Us\n" << endl;
     volVectorField Us
     (
         IOobject
@@ -76,9 +75,8 @@
         mesh
     );
 
-
     //mod by alice
-    Info<< "Reading field phiIB\n" << endl;
+    Info<< "Reading field voidfraction\n" << endl;
     volScalarField voidfraction
     (
         IOobject
