@@ -154,3 +154,22 @@
     (
         incompressible::turbulenceModel::New(URec, phiRec, laminarTransport)
     );
+
+   // place to put weight functions
+    IOdictionary weightDict
+    (
+        IOobject
+        (
+            "weightDict",
+            runTime.constant(),
+            mesh,
+            IOobject::READ_IF_PRESENT,
+            IOobject::NO_WRITE
+        )
+    );
+    if (!weightDict.headerOk())
+    {
+        weightDict.add("weights",scalarList(1,1.0));
+    }
+    scalarList weights(weightDict.lookup("weights"));
+    Info << "database initial weights: " << weights << endl;

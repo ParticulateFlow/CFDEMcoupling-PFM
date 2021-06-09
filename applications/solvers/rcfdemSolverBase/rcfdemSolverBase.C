@@ -43,6 +43,7 @@ Rules
 #include "cfdemCloudRec.H"
 #include "recBase.H"
 #include "recModel.H"
+#include "recPath.H"
 
 #include "cfdemCloud.H"
 #include "clockModel.H"
@@ -91,7 +92,7 @@ int main(int argc, char *argv[])
         if ( runTime.timeOutputValue() - startTime - (recTimeIndex+1)*recTimeStep + 1.0e-5 > 0.0 )
         {
             recurrenceBase.updateRecFields();
-            #include "readFields.H"
+            #include "updateFields.H"
             recTimeIndex++;
         }
 
