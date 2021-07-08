@@ -284,7 +284,7 @@ void heatTransferGunn::calcEnergyContribution()
     vector Us(0,0,0);
     scalar ds(0);
     scalar ds_scaled(0);
-    scalar scaleDia3 = typeCG_[0]*typeCG_[0]*typeCG_[0];
+    scalar scaleDia3 = scaleDia_*scaleDia_*scaleDia_;
     scalar muf(0);
     scalar magUr(0);
     scalar Rep(0);
@@ -293,7 +293,7 @@ void heatTransferGunn::calcEnergyContribution()
     scalar Tsum(0.0);
     scalar Nsum(0.0);
 
-    scalar cg = typeCG_[0];
+    scalar cg = scaleDia_;
     label partType = 1;
 
     interpolationCellPoint<scalar> voidfractionInterpolator_(voidfraction_);

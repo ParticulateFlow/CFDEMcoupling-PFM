@@ -18,6 +18,7 @@ EXE_INC = \
     -I$(CFDEM_LIGGGHTS_SRC_DIR) \
     -I$(CFDEM_M2MLIB_PATH) \
     -I$(CFDEM_SRC_DIR)/cfdTools \
+    -Wno-deprecated-copy
 
 
 LIB_LIBS = \

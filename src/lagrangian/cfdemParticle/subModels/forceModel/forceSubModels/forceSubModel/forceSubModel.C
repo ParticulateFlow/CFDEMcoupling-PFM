@@ -192,7 +192,7 @@ void forceSubModel::explicitCorr
 
 void forceSubModel::readSwitches()
 {
-    Info << "\nreading switches for forceSubModel:" << myType() << endl;
+    Info << "\nreading switches for forceSubModel:" << type() << endl;
     forAll(switchesNameList_,i)
     {
         if(switchesList_[i]) //check if switch is required

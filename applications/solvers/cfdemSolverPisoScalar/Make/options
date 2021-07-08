@@ -11,6 +11,7 @@ EXE_INC = \
     -I../cfdemSolverPiso \
     -I$(CFDEM_SRC_DIR)/lagrangian/cfdemParticle/lnInclude \
     -I$(CFDEM_SRC_DIR)/lagrangian/cfdemParticle/cfdTools \
+    -Wno-deprecated-copy
 
 EXE_LIBS = \
     -L$(CFDEM_LIB_DIR)\

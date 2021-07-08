@@ -22,7 +22,7 @@ License
     along with CFDEMcoupling academic.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::gerhardsRecModel
+    Foam::lruRecModel
 
 Description
     A recurrence model for a dataBase with a smaller, or equal number of slots
@@ -42,13 +42,13 @@ Description
     \endverbatim
 
 SourceFiles
-    gerhardsRecModelI.H
-    gerhardsRecModel.C
+    lruRecModelI.H
+    lruRecModel.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef gerhardsRecModel_H
-#define gerhardsRecModel_H
+#ifndef lruRecModel_H
+#define lruRecModel_H
 
 #include "recModel.H"
 
@@ -58,10 +58,10 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class gerhardsRecModel Declaration
+                           Class lruRecModel Declaration
 \*---------------------------------------------------------------------------*/
 
-class gerhardsRecModel
+class lruRecModel
 :
     public recModel
 {
@@ -119,13 +119,13 @@ protected:
 public:
 
     //- Runtime type information
-    TypeName("gerhardsRecModel");
+    TypeName("lruRecModel");
 
 
     // Constructors
 
         //- Construct from components
-        gerhardsRecModel
+        lruRecModel
         (
             const dictionary& dict,
             recBase& base
@@ -133,7 +133,7 @@ public:
 
     // Destructor
 
-        ~gerhardsRecModel();
+        ~lruRecModel();
 
     void exportVolScalarField(word, volScalarField&);
     void exportVolVectorField(word, volVectorField&);
@@ -204,7 +204,7 @@ private:
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#include "gerhardsRecModelI.H"
+#include "lruRecModelI.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

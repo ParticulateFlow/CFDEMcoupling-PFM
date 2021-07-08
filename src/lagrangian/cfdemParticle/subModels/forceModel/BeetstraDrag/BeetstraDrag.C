@@ -153,7 +153,6 @@ void BeetstraDrag::setForce() const
     else if (particleCloud_.cg() > 1)
     {
         scaleDia_=particleCloud_.cg();
-        typeCG_[0] = scaleDia_;
         Info << "Beetstra using scale from liggghts cg = " << scaleDia_ << endl;
     }
 
@@ -171,7 +170,7 @@ void BeetstraDrag::setForce() const
     scalar ds(0);
     scalar ds_scaled(0);
     scalar dSauter(0);
-    scalar scaleDia3 = typeCG_[0]*typeCG_[0]*typeCG_[0];
+    scalar scaleDia3 = scaleDia_*scaleDia_*scaleDia_;
     scalar nuf(0);
     scalar rho(0);
     scalar magUr(0);
@@ -180,7 +179,7 @@ void BeetstraDrag::setForce() const
     scalar GCcorr(1.);
     scalar PCcorr(1.);
 
-    scalar cg = typeCG_[0];
+    scalar cg = scaleDia_;
     label partType = 1;
 
     vector dragExplicit(0,0,0);
