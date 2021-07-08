@@ -66,6 +66,12 @@ protected:
 
     word kName_;
 
+    bool usePreCalcDispField_;
+
+    word dispFieldName_;
+
+    mutable volVectorField* dispField_;
+
     mutable volScalarField nut_;
 
     mutable volScalarField wallIndicatorField_;

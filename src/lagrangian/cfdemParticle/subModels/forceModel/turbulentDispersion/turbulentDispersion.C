@@ -66,6 +66,8 @@ turbulentDispersion::turbulentDispersion
     nutName_(propsDict_.lookupOrDefault<word>("nutName","nut")),
     usePreCalcK_(propsDict_.lookupOrDefault<bool>("usePreCalcK",false)),
     kName_(propsDict_.lookupOrDefault<word>("kName","k")),
+    usePreCalcDispField_(propsDict_.lookupOrDefault<bool>("usePreCalcDispField",false)),
+    dispFieldName_(propsDict_.lookupOrDefault<word>("dispFieldName","dispVarField")),
     nut_
     (   IOobject
         (
@@ -117,9 +119,9 @@ turbulentDispersion::turbulentDispersion
     }
     else existIgnoreCells_ = false;
 
-    if (usePreCalcNut_ && usePreCalcK_)
+    if ((usePreCalcNut_ && usePreCalcK_) || (usePreCalcNut_ && usePreCalcDispField_) || (usePreCalcDispField_ && usePreCalcK_))
     {
-        FatalError<< "Cannot use precalculated nut and k at the same time. Choose one." << abort(FatalError);
+        FatalError<< "Cannot use more than one precalculated nut, k and displacement fluctuations at the same time. Choose one." << abort(FatalError);
     }
 
     if (usePreCalcK_)
@@ -166,7 +168,7 @@ bool turbulentDispersion::ignoreCell(label cell) const
 
 void turbulentDispersion::setForce() const
 {
-    if (!usePreCalcNut_ && !usePreCalcK_)
+    if (!usePreCalcNut_ && !usePreCalcK_ && !usePreCalcDispField_)
     {
         nut_ = particleCloud_.turbulence().nut()();
     }
@@ -175,10 +177,15 @@ void turbulentDispersion::setForce() const
         volScalarField& nutRef (const_cast<volScalarField&>(mesh_.lookupObject<volScalarField> (nutName_)));
         nut_ = nutRef;
     }
-    else
+    else if (usePreCalcK_)
     {
         volScalarField& kRef (const_cast<volScalarField&>(mesh_.lookupObject<volScalarField> (kName_)));
         nut_ = Ck_ * delta_ * sqrt(kRef);
+    }
+    else
+    {
+        volVectorField& dispFieldRef (const_cast<volVectorField&>(mesh_.lookupObject<volVectorField> (dispFieldName_)));
+        dispField_ = &dispFieldRef;
     }
 
     label cellI = -1;
@@ -186,6 +193,7 @@ void turbulentDispersion::setForce() const
     label faceIGlobal = -1;
     scalar flucProjection = 0.0;
     scalar D = 0.0;
+    scalar randScalar = 0.0;
     vector faceINormal = vector::zero;
     vector flucU = vector::zero;
     vector position = vector::zero;
@@ -198,19 +206,30 @@ void turbulentDispersion::setForce() const
         cellI = particleCloud_.cellIDs()[index][0];
         if (cellI > -1 && !ignoreCell(cellI))
         {
-            if (interpolate_)
+            if (usePreCalcDispField_)
             {
-                position = particleCloud_.position(index);
-                D = nutInterpolator_.interpolate(position,cellI) / turbulentSchmidtNumber_;
+                for (label comp=0; comp<3; comp++)
+                {
+                    randScalar=ranGen_.scalarNormal();
+                    flucU.component(comp) = randScalar * (*dispField_)[cellI].component(comp);
+                }
             }
             else
             {
-                D = nut_[cellI] / turbulentSchmidtNumber_;
+                if (interpolate_)
+                {
+                    position = particleCloud_.position(index);
+                    D = nutInterpolator_.interpolate(position,cellI) / turbulentSchmidtNumber_;
+                }
+                else
+                {
+                    D = nut_[cellI] / turbulentSchmidtNumber_;
+                }
+
+                // include concentration dependence on the diffusivity at this point if necessary
+
+                flucU=unitFlucDir()*Foam::sqrt(6.0*D/dt_);
             }
-
-            // include concentration dependence on the diffusivity at this point if necessary
-
-            flucU=unitFlucDir()*Foam::sqrt(6.0*D/dt_);
 
             // prevent particles being pushed through walls by regulating velocity fluctuations
             // check if cell is adjacent to wall and remove corresponding components
