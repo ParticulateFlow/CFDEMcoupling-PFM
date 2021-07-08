@@ -91,6 +91,7 @@ int main(int argc, char *argv[])
 
         if ( runTime.timeOutputValue() - startTime - (recTimeIndex+1)*recTimeStep + 1.0e-5 > 0.0 )
         {
+            Info << "updating recurrence fields at time " << runTime.timeName() << "with recTimeIndex = " << recTimeIndex << nl << endl;
             recurrenceBase.updateRecFields();
             #include "updateFields.H"
             recTimeIndex++;

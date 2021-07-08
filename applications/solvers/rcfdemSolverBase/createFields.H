@@ -155,6 +155,24 @@
         incompressible::turbulenceModel::New(URec, phiRec, laminarTransport)
     );
 
+    IOdictionary recDict
+    (
+        IOobject
+        (
+            "recProperties",
+            runTime.constant(),
+            mesh,
+            IOobject::MUST_READ,
+            IOobject::NO_WRITE
+        )
+    );
+
+    word voidfractionFieldName(recDict.lookupOrDefault<word>("voidfractionFieldName","voidfraction"));
+    word UFieldName(recDict.lookupOrDefault<word>("UFieldName","U"));
+    word UsFieldName(recDict.lookupOrDefault<word>("UsFieldName","Us"));
+    word fluxFieldName(recDict.lookupOrDefault<word>("fluxFieldName","phi"));
+
+
    // place to put weight functions
     IOdictionary weightDict
     (
