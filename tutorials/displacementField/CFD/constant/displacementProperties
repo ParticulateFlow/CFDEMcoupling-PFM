@@ -25,6 +25,8 @@ FoamFile
 
 dumpIndexStart 4004000;
 
+dumpIndexEnd 4028000;
+
 dumpIndexIncrement 4000;
 
 nNeighMin 3;

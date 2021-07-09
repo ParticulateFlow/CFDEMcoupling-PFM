@@ -39,6 +39,7 @@ void findPairs(labelList &, labelList &, labelPairList &);
 void findPairsUnordered(labelList &, labelList &, labelPairList &);
 void interpolateCellValues(fvMesh &, label , labelList &, volVectorField &, volVectorField &, scalarList &, scalar);
 void nearestNeighborCells(fvMesh &, label, label, labelList &, labelList &);
+void normalizeFields(labelList &, volVectorField &, volVectorField &);
 void readDump(std::string, labelList &, vectorList &);
 scalar weightFun(scalar);
 
@@ -82,6 +83,7 @@ int main(int argc, char *argv[])
     );
 
     label dumpIndexStart(readLabel(displacementProperties.lookup("dumpIndexStart")));
+    label dumpIndexEnd(readLabel(displacementProperties.lookup("dumpIndexEnd")));
     label dumpIndexIncrement(readLabel(displacementProperties.lookup("dumpIndexIncrement")));
     label nNeighMin(readLabel(displacementProperties.lookup("nNeighMin")));
     scalar timePerStep(readScalar(displacementProperties.lookup("timePerStep")));
@@ -89,6 +91,7 @@ int main(int argc, char *argv[])
     std::string filepath=string(displacementProperties.lookup("filepath"));
     std::string fileext=string(displacementProperties.lookupOrDefault<string>("fileextension",""));
     bool fillEmptyCells=bool(displacementProperties.lookupOrDefault<bool>("fillEmptyCells",true));
+    bool averageMode=bool(displacementProperties.lookupOrDefault<bool>("averageMode",false));
     scalar xmin=scalar(displacementProperties.lookupOrDefault<scalar>("xmin",-1e10));
     scalar xmax=scalar(displacementProperties.lookupOrDefault<scalar>("xmax",1e10));
     scalar ymin=scalar(displacementProperties.lookupOrDefault<scalar>("ymin",-1e10));
@@ -135,6 +138,8 @@ int main(int argc, char *argv[])
         dimensionedVector("zero", dimensionSet(0,1,-1,0,0), vector::zero)
     );
 
+    labelList particlesInCell(mesh.nCells(), 0);
+
     scalar currTime=startTime + thisProc * timePerStep;
     label timeIndex=thisProc;
 
@@ -152,7 +157,24 @@ int main(int argc, char *argv[])
         ss << filepath << dumpIndex2 << fileext;
         std::string filename2 = ss.str();
 
-        if (access( filename1.c_str(), F_OK ) == -1 || access( filename2.c_str(), F_OK ) == -1) break;
+        if (access( filename1.c_str(), F_OK ) == -1 || access( filename2.c_str(), F_OK ) == -1 || dumpIndex2 > dumpIndexEnd)
+        {
+            if (averageMode)
+            {
+                normalizeFields(particlesInCell, Us, UsDirectedVariance);
+
+                if (fillEmptyCells)
+                {
+                    interpolateCellValues(mesh,nNeighMin,particlesInCell,Us,UsDirectedVariance,boundaries,timePerStep);
+                }
+
+                Us /= timePerStep;
+                UsDirectedVariance /= timePerStep;
+                Us.write();
+                UsDirectedVariance.write();
+            }
+            break;
+        }
 
         Info << "\nReading" << endl;
         Info << "\t" << filename1 << endl;
@@ -167,13 +189,17 @@ int main(int argc, char *argv[])
 
         // average particle displacements and their variance
         Info << "Binning particle displacements on mesh." << endl;
-        labelList particlesInCell(mesh.nCells(), 0);
         vector position, displacement;
         label line1, line2;
         label cellI;
 
-        Us *= 0.0;
-        UsDirectedVariance *= 0.0;
+        if (!averageMode)
+        {
+            Us *= 0.0;
+            UsDirectedVariance *= 0.0;
+            particlesInCell.clear();
+            particlesInCell.setSize(mesh.nCells(), 0);
+        }
         for (label partI = 0; partI < pairs.size(); partI++)
         {
             line1 = pairs[partI].first();
@@ -191,38 +217,23 @@ int main(int argc, char *argv[])
             }
         }
 
-
-        for (label cellJ = 0; cellJ<particlesInCell.size(); cellJ++)
+        if (!averageMode)
         {
-            if (particlesInCell[cellJ] > 0)
+            normalizeFields(particlesInCell, Us, UsDirectedVariance);
+
+            if (fillEmptyCells)
             {
-                Us[cellJ] /= particlesInCell[cellJ];
-                UsDirectedVariance[cellJ] /= particlesInCell[cellJ];
-                for (label comp=0;comp<3;comp++)
-                {
-                    UsDirectedVariance[cellJ].component(comp) -= Us[cellJ].component(comp)*Us[cellJ].component(comp);
-                    if (UsDirectedVariance[cellJ].component(comp) > 0) UsDirectedVariance[cellJ].component(comp) = Foam::sqrt(UsDirectedVariance[cellJ].component(comp));
-                }
+                interpolateCellValues(mesh,nNeighMin,particlesInCell,Us,UsDirectedVariance,boundaries,timePerStep);
             }
+
+            Us /= timePerStep;
+            UsDirectedVariance /= timePerStep;
+            Us.write();
+            UsDirectedVariance.write();
         }
 
-
-        // interpolate values for empty cells
-        if (fillEmptyCells)
-        {
-            Info << "Interpolating empty cells." << endl;
-            interpolateCellValues(mesh,nNeighMin,particlesInCell,Us,UsDirectedVariance,boundaries,timePerStep);
-        }
-
-//        dumpIndex1 = dumpIndex2;
-//        dumpIndex2 = dumpIndex1 + dumpIndexIncrement;
         dumpIndex1 += dumpIndexIncrement*totalProcs;
         dumpIndex2 += dumpIndexIncrement*totalProcs;
-
-        Us /= timePerStep;
-        UsDirectedVariance /= timePerStep;
-        Us.write();
-        UsDirectedVariance.write();
         currTime += timePerStep*totalProcs;
         timeIndex += totalProcs;
     }
@@ -311,6 +322,8 @@ void interpolateCellValues(fvMesh &mesh, label nNeighMin, labelList &particlesIn
     scalar weight;
     scalar weightSum;
     scalarList weights;
+
+    Info << "Interpolating empty cells." << endl;
     forAll(mesh.C(), cellI)
     {
         if (particlesInCell[cellI] > 0) continue;
@@ -338,6 +351,8 @@ void interpolateCellValues(fvMesh &mesh, label nNeighMin, labelList &particlesIn
         }
 
         // make sure no particles are placed outside of domain
+        // TODO: correct following implementation (meshSearch) and test it
+/*
         vector shiftedPosition = position + dt * Us[cellI];
         cellJ = mesh.findCell(shiftedPosition);
         if (cellJ < 0)
@@ -345,6 +360,7 @@ void interpolateCellValues(fvMesh &mesh, label nNeighMin, labelList &particlesIn
             cellK = mesh.findNearestCellWalk(shiftedPosition,cellI);
             Us[cellI] = (mesh.C()[cellI] - mesh.C()[cellK]) / dt;
         }
+*/
     }
 }
 
@@ -382,6 +398,23 @@ void nearestNeighborCells(fvMesh &mesh, label refCell, label nNeighMin, labelLis
         recentNeighbors.clear();
         recentNeighbors = newNeighbors;
         newNeighbors.clear();
+    }
+}
+
+void normalizeFields(labelList& particlesInCell, volVectorField& Us, volVectorField & UsDirectedVariance)
+{
+    for (label cellJ = 0; cellJ<particlesInCell.size(); cellJ++)
+    {
+        if (particlesInCell[cellJ] > 0)
+        {
+            Us[cellJ] /= particlesInCell[cellJ];
+            UsDirectedVariance[cellJ] /= particlesInCell[cellJ];
+            for (label comp=0;comp<3;comp++)
+            {
+                UsDirectedVariance[cellJ].component(comp) -= Us[cellJ].component(comp)*Us[cellJ].component(comp);
+                if (UsDirectedVariance[cellJ].component(comp) > 0) UsDirectedVariance[cellJ].component(comp) = Foam::sqrt(UsDirectedVariance[cellJ].component(comp));
+            }
+        }
     }
 }
 
