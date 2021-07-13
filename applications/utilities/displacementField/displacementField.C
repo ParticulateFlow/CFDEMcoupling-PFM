@@ -84,14 +84,17 @@ int main(int argc, char *argv[])
 
     label dumpIndexStart(readLabel(displacementProperties.lookup("dumpIndexStart")));
     label dumpIndexEnd(readLabel(displacementProperties.lookup("dumpIndexEnd")));
-    label dumpIndexIncrement(readLabel(displacementProperties.lookup("dumpIndexIncrement")));
+    label dumpIndexInputIncrement(readLabel(displacementProperties.lookup("dumpIndexInputIncrement")));
+    label dumpIndexDisplacementIncrement(readLabel(displacementProperties.lookup("dumpIndexDisplacementIncrement")));
     label nNeighMin(readLabel(displacementProperties.lookup("nNeighMin")));
-    scalar timePerStep(readScalar(displacementProperties.lookup("timePerStep")));
+    scalar timePerInputStep(readScalar(displacementProperties.lookup("timePerInputStep")));
+    scalar timePerDisplacementStep(readScalar(displacementProperties.lookup("timePerDisplacementStep")));
     scalar startTime(readScalar(displacementProperties.lookup("startTime")));
     std::string filepath=string(displacementProperties.lookup("filepath"));
     std::string fileext=string(displacementProperties.lookupOrDefault<string>("fileextension",""));
     bool fillEmptyCells=bool(displacementProperties.lookupOrDefault<bool>("fillEmptyCells",true));
     bool averageMode=bool(displacementProperties.lookupOrDefault<bool>("averageMode",false));
+
     scalar xmin=scalar(displacementProperties.lookupOrDefault<scalar>("xmin",-1e10));
     scalar xmax=scalar(displacementProperties.lookupOrDefault<scalar>("xmax",1e10));
     scalar ymin=scalar(displacementProperties.lookupOrDefault<scalar>("ymin",-1e10));
@@ -106,9 +109,25 @@ int main(int argc, char *argv[])
     boundaries[4]=zmin;
     boundaries[5]=zmax;
 
+    vectorList probePoints=vectorList(displacementProperties.lookupOrDefault<vectorList>("probePoints",vectorList(0)));
+    bool monitorProbes = false;
+    if (probePoints.size()>0) monitorProbes = true;
+    #include "OFstream.H"
+    OFstream monitoringDataFile("monitoringData.txt");
+    if (monitorProbes)
+    {
+        monitoringDataFile << "# monitoring data file" << endl;
+        monitoringDataFile << "# format: time nPerCell[p1] UDisp[p1] UDispDirectedVariance[p1] nPerCell[p2] ... " << endl;
+        for(label p=0;p<probePoints.size();p++)
+        {
+            vector pos = probePoints[p];
+            monitoringDataFile << "# point[" << p << "] = " << pos << endl;
+        }
+    }
 
-    label dumpIndex1 = dumpIndexStart + thisProc * dumpIndexIncrement;
-    label dumpIndex2 = dumpIndex1 + dumpIndexIncrement;
+
+    label dumpIndex1 = dumpIndexStart + thisProc * dumpIndexInputIncrement;
+    label dumpIndex2 = dumpIndex1 + dumpIndexDisplacementIncrement;
 
     volVectorField Us
     (
@@ -140,7 +159,7 @@ int main(int argc, char *argv[])
 
     labelList particlesInCell(mesh.nCells(), 0);
 
-    scalar currTime=startTime + thisProc * timePerStep;
+    scalar currTime=startTime + thisProc * timePerInputStep;
     label timeIndex=thisProc;
 
     while(true)
@@ -165,11 +184,11 @@ int main(int argc, char *argv[])
 
                 if (fillEmptyCells)
                 {
-                    interpolateCellValues(mesh,nNeighMin,particlesInCell,Us,UsDirectedVariance,boundaries,timePerStep);
+                    interpolateCellValues(mesh,nNeighMin,particlesInCell,Us,UsDirectedVariance,boundaries,timePerDisplacementStep);
                 }
 
-                Us /= timePerStep;
-                UsDirectedVariance /= timePerStep;
+                Us /= timePerDisplacementStep;
+                UsDirectedVariance /= timePerDisplacementStep;
                 Us.write();
                 UsDirectedVariance.write();
             }
@@ -200,6 +219,7 @@ int main(int argc, char *argv[])
             particlesInCell.clear();
             particlesInCell.setSize(mesh.nCells(), 0);
         }
+
         for (label partI = 0; partI < pairs.size(); partI++)
         {
             line1 = pairs[partI].first();
@@ -223,18 +243,30 @@ int main(int argc, char *argv[])
 
             if (fillEmptyCells)
             {
-                interpolateCellValues(mesh,nNeighMin,particlesInCell,Us,UsDirectedVariance,boundaries,timePerStep);
+                interpolateCellValues(mesh,nNeighMin,particlesInCell,Us,UsDirectedVariance,boundaries,timePerDisplacementStep);
             }
 
-            Us /= timePerStep;
-            UsDirectedVariance /= timePerStep;
+            Us /= timePerDisplacementStep;
+            UsDirectedVariance /= timePerDisplacementStep;
             Us.write();
             UsDirectedVariance.write();
         }
 
-        dumpIndex1 += dumpIndexIncrement*totalProcs;
-        dumpIndex2 += dumpIndexIncrement*totalProcs;
-        currTime += timePerStep*totalProcs;
+        if (averageMode && monitorProbes)
+        {
+            monitoringDataFile << currTime << " ";
+            for(label p=0;p<probePoints.size();p++)
+            {
+                vector pos = probePoints[p];
+                label cellP = mesh.findCell(pos);
+                monitoringDataFile << " " << particlesInCell[cellP] << " " << Us[cellP]/timePerDisplacementStep << " " << UsDirectedVariance[cellP]/(timePerDisplacementStep*timePerDisplacementStep);
+            }
+            monitoringDataFile << endl;
+        }
+
+        dumpIndex1 += dumpIndexInputIncrement*totalProcs;
+        dumpIndex2 += dumpIndexInputIncrement*totalProcs;
+        currTime += timePerInputStep*totalProcs;
         timeIndex += totalProcs;
     }
     return 0;

@@ -27,11 +27,15 @@ dumpIndexStart 4004000;
 
 dumpIndexEnd 4028000;
 
-dumpIndexIncrement 4000;
+dumpIndexDisplacementIncrement 8000;
+
+dumpIndexInputIncrement 4000;
 
 nNeighMin 3;
 
-timePerStep 0.05;
+timePerDisplacementStep 0.1;
+
+timePerInputStep 0.05;
 
 startTime 0.0;
 
