@@ -37,7 +37,7 @@ Application
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 void findPairs(labelList &, labelList &, labelPairList &);
 void findPairsUnordered(labelList &, labelList &, labelPairList &);
-void interpolateCellValues(fvMesh &, label , labelList &, volVectorField &, volVectorField &, scalarList &, scalar);
+void fillEmptyCells(fvMesh &, label , labelList &, volVectorField &, volVectorField &, scalarList &, vector, vector, bool, scalar);
 void nearestNeighborCells(fvMesh &, label, label, labelList &, labelList &);
 void normalizeFields(labelList &, volVectorField &, volVectorField &);
 void readDump(std::string, labelList &, vectorList &);
@@ -92,8 +92,10 @@ int main(int argc, char *argv[])
     scalar startTime(readScalar(displacementProperties.lookup("startTime")));
     std::string filepath=string(displacementProperties.lookup("filepath"));
     std::string fileext=string(displacementProperties.lookupOrDefault<string>("fileextension",""));
-    bool fillEmptyCells=bool(displacementProperties.lookupOrDefault<bool>("fillEmptyCells",true));
+    bool interpolate=bool(displacementProperties.lookupOrDefault<bool>("fillEmptyCells",true));
     bool averageMode=bool(displacementProperties.lookupOrDefault<bool>("averageMode",false));
+    vector defaultUs=vector(displacementProperties.lookupOrDefault<vector>("defaultUs",vector::zero));
+    vector defaultUsDirectedVariance=vector(displacementProperties.lookupOrDefault<vector>("defaultUsDirectedVariance",vector::zero));
 
     scalar xmin=scalar(displacementProperties.lookupOrDefault<scalar>("xmin",-1e10));
     scalar xmax=scalar(displacementProperties.lookupOrDefault<scalar>("xmax",1e10));
@@ -181,11 +183,7 @@ int main(int argc, char *argv[])
             if (averageMode)
             {
                 normalizeFields(particlesInCell, Us, UsDirectedVariance);
-
-                if (fillEmptyCells)
-                {
-                    interpolateCellValues(mesh,nNeighMin,particlesInCell,Us,UsDirectedVariance,boundaries,timePerDisplacementStep);
-                }
+                fillEmptyCells(mesh,nNeighMin,particlesInCell,Us,UsDirectedVariance,boundaries,defaultUs,defaultUsDirectedVariance,interpolate,timePerDisplacementStep);
 
                 Us /= timePerDisplacementStep;
                 UsDirectedVariance /= timePerDisplacementStep;
@@ -240,11 +238,7 @@ int main(int argc, char *argv[])
         if (!averageMode)
         {
             normalizeFields(particlesInCell, Us, UsDirectedVariance);
-
-            if (fillEmptyCells)
-            {
-                interpolateCellValues(mesh,nNeighMin,particlesInCell,Us,UsDirectedVariance,boundaries,timePerDisplacementStep);
-            }
+            fillEmptyCells(mesh,nNeighMin,particlesInCell,Us,UsDirectedVariance,boundaries,defaultUs,defaultUsDirectedVariance,interpolate,timePerDisplacementStep);
 
             Us /= timePerDisplacementStep;
             UsDirectedVariance /= timePerDisplacementStep;
@@ -345,7 +339,7 @@ void findPairsUnordered(labelList &indices1, labelList &indices2, labelPairList 
     Info << "findPairs: " << pairs.size() << " pairs found." << endl;
 }
 
-void interpolateCellValues(fvMesh &mesh, label nNeighMin, labelList &particlesInCell, volVectorField &Us, volVectorField& UsDirectedVariance,scalarList& boundaries, scalar dt)
+void fillEmptyCells(fvMesh &mesh, label nNeighMin, labelList &particlesInCell, volVectorField &Us, volVectorField& UsDirectedVariance,scalarList& boundaries, vector defaultUs, vector defaultUsDirectedVariance, bool interpolate, scalar dt)
 {
     label cellJ;
     label cellK;
@@ -355,15 +349,23 @@ void interpolateCellValues(fvMesh &mesh, label nNeighMin, labelList &particlesIn
     scalar weightSum;
     scalarList weights;
 
-    Info << "Interpolating empty cells." << endl;
+    Info << "Filling empty cells." << endl;
     forAll(mesh.C(), cellI)
     {
         if (particlesInCell[cellI] > 0) continue;
 
         vector position = mesh.C()[cellI];
-        if (position.x() < boundaries[0] || position.x() > boundaries[1]) continue;
-        if (position.y() < boundaries[2] || position.y() > boundaries[3]) continue;
-        if (position.z() < boundaries[4] || position.z() > boundaries[5]) continue;
+        label outsideBox = 0;
+        if (position.x() < boundaries[0] || position.x() > boundaries[1]) outsideBox++;
+        if (position.y() < boundaries[2] || position.y() > boundaries[3]) outsideBox++;
+        if (position.z() < boundaries[4] || position.z() > boundaries[5]) outsideBox++;
+
+        if (outsideBox > 0 || !interpolate)
+        {
+            Us[cellI] = defaultUs*dt;
+            UsDirectedVariance[cellI] = defaultUsDirectedVariance*dt;
+            continue;
+        }
 
         nearestNeighborCells(mesh, cellI, nNeighMin, particlesInCell, neighborsWithValues);
         weightSum = 0.0;
