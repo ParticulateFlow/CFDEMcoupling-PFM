@@ -47,6 +47,7 @@ reactionHeat::reactionHeat
     propsDict_(dict.subDict(typeName + "Props")),
     interpolation_(propsDict_.lookupOrDefault<bool>("interpolation",false)),
     verbose_(propsDict_.lookupOrDefault<bool>("verbose",false)),
+    execution_(true),
     mesh_(sm.mesh()),
     maxSource_(1e30),
     reactionHeatName_(propsDict_.lookupOrDefault<word>("reactionHeatName","reactionHeat")),
@@ -94,7 +95,8 @@ reactionHeat::~reactionHeat()
 void reactionHeat::calcEnergyContribution()
 {
     loopCounter_++;
-    if (loopCounter_ % Nevery_ != 0)
+    execution_ = (particleCloud_.dataExchangeM().couplingStep() % Nevery_ == 0);
+    if (!execution_)
     {
         return;
     }

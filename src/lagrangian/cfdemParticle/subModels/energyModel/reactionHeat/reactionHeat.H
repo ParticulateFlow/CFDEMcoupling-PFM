@@ -50,6 +50,8 @@ protected:
 
     bool verbose_;
 
+    bool execution_;
+
     const fvMesh& mesh_;
 
     scalar maxSource_;
