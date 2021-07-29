@@ -193,7 +193,7 @@ void MarkovPath::extendPath()
         else
         {
             scalar randIntStart = ranGen.scalar01();
-            seqStart = (int)(startLoop + randIntStart*(endLoop - startLoop));
+            seqStart = static_cast<label>(startLoop + randIntStart*(endLoop - startLoop));
         }
 
         virtualTimeIndex = seqStart;
