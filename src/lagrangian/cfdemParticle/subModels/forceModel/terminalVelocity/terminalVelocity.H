@@ -66,15 +66,15 @@ private:
 
 //    volScalarField* turbKineticEnergy_;
 
+    bool existturbDissipationRateInObjReg_;
+
+    bool turbulenceCorrection_;
+
     volScalarField* turbDissipationRate_;
 
 //    mutable volScalarField delta;
 
     mutable volScalarField wallIndicatorField_;
-
-    bool existturbDissipationRateInObjReg_;
-
-    bool turbulenceCorrection_;
 
     scalar liquidViscosity_;
 
