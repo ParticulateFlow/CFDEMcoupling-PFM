@@ -1058,6 +1058,11 @@ void lruRecModel::exportAveragedVolVectorField(volVectorField& smoothfield, word
     smoothfield /= counter;
 }
 
+label lruRecModel::currentTimeIndex() const
+{
+    return virtualTimeIndex;
+}
+
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
