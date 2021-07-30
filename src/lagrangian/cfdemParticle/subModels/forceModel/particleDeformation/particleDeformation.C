@@ -54,7 +54,11 @@ particleDeformation::particleDeformation
     refFieldName_(propsDict_.lookup("refFieldName")),
     refField_(),
     voidfractionFieldName_(propsDict_.lookupOrDefault<word>("voidfractionFieldName","voidfraction")),
+#if OPENFOAM_VERSION_MAJOR < 5
+    voidfraction_(const_cast<volScalarField&>(sm.mesh().lookupObject<volScalarField>(voidfractionFieldName_))),
+#else
     voidfraction_(sm.mesh().lookupObjectRef<volScalarField> (voidfractionFieldName_)),
+#endif
     defaultDeformCellsName_(propsDict_.lookupOrDefault<word>("defaultDeformCellsName","none")),
     defaultDeformCells_(),
     existDefaultDeformCells_(false),

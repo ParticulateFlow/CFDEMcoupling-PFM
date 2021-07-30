@@ -210,7 +210,11 @@ void turbulentDispersion::setForce() const
             {
                 for (label comp=0; comp<3; comp++)
                 {
-                    randScalar=ranGen_.scalarNormal();
+#if OPENFOAM_VERSION_MAJOR < 6
+                    randScalar = ranGen_.GaussNormal();
+#else
+                    randScalar = ranGen_.scalarNormal();
+#endif
                     flucU.component(comp) = randScalar * (*dispField_)[cellI].component(comp);
                 }
             }
