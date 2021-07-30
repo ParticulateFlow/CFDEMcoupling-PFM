@@ -13,20 +13,18 @@ FoamFile
     object      blockMeshDict;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-#include "../../geometry"
 convertToMeters 1;
-
 
 vertices
 (
-    ($mhlx $mhly 0)
-    ($hlx $mhly 0)
-    ($hlx $hly 0)
-    ($mhlx $hly 0)
-    ($mhlx $mhly $lz)
-    ($hlx $mhly $lz)
-    ($hlx $hly $lz)
-    ($mhlx $hly $lz)
+    (-0.04 -0.0075 0)
+    (0.04 -0.075 0)
+    (0.04 0.075 0)
+    (-0.04 0.075 0)
+    (-0.04 -0.075 0.25)
+    (0.04 -0.075 0.25)
+    (0.04 0.075 0.25)
+    (-0.04 0.075 0.25)
 );
 
 blocks
