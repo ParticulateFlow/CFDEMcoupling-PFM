@@ -95,6 +95,8 @@ protected:
 
     bool allowCFDsubTimestep_;
 
+    const bool modelCheck_;
+
     const bool limitDEMForces_;
 
     const bool phaseInForces_;
@@ -104,6 +106,10 @@ protected:
     const bool getParticleEffVolFactors_;
 
     const bool getParticleTypes_;
+
+    const bool streamingMode_;
+
+    const bool streamingFluc_;
 
     scalar maxDEMForce_;
 
@@ -291,6 +297,8 @@ public:
 
        label liggghtsCommandModelIndex(const word&) const;
 
+       inline void scaleForce(int, scalar);
+
        inline void setCG(double);
 
        inline scalar cg() const;
@@ -304,6 +312,8 @@ public:
        inline bool treatVoidCellsAsExplicitForce() const;
 
        inline bool ignore() const;
+
+       inline bool modelCheck() const;
 
        inline const fvMesh& mesh() const;
 

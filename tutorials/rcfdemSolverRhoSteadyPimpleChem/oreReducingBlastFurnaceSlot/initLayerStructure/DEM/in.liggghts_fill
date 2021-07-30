@@ -1,0 +1,57 @@
+# material properties
+include ../../CFDDEM/DEM/DEMparameters
+
+
+###############################################
+atom_style		granular
+atom_modify		map array
+communicate	single vel yes
+
+boundary		f p f
+newton			off
+units			si
+processors      1 1 8
+
+region		reg block -7.5 7.5 -0.6 0.6 -2.05 40 units box
+create_box	5 reg
+
+neighbor	0.001 bin
+neigh_modify	delay 0
+
+timestep    ${dt}
+
+include ../../CFDDEM/DEM/in.material_settings
+
+fix         pts1 all particletemplate/sphere 2 atom_type 1 density constant ${dens_C} radius constant ${rad_C}
+fix	    pdd1 all particledistribution/discrete 1.0 1 pts1 1.0
+
+fix	    fp all property/atom/polydispparcel effvolfactor ${poly_C} ${poly_fC} ${poly_O} ${poly_fO} 1.0
+
+fix	    integr all nve/sphere
+
+
+#screen output
+compute		1 all erotate/sphere
+thermo_style	custom step atoms ke c_1 vol 
+thermo		10000
+thermo_modify	lost ignore norm no
+compute_modify	thermo_temp dynamic yes
+
+
+# insertion
+###########
+
+# fill BF with coke 
+
+region		insReg0 block -7.4 7.4 -0.59 0.59 -1.9 35 units box
+fix ins0 all insert/pack/dense seed 123 region insReg0 distributiontemplate pdd1 volumefraction_region 0.56
+
+run 150000
+
+region insReg0 delete
+region		delReg0 block INF INF INF INF 26 INF units box
+group		delGroup0 region delReg0
+delete_atoms group delGroup0
+run 30000
+
+write_restart  	liggghts.restart_fill

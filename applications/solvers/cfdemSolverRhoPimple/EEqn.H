@@ -20,21 +20,23 @@
 
     Cpv = he.name() == "e" ? thermo.Cv() : thermo.Cp();
 
-    // correct source for the thermodynamic reference temperature
-    dimensionedScalar Tref("Tref", dimTemperature, T[0]-he[0]/(Cpv[0]+SMALL));
-    Qsource += QCoeff*Tref;
+// For implict T terms in the energy/enthalpy transport equation, use
+// (he_n+1 - he_n) / (T_n+1 - T_n) = Cpv to eliminate T_n+1 with he_n+1.
+// This formula is valid for ideal gases with e=e(T) and h=h(T). For
+// incompressible fluids, e=e(T) holds, too, but enthalpy would need correction
+// terms accounting for pressure variations.
 
     fvScalarMatrix EEqn
     (
         fvm::ddt(rhoeps, he) + fvm::div(phi, he)
       + addSource
-     // net heat transfer from particles to fluid
       - Qsource
+      - QCoeff*T
       - fvm::Sp(QCoeff/Cpv, he)
-     // thermal conduction of the fluid with effective conductivity
+      + QCoeff/Cpv*he
+      - fvc::laplacian(voidfraction*thCond,T)
       - fvm::laplacian(voidfraction*thCond/Cpv,he)
-      // + particle-fluid energy transfer due to work
-      // + fluid energy dissipation due to shearing
+      + fvc::laplacian(voidfraction*thCond/Cpv,he)
      ==
         fvOptions(rho, he)
     );

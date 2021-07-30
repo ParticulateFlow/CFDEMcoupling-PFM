@@ -43,6 +43,7 @@ Rules
 #include "cfdemCloudRec.H"
 #include "recBase.H"
 #include "recModel.H"
+#include "recPath.H"
 
 #include "cfdemCloud.H"
 #include "clockModel.H"
@@ -58,6 +59,8 @@ int main(int argc, char *argv[])
     #include "createControl.H"
     #include "createFields.H"
     #include "createFvOptions.H"
+
+    #include "readGravitationalAcceleration.H"
 
     cfdemCloudRec<cfdemCloud> particleCloud(mesh);
     recBase recurrenceBase(mesh);
@@ -88,8 +91,9 @@ int main(int argc, char *argv[])
 
         if ( runTime.timeOutputValue() - startTime - (recTimeIndex+1)*recTimeStep + 1.0e-5 > 0.0 )
         {
+            Info << "updating recurrence fields at time " << runTime.timeName() << "with recTimeIndex = " << recTimeIndex << nl << endl;
             recurrenceBase.updateRecFields();
-            #include "readFields.H"
+            #include "updateFields.H"
             recTimeIndex++;
         }
 

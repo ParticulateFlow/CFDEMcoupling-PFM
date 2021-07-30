@@ -46,7 +46,9 @@ weightSecondaryPhase::weightSecondaryPhase
     volfracFieldName_(propsDict_.lookup("volfracFieldName")),
     alpha_(sm.mesh().lookupObject<volScalarField> (volfracFieldName_)),
     rho_("rho",dimensionSet(1,-3,0,0,0),0.0),
-    g_("g",dimensionSet(0,1,-2,0,0),vector(0,0,-9.81))
+    gravityFieldName_(propsDict_.lookupOrDefault<word>("gravityFieldName","g")),
+    g_(sm.mesh().lookupObject<uniformDimensionedVectorField> (gravityFieldName_))
+
 {
     if (propsDict_.found("rho"))
         rho_.value()=readScalar(propsDict_.lookup ("rho"));

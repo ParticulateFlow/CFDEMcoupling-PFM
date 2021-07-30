@@ -160,6 +160,8 @@ public:
     label numRecFields() const;
     label numDataBaseFields() const;
 
+    label currentTimeIndex() const;
+
     void updateRecFields();
 
     void writeRecMatrix() const;

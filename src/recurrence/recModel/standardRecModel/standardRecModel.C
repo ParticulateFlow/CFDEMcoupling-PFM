@@ -63,6 +63,7 @@ standardRecModel::standardRecModel
     cumulativeNumRecFields_(),
     totNumRecFields_(0),
     storeAveragedFields_(propsDict_.lookupOrDefault<bool>("storeAveragedFields",false)),
+    checkTimeStep_(propsDict_.lookupOrDefault<bool>("checkTimeStep",true)),
     recurrenceMatrix_(1,scalar(-1.0)),
     timeIndexList_(),
     timeValueList_(),
@@ -127,7 +128,11 @@ standardRecModel::standardRecModel
 
     // check if time steps in databases are consistent
     // if no initial number of time steps has been specified, create path for full runtime immediately
-    recTimeStep_ = checkTimeStep();
+    if(checkTimeStep_)
+    {
+        recTimeStep_ = checkTimeStep();
+    }
+
     if(totRecSteps_ < 0)
     {
         totRecSteps_ = 1 + static_cast<label>( (endTime_-startTime_) / recTimeStep_ );
@@ -195,6 +200,24 @@ scalar standardRecModel::checkTimeStep()
 void standardRecModel::init()
 {
     recModel::init();
+
+    const objectRegistry& objReg = base_.mesh().thisDb();
+
+    for(int j=0; j<volScalarFieldNames_.size(); j++)
+    {
+        objReg.checkIn(volScalarFieldList_[j][virtualTimeIndex]);
+    }
+
+    for(int j=0; j<volVectorFieldNames_.size(); j++)
+    {
+        objReg.checkIn(volVectorFieldList_[j][virtualTimeIndex]);
+    }
+
+    for(int j=0; j<surfaceScalarFieldNames_.size(); j++)
+    {
+        objReg.checkIn(surfaceScalarFieldList_[j][virtualTimeIndex]);
+    }
+
 
     for(int i = 0; i < numDataBases_; i++)
     {
@@ -699,6 +722,27 @@ label standardRecModel::numDataBaseFields() const
 
 void standardRecModel::updateRecFields()
 {
+    // make fields of upcoming virtualTimeIndex available in object registry
+    const objectRegistry& objReg = base_.mesh().thisDb();
+
+    for(int j=0; j<volScalarFieldNames_.size(); j++)
+    {
+        objReg.checkOut(volScalarFieldList_[j][virtualTimeIndex]);
+        objReg.checkIn(volScalarFieldList_[j][virtualTimeIndexNext]);
+    }
+
+    for(int j=0; j<volVectorFieldNames_.size(); j++)
+    {
+        objReg.checkOut(volVectorFieldList_[j][virtualTimeIndex]);
+        objReg.checkIn(volVectorFieldList_[j][virtualTimeIndexNext]);
+    }
+
+    for(int j=0; j<surfaceScalarFieldNames_.size(); j++)
+    {
+        objReg.checkOut(surfaceScalarFieldList_[j][virtualTimeIndex]);
+        objReg.checkIn(surfaceScalarFieldList_[j][virtualTimeIndexNext]);
+    }
+
     virtualTimeIndex = virtualTimeIndexNext;
     virtualTimeIndexNext++;
 
@@ -736,6 +780,10 @@ void standardRecModel::updateRecFields()
     }
 }
 
+label standardRecModel::currentTimeIndex() const
+{
+    return virtualTimeIndex;
+}
 
 void standardRecModel::writeRecMatrix() const
 {

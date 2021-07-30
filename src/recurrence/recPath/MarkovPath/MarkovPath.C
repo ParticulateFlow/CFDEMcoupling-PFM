@@ -56,6 +56,7 @@ MarkovPath::MarkovPath
 :
     recPath(dict, base),
     propsDict_(dict.subDict(typeName + "Props")),
+    searchMinimum_(propsDict_.lookupOrDefault<bool>("searchMinimum",true)),
     correlationSteps_(readLabel(propsDict_.lookup("correlationSteps"))),
     meanIntervalSteps_(propsDict_.lookupOrDefault<label>("meanIntervalSteps",-1)),
     minIntervalSteps_(propsDict_.lookupOrDefault<label>("minIntervalSteps",0)),
@@ -167,7 +168,7 @@ void MarkovPath::extendPath()
         scalar randInterval = ranGen.scalar01();
 
         label interval = numIntervals_-1;
-        for(int i = numIntervals_-2 ;i >= 0; i--)
+        for(int i = numIntervals_-2; i >= 0; i--)
         {
            if (randInterval < intervalWeightsCumulative_[i]) interval=i;
         }
@@ -176,15 +177,23 @@ void MarkovPath::extendPath()
         if (interval > 0) startLoop = intervalSizesCumulative_[interval-1];
         label endLoop = intervalSizesCumulative_[interval] - meanIntervalSteps_;
 
-        scalar nextMinimum(GREAT);
-        for (label j = startLoop; j <= endLoop; j++)
+        if (searchMinimum_)
         {
-            if(abs(j - virtualTimeIndex) < correlationSteps_) continue;
-            if (recurrenceMatrix[j][virtualTimeIndex] < nextMinimum)
+            scalar nextMinimum(GREAT);
+            for (label j = startLoop; j <= endLoop; j++)
             {
-                nextMinimum = recurrenceMatrix[j][virtualTimeIndex];
-                seqStart = j+1;
+                if(abs(j - virtualTimeIndex) < correlationSteps_) continue;
+                if (recurrenceMatrix[j][virtualTimeIndex] < nextMinimum)
+                {
+                    nextMinimum = recurrenceMatrix[j][virtualTimeIndex];
+                    seqStart = j+1;
+                }
             }
+        }
+        else
+        {
+            scalar randIntervalStart = ranGen.scalar01();
+            seqStart = static_cast<label>(startLoop + randIntervalStart*(endLoop - startLoop));
         }
 
         virtualTimeIndex = seqStart;

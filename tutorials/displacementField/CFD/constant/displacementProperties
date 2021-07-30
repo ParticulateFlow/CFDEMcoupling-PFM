@@ -1,0 +1,46 @@
+/*---------------------------------------------------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.4                                   |
+|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+
+    root            "";
+    case            "";
+    instance        "";
+    local           "";
+
+    class           dictionary;
+    object          displacementProperties;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dumpIndexStart 4004000;
+
+dumpIndexEnd 4028000;
+
+dumpIndexDisplacementIncrement 8000;
+
+dumpIndexInputIncrement 4000;
+
+nNeighMin 3;
+
+timePerDisplacementStep 0.1;
+
+timePerInputStep 0.05;
+
+startTime 0.0;
+
+filepath "../DEM/post_disp/dump";
+
+fillEmptyCells false;
+
+// ************************************************************************* //

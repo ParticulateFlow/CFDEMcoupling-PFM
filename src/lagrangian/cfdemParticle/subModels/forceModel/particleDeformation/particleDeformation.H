@@ -59,6 +59,10 @@ private:
 
     mutable autoPtr<volScalarField> refField_;
 
+    word voidfractionFieldName_;
+
+    volScalarField& voidfraction_;
+
     // default deformation in region
     const word defaultDeformCellsName_;
 
@@ -68,6 +72,12 @@ private:
 
     scalar defaultDeformation_;
 
+    bool existBackgroundVoidage_;
+
+    scalar backgroundVoidage_;
+
+    scalar backgroundRef_;
+
     labelList partTypes_;
 
     scalarList lowerBounds_;
@@ -75,6 +85,22 @@ private:
     scalarList upperBounds_;
 
     const word partDeformationsName_;
+
+    // control functionality
+
+    bool controlForceOnDefPart_;
+
+    word controlFieldName_;
+
+    mutable volScalarField* controlField_;
+
+    vector controlPoint_;
+
+    label controlCell_;
+
+    scalar controlTargetValue_;
+
+    scalar controlCouplingStrength_;
 
     label getListIndex(label) const;
 
