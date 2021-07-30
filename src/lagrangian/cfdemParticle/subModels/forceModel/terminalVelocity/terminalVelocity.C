@@ -61,24 +61,9 @@ terminalVelocity::terminalVelocity
     ignoreCellsName_(propsDict_.lookupOrDefault<word>("ignoreCellsName","none")),
     ignoreCells_(),
     existIgnoreCells_(true),
-//    turbKineticEnergyFieldName_(propsDict_.lookupOrDefault<word>("turbKineticEnergyFieldName","")),
-//    turbDissipationRateFieldName_(propsDict_.lookupOrDefault<word>("turbDissipationRateFieldName","")),
-//    turbKineticEnergy_(NULL),
     existturbDissipationRateInObjReg_(false),
     turbulenceCorrection_(propsDict_.lookupOrDefault<bool>("turbulenceCorrection",false)),
     turbDissipationRate_(NULL),
-//    recurrenceBaseName_(propsDict_.lookupOrDefault<word>("recurrenceBaseName","")),
-//    recurrenceBase_(NULL),
-//    delta(  IOobject
-//                (
-//                      "delta",
-//                      mesh_.time().timeName(),
-//                      mesh_,
-//                      IOobject::NO_READ,
-//                      IOobject::NO_WRITE
-//                ),
-//                mesh_,
-//                dimensionedScalar("delta", dimLength, 1.0)),
     wallIndicatorField_
     (   IOobject
         (
@@ -115,15 +100,6 @@ terminalVelocity::terminalVelocity
     }
     else existIgnoreCells_ = false;
 
-/*
-    if (recurrenceBaseName_ != "")
-    {
-        Info << "creating the recBase pointer" << endl;
-        Foam::recBase& rBase_ = const_cast<recBase&>(sm.mesh().lookupObject<Foam::recBase>(recurrenceBaseName_));
-        recurrenceBase_ = &rBase_;
-        existturbDissipationRateInObjReg_ = true;
-    }
-*/
        turbDissipationRate_ = new volScalarField
         (
             IOobject
@@ -137,25 +113,6 @@ terminalVelocity::terminalVelocity
             mesh_,
             dimensionedScalar("zero", dimensionSet(0,2,-3,0,0), 0)
         );
-/*
-       if (turbKineticEnergyFieldName_ != "")
-       {
-           turbKineticEnergy_ = new volScalarField
-                   (
-                       IOobject
-                       (
-                           "turbKineticEnergy",
-                           mesh_.time().timeName(),
-                           mesh_,
-                           IOobject::NO_READ,
-                           IOobject::NO_WRITE
-                       ),
-                       mesh_,
-                       dimensionedScalar("zero", dimensionSet(0,2,-2,0,0), 0)
-                   );
-           delta.primitiveFieldRef()=Foam::pow(mesh_.V(),1.0/3.0);
-       }
-*/
        // define a field to indicate if a cell is next to boundary
         label cellI = -1;
         forAll (mesh_.boundary(),patchI)
@@ -195,7 +152,6 @@ void terminalVelocity::setForce() const
     updateEpsilon();
 
     vector position(0,0,0);
- //   scalar Urising=0.0;
     label cellI=-1;
     scalar radius=0.0;
     scalar epsilon=0.0;
@@ -213,7 +169,6 @@ void terminalVelocity::setForce() const
     for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
     {
             cellI = particleCloud_.cellIDs()[index][0];
- //           Urising =0.0;
             Uparticle = vector::zero;
             if (cellI > -1 && !ignoreCell(cellI)) // particle found
             {
@@ -237,7 +192,6 @@ void terminalVelocity::setForce() const
                     velReductionFactor = Foam::sqrt( 1 + ( dragReductionFactor_*pow(dLambda,3)));
                     terminalVel_ =  terminalVel_ / velReductionFactor;
                 }
-//                    particleCloud_.particleConvVels()[index][] += Urising_;
 
                     // read the new particle velocity
                     for(int j=0;j<3;j++)
@@ -293,29 +247,6 @@ void terminalVelocity::updateEpsilon() const
         Info << "epsilon is calculated from the turbulence model. " << endl;
         *turbDissipationRate_ = particleCloud_.turbulence().epsilon()();
     }
-/*
-    else if (recurrenceBaseName_ != "")
-    {
-         Info << "updating epsilon from the database. " << endl;
-         label currTimeIndex = recurrenceBase_ ->recM().currentTimeIndex();
-         Info << "current time index = " << currTimeIndex << endl;
-
-         if(turbDissipationRateFieldName_ != "")
-         {
-             *turbDissipationRate_ = recurrenceBase_ -> recM().exportVolScalarField(turbDissipationRateFieldName_,currTimeIndex);
-         }
-
-         else if(turbKineticEnergyFieldName_ !="")
-         {
-             *turbKineticEnergy_ = recurrenceBase_ -> recM().exportVolScalarField(turbKineticEnergyFieldName_,currTimeIndex);
-             *turbDissipationRate_ = 1.048*Foam::pow(*turbKineticEnergy_,1.5)/delta;
-         }
-     }
-    else
-    {
-        FatalError <<"turbulent dissipation enery must be calculated either from the turbulence model or recurrence dataBase!\n" << abort(FatalError);
-    }
-*/
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

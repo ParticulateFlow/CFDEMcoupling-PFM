@@ -74,7 +74,7 @@ private:
 
 //    mutable volScalarField delta;
 
-    mutable volScalarField wallIndicatorField_;
+    volScalarField wallIndicatorField_;
 
     scalar liquidViscosity_;
 
