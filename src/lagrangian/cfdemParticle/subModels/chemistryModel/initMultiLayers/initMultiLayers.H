@@ -66,11 +66,9 @@ private:
 
     vector defaultRelRadii_;
 
-    mutable double** relRadii_;
+    const word relRadiiRegName_;
 
     std::string filepath_;
-
-    void allocateMyArrays() const;
 
     bool initialized_;
 

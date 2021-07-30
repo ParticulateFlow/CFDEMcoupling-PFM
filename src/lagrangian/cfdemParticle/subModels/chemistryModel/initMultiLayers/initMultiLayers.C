@@ -59,7 +59,7 @@ initMultiLayers::initMultiLayers
     maxNumLayers_(0),
     numLayers_(propsDict_.lookupOrDefault<labelList>("numLayers",labelList(1,-1))),
     partTypes_(propsDict_.lookupOrDefault<labelList>("partTypes",labelList(1,-1))),
-    relRadii_(NULL),
+    relRadiiRegName_(typeName + "relRadii"),
     filepath_(string(propsDict_.lookup("filepath"))),
     initialized_(false)
 {
@@ -73,27 +73,21 @@ initMultiLayers::initMultiLayers
     }
     defaultRelRadii_ = vector(0.998, 0.995, 0.98);
     particleCloud_.checkCG(false);
-    allocateMyArrays();
+    particleCloud_.registerParticleProperty<double**>(relRadiiRegName_,maxNumLayers_);
+
 }
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 initMultiLayers::~initMultiLayers()
 {
-    particleCloud_.dataExchangeM().destroy(relRadii_,1);
 }
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
 
-void initMultiLayers::allocateMyArrays() const
-{
-    double initVal=0.0;
-    particleCloud_.dataExchangeM().allocateArray(relRadii_,initVal,maxNumLayers_);
-}
-
-
 bool initMultiLayers::init()
 {
+    double**& relRadii = particleCloud_.getParticlePropertyRef<double**>(relRadiiRegName_);
     // for all types of particles
     for(label types=0; types<partTypes_.size(); types++)
     {
@@ -194,10 +188,10 @@ bool initMultiLayers::init()
                 {
                     relRadiiLoopVar = defaultRelRadii_;
                 }
-                relRadii_[index][0] = 1.0;
+                relRadii[index][0] = 1.0;
                 for (label i=1;i<numLayers_[listIndex];i++)
                 {
-                    relRadii_[index][i] = relRadiiLoopVar.component(i-1);
+                    relRadii[index][i] = relRadiiLoopVar.component(i-1);
                 }
             }
         }
@@ -212,10 +206,10 @@ void initMultiLayers::execute()
 {
     if(!initialized_)
     {
-        allocateMyArrays();
         if (init())
         {
-            particleCloud_.dataExchangeM().giveData("relRadii","vector-atom", relRadii_);
+            double**& relRadii = particleCloud_.getParticlePropertyRef<double**>(relRadiiRegName_);
+            particleCloud_.dataExchangeM().giveData("relRadii","vector-atom", relRadii);
         }
         initialized_ = true;
     }
@@ -288,7 +282,7 @@ void initMultiLayers::readDump(std::string filename, label type, labelList &indi
     relradii.clear();
 
     std::ifstream file(filename);
-    std::string str; 
+    std::string str;
     while (std::getline(file, str))
     {
         if (lineCounter >= leadingLines)
