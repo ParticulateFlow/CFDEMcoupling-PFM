@@ -60,8 +60,6 @@ protected:
 
     volScalarField reactionHeatField_;
 
-    label loopCounter_;
-
     label Nevery_;
 
     scalar couplingTimestep_;

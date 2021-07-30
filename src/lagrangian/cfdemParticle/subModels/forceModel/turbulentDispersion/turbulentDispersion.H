@@ -78,8 +78,6 @@ protected:
 
     mutable volScalarField delta_;
 
-    scalar Ck_;
-
     scalar dt_;
 
     scalar turbulentSchmidtNumber_;
@@ -90,9 +88,11 @@ protected:
 
     scalar critVoidfraction_;
 
-    virtual vector unitFlucDir() const;
+    scalar Ck_;
 
     mutable Random ranGen_;
+
+    virtual vector unitFlucDir() const;
 
     bool ignoreCell(label) const;
 

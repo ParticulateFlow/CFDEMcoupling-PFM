@@ -341,8 +341,6 @@ void findPairsUnordered(labelList &indices1, labelList &indices2, labelPairList 
 
 void fillEmptyCells(fvMesh &mesh, label nNeighMin, labelList &particlesInCell, volVectorField &Us, volVectorField& UsDirectedVariance,scalarList& boundaries, vector defaultUs, vector defaultUsDirectedVariance, bool interpolate, scalar dt)
 {
-    label cellJ;
-    label cellK;
     labelList neighborsWithValues;
     scalar neighborSqrDistance;
     scalar weight;
@@ -388,10 +386,10 @@ void fillEmptyCells(fvMesh &mesh, label nNeighMin, labelList &particlesInCell, v
         // TODO: correct following implementation (meshSearch) and test it
 /*
         vector shiftedPosition = position + dt * Us[cellI];
-        cellJ = mesh.findCell(shiftedPosition);
+        label cellJ = mesh.findCell(shiftedPosition);
         if (cellJ < 0)
         {
-            cellK = mesh.findNearestCellWalk(shiftedPosition,cellI);
+            label cellK = mesh.findNearestCellWalk(shiftedPosition,cellI);
             Us[cellI] = (mesh.C()[cellI] - mesh.C()[cellK]) / dt;
         }
 */

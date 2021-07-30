@@ -64,7 +64,6 @@ reactionHeat::reactionHeat
         mesh_,
         dimensionedScalar("zero", dimensionSet(1,-1,-3,0,0,0,0),0.0)
     ),
-    loopCounter_(-1),
     Nevery_(propsDict_.lookupOrDefault<label>("Nevery",1)),
     couplingTimestep_(0.0)
 {
@@ -94,7 +93,6 @@ reactionHeat::~reactionHeat()
 
 void reactionHeat::calcEnergyContribution()
 {
-    loopCounter_++;
     execution_ = (particleCloud_.dataExchangeM().couplingStep() % Nevery_ == 0);
     if (!execution_)
     {

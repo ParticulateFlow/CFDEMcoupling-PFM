@@ -68,8 +68,6 @@ int main(int argc, char *argv[])
 
     scalar t;
 
-    label shiftedTimeI = 0;
-
     // check number of time directories
     label shift = 0;
     forAll(timeDirs, timeI)
