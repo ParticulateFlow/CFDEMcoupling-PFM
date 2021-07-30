@@ -65,7 +65,8 @@ terminalVelocity::terminalVelocity
     turbulenceCorrection_(propsDict_.lookupOrDefault<bool>("turbulenceCorrection",false)),
     turbDissipationRate_(NULL),
     wallIndicatorField_
-    (   IOobject
+    (
+        IOobject
         (
             "wallIndicator",
             sm.mesh().time().timeName(),
@@ -92,40 +93,44 @@ terminalVelocity::terminalVelocity
     scalar terminalVelMagnitude(propsDict_.lookupOrDefault<scalar>("terminalVelocity", 0.0));
     terminalVel_ = -terminalVelMagnitude * g_.value() / mag(g_.value());
 
-    if(ignoreCellsName_ != "none")
+    if (ignoreCellsName_ != "none")
     {
        ignoreCells_.set(new cellSet(particleCloud_.mesh(),ignoreCellsName_));
-       Info << "terminalVelocity: ignoring rising velocity in cellSet " << ignoreCells_().name() <<
-        " with " << ignoreCells_().size() << " cells." << endl;
+       Info<< "terminalVelocity: ignoring rising velocity in cellSet " << ignoreCells_().name()
+           << " with " << ignoreCells_().size() << " cells." << endl;
     }
-    else existIgnoreCells_ = false;
+    else
+    {
+        existIgnoreCells_ = false;
+    }
 
-       turbDissipationRate_ = new volScalarField
+    turbDissipationRate_ = new volScalarField
+    (
+        IOobject
         (
-            IOobject
-            (
-                "turbDissipationRate",
-                mesh_.time().timeName(),
-                mesh_,
-                IOobject::NO_READ,
-                IOobject::NO_WRITE
-            ),
+            "turbDissipationRate",
+            mesh_.time().timeName(),
             mesh_,
-            dimensionedScalar("zero", dimensionSet(0,2,-3,0,0), 0)
-        );
-       // define a field to indicate if a cell is next to boundary
-        label cellI = -1;
-        forAll (mesh_.boundary(),patchI)
-        {
-            word patchName = mesh_.boundary()[patchI].name();
-            if (patchName.rfind("procB",0) == 0) continue;
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        mesh_,
+        dimensionedScalar("zero", dimensionSet(0,2,-3,0,0), 0)
+    );
 
-            forAll(mesh_.boundary()[patchI], faceI)
-            {
-                cellI = mesh_.boundary()[patchI].faceCells()[faceI];
-                wallIndicatorField_[cellI] = 1.0;
-            }
+    // define a field to indicate if a cell is next to boundary
+    label cellI = -1;
+    forAll(mesh_.boundary(), patchI)
+    {
+        word patchName = mesh_.boundary()[patchI].name();
+        if (patchName.rfind("procB",0) == 0) continue;
+
+        forAll(mesh_.boundary()[patchI], faceI)
+        {
+            cellI = mesh_.boundary()[patchI].faceCells()[faceI];
+            wallIndicatorField_[cellI] = 1.0;
         }
+    }
 
 }
 
@@ -134,7 +139,7 @@ terminalVelocity::terminalVelocity
 
 terminalVelocity::~terminalVelocity()
 {
-        if (!existturbDissipationRateInObjReg_) delete turbDissipationRate_;
+    if (!existturbDissipationRateInObjReg_) delete turbDissipationRate_;
 }
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
@@ -152,9 +157,9 @@ void terminalVelocity::setForce() const
     updateEpsilon();
 
     vector position(0,0,0);
-    label cellI=-1;
-    scalar radius=0.0;
-    scalar epsilon=0.0;
+    label cellI = -1;
+    scalar radius = 0.0;
+    scalar epsilon = 0.0;
     scalar dLambda = 0.0;
     scalar velReductionFactor = 0.0;
     vector Uparticle(0,0,0);
@@ -166,76 +171,78 @@ void terminalVelocity::setForce() const
     word patchName("");
 
     interpolationCellPoint<scalar> turbDissipationRateInterpolator_(*turbDissipationRate_);
-    for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
+
+    for (int index = 0; index < particleCloud_.numberOfParticles(); ++index)
     {
-            cellI = particleCloud_.cellIDs()[index][0];
-            Uparticle = vector::zero;
-            if (cellI > -1 && !ignoreCell(cellI)) // particle found
+        cellI = particleCloud_.cellIDs()[index][0];
+        Uparticle = vector::zero;
+
+        if (cellI > -1 && !ignoreCell(cellI)) // particle found
+        {
+            if (interpolate_)
             {
-                if (interpolate_)
-                {
-                    position = particleCloud_.position(index);
-                    epsilon = turbDissipationRateInterpolator_.interpolate(position,cellI);
-                }
-                else
-                {
-                    epsilon = (*turbDissipationRate_)[cellI];
-                }
+                position = particleCloud_.position(index);
+                epsilon = turbDissipationRateInterpolator_.interpolate(position,cellI);
+            }
+            else
+            {
+                epsilon = (*turbDissipationRate_)[cellI];
+            }
 
-                    position = particleCloud_.position(index);
-                    radius = particleCloud_.radius(index);
+            position = particleCloud_.position(index);
+            radius = particleCloud_.radius(index);
 
-                if (turbulenceCorrection_)
+            if (turbulenceCorrection_)
+            {
+                // d * kolmogorov length scale
+                dLambda = 2*radius*pow(epsilon,0.25)/pow(liquidViscosity_,0.75);
+                velReductionFactor = Foam::sqrt(1 + (dragReductionFactor_*pow(dLambda,3)));
+                terminalVel_ =  terminalVel_ / velReductionFactor;
+            }
+
+            // read the new particle velocity
+            for (int j = 0; j < 3; j++)
+            {
+                particleCloud_.particleConvVels()[index][j] += terminalVel_[j];
+                Uparticle[j] = particleCloud_.particleConvVels()[index][j];
+            }
+
+            // prevent particles being pushed through walls
+            // check if cell is adjacent to wall and remove the normal velocity to the wall
+            if (wallIndicatorField_[cellI] > 0.5)
+            {
+                const cell& faces = mesh_.cells()[cellI];
+                forAll(faces, faceI)
                 {
-                    // d * kolmogorov length scale
-                    dLambda = 2*radius*pow(epsilon,0.25)/pow(liquidViscosity_,0.75);
-                    velReductionFactor = Foam::sqrt( 1 + ( dragReductionFactor_*pow(dLambda,3)));
-                    terminalVel_ =  terminalVel_ / velReductionFactor;
-                }
+                    faceIGlobal = faces[faceI];
+                    patchID = mesh_.boundaryMesh().whichPatch(faceIGlobal);
+                    if (patchID < 0) continue;
+                    patchName = mesh_.boundary()[patchID].name();
 
-                    // read the new particle velocity
-                    for(int j=0;j<3;j++)
+                    if (patchName.rfind("procB",0) == 0) continue;
+
+                    faceINormal = mesh_.Sf()[faceIGlobal];
+                    faceINormal /= mag(faceINormal);
+                    velProjection = faceINormal&Uparticle;
+                    if (velProjection > 0.0)
                     {
-                        particleCloud_.particleConvVels()[index][j] += terminalVel_[j];
-                        Uparticle[j] = particleCloud_.particleConvVels()[index][j];
-                    }
-
-                    // prevent particles being pushed through walls
-                    // check if cell is adjacent to wall and remove the normal velocity to the wall
-                    if (wallIndicatorField_[cellI] > 0.5)
-                    {
-                        const cell& faces = mesh_.cells()[cellI];
-                        forAll (faces, faceI)
+                        // removes the value normal to the face
+                        for (int j = 0; j < 3; j++)
                         {
-                            faceIGlobal = faces[faceI];
-                            patchID = mesh_.boundaryMesh().whichPatch(faceIGlobal);
-                            if (patchID < 0) continue;
-                            patchName = mesh_.boundary()[patchID].name();
-
-                            if (patchName.rfind("procB",0) == 0) continue;
-
-                            faceINormal = mesh_.Sf()[faceIGlobal];
-                            faceINormal /= mag(faceINormal);
-                            velProjection = faceINormal&Uparticle;
-                            if (velProjection > 0.0)
-                            {
-                                // removes the value normal to the face
-                                for(int j=0;j<3;j++)
-                                {
-                                    particleCloud_.particleConvVels()[index][j] -= velProjection*faceINormal[j];
-                                }
-                            }
+                            particleCloud_.particleConvVels()[index][j] -= velProjection*faceINormal[j];
                         }
                     }
-	    }
-
-            if (forceSubM(0).verbose() && index >0 && index <2)
-            {
-                Pout << "cellI = " << cellI << endl;
-                Pout << "index = " << index << endl;
-                Pout << "epsilon = " << epsilon << endl;
-                Pout << "rising velocity = " << terminalVel_ << endl;
+                }
             }
+        }
+
+        if (forceSubM(0).verbose() && index > 0 && index < 2)
+        {
+            Pout<< "cellI = " << cellI << endl;
+            Pout<< "index = " << index << endl;
+            Pout<< "epsilon = " << epsilon << endl;
+            Pout<< "rising velocity = " << terminalVel_ << endl;
+        }
     }
 }
 
@@ -244,7 +251,7 @@ void terminalVelocity::updateEpsilon() const
 {
     if (!existturbDissipationRateInObjReg_)
     {
-        Info << "epsilon is calculated from the turbulence model. " << endl;
+        Info<< "epsilon is calculated from the turbulence model. " << endl;
         *turbDissipationRate_ = particleCloud_.turbulence().epsilon()();
     }
 }
