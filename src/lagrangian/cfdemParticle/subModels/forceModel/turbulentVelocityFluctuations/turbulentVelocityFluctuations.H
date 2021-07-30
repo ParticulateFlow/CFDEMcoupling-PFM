@@ -58,7 +58,7 @@ protected:
 
     bool existIgnoreCells_;
 
-    mutable volScalarField wallIndicatorField_;
+    volScalarField wallIndicatorField_;
 
     scalar minTurbKineticEnergy_;
 

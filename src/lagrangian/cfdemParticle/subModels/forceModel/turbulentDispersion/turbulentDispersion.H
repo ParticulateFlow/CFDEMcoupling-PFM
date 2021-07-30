@@ -74,9 +74,9 @@ protected:
 
     mutable volScalarField nut_;
 
-    mutable volScalarField wallIndicatorField_;
+    volScalarField wallIndicatorField_;
 
-    mutable volScalarField delta_;
+    volScalarField delta_;
 
     scalar dt_;
 
