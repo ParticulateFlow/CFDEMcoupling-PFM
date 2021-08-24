@@ -37,8 +37,8 @@ Application
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 void findPairs(labelList &, labelList &, labelPairList &);
 void findPairsUnordered(labelList &, labelList &, labelPairList &);
-void fillEmptyCells(fvMesh &, label , labelList &, volVectorField &, volVectorField &, scalarList &, vector, vector, bool, scalar);
-void nearestNeighborCells(fvMesh &, label, label, labelList &, labelList &);
+void fillEmptyCells(fvMesh &, label, label, labelList &, volVectorField &, volVectorField &, scalarList &, volVectorField &, volVectorField &, bool, scalar);
+void nearestNeighborCells(fvMesh &, label, label, label, labelList &, labelList &);
 void normalizeFields(labelList &, volVectorField &, volVectorField &);
 void readDump(std::string, labelList &, vectorList &);
 scalar weightFun(scalar);
@@ -87,6 +87,7 @@ int main(int argc, char *argv[])
     label dumpIndexInputIncrement(readLabel(displacementProperties.lookup("dumpIndexInputIncrement")));
     label dumpIndexDisplacementIncrement(readLabel(displacementProperties.lookup("dumpIndexDisplacementIncrement")));
     label nNeighMin(readLabel(displacementProperties.lookup("nNeighMin")));
+    label maxSearchLayers(displacementProperties.lookupOrDefault<label>("maxSearchLayers",0));
     scalar timePerInputStep(readScalar(displacementProperties.lookup("timePerInputStep")));
     scalar timePerDisplacementStep(readScalar(displacementProperties.lookup("timePerDisplacementStep")));
     scalar startTime(readScalar(displacementProperties.lookup("startTime")));
@@ -94,8 +95,34 @@ int main(int argc, char *argv[])
     std::string fileext=string(displacementProperties.lookupOrDefault<string>("fileextension",""));
     bool interpolate=bool(displacementProperties.lookupOrDefault<bool>("fillEmptyCells",true));
     bool averageMode=bool(displacementProperties.lookupOrDefault<bool>("averageMode",false));
-    vector defaultUs=vector(displacementProperties.lookupOrDefault<vector>("defaultUs",vector::zero));
-    vector defaultUsDirectedVariance=vector(displacementProperties.lookupOrDefault<vector>("defaultUsDirectedVariance",vector::zero));
+    
+    volVectorField defaultUs
+    (
+        IOobject
+        (
+            "defaultUDisp",
+            runTime.timeName(),
+            mesh,
+            IOobject::READ_IF_PRESENT,
+            IOobject::NO_WRITE
+        ),
+        mesh,
+        dimensionedVector("zero", dimensionSet(0,1,-1,0,0), vector::zero)
+    );
+
+    volVectorField defaultUsDirectedVariance
+    (
+        IOobject
+        (
+            "defaultUDispDirectedVariance",
+            runTime.timeName(),
+            mesh,
+            IOobject::READ_IF_PRESENT,
+            IOobject::NO_WRITE
+        ),
+        mesh,
+        dimensionedVector("zero", dimensionSet(0,1,-1,0,0), vector::zero)
+    );
 
     scalar xmin=scalar(displacementProperties.lookupOrDefault<scalar>("xmin",-1e10));
     scalar xmax=scalar(displacementProperties.lookupOrDefault<scalar>("xmax",1e10));
@@ -183,7 +210,7 @@ int main(int argc, char *argv[])
             if (averageMode)
             {
                 normalizeFields(particlesInCell, Us, UsDirectedVariance);
-                fillEmptyCells(mesh,nNeighMin,particlesInCell,Us,UsDirectedVariance,boundaries,defaultUs,defaultUsDirectedVariance,interpolate,timePerDisplacementStep);
+                fillEmptyCells(mesh,nNeighMin,maxSearchLayers,particlesInCell,Us,UsDirectedVariance,boundaries,defaultUs,defaultUsDirectedVariance,interpolate,timePerDisplacementStep);
 
                 Us /= timePerDisplacementStep;
                 UsDirectedVariance /= timePerDisplacementStep;
@@ -238,7 +265,7 @@ int main(int argc, char *argv[])
         if (!averageMode)
         {
             normalizeFields(particlesInCell, Us, UsDirectedVariance);
-            fillEmptyCells(mesh,nNeighMin,particlesInCell,Us,UsDirectedVariance,boundaries,defaultUs,defaultUsDirectedVariance,interpolate,timePerDisplacementStep);
+            fillEmptyCells(mesh,nNeighMin,maxSearchLayers,particlesInCell,Us,UsDirectedVariance,boundaries,defaultUs,defaultUsDirectedVariance,interpolate,timePerDisplacementStep);
 
             Us /= timePerDisplacementStep;
             UsDirectedVariance /= timePerDisplacementStep;
@@ -339,7 +366,7 @@ void findPairsUnordered(labelList &indices1, labelList &indices2, labelPairList 
     Info << "findPairs: " << pairs.size() << " pairs found." << endl;
 }
 
-void fillEmptyCells(fvMesh &mesh, label nNeighMin, labelList &particlesInCell, volVectorField &Us, volVectorField& UsDirectedVariance,scalarList& boundaries, vector defaultUs, vector defaultUsDirectedVariance, bool interpolate, scalar dt)
+void fillEmptyCells(fvMesh &mesh, label nNeighMin, label maxSearchLayers, labelList &particlesInCell, volVectorField &Us, volVectorField& UsDirectedVariance,scalarList& boundaries, volVectorField &defaultUs, volVectorField &defaultUsDirectedVariance, bool interpolate, scalar dt)
 {
     labelList neighborsWithValues;
     scalar neighborSqrDistance;
@@ -360,12 +387,12 @@ void fillEmptyCells(fvMesh &mesh, label nNeighMin, labelList &particlesInCell, v
 
         if (outsideBox > 0 || !interpolate)
         {
-            Us[cellI] = defaultUs*dt;
-            UsDirectedVariance[cellI] = defaultUsDirectedVariance*dt;
+            Us[cellI] = defaultUs[cellI]*dt;
+            UsDirectedVariance[cellI] = defaultUsDirectedVariance[cellI]*dt;
             continue;
         }
 
-        nearestNeighborCells(mesh, cellI, nNeighMin, particlesInCell, neighborsWithValues);
+        nearestNeighborCells(mesh, cellI, nNeighMin, maxSearchLayers, particlesInCell, neighborsWithValues);
         weightSum = 0.0;
         weights.clear();
         for (label neighI=0; neighI<neighborsWithValues.size(); neighI++)
@@ -380,6 +407,12 @@ void fillEmptyCells(fvMesh &mesh, label nNeighMin, labelList &particlesInCell, v
             weight = weights[neighI]/weightSum;
             Us[cellI] += weight*Us[neighborsWithValues[neighI]];
             UsDirectedVariance[cellI] += weight*UsDirectedVariance[neighborsWithValues[neighI]];
+        }
+        
+        if (neighborsWithValues.size() == 0)
+        {
+            Us[cellI] = defaultUs[cellI]*dt;
+            UsDirectedVariance[cellI] = defaultUsDirectedVariance[cellI]*dt;
         }
 
         // make sure no particles are placed outside of domain
@@ -396,8 +429,9 @@ void fillEmptyCells(fvMesh &mesh, label nNeighMin, labelList &particlesInCell, v
     }
 }
 
-void nearestNeighborCells(fvMesh &mesh, label refCell, label nNeighMin, labelList &particlesInCell, labelList &neighborsWithValues)
+void nearestNeighborCells(fvMesh &mesh, label refCell, label nNeighMin, label maxSearchLayers, labelList &particlesInCell, labelList &neighborsWithValues)
 {
+    label numSearchLayers = 0;
     std::set<label> neighbors;
     std::set<label> newNeighbors;
     std::set<label> recentNeighbors;
@@ -425,6 +459,9 @@ void nearestNeighborCells(fvMesh &mesh, label refCell, label nNeighMin, labelLis
                 }
             }
         }
+        
+        numSearchLayers++;
+        if (numSearchLayers > maxSearchLayers && maxSearchLayers > 0) return;
 
         if (newNeighbors.size() == 0) return;
         recentNeighbors.clear();
