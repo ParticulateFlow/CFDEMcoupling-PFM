@@ -71,7 +71,8 @@ compressible, reacting flows.
 
 heatTransferGunn,
 heatTransferGunnPartField,
-reactionHeat :tb(c=2,ea=c)
+reactionHeat,
+"wallHeatTransferYagi"_energyModel_wallHeatTransferYagi.html :tb(c=2,ea=c)
 
 
 6.7 Force models :h4
@@ -103,6 +104,7 @@ granKineticEnergy,
 "pdCorrelation"_forceModel_pdCorrelation.html,
 "surfaceTensionForce"_forceModel_surfaceTensionForce.html,
 "virtualMassForce"_forceModel_virtualMassForce.html,
+"ParmarBassetForce"_forceModel_ParmarBassetForce.html,
 "viscForce"_forceModel_viscForce.html,
 "volWeightedAverage"_forceModel_volWeightedAverage.html :tb(c=2,ea=c)
 
@@ -192,7 +194,8 @@ smoothing the exchange fields.
 
 "constDiffSmoothing"_smoothingModel_constDiffSmoothing.html,
 "off"_smoothingModel_noSmoothing.html,
-"temporalSmoothing"_smoothingModel_temporalSmoothing.html :tb(c=2,ea=c)
+"temporalSmoothing"_smoothingModel_temporalSmoothing.html,
+"constDiffAndTemporalSmoothing"_smoothingModel_constDiffAndTemporalSmoothing.html :tb(c=2,ea=c)
 
 
 6.16 Thermal conductivity models :h4
@@ -215,4 +218,19 @@ accounting for the volume of the particles in the CFD domain.
 "bigParticle"_voidFractionModel_bigParticleVoidFraction.html,
 "centre"_voidFractionModel_centreVoidFraction.html,
 "divided"_voidFractionModel_dividedVoidFraction.html :tb(c=2,ea=c)
+
+6.18 Mass transfer models :h4
+
+The {massTransferModels} keyword specifies a list of mass transfer models used evaluating
+species transfer between particles and fluids.
+
+massTransferGunn :tb(c=2,ea=c)
+
+6.19 Diffusion coefficient models :h4
+
+The {diffCoeffModel} keyword entry specifies the model for the diffusion
+coefficient of dissolved spieces in the fluid phase in the presence of particles.
+
+SyamlalDiffCoeff,
+off :tb(c=2,ea=c)
 
