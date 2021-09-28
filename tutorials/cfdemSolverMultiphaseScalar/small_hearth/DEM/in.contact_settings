@@ -1,0 +1,11 @@
+# Material properties required for granular pair styles
+fix             m1 all property/global youngsModulus	                peratomtype       5.e6
+fix             m2 all property/global poissonsRatio 	                peratomtype	  0.3
+fix             m3 all property/global coefficientRestitution           peratomtypepair 1 0.3
+fix             m4 all property/global coefficientFriction 	        peratomtypepair 1 0.5
+fix             m5 all property/global coefficientRollingFriction       peratomtypepair 1 0.2
+fix             m6 all property/global coefficientRollingViscousDamping peratomtypepair 1 0.3
+
+# pair style
+pair_style	gran model hertz tangential history rolling_friction epsd
+pair_coeff  	* *

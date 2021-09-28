@@ -1,0 +1,121 @@
+echo            both
+log             ../log/log.liggghts_init
+
+atom_style      granular
+atom_modify     map array
+boundary        f f f
+newton          off
+
+communicate     single vel yes
+
+units           si
+processors      2 2 2
+
+region          reg block -0.5 0.5 -0.5 0.5 -0.0025 1 units box
+create_box      1 reg
+
+neighbor        0.007 bin
+neigh_modify    delay 0
+
+# contact model
+include         in.contact_settings
+
+# timestep
+timestep	1e-4
+
+# hearth settings
+include         in.hearth_settings
+
+# heat transfer
+fix             m7 all property/global thermalConductivity peratomtype ${particlekInit} # lambda in [W/(K*m)]
+fix             m8 all property/global thermalCapacity     peratomtype ${particleCp}  # cp in [J/(kg*K)]
+
+fix             heattransfer all heat/gran/conduction initial_temperature ${Tinlet}
+
+# walls
+include         in.wall_settings
+
+# gravity
+fix		gravi all gravity 9.81 vector 0.0 0.0 -1.0
+
+######################################
+
+# particle distribution
+include	   	in.particleSizeDistribution1
+include	   	in.particleSizeDistribution2
+
+# raceways
+include		in.raceways
+
+######################################
+
+# add a wall between core and shell regions
+fix             coreWall all wall/gran model hertz tangential history primitive type 1 zcylinder ${coreRadius} 0 0
+
+# insert in bed volume 
+fix         	ins1 all insert/pack seed 32452843 distributiontemplate pdd1 all_in yes insert_every 100 overlapcheck yes region initShellReg volumefraction_region 0.7
+fix         	ins2 all insert/pack seed 32452843 distributiontemplate pdd2 all_in yes insert_every 100 overlapcheck yes region initCoreReg  volumefraction_region 0.7
+
+# insert the first particles
+run             1
+
+# apply nve integration to all particles
+fix	    	integr all nve/sphere
+
+######################################
+
+# add load
+include         in.pressure_profile
+
+# add buoyancy
+fix	  	archi all buoyancy density ${liquidDensity} dim z level ${liquidLevel}
+
+######################################
+
+# output settings
+thermo_style	custom step time atoms ke v_nForceReg v_totalForce v_avForcePerPart
+thermo          100
+
+# dump settings
+dump            dmp all custom 1000 post/dump*.liggghts_init id type x y z ix iy iz vx vy vz fx fy fz omegax omegay omegaz radius density f_Temp[0]
+
+######################################
+
+# run for some steps
+label           run1
+run		1000 post no
+
+# repeat until kinetic energy is below treshold
+if              "${kinEn} > ${kinEnMax}" then "jump SELF run1"
+
+# remove wall between core and shell regions and run some more steps
+unfix           coreWall
+run             5000 pre no post no
+
+######################################
+
+# stop insertion		
+unfix		ins1
+unfix		ins2					
+
+######################################
+
+# set all temperatures
+set             region bedReg property/atom Temp ${Tinit}
+
+# insert in insertion volume 
+fix         	ins3 all insert/pack seed 32452843 distributiontemplate pdd1 all_in yes insert_every ${delIntSteps} overlapcheck yes region insShellReg volumefraction_region 0.7
+fix         	ins4 all insert/pack seed 32452843 distributiontemplate pdd2 all_in yes insert_every ${delIntSteps} overlapcheck yes region insCoreReg  volumefraction_region 0.7
+
+# run for some steps and remove particles in raceways
+label	     	run2
+run		100000 pre no post yes every ${delIntSteps} "delete_atoms porosity raceways ${fDelInit} 123457 compress no" "delete_atoms region freeboard compress no" "set region raceways property/atom Temp ${Tinlet}"	
+
+######################################
+
+# remove buoyancy
+unfix		archi
+
+# write restart file
+write_restart   post/restart/liggghts.restart
+
