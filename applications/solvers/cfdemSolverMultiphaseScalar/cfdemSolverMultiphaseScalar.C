@@ -112,8 +112,8 @@ int main(int argc, char *argv[])
             rho = mixture.rho();
             rhoEps = rho * voidfraction;
 
-	    #include "EEqn.H"
-	    #include "CEqn.H"
+        #include "EEqn.H"
+        #include "CEqn.H"
             
              // --- Pressure-velocity PIMPLE corrector loop
             while (pimple.loop())
@@ -139,7 +139,7 @@ int main(int argc, char *argv[])
 
         particleCloud.clockM().start(31,"postFlow");
         particleCloud.postFlow();
-        particleCloud.clockM().stop("postFlow");	
+        particleCloud.clockM().stop("postFlow");
 
         runTime.write();
 

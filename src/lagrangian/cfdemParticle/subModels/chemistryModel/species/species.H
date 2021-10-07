@@ -68,44 +68,32 @@ private:
 
     UPtrList<volScalarField> X_;
 
-    mutable List<double**> molarFractions_;
-
-    mutable List<double**> changeOfSpeciesMass_;
-
     PtrList<volScalarField> changeOfSpeciesMassFields_;
 
     volScalarField changeOfGasMassField_;
 
-    word tempFieldName_;
+    const word tempFieldName_;
 
     const volScalarField& tempField_;              // ref to gas temperature field
 
-    word partTempName_;
+    const word partTempName_;
 
-    mutable double **partTemp_;                    // gas temperature at particle positions
-
-    word densityFieldName_;
+    const word densityFieldName_;
 
     const volScalarField& rho_;
 
-    word partRhoName_;
+    const word partRhoName_;
 
-    mutable double **partRho_;                     // gas density at particle positions
-
-    word voidfractionFieldName_;
+    const word voidfractionFieldName_;
 
     const volScalarField& voidfraction_;
 
-    void allocateMyArrays() const;
-
     // total mole field
-    word molarConcFieldName_;
+    const word molarConcFieldName_;
 
     const volScalarField& molarConc_;
 
-    word partMolarConcName_;
-
-    mutable double **partMolarConc_;
+    const word partMolarConcName_;
 
     label loopCounter_;
 
@@ -140,8 +128,6 @@ public:
 
     // Member Functions
         void execute();
-
-        void reAllocMyArrays() const;
 
         tmp <volScalarField> Smi(const label i) const;
 

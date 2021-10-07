@@ -1,0 +1,122 @@
+/*---------------------------------------------------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.4                                   |
+|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+
+    root            "";
+    case            "";
+    instance        "";
+    local           "";
+
+    class           dictionary;
+    object          couplingProperties;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+//===========================================================================//
+// sub-models & settings
+
+syncMode false;
+
+modelType "A";
+
+couplingInterval 100;
+
+voidFractionModel divided;
+
+locateModel engineSearchMany2Many;
+
+meshMotionModel noMeshMotion;
+
+regionModel allRegion;
+
+IOModel basicIO;
+
+probeModel off;
+
+dataExchangeModel twoWayOne2One;
+
+averagingModel dense;
+
+clockModel standardClock;
+
+smoothingModel off;
+
+forceModels
+(
+    gradPForce
+    viscForce
+    KochHillDrag
+);
+
+momCoupleModels
+(
+    implicitCouple
+);
+
+turbulenceModelType "turbulenceProperties";
+
+//===========================================================================//
+// sub-model properties
+
+dividedProps
+{
+    alphaMin 0.01;
+    scaleUpVol 1.0;
+}
+
+engineSearchMany2ManyProps
+{
+    engineProps
+    {
+        treeSearch true;
+    }
+}
+
+twoWayOne2OneProps
+{
+    liggghtsPath "../DEM/in.liggghts_run";
+    verbose true;
+}
+
+gradPForceProps
+{
+    pFieldName "p";
+    voidfractionFieldName "voidfraction";
+    velocityFieldName "U";
+    interpolation true;
+}
+
+viscForceProps
+{
+    velocityFieldName "U";
+    interpolation true;
+}
+
+KochHillDragProps
+{
+    verbose true;
+    velFieldName "U";
+    voidfractionFieldName "voidfraction";
+    interpolation true;
+    implForceDEM true;
+}
+
+implicitCoupleProps
+{
+    velFieldName "U";
+    granVelFieldName "Us";
+    voidfractionFieldName "voidfraction";
+}
+
+// ************************************************************************* //

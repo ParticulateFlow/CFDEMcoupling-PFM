@@ -42,12 +42,12 @@ cfdemCloudEnergy::cfdemCloudEnergy
 :
     cfdemCloud(mesh),
     energyModels_(couplingProperties_.lookup("energyModels")),
-	massTransferModels_(couplingProperties_.lookup("massTransferModels")),
+    massTransferModels_(couplingProperties_.lookup("massTransferModels")),
     implicitEnergyModel_(false),
-	implicitMassTransferModel_(false),
+    implicitMassTransferModel_(false),
     chemistryModels_(couplingProperties_.lookup("chemistryModels")),
     energyModel_(nrEnergyModels()),
-	massTransferModel_(nrMassTransferModels()),
+    massTransferModel_(nrMassTransferModels()),
     thermCondModel_
     (
         thermCondModel::New
@@ -80,7 +80,7 @@ cfdemCloudEnergy::cfdemCloudEnergy
         );
     }
 
-	forAll(massTransferModels_, modeli)
+    forAll(massTransferModels_, modeli)
     {
         massTransferModel_.set
         (
@@ -244,11 +244,12 @@ bool cfdemCloudEnergy::evolve
 {
     if (cfdemCloud::evolve(alpha, Us, U))
     {
-        // calc energy contributions
+        // calc energy contributions including thermal conductivity
         // position 26 was already defined as Flow in clockModels and RhoPimpleChem solver.
         clockM().start(27,"calcEnergyContributions");
         if(verbose_) Info << "- calcEnergyContributions" << endl;
         calcEnergyContributions();
+        thermCondModel_().calcThermCond();
         if(verbose_) Info << "calcEnergyContributions done." << endl;
         clockM().stop("calcEnergyContributions");
 
@@ -259,8 +260,8 @@ bool cfdemCloudEnergy::evolve
         if(verbose_) Info << "speciesExecute done" << endl;
         clockM().stop("speciesExecute");
 
-		// calculate mass contributions
-		clockM().start(33,"calcMassContributions");
+        // calculate mass contributions
+        clockM().start(33,"calcMassContributions");
         if(verbose_) Info << "- calcMassContributions" << endl;
         calcMassContributions();
         if(verbose_) Info << "calcMassContributions done." << endl;
@@ -278,7 +279,7 @@ void cfdemCloudEnergy::postFlow()
     {
         energyModel_[modeli].postFlow();
     }
-	forAll(massTransferModel_, modeli)
+    forAll(massTransferModel_, modeli)
     {
         massTransferModel_[modeli].postFlow();
     }
@@ -290,7 +291,7 @@ void cfdemCloudEnergy::solve()
     {
         energyModel_[modeli].solve();
     }
-	forAll(massTransferModel_, modeli)
+    forAll(massTransferModel_, modeli)
     {
         massTransferModel_[modeli].solve();
     }

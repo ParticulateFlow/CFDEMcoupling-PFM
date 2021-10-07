@@ -69,7 +69,7 @@ protected:
 
         volScalarField voidfractionNext_;
 
-        int ** cellsPerParticle_;
+        const word partCellsRegName_;
 
         int maxCellsPerParticle_;
 
@@ -106,6 +106,14 @@ public:
         (
             const dictionary& dict,
             cfdemCloud& sm
+        );
+
+        //- Construct from components, specifiy initial value of fields
+        voidFractionModel
+        (
+            const dictionary& dict,
+            cfdemCloud& sm,
+            const scalar initVoidfraction
         );
 
 
@@ -156,10 +164,6 @@ public:
         int** const& cellsPerParticle() const;
 
         int maxCellsPerParticle() const;
-
-        void reAllocArrays();
-
-        void reAllocArrays(int nP);  //force number of particles during reallocation, for CFD offline-use
 
         virtual void setParticleType(label type) const {}
 

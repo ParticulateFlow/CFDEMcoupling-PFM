@@ -45,11 +45,11 @@ private:
 
     dictionary propsDict_;
 
-    mutable double **d_;
-    mutable double **p_;
-    mutable double **d2_;
-    mutable double **pd_;
-    mutable double **cg3_;
+    const word dRegName_;
+    const word pRegName_;
+    const word d2RegName_;
+    const word pdRegName_;
+    const word cg3RegName_;
 
     mutable volScalarField dField_;
     mutable volVectorField pField_;
@@ -58,13 +58,12 @@ private:
 
     mutable volScalarField cg3Field_;
 
-    const scalarList typeCG_;
     const scalarList particleDensities_;
+    const scalarList typeCG_;
+    const label maxTypeCG_;
     const Switch     constantCG_;
     const Switch     CG_;
     const Switch     runOnWriteOnly_;
-
-    void allocateMyArrays() const;
 
 public:
 

@@ -176,18 +176,19 @@ volScalarField kf
     mixture.kf()
 );
 
-volScalarField keff
+volScalarField thCond
 (
     IOobject
     (
-        "keff",
+        "thCond",
         runTime.timeName(),
         mesh,
-        IOobject::NO_READ,
+        IOobject::READ_IF_PRESENT,
         IOobject::AUTO_WRITE
     ),
     mesh,
-    dimensionedScalar("zero", dimensionSet(1,1,-3,-1,0,0,0), 0.0)
+    dimensionedScalar("zero", dimensionSet(1,1,-3,-1,0,0,0), 0.0),
+    "zeroGradient"
 );
 
 Info<< "Reading/creating concentration fields\n" << endl;
@@ -256,7 +257,7 @@ volScalarField Deff
         IOobject::READ_IF_PRESENT,
         IOobject::AUTO_WRITE
     ),
-	mesh,
+    mesh,
     dimensionedScalar("zero", dimensionSet(0,2,-1,0,0,0,0), 0.0)
 );
 
@@ -275,15 +276,15 @@ volScalarField Cs
 
 surfaceScalarField diffusionCorrection
 (
-	IOobject
-	(
-		"diffusionCorrection",
-		runTime.timeName(),
-		mesh,
-		IOobject::NO_READ,
-		IOobject::AUTO_WRITE
-	),
-	mixture.diffusionCorrection()
+    IOobject
+    (
+        "diffusionCorrection",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::AUTO_WRITE
+    ),
+    mixture.diffusionCorrection()
 );
 
 //========================

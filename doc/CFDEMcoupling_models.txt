@@ -27,7 +27,8 @@ The "averagingModel"_averagingModel.html keyword entry defines the model used to
 map the Lagrangian data to Eulerian values.
 
 "dense"_averagingModel_dense.html,
-"dilute"_averagingModel_dilute.html :tb(c=2,ea=c)
+"dilute"_averagingModel_dilute.html,
+off :tb(c=2,ea=c)
 
 
 6.3 Chemistry models :h4
@@ -69,10 +70,11 @@ that performs the data exchange between the DEM code and the CFD code.
 The {energyModels} keyword specifies a list of energy models used for e.g.
 compressible, reacting flows.
 
+heatTransferGranConduction,
 heatTransferGunn,
-heatTransferGunnPartField,
+heatTransferRanzMarshall,
 reactionHeat,
-"wallHeatTransferYagi"_energyModel_wallHeatTransferYagi.html :tb(c=2,ea=c)
+wallHeatTransferYagi :tb(c=2,ea=c)
 
 
 6.7 Force models :h4
@@ -93,15 +95,23 @@ Fines,
 "MeiLift"_forceModel_MeiLift.html,
 "SchillerNaumannDrag"_forceModel_SchillerNaumannDrag.html,
 "ShirgaonkarIB"_forceModel_ShirgaonkarIB.html,
+dSauter,
+deactivateForce,
+directedDiffusiveRelaxation,
+evaluateFluctuations,
 "fieldStore"_forceModel_fieldStore.html,
 "fieldTimeAverage"_forceModel_fieldTimeAverage.html,
+freeStreaming,
 "gradPForce"_forceModel_gradPForce.html,
 "gradPForceSmooth"_forceModel_gradPForceSmooth.html,
 granKineticEnergy,
 "interface"_forceModel_interface.html,
+isotropicFluctuations,
 "noDrag"_forceModel_noDrag.html,
 "particleCellVolume"_forceModel_particleCellVolume.html,
+particleDeformation,
 "pdCorrelation"_forceModel_pdCorrelation.html,
+potentialRelaxation,
 "surfaceTensionForce"_forceModel_surfaceTensionForce.html,
 "virtualMassForce"_forceModel_virtualMassForce.html,
 "ParmarBassetForce"_forceModel_ParmarBassetForce.html,
@@ -155,6 +165,7 @@ used to manipulate the CFD mesh according to the DEM mesh motion.
 The "momCoupleModels"_momCoupleModel.html keyword specifies a list of models
 used for momentum exchange between DEM and CFD simulation
 
+deactivateCouple,
 "explicitCouple"_momCoupleModel_explicitCouple.html,
 "implicitCouple"_momCoupleModel_implicitCouple.html,
 "off"_momCoupleModel_noCouple.html :tb(c=2,ea=c)
@@ -217,7 +228,9 @@ accounting for the volume of the particles in the CFD domain.
 "IB"_voidFractionModel_IBVoidFraction.html,
 "bigParticle"_voidFractionModel_bigParticleVoidFraction.html,
 "centre"_voidFractionModel_centreVoidFraction.html,
-"divided"_voidFractionModel_dividedVoidFraction.html :tb(c=2,ea=c)
+"divided"_voidFractionModel_dividedVoidFraction.html,
+off,
+trilinear :tb(c=2,ea=c)
 
 6.18 Mass transfer models :h4
 

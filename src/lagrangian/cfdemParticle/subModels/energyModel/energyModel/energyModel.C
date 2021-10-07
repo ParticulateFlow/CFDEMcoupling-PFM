@@ -55,7 +55,7 @@ energyModel::energyModel
             IOobject::NO_WRITE
         )
     ),
-	kf0Field_
+    kf0Field_
     (
         IOobject
         (
@@ -68,7 +68,7 @@ energyModel::energyModel
         sm.mesh(),
         dimensionedScalar("zero", dimensionSet(1,1,-3,-1,0,0,0), 0.)
     ),
-	CpField_
+    CpField_
     (
         IOobject
         (
@@ -82,10 +82,10 @@ energyModel::energyModel
         dimensionedScalar("zero", dimensionSet(0,2,-2,-1,0,0,0), 0.)
     )
 {
-	// build constant fields for single phase case
-	if (!particleCloud_.multiphase())
-	{
-		kf0Field_ = volScalarField
+    // build constant fields for single phase case
+    if (!particleCloud_.multiphase())
+    {
+        kf0Field_ = volScalarField
         (
             IOobject
             (
@@ -99,7 +99,7 @@ energyModel::energyModel
             dimensionedScalar(transportProperties_.lookup("kf"))
         );
 
-		CpField_ = volScalarField
+        CpField_ = volScalarField
         (
             IOobject
             (
@@ -112,7 +112,7 @@ energyModel::energyModel
             particleCloud_.mesh(),
             dimensionedScalar(transportProperties_.lookup("Cp"))
         );
-	}
+    }
 }
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
@@ -124,26 +124,26 @@ energyModel::~energyModel()
 
 const volScalarField& energyModel::kf0Field() const
 {
-	if (particleCloud_.multiphase())
-	{
-		return particleCloud_.mesh().lookupObject<volScalarField>("kf");
-	}
-	else
-	{
-		return kf0Field_;
-	}
+    if (particleCloud_.multiphase())
+    {
+        return particleCloud_.mesh().lookupObject<volScalarField>("kf");
+    }
+    else
+    {
+        return kf0Field_;
+    }
 }
 
 const volScalarField& energyModel::CpField() const
 {
-	if (particleCloud_.multiphase())
-	{
-		return particleCloud_.mesh().lookupObject<volScalarField>("Cp");
-	}
-	else
-	{
-		return CpField_;
-	}
+    if (particleCloud_.multiphase())
+    {
+        return particleCloud_.mesh().lookupObject<volScalarField>("Cp");
+    }
+    else
+    {
+        return CpField_;
+    }
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

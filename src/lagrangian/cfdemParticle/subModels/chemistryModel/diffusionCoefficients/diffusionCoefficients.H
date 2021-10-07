@@ -76,19 +76,15 @@ private:
 
     word partPressureName_;
 
-    mutable double **partPressure_;
-
     UPtrList<volScalarField> X_;
 
     wordList diffusantGasNames_;
 
-    mutable List<double**> diffusionCoefficients_;
-
     UPtrList<volScalarField> Xdiffusant_;
 
-    HashTable<scalar, word> coeffs;
+    HashTable<scalar> coeffs;
 
-    HashTable<scalar, word> molWeight;
+    HashTable<scalar> molWeight;
 
     void createCoeffs();
 
@@ -99,8 +95,6 @@ private:
 
     // calculate denominator part diffusion volume equation
     double calcDiffVol(int, int);
-
-    void allocateMyArrays() const;
 
     bool initialized_;
 
@@ -126,8 +120,6 @@ private:
 
     // Member Functions
         void execute();
-
-        void reAllocMyArrays() const;
 };
 
 

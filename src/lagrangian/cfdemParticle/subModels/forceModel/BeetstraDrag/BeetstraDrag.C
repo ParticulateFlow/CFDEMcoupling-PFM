@@ -58,8 +58,9 @@ BeetstraDrag::BeetstraDrag
     minVoidfraction_(propsDict_.lookupOrDefault<scalar>("minVoidfraction",0.1)),
     UsFieldName_(propsDict_.lookup("granVelFieldName")),
     UsField_(sm.mesh().lookupObject<volVectorField> (UsFieldName_)),
-    scaleDia_(1.),
+    maxTypeCG_(1),
     typeCG_(propsDict_.lookupOrDefault<scalarList>("coarseGrainingFactors",scalarList(1,1.0))),
+    scaleDia_(1.),
     scaleDrag_(1.),
     rhoP_(0.),
     rho_(0.),
@@ -103,7 +104,11 @@ BeetstraDrag::BeetstraDrag
         scaleDrag_=scalar(readScalar(propsDict_.lookup("scaleDrag")));
     }
 
-    if (typeCG_.size()>1) multiTypes_ = true;
+    if (typeCG_.size()>1)
+    {
+        multiTypes_ = true;
+        maxTypeCG_ = typeCG_.size();
+    }
 
     if (propsDict_.found("useFilteredDragModel"))
     {
@@ -215,12 +220,14 @@ void BeetstraDrag::setForce() const
                     voidfraction = voidfraction_[cellI];
                     Ufluid = U_[cellI];
                 }
-                // in case a fines phase is present, void fraction needs to be adapted
-                adaptVoidfraction(voidfraction, cellI);
 
                 if (multiTypes_)
                 {
                     partType = particleCloud_.particleType(index);
+                    if (partType > maxTypeCG_)
+                    {
+                        FatalError<< "Too few coarse-graining factors provided." << abort(FatalError);
+                    }
                     cg = typeCG_[partType - 1];
                     scaleDia3 = cg*cg*cg;
                 }

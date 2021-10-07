@@ -29,6 +29,8 @@ END_RST -->
 
 For more details, see "Vångö et al. (2018)"_#Vångö2018.
 
+IMPORTANT NOTE: This solver requires OpenFOAM 4.x or 5.x to work properly.
+
 :line
 
 :link(Vångö2018)

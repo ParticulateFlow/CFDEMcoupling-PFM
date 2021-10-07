@@ -56,17 +56,17 @@ protected:
 
     const wordList energyModels_;
 
-	const wordList massTransferModels_;
+    const wordList massTransferModels_;
 
     bool implicitEnergyModel_;
 
-	bool implicitMassTransferModel_;
+    bool implicitMassTransferModel_;
 
     const wordList chemistryModels_;
 
     PtrList<energyModel> energyModel_;
 
-	PtrList<massTransferModel> massTransferModel_;
+    PtrList<massTransferModel> massTransferModel_;
 
     autoPtr<thermCondModel> thermCondModel_;
 
@@ -76,7 +76,7 @@ protected:
 
     void calcEnergyContributions();
 
-	void calcMassContributions();
+    void calcMassContributions();
 
     void speciesExecute();
 
@@ -84,7 +84,7 @@ public:
 
     friend class energyModel;
 
-	friend class massTransferModel;
+    friend class massTransferModel;
 
     friend class chemistryModel;
 
@@ -106,7 +106,7 @@ public:
 
        const energyModel& energyM(int);
 
-	   const massTransferModel& massTransferM(int);
+       const massTransferModel& massTransferM(int);
 
        const thermCondModel& thermCondM();
 
@@ -116,17 +116,17 @@ public:
 
        label nrEnergyModels() const;
 
-	   label nrMassTransferModels() const;
+       label nrMassTransferModels() const;
 
        bool implicitEnergyModel() const;
 
-	   bool implicitMassTransferModel() const;
+       bool implicitMassTransferModel() const;
 
        int nrChemistryModels();
 
        inline const wordList& energyModels() const;
 
-	   inline const wordList& massTransferModels() const;
+       inline const wordList& massTransferModels() const;
 
        inline const wordList& chemistryModels() const;
 
@@ -134,7 +134,7 @@ public:
 
        void energyCoefficients(volScalarField&);
 
-	   void massContributions(volScalarField&);
+       void massContributions(volScalarField&);
 
        void massCoefficients(volScalarField&);
 

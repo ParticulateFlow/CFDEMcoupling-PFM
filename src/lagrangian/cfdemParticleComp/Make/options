@@ -6,6 +6,8 @@ sinclude $(RULES)/mplib$(WM_MPLIB)
 
 GIT_VERSION := $(shell git describe --dirty --always --tags)
 PFLAGS+= -DGITVERSION=\"$(GIT_VERSION)\"
+FOAM_VERSION_MAJOR := $(word 1,$(subst ., ,$(WM_PROJECT_VERSION)))
+PFLAGS+= -DOPENFOAM_VERSION_MAJOR=$(FOAM_VERSION_MAJOR)
 PFLAGS+= -Dcompre
 
 
@@ -26,7 +28,8 @@ EXE_INC = \
     -I$(CFDEM_SRC_DIR)/cfdTools \
     -Wno-old-style-cast \
     -Wno-unused-result \
-    -Wno-literal-suffix
+    -Wno-literal-suffix \
+    -Wno-deprecated-copy
 
 LIB_LIBS = \
      $(PLIBS) \
@@ -42,3 +45,4 @@ LIB_LIBS = \
     -lliggghts \
     -L$(CFDEM_Many2ManyLIB_PATH) \
     -lcoupleMany2Many
+

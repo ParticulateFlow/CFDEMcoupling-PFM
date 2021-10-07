@@ -16,7 +16,7 @@
     }
 
     label partCellId = particleCloud_.locateM().findSingleCell(subPosition,cellID);
-               
+
     //NP fprintf(lmp->screen,"cellID=%d, partCellId=%d\n",static_cast<int>(cellID),static_cast<int>(partCellId));
 
     if(partCellId!=cellID)
@@ -35,7 +35,7 @@
         scalar partCellVol = particleCloud_.mesh().V()[partCellId];
         scalar particleVolume = volume/static_cast<scalar>(nPoints);
         scalar newAlpha = voidfractionNext_[partCellId]- particleVolume / partCellVol;
-        
+
         if(newAlpha > alphaMin_) voidfractionNext_[partCellId] = newAlpha;
         else
         {
@@ -49,9 +49,9 @@
         // add sub particle representation
         bool createNew = true;
         label storeInIndex=0;
-        for(int i=0; i < cellsPerParticle_[index][0] ; i++)
+        for(int i=0; i < cellsPerParticle()[index][0] ; i++)
         {
-            if(partCellId == particleCloud_.cellIDs()[index][i]) 
+            if(partCellId == particleCloud_.cellIDs()[index][i])
             {
                 storeInIndex = i;
                 createNew = false;
@@ -61,8 +61,8 @@
 
         if(createNew)
         {
-            cellsPerParticle_[index][0] ++;
-            storeInIndex = cellsPerParticle_[index][0]-1;
+            cellsPerParticle()[index][0] ++;
+            storeInIndex = cellsPerParticle()[index][0]-1;
             particleCloud_.cellIDs()[index][storeInIndex] = partCellId;
 
         }

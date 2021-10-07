@@ -1,0 +1,16 @@
+############
+# monitoring
+############
+
+variable np equal count(all)
+fix printN all print ${Nmonitor} "${time} ${np} ${nTot}" append ../DEM/monitor/Npart_dataDrivenCFD.txt title "#time   n_p n_upper"
+
+# coke in lower part
+fix printcokehearth all print ${Nmonitor} "${time} ${nCokeRW} ${nCokeRWRef} ${nFineCokeRW} ${nFineCokeRWRef}" append ../DEM/monitor/Npart_coke_hearth_dataDrivenCFD.txt title "#time   N_coke_start   N_coke_curr N_finecoke_start N_finecoke_curr"
+
+# coke and ore in upper part
+region upperMonitorReg block INF INF INF INF 10 INF
+variable nCokeUpperMonitor equal count(coke,upperMonitorReg)
+variable nOreUpperMonitor equal count(ore,upperMonitorReg)
+variable nUpperMonitor equal count(all,upperMonitorReg)
+fix printPartupper all print ${Nmonitor} "${time} ${nUpperMonitor} ${nCokeUpperMonitor} ${nOreUpperMonitor}" append ../DEM/monitor/monitor_upper.txt title "#time   N_all   N_coke    N_ore"

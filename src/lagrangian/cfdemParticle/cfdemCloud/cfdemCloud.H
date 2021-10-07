@@ -45,6 +45,7 @@ SourceFiles
 // choose version
 #include "OFversion.H"
 #include <vector>
+#include <typeinfo>
 
 #include "fvCFD.H"
 #include "IFstream.H"
@@ -92,11 +93,13 @@ protected:
 
     const bool ignore_;
 
-	const bool multiphase_;
+    const bool multiphase_;
 
     bool allowCFDsubTimestep_;
 
     const bool limitDEMForces_;
+
+    const bool phaseInForces_;
 
     const bool getParticleDensities_;
 
@@ -108,15 +111,17 @@ protected:
 
     scalar maxDEMForce_;
 
+    scalar phaseInForcesTime_;
+
     const word modelType_;
 
-    double **positions_;
+    double **positions_; // particle positions
 
-    double **velocities_;
+    double **velocities_; // particle velocities
 
-    double **fluidVel_;
+    double **fluidVel_; // fluid velocities at particle positions
 
-    double **fAcc_;
+    double **fAcc_; // accumulated implicit forces on particles (only used in Koch Hill drag model)
 
     double **impForces_;
 
@@ -124,27 +129,31 @@ protected:
 
     double **DEMForces_;
 
-    double **Cds_;
+    double **Cds_; // Ksl
 
-    double **radii_;
+    double **radii_; // particle radii
 
     double **voidfractions_;
 
-    int **cellIDs_;
+    int **cellIDs_; // ID of cell each particle is in
 
-    double **particleDensities_;
+    double **particleDensities_; // particle densities
 
-    double **particleEffVolFactors_;
+    double **particleEffVolFactors_; // per particle volume factor
 
-    int **particleTypes_;
+    int **particleTypes_; // per particle type
 
-    double **particleAngVels_;
+    double **particleAngVels_; // particle angular velocities
 
-    double **particleWeights_;
+    double **particleWeights_; // particle weights
 
-    double **particleVolumes_;
+    double **particleVolumes_; // particle volumes with subcell information
 
-    double **particleV_;
+    double **particleV_; // particle total volumes
+
+    double **particleConvVel_;
+
+    double **particleFlucVel_;
 
     int numberOfParticles_;
 
@@ -186,6 +195,21 @@ protected:
 
     const turbulenceModel& turbulence_;
 
+    struct particleProperty {
+        void** property;            // pointer to per-particle data; memory deallocation by cfdemCloud
+        const std::type_info* ti;   // type of particle data (int**, double**)
+        int size;                   // size of single particle data; memory allocation by cfdemCloud if size > 0
+        double initVal;             // initial property value
+        bool reset;                 // if true, data is reset to initial value every coupling step
+        template<typename T>
+        T& ref() {
+          if (*ti == typeid(T)) return *reinterpret_cast<T*>(&property);
+          else throw std::bad_cast();
+        }
+    };
+
+    HashTable<particleProperty> particlePropertyTable; // table of registered per-particle properties
+
     autoPtr<dataExchangeModel> dataExchangeModel_;
 
     PtrList<forceModel> forceModel_;
@@ -217,8 +241,6 @@ protected:
 
     virtual void giveDEMdata();
 
-    virtual void setNumberOfParticles(int);
-
     virtual void findCells();
 
     virtual void setForces();
@@ -230,11 +252,6 @@ protected:
     virtual void setVectorAverages();
 
 public:
-
-    friend class dataExchangeModel;
-    friend class voidFractionModel;
-    friend class forceModel;
-    friend class forceSubModel;
 
 // Constructors
 
@@ -254,9 +271,11 @@ public:
 
        void setAllowCFDsubTimestep(bool b) { allowCFDsubTimestep_ = b; }
 
+       virtual void setNumberOfParticles(int numberOfParticles);
+
        void checkCG(bool);
 
-       void setPos(double **&);
+       void setPos(const double *const *);
 
        const word& modelType() const { return modelType_; }
 
@@ -267,8 +286,6 @@ public:
        vector velocity(int) const;
 
        vector expForce(int) const;
-
-       vector fluidVel(int) const;
 
        virtual const forceModel& forceM(int);
 
@@ -300,7 +317,7 @@ public:
 
        inline bool verbose() const;
 
-	   inline bool multiphase() const;
+       inline bool multiphase() const;
 
        inline const IOdictionary& couplingProperties() const;
 
@@ -331,6 +348,10 @@ public:
        inline void get_cellIDs(int**&) const;
 
        inline double ** particleWeights() const;
+
+       inline double ** particleConvVels() const;
+
+       inline double ** particleFlucVels() const;
 
        virtual inline label body(int) const;
 
@@ -363,7 +384,7 @@ public:
        virtual inline double ** particleAngVels() const;
        virtual vector particleAngVel(label index) const; 
 
-       //access to the particle's and torque data
+       //access to the particle's rotation and torque data
        virtual inline double ** DEMTorques() const {return NULL;}
        virtual inline double ** omegaArray() const {return NULL;}
        virtual vector omega(int) const {return vector::zero;}
@@ -417,6 +438,12 @@ public:
     // Write
 
       // write cfdemCloud internal data
+        inline void setPositions(label n,double* pos);
+        inline void setCellIDs(label n,int* ID);
+        inline void setCellIDs(DynamicList<label> const& IDs);
+        inline void setImpDEMdrag(bool flag) { impDEMdrag_ = flag; }
+        inline void setImpDEMdragAcc(bool flag) { impDEMdragAcc_ = flag; }
+
         virtual bool evolve(volScalarField&,volVectorField&,volVectorField&);
 
         virtual void postFlow() {}
@@ -424,9 +451,9 @@ public:
         virtual bool reAllocArrays();
 
     // IO
-        void writeScalarFieldToTerminal(double**&) const;
+        void writeScalarFieldToTerminal(const double *const *) const;
 
-        void writeVectorFieldToTerminal(double**&) const;
+        void writeVectorFieldToTerminal(const double *const *) const;
 
     // functions
         tmp<fvVectorMatrix> divVoidfractionTau(volVectorField& ,volScalarField&) const;
@@ -444,6 +471,14 @@ public:
         void otherForces(volVectorField&);
 
         bool checkPeriodicCells() const { return checkPeriodicCells_; }
+
+        template<typename T>
+        void registerParticleProperty(const word& property, int size=0, double initVal=0.0, bool reset=true);
+        template<typename T>
+        T& getParticlePropertyRef(const word& property);
+protected:
+        virtual int**& getParticlePropertyImpl(const word& property, int**);
+        virtual double**& getParticlePropertyImpl(const word& property, double**);
 };
 
 

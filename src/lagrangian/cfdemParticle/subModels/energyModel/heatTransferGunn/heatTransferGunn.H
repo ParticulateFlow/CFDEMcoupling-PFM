@@ -56,11 +56,23 @@ protected:
 
     bool implicit_;
 
-    word QPartFluidName_;
+    bool calcTotalHeatFlux_;
+
+    bool initPartTemp_;
+
+    scalar Tmin_;
+
+    scalar Tmax_;
+
+    scalar totalHeatFlux_;
+
+    scalar NusseltScalingFactor_;
+
+    const word QPartFluidName_;
 
     volScalarField QPartFluid_;
 
-    word QPartFluidCoeffName_;
+    const word QPartFluidCoeffName_;
 
     volScalarField QPartFluidCoeff_;
 
@@ -76,47 +88,41 @@ protected:
 
     bool calcPartTempField_;
 
-    bool calcPartTempAve_;
+    dimensionedScalar partTempAve_;
 
-    scalar partTempAve_;
-
-    word tempFieldName_;
+    const word tempFieldName_;
 
     const volScalarField& tempField_;           // ref to temperature field
 
-    word voidfractionFieldName_;
+    const word voidfractionFieldName_;
 
     const volScalarField& voidfraction_;        // ref to voidfraction field
 
     scalar maxSource_;                          // max (limited) value of src field
 
-    word velFieldName_;
+    const word velFieldName_;
 
     const volVectorField& U_;
 
-    word densityFieldName_;
+    const word densityFieldName_;
 
     const volScalarField& rho_;
 
-    word partTempName_;
+    const word partTempName_;
 
-    mutable double **partTemp_;
+    const word partHeatFluxName_;
 
-    word partHeatFluxName_;
+    const word partHeatFluxCoeffRegName_;
 
-    mutable double **partHeatFlux_;
+    const word partReRegName_;
 
-    mutable double **partHeatFluxCoeff_;
-
-    mutable double **partRe_;
-
-    mutable double **partNu_;
+    const word partNuRegName_;
 
     mutable scalar scaleDia_;
 
     scalarList typeCG_;
 
-    void allocateMyArrays() const;
+    const label maxTypeCG_;
 
     void partTempField();
 
@@ -125,6 +131,8 @@ protected:
     virtual void giveData();
 
     virtual void heatFlux(label, scalar, scalar, scalar, scalar cg3 = 1.0);
+
+    virtual void initPartTemp();
 
 public:
 
@@ -155,8 +163,6 @@ public:
         void calcEnergyContribution();
 
         void postFlow();
-
-        scalar aveTpart() const;
 };
 
 

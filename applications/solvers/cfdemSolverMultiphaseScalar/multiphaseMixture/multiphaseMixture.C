@@ -458,8 +458,8 @@ Foam::multiphaseMixture::Cs() const
 Foam::tmp<Foam::surfaceScalarField>
 Foam::multiphaseMixture::diffusionCorrection() const
 {
-	
-	surfaceScalarField numerator
+    
+    surfaceScalarField numerator
     (
         IOobject
         (
@@ -473,7 +473,7 @@ Foam::multiphaseMixture::diffusionCorrection() const
         dimensionedScalar("zero", dimless/dimLength, 0.0)
     );
 
-	surfaceScalarField denominator
+    surfaceScalarField denominator
     (
         IOobject
         (
@@ -486,35 +486,35 @@ Foam::multiphaseMixture::diffusionCorrection() const
         mesh_,
         dimensionedScalar("zero", dimless, 0.0)
     );
-	
-	PtrDictionary<phase>::const_iterator iter = phases_.begin();
-	const phase& alpha1 = iter();
+    
+    PtrDictionary<phase>::const_iterator iter = phases_.begin();
+    const phase& alpha1 = iter();
 
-	for (++iter; iter != phases_.end(); ++iter)
+    for (++iter; iter != phases_.end(); ++iter)
     {
         const phase& alpha2 = iter();
-		scalar He = alpha1.Cs().value() / (alpha2.Cs().value() + SMALL);
+        scalar He = alpha1.Cs().value() / (alpha2.Cs().value() + SMALL);
 
-		numerator   += (1/He - 1) * fvc::snGrad(alpha2);
-		denominator += fvc::interpolate(alpha2) * (1/He - 1);
+        numerator   += (1/He - 1) * fvc::snGrad(alpha2);
+        denominator += fvc::interpolate(alpha2) * (1/He - 1);
     }
 
-	tmp<surfaceScalarField> correction = numerator / (denominator + 1 + SMALL);
-	
-	/*
-	PtrDictionary<phase>::const_iterator iter = phases_.begin();
+    tmp<surfaceScalarField> correction = numerator / (denominator + 1 + SMALL);
+    
+    /*
+    PtrDictionary<phase>::const_iterator iter = phases_.begin();
 
-	const phase& alphaL = iter();
-	++iter;
-	const phase& alphaG = iter();
-	scalar He = alphaG.Cs().value() / (alphaL.Cs().value() + SMALL);
+    const phase& alphaL = iter();
+    ++iter;
+    const phase& alphaG = iter();
+    scalar He = alphaG.Cs().value() / (alphaL.Cs().value() + SMALL);
 
-	surfaceScalarField gradAlphaL = fvc::snGrad(alphaL);
-	surfaceScalarField surfAlphaL = fvc::interpolate(alphaL);
+    surfaceScalarField gradAlphaL = fvc::snGrad(alphaL);
+    surfaceScalarField surfAlphaL = fvc::interpolate(alphaL);
 
-	tmp<surfaceScalarField> correction = (1-He)/(surfAlphaL + He*(1-surfAlphaL) + 10*SMALL) * gradAlphaL;
-	*/
-	return correction;
+    tmp<surfaceScalarField> correction = (1-He)/(surfAlphaL + He*(1-surfAlphaL) + 10*SMALL) * gradAlphaL;
+    */
+    return correction;
 }
 
 void Foam::multiphaseMixture::solve()

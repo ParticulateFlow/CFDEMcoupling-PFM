@@ -89,9 +89,9 @@ private:
 
     const bool randomTauE_;
 
-    mutable double **partTime_;                // Lagrangian array
+    const word partTimeRegName_;
 
-    mutable double **partUfluct_;              // Lagrangian array
+    const word partUfluctRegName_;
 
     mutable Random RanGen_;
 
@@ -117,8 +117,6 @@ public:
 
     // Member Functions
         void setForce() const;
-
-        void reAllocArrays() const;
 };
 
 

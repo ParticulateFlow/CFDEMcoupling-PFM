@@ -394,9 +394,9 @@ averagingModel::averagingModel
             IOobject::READ_IF_PRESENT,//MUST_READ,
             IOobject::AUTO_WRITE
         ),
-        sm.mesh().lookupObject<volVectorField> ("Us")
-        /*sm.mesh(),
-        dimensionedVector("zero", dimensionSet(0,1,-1,0,0),vector::zero)*/
+      //  sm.mesh().lookupObject<volVectorField> ("Us")
+        sm.mesh(),
+        dimensionedVector("zero", dimensionSet(0,1,-1,0,0),vector::zero)
     ),
     UsNext_
     (   IOobject
@@ -407,11 +407,19 @@ averagingModel::averagingModel
             IOobject::READ_IF_PRESENT,//MUST_READ,
             IOobject::AUTO_WRITE
         ),
-        sm.mesh().lookupObject<volVectorField> ("Us")
-        /*sm.mesh(),
-        dimensionedVector("zero", dimensionSet(0,1,-1,0,0),vector::zero)*/
+    //    sm.mesh().lookupObject<volVectorField> ("Us")
+        sm.mesh(),
+        dimensionedVector("zero", dimensionSet(0,1,-1,0,0),vector::zero)
     )
-{}
+{
+    const objectRegistry& db = UsWeightField_.db();
+    if (db.foundObject<volVectorField>("Us"))
+    {
+        const volVectorField& Usref(db.lookupObject<volVectorField>("Us"));
+        UsNext_ = Usref;
+        UsPrev_ = Usref;
+    }
+}
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //

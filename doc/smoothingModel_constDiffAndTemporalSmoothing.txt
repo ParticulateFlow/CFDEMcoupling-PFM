@@ -39,7 +39,7 @@ constDiffAndTemporalSmoothingProps
     lowerLimit       0.1;
     upperLimit       1e10;
     smoothingLength  1500e-6;
-    smoothingLengthReferenceField 9000e-6;	
+    smoothingLengthReferenceField 9000e-6;
     referenceField   "p";
     gamma            1.0;
 \} :pre

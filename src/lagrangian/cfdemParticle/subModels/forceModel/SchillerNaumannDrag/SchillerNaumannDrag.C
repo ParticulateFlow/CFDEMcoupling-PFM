@@ -66,7 +66,9 @@ SchillerNaumannDrag::SchillerNaumannDrag
     propsDict_(dict.subDict(typeName + "Props")),
     verbose_(propsDict_.found("verbose")),
     velFieldName_(propsDict_.lookup("velFieldName")),
-    U_(sm.mesh().lookupObject<volVectorField> (velFieldName_))
+    U_(sm.mesh().lookupObject<volVectorField> (velFieldName_)),
+    scaleDia_(1.),
+    scaleDrag_(1.)
 {
     //Append the field names to be probed
     particleCloud_.probeM().initialize(typeName, typeName+".logDat");
@@ -85,7 +87,12 @@ SchillerNaumannDrag::SchillerNaumannDrag
     // read those switches defined above, if provided in dict
     forceSubM(0).readSwitches();
 
-    particleCloud_.checkCG(false);
+    particleCloud_.checkCG(true);
+
+    if (propsDict_.found("scale"))
+        scaleDia_ = scalar(readScalar(propsDict_.lookup("scale")));
+    if (propsDict_.found("scaleDrag"))
+        scaleDrag_ = scalar(readScalar(propsDict_.lookup("scaleDrag")));
 }
 
 
@@ -99,6 +106,16 @@ SchillerNaumannDrag::~SchillerNaumannDrag()
 
 void SchillerNaumannDrag::setForce() const
 {
+    if (scaleDia_ > 1.0)
+    {
+        Info << "SchillerNaumann using scale = " << scaleDia_ << endl;
+    }
+    else if (particleCloud_.cg() > 1.0)
+    {
+        scaleDia_ = particleCloud_.cg();
+        Info << "SchillerNaumann using scale from liggghts cg = " << scaleDia_ << endl;
+    }
+
     #include "setupProbeModel.H"
 
     const volScalarField& nufField = forceSubM(0).nuField();
@@ -117,6 +134,7 @@ void SchillerNaumannDrag::setForce() const
                 vector Us = particleCloud_.velocity(index);
                 vector Ur = U_[cellI]-Us;
                 scalar ds = 2*particleCloud_.radius(index);
+                scalar ds_scaled = ds/scaleDia_;
                 scalar nuf = nufField[cellI];
                 scalar rho = rhoField[cellI];
                 scalar voidfraction = particleCloud_.voidfraction(index);
@@ -127,30 +145,33 @@ void SchillerNaumannDrag::setForce() const
                 if (magUr > 0)
                 {
                    // calc particle Re Nr
-                    Rep = ds*magUr/nuf;
+                    Rep = ds_scaled*magUr/nuf;
 
                     // calc fluid drag Coeff
                     Cd = max(0.44,24.0/Rep*(1.0+0.15*pow(Rep,0.687)));
 
                     // calc particle's drag
-                    drag = 0.125*Cd*rho*M_PI*ds*ds*magUr*Ur;
+                    drag = 0.125*Cd*rho*M_PI*ds*ds*scaleDia_*magUr*Ur*scaleDrag_;
 
                     if (modelType_=="B")
                         drag /= voidfraction;
                 }
 
-                if(verbose_ && index >100 && index <102)
+                if(verbose_ && index >=100 && index <102)
                 {
-                    Info << "index = " << index << endl;
-                    Info << "Us = " << Us << endl;
-                    Info << "Ur = " << Ur << endl;
-                    Info << "ds = " << ds << endl;
-                    Info << "rho = " << rho << endl;
-                    Info << "nuf = " << nuf << endl;
-                    Info << "voidfraction = " << voidfraction << endl;
-                    Info << "Rep = " << Rep << endl;
-                    Info << "Cd = " << Cd << endl;
-                    Info << "drag = " << drag << endl;
+                    Pout << "cellI = " << cellI << endl;
+                    Pout << "index = " << index << endl;
+                    Pout << "Ufluid = " << U_[cellI] << endl;
+                    Pout << "Us = " << Us << endl;
+                    Pout << "Ur = " << Ur << endl;
+                    Pout << "ds = " << ds << endl;
+                    Pout << "ds/scale = " << ds_scaled << endl;
+                    Pout << "rho = " << rho << endl;
+                    Pout << "nuf = " << nuf << endl;
+                    Pout << "voidfraction = " << voidfraction << endl;
+                    Pout << "Rep = " << Rep << endl;
+                    Pout << "Cd = " << Cd << endl;
+                    Pout << "drag = " << drag << endl;
                 }
 
                 //Set value fields and write the probe

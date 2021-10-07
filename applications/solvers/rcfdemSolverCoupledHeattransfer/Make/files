@@ -1,0 +1,3 @@
+rcfdemSolverCoupledHeattransfer.C
+
+EXE=$(CFDEM_APP_DIR)/rcfdemSolverCoupledHeattransfer

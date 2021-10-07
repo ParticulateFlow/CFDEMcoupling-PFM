@@ -107,9 +107,16 @@ public:
 
         virtual void solve() {}
 
-		const volScalarField& kf0Field() const;
+        const volScalarField& kf0Field() const;
 
-		const volScalarField& CpField() const;
+        const volScalarField& CpField() const;
+
+        virtual scalar aveTpart() const
+        {
+            return 0.0;
+        }
+
+
 };
 
 

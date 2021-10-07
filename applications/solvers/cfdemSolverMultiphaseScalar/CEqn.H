@@ -1,5 +1,5 @@
         // get mixture properties
-	Cs  = mixture.Cs();
+    Cs  = mixture.Cs();
         diffusionCorrection = mixture.diffusionCorrection();
         Deff=particleCloud.diffCoeffM().diffCoeff(); 
 
@@ -9,12 +9,12 @@
 
         fvScalarMatrix CEqn
         (
-	 	fvm::ddt(voidfraction,C)
-		+ fvm::div(phi,C)
-	 	- fvm::laplacian(Deff*voidfraction,C)
-		+ fvm::div(fvc::interpolate(Deff*voidfraction)*diffusionCorrection*mesh.magSf(), C)
+         fvm::ddt(voidfraction,C)
+        + fvm::div(phi,C)
+         - fvm::laplacian(Deff*voidfraction,C)
+        + fvm::div(fvc::interpolate(Deff*voidfraction)*diffusionCorrection*mesh.magSf(), C)
          ==
-	 Sm + fvm::Sp(Smi,C)
+     Sm + fvm::Sp(Smi,C)
         );
 
         CEqn.relax();

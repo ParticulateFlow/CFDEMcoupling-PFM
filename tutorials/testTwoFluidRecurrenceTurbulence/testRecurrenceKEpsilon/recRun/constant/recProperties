@@ -1,0 +1,48 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  4.0                                   |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      recProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+recModel standardRecModel;
+
+verbose on;
+
+volScalarFields (alpha.air alpha.water k.water epsilon.water);
+volVectorFields (U.water);
+surfaceScalarFields ();
+
+
+standardRecModelProps
+{
+    verbose on;
+}
+
+
+
+recNorm sqrDiffNorm;
+
+sqrDiffNormProps
+{
+    fieldType volScalarField;
+    fieldName alpha.air;
+}
+
+
+recPath simpleRandomPath;
+
+simpleRandomPathProps
+{
+    verbose on;
+}

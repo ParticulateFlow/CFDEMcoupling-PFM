@@ -1,0 +1,87 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.3.x                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       regIOobject;
+    location    "constant/polyMesh";
+    object      cellZones;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+3
+(
+probeZone1
+{
+    type cellZone;
+cellLabels      List<label> 
+12
+(
+15736
+15737
+15753
+15754
+15668
+15669
+15685
+15686
+15702
+15703
+15719
+15720
+)
+;
+}
+
+probeZone2
+{
+    type cellZone;
+cellLabels      List<label> 
+12
+(
+3668
+3669
+3685
+3686
+3702
+3703
+3719
+3720
+3736
+3737
+3753
+3754
+)
+;
+}
+
+probeZone3
+{
+    type cellZone;
+cellLabels      List<label> 
+12
+(
+4564
+4565
+4570
+4576
+17242
+17248
+4571
+4577
+17243
+17249
+17254
+17255
+)
+;
+}
+)
+
+// ************************************************************************* //

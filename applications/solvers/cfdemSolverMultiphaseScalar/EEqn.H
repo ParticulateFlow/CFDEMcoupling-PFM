@@ -1,7 +1,6 @@
         // get mixture properties
         Cp  = mixture.Cp();
-	kf  = mixture.kf();
-        keff=particleCloud.thermCondM().thermCond(); 
+        kf  = mixture.kf(); 
 
         // get scalar source from DEM        
         particleCloud.energyContributions(Qsource);
@@ -9,11 +8,11 @@
 
         fvScalarMatrix EEqn
         (
-	 rho*Cp*(fvm::ddt(voidfraction,T)
-		 + fvm::div(phi,T))
-	 - fvm::laplacian(keff*voidfraction,T)
-         ==
-	 Qsource + fvm::Sp(QCoeff,T)
+            rho*Cp*(fvm::ddt(voidfraction,T)
+            + fvm::div(phi,T))
+            - fvm::laplacian(thCond*voidfraction,T)
+            ==
+            Qsource + fvm::Sp(QCoeff,T)
         );
 
 
