@@ -1,0 +1,259 @@
+/*---------------------------------------------------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.4                                   |
+|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+
+    root            "";
+    case            "";
+    instance        "";
+    local           "";
+
+    class           dictionary;
+    object          couplingProperties;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+//===========================================================================//
+// sub-models & settings
+
+syncMode		false;  
+modelType		"A";
+couplingInterval 	100;
+voidFractionModel 	divided;
+locateModel 		engine;
+meshMotionModel 	noMeshMotion;
+regionModel 		allRegion;
+IOModel 		basicIO;
+probeModel 		off;//particleProbe;
+dataExchangeModel 	twoWayMPI;
+averagingModel 		dense;
+clockModel 		standardClock;
+smoothingModel 		constDiffSmoothing;//off;
+//useDDTvoidfraction;
+
+forceModels
+(
+    gradPForce//Smooth
+    viscForce  
+    Archimedes
+    BeetstraDrag
+    //DiFeliceDrag
+    //KochHillDrag
+    //GidaspowDrag
+    //SchillerNaumannDrag
+    virtualMassForce
+    MeiLift
+    ParmarBassetForce
+    dSauter
+);
+
+getParticleDensities	true;
+getParticleAngVels	true;
+
+momCoupleModels
+(
+    implicitCouple
+);
+
+turbulenceModelType "turbulenceProperties";
+
+//===========================================================================//
+// sub-model properties
+
+particleProbeProps
+{
+    particleIDsToSample		(0 1000 2000 3000 4000 5000);
+    verboseToFile;
+    verbose;
+    printEvery			500;
+    sampleAll;
+    probeDebug;
+    includePosition;
+    writePrecision		4;
+}
+
+ParmarBassetForceProps
+{
+    velFieldName		"U";
+    granVelFieldName 		"Us";
+    useUs               	true;
+    interpolation		true;
+    nIntegral	        	20;
+    discretisationOrder         1;
+    smoothingModel              constDiffAndTemporalSmoothing;
+    
+    constDiffAndTemporalSmoothingProps
+    {
+	lowerLimit		1e-8;
+    	upperLimit		1e8;
+    	smoothingLength 	0.0015;  // dp
+    	smoothingStrength	0.01; // timescale = dt/gamma
+	correctBoundary		true;
+    }
+}
+
+BeetstraDragProps
+{
+    velFieldName		"U";
+    granVelFieldName		"Us";
+    voidfractionFieldName 	"voidfraction";
+    interpolation    		true;
+    verbose 			false;
+    polydisperse		false;
+    implForceDEM		true;
+    dSauterFieldName		"voidfraction";
+    suppressProbe		true;
+}
+
+DiFeliceDragProps
+{
+    velFieldName		"U";
+    granVelFieldName		"Us";
+    voidfractionFieldName 	"voidfraction";
+    interpolation    		true;
+    verbose 			false;
+    implForceDEM		true;
+}
+
+KochHillDragProps
+{
+    velFieldName		"U";
+    granVelFieldName		"Us";
+    voidfractionFieldName 	"voidfraction";
+    interpolation    		true;
+    verbose 			false;
+    implForceDEM		true;
+}
+
+GidaspowDragProps
+{
+    velFieldName		"U";
+    granVelFieldName		"Us";
+    voidfractionFieldName 	"voidfraction";
+    interpolation    		true;
+    verbose 			false;
+    implForceDEM		true;
+    phi                         1.0;
+}
+
+SchillerNaumannDragProps
+{
+    velFieldName		"U";
+    granVelFieldName		"Us";
+    voidfractionFieldName 	"voidfraction";
+    interpolation    		true;
+    verbose 			false;
+    implForceDEM		true;
+}
+
+virtualMassForceProps
+{
+    velFieldName		"U";
+    voidfractionFieldName 	"voidfraction";
+    granVelFieldName		"Us";
+    phiFieldName 		"phi";
+    useUs 			true;
+    useFelderhof 		true;
+    interpolation 		true;
+    smoothingModel              constDiffAndTemporalSmoothing;
+    
+    constDiffAndTemporalSmoothingProps
+    {
+	lowerLimit		1e-8;
+    	upperLimit		1e8;
+    	smoothingLength 	0.0015; // dp
+    	smoothingStrength	0.01; // timescale = dt/gamma
+	correctBoundary		true;
+    }
+}
+
+MeiLiftProps
+{
+    velFieldName		"U";
+    useShearInduced 		true;
+    useSpinInduced 		true;
+    combineShearSpin 		false;
+    interpolation		true;
+    verbose			false;
+}
+
+dSauterProps
+{
+}
+
+ArchimedesProps
+{
+    gravityFieldName		"g";
+    treatForceDEM               true; // needed for models "A" or "Bfull"
+}    
+
+gradPForceProps
+{
+    pFieldName			"p";
+    voidfractionFieldName 	"voidfraction";
+    velocityFieldName		"U";
+    interpolation 		true;
+}
+
+gradPForceSmoothProps
+{
+    pFieldName			"p";
+    voidfractionFieldName 	"voidfraction";
+    velocityFieldName		"U";
+    smoothingModel 		"temporalSmoothing";
+    temporalSmoothingProps
+    {
+        lowerLimit		1e-8;
+        upperLimit 		1e8;
+	refField		"p";
+	gamma		 	0.01; // timescale = dt/gamma
+    }
+}
+
+viscForceProps
+{
+    velocityFieldName		"U";
+    interpolation 		true;
+}
+
+constDiffSmoothingProps
+{
+    lowerLimit			1e-8;
+    upperLimit			1e8;
+    smoothingLength		0.0015; //dp
+}
+
+engineProps
+{
+    treeSearch			true;
+}
+
+dividedProps
+{
+    alphaMin			0.01;
+    scaleUpVol			1.0;
+}
+
+twoWayMPIProps
+{
+    liggghtsPath		"../DEM/in.liggghts_run";
+}
+
+implicitCoupleProps
+{
+    velFieldName		"U";
+    granVelFieldName 		"Us";
+    voidfractionFieldName 	"voidfraction";
+}
+
+// ************************************************************************* //
