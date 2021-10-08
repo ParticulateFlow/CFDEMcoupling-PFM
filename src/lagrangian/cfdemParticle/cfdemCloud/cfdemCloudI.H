@@ -128,6 +128,11 @@ inline bool cfdemCloud::verbose() const
     return verbose_;
 }
 
+inline bool cfdemCloud::multiphase() const
+{
+    return multiphase_;
+}
+
 inline const IOdictionary& cfdemCloud::couplingProperties() const
 {
     return couplingProperties_;
@@ -308,6 +313,27 @@ inline label cfdemCloud::particleType(label index) const
     else
     {
         return particleTypes_[index][0];
+    }
+}
+
+inline bool cfdemCloud::getParticleAngVels() const
+{
+    return getParticleAngVels_;
+}
+      
+inline double ** cfdemCloud::particleAngVels() const
+{
+    return particleAngVels_;
+}
+
+inline vector cfdemCloud::particleAngVel(label index) const
+{
+    if(!getParticleAngVels_) return vector::zero;
+    else
+    {
+        vector angVel;
+        for(int i=0;i<3;i++) angVel[i] = particleAngVels_[index][i];
+        return angVel;
     }
 }
 

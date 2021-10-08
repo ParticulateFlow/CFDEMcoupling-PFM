@@ -82,6 +82,7 @@ cfdemCloud::cfdemCloud
     solveFlow_(couplingProperties_.lookupOrDefault<bool>("solveFlow", true)),
     verbose_(couplingProperties_.found("verbose")),
     ignore_(couplingProperties_.found("ignore")),
+    multiphase_(couplingProperties_.lookupOrDefault<bool>("multiphase",false)),
     allowCFDsubTimestep_(true),
     modelCheck_(couplingProperties_.lookupOrDefault<bool>("modelCheck",true)),
     limitDEMForces_(couplingProperties_.found("limitDEMForces")),
@@ -89,6 +90,7 @@ cfdemCloud::cfdemCloud
     getParticleDensities_(couplingProperties_.lookupOrDefault<bool>("getParticleDensities",false)),
     getParticleEffVolFactors_(couplingProperties_.lookupOrDefault<bool>("getParticleEffVolFactors",false)),
     getParticleTypes_(couplingProperties_.lookupOrDefault<bool>("getParticleTypes",false)),
+    getParticleAngVels_(couplingProperties_.lookupOrDefault<bool>("getParticleAngVels",false)),
     streamingMode_(couplingProperties_.lookupOrDefault<bool>("streamingMode",false)),
     streamingFluc_(couplingProperties_.lookupOrDefault<bool>("streamingFluc",false)),
     maxDEMForce_(0.),
@@ -108,6 +110,7 @@ cfdemCloud::cfdemCloud
     particleDensities_(NULL),
     particleEffVolFactors_(NULL),
     particleTypes_(NULL),
+    particleAngVels_(NULL),
     particleWeights_(NULL),
     particleVolumes_(NULL),
     particleV_(NULL),
@@ -406,6 +409,7 @@ cfdemCloud::~cfdemCloud()
     if(getParticleDensities_) dataExchangeM().destroy(particleDensities_,1);
     if(getParticleEffVolFactors_) dataExchangeM().destroy(particleEffVolFactors_,1);
     if(getParticleTypes_) dataExchangeM().destroy(particleTypes_,1);
+    if(getParticleAngVels_) dataExchangeM().destroy(particleAngVels_,1);
 
     for
     (
@@ -437,6 +441,7 @@ void cfdemCloud::getDEMdata()
     if(getParticleDensities_) dataExchangeM().getData("density","scalar-atom",particleDensities_);
     if(getParticleEffVolFactors_) dataExchangeM().getData("effvolfactor","scalar-atom",particleEffVolFactors_);
     if(getParticleTypes_) dataExchangeM().getData("type","scalar-atom",particleTypes_);
+    if(getParticleAngVels_) dataExchangeM().getData("omega","vector-atom",particleAngVels_);
 }
 
 void cfdemCloud::giveDEMdata()
@@ -493,7 +498,12 @@ void cfdemCloud::setForces()
     resetArray(expForces_,numberOfParticles(),3);
     resetArray(DEMForces_,numberOfParticles(),3);
     resetArray(Cds_,numberOfParticles(),1);
-    for (int i=0;i<cfdemCloud::nrForceModels();i++) cfdemCloud::forceM(i).setForce();
+    for (int i=0;i<cfdemCloud::nrForceModels();i++)
+    {
+        clockM().start(30+i,forceModels_[i]);
+        cfdemCloud::forceM(i).setForce();
+        clockM().stop(forceModels_[i]);
+    }
 
     if (limitDEMForces_)
     {
@@ -811,6 +821,7 @@ bool cfdemCloud::reAllocArrays()
         if(getParticleDensities_) dataExchangeM().allocateArray(particleDensities_,0.,1);
         if(getParticleEffVolFactors_) dataExchangeM().allocateArray(particleEffVolFactors_,0.,1);
         if(getParticleTypes_) dataExchangeM().allocateArray(particleTypes_,0,1);
+        if(getParticleAngVels_) dataExchangeM().allocateArray(particleAngVels_,0.,3);
 
         for
         (

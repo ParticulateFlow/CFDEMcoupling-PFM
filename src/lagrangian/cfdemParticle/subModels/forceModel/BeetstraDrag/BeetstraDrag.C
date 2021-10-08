@@ -72,13 +72,14 @@ BeetstraDrag::BeetstraDrag
     useGC_(false),
     usePC_(false)
 {
+
     //Append the field names to be probed
     particleCloud_.probeM().initialize(typeName, typeName+".logDat");
     particleCloud_.probeM().vectorFields_.append("dragForce"); //first entry must  be the force
     particleCloud_.probeM().vectorFields_.append("Urel");
     particleCloud_.probeM().scalarFields_.append("Rep");
-    particleCloud_.probeM().scalarFields_.append("betaP");
     particleCloud_.probeM().scalarFields_.append("voidfraction");
+    particleCloud_.probeM().scalarFields_.append("y_polydisperse");
     particleCloud_.probeM().writeHeader();
 
     // init force sub model
@@ -163,7 +164,7 @@ void BeetstraDrag::setForce() const
     scalar voidfraction(1);
     vector Ufluid(0,0,0);
     vector drag(0,0,0);
-    label cellI=0;
+    label  cellI = 0;
 
     vector Us(0,0,0);
     vector Ur(0,0,0);
@@ -209,6 +210,7 @@ void BeetstraDrag::setForce() const
                     Ufluid       = UInterpolator_.interpolate(position,cellI);
                     //Ensure interpolated void fraction to be meaningful
                     // Info << " --> voidfraction: " << voidfraction << endl;
+
                     if (voidfraction > 1.00) voidfraction = 1.0;
                     if (voidfraction < minVoidfraction_) voidfraction = minVoidfraction_;
                 }
@@ -248,7 +250,7 @@ void BeetstraDrag::setForce() const
                 dragCoefficient = F(voidfraction, Rep)
                                    *3*M_PI*nuf*rho*voidfraction
                                    *effDiameter(ds_scaled, cellI, index)
-                                   *scaleDia3*scaleDrag_;
+                                   *scaleDia3*scaleDrag_;		
 
                 // calculate filtering corrections
                 if (useGC_)
@@ -280,6 +282,7 @@ void BeetstraDrag::setForce() const
                 {
                     Pout << "cellI = " << cellI << endl;
                     Pout << "index = " << index << endl;
+                    Pout << "Ufluid = " << Ufluid << endl;
                     Pout << "Us = " << Us << endl;
                     Pout << "Ur = " << Ur << endl;
                     Pout << "ds = " << ds << endl;

@@ -1,0 +1,84 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.6                                   |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      fvSolution;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+solvers
+{
+    "(p)"
+    {
+        solver          PCG;
+        preconditioner
+        {
+            preconditioner        GAMG;
+            tolerance             1e-8;
+            relTol                0;
+            smoother              GaussSeidel;
+            nPreSweeps            0;
+            nPostSweeps           2;
+            nFinestSweeps         2;
+            cacheAgglomeration    on;
+            nCellsInCoarsestLevel 100;
+            agglomerator          faceAreaPair;
+            mergeLevels           1;
+        }
+        tolerance       1e-8;
+        relTol          0.01;
+        maxIter         100;
+    }
+    
+    pFinal
+    {
+        solver                GAMG;
+        tolerance             1e-8;
+        relTol                0;
+        smoother              GaussSeidel;
+        nPreSweeps            0;
+        nPostSweeps           2;
+        nFinestSweeps         2;
+        cacheAgglomeration    on;
+        nCellsInCoarsestLevel 100;
+        agglomerator          faceAreaPair;
+        mergeLevels           1;
+    }
+
+    "(U|k|epsilon|R|nuTilda)"
+    {
+        solver          smoothSolver;
+        smoother        GaussSeidel;
+        tolerance       1e-8;
+        relTol          0.0;
+        nSweeps         1;
+    }      
+
+    "(voidfraction|Us|Ksl|dSmoothing|UsNext|voidfractionNext|sSmoothField|vSmoothField|UrelSmooth)"
+    {
+        solver          PCG;
+        preconditioner  DIC;
+        tolerance       1e-5;
+        relTol          0;
+    }
+}
+
+PISO
+{
+    nCorrectors               3;
+    nNonOrthogonalCorrectors  1;
+    pRefPoint                 (0 0.025 0);
+    pRefValue                 0;
+}
+
+
+// ************************************************************************* //

@@ -74,6 +74,8 @@ class uniformFixedValueTubeFvPatchField
 
         scalar zeta_;
 
+        scalar p0_;
+
 public:
 
     //- Runtime type information

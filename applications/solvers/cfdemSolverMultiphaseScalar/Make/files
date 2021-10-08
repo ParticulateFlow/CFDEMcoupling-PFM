@@ -1,0 +1,3 @@
+cfdemSolverMultiphaseScalar.C
+
+EXE = $(CFDEM_APP_DIR)/cfdemSolverMultiphaseScalar
