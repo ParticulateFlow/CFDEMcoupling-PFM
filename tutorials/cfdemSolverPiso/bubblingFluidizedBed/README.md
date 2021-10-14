@@ -2,7 +2,7 @@
 
 based on
 * Khawaja, H.A., J. Comput. Multiph. Flows 7(4), 227-240 (2015)
-* Khawaja, H.A. and Mojtaba Moatamedi, M., Multiphysics Modelling of Fluid-Particulate Systems, 51-74 (2020)
+* Khawaja, H.A. and Moatamedi, M., Multiphysics Modelling of Fluid-Particulate Systems, 51-74 (2020)
 
 #### Case B
 
