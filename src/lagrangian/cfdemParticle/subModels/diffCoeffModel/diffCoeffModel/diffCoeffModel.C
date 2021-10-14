@@ -58,7 +58,7 @@ diffCoeffModel::diffCoeffModel
             IOobject::NO_WRITE
         )
     ),
-	D0Field_
+    D0Field_
     (
         IOobject
         (
@@ -72,10 +72,10 @@ diffCoeffModel::diffCoeffModel
         dimensionedScalar("zero", dimensionSet(0,2,-1,0,0,0,0), 0.)
     )
 {
-	// build constant fields for single phase case
-	if (!particleCloud_.multiphase())
-	{
-		D0Field_ = volScalarField
+    // build constant fields for single phase case
+    if (!particleCloud_.multiphase())
+    {
+        D0Field_ = volScalarField
         (
             IOobject
             (
@@ -88,7 +88,7 @@ diffCoeffModel::diffCoeffModel
             particleCloud_.mesh(),
             dimensionedScalar(transportProperties_.lookup("D"))
         );
-	}
+    }
 }
 
 
@@ -101,14 +101,14 @@ diffCoeffModel::~diffCoeffModel()
 
 const volScalarField& diffCoeffModel::D0Field() const
 {
-	if (particleCloud_.multiphase())
-	{
-		return particleCloud_.mesh().lookupObject<volScalarField>("D");
-	}
-	else
-	{
-		return D0Field_;
-	}
+    if (particleCloud_.multiphase())
+    {
+        return particleCloud_.mesh().lookupObject<volScalarField>("D");
+    }
+    else
+    {
+        return D0Field_;
+    }
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

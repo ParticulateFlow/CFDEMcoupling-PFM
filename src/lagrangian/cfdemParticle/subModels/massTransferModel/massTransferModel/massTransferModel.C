@@ -55,7 +55,7 @@ massTransferModel::massTransferModel
             IOobject::NO_WRITE
         )
     ),
-	D0Field_
+    D0Field_
     (
         IOobject
         (
@@ -68,7 +68,7 @@ massTransferModel::massTransferModel
         sm.mesh(),
         dimensionedScalar("zero", dimensionSet(0,2,-1,0,0,0,0), 0.)
     ),
-	CsField_
+    CsField_
     (
         IOobject
         (
@@ -82,10 +82,10 @@ massTransferModel::massTransferModel
         dimensionedScalar("zero", dimensionSet(1,-3,0,0,0,0,0), 0.)
     )
 {
-	// build constant fields for single phase case
-	if (!particleCloud_.multiphase())
-	{
-		D0Field_ = volScalarField
+    // build constant fields for single phase case
+    if (!particleCloud_.multiphase())
+    {
+        D0Field_ = volScalarField
         (
             IOobject
             (
@@ -99,7 +99,7 @@ massTransferModel::massTransferModel
             dimensionedScalar(transportProperties_.lookup("D"))
         );
 
-		CsField_ = volScalarField
+        CsField_ = volScalarField
         (
             IOobject
             (
@@ -112,7 +112,7 @@ massTransferModel::massTransferModel
             particleCloud_.mesh(),
             dimensionedScalar(transportProperties_.lookup("Cs"))
         );
-	}
+    }
 }
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
@@ -124,26 +124,26 @@ massTransferModel::~massTransferModel()
 
 const volScalarField& massTransferModel::D0Field() const
 {
-	if (particleCloud_.multiphase())
-	{
-		return particleCloud_.mesh().lookupObject<volScalarField>("D");
-	}
-	else
-	{
-		return D0Field_;
-	}
+    if (particleCloud_.multiphase())
+    {
+        return particleCloud_.mesh().lookupObject<volScalarField>("D");
+    }
+    else
+    {
+        return D0Field_;
+    }
 }
 
 const volScalarField& massTransferModel::CsField() const
 {
-	if (particleCloud_.multiphase())
-	{
-		return particleCloud_.mesh().lookupObject<volScalarField>("Cs");
-	}
-	else
-	{
-		return CsField_;
-	}
+    if (particleCloud_.multiphase())
+    {
+        return particleCloud_.mesh().lookupObject<volScalarField>("Cs");
+    }
+    else
+    {
+        return CsField_;
+    }
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

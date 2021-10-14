@@ -101,7 +101,7 @@ massTransferGunn::massTransferGunn
     ),
     concFieldName_(propsDict_.lookupOrDefault<word>("concFieldName","C")),
     concField_(sm.mesh().lookupObject<volScalarField> (concFieldName_)),
-	satConcFieldName_(propsDict_.lookupOrDefault<word>("satConcFieldName","Cs")),
+    satConcFieldName_(propsDict_.lookupOrDefault<word>("satConcFieldName","Cs")),
     satConcField_(sm.mesh().lookupObject<volScalarField> (satConcFieldName_)),
     voidfractionFieldName_(propsDict_.lookupOrDefault<word>("voidfractionFieldName","voidfraction")),
     voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
@@ -110,7 +110,7 @@ massTransferGunn::massTransferGunn
     U_(sm.mesh().lookupObject<volVectorField> (velFieldName_)),
     densityFieldName_(propsDict_.lookupOrDefault<word>("densityFieldName","rho")),
     rho_(sm.mesh().lookupObject<volScalarField> (densityFieldName_)),
-	coupleDEM_(propsDict_.lookupOrDefault<bool>("coupleDEM",false)),
+    coupleDEM_(propsDict_.lookupOrDefault<bool>("coupleDEM",false)),
     partMassFluxName_(propsDict_.lookupOrDefault<word>("partMassFluxName","convectiveMassFlux")),
     partMassFlux_(NULL),
     partMassFluxCoeff_(NULL),
@@ -135,7 +135,7 @@ massTransferGunn::massTransferGunn
     if (verbose_)
     {
         ReField_.writeOpt() = IOobject::AUTO_WRITE;
-    	ShField_.writeOpt() = IOobject::AUTO_WRITE;
+        ShField_.writeOpt() = IOobject::AUTO_WRITE;
         ReField_.write();
         ShField_.write();
         if (expSherwood_)
@@ -165,11 +165,11 @@ massTransferGunn::~massTransferGunn()
         particleCloud_.dataExchangeM().destroy(partMassFluxCoeff_,1);
     }
 
-		if(verbose_)
-	{
-    	particleCloud_.dataExchangeM().destroy(partRe_,1);
-    	particleCloud_.dataExchangeM().destroy(partSh_,1);
-	}
+    if(verbose_)
+    {
+        particleCloud_.dataExchangeM().destroy(partRe_,1);
+        particleCloud_.dataExchangeM().destroy(partSh_,1);
+    }
 
 }
 
@@ -214,7 +214,7 @@ void massTransferGunn::calcMassContribution()
        const volScalarField mufField = particleCloud_.turbulence().nu()*rho_;
     #endif
 
-	const volScalarField& D0Field_ = D0Field();
+    const volScalarField& D0Field_ = D0Field();
 
     if (typeCG_.size()>1 || typeCG_[0] > 1)
     {
@@ -230,14 +230,14 @@ void massTransferGunn::calcMassContribution()
     scalar voidfraction(1);
     vector Ufluid(0,0,0);
     scalar Cfluid(0);
-	scalar Csfluid(0);
+    scalar Csfluid(0);
     label cellI=0;
     vector Us(0,0,0);
     scalar ds(0);
     scalar ds_scaled(0);
     scalar scaleDia3 = typeCG_[0]*typeCG_[0]*typeCG_[0];
     scalar muf(0);
-	scalar rhof(0);
+    scalar rhof(0);
     scalar magUr(0);
     scalar Rep(0);
     scalar Sc(0);
@@ -282,15 +282,15 @@ void massTransferGunn::calcMassContribution()
                 // calc relative velocity
                 Us = particleCloud_.velocity(index);
                 magUr = mag(Ufluid - Us);
-				ds = 2.*particleCloud_.radius(index);
+                ds = 2.*particleCloud_.radius(index);
                 ds_scaled = ds/cg;
                 muf = mufField[cellI];
-				rhof = rho_[cellI];
-				Csfluid = satConcField_[cellI];
+                rhof = rho_[cellI];
+                Csfluid = satConcField_[cellI];
 
                 Rep = ds_scaled * magUr * voidfraction * rhof/ muf;
 
-				scalar D0 = D0Field_[cellI];
+                scalar D0 = D0Field_[cellI];
 
                 Sc = max(SMALL, muf / (rhof*D0));
 
@@ -324,7 +324,7 @@ void massTransferGunn::calcMassContribution()
                     Pout << "Shp = " << Shp << endl;
                     Pout << "voidfraction = " << voidfraction << endl;
                     Pout << "Cfluid = " << Cfluid << endl;
-					Pout << "Csfluid = " << Csfluid << endl;
+                    Pout << "Csfluid = " << Csfluid << endl;
                 }
             }
     }
@@ -453,42 +453,42 @@ void massTransferGunn::giveData()
 void massTransferGunn::postFlow()
 {
     // send mass flux to DEM
-	if (coupleDEM_)
-	{
-		if(implicit_)
-		{
-			label cellI;
-			scalar Cfluid(0.0);
-			interpolationCellPoint<scalar> CInterpolator_(concField_);
+    if (coupleDEM_)
+    {
+        if(implicit_)
+        {
+            label cellI;
+            scalar Cfluid(0.0);
+            interpolationCellPoint<scalar> CInterpolator_(concField_);
 
-			for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)
-			{
-				cellI = particleCloud_.cellIDs()[index][0];
-				if(cellI >= 0)
-				{
-					if(interpolation_)
-					{
-						vector position = particleCloud_.position(index);
-						Cfluid = CInterpolator_.interpolate(position,cellI);
-					}
-					else
-					{
-						Cfluid = concField_[cellI];						
-					}
+            for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)
+            {
+                cellI = particleCloud_.cellIDs()[index][0];
+                if(cellI >= 0)
+                {
+                    if(interpolation_)
+                    {
+                        vector position = particleCloud_.position(index);
+                        Cfluid = CInterpolator_.interpolate(position,cellI);
+                    }
+                    else
+                    {
+                        Cfluid = concField_[cellI];
+                    }
 
-					partMassFlux_[index][0] += Cfluid * partMassFluxCoeff_[index][0];
+                    partMassFlux_[index][0] += Cfluid * partMassFluxCoeff_[index][0];
 
-					if(verbose_ && index >=0 && index <2)
-					{
-						Pout << "partMassFlux = " << partMassFlux_[index][0] << endl;
-						Pout << "Cfluid = " << Cfluid << endl;
-                	}
-				}
-			}
-		}
+                    if(verbose_ && index >=0 && index <2)
+                    {
+                        Pout << "partMassFlux = " << partMassFlux_[index][0] << endl;
+                        Pout << "Cfluid = " << Cfluid << endl;
+                    }
+                }
+            }
+        }
 
-		giveData();
-	}
+        giveData();
+    }
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

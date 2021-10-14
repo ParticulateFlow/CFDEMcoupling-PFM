@@ -46,9 +46,9 @@ protected:
 
         IOdictionary transportProperties_;
 
-		mutable volScalarField D0Field_;
-		
-		mutable volScalarField CsField_;
+        mutable volScalarField D0Field_;
+
+        mutable volScalarField CsField_;
 
 public:
 
@@ -107,9 +107,9 @@ public:
 
         virtual void solve() {}
 
-		const volScalarField& D0Field() const;
+        const volScalarField& D0Field() const;
 
-		const volScalarField& CsField() const;
+        const volScalarField& CsField() const;
 };
 
 

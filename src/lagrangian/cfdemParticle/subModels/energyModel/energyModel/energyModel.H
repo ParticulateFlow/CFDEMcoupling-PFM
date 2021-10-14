@@ -46,9 +46,9 @@ protected:
 
         IOdictionary transportProperties_;
 
-		mutable volScalarField kf0Field_;
-		
-		mutable volScalarField CpField_;
+        mutable volScalarField kf0Field_;
+
+        mutable volScalarField CpField_;
 
 public:
 

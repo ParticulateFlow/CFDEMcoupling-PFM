@@ -84,9 +84,9 @@ private:
     const bool splitUrelCalculation_;      //indicator to split calculation of Urel between CFDEM and LIGGGHTS
                                            //requires the integration fix to take dv/dt into account!
 
-    mutable bool useUs_;				   //indicator to use averaged Us instead of v_p
+    mutable bool useUs_;                   //indicator to use averaged Us instead of v_p
 
-    mutable bool useFelderhof_;			   //indicator to use Cadd values from Felderhof
+    mutable bool useFelderhof_;            //indicator to use Cadd values from Felderhof
 
     mutable double Cadd_;                  //custom Cadd value
 

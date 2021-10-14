@@ -50,22 +50,22 @@ protected:
     bool implicit_;
 
     word QWallFluidName_;
-        
+
     volScalarField QWallFluid_;
 
     word QWallFluidCoeffName_;
-        
+
     volScalarField QWallFluidCoeff_;
 
     word wallTempName_;
 
     volScalarField wallTemp_;
 
-	volScalarField dpField_;
+    volScalarField dpField_;
 
-	volVectorField GField_;
+    volVectorField GField_;
 
-	volScalarField magGField_;
+    volScalarField magGField_;
 
     volScalarField ReField_;
 
@@ -121,9 +121,9 @@ public:
 
     void addEnergyContribution(volScalarField&) const;
 
-	void addEnergyCoefficient(volScalarField&) const;
+    void addEnergyCoefficient(volScalarField&) const;
 
-	void calcEnergyContribution();
+    void calcEnergyContribution();
 };
 
 

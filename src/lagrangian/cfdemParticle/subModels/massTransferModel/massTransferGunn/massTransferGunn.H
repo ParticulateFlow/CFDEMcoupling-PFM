@@ -84,7 +84,7 @@ protected:
 
     const volScalarField& concField_;           // ref to concentration field
 
-	word satConcFieldName_;
+    word satConcFieldName_;
 
     const volScalarField& satConcField_;        // ref to saturation concentration field
 
@@ -106,7 +106,7 @@ protected:
 
     //mutable double **partTemp_;
 
-	bool coupleDEM_;
+    bool coupleDEM_;
 
     word partMassFluxName_;
 

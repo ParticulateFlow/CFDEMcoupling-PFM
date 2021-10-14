@@ -18,8 +18,8 @@ License
 
 
 Description
-    diffusion coefficient of species in fluid phase in presence of particles 
-	according to Syamlal, M. and Gidaspow, M. AIChE Journal 31.1 (1985)
+    diffusion coefficient of species in fluid phase in presence of particles
+    according to Syamlal, M. and Gidaspow, M. AIChE Journal 31.1 (1985)
 
 Class
     SyamlalDiffCoeff

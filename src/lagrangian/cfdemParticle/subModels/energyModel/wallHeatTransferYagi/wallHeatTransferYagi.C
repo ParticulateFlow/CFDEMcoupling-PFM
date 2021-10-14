@@ -84,7 +84,7 @@ wallHeatTransferYagi::wallHeatTransferYagi
         sm.mesh(),
         dimensionedScalar("zero", dimensionSet(0,0,0,1,0,0,0), 0.0)
     ),
-	dpField_
+    dpField_
     (   IOobject
         (
         "dpField",
@@ -96,7 +96,7 @@ wallHeatTransferYagi::wallHeatTransferYagi
         sm.mesh(),
         dimensionedScalar("zero", dimensionSet(0,1,0,0,0,0,0), 0.0)
     ),
-	GField_
+    GField_
     (   IOobject
         (
         "GField",
@@ -108,7 +108,7 @@ wallHeatTransferYagi::wallHeatTransferYagi
         sm.mesh(),
         dimensionedVector("zero", dimensionSet(1,-2,-1,0,0,0,0), vector(0.0, 0.0, 0.0))
     ),
-	magGField_
+    magGField_
     (   IOobject
         (
         "magGField",
@@ -171,19 +171,19 @@ wallHeatTransferYagi::wallHeatTransferYagi
 
     if (verbose_)
     {
-		dpField_.writeOpt() = IOobject::AUTO_WRITE;
+        dpField_.writeOpt() = IOobject::AUTO_WRITE;
         GField_.writeOpt() = IOobject::AUTO_WRITE;
-		magGField_.writeOpt() = IOobject::AUTO_WRITE;
+        magGField_.writeOpt() = IOobject::AUTO_WRITE;
         ReField_.writeOpt() = IOobject::AUTO_WRITE;
         PrField_.writeOpt() = IOobject::AUTO_WRITE;
 
-		dpField_.write();
+        dpField_.write();
         GField_.write();
-		magGField_.write();
+        magGField_.write();
         ReField_.write();
         PrField_.write();
     }
-    
+
     // currently it is detected if field was auto generated or defined
     // improvement would be changing the type here automatically
     forAll(wallTemp_.boundaryField(),patchI)
@@ -229,8 +229,8 @@ void wallHeatTransferYagi::calcEnergyContribution()
     const volScalarField mufField = particleCloud_.turbulence().nu()*rho_;
     #endif
 
-	const volScalarField& CpField_  = CpField();
-	const volScalarField& kf0Field_ = kf0Field();
+    const volScalarField& CpField_  = CpField();
+    const volScalarField& kf0Field_ = kf0Field();
 
     // calculate mean dp
     for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)
@@ -255,14 +255,14 @@ void wallHeatTransferYagi::calcEnergyContribution()
     );
 
     // calculate G field (superficial mass velocity)
-	GField_ = U_*voidfraction_*rho_;
-	magGField_ = mag(GField_);
+    GField_ = U_*voidfraction_*rho_;
+    magGField_ = mag(GField_);
 
-	// calculate Re field
-	ReField_ = dpField_ * magGField_ / mufField;
+    // calculate Re field
+    ReField_ = dpField_ * magGField_ / mufField;
 
-	// calculate Pr field
-	PrField_ = CpField_ * mufField / kf0Field_;         
+    // calculate Pr field
+    PrField_ = CpField_ * mufField / kf0Field_;
 
     const fvPatchList& patches = U_.mesh().boundary();
 
@@ -276,7 +276,7 @@ void wallHeatTransferYagi::calcEnergyContribution()
             if(tempField_.boundaryField().types()[patchi] == "zeroGradient")
             {
                 forAll(curPatch, facei)
-                {							
+                {
                     label faceCelli = curPatch.faceCells()[facei];
 
                     // calculate H
@@ -286,7 +286,7 @@ void wallHeatTransferYagi::calcEnergyContribution()
                     else
                         JH = 0;
 
-					scalar h = JH * CpField_[faceCelli] * magGField_[faceCelli] / (pow(PrField_[faceCelli],0.666) + SMALL);
+                    scalar h = JH * CpField_[faceCelli] * magGField_[faceCelli] / (pow(PrField_[faceCelli],0.666) + SMALL);
 
                     // get delta T (wall-fluid)
                     scalar Twall  = wallTemp_.boundaryField()[patchi][facei];
@@ -300,21 +300,21 @@ void wallHeatTransferYagi::calcEnergyContribution()
 
                     if(verbose_ && facei >=0 && facei <2)
                     {
-						scalar deltaT = Twall - Tfluid;
+                        scalar deltaT = Twall - Tfluid;
                         Info << "####################" << endl;
                         Info << "cellID: " << faceCelli << endl;
-						Info << "kf: " << kf0Field_[faceCelli] << " J/msK" << endl;
-						Info << "Cp: " << CpField_[faceCelli] << " J/kgK" << endl;
-						Info << "ro: " << rho_[faceCelli] << " kg/m3" << endl;
-						Info << "mu: " << mufField[faceCelli] << " Pa s" << endl;
-						Info << "dp: " << dpField_[faceCelli] << " m" << endl;
-						Info << "ep: " << voidfraction_[faceCelli] << endl;
-						Info << "U : " << U_[faceCelli] << " m/s" << endl;
-						Info << "G : " << GField_[faceCelli] << " kg/m2s" << endl;
+                        Info << "kf: " << kf0Field_[faceCelli] << " J/msK" << endl;
+                        Info << "Cp: " << CpField_[faceCelli] << " J/kgK" << endl;
+                        Info << "ro: " << rho_[faceCelli] << " kg/m3" << endl;
+                        Info << "mu: " << mufField[faceCelli] << " Pa s" << endl;
+                        Info << "dp: " << dpField_[faceCelli] << " m" << endl;
+                        Info << "ep: " << voidfraction_[faceCelli] << endl;
+                        Info << "U : " << U_[faceCelli] << " m/s" << endl;
+                        Info << "G : " << GField_[faceCelli] << " kg/m2s" << endl;
                         Info << "mG: " << magGField_[faceCelli] << " kg/m2s" << endl;
                         Info << "Re: " << ReField_[faceCelli] << endl;
-						Info << "Pr: " << PrField_[faceCelli] << endl;
-						Info << "JH: " << JH << endl;
+                        Info << "Pr: " << PrField_[faceCelli] << endl;
+                        Info << "JH: " << JH << endl;
                         Info << "h : " << h << " J/m2sK" << endl;
                         Info << "Tw: " << Twall << " K" << endl;
                         Info << "Tf: " << Tfluid << " K" << endl;
@@ -323,13 +323,13 @@ void wallHeatTransferYagi::calcEnergyContribution()
                         Info << "A : " << area << " m2" << endl;
                         Info << "Q : " << h*deltaT*area << " J/s" << endl;
                     }
-                }		    
+                }
             }
             else
             {
                 FatalError << "wallHeatTransferYagi requires zeroGradient BC for temperature field" << endl;
-            }		    
-        }	    
+            }
+        }
     }
 
     QWallFluid_.primitiveFieldRef() /= QWallFluid_.mesh().V();

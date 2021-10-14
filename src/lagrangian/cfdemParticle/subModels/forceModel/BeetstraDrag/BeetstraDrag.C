@@ -118,8 +118,8 @@ BeetstraDrag::BeetstraDrag
         rhoP_=scalar(readScalar(propsDict_.lookup("rhoP")));
         rho_=scalar(readScalar(propsDict_.lookup("rho")));
         nuf_=scalar(readScalar(propsDict_.lookup("nuf")));
-	    scalar ut = terminalVelocity(1., dPrim_, nuf_, rho_, rhoP_, g_);
-	    scalar Frp = ut*ut/g_/dPrim_;
+        scalar ut = terminalVelocity(1., dPrim_, nuf_, rho_, rhoP_, g_);
+        scalar Frp = ut*ut/g_/dPrim_;
         Lc2_ = ut*ut/g_*pow(Frp, -.6666667); // n is hardcoded as -2/3
         Info << "using grid coarsening correction with Lc2 = " << Lc2_ << " and ut = " << ut << " and Frp = " << Frp<< endl;
 
@@ -250,7 +250,7 @@ void BeetstraDrag::setForce() const
                 dragCoefficient = F(voidfraction, Rep)
                                    *3*M_PI*nuf*rho*voidfraction
                                    *effDiameter(ds_scaled, cellI, index)
-                                   *scaleDia3*scaleDrag_;		
+                                   *scaleDia3*scaleDrag_;
 
                 // calculate filtering corrections
                 if (useGC_)
@@ -292,7 +292,7 @@ void BeetstraDrag::setForce() const
                     Pout << "voidfraction = " << voidfraction << endl;
                     Pout << "Rep = " << Rep << endl;
                     Pout << "GCcorr = " << GCcorr << endl;
-		            Pout << "PCcorr = " << PCcorr << endl;
+                    Pout << "PCcorr = " << PCcorr << endl;
                     Pout << "drag = " << drag << endl;
                 }
 
@@ -334,7 +334,7 @@ double BeetstraDrag::F(double voidfraction, double Rep) const
                          );
 
 }
- 
+
 
 /*********************************************************
  * "A drag model for filtered Euler-Lagange simulations  *

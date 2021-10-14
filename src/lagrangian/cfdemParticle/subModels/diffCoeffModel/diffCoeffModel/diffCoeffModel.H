@@ -55,7 +55,7 @@ protected:
 
         IOdictionary transportProperties_;
 
-		mutable volScalarField D0Field_;
+        mutable volScalarField D0Field_;
 
 public:
 
@@ -105,7 +105,7 @@ public:
 
         virtual tmp<volScalarField> diffCoeff() const = 0;
 
-		const volScalarField& D0Field() const;
+        const volScalarField& D0Field() const;
 
 };
 

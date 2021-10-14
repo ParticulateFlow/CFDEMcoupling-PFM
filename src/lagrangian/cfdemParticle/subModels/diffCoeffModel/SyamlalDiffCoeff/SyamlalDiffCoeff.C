@@ -67,7 +67,7 @@ SyamlalDiffCoeff::~SyamlalDiffCoeff()
 
 tmp<volScalarField> SyamlalDiffCoeff::diffCoeff() const
 {
-	const volScalarField& D0Field_ = D0Field();
+    const volScalarField& D0Field_ = D0Field();
 
     tmp<volScalarField> tvf
     (
@@ -91,7 +91,7 @@ tmp<volScalarField> SyamlalDiffCoeff::diffCoeff() const
     forAll(svf,cellI)
     {
         scalar D0 = D0Field_[cellI];
-      
+
         if (1-voidfraction_[cellI] < SMALL) svf[cellI] = D0;
         else if (voidfraction_[cellI] < SMALL) svf[cellI] = 0.0;
         else svf[cellI] = (1-sqrt(1-voidfraction_[cellI]+SMALL)) / (voidfraction_[cellI]) * D0;

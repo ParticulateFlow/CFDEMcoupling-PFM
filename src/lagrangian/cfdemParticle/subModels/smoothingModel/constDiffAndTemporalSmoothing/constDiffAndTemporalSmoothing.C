@@ -68,8 +68,8 @@ constDiffAndTemporalSmoothing::constDiffAndTemporalSmoothing
     smoothingLength_(dimensionedScalar("smoothingLength",dimensionSet(0,1,0,0,0,0,0), readScalar(propsDict_.lookup("smoothingLength")))),
     smoothingLengthReferenceField_(dimensionedScalar("smoothingLengthReferenceField",dimensionSet(0,1,0,0,0,0,0), readScalar(propsDict_.lookup("smoothingLength")))),
     DT_("DT", dimensionSet(0,2,-1,0,0), 0.),
-	gamma_(readScalar(propsDict_.lookup("smoothingStrength"))),
-	correctBoundary_(propsDict_.lookupOrDefault<bool>("correctBoundary",false)),
+    gamma_(readScalar(propsDict_.lookup("smoothingStrength"))),
+    correctBoundary_(propsDict_.lookupOrDefault<bool>("correctBoundary",false)),
     verbose_(false)
 {
 
@@ -177,7 +177,7 @@ void constDiffAndTemporalSmoothing::smoothen(volVectorField& fieldSrc) const
 
     // create temporally smoothened boundary field
     if (correctBoundary_)
-    	vSmoothField.boundaryFieldRef() = 1/(1+gamma_)*fieldSrc.oldTime().boundaryField() + gamma_/(1+gamma_)*fieldSrc.boundaryField();
+        vSmoothField.boundaryFieldRef() = 1/(1+gamma_)*fieldSrc.oldTime().boundaryField() + gamma_/(1+gamma_)*fieldSrc.boundaryField();
 
     // get data from working vSmoothField
     fieldSrc=vSmoothField;
