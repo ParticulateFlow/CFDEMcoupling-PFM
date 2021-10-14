@@ -77,11 +77,11 @@ int main(int argc, char *argv[])
     {
         #include "CourantNo.H"
         #include "alphaCourantNo.H"
-        
+
         particleCloud.clockM().start(1,"Global");
 
         Info<< "Time = " << runTime.timeName() << nl << endl;
-        
+
         particleCloud.clockM().start(2,"Coupling");
         bool hasEvolved = particleCloud.evolve(voidfraction,Us,U);
 
@@ -107,25 +107,25 @@ int main(int argc, char *argv[])
         particleCloud.clockM().start(26,"Flow");
 
         if(particleCloud.solveFlow())
-        {    
+        {
             mixture.solve();
             rho = mixture.rho();
             rhoEps = rho * voidfraction;
 
-        #include "EEqn.H"
-        #include "CEqn.H"
-            
+            #include "EEqn.H"
+            #include "CEqn.H"
+
              // --- Pressure-velocity PIMPLE corrector loop
             while (pimple.loop())
             {
                 #include "UEqn.H"
-    
+
                 // --- Pressure corrector loop
                 while (pimple.correct())
                 {
                     #include "pEqn.H"
                 }
-    
+
                 if (pimple.turbCorr())
                 {
                     turbulence->correct();
@@ -146,7 +146,7 @@ int main(int argc, char *argv[])
         Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
             << "  ClockTime = " << runTime.elapsedClockTime() << " s"
             << nl << endl;
-        
+
         particleCloud.clockM().stop("Flow");
         particleCloud.clockM().stop("Global");
     }

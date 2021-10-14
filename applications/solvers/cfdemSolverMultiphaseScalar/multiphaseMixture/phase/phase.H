@@ -166,7 +166,7 @@ public:
         const dimensionedScalar& Cs() const
         {
             return Cs_;
-        } 
+        }
 
         //- Correct the phase properties
         void correct();

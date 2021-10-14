@@ -62,14 +62,14 @@ Foam::multiphaseMixture::calcNu() const
     // nu
     tmp<volScalarField> tnu = iter()*iter().nu();
     volScalarField& nu = tnu.ref();
-    
+
     for (++iter; iter != phases_.end(); ++iter)
     {
         nuInv += iter()/iter().nu();
     }
 
     nu = 1/nuInv;
-    
+
     return tnu;
 }
 
@@ -223,7 +223,7 @@ Foam::multiphaseMixture::multiphaseMixture
     calcAlphas();
     alphas_.write();
     surfaceTensionForce_ = calcStf();
-    
+
 }
 
 
@@ -308,20 +308,20 @@ Foam::multiphaseMixture::mu(const label patchi) const
 Foam::tmp<Foam::surfaceScalarField>
 Foam::multiphaseMixture::muf() const
 {
-    
+
     return nuf()*fvc::interpolate(rho());
 //    PtrDictionary<phase>::const_iterator iter = phases_.begin();
-    
+
 //    tmp<surfaceScalarField> tmuf =
 //            fvc::interpolate(iter())*iter().rho()*fvc::interpolate(iter().nu());
 //    surfaceScalarField& muf = tmuf.ref();
-    
+
 //    for (++iter; iter != phases_.end(); ++iter)
 //    {
 //        muf +=
 //                fvc::interpolate(iter())*iter().rho()*fvc::interpolate(iter().nu());
 //    }
-    
+
 //    return tmuf;
 }
 
@@ -458,7 +458,7 @@ Foam::multiphaseMixture::Cs() const
 Foam::tmp<Foam::surfaceScalarField>
 Foam::multiphaseMixture::diffusionCorrection() const
 {
-    
+
     surfaceScalarField numerator
     (
         IOobject
@@ -486,7 +486,7 @@ Foam::multiphaseMixture::diffusionCorrection() const
         mesh_,
         dimensionedScalar("zero", dimless, 0.0)
     );
-    
+
     PtrDictionary<phase>::const_iterator iter = phases_.begin();
     const phase& alpha1 = iter();
 
@@ -500,7 +500,7 @@ Foam::multiphaseMixture::diffusionCorrection() const
     }
 
     tmp<surfaceScalarField> correction = numerator / (denominator + 1 + SMALL);
-    
+
     /*
     PtrDictionary<phase>::const_iterator iter = phases_.begin();
 
@@ -551,7 +551,7 @@ void Foam::multiphaseMixture::solve()
             !(++alphaSubCycle).end();
         )
         {
-            FatalError << "Sub-cycling of the alpha equation not yet implemented!!" << abort(FatalError);            
+            FatalError << "Sub-cycling of the alpha equation not yet implemented!!" << abort(FatalError);
             solveAlphas(cAlpha);
             rhoPhiSum += (runTime.deltaT()/totalDeltaT)*rhoPhi_;
         }
@@ -565,7 +565,7 @@ void Foam::multiphaseMixture::solve()
 
     // Update the mixture kinematic viscosity
     nu_ = calcNu();
-    
+
     surfaceTensionForce_ = calcStf();
 }
 
