@@ -21,7 +21,7 @@ phi = phiHbyA + rAUf*(fvc::interpolate(Ksl/rho) * phiS);
 MRF.makeRelative(phi);
 
 // adjustment of phi (only in cases w.o. p boundary conditions) not tested yet
-//adjustPhi(phi, U, p);
+adjustPhi(phi, U, p);
 
 // Update the pressure BCs to ensure flux consistency
 constrainPressure(p, Uvoidfraction, phiHbyA, rAUvoidfraction, MRF);
