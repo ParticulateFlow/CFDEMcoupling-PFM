@@ -64,21 +64,9 @@ protected:
 
     volScalarField SPartFluidCoeff_;
 
-    //mutable volScalarField partTempField_;
-
-    //volScalarField partRelTempField_;
-
     volScalarField ReField_;
 
     volScalarField ShField_;
-
-    //dimensionedScalar partRefTemp_;
-
-    //bool calcPartTempField_;
-
-    //bool calcPartTempAve_;
-
-    //scalar partTempAve_;
 
     word concFieldName_;
 
@@ -101,10 +89,6 @@ protected:
     word densityFieldName_;
 
     const volScalarField& rho_;
-
-    //word partTempName_;
-
-    //mutable double **partTemp_;
 
     bool coupleDEM_;
 
@@ -155,8 +139,6 @@ public:
         void calcMassContribution();
 
         void postFlow();
-
-        //scalar aveTpart() const;
 };
 
 
