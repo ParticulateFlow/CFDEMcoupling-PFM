@@ -72,14 +72,13 @@ BeetstraDrag::BeetstraDrag
     useGC_(false),
     usePC_(false)
 {
-
     //Append the field names to be probed
     particleCloud_.probeM().initialize(typeName, typeName+".logDat");
     particleCloud_.probeM().vectorFields_.append("dragForce"); //first entry must  be the force
     particleCloud_.probeM().vectorFields_.append("Urel");
     particleCloud_.probeM().scalarFields_.append("Rep");
+    particleCloud_.probeM().scalarFields_.append("betaP");
     particleCloud_.probeM().scalarFields_.append("voidfraction");
-    particleCloud_.probeM().scalarFields_.append("y_polydisperse");
     particleCloud_.probeM().writeHeader();
 
     // init force sub model
