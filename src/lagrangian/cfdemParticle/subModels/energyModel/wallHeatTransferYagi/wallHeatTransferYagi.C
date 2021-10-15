@@ -154,9 +154,9 @@ wallHeatTransferYagi::wallHeatTransferYagi
     U_(sm.mesh().lookupObject<volVectorField> (velFieldName_)),
     densityFieldName_(propsDict_.lookupOrDefault<word>("densityFieldName","rho")),
     rho_(sm.mesh().lookupObject<volScalarField> (densityFieldName_)),
-    dpArray_(NULL)
+    dpArrayRegName_(typeName + "dpArray")
 {
-    allocateMyArrays();
+    particleCloud_.registerParticleProperty<double**>(dpArrayRegName_,1);
 
     if (propsDict_.found("maxSource"))
     {
@@ -197,26 +197,15 @@ wallHeatTransferYagi::wallHeatTransferYagi
 
 wallHeatTransferYagi::~wallHeatTransferYagi()
 {
-    particleCloud_.dataExchangeM().destroy(dpArray_,1);
 }
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
-void wallHeatTransferYagi::allocateMyArrays() const
-{
-    // get memory for 2d arrays
-    double initVal=0.0;
-
-    if(verbose_)
-    {
-        particleCloud_.dataExchangeM().allocateArray(dpArray_,initVal,1);
-    }
-}
 
   // * * * * * * * * * * * * * * * * Member Fct  * * * * * * * * * * * * * * * //
 
 void wallHeatTransferYagi::calcEnergyContribution()
 {
-    allocateMyArrays();
+    double**& dpArray_ = particleCloud_.getParticlePropertyRef<double**>(dpArrayRegName_);
 
     // reset Scalar field
     QWallFluid_.primitiveFieldRef() = 0.0;

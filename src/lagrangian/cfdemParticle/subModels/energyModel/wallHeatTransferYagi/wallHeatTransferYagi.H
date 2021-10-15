@@ -91,9 +91,7 @@ protected:
 
     const volScalarField& rho_;
 
-    mutable double **dpArray_;
-
-    void allocateMyArrays() const;
+    const word dpArrayRegName_;
 
     virtual void heatFlux(label, scalar, scalar, scalar, scalar);
 
