@@ -125,8 +125,8 @@ ParmarBassetForce::ParmarBassetForce
     //Extra switches/settings
     particleCloud_.checkCG(true);
 
-    if (discOrder_!=1 || discOrder_!=2)
-        FatalError << "Parmar Basset Force: Discretisation order > 2 not implemented!" << endl;
+    if (discOrder_ < 1 || discOrder_ > 2)
+        FatalError << "Parmar Basset Force: Discretisation order > 2 not implemented!" << abort(FatalError);
 
     //Append the field names to be probed
     particleCloud_.probeM().initialize(typeName, typeName+".logDat");
