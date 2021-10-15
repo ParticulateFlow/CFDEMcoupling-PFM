@@ -108,23 +108,17 @@ protected:
 
     bool coupleDEM_;
 
-    word partMassFluxName_;
+    const word partMassFluxName_;
 
-    mutable double **partMassFlux_;
+    const word partMassFluxCoeffRegName_;
 
-    mutable double **partMassFluxCoeff_;
+    const word partReRegName_;
 
-    mutable double **partRe_;
-
-    mutable double **partSh_;
+    const word partShRegName_;
 
     mutable scalar scaleDia_;
 
     scalarList typeCG_;
-
-    void allocateMyArrays() const;
-
-    //void partTempField();
 
     scalar Sherwood(scalar, scalar, scalar) const;
 

@@ -112,14 +112,23 @@ massTransferGunn::massTransferGunn
     rho_(sm.mesh().lookupObject<volScalarField> (densityFieldName_)),
     coupleDEM_(propsDict_.lookupOrDefault<bool>("coupleDEM",false)),
     partMassFluxName_(propsDict_.lookupOrDefault<word>("partMassFluxName","convectiveMassFlux")),
-    partMassFlux_(NULL),
-    partMassFluxCoeff_(NULL),
-    partRe_(NULL),
-    partSh_(NULL),
+    partMassFluxCoeffRegName_(typeName + "partMassFluxCoeff"),
+    partReRegName_(typeName + "partRe"),
+    partShRegName_(typeName + "partSh"),
     scaleDia_(1.),
     typeCG_(propsDict_.lookupOrDefault<scalarList>("coarseGrainingFactors",scalarList(1,1.0)))
 {
-    allocateMyArrays();
+    particleCloud_.registerParticleProperty<double**>(partMassFluxName_,1);
+    if(implicit_)
+    {
+        particleCloud_.registerParticleProperty<double**>(partMassFluxCoeffRegName_,1);
+    }
+    if(verbose_)
+    {
+        particleCloud_.registerParticleProperty<double**>(partReRegName_,1);
+        particleCloud_.registerParticleProperty<double**>(partShRegName_,1);
+    }
+
 
     if (propsDict_.found("maxSource"))
     {
@@ -161,46 +170,15 @@ massTransferGunn::massTransferGunn
 
 massTransferGunn::~massTransferGunn()
 {
-    particleCloud_.dataExchangeM().destroy(partMassFlux_,1);
-
-    if (implicit_)
-    {
-        particleCloud_.dataExchangeM().destroy(partMassFluxCoeff_,1);
-    }
-
-    if(verbose_)
-    {
-        particleCloud_.dataExchangeM().destroy(partRe_,1);
-        particleCloud_.dataExchangeM().destroy(partSh_,1);
-    }
-
 }
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
-void massTransferGunn::allocateMyArrays() const
-{
-    // get memory for 2d arrays
-    double initVal=0.0;
-
-    particleCloud_.dataExchangeM().allocateArray(partMassFlux_,initVal,1);
-    if(implicit_)
-    {
-        particleCloud_.dataExchangeM().allocateArray(partMassFluxCoeff_,initVal,1);
-    }
-
-    if(verbose_)
-    {
-        particleCloud_.dataExchangeM().allocateArray(partRe_,initVal,1);
-        particleCloud_.dataExchangeM().allocateArray(partSh_,initVal,1);
-    }
-}
 
 // * * * * * * * * * * * * * * * * Member Fct  * * * * * * * * * * * * * * * //
 
 void massTransferGunn::calcMassContribution()
 {
-   // realloc the arrays
-    allocateMyArrays();
+    double**& partMassFlux_ = particleCloud_.getParticlePropertyRef<double**>(partMassFluxName_);
 
     // reset Scalar field
     SPartFluid_.primitiveFieldRef() = 0.0;
@@ -301,6 +279,8 @@ void massTransferGunn::calcMassContribution()
 
                 if(verbose_)
                 {
+                    double**& partRe_ = particleCloud_.getParticlePropertyRef<double**>(partReRegName_);
+                    double**& partSh_ = particleCloud_.getParticlePropertyRef<double**>(partShRegName_);
                     partRe_[index][0] = Rep;
                     partSh_[index][0] = Shp;
                 }
@@ -338,6 +318,7 @@ void massTransferGunn::calcMassContribution()
 
     if(implicit_)
     {
+        double**& partMassFluxCoeff_ = particleCloud_.getParticlePropertyRef<double**>(partMassFluxCoeffRegName_);
         SPartFluidCoeff_.primitiveFieldRef() = 0.0;
 
         particleCloud_.averagingM().setScalarSum
@@ -353,6 +334,8 @@ void massTransferGunn::calcMassContribution()
 
     if(verbose_)
     {
+        double**& partRe_ = particleCloud_.getParticlePropertyRef<double**>(partReRegName_);
+        double**& partSh_ = particleCloud_.getParticlePropertyRef<double**>(partShRegName_);
         ReField_.primitiveFieldRef() = 0.0;
         ShField_.primitiveFieldRef() = 0.0;
         particleCloud_.averagingM().resetWeightFields();
@@ -422,6 +405,7 @@ scalar massTransferGunn::Sherwood(scalar voidfraction, scalar Rep, scalar Sc) co
 void massTransferGunn::massFlux(label index, scalar h, scalar As, scalar Cfluid, scalar Csfluid, scalar cg3)
 {
     scalar hAs = h * As * cg3;
+    double**& partMassFlux_ = particleCloud_.getParticlePropertyRef<double**>(partMassFluxName_);
 
     if (particleCloud_.getParticleEffVolFactors())
     {
@@ -436,6 +420,7 @@ void massTransferGunn::massFlux(label index, scalar h, scalar As, scalar Cfluid,
     }
     else
     {
+        double**& partMassFluxCoeff_ = particleCloud_.getParticlePropertyRef<double**>(partMassFluxCoeffRegName_);
         partMassFluxCoeff_[index][0] = hAs;
     }
 }
@@ -444,6 +429,7 @@ void massTransferGunn::giveData()
 {
     Info << "total convective particle-fluid mass flux [kg/s] (Eulerian) = " << gSum(SPartFluid_*1.0*SPartFluid_.mesh().V()) << endl;
 
+    double**& partMassFlux_ = particleCloud_.getParticlePropertyRef<double**>(partMassFluxName_);
     particleCloud_.dataExchangeM().giveData(partMassFluxName_,"scalar-atom", partMassFlux_);
 }
 
@@ -457,6 +443,8 @@ void massTransferGunn::postFlow()
             label cellI;
             scalar Cfluid(0.0);
             interpolationCellPoint<scalar> CInterpolator_(concField_);
+            double**& partMassFlux_ = particleCloud_.getParticlePropertyRef<double**>(partMassFluxName_);
+            double**& partMassFluxCoeff_ = particleCloud_.getParticlePropertyRef<double**>(partMassFluxCoeffRegName_);
 
             for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)
             {
