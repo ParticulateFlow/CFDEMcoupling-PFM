@@ -205,12 +205,6 @@ void massTransferGunn::calcMassContribution()
     // reset Scalar field
     SPartFluid_.primitiveFieldRef() = 0.0;
 
-    if(particleCloud_.cg() > 1.)
-    {
-        scaleDia_ = particleCloud_.cg();
-        Info << "Mass Transfer Gunn is using scale from liggghts cg = " << scaleDia_ << endl;
-    }
-
     #ifdef compre
        const volScalarField mufField = particleCloud_.turbulence().mu();
     #else
@@ -238,7 +232,7 @@ void massTransferGunn::calcMassContribution()
     vector Us(0,0,0);
     scalar ds(0);
     scalar ds_scaled(0);
-    scalar scaleDia3 = typeCG_[0]*typeCG_[0]*typeCG_[0];
+    scalar scaleDia3 = scaleDia_*scaleDia_*scaleDia_;
     scalar muf(0);
     scalar rhof(0);
     scalar magUr(0);
@@ -246,7 +240,7 @@ void massTransferGunn::calcMassContribution()
     scalar Sc(0);
     scalar Shp(0);
 
-    scalar cg = typeCG_[0];
+    scalar cg = scaleDia_;
     label partType = 1;
 
     interpolationCellPoint<scalar> voidfractionInterpolator_(voidfraction_);
