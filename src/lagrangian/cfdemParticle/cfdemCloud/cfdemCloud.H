@@ -109,7 +109,7 @@ protected:
 
     const bool getParticleTypes_;
 
-    bool getParticleAngVels_;
+    const bool getParticleAngVels_;
 
     const bool streamingMode_;
 
@@ -392,7 +392,7 @@ public:
 
        inline bool getParticleAngVels() const;
        virtual inline double ** particleAngVels() const;
-       virtual vector particleAngVel(label index) const; 
+       virtual vector particleAngVel(label index) const;
 
        //access to the particle's rotation and torque data
        virtual inline double ** DEMTorques() const {return NULL;}
