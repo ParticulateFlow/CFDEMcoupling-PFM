@@ -150,7 +150,10 @@ massTransferGunn::massTransferGunn
         scaleDia_=scalar(readScalar(propsDict_.lookup("scale")));
         typeCG_[0] = scaleDia_;
     }
-    else if (typeCG_.size()>1) multiTypes_ = true;
+    else if (typeCG_.size()>1)
+    {
+        multiTypes_ = true;
+    }
 }
 
 
