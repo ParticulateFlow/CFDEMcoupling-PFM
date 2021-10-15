@@ -97,31 +97,35 @@ gradPForceSmooth::gradPForceSmooth
     if (modelType_ == "B")
     {
         FatalError <<"using  model gradPForceSmooth with model type B is not valid\n" << abort(FatalError);
-    }else if (modelType_ == "Bfull")
+    }
+    else if (modelType_ == "Bfull")
     {
         if(forceSubM(0).switches()[1])
         {
             Info << "Using treatForceDEM false!" << endl;
             forceSubM(0).setSwitches(1,false); // treatForceDEM = false
         }
-    }else // modelType_=="A"
+    }
+    else // modelType_=="A"
     {
-        if(!forceSubM(0).switches()[1])
+        if (!forceSubM(0).switches()[1])
         {
             Info << "Using treatForceDEM true!" << endl;
             forceSubM(0).setSwitches(1,true); // treatForceDEM = true
         }
     }
 
-    if (propsDict_.found("useU")) useU_=true;
-    if (propsDict_.found("useAddedMass")) 
+    if (propsDict_.found("useU"))
+        useU_=true;
+
+    if (propsDict_.found("useAddedMass"))
     {
         addedMassCoeff_ =  readScalar(propsDict_.lookup("useAddedMass"));
         Info << "gradP will also include added mass with coefficient: " << addedMassCoeff_ << endl;
         Info << "WARNING: use fix nve/sphere/addedMass in LIGGGHTS input script to correctly account for added mass effects!" << endl;
     }
 
-    if(p_.dimensions()==dimensionSet(0,2,-2,0,0))
+    if (p_.dimensions()==dimensionSet(0,2,-2,0,0))
         useRho_ = true;
 
     particleCloud_.checkCG(true);
@@ -131,15 +135,14 @@ gradPForceSmooth::gradPForceSmooth
     particleCloud_.probeM().scalarFields_.append("Vs");
     particleCloud_.probeM().scalarFields_.append("rho");
     particleCloud_.probeM().writeHeader();
-    
-    //pSmooth_ = p_;
-   }
+}
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 gradPForceSmooth::~gradPForceSmooth()
-{}
+{
+}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
@@ -147,35 +150,26 @@ gradPForceSmooth::~gradPForceSmooth()
 void gradPForceSmooth::setForce() const
 {
     volVectorField gradPField = fvc::grad(p_);
-    if(pFieldName_ == "p_rgh")
+    if (pFieldName_ == "p_rgh")
     {
         const volScalarField& rho_ = particleCloud_.mesh().lookupObject<volScalarField>("rho");
         const volScalarField& gh_ = particleCloud_.mesh().lookupObject<volScalarField>("gh");
-        
+
         //Smooth p_rgh, easier to handle boundaries
         smoothingM().smoothen(pSmooth_);
-        
+
         //Superpose hydrostatic pressure
         volScalarField pFull = pSmooth_ + rho_*gh_;
-        
+
         gradPField = fvc::grad(pFull);
-        
-    }else{
-        
+    }
+    else
+    {
         smoothingM().smoothen(pSmooth_);
         gradPField = fvc::grad(pSmooth_);
-        
+
     }
-    
-    /*if (useU_)
-    {
-        // const volScalarField& voidfraction_ = particleCloud_.mesh().lookupObject<volScalarField> ("voidfraction");
-        volScalarField U2 = U_&U_;// *voidfraction_*voidfraction_;
-        if (useRho_)
-            gradPField = fvc::grad(0.5*U2);
-        else
-            gradPField = fvc::grad(0.5*forceSubM(0).rhoField()*U2);
-    }*/
+
     vector gradP;
     scalar Vs;
     scalar rho;
@@ -186,7 +180,7 @@ void gradPForceSmooth::setForce() const
     interpolationCellPoint<vector> gradPInterpolator_(gradPField);
     #include "setupProbeModel.H"
 
-    for(int index = 0;index <  particleCloud_.numberOfParticles(); index++)
+    for (int index = 0;index < particleCloud_.numberOfParticles(); index++)
     {
         //if(mask[index][0])
         //{
@@ -196,11 +190,12 @@ void gradPForceSmooth::setForce() const
             if (cellI > -1) // particle Found
             {
                 position = particleCloud_.position(index);
-                
-                if(forceSubM(0).interpolation()) // use intepolated values for alpha (normally off!!!)
+
+                if (forceSubM(0).interpolation()) // use intepolated values for alpha (normally off!!!)
                 {
                     gradP = gradPInterpolator_.interpolate(position,cellI);
-                }else
+                }
+                else
                 {
                     gradP = gradPField[cellI];
                 }
@@ -214,7 +209,7 @@ void gradPForceSmooth::setForce() const
                 else
                     force = -Vs*gradP*(1.0+addedMassCoeff_);
 
-                if(forceSubM(0).verbose() && index >=0 && index <2)
+                if (forceSubM(0).verbose() && index >=0 && index <2)
                 {
                     Info << "index = " << index << endl;
                     Info << "gradP = " << gradP << endl;
@@ -222,7 +217,7 @@ void gradPForceSmooth::setForce() const
                 }
 
                 //Set value fields and write the probe
-                if(probeIt_)
+                if (probeIt_)
                 {
                     #include "setupProbeModelfields.H"
                     vValues.append(force);           //first entry must the be the force
