@@ -488,7 +488,7 @@ void Foam::ParmarBassetForce::reAllocArrays() const
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 scalar Foam::ParmarBassetForce::calculateK0(scalar r, scalar dt) const
 {
-    scalar gamma = pow(r,0.333)*pow(dt,0.25);
+    scalar gamma = cbrt(r)*pow(dt,0.25);
 
     /*
     scalar K0 = 2./(9.*pow(r,0.666)) *
