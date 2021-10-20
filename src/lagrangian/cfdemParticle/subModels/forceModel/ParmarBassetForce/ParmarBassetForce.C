@@ -168,7 +168,7 @@ ParmarBassetForce::~ParmarBassetForce()
         particleCloud_.dataExchangeM().destroy(rHist_      [i],1);
     }
 
-    for (int i=0; i<3; i++)
+    for (int i=0; i<2*discOrder_+1; i++)
         for (int k=0; k<2; k++)
             particleCloud_.dataExchangeM().destroy(FHist_[k][i],3);
 
