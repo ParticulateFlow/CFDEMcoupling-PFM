@@ -91,7 +91,7 @@ ParmarBassetForce::ParmarBassetForce
             IOobject::AUTO_WRITE
         ),
         sm.mesh(),
-        dimensionedVector("zero", dimensionSet(0,1,-1,0,0,0,0), vector(0,0,0))
+        dimensionedVector("zero", dimensionSet(0,1,-1,0,0,0,0), vector::zero)
     ),
     ddtUrel_
     (   IOobject
@@ -103,7 +103,7 @@ ParmarBassetForce::ParmarBassetForce
             IOobject::AUTO_WRITE
         ),
         sm.mesh(),
-        dimensionedVector("zero", dimensionSet(0,1,-2,0,0,0,0), vector(0,0,0))
+        dimensionedVector("zero", dimensionSet(0,1,-2,0,0,0,0), vector::zero)
     ),
     smoothingModel_
     (
@@ -353,7 +353,7 @@ void ParmarBassetForce::setForce() const
                 //********* long term force computing (differential form) *********//
 
                 // update F1, F2 history
-                update_FHist(vector(0., 0., 0.),vector(0., 0., 0.),index);
+                update_FHist(vector::zero,vector::zero,index);
 
                 // initialise ddtUrel(t0) and Flong(:) as 0 and r(t0) as 1
                 if (nKnown == nInt_)
