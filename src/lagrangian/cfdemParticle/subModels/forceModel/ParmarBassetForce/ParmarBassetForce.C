@@ -511,7 +511,7 @@ scalar Foam::ParmarBassetForce::calculateK0(scalar r, scalar dt) const
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 scalar Foam::ParmarBassetForce::trapWeight(int i, int n) const
 {
-    if ( (i==1) | (i==(n-1)) )
+    if ( (i==1) || (i==(n-1)) )
         return 0.5;
     else
         return 1.0;
