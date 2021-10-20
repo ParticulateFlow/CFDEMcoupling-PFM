@@ -365,9 +365,9 @@ void ParmarBassetForce::setForce() const
                             ddtUrelHist_[j][index][i] = 0.0;
                     }
 
-                    for (int j=0; j<2*discOrder_+1; j++) // loop over past times
-                        for (int i=0; i<3; i++) // loop over dimensions
-                            for (int k=0; k<2; k++) // loop over F1, F2
+                    for (int k=0; k<2; k++) // loop over F1, F2
+                        for (int j=0; j<2*discOrder_+1; j++) // loop over past times
+                            for (int i=0; i<3; i++) // loop over dimensions
                                 FHist_[k][j][index][i] = 0.0;
                     nKnown = nHist_;
                 }
@@ -488,7 +488,8 @@ void Foam::ParmarBassetForce::reAllocArrays() const
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 scalar Foam::ParmarBassetForce::calculateK0(scalar r, scalar dt) const
 {
-    scalar gamma = cbrt(r)*pow(dt,0.25);
+    scalar cbrtr = cbrt(r); // cube root of r
+    scalar gamma = cbrtr*pow(dt,0.25);
 
     /*
     scalar K0 = 2./(9.*pow(r,0.666)) *
@@ -497,8 +498,8 @@ scalar Foam::ParmarBassetForce::calculateK0(scalar r, scalar dt) const
                     + 2.*sqrt(3.)*atan(sqrt(3.)*gamma/(2.-gamma))
                     + log((gamma*gamma-gamma+1.)/(gamma+1.)/(gamma+1.))
             ); // int_0^dt K(r,xi) dxi
-    */
-    scalar K0 = 2./(9.*pow(r,0.666)) *
+    */  
+    scalar K0 = 2./(9.*cbrtr*cbrtr) *
             (
               -  0.37224 * gamma
               + 12.1587  * gamma*gamma
