@@ -67,11 +67,11 @@ private:
 
     const volVectorField& Us_;
 
-    scalar nInt_;                          //no of timesteps to solve full integral
+    label nInt_;                            //no of timesteps to solve full integral
 
-    scalar discOrder_;                     //ODE discretisation order
+    label discOrder_;                       //ODE discretisation order
 
-    scalar nHist_;                         //no of timesteps to save ddtUrel history for
+    label nHist_;                           //no of timesteps to save ddtUrel history for
 
     mutable List<double**> ddtUrelHist_;
 

@@ -71,8 +71,8 @@ ParmarBassetForce::ParmarBassetForce
     U_(sm.mesh().lookupObject<volVectorField> (velFieldName_)),
     UsFieldName_(propsDict_.lookup("granVelFieldName")),
     Us_(sm.mesh().lookupObject<volVectorField> (UsFieldName_)),
-    nInt_(readScalar(propsDict_.lookup("nIntegral"))),
-    discOrder_(readScalar(propsDict_.lookup("discretisationOrder"))),
+    nInt_(readLabel(propsDict_.lookup("nIntegral"))),
+    discOrder_(readLabel(propsDict_.lookup("discretisationOrder"))),
     nHist_(nInt_+discOrder_+1),
     ddtUrelHist_(nHist_,NULL),                     // UrelHist_[ndt in past][particle ID][dim]
     rHist_(nHist_,NULL),                           // rHist_[ndt in past][particle ID][0]
