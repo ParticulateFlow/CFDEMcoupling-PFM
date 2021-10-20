@@ -93,6 +93,23 @@ private:
 
     autoPtr<smoothingModel> smoothingModel_;
 
+private:
+
+    scalar calculateK0(scalar r, scalar dt) const;
+
+    scalar trapWeight(int i, int n) const;
+
+    void update_ddtUrelHist(const vector& ddtUrel, int index) const;
+
+    void update_rHist(scalar r, int index) const;
+
+    void update_FHist(const vector& F1, const vector& F2, int index) const;
+
+    void calculateCoeffs(int k, scalar t0, scalar r, double c[2][4][3], double chi[2][4][2], double C[4]) const;
+
+    void solveFlongODE(int k, double C[4], scalar dt, int index) const;
+
+    void rescaleHist(scalar tScale, scalar mScale, scalar lScale, scalar rScale, int index) const;
 
 public:
 
@@ -124,22 +141,6 @@ public:
         {
             return smoothingModel_;
         }
-
-        scalar calculateK0(scalar r, scalar dt) const;
-
-        scalar trapWeight(int i, int n) const;
-
-        void update_ddtUrelHist(vector ddtUrel, int index) const;
-
-        void update_rHist(scalar r, int index) const;
-
-        void update_FHist(vector F1, vector F2, int index) const;
-
-        void calculateCoeffs(int k, scalar t0, scalar r, double c[2][4][3], double chi[2][4][2], double C[4]) const;
-
-        void solveFlongODE(int k, double C[4], scalar dt, int index) const;
-
-        void rescaleHist(scalar tScale, scalar mScale, scalar lScale, scalar rScale, int index) const;
 
 };
 

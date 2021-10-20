@@ -522,7 +522,7 @@ scalar Foam::ParmarBassetForce::trapWeight(int i, int n) const
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-void Foam::ParmarBassetForce::update_ddtUrelHist(vector ddtUrel, int index) const
+void Foam::ParmarBassetForce::update_ddtUrelHist(const vector& ddtUrel, int index) const
 {
     for (int i=0; i<3; i++) // loop over dimensions
     {
@@ -543,7 +543,7 @@ void Foam::ParmarBassetForce::update_rHist(scalar r, int index) const
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-void Foam::ParmarBassetForce::update_FHist(vector F1, vector F2, int index) const
+void Foam::ParmarBassetForce::update_FHist(const vector& F1, const vector& F2, int index) const
 {
     for (int i=0; i<3; i++) // loop over dimensions
     {
