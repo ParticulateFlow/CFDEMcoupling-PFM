@@ -269,7 +269,7 @@ void ParmarBassetForce::setForce() const
                 {
                     r = pow(gH0_[index][0]/gH,1.5); // Eq. 3.4
 
-                    if (r<.25 || r>2.)
+                    if (r<0.25 || r>2.0)
                     {
                         gH0_[index][0]            = NOTONCPU; //reset reference
                         ddtUrelHist_[0][index][0] = NOTONCPU; //reset ddtU history (only component used for checking nKnown)
@@ -284,7 +284,7 @@ void ParmarBassetForce::setForce() const
                     scalar Vs   = rs*rs*rs*M_PI*4/3;
                     scalar mRef = Vs*rhoField[cellI] * gH * 5.2863;             // 9/(2*sqrt(pi))*(256/pi)^(1/6) = 5.2863 (Eq. 3.2)
 
-                     gH0_[index][0] = gH;
+                    gH0_[index][0] = gH;
                     tRef_[index][0] = tRef;
                     mRef_[index][0] = mRef;
                     lRef_[index][0] = rs;
@@ -397,10 +397,6 @@ void ParmarBassetForce::setForce() const
                 }
                 ParmarBassetForce *= newton;
 
-                if( forceSubM(0).verbose() ) //&& index>100 && index < 105)
-                {
-                }
-
                 // Set value fields and write the probe
                 if(probeIt_)
                 {
@@ -504,7 +500,7 @@ scalar Foam::ParmarBassetForce::calculateK0(scalar r, scalar dt) const
     */
     scalar K0 = 2./(9.*pow(r,0.666)) *
             (
-              -   .37224 * gamma
+              -  0.37224 * gamma
               + 12.1587  * gamma*gamma
               -  6.4884  * gamma*gamma*gamma
             ); // third order approximation to the eq. above
