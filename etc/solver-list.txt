@@ -1,4 +1,5 @@
 rcfdemSolverRhoSteadyPimple/dir
+rcfdemSolverRhoSteadyPimpleChem/dir
 rcfdemSolverCoupledHeattransfer/dir
 rcfdemSolverForcedTracers/dir
 rStatAnalysis/dir
