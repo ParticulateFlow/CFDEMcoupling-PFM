@@ -57,6 +57,7 @@ reactantPerParticle::reactantPerParticle
     propsDict_(dict.subDict(typeName + "Props")),
     mesh_(sm.mesh()),
     verbose_(propsDict_.lookupOrDefault<bool>("verbose",false)),
+    multiTypes_(false),
     partReactantName_("reactantPerParticle"),
     voidfractionFieldName_(propsDict_.lookupOrDefault<word>("voidfractionFieldName","voidfraction")),
     voidfraction_(sm.mesh().lookupObject<volScalarField>(voidfractionFieldName_)),
@@ -73,10 +74,26 @@ reactantPerParticle::reactantPerParticle
         dimensionedScalar("zero", dimensionSet(0,0,0,0,0), 0)
     ),
     loopCounter_(-1),
-    Nevery_(propsDict_.lookupOrDefault<label>("Nevery",1))
+    Nevery_(propsDict_.lookupOrDefault<label>("Nevery",1)),
+    maxTypeCG_(1),
+    typeCG_(propsDict_.lookupOrDefault<scalarList>("coarseGrainingFactors",scalarList(1,1.0))),
+    scaleDia_(1.)
 {
-    particleCloud_.checkCG(false);
     particleCloud_.registerParticleProperty<double**>(partReactantName_,1);
+
+    particleCloud_.checkCG(true);
+    if (propsDict_.found("scale") && typeCG_.size()==1)
+    {
+        // if "scale" is specified and there's only one single type, use "scale"
+        scaleDia_=scalar(readScalar(propsDict_.lookup("scale")));
+        typeCG_[0] = scaleDia_;
+    }
+
+    if (typeCG_.size()>1)
+    {
+        multiTypes_ = true;
+        maxTypeCG_ = typeCG_.size();
+    }
 }
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
@@ -100,9 +117,18 @@ void reactantPerParticle::execute()
     particlesPerCell_ *= 0.0;
 
     label  cellI=0;
-    scalar voidfraction(1);
-    scalar cellvolume(0.0);
-    scalar particlesPerCell(1.0);
+    scalar voidfraction = 1.0;
+    scalar cellvolume = 0.0;
+    scalar particlesPerCell = 1.0;
+    scalar cg = 1.0;
+    label partType = 1;
+
+    if (particleCloud_.cg() > 1)
+    {
+        scaleDia_ = particleCloud_.cg();
+    }
+    scalar scaleDia3 = scaleDia_*scaleDia_*scaleDia_;
+
     double**& reactantPerParticle_ = particleCloud_.getParticlePropertyRef<double**>(partReactantName_);
 
     // first create particles per cell field
@@ -111,11 +137,22 @@ void reactantPerParticle::execute()
         cellI=particleCloud_.cellIDs()[index][0];
         if (cellI >= 0)
         {
-            particlesPerCell_[cellI] += 1.0;
+
+            if (multiTypes_)
+            {
+                partType = particleCloud_.particleType(index);
+                if (partType > maxTypeCG_)
+                {
+                    FatalError<< "Too few coarse-graining factors provided." << abort(FatalError);
+                }
+                cg = typeCG_[partType - 1];
+                scaleDia3 = cg*cg*cg;
+            }
+            particlesPerCell_[cellI] += scaleDia3;
         }
     }
 
-    // no fill array and communicate it
+    // fill array and communicate it
     for (int index=0; index<particleCloud_.numberOfParticles(); ++index)
     {
         cellI=particleCloud_.cellIDs()[index][0];
