@@ -73,6 +73,8 @@ private:
 
     label nHist_;                           //no of timesteps to save ddtUrel history for
 
+    label FHistSize_;
+
     mutable List<double**> ddtUrelHist_;
 
     mutable List<double**> rHist_;

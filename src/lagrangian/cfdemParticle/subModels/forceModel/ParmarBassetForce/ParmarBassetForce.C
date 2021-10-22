@@ -74,9 +74,10 @@ ParmarBassetForce::ParmarBassetForce
     nInt_(readLabel(propsDict_.lookup("nIntegral"))),
     discOrder_(readLabel(propsDict_.lookup("discretisationOrder"))),
     nHist_(nInt_+discOrder_+1),
+    FHistSize_(2*discOrder_+1),
     ddtUrelHist_(nHist_,NULL),                     // UrelHist_[ndt in past][particle ID][dim]
     rHist_(nHist_,NULL),                           // rHist_[ndt in past][particle ID][0]
-    FHist_(2,List<double**>(2*discOrder_+1,NULL)), // FHist_[k={1,2}-1][ndt in past][particle ID][dim]
+    FHist_(2,List<double**>(FHistSize_,NULL)),     // FHist_[k={1,2}-1][ndt in past][particle ID][dim]
     gH0_(NULL),
     tRef_(NULL),
     mRef_(NULL),
@@ -168,7 +169,7 @@ ParmarBassetForce::~ParmarBassetForce()
         particleCloud_.dataExchangeM().destroy(rHist_      [i],1);
     }
 
-    for (int i=0; i<2*discOrder_+1; i++)
+    for (int i=0; i<FHistSize_; i++)
         for (int k=0; k<2; k++)
             particleCloud_.dataExchangeM().destroy(FHist_[k][i],3);
 
@@ -366,7 +367,7 @@ void ParmarBassetForce::setForce() const
                     }
 
                     for (int k=0; k<2; k++) // loop over F1, F2
-                        for (int j=0; j<2*discOrder_+1; j++) // loop over past times
+                        for (int j=0; j<FHistSize_; j++) // loop over past times
                             for (int i=0; i<3; i++) // loop over dimensions
                                 FHist_[k][j][index][i] = 0.0;
                     nKnown = nHist_;
@@ -545,7 +546,7 @@ void Foam::ParmarBassetForce::update_FHist(const vector& F1, const vector& F2, i
     for (int i=0; i<3; i++) // loop over dimensions
     {
         for (int k=0; k<2; k++) // loop over F1, F2
-            for (int j=2*discOrder_; j>0; j--) // loop over past times
+            for (int j=FHistSize_-1; j>0; j--) // loop over past times
                 FHist_[k][j][index][i] = FHist_[k][j-1][index][i];
 
         FHist_[0][0][index][i] = F1[i];
@@ -608,7 +609,7 @@ void Foam::ParmarBassetForce::rescaleHist(scalar tScale, scalar mScale, scalar l
 
         // rescale F1, F2 history
         for (int k=0; k<2; k++) // loop over F1, F2
-            for (int j=0; j<(2*discOrder_+1); j++) // loop over past times
+            for (int j=0; j<FHistSize_; j++) // loop over past times
                 FHist_[k][j][index][i] *= mScale*lScale/(tScale*tScale);
     }
     // rescale r history
