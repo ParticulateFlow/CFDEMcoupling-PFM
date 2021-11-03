@@ -18,6 +18,6 @@ else
 fi
 
 #- other paths
-logPath=$casePath/log
-mkdir $logPath
+logpath=$casePath/log
+mkdir $logpath
 
