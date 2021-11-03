@@ -16,6 +16,10 @@ scriptPath="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 echo "runAllPar: calling preRunAllPar"
 . $scriptPath/preRunAllPar.sh $casePath
 
+# duplicate restart file to restartSequence
+echo "runAllPar: duplicating LIGGGHTS restart file"
+cp $casePath/DEM/post/restart/liggghts.restart $casePath/DEM/post/restart/liggghts.restartSequence
+
 #- run parallel CFD-DEM
 echo "runAllPar: Running CFD-DEM"
 . $scriptPath/runCFDDEMPar.sh $casePath
