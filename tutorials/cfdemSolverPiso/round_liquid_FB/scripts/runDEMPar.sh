@@ -18,10 +18,10 @@ scriptPath="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 . $casePath/runSettings.sh "DEM"
 #--------------------------------------------------------------------------------#
 
-echo  $logPath $logfileName $casePath $headerText $solverName $nrProcs $machineFileName $debugMode
+echo  $logpath $logfileName $casePath $headerText $solverName $nrProcs $machineFileName $debugMode
 
 #- call function to run DEM case
-parDEMrun $logPath $logfileName $casePath $headerText $solverName $nrProcs $machineFileName $debugMode
+parDEMrun $logpath $logfileName $casePath $headerText $solverName $nrProcs $machineFileName $debugMode
 
 #- return
 cd $currentPath

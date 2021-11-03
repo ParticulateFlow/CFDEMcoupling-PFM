@@ -40,7 +40,7 @@ if [ -f "$casePath/CFD/constant/polyMesh/points" ]; then
     echo "preRunAllPar: using old mesh"
 else
     echo "preRunAllPar: Building mesh"
-    . $scriptPath/buildMesh.sh $casePath > $logPath/log.mesh
+    . $scriptPath/buildMesh.sh $casePath > $logpath/log.mesh
 fi
 
 #-  set fields
