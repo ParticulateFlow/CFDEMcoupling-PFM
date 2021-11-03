@@ -64,13 +64,19 @@ protected:
     // correlation steps determine which temporal neighborhood is excluded from nearest-neighbor search
     label correlationSteps_;
 
+    label currentDatabase_;
+
     label meanIntervalSteps_;
 
     label minIntervalSteps_;
 
+    label minStepsWithinDatabase_;
+
     label numIntervals_;
 
     label recSteps_;
+
+    label stepsInCurrentDatabase_;
 
     label startIndex_;
 
@@ -78,11 +84,15 @@ protected:
 
     labelList intervalSizesCumulative_;
 
+    labelList numberOfIntervalsInEachDatabase_;
+
     scalar Pjump_;
 
     scalarList intervalWeights_;
 
     scalarList intervalWeightsCumulative_;
+
+    scalarList timeSpentInEachDatabase_;
 
     Random ranGen;
 

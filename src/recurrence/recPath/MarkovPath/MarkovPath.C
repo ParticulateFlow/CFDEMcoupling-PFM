@@ -57,22 +57,29 @@ MarkovPath::MarkovPath
     recPath(dict, base),
     propsDict_(dict.subDict(typeName + "Props")),
     searchMinimum_(propsDict_.lookupOrDefault<bool>("searchMinimum",true)),
+    currentDatabase_(0),
     correlationSteps_(readLabel(propsDict_.lookup("correlationSteps"))),
     meanIntervalSteps_(propsDict_.lookupOrDefault<label>("meanIntervalSteps",-1)),
     minIntervalSteps_(propsDict_.lookupOrDefault<label>("minIntervalSteps",0)),
+    minStepsWithinDatabase_(propsDict_.lookupOrDefault<label>("minStepsWithinDatabase",0)),
     numIntervals_(base.recM().numIntervals()),
     recSteps_(0),
+    stepsInCurrentDatabase_(0),
     startIndex_(propsDict_.lookupOrDefault<label>("startIndex",0)),
     intervalSizes_(numIntervals_),
     intervalSizesCumulative_(numIntervals_),
+    numberOfIntervalsInEachDatabase_(numIntervals_),
     Pjump_(0.0),
     intervalWeights_(propsDict_.lookupOrDefault<scalarList>("intervalWeights",scalarList(numIntervals_,1.0))),
     intervalWeightsCumulative_(intervalWeights_),
+    timeSpentInEachDatabase_(intervalWeights_),
     ranGen(clock::getTime()+pid())
 {
     for(int i=0;i<numIntervals_;i++)
     {
         intervalSizes_[i] = base.recM().numRecFields(i);
+        numberOfIntervalsInEachDatabase_[i] = 0;
+        timeSpentInEachDatabase_[i] = 0.0;
     }
 
     if(meanIntervalSteps_<0)
@@ -113,7 +120,13 @@ MarkovPath::MarkovPath
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 MarkovPath::~MarkovPath()
-{}
+{
+    for(int i=0;i<numIntervals_;i++)
+    {
+        Info << "recurrence Path: total steps spent in database " << i << " = " << timeSpentInEachDatabase_[i]
+        << " (distributed over " << numberOfIntervalsInEachDatabase_[i] << " episodes)" << endl;
+    }
+}
 
 // * * * * * * * * * * * * * protected Member Functions  * * * * * * * * * * * * //
 
@@ -147,6 +160,13 @@ void MarkovPath::computeRecPath()
     {
         extendPath();
     }
+
+    for(int i=0;i<numIntervals_;i++)
+    {
+        Info << "recurrence Path: total steps spent so far in database " << i << " = " << timeSpentInEachDatabase_[i]
+        << " (distributed over " << numberOfIntervalsInEachDatabase_[i] << " episodes)" << endl;
+    }
+
     Info << "\nComputing recurrence path done\n" << endl;
 }
 
@@ -164,18 +184,29 @@ void MarkovPath::extendPath()
     {
         virtualTimeIndex = virtualTimeIndexList_.last().second();
 
-        // jump to similar state in same or other database
-        scalar randInterval = ranGen.scalar01();
-
-        label interval = numIntervals_-1;
-        for(int i = numIntervals_-2; i >= 0; i--)
+        if (stepsInCurrentDatabase_ >= minStepsWithinDatabase_)
         {
-           if (randInterval < intervalWeightsCumulative_[i]) interval=i;
+            label prevDatabase = currentDatabase_;
+            // jump to similar state in same or other database
+            scalar randInterval = ranGen.scalar01();
+
+            label interval = numIntervals_-1;
+            for(int i = numIntervals_-2; i >= 0; i--)
+            {
+               if (randInterval < intervalWeightsCumulative_[i]) interval=i;
+            }
+
+            currentDatabase_ = interval;
+            if (prevDatabase != currentDatabase_)
+            {
+                stepsInCurrentDatabase_ = 0;
+                numberOfIntervalsInEachDatabase_[prevDatabase] += 1;
+            }
         }
 
         label startLoop = 0;
-        if (interval > 0) startLoop = intervalSizesCumulative_[interval-1];
-        label endLoop = intervalSizesCumulative_[interval] - meanIntervalSteps_;
+        if (currentDatabase_ > 0) startLoop = intervalSizesCumulative_[currentDatabase_-1];
+        label endLoop = intervalSizesCumulative_[currentDatabase_] - meanIntervalSteps_;
 
         if (searchMinimum_)
         {
@@ -205,6 +236,7 @@ void MarkovPath::extendPath()
 
     // take a series of consecutive steps
     bool takeAnotherStep = true;
+    virtualTimeIndex--; // decrement because in the following at least one step is taken
     while(takeAnotherStep)
     {
         virtualTimeIndex++;
@@ -225,7 +257,10 @@ void MarkovPath::extendPath()
     // add interval to recurrence path
     labelPair seqStartEnd(seqStart,seqEnd);
     virtualTimeIndexList_.append(seqStartEnd);
-    recSteps_ += seqEnd - seqStart + 1;
+    label addSteps = seqEnd - seqStart + 1;
+    recSteps_ += addSteps;
+    stepsInCurrentDatabase_ += addSteps;
+    timeSpentInEachDatabase_[currentDatabase_] += addSteps;
 }
 
 
