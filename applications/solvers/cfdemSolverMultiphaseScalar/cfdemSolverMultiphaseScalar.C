@@ -51,6 +51,10 @@ Description
 
 int main(int argc, char *argv[])
 {
+#if OPENFOAM_VERSION_MAJOR >= 6
+    FatalError << "cfdemSolverMultiphase requires OpenFOAM 4.x or 5.x to work properly" << exit(FatalError);
+#endif
+
     #include "postProcess.H"
     #include "setRootCase.H"
     #include "createTime.H"
