@@ -1,0 +1,83 @@
+"CFDEMproject Website"_lws - "Main Page"_main :c
+
+:link(lws,http://www.cfdem.com)
+:link(main,CFDEMcoupling_Manual.html)
+
+:line
+
+energyModel wallHeatTransferYagi command :h3
+
+[Syntax:]
+
+Defined in "couplingProperties"_CFDEMcoupling_dicts.html#couplingProperties
+dictionary.
+
+energyModels
+(
+    wallHeatTransferYagi
+);
+wallHeatTransferYagiProps
+\{
+    QWallFluidName         "QWallFluid";
+    QWallFluidCoeffNAme    "QWallFluidCoeff";
+    wallTempName           "wallTemp";
+    tempFieldName          "T";
+    voidfractionFieldName  "voidfraction";
+    voidfractionMax        scalar1;
+    maxSource              scalar2;
+    velFieldName           "U";
+    densityFieldName       "rho";
+    implicit               switch1;
+    verbose                switch2;
+\} :pre
+
+{QWallFluid} = name of the wall-fluid heat transfer rate field :ulb,l
+{QwallFluidCoeff} = name of the wall-fluid heat transfer coefficient field :l
+{wallTemp} = name of the wall temperature field :l
+{T} = name of the fluid temperature field :l
+{voidfraction} = name of the finite volume void fraction field :l 
+{scalar1} = maximum void fraction for a cell to be considered packed :l 
+{scalar2} = (optional, default 1e30) maximum allowed source term :l
+{U} = name of the finite volume fluid velocity field :l
+{rho} = name of the fluid density field :l
+{switch1} = (optional, default true) activate to treat the fluid temperature implicitly :l
+{switch2} = (optional, default false) activate to write additional fields, and write cell-based data to the terminal :l
+:ule
+
+[Examples:]
+
+energyModels
+(
+    wallHeatTransferYagi
+);
+wallHeatTransferYagiProps
+\{
+    QWallFluidName         "QWallFluid";
+    QWallFluidCoeffNAme    "QWallFluidCoeff";
+    wallTempName           "wallTemp";
+    tempFieldName          "T";
+    voidfractionFieldName  "voidfraction";
+    voidfractionMax        0.5;
+    velFieldName           "U";
+    densityFieldName       "rho";
+    implicit               true;
+\} :pre
+
+[Description:]
+
+The energy model performs calculation of wall-to-bed heat transfer for a
+packed bed, based on the correlation of "Yagi and Wakao (1959)"_#Yagi1959.
+
+:link(Yagi1959)
+[(Yagi1959)] S. Yagi, N. Wakao. (1959):
+"Heat and Mass Transfer from Wall to Fluid in Packed Beds",
+AIChE Journal
+
+[Restrictions:]
+
+IMPORTANT NOTE: Model not validated!
+
+[Related commands:]
+
+energyModel
+

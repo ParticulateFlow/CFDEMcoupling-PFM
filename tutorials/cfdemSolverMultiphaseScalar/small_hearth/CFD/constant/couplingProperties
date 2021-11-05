@@ -1,0 +1,304 @@
+/*---------------------------------------------------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.4                                   |
+|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+
+    root            "";
+    case            "";
+    instance        "";
+    local           "";
+
+    class           dictionary;
+    object          couplingProperties;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+//===========================================================================//
+// sub-models & settings
+
+syncMode                 false;
+//verbose;
+useDDTvoidfraction;
+modelType                "A";              
+couplingInterval         5;
+voidFractionModel        divided;          
+locateModel              engine;			      
+meshMotionModel 	 noMeshMotion;
+regionModel 		 allRegion;
+IOModel 		 basicIO;
+probeModel 		 off;
+dataExchangeModel  	 twoWayMPI;		 
+averagingModel 		 dense;
+clockModel 		 standardClock;
+smoothingModel 	         constDiffSmoothing;
+
+getParticleDensities 	 true;
+getParticleAngVels	 true;
+
+multiphase		 true;
+
+forceModels
+(    
+    BeetstraDrag
+
+    MeiLift
+    virtualMassForce
+    ParmarBassetForce
+
+    viscForce
+    gradPForceSmooth
+    surfaceTensionForce
+);
+
+momCoupleModels
+(
+    implicitCouple
+);
+
+energyModels
+(
+    heatTransferGunn
+    wallHeatTransferYagi
+);
+
+massTransferModels
+(
+    massTransferGunn
+);
+
+chemistryModels
+(
+    off
+);
+
+thermCondModel		SyamlalThermCond;
+
+diffCoeffModel		SyamlalDiffCoeff;
+
+turbulenceModelType	"turbulenceProperties";
+
+//===========================================================================//
+// sub-model properties
+
+heatTransferGunnProps
+{
+    interpolation			true;
+    verbose				false;
+    partRefTemp 	             	1650;
+    calcPartTempField 	       	     	true;
+    partTempName 	             	"Temp";
+    partHeatFluxName 	             	"convectiveHeatFlux";
+    implicit				true;
+}
+
+wallHeatTransferYagiProps
+{
+    interpolation			true;
+    verbose				true;
+    wallTempName			"wallTemp";
+    granVelFieldName			"Us";
+    voidfractionMax                     0.5;
+    implicit				true;
+}
+
+massTransferGunnProps
+{
+    interpolation			false;
+    verbose				false;
+    partMassFluxName 	             	"convectiveMassFlux";
+    implicit				false;
+    coupleDEM				true;
+}
+
+SyamlalThermCondProps
+{
+}
+
+SyamlalDiffCoeffProps
+{
+}
+
+BeetstraDragProps
+{
+    velFieldName		"U";
+    granVelFieldName		"Us";
+    voidfractionFieldName 	"voidfraction";
+    interpolation    		true;
+    verbose 			false;
+    implForceDEM		true;
+}
+
+dSauterProps
+{
+}
+
+KochHillDragProps
+{
+    velFieldName 		 "U";
+    voidfractionFieldName 	 "voidfraction";
+    implForceDEM		 true;
+}
+
+MeiLiftProps
+{
+    velFieldName		"U";
+    useShearInduced 		true;
+    useSpinInduced 		true;
+    combineShearSpin 		false;
+    interpolation		true;
+    verbose			false;
+}
+
+virtualMassForceProps
+{
+    velFieldName		"U";
+    voidfractionFieldName 	"voidfraction";
+    granVelFieldName		"Us";
+    phiFieldName 		"phi";
+    useUs 			true;
+    useFelderhof 		true;
+    interpolation 		true;
+    smoothingModel              constDiffAndTemporalSmoothing;
+    
+    constDiffAndTemporalSmoothingProps
+    {
+	lowerLimit		1e-8;
+    	upperLimit		1e8;
+    	smoothingLength 	0.05;    // 2dp 
+    	smoothingStrength	0.0005;  // timeScale = dt/gamma
+	correctBoundary		true;
+    }
+}
+
+ParmarBassetForceProps
+{
+    velFieldName		"U";
+    granVelFieldName 		"Us";
+    useUs               	true;
+    interpolation		true;
+    nIntegral	        	10;
+    discretisationOrder         1;
+    smoothingModel              constDiffAndTemporalSmoothing;
+    
+    constDiffAndTemporalSmoothingProps
+    {
+	lowerLimit		1e-8;
+    	upperLimit		1e8;
+    	smoothingLength 	0.05;    // 2dp
+    	smoothingStrength	0.0005;  // timeScale = dt/gamma
+	correctBoundary		true;
+    }
+}
+
+viscForceProps
+{
+    velocityFieldName		"U";
+}
+
+gradPForceProps
+{
+    pFieldName			"p";
+    voidfractionFieldName 	"voidfraction";
+    velocityFieldName		"U";
+}
+
+gradPForceSmoothProps
+{
+    pFieldName			"p_rgh";
+    voidfractionFieldName 	"voidfraction";
+    velocityFieldName		"U";
+    smoothingModel 		"temporalSmoothing";
+    temporalSmoothingProps
+    {
+        lowerLimit		0.1;
+        upperLimit 		1e10;
+	refField		"p_rgh";
+	gamma		 	0.0005; // timeScale = dt/gamma
+    }
+}
+
+ArchimedesProps
+{
+    gravityFieldName		"g";
+}
+
+surfaceTensionForceProps
+{
+}
+
+constDiffSmoothingProps
+{
+    lowerLimit			0.1;
+    upperLimit 			1e10;
+    smoothingLength 		0.1; // 2dx
+}
+
+implicitCoupleProps
+{
+    velFieldName		"U";
+    granVelFieldName 		"Us";
+    voidfractionFieldName 	"voidfraction";
+}
+
+volWeightedAverageProps
+{
+    scalarFieldNames
+    (
+        voidfraction
+    );
+    vectorFieldNames
+    (
+    );
+    upperThreshold		0.999;
+    lowerThreshold 		0;
+}
+
+totalMomentumExchangeProps
+{
+    implicitMomExFieldName	"Ksl";
+    explicitMomExFieldName	"none";
+    fluidVelFieldName		"U";
+    granVelFieldName		"Us";
+}
+
+particleCellVolumeProps
+{
+    upperThreshold		0.999;
+    lowerThreshold 		0.;
+}
+
+
+engineProps
+{
+    treeSearch			true;
+}
+
+dividedProps
+{
+    alphaMin			0.01;
+    //porosity 			0.5;
+    //interpolation 		true;
+}
+
+twoWayMPIProps
+{
+    liggghtsPath		"../DEM/in.liggghts_run";
+}
+
+trilinearProps
+{
+    alphaMin			0.01;
+}
+
+}
+// ************************************************************************* //

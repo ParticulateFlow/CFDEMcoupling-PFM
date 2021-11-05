@@ -1,0 +1,191 @@
+#===================================================================#
+# runAllParTapping
+# Tim MJ Nijssen - September 2021
+#===================================================================#
+
+NOTE: the runAllParTapping script is very similar and heavily depends on the runAllParSequence script. It is recommend to read the runAllParSequence documentation first.
+
+#===================================================================#
+
+Argument(s):
+
+- casePath (optional): path to the CFDEM case to run (default: cd)
+
+- tappingSettingsPath (optional): path to the tappingSettings file (default: casePath/tappingSettings)
+
+#===================================================================#
+
+Example(s):
+
+- cd ~/CFDEM/user/run/exampleCase
+  runAllParTapping
+
+- runAllParTapping ~/CFDEM/user/run/exampleCase ~/CFDEM/user/run/exampleCase/TappingSettings
+
+#===================================================================#
+
+Prerequisites:
+
+- sequence_files: directory containing directories for each available set of boundary conditions.
+
+- tappingSettings: file specifying which set of boundary conditions to use with corresponding start and end times.
+
+- liggghts.restartSequence: LIGGGHTS restart file being updated after each step in the sequence.
+
+- variable.dat: OpenFOAM output file containing a variable on which the conditional switching will operate
+
+#===================================================================#
+
+Description:
+
+runAllParTapping runs a parralel CFDEM job using multiple sets of boundary conditions in a conditional sequence. This way, e.g. the conditional opening and closing of a valve can be simulated by alternatingly defining the valve path as a wall or an outlet. runAllParTapping will execute the following tasks:
+
+- preRunAllPar
+- duplicate liggghts.restart to liggghts.restartSequence
+- for every line in tappingSettings:
+-- replace boundary conditions at startTime with the set specified
+-- until either the specified condition is met or nRunsMax is reached:
+--- update controlDict with the apropriate start and end times
+--- runCFDDEMPar
+--- check the specified condition, break loop if true
+- postRunAllPar
+
+#===================================================================#
+
+sequence_files:
+
+Please refer to the runAllParSequence documentation instead.
+
+#===================================================================#
+
+tappingSettings:
+
+This file is contained in the case directory by default, though an alternative path can be passed as an argument. Every line contains:
+- the name of a set of boundary conditions (corresponding with the name of the directory in sequence_files/)
+- the name of a variable for the condition to operate on (corresponding with the name of the file in CFD/postProcessing)
+- a condition to check (consisting of a boolean operator and a value)
+- the interval at which to check the condition (in s)
+- the maximum number of checks to preform
+
+C-style and bash-style single-line comments are supported. An example is given below:
+
+caseDir/tappingSettings:
+
+#stepName	variable        operator	value	interval (s)	nRunsMax
+valve_open	liquidLevel	<=		1.00	10.0		10
+valve_closed	liquidLevel	>=		2.00	10.0		10
+valve_open	liquidLevel	<=		1.00	10.0		10
+valve_closed	liquidLevel	>=		2.00	10.0		10
+valve_open	liquidLevel	<=		1.00	10.0		10
+valve_closed	liquidLevel	>=		2.00	10.0		10
+
+#===================================================================#
+
+liggghts.restartSequence:
+
+Please refer to the runAllParSequence documentation instead.
+
+#===================================================================#
+
+variable.dat:
+
+This file should be contained in CFD/postProcessing, and its should must correspond with the variable in the tappingSettings file.  It should be updated on run time to contain the value which the conditional switching should check. Standard OpenFOAM postprocessing procedure can be used to generate this file. This is usually done by adding a function to the controlDict. Examples of such a function and the resulting variable.dat file are given below:
+
+caseDir/CFD/system/controlDict:
+
+[the regular controlDict contents go here]
+
+functions
+{  
+    liquidLevel
+    {
+        functionObjectLibs ("libutilityFunctionObjects.so");
+        type            coded;
+        name            integral;
+        executeControl  writeTime;
+	executeInterval 1;
+	writeControl    writeTime;
+	writeInterval   1;
+       
+        codeExecute
+        #{
+	    scalar vesselRadius = 1.0; //m
+	    scalar vesselArea = M_PI*vesselRadius*vesselRadius;
+	    const volScalarField& alphaWater = mesh().lookupObject<volScalarField>("alpha.water");
+
+	    scalar liquidVol = 0;
+	    forAll (mesh().V(), cellI)
+	    {
+	      liquidVol += alphaWater[cellI]*mesh().V()[cellI];
+            }
+
+	    reduce(liquidVol, sumOp<scalar>()); // sum over all processors
+	    
+	    scalar liquidLevel = liquidVol/vesselArea;
+ 
+            Info << "liquid level: " << liquidLevel << " m" << endl;
+
+	    if(Pstream::master()) {
+	    
+	        // output file
+	        if(!isDir(mesh().time().path()/".."/"postProcessing"))
+		    mkDir(mesh().time().path()/".."/"postProcessing");
+
+		fileName outputFile(mesh().time().path()/".."/"postProcessing"/"liquidLevel.dat");
+
+		std::ofstream file;
+
+		// header
+		if(!isFile(outputFile)) {
+		    file.open(outputFile,ios_base::out);
+		    file << "#time(s) \t liquid_lev(m)" << std::endl;
+		    file.close();
+		}
+
+		// output to file
+		file.open(outputFile,ios_base::out | ios_base::app);
+		file << mesh().time().value() << " \t";
+		file << liquidLevel << std::endl;
+		file.close();
+	    }
+      
+        #};
+    }
+}
+
+The resulting variable.dat file:
+
+caseDir/CFD/postProcessing/liquidLevel.dat:
+
+#time(s) 	 liquid_lev(m)
+0.5 	2.000000
+1 	1.950000
+1.5 	1.900000
+2 	1.850000
+2.5 	1.800000
+3 	1.750000
+3.5 	1.700000
+4 	1.650000
+4.5 	1.600000
+5.5 	1.550000
+6 	1.500000
+6.5 	1.450000
+7 	1.400000
+7.5 	1.350000
+8 	1.300000
+8.5 	1.250000
+9 	1.200000
+9.5 	1.150000
+10 	1.100000
+
+#===================================================================#
+
+
+
+
+
+
+
+
+
+

@@ -83,7 +83,11 @@ private:
 
     const volVectorField& U_;
 
-    bool useSecondOrderTerms_;
+    bool useShearInduced_;
+
+    bool useSpinInduced_;
+
+    bool combineShearSpin_;
 
 public:
 

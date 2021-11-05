@@ -1,0 +1,67 @@
+# hearth settings
+variable        hearthRadius  equal 0.5     # hearth radius (m)
+variable        coreRadius    equal 0.15    # radius of core region (m)
+variable        liquidLevel   equal 0.4     # initial liquid level (m) [set in setFieldsDict as well!]
+variable        liquidDensity equal 6700.   # liquid density (kg/m3)
+
+# heat/mass transfer settings
+variable        particlekInit equal 5000    # particle thermal conductivity during init (W/Km)
+variable        particlekRun  equal 40.0    # particle thermal conductivity during run  (W/Km) [sped up! 2.0*20!]
+variable        particleCp    equal 870     # particle heat capacity (J/kgK)
+variable        Tinlet        equal 1823.15 # particle inlet temperature (K) [set in CFD as well!]
+variable        Tinit         equal 1623.15 # initial temperature (K) [set in CFD as well!]
+variable        Twall         equal 1423.15 # wall temperature (K) [set in CFD as well!]
+variable        rRemove       equal 0.001   # radius at which dissolved particles are removed (m)
+
+# zone definitions
+variable        forceZmin     equal 0.70    # lower boundary of force zone (m)
+variable        forceZmax     equal 0.80    # upper boundary of force zone (m)
+variable        insZmin       equal 0.70    # lower boundary of insertion zone (m)
+variable        insZmax       equal 0.80    # upper boundary of insertion zone (m)
+
+region          bedReg        cylinder z 0 0 ${hearthRadius} 0            ${insZmax}
+region          coreReg       cylinder z 0 0 ${coreRadius}   0            ${insZmax} side in
+region          invCoreReg    cylinder z 0 0 ${coreRadius}   0            ${insZmax} side out
+region          shellReg      intersect 2 bedReg invCoreReg
+
+region		insReg        cylinder z 0 0 ${hearthRadius} ${insZmin}   ${insZmax}
+region          insCoreReg    intersect 2 insReg coreReg
+region          insShellReg   intersect 2 insReg invCoreReg
+
+region		forceReg      cylinder z 0 0 ${hearthRadius} ${forceZmin} ${forceZmax}
+region          freeboard     cylinder z 0 0 ${hearthRadius} ${insZmax} INF
+
+region          mushroom      block 0.4 0.5 -0.05 0.05 0.2 0.3 side out # mushroom cutout
+region          initReg       intersect 2 bedReg mushroom # entire bed minus mushroom
+region          initCoreReg   intersect 2 initReg coreReg
+region          initShellReg  intersect 2 initReg invCoreReg
+
+# total burden weight
+variable        pressureMin   equal 2000    # lower pressure value (Pa), near wall 
+variable        pressureMax   equal 20000   # upper pressure value (Pa), near core 
+
+# kinetic energy
+variable        kinEn         equal ke      # kinetic energy (J)
+variable        kinEnMax      equal 2.      # kinetic energy threshold for init (J) 
+
+# coke removal settings
+variable        cokeRateInit  equal 20.     # coke combustion rate during init (kg/s)
+variable        cokeRateRun   equal 1.      # coke combustion rate during run (kg/s)
+variable        delInt        equal 0.1     # removal interval (s) [set in liggghtsCommands as well!]
+
+variable        nFreeboard    equal count(all,freeboard)
+
+variable        nRaceways     equal count(all,raceways)
+variable        mRaceways     equal mass(all,raceways)
+variable        avMass        equal "v_mRaceways/(v_nRaceways+1e-3)"
+
+variable        delIntSteps   equal "floor(v_delInt/dt)"
+
+variable        nDelInit      equal "v_delIntSteps*dt*v_cokeRateInit/v_avMass"
+variable        fDelInit      equal "v_nDelInit/(v_nRaceways+1e-3)"
+
+variable        nDelRun       equal "v_delIntSteps*dt*v_cokeRateRun/v_avMass"
+variable        fDelRun       equal "v_nDelRun/(v_nRaceways+1e-3)"
+
+
+

@@ -1,0 +1,4 @@
+    outlet
+    {
+        type            zeroGradient;
+    }

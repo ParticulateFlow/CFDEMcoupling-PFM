@@ -2,10 +2,12 @@ cfdemCloud = cfdemCloud
 cfdTools = cfdTools
 recModels = subModels/recModel
 energyModels = subModels/energyModel
+massTransferModels = subModels/massTransferModel
 forceModels = subModels/forceModel
 forceSubModels = subModels/forceModel/forceSubModels
 forceModelsMS = subModels/forceModelMS
 thermCondModels = subModels/thermCondModel
+diffCoeffModels = subModels/diffCoeffModel
 chemistryModels = subModels/chemistryModel
 IOModels = subModels/IOModel
 voidFractionModels = subModels/voidFractionModel
@@ -44,13 +46,23 @@ $(energyModels)/energyModel/newEnergyModel.C
 $(energyModels)/heatTransferGunn/heatTransferGunn.C
 $(energyModels)/heatTransferRanzMarshall/heatTransferRanzMarshall.C
 $(energyModels)/heatTransferInterGrain/heatTransferInterGrain.C
+$(energyModels)/wallHeatTransferYagi/wallHeatTransferYagi.C
 $(energyModels)/reactionHeat/reactionHeat.C
+
+$(massTransferModels)/massTransferModel/massTransferModel.C
+$(massTransferModels)/massTransferModel/newMassTransferModel.C
+$(massTransferModels)/massTransferGunn/massTransferGunn.C
 
 $(thermCondModels)/thermCondModel/thermCondModel.C
 $(thermCondModels)/thermCondModel/newThermCondModel.C
 $(thermCondModels)/SyamlalThermCond/SyamlalThermCond.C
 $(thermCondModels)/ZehnerSchluenderThermCond/ZehnerSchluenderThermCond.C
 $(thermCondModels)/noTherm/noThermCond.C
+
+$(diffCoeffModels)/diffCoeffModel/diffCoeffModel.C
+$(diffCoeffModels)/diffCoeffModel/newDiffCoeffModel.C
+$(diffCoeffModels)/SyamlalDiffCoeff/SyamlalDiffCoeff.C
+$(diffCoeffModels)/noDiff/noDiffCoeff.C
 
 $(forceModels)/forceModel/forceModel.C
 $(forceModels)/forceModel/newForceModel.C
@@ -68,6 +80,7 @@ $(forceModels)/KochHillDrag/KochHillDrag.C
 $(forceModels)/KochHillRWDrag/KochHillRWDrag.C
 $(forceModels)/LaEuScalarTemp/LaEuScalarTemp.C
 $(forceModels)/virtualMassForce/virtualMassForce.C
+$(forceModels)/ParmarBassetForce/ParmarBassetForce.C
 $(forceModels)/gradPForce/gradPForce.C
 $(forceModels)/viscForce/viscForce.C
 $(forceModels)/MeiLift/MeiLift.C
@@ -191,5 +204,6 @@ $(smoothingModels)/smoothingModel/newSmoothingModel.C
 $(smoothingModels)/noSmoothing/noSmoothing.C
 $(smoothingModels)/constDiffSmoothing/constDiffSmoothing.C
 $(smoothingModels)/temporalSmoothing/temporalSmoothing.C
+$(smoothingModels)/constDiffAndTemporalSmoothing/constDiffAndTemporalSmoothing.C
 
 LIB = $(CFDEM_LIB_DIR)/lib$(CFDEM_LIB_NAME)

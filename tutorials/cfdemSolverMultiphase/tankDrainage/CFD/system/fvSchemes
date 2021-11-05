@@ -38,7 +38,7 @@ divSchemes
     div(((dev(grad(U).T())*rho)*dev(grad(U).T()))) Gauss linear;
     div((((((alpha.water*rho)*nu.water)|(alpha.water*rho))*rho)*dev(grad(U).T()))) Gauss linear;
     div(((nu*rho)*dev(grad(U).T()))) Gauss linear;
-	default Gauss linear;
+    default Gauss linear;
 }
 
 laplacianSchemes
