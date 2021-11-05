@@ -3,7 +3,7 @@ rho = max(rho, rhoMin);
 rho = min(rho, rhoMax);
 rho.relax();
 
-if (stepcounter%nEveryFlow==0)
+if (totalStepCounter%nEveryFlow==0)
 {
 
 volScalarField rAU(1.0/UEqn.A());

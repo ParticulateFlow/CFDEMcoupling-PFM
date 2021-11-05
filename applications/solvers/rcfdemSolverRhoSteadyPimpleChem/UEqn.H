@@ -11,7 +11,7 @@ fvVectorMatrix UEqn
     fvOptions(rho, U)
 );
 
-if (stepcounter%nEveryFlow==0)
+if (totalStepCounter%nEveryFlow==0)
 {
     UEqn.relax();
 

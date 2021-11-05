@@ -67,7 +67,8 @@ int main(int argc, char *argv[])
     Info << "\nCalculating particle trajectories based on recurrence statistics\n" << endl;
 
     label recTimeIndex(0);
-    scalar recTimeStep_=recurrenceBase.recM().recTimeStep();
+    label stepCounter = 0;
+    label recTimeStep2CFDTimeStep = recurrenceBase.recM().recTimeStep2CFDTimeStep();
 
     while (runTime.run())
     {
@@ -82,14 +83,17 @@ int main(int argc, char *argv[])
         #include "TEq.H"
         particleCloud.clockM().stop("Flow");
 
+        stepCounter++;
 
-        if ( runTime.timeOutputValue() - (recTimeIndex+1)*recTimeStep_ + 1.0e-5 > 0.0 )
+        if (stepCounter == recTimeStep2CFDTimeStep)
         {
             Info << "Updating fields at run time " << runTime.timeOutputValue()
-                 << " corresponding to recurrence time " << (recTimeIndex+1)*recTimeStep_ << ".\n" << endl;
+                 << " corresponding to recTimeIndex " << recTimeIndex << ".\n" << endl;
             recurrenceBase.updateRecFields();
             #include "readFields.H"
             recTimeIndex++;
+            stepCounter = 0;
+            recTimeStep2CFDTimeStep = recurrenceBase.recM().recTimeStep2CFDTimeStep();
         }
 
         particleCloud.clockM().start(27,"Output");
