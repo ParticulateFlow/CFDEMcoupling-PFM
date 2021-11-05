@@ -63,7 +63,8 @@ protected:
 
     scalar recStartTime_;
     scalar recEndTime_;
-    scalar recTimeStep_;
+    scalarList recTimeStep_;
+    labelList recTimeStep2CFDTimeStep_;
     label totRecSteps_;
 
     label sequenceStart;
@@ -220,7 +221,12 @@ public:
 
     scalar recTimeStep() const
     {
-        return recTimeStep_;
+        return recTimeStep_[currDataBase_];
+    }
+
+    label recTimeStep2CFDTimeStep() const
+    {
+        return recTimeStep2CFDTimeStep_[currDataBase_];
     }
 
     virtual void updateRecFields() = 0;

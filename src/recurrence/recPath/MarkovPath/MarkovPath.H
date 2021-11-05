@@ -61,16 +61,7 @@ protected:
 
     bool searchMinimum_;
 
-    // correlation steps determine which temporal neighborhood is excluded from nearest-neighbor search
-    label correlationSteps_;
-
     label currentDatabase_;
-
-    label meanIntervalSteps_;
-
-    label minIntervalSteps_;
-
-    label minStepsWithinDatabase_;
 
     label numIntervals_;
 
@@ -80,17 +71,25 @@ protected:
 
     label startIndex_;
 
+    labelList correlationSteps_;
+
     labelList intervalSizes_;
 
     labelList intervalSizesCumulative_;
 
-    labelList numberOfIntervalsInEachDatabase_;
+    labelList meanIntervalSteps_;
 
-    scalar Pjump_;
+    labelList minIntervalSteps_;
+
+    labelList minStepsWithinDatabase_;
+
+    labelList numberOfIntervalsInEachDatabase_;
 
     scalarList intervalWeights_;
 
     scalarList intervalWeightsCumulative_;
+
+    scalarList Pjump_;
 
     scalarList timeSpentInEachDatabase_;
 

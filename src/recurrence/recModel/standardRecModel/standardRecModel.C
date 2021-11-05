@@ -63,7 +63,6 @@ standardRecModel::standardRecModel
     cumulativeNumRecFields_(),
     totNumRecFields_(0),
     storeAveragedFields_(propsDict_.lookupOrDefault<bool>("storeAveragedFields",false)),
-    checkTimeStep_(propsDict_.lookupOrDefault<bool>("checkTimeStep",true)),
     recurrenceMatrix_(1,scalar(-1.0)),
     timeIndexList_(),
     timeValueList_(),
@@ -76,6 +75,9 @@ standardRecModel::standardRecModel
     aveVolVectorFieldList_(volVectorFieldNames_.size()),
     aveSurfaceScalarFieldList_(surfaceScalarFieldNames_.size())
 {
+    recTimeStep_.resize(numDataBases_);
+    recTimeStep2CFDTimeStep_.resize(numDataBases_);
+
     for(label i=0;i<numDataBases_;i++)
     {
         Foam::Time recTime(fileName(dataBaseNames_[i]), "", "../system", "../constant", false);
@@ -90,7 +92,7 @@ standardRecModel::standardRecModel
             FatalError <<"database " << dataBaseNames_[i] << " contains only one or two entries. "<<
             "To describe a steady state, create copies of the steady fields so that the database contains "<<
             "entries with three identical sets of fields.\n" << abort(FatalError);
-        } 
+        }
         timeDirs_.append(timeDirs);
 
         numRecFields_.append(label(timeDirs_[i].size()));
@@ -126,16 +128,12 @@ standardRecModel::standardRecModel
 
     readTimeSeries();
 
-    // check if time steps in databases are consistent
-    // if no initial number of time steps has been specified, create path for full runtime immediately
-    if(checkTimeStep_)
-    {
-        recTimeStep_ = checkTimeStep();
-    }
+    // check if time steps in databases are consistent and set them
+    checkTimeStep();
 
     if(totRecSteps_ < 0)
     {
-        totRecSteps_ = 1 + static_cast<label>( (endTime_-startTime_) / recTimeStep_ );
+        totRecSteps_ = 1 + static_cast<label>( (endTime_-startTime_) / recTimeStep_[0] );
     }
 
     for(int i=0; i<volScalarFieldNames_.size(); i++)
@@ -165,16 +163,17 @@ standardRecModel::~standardRecModel()
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-scalar standardRecModel::checkTimeStep()
+void standardRecModel::checkTimeStep()
 {
-    // check time step of provided data
-    scalar dtCur(1.e10);
-    scalar dtOld(1.e10);
-    bool first = true;
-    scalar frac = 0.0;
-    scalar tolerance = 1e-5;
     for(int i=0;i<numDataBases_;i++)
     {
+        // check time step of provided data
+        scalar dtCur(1.e10);
+        scalar dtOld(1.e10);
+        bool first = true;
+        scalar frac = 0.0;
+        scalar tolerance = 1e-5;
+
         for(int j=0;j<numRecFields_[i]-1;j++)
         {
             dtOld = dtCur;
@@ -184,16 +183,24 @@ scalar standardRecModel::checkTimeStep()
             {
                 FatalError <<"detected different time steps in database(s)\n" << abort(FatalError);
             }
+            first = false;
+        }
+        recTimeStep_[i] = dtCur*recTimeDilationFactor_;
+
+        scalar dTRec2dTCFD = recTimeStep_[i] / timeStep_;
+        scalar dTRec2dTCFDshifted = dTRec2dTCFD + 0.5;
+        recTimeStep2CFDTimeStep_[i] = (label) dTRec2dTCFDshifted;
+        if (abs(recTimeStep2CFDTimeStep_[i]*timeStep_ - recTimeStep_[i]) > 1e-9)
+        {
+            FatalError <<"Time step of database " << i << "is not a multiple of CFD time step.\n" << abort(FatalError);
+        }
+
+        if (verbose_)
+        {
+            Info << "Setting deltaRecT of database " << i << " to " << dtCur << endl;
+            Info << "Actual runTime.deltaT = " << timeStep_ << endl;
         }
     }
-
-    if (verbose_)
-    {
-        Info << "Setting deltaRecT to " << dtCur << endl;
-        Info << "Actual runTime.deltaT = " << timeStep_ << endl;
-    }
-
-    return dtCur*recTimeDilationFactor_;
 }
 
 

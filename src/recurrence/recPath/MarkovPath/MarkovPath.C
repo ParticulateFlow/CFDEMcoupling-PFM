@@ -58,20 +58,20 @@ MarkovPath::MarkovPath
     propsDict_(dict.subDict(typeName + "Props")),
     searchMinimum_(propsDict_.lookupOrDefault<bool>("searchMinimum",true)),
     currentDatabase_(0),
-    correlationSteps_(readLabel(propsDict_.lookup("correlationSteps"))),
-    meanIntervalSteps_(propsDict_.lookupOrDefault<label>("meanIntervalSteps",-1)),
-    minIntervalSteps_(propsDict_.lookupOrDefault<label>("minIntervalSteps",0)),
-    minStepsWithinDatabase_(propsDict_.lookupOrDefault<label>("minStepsWithinDatabase",0)),
     numIntervals_(base.recM().numIntervals()),
+    correlationSteps_(propsDict_.lookupOrDefault<labelList>("correlationStepsList",labelList(numIntervals_,0))),
+    intervalSizes_(numIntervals_),
+    intervalSizesCumulative_(numIntervals_),
+    meanIntervalSteps_(propsDict_.lookupOrDefault<labelList>("meanIntervalStepsList",labelList(numIntervals_,0))),
+    minIntervalSteps_(propsDict_.lookupOrDefault<labelList>("minIntervalStepsList",labelList(numIntervals_,0))),
+    minStepsWithinDatabase_(propsDict_.lookupOrDefault<labelList>("minStepsWithinDatabase",labelList(numIntervals_,0))),
+    numberOfIntervalsInEachDatabase_(numIntervals_),
     recSteps_(0),
     stepsInCurrentDatabase_(0),
     startIndex_(propsDict_.lookupOrDefault<label>("startIndex",0)),
-    intervalSizes_(numIntervals_),
-    intervalSizesCumulative_(numIntervals_),
-    numberOfIntervalsInEachDatabase_(numIntervals_),
-    Pjump_(0.0),
     intervalWeights_(propsDict_.lookupOrDefault<scalarList>("intervalWeights",scalarList(numIntervals_,1.0))),
     intervalWeightsCumulative_(intervalWeights_),
+    Pjump_(scalarList(numIntervals_,0.0)),
     timeSpentInEachDatabase_(intervalWeights_),
     ranGen(clock::getTime()+pid())
 {
@@ -82,10 +82,78 @@ MarkovPath::MarkovPath
         timeSpentInEachDatabase_[i] = 0.0;
     }
 
-    if(meanIntervalSteps_<0)
+    if (propsDict_.found("correlationStepsList"))
     {
-        // if no mean interval length for consecutive steps is specified, use 1/5 from first interval
-        meanIntervalSteps_ = static_cast<label>(0.2 * intervalSizes_[0]);
+    }
+    else if (propsDict_.found("correlationSteps"))
+    {
+        label correlationSteps = readLabel(propsDict_.lookup("correlationSteps"));
+        for(int i=0;i<numIntervals_;i++)
+        {
+            correlationSteps_[i] = correlationSteps;
+        }
+    }
+    else
+    {
+        FatalError << "Neither 'correlationSteps' nor 'correlationStepsList' specified.\n" << abort(FatalError);
+    }
+
+    if (propsDict_.found("meanIntervalStepsList"))
+    {
+    }
+    else if (propsDict_.found("meanIntervalSteps"))
+    {
+        label meanIntervalSteps = readLabel(propsDict_.lookup("meanIntervalSteps"));
+        for(int i=0;i<numIntervals_;i++)
+        {
+            meanIntervalSteps_[i] = meanIntervalSteps;
+        }
+    }
+    else
+    {
+        FatalError << "Neither 'meanIntervalSteps' nor 'meanIntervalStepsList' specified.\n" << abort(FatalError);
+    }
+
+    if (propsDict_.found("minIntervalStepsList"))
+    {
+    }
+    else if (propsDict_.found("minIntervalSteps"))
+    {
+        label minIntervalSteps = readLabel(propsDict_.lookup("minIntervalSteps"));
+        for(int i=0;i<numIntervals_;i++)
+        {
+            minIntervalSteps_[i] = minIntervalSteps;
+        }
+    }
+    else
+    {
+        FatalError << "Neither 'minIntervalSteps' nor 'minIntervalStepsList' specified.\n" << abort(FatalError);
+    }
+
+    if (propsDict_.found("minStepsWithinDatabase"))
+    {
+    }
+    else if (propsDict_.found("minStepsWithinDatabase"))
+    {
+        label minStepsWithinDatabase = readLabel(propsDict_.lookup("minStepsWithinDatabase"));
+        for(int i=0;i<numIntervals_;i++)
+        {
+            minStepsWithinDatabase_[i] = minStepsWithinDatabase;
+        }
+    }
+    else
+    {
+        FatalError << "Neither 'minStepsWithinDatabase' nor 'minStepsWithinDatabaseList' specified.\n" << abort(FatalError);
+    }
+
+
+    for(int i=0;i<numIntervals_;i++)
+    {
+        if(meanIntervalSteps_[i]<0)
+        {
+            // if no mean interval length for consecutive steps is specified, use 1/5 from interval
+            meanIntervalSteps_[i] = static_cast<label>(0.2 * intervalSizes_[i]);
+        }
     }
 
     // normalize weights and create cumulative distribution
@@ -103,18 +171,21 @@ MarkovPath::MarkovPath
     }
 
     // check if meanIntervalSteps and correlationSteps are reasonable
-    label critLength = meanIntervalSteps_ + 2 * correlationSteps_;
     for(int i=0;i<numIntervals_;i++)
     {
+        label critLength = meanIntervalSteps_[i] + 2 * correlationSteps_[i];
         if (critLength >= intervalSizes_[i])
         {
-            FatalError <<"too big mean interval size and correlation time for database " << i << "\n" << abort(FatalError);
+            FatalError << "Too big mean interval size and correlation time for database " << i << "\n" << abort(FatalError);
         }
     }
 
     // given a jump probability of P, the probability of finding a chain of length N is
     // P(N) = (1 - P)^N * P, and the mean length E(N) = (1 - P) / P
-    Pjump_ = 1.0 / (1 + meanIntervalSteps_);
+    for(int i=0;i<numIntervals_;i++)
+    {
+        Pjump_[i] = 1.0 / (1 + meanIntervalSteps_[i]);
+    }
 }
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
@@ -184,7 +255,7 @@ void MarkovPath::extendPath()
     {
         virtualTimeIndex = virtualTimeIndexList_.last().second();
 
-        if (stepsInCurrentDatabase_ >= minStepsWithinDatabase_)
+        if (stepsInCurrentDatabase_ >= minStepsWithinDatabase_[currentDatabase_])
         {
             label prevDatabase = currentDatabase_;
             // jump to similar state in same or other database
@@ -206,14 +277,14 @@ void MarkovPath::extendPath()
 
         label startLoop = 0;
         if (currentDatabase_ > 0) startLoop = intervalSizesCumulative_[currentDatabase_-1];
-        label endLoop = intervalSizesCumulative_[currentDatabase_] - meanIntervalSteps_;
+        label endLoop = intervalSizesCumulative_[currentDatabase_] - meanIntervalSteps_[currentDatabase_];
 
         if (searchMinimum_)
         {
             scalar nextMinimum(GREAT);
             for (label j = startLoop; j <= endLoop; j++)
             {
-                if(abs(j - virtualTimeIndex) < correlationSteps_) continue;
+                if(abs(j - virtualTimeIndex) < correlationSteps_[currentDatabase_]) continue;
                 if (recurrenceMatrix[j][virtualTimeIndex] < nextMinimum)
                 {
                     nextMinimum = recurrenceMatrix[j][virtualTimeIndex];
@@ -243,7 +314,7 @@ void MarkovPath::extendPath()
 
         // take another step according to jump probability? only if minIntervalSteps taken
         scalar randJump = ranGen.scalar01();
-        if (randJump < Pjump_ && virtualTimeIndex - seqStart >= minIntervalSteps_) takeAnotherStep=false;
+        if (randJump < Pjump_[currentDatabase_] && virtualTimeIndex - seqStart >= minIntervalSteps_[currentDatabase_]) takeAnotherStep=false;
 
         // interval border? must jump
         for(int i = 0;i < numIntervals_; i++)

@@ -138,7 +138,7 @@ lruRecModel::lruRecModel
     readTimeSeries();
 
     recTimeStep_ = checkTimeStep();
-    totRecSteps_ = 1 + static_cast<label>( (endTime_-startTime_) / recTimeStep_ );
+    totRecSteps_ = 1 + static_cast<label>( (endTime_-startTime_) / recTimeStep_[0] );
 
     for(int i=0; i<volScalarFieldNames_.size(); i++)
     {
