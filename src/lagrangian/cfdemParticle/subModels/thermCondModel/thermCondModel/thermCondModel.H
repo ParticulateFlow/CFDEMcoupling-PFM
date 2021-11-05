@@ -63,7 +63,9 @@ protected:
 
         IOdictionary transportProperties_;
 
-        dimensionedScalar kf0_;
+        mutable volScalarField kf0Field_;
+        
+        mutable volScalarField CpField_;
 
         volScalarField& thermCondField_;
 
@@ -131,6 +133,10 @@ public:
         virtual void calcThermCond() {}
 
         virtual void calcBoundaryCorrections();
+
+        const volScalarField& kf0Field() const;
+
+        const volScalarField& CpField() const;
 
 };
 

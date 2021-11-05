@@ -1,0 +1,30 @@
+ outlet
+    {
+        type            codedFixedValue;
+	value           uniform 0;
+
+	redirectType    tapholeVoidfraction;
+	code
+	#{
+	    // set voidfraction such that patchArea*voidfraction = tapholeArea 
+            const fvPatch& patchI = patch();
+	    scalarField& field = *this;
+
+	    scalar tapholeDiam = 0.05; //m
+	    scalar tapholeArea = M_PI/4*tapholeDiam*tapholeDiam; //m2
+
+	    // get patchArea
+	    scalar patchArea = 0.0; //m2
+	    forAll(patchI, faceI)
+	    {
+	        patchArea += patchI.magSf()[faceI];
+            }
+	    reduce(patchArea, sumOp<scalar>()); // sum across procs
+
+	    // set value
+	    forAll(patchI, faceI)
+	    {
+	        field[faceI] = tapholeArea/patchArea;
+	    }
+        #};
+    }

@@ -1,0 +1,152 @@
+#===================================================================#
+# runAllParSequence
+# Tim MJ Nijssen - October 2019
+#===================================================================#
+
+Argument(s):
+
+- casePath (optional): path to the CFDEM case to run (default: cd)
+
+- sequenceSettingsPath (optional): path to the sequenceSettings file (default: casePath/sequenceSettings)
+
+#===================================================================#
+
+Example(s):
+
+- cd ~/CFDEM/user/run/exampleCase
+  runAllParSequence
+
+- runAllParSequence ~/CFDEM/user/run/exampleCase ~/CFDEM/user/run/exampleCase/sequenceSettings
+
+#===================================================================#
+
+Prerequisites:
+
+- sequence_files: directory containing directories for each available set of boundary conditions.
+
+- sequenceSettings: file specifying which set of boundary conditions to use with corresponding start and end times.
+
+- liggghts.restartSequence: LIGGGHTS restart file being updated after each step in the sequence.
+
+#===================================================================#
+
+Description:
+
+runAllParSequence runs a parralel CFDEM job using multiple sets of boundary conditions in a predifined sequence. This way, e.g. the opening and closing of a valve can be simulated by alternatingly defining the valve path as a wall or an outlet. runAllParSequence will execute the following tasks:
+
+- preRunAllPar
+- duplicate liggghts.restart to liggghts.restartSequence
+- for everyline in sequenceSettings:
+-- update controlDict with the specified start and end times
+-- replace boundary conditions at startTime with the set specified
+-- runCFDDEMPar
+- postRunAllPar
+
+#===================================================================#
+
+sequence_files:
+
+This directory is located in the case directory. It contains separate directories for each set of boundary conditions. An example of the file structure is given below:
+
+- exampleCase
+-- sequence_files
+--- valve_closed
+---- U
+---- p
+--- valve_open
+---- U
+---- p
+
+Each of the boundary condition files is of the same name and structure as the boundary condition files located in the org.0 directory. It is important that ONLY the boundaryField information of the relevant patches is present in files. The FOAMFile header, internalField and other patches should be removed. Examples of such files are given below:
+
+caseDir/sequence_files/valve_closed/U:
+
+ valve
+ {
+	type	fixedValue;
+	value   uniform (0 0 0);
+ }
+
+caseDir/sequence_files/valve_closed/p:
+
+ valve
+ {
+	type	zeroGradient;
+ }
+
+caseDir/sequence_files/valve_open/U:
+
+ valve
+ {
+	type	zeroGradient;
+ }
+
+caseDir/sequence_files/valve_open/p:
+
+ valve
+ {
+	type	fixedValue;
+	value   uniform 0;
+ }
+
+runAllParSequence will use replaceBC.pl to place these boundary conditions in the simulation at the appropriate times. C-style comments (single-line and multi-line) are allowed in these files.
+
+#===================================================================#
+
+sequenceSettings:
+
+This file is contained in the case directory by default, though an alternative path can be passed as an argument. Every line contains the name of a set of boundary conditions (corresponding with the name of the directory in sequence_files/) and the corresponding start and end times. C-style and bash-style single-line comments are supported. An example is given below:
+
+caseDir/sequenceSettings:
+
+#stepName	startTime	endTime
+valve_open	0.0		1.0
+valve_closed	1.0		2.0
+valve_open	2.0		3.0
+valve_closed	3.0		4.0
+
+#===================================================================#
+
+liggghts.restartSequence:
+
+runAllParSequence uses DEM/post/restart/liggghts.restartSequence to save the DEM state between runs. Before the first run, the DEM initialisation file liggghts.restart is duplicated to liggghts.restartSequence. It can then be overwritten after every run by adding the code below to CFD/constant/liggghtsCommands. Add 'execute' to the list of liggghtsCommandsModels and set <N> accordingly. Please refer to the liggghtsCommands page in CFDEMCoupling documentation for details.
+
+caseDir/CFD/constant/liggghtsCommands:
+
+executeProps<N>
+{
+	command
+	(
+		write_restart
+		noBlanks
+		dotdot
+		slash
+		DEM
+		slash
+		post
+		slash
+		restart
+		slash
+		liggghts.restartSequence
+	);
+	runFirst		off;
+	runLast			on;
+	runEveryCouplingStep	off;
+	runEveryWriteStep	off;
+}
+
+To ensure the correct restart file is read, ensure that DEM/in.liggghts_run contains the following line:
+
+caseDir/DEM/in.liggghts_run:
+
+read_restart    ../DEM/post/restart/liggghts.restartSequence
+
+#===================================================================#
+
+
+
+
+
+
+
+

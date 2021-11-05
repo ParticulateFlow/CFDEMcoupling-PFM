@@ -1,0 +1,162 @@
+# Pressure profile definition for LIGGGHTS
+
+# reactor radius = 0.500000 m 
+# R1 = 0.150000 m 
+# R2 = 0.400000 m 
+# number of bins = 12
+
+# Region01
+region   forceReg01		 cylinder z 0 0 0.15	${forceZmin} ${forceZmax} side in  	# center region
+variable nForceReg01	 equal count(all,forceReg01) 								# number of particles inside
+variable forceRegArea01	 equal 0.070686												# ring area (m2)
+variable forceFact01	 equal 1												# force factor [0-1] (-)
+variable totalForce01	 equal "-(v_forceFact01*(v_pressureMax-v_pressureMin)+v_pressureMin)*v_forceRegArea01"	# total force (N)
+variable forcePerPart01	 equal "v_totalForce01/(v_nForceReg01+1e-3)"				# force per particle (N)
+fix      force01		 all addforce 0 0 v_forcePerPart01 region forceReg01		# apply force
+
+# Region02
+region   forceRegIn02	 cylinder z 0 0 0.15	${forceZmin} ${forceZmax} side out 	# inner region
+region   forceRegOut02	 cylinder z 0 0 0.17083	${forceZmin} ${forceZmax} side in  	# outer region
+region   forceReg02		 intersect 2 forceRegIn02 forceRegOut02						# annular region
+variable nForceReg02	 equal count(all,forceReg02) 								# number of particles inside
+variable forceRegArea02	 equal 0.020998												# ring area (m2)
+variable forceFact02	 equal 0.95833												# force factor [0-1] (-)
+variable totalForce02	 equal "-(v_forceFact02*(v_pressureMax-v_pressureMin)+v_pressureMin)*v_forceRegArea02"	# total force (N)
+variable forcePerPart02	 equal "v_totalForce02/(v_nForceReg02+1e-3)"				# force per particle (N)
+fix      force02		 all addforce 0 0 v_forcePerPart02 region forceReg02		# apply force
+
+# Region03
+region   forceRegIn03	 cylinder z 0 0 0.17083	${forceZmin} ${forceZmax} side out 	# inner region
+region   forceRegOut03	 cylinder z 0 0 0.19167	${forceZmin} ${forceZmax} side in  	# outer region
+region   forceReg03		 intersect 2 forceRegIn03 forceRegOut03						# annular region
+variable nForceReg03	 equal count(all,forceReg03) 								# number of particles inside
+variable forceRegArea03	 equal 0.023726												# ring area (m2)
+variable forceFact03	 equal 0.875												# force factor [0-1] (-)
+variable totalForce03	 equal "-(v_forceFact03*(v_pressureMax-v_pressureMin)+v_pressureMin)*v_forceRegArea03"	# total force (N)
+variable forcePerPart03	 equal "v_totalForce03/(v_nForceReg03+1e-3)"				# force per particle (N)
+fix      force03		 all addforce 0 0 v_forcePerPart03 region forceReg03		# apply force
+
+# Region04
+region   forceRegIn04	 cylinder z 0 0 0.19167	${forceZmin} ${forceZmax} side out 	# inner region
+region   forceRegOut04	 cylinder z 0 0 0.2125	${forceZmin} ${forceZmax} side in  	# outer region
+region   forceReg04		 intersect 2 forceRegIn04 forceRegOut04						# annular region
+variable nForceReg04	 equal count(all,forceReg04) 								# number of particles inside
+variable forceRegArea04	 equal 0.026453												# ring area (m2)
+variable forceFact04	 equal 0.79167												# force factor [0-1] (-)
+variable totalForce04	 equal "-(v_forceFact04*(v_pressureMax-v_pressureMin)+v_pressureMin)*v_forceRegArea04"	# total force (N)
+variable forcePerPart04	 equal "v_totalForce04/(v_nForceReg04+1e-3)"				# force per particle (N)
+fix      force04		 all addforce 0 0 v_forcePerPart04 region forceReg04		# apply force
+
+# Region05
+region   forceRegIn05	 cylinder z 0 0 0.2125	${forceZmin} ${forceZmax} side out 	# inner region
+region   forceRegOut05	 cylinder z 0 0 0.23333	${forceZmin} ${forceZmax} side in  	# outer region
+region   forceReg05		 intersect 2 forceRegIn05 forceRegOut05						# annular region
+variable nForceReg05	 equal count(all,forceReg05) 								# number of particles inside
+variable forceRegArea05	 equal 0.02918												# ring area (m2)
+variable forceFact05	 equal 0.70833												# force factor [0-1] (-)
+variable totalForce05	 equal "-(v_forceFact05*(v_pressureMax-v_pressureMin)+v_pressureMin)*v_forceRegArea05"	# total force (N)
+variable forcePerPart05	 equal "v_totalForce05/(v_nForceReg05+1e-3)"				# force per particle (N)
+fix      force05		 all addforce 0 0 v_forcePerPart05 region forceReg05		# apply force
+
+# Region06
+region   forceRegIn06	 cylinder z 0 0 0.23333	${forceZmin} ${forceZmax} side out 	# inner region
+region   forceRegOut06	 cylinder z 0 0 0.25417	${forceZmin} ${forceZmax} side in  	# outer region
+region   forceReg06		 intersect 2 forceRegIn06 forceRegOut06						# annular region
+variable nForceReg06	 equal count(all,forceReg06) 								# number of particles inside
+variable forceRegArea06	 equal 0.031907												# ring area (m2)
+variable forceFact06	 equal 0.625												# force factor [0-1] (-)
+variable totalForce06	 equal "-(v_forceFact06*(v_pressureMax-v_pressureMin)+v_pressureMin)*v_forceRegArea06"	# total force (N)
+variable forcePerPart06	 equal "v_totalForce06/(v_nForceReg06+1e-3)"				# force per particle (N)
+fix      force06		 all addforce 0 0 v_forcePerPart06 region forceReg06		# apply force
+
+# Region07
+region   forceRegIn07	 cylinder z 0 0 0.25417	${forceZmin} ${forceZmax} side out 	# inner region
+region   forceRegOut07	 cylinder z 0 0 0.275	${forceZmin} ${forceZmax} side in  	# outer region
+region   forceReg07		 intersect 2 forceRegIn07 forceRegOut07						# annular region
+variable nForceReg07	 equal count(all,forceReg07) 								# number of particles inside
+variable forceRegArea07	 equal 0.034634												# ring area (m2)
+variable forceFact07	 equal 0.54167												# force factor [0-1] (-)
+variable totalForce07	 equal "-(v_forceFact07*(v_pressureMax-v_pressureMin)+v_pressureMin)*v_forceRegArea07"	# total force (N)
+variable forcePerPart07	 equal "v_totalForce07/(v_nForceReg07+1e-3)"				# force per particle (N)
+fix      force07		 all addforce 0 0 v_forcePerPart07 region forceReg07		# apply force
+
+# Region08
+region   forceRegIn08	 cylinder z 0 0 0.275	${forceZmin} ${forceZmax} side out 	# inner region
+region   forceRegOut08	 cylinder z 0 0 0.29583	${forceZmin} ${forceZmax} side in  	# outer region
+region   forceReg08		 intersect 2 forceRegIn08 forceRegOut08						# annular region
+variable nForceReg08	 equal count(all,forceReg08) 								# number of particles inside
+variable forceRegArea08	 equal 0.037361												# ring area (m2)
+variable forceFact08	 equal 0.45833												# force factor [0-1] (-)
+variable totalForce08	 equal "-(v_forceFact08*(v_pressureMax-v_pressureMin)+v_pressureMin)*v_forceRegArea08"	# total force (N)
+variable forcePerPart08	 equal "v_totalForce08/(v_nForceReg08+1e-3)"				# force per particle (N)
+fix      force08		 all addforce 0 0 v_forcePerPart08 region forceReg08		# apply force
+
+# Region09
+region   forceRegIn09	 cylinder z 0 0 0.29583	${forceZmin} ${forceZmax} side out 	# inner region
+region   forceRegOut09	 cylinder z 0 0 0.31667	${forceZmin} ${forceZmax} side in  	# outer region
+region   forceReg09		 intersect 2 forceRegIn09 forceRegOut09						# annular region
+variable nForceReg09	 equal count(all,forceReg09) 								# number of particles inside
+variable forceRegArea09	 equal 0.040088												# ring area (m2)
+variable forceFact09	 equal 0.375												# force factor [0-1] (-)
+variable totalForce09	 equal "-(v_forceFact09*(v_pressureMax-v_pressureMin)+v_pressureMin)*v_forceRegArea09"	# total force (N)
+variable forcePerPart09	 equal "v_totalForce09/(v_nForceReg09+1e-3)"				# force per particle (N)
+fix      force09		 all addforce 0 0 v_forcePerPart09 region forceReg09		# apply force
+
+# Region10
+region   forceRegIn10	 cylinder z 0 0 0.31667	${forceZmin} ${forceZmax} side out 	# inner region
+region   forceRegOut10	 cylinder z 0 0 0.3375	${forceZmin} ${forceZmax} side in  	# outer region
+region   forceReg10		 intersect 2 forceRegIn10 forceRegOut10						# annular region
+variable nForceReg10	 equal count(all,forceReg10) 								# number of particles inside
+variable forceRegArea10	 equal 0.042815												# ring area (m2)
+variable forceFact10	 equal 0.29167												# force factor [0-1] (-)
+variable totalForce10	 equal "-(v_forceFact10*(v_pressureMax-v_pressureMin)+v_pressureMin)*v_forceRegArea10"	# total force (N)
+variable forcePerPart10	 equal "v_totalForce10/(v_nForceReg10+1e-3)"				# force per particle (N)
+fix      force10		 all addforce 0 0 v_forcePerPart10 region forceReg10		# apply force
+
+# Region11
+region   forceRegIn11	 cylinder z 0 0 0.3375	${forceZmin} ${forceZmax} side out 	# inner region
+region   forceRegOut11	 cylinder z 0 0 0.35833	${forceZmin} ${forceZmax} side in  	# outer region
+region   forceReg11		 intersect 2 forceRegIn11 forceRegOut11						# annular region
+variable nForceReg11	 equal count(all,forceReg11) 								# number of particles inside
+variable forceRegArea11	 equal 0.045542												# ring area (m2)
+variable forceFact11	 equal 0.20833												# force factor [0-1] (-)
+variable totalForce11	 equal "-(v_forceFact11*(v_pressureMax-v_pressureMin)+v_pressureMin)*v_forceRegArea11"	# total force (N)
+variable forcePerPart11	 equal "v_totalForce11/(v_nForceReg11+1e-3)"				# force per particle (N)
+fix      force11		 all addforce 0 0 v_forcePerPart11 region forceReg11		# apply force
+
+# Region12
+region   forceRegIn12	 cylinder z 0 0 0.35833	${forceZmin} ${forceZmax} side out 	# inner region
+region   forceRegOut12	 cylinder z 0 0 0.37917	${forceZmin} ${forceZmax} side in  	# outer region
+region   forceReg12		 intersect 2 forceRegIn12 forceRegOut12						# annular region
+variable nForceReg12	 equal count(all,forceReg12) 								# number of particles inside
+variable forceRegArea12	 equal 0.048269												# ring area (m2)
+variable forceFact12	 equal 0.125												# force factor [0-1] (-)
+variable totalForce12	 equal "-(v_forceFact12*(v_pressureMax-v_pressureMin)+v_pressureMin)*v_forceRegArea12"	# total force (N)
+variable forcePerPart12	 equal "v_totalForce12/(v_nForceReg12+1e-3)"				# force per particle (N)
+fix      force12		 all addforce 0 0 v_forcePerPart12 region forceReg12		# apply force
+
+# Region13
+region   forceRegIn13	 cylinder z 0 0 0.37917	${forceZmin} ${forceZmax} side out 	# inner region
+region   forceRegOut13	 cylinder z 0 0 0.4	${forceZmin} ${forceZmax} side in  	# outer region
+region   forceReg13		 intersect 2 forceRegIn13 forceRegOut13						# annular region
+variable nForceReg13	 equal count(all,forceReg13) 								# number of particles inside
+variable forceRegArea13	 equal 0.050996												# ring area (m2)
+variable forceFact13	 equal 0.041667												# force factor [0-1] (-)
+variable totalForce13	 equal "-(v_forceFact13*(v_pressureMax-v_pressureMin)+v_pressureMin)*v_forceRegArea13"	# total force (N)
+variable forcePerPart13	 equal "v_totalForce13/(v_nForceReg13+1e-3)"				# force per particle (N)
+fix      force13		 all addforce 0 0 v_forcePerPart13 region forceReg13		# apply force
+
+# Region14
+region   forceRegIn14	 cylinder z 0 0 0.4	${forceZmin} ${forceZmax} side out 	# inner region
+region   forceRegOut14	 cylinder z 0 0 0.5	${forceZmin} ${forceZmax} side in  	# outer region
+region   forceReg14		 intersect 2 forceRegIn14 forceRegOut14						# annular region
+variable nForceReg14	 equal count(all,forceReg14) 								# number of particles inside
+variable forceRegArea14	 equal 0.28274												# ring area (m2)
+variable forceFact14	 equal 0												# force factor [0-1] (-)
+variable totalForce14	 equal "-(v_forceFact14*(v_pressureMax-v_pressureMin)+v_pressureMin)*v_forceRegArea14"	# total force (N)
+variable forcePerPart14	 equal "v_totalForce14/(v_nForceReg14+1e-3)"				# force per particle (N)
+fix      force14		 all addforce 0 0 v_forcePerPart14 region forceReg14		# apply force
+
+variable totalForce		 equal "v_forcePerPart01*v_nForceReg01+v_forcePerPart02*v_nForceReg02+v_forcePerPart03*v_nForceReg03+v_forcePerPart04*v_nForceReg04+v_forcePerPart05*v_nForceReg05+v_forcePerPart06*v_nForceReg06+v_forcePerPart07*v_nForceReg07+v_forcePerPart08*v_nForceReg08+v_forcePerPart09*v_nForceReg09+v_forcePerPart10*v_nForceReg10+v_forcePerPart11*v_nForceReg11+v_forcePerPart12*v_nForceReg12+v_forcePerPart13*v_nForceReg13+v_forcePerPart14*v_nForceReg14" 	# sum of all forces (N)
+variable nForceReg		 equal "v_nForceReg01+v_nForceReg02+v_nForceReg03+v_nForceReg04+v_nForceReg05+v_nForceReg06+v_nForceReg07+v_nForceReg08+v_nForceReg09+v_nForceReg10+v_nForceReg11+v_nForceReg12+v_nForceReg13+v_nForceReg14" 	# sum of all numbers of particles (N)
+variable avForcePerPart	 equal "v_totalForce/(v_nForceReg+1e-3)"	# average force per particle (N)

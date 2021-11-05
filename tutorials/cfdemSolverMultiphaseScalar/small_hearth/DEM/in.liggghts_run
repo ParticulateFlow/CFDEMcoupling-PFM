@@ -1,0 +1,78 @@
+echo            both
+log             ../log/log.liggghts_run
+thermo_log      ../log/thermo.txt
+
+atom_style      granular
+atom_modify     map array
+boundary        f f f
+newton          off
+
+communicate     single vel yes
+
+units           si
+processors      2 2 2
+
+# read the restart file
+read_restart    ../DEM/post/restart/liggghts.restartSequence
+
+neighbor        0.007 bin
+neigh_modify    delay 0
+
+# contact model
+include         ../DEM/in.contact_settings
+
+# hearth settings
+include         ../DEM/in.hearth_settings
+
+# timestep
+timestep        1e-4
+
+# cfd coupling
+fix             cfd all couple/cfd couple_every 100 mpi
+fix             cfd2 all couple/cfd/force/implicit
+
+# heat transfer
+fix             m7 all property/global thermalConductivity peratomtype ${particlekRun} # lambda in [W/(K*m)]
+fix             m8 all property/global thermalCapacity     peratomtype ${particleCp}   # cp in [J/(kg*K)]
+fix             heattransfer all heat/gran/conduction initial_temperature ${Tinlet}
+fix             cfd3 all couple/cfd/convection T0 ${Tinlet}
+
+# mass transfer
+fix             cfd4 all couple/cfd/dissolve rmin ${rRemove}
+
+# walls
+include         ../DEM/in.wall_settings
+
+# gravity
+fix		gravi all gravity 9.81 vector 0.0 0.0 -1.0
+
+######################################
+
+# particle distribution
+include	   	../DEM/in.particleSizeDistribution1
+include	   	../DEM/in.particleSizeDistribution2
+
+# raceways
+include		../DEM/in.raceways
+
+# burden weight
+include         ../DEM/in.pressure_profile
+
+# insert in insertion volume 
+fix         	ins3 all insert/pack seed 32452843 distributiontemplate pdd1 all_in yes insert_every ${delIntSteps} overlapcheck yes region insShellReg volumefraction_region 0.7
+fix         	ins4 all insert/pack seed 32452843 distributiontemplate pdd2 all_in yes insert_every ${delIntSteps} overlapcheck yes region insCoreReg  volumefraction_region 0.7
+
+######################################
+
+# apply nve integration to all particles
+fix             integr all nve/sphere
+
+# output settings
+thermo_style    custom step time atoms ke v_totalForce v_avForcePerPart v_nDelRun
+thermo          10
+
+# dump settings
+dump            dmp all custom 5000 ../DEM/post/dump*.liggghts_run id type x y z ix iy iz vx vy vz fx fy fz omegax omegay omegaz radius density f_Temp[0] f_convectiveHeatFlux[0] f_convectiveMassFlux[0]
+#5000
+run             0
+

@@ -147,7 +147,7 @@ void liggghtsCommandModel::checkTimeSettings(const dictionary& propsDict)
                 // if this makes troubles try floor((startTime_+SMALL)/.. as above
                 firstCouplingStep_ = floor((startTime_+SMALL-simStartTime)/DEMts/couplingInterval);
                 lastCouplingStep_ = floor((endTime_+SMALL-simStartTime)/DEMts/couplingInterval);
-                couplingStepInterval_ = floor(timeInterval_+SMALL/DEMts/couplingInterval);
+                couplingStepInterval_ = floor((timeInterval_+SMALL)/DEMts/couplingInterval);
             }
             else      //runEveryCouplingStep  or writeStep
             {
@@ -240,7 +240,7 @@ DynamicList<scalar> liggghtsCommandModel::executionsWithinPeriod(scalar TSstart,
             }
         }
         //else
-        //    Info << "liggghtsCommandModel::executionsWithinPeriod error???" << endl;     
+        //    Info << "liggghtsCommandModel::executionsWithinPeriod error???" << endl;
 
         // debug
         Info << "liggghtsCommandModel::executionsWithinPeriod executions=" << executions << endl;
@@ -279,6 +279,11 @@ void liggghtsCommandModel::parseCommandList(wordList& commandList,labelList& lab
         else if (add=="dot")    add = ".";
         else if (add=="dotdot") add = "..";
         else if (add=="slash")  add = "/";
+        else if (add=="dollar") add = "$";
+        else if (add=="curlyOpen") add = "{";
+        else if (add=="curlyClose") add = "}";
+        else if (add=="squareOpen") add = "[";
+        else if (add=="squareClose") add = "]";
         else if (add=="noBlanks")  // no blanks after the following words
         {
             add = "";

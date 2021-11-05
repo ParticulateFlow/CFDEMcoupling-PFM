@@ -1,0 +1,3 @@
+fix		sides     all mesh/surface file mesh/small_hearth_sides.stl       type 1 temperature ${Twall} curvature 1e-5
+fix 		bottom    all mesh/surface file mesh/small_hearth_bottom.stl      type 1 temperature ${Twall}
+fix		granwalls all wall/gran model hertz tangential history rolling_friction epsd mesh n_meshes 2 meshes sides bottom temperature ${Twall}

@@ -1,0 +1,9 @@
+# Particle size distribution for LIGGGHTS
+
+# mean radius = 0.0100000 m 
+# standard deviation = 0.00000 m 
+# density = 900 kg/m3 
+ 
+fix	pts1 all particletemplate/sphere 10007 atom_type 1 density constant 900 radius constant 0.01
+
+fix	pdd1 all particledistribution/discrete 10009 1 pts1 1.000000

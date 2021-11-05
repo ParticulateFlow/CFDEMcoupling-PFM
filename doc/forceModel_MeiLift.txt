@@ -19,19 +19,23 @@ forceModels
 MeiLiftProps
 \{
     velFieldName        "U";
-    useSecondOrderTerms;
-    treatForceExplicit  switch1;
-    verbose             switch2;
-    interpolation       switch3;
-    scalarViscosity     switch4;
+    useShearInduced     switch1;
+    useSpinInduced      switch2;
+    combineShearSpin    switch3;
+    treatForceExplicit  switch4;
+    verbose             switch5;
+    interpolation       switch6;
+    scalarViscosity     switch7;
 \} :pre
 
 {U} = name of the finite volume fluid velocity field :ulb,l
-{useSecondOrderTerms} = (optional, default false) switch to activate second order terms in the lift force model :l
-{switch1} = (optional, default false) sub model switch, see "forceSubModel"_forceSubModel.html for details :l
-{switch2} = (optional, default false) switch to activate the report of per-particle quantities to the screen :l
-{switch3} = (optional, default false) switch to activate tri-linear interpolation of the flow quantities at the particle position :l
+{useShearInduced} = (optional, default true) switch to activate shear-induced (Saffman) lift :l
+{useSpinInduced} = (optional, default false) switch to activate spin-induced (Magnus) lift :l
+{combineShearSpin} = (optional, default false) switch to use the correlation for combined shear- and spin-induced lift by "Loth and Dorgan (2009)"_#LothDorgan2009 :l
 {switch4} = (optional, default false) sub model switch, see "forceSubModel"_forceSubModel.html for details :l
+{switch5} = (optional, default false) switch to activate the report of per-particle quantities to the screen :l
+{switch6} = (optional, default false) switch to activate tri-linear interpolation of the flow quantities at the particle position :l
+{switch7} = (optional, default false) sub model switch, see "forceSubModel"_forceSubModel.html for details :l
 :ule
 
 [Examples:]
@@ -43,7 +47,6 @@ forceModels
 MeiLiftProps
 \{
     velFieldName        "U";
-    useSecondOrderTerms;
     interpolation       true;
     verbose             true;
 \} :pre
@@ -52,9 +55,12 @@ MeiLiftProps
 
 The force model performs the calculation of forces (e.g. fluid-particle
 interaction forces) acting on each DEM particle. The {MeiLift} model calculates
-the lift force for each particle based on Loth and Dorgan (2009). In case the
-keyword "useSecondOrderTerms" is not specified, this lift force model uses the
-expression of McLaughlin (1991, J. Fluid Mech. 224:261-274).
+the lift force for each particle based on "Loth and Dorgan (2009)"_#LothDorgan2009.
+
+:link(LothDorgan2009)
+[(LothDorgan2009)] E. Loth, A.J. Dorgan. (2009):
+"An equation of motion for particles of finite Reynolds number and size",
+Environmental Fluid Mechanics
 
 [Restrictions:]
 

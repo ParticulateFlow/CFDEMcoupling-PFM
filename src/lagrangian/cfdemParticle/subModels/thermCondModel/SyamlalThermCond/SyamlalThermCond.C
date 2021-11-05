@@ -64,11 +64,15 @@ SyamlalThermCond::~SyamlalThermCond()
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 void SyamlalThermCond::calcThermCond()
 {
+    const volScalarField& kf0Field_ = kf0Field();
+
     forAll(thermCondField_,cellI)
     {
-        if (1-voidfraction_[cellI] < SMALL) thermCondField_[cellI] = kf0_.value();
+        scalar kf0 = kf0Field_[cellI];
+
+        if (1-voidfraction_[cellI] < SMALL) thermCondField_[cellI] = kf0;
         else if (voidfraction_[cellI] < SMALL) thermCondField_[cellI] = 0.0;
-        else thermCondField_[cellI] = (1-sqrt(1-voidfraction_[cellI]+SMALL)) / (voidfraction_[cellI]) * kf0_.value();
+        else thermCondField_[cellI] = (1-sqrt(1-voidfraction_[cellI]+SMALL)) / (voidfraction_[cellI]) * kf0;
     }
 
     thermCondField_.correctBoundaryConditions();
