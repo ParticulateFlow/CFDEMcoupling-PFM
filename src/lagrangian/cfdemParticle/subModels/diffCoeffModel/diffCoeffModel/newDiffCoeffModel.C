@@ -37,7 +37,7 @@ autoPtr<diffCoeffModel> diffCoeffModel::New
 {
     word diffCoeffModelType
     (
-        dict.lookup("diffCoeffModel")
+        dict.lookupOrDefault<word>("diffCoeffModel","off")
     );
 
     Info<< "Selecting diffCoeffModel "

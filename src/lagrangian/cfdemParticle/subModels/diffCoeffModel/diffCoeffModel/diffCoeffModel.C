@@ -73,7 +73,7 @@ diffCoeffModel::diffCoeffModel
     )
 {
     // build constant fields for single phase case
-    if (!particleCloud_.multiphase())
+    if (!particleCloud_.multiphase() && dict_.found("diffCoeffModel"))
     {
         D0Field_ = volScalarField
         (
