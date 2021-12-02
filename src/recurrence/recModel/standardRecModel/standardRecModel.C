@@ -189,7 +189,7 @@ void standardRecModel::checkTimeStep()
 
         scalar dTRec2dTCFD = recTimeStep_[i] / timeStep_;
         scalar dTRec2dTCFDshifted = dTRec2dTCFD + 0.5;
-        recTimeStep2CFDTimeStep_[i] = (label) dTRec2dTCFDshifted;
+        recTimeStep2CFDTimeStep_[i] = static_cast<label>(dTRec2dTCFDshifted);
         if (abs(recTimeStep2CFDTimeStep_[i]*timeStep_ - recTimeStep_[i]) > 1e-9)
         {
             FatalError <<"Time step of database " << i << "is not a multiple of CFD time step.\n" << abort(FatalError);
