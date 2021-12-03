@@ -13,6 +13,6 @@ cfdemSolverPisoScalar/dir
 cfdemSolverRhoPimpleChem/dir
 cfdemSolverMultiphase/dir
 cfdemSolverMultiphaseScalar/dir
-rcfdemSolverRhoSteadyPimpleChem/dir
 rctfSpeciesTransport/dir
 cfdemSolverPisoFreeStreaming/dir
+
