@@ -1,6 +1,6 @@
 /*---------------------------------------------------------------------------*\
     CFDEMcoupling academic - Open Source CFD-DEM coupling
-    
+
     Contributing authors:
     Thomas Lichtenegger, Gerhard Holzinger, Sanaz Abbasi
     Copyright (C) 2015- Johannes Kepler University, Linz
@@ -29,11 +29,11 @@ Description
     for a solver based on recurrence statistics
 
 Rules
-	Solution data to compute the recurrence statistics from, needs to 
-        reside in $CASE_ROOT/dataBase(0...N)
+    Solution data to compute the recurrence statistics from, needs to
+    reside in $CASE_ROOT/dataBase(0...N)
     Time step data in the first dataBase needs to be evenly spaced in time
     A list of indices for the corresponding incoherent fields to coherent ones
-        should be provided.
+    should be provided.
 
 \*---------------------------------------------------------------------------*/
 
@@ -84,15 +84,15 @@ int main(int argc, char *argv[])
         runTime++;
 
         myClock().start(11,"Total");
-        
+
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
         myClock().start(2,"fieldUpdate");
-        
+
         if ( runTime.timeOutputValue() - (recTimeIndex+1)*recTimeStep_ + 1.0e-5 > 0.0 )
         {
-	    Info << "Updating fields at run time " << runTime.timeOutputValue()
-	        << " corresponding to recurrence time " << (recTimeIndex+1)*recTimeStep_ << ".\n" << endl;
+            Info<< "Updating fields at run time " << runTime.timeOutputValue()
+                << " corresponding to recurrence time " << (recTimeIndex+1)*recTimeStep_ << ".\n" << endl;
             recBases[0].updateRecFields();
             #include "readFields.H"
 
@@ -110,16 +110,16 @@ int main(int argc, char *argv[])
         myClock().stop("Total");
 
         runTime.write();
-        
+
         Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
-        << "  ClockTime = " << runTime.elapsedClockTime() << " s"
-        << nl << endl;
+            << "  ClockTime = " << runTime.elapsedClockTime() << " s"
+            << nl << endl;
 
         myClock().stop("Global");
 
     }
 
-    
+
     myClock().evalPar();
     myClock().normHist();
 
