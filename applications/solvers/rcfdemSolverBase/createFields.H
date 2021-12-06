@@ -44,7 +44,7 @@
         dimensionedVector("URec", dimensionSet(0, 1, -1, 0, 0), vector::zero)
     );
 
-    bool updateURec = false;
+    Switch updateURec(false);
     if (URec.headerOk())
     {
         updateURec = true;
@@ -65,7 +65,7 @@
         dimensionedScalar("voidfractionRec", dimensionSet(0, 0, 0, 0, 0), 1.0)
     );
 
-    bool updateVoidfractionRec = false;
+    Switch updateVoidfractionRec(false);
     if (voidfractionRec.headerOk())
     {
         updateVoidfractionRec = true;
@@ -86,7 +86,7 @@
         dimensionedVector("URec", dimensionSet(0, 1, -1, 0, 0), vector::zero)
     );
 
-    bool updateUsRec = false;
+    Switch updateUsRec(false);
     if (UsRec.headerOk())
     {
         updateUsRec = true;
@@ -140,7 +140,7 @@
         linearInterpolate(URec*voidfractionRec) & mesh.Sf()
     );
 
-    bool updatePhiRec = false;
+    Switch updatePhiRec(false);
     if (phiRec.headerOk())
     {
         updatePhiRec = true;

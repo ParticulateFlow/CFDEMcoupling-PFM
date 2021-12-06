@@ -58,10 +58,11 @@ int main(int argc, char *argv[])
     #include "createTime.H"
     #include "createMesh.H"
     #include "createControl.H"
+    #include "initContinuityErrs.H"
     #include "createFields.H"
     #include "createFvOptions.H"
-    scalar cumulativeContErr = 0;
-  
+    scalar relaxCoeff(0.0);
+
     //create recBases according to a list of recProperties
     #include "createRecBase.H"
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -24,7 +24,7 @@ Info<< "Reading thermophysical properties\n" << endl;
     volScalarField W(thermo.W());
 #endif
 
-    bool propagateInertSpecie(thermo.lookupOrDefault<bool>("propagateInertSpecie",true));
+    Switch propagateInertSpecie(thermo.lookupOrDefault<bool>("propagateInertSpecie",true));
 
     const word inertSpecie(thermo.lookupOrDefault<word>("inertSpecie","none"));
 
@@ -40,9 +40,9 @@ Info<< "Reading thermophysical properties\n" << endl;
             << exit(FatalError);
     }
 
+    Info<< "inert will be bounded in [" << inertLowerBound << "," << inertUpperBound << "]" << endl;
+
     volScalarField& p = thermo.p();
-    const volScalarField& T = thermo.T();
-    const volScalarField& psi = thermo.psi();
 
     multivariateSurfaceInterpolationScheme<scalar>::fieldTable fields;
 
@@ -212,7 +212,7 @@ Info<< "Reading thermophysical properties\n" << endl;
          linearInterpolate(rho*U*voidfraction) & mesh.Sf()
     );
 
-    bool transientEEqn(pimple.dict().lookupOrDefault<bool>("transientEEqn",false));
+    Switch transientEEqn(pimple.dict().lookupOrDefault<bool>("transientEEqn",false));
 
     dimensionedScalar rhoMax
     (
