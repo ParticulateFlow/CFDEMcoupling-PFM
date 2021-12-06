@@ -127,6 +127,8 @@ do
     sleep 2
 done
 
+compileResultAll=0
+
 if [ ! -f "$CWD/$whitelist" ];then
     echo "$whitelist does not exist in $CWD"
 else
@@ -164,7 +166,11 @@ else
             casePath="$CFDEM_SOLVER_DIR/$LINE"
             #--------------------------------------------------------------------------------#            
             collectLogCFDEMcoupling_sol $logpath $logfileName $casePath
+            compileResultOne=$(checkLogCFDEMcoupling_sol $logpath $logfileName $casePath)
+            compileResultAll=$((compileResultAll+compileResultOne))
         done
     done
 fi
+
+exit $compileResultAll
 
