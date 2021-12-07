@@ -64,7 +64,7 @@ MarkovPath::MarkovPath
     intervalSizesCumulative_(numIntervals_),
     meanIntervalSteps_(propsDict_.lookupOrDefault<labelList>("meanIntervalStepsList",labelList(numIntervals_,0))),
     minIntervalSteps_(propsDict_.lookupOrDefault<labelList>("minIntervalStepsList",labelList(numIntervals_,0))),
-    minStepsWithinDatabase_(propsDict_.lookupOrDefault<labelList>("minStepsWithinDatabase",labelList(numIntervals_,0))),
+    minStepsWithinDatabase_(propsDict_.lookupOrDefault<labelList>("minStepsWithinDatabaseList",labelList(numIntervals_,0))),
     numberOfIntervalsInEachDatabase_(numIntervals_),
     recSteps_(0),
     stepsInCurrentDatabase_(0),
@@ -130,7 +130,7 @@ MarkovPath::MarkovPath
         FatalError << "Neither 'minIntervalSteps' nor 'minIntervalStepsList' specified.\n" << abort(FatalError);
     }
 
-    if (propsDict_.found("minStepsWithinDatabase"))
+    if (propsDict_.found("minStepsWithinDatabaseList"))
     {
     }
     else if (propsDict_.found("minStepsWithinDatabase"))
@@ -140,10 +140,6 @@ MarkovPath::MarkovPath
         {
             minStepsWithinDatabase_[i] = minStepsWithinDatabase;
         }
-    }
-    else
-    {
-        FatalError << "Neither 'minStepsWithinDatabase' nor 'minStepsWithinDatabaseList' specified.\n" << abort(FatalError);
     }
 
 
@@ -223,13 +219,13 @@ void MarkovPath::computeRecPath()
     {
         extendPath();
         base_.recM().writeRecPathLastInterval();
-        Info << "\nExtending recurrence path done\n" << endl;
-        return;
     }
-
-    while(recSteps_ <= base_.recM().totRecSteps() )
+    else
     {
-        extendPath();
+        while(recSteps_ <= base_.recM().totRecSteps() )
+        {
+            extendPath();
+        }
     }
 
     for(int i=0;i<numIntervals_;i++)
@@ -238,7 +234,7 @@ void MarkovPath::computeRecPath()
         << " (distributed over " << numberOfIntervalsInEachDatabase_[i] << " episodes)" << endl;
     }
 
-    Info << "\nComputing recurrence path done\n" << endl;
+    Info << "\nComputing/extending  recurrence path done\n" << endl;
 }
 
 void MarkovPath::extendPath()
