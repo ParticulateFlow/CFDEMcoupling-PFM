@@ -42,7 +42,7 @@ cfdemCloudEnergy::cfdemCloudEnergy
 :
     cfdemCloud(mesh),
     energyModels_(couplingProperties_.lookup("energyModels")),
-    massTransferModels_(couplingProperties_.lookup("massTransferModels")),
+    massTransferModels_(couplingProperties_.lookupOrDefault<wordList>("massTransferModels",wordList::null())),
     implicitEnergyModel_(false),
     implicitMassTransferModel_(false),
     chemistryModels_(couplingProperties_.lookup("chemistryModels")),
@@ -193,7 +193,7 @@ const thermCondModel& cfdemCloudEnergy::thermCondM()
 const diffCoeffModel& cfdemCloudEnergy::diffCoeffM()
 {
     return diffCoeffModel_;
-}  
+}
 
 void cfdemCloudEnergy::energyContributions(volScalarField& Qsource)
 {

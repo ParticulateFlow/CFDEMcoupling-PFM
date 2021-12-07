@@ -58,13 +58,14 @@ int main(int argc, char *argv[])
     #include "createControl.H"
     #include "createFields.H"
     #include "createFvOptions.H"
+    scalar relaxCoeff(0.0);
 
     cfdemCloudRec<cfdemCloud> particleCloud(mesh);
     recBase recurrenceBase(mesh);
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-    Info << "\nCalculating particle trajectories based on recurrence statistics\n" << endl;
+    Info<< "\nCalculating particle trajectories based on recurrence statistics\n" << endl;
 
     label recTimeIndex(0);
     label stepCounter = 0;
@@ -77,7 +78,7 @@ int main(int argc, char *argv[])
         // do stuff (every lagrangian time step)
         particleCloud.clockM().start(1,"Global");
 
-        Info << "Time = " << runTime.timeName() << nl << endl;
+        Info<< "Time = " << runTime.timeName() << nl << endl;
 
         particleCloud.clockM().start(2,"Flow");
         #include "TEq.H"
@@ -87,8 +88,8 @@ int main(int argc, char *argv[])
 
         if (stepCounter == recTimeStep2CFDTimeStep)
         {
-            Info << "Updating fields at run time " << runTime.timeOutputValue()
-                 << " corresponding to recTimeIndex " << recTimeIndex << ".\n" << endl;
+            Info<< "Updating fields at run time " << runTime.timeOutputValue()
+                << " corresponding to recTimeIndex " << recTimeIndex << ".\n" << endl;
             recurrenceBase.updateRecFields();
             #include "readFields.H"
             recTimeIndex++;
@@ -102,12 +103,12 @@ int main(int argc, char *argv[])
 
         particleCloud.clockM().stop("Global");
 
-        Info << "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
-             << "  ClockTime = " << runTime.elapsedClockTime() << " s"
-             << nl << endl;
+        Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
+            << "  ClockTime = " << runTime.elapsedClockTime() << " s"
+            << nl << endl;
     }
 
-    Info << "End\n" << endl;
+    Info<< "End\n" << endl;
 
     return 0;
 }

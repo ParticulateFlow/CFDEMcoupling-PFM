@@ -1,6 +1,6 @@
 /*---------------------------------------------------------------------------*\
     CFDEMcoupling academic - Open Source CFD-DEM coupling
-    
+
     Contributing authors:
     Thomas Lichtenegger, Gerhard Holzinger
     Copyright (C) 2015- Johannes Kepler University, Linz
@@ -29,9 +29,9 @@ Description
     for a solver based on recurrence statistics
 
 Rules
-	Solution data to compute the recurrence statistics from, needs to
-		reside in $CASE_ROOT/dataBase
-	Time step data in dataBase needs to be evenly spaced in time
+    Solution data to compute the recurrence statistics from, needs to
+    reside in $CASE_ROOT/dataBase
+    Time step data in dataBase needs to be evenly spaced in time
 
 \*---------------------------------------------------------------------------*/
 
@@ -55,6 +55,7 @@ int main(int argc, char *argv[])
     #include "createControl.H"
     #include "createFields.H"
     #include "createFvOptions.H"
+    scalar relaxCoeff(0.0);
 
     recBase recurrenceBase(mesh);
 
@@ -81,8 +82,8 @@ int main(int argc, char *argv[])
 
         if (stepCounter == recTimeStep2CFDTimeStep)
         {
-	    Info << "Updating fields at run time " << runTime.timeOutputValue()
-	        << " with recTimeIndex " << recTimeIndex << ".\n" << endl;
+            Info<< "Updating fields at run time " << runTime.timeOutputValue()
+                << " with recTimeIndex " << recTimeIndex << ".\n" << endl;
             recurrenceBase.updateRecFields();
             #include "readFields.H"
             recTimeIndex++;
@@ -97,15 +98,15 @@ int main(int argc, char *argv[])
         myClock().stop("speciesEqn");
 
         runTime.write();
-        
+
         Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
-        << "  ClockTime = " << runTime.elapsedClockTime() << " s"
-        << nl << endl;
-        
+            << "  ClockTime = " << runTime.elapsedClockTime() << " s"
+            << nl << endl;
+
         myClock().stop("Global");
 
     }
-    
+
     myClock().evalPar();
     myClock().normHist();
 
