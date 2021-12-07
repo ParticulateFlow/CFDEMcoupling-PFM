@@ -42,10 +42,10 @@ cfdemCloudEnergy::cfdemCloudEnergy
 :
     cfdemCloud(mesh),
     energyModels_(couplingProperties_.lookup("energyModels")),
-    massTransferModels_(couplingProperties_.lookupOrDefault<wordList>("massTransferModels",wordList::null())),
+    massTransferModels_(couplingProperties_.lookupOrDefault<wordList>("massTransferModels",wordList(0,""))),
     implicitEnergyModel_(false),
     implicitMassTransferModel_(false),
-    chemistryModels_(couplingProperties_.lookup("chemistryModels")),
+    chemistryModels_(couplingProperties_.lookupOrDefault<wordList>("chemistryModels",wordList(0,""))),
     energyModel_(nrEnergyModels()),
     massTransferModel_(nrMassTransferModels()),
     thermCondModel_
