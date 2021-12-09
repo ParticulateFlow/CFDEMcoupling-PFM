@@ -45,7 +45,7 @@ cfdemCloudEnergy::cfdemCloudEnergy
     massTransferModels_(couplingProperties_.lookupOrDefault<wordList>("massTransferModels",wordList(0,""))),
     implicitEnergyModel_(false),
     implicitMassTransferModel_(false),
-    chemistryModels_(couplingProperties_.lookupOrDefault<wordList>("chemistryModels",wordList(0,""))),
+    chemistryModels_(couplingProperties_.lookupOrDefault<wordList>("chemistryModels",wordList(1,"off"))),
     energyModel_(nrEnergyModels()),
     massTransferModel_(nrMassTransferModels()),
     thermCondModel_
