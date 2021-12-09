@@ -152,6 +152,22 @@ Info<< "Reading thermophysical properties\n" << endl;
         dimensionedScalar("zero", dimensionSet(1,-1,-3,-1,0,0,0), 0.0)
     );
 
+    Info<< "\nCreating fluid thermal conduction field\n" << endl;
+    volScalarField QFluidCond
+    (
+        IOobject
+        (
+            "QFluidCond",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        mesh,
+        dimensionedScalar("zero", dimensionSet(1,-1,-3,0,0,0,0), 0.0)
+    );
+
+
     Info<< "\nCreating thermal conductivity field\n" << endl;
     volScalarField thCond
     (
