@@ -54,6 +54,7 @@ heatTransferRanzMarshall::heatTransferRanzMarshall
     Tmax_(propsDict_.lookupOrDefault<scalar>("Tmax",1e6)),
     totalHeatFlux_(0.0),
     NusseltScalingFactor_(1.0),
+    NusseltConstParameter_(propsDict_.lookupOrDefault<scalar>("NusseltConstParameter",0.6)),
     QPartFluidName_(propsDict_.lookupOrDefault<word>("QPartFluidName","QPartFluid")),
     QPartFluid_
     (   IOobject
@@ -168,6 +169,15 @@ heatTransferRanzMarshall::heatTransferRanzMarshall
         Info << "NusseltScalingFactor set to: " << NusseltScalingFactor_ << endl;
     }
 
+    if (NusseltConstParameter_ < 0.6 || NusseltConstParameter_ > 1.8)
+    {
+        Warning << "NusseltConstParameter set to: " << NusseltConstParameter_ << " outside the range [0.6,1.8]" << endl;
+    }
+    else
+    {
+        Info << "NusseltConstParameter set to: " << NusseltConstParameter_ << endl;
+    }
+
     if (propsDict_.found("maxSource"))
     {
         maxSource_=readScalar(propsDict_.lookup ("maxSource"));
@@ -267,7 +277,7 @@ void heatTransferRanzMarshall::calcEnergyContribution()
     #endif
 
     const volScalarField& CpField_ = CpField();
-    const volScalarField& kf0Field_ = kf0Field();    
+    const volScalarField& kf0Field_ = kf0Field();
 
     if (typeCG_.size()>1 || typeCG_[0] > 1)
     {
@@ -341,8 +351,8 @@ void heatTransferRanzMarshall::calcEnergyContribution()
                 ds = 2.*particleCloud_.radius(index);
                 ds_scaled = ds/cg;
 
-                scalar kf0 = kf0Field_[cellI]; 
-                scalar Cp  = CpField_[cellI];               
+                scalar kf0 = kf0Field_[cellI];
+                scalar Cp  = CpField_[cellI];
 
                 if (expNusselt_)
                 {
@@ -491,7 +501,7 @@ void heatTransferRanzMarshall::addEnergyCoefficient(volScalarField& Qsource) con
 
 scalar heatTransferRanzMarshall::Nusselt(scalar voidfraction, scalar Rep, scalar Pr) const
 {
-    return (2 + 0.6 * Foam::pow(Rep,0.5) * Foam::pow(Pr,0.33));
+    return (2.0 + NusseltConstParameter_ * Foam::sqrt(Rep) * Foam::cbrt(Pr));
 }
 
 void heatTransferRanzMarshall::heatFlux(label index, scalar h, scalar As, scalar Tfluid, scalar cg3)
