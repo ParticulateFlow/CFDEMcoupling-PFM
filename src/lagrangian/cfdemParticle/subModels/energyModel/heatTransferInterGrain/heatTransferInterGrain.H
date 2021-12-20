@@ -108,8 +108,6 @@ protected:
 
     const scalar voidfracMin = 0.05;
 
-    const scalar StefanBoltzmannConst_;
-
     scalarList typePartEmissivity_;
 
     scalar kMax_;

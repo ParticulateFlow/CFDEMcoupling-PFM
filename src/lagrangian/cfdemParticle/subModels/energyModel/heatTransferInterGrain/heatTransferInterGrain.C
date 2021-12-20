@@ -23,6 +23,7 @@ License
 #include "heatTransferInterGrain.H"
 #include "addToRunTimeSelectionTable.H"
 #include "fvCFD.H"
+#include "physicoChemicalConstants.H"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -135,7 +136,6 @@ heatTransferInterGrain::heatTransferInterGrain
     typePartThermCap_(propsDict_.lookupOrDefault<scalarList>("thermalCapacities",scalarList(1,-1.0))),
     partThermCapRegName_(typeName + "partThermCap"),
     partThermRadRegName_(typeName + "partThermRad"),
-    StefanBoltzmannConst_(5.67e-8),
     typePartEmissivity_(propsDict_.lookupOrDefault<scalarList>("thermalEmissivities",scalarList(1,-1.0))),
     kMax_(propsDict_.lookupOrDefault<scalar>("kMax",-1.0))
 
@@ -405,7 +405,7 @@ void heatTransferInterGrain::calcPartThermRad()
                 if (voidfraction < voidfracMin) voidfraction = voidfracMin;
                 else if (voidfraction > voidfracMax) voidfraction = voidfracMax;
 
-                prefac = 4.0*StefanBoltzmannConst_*ds*Tp*Tp*Tp;
+                prefac = 4.0*constant::physicoChemical::sigma.value()*ds*Tp*Tp*Tp;
                 L = partThermCond_[index][0]/prefac;
                 // LIGGGGHTS counts types 1, 2, ..., C++ array starts at 0
                 partThermRad_[index][0] = prefac*FE(voidfraction,typePartEmissivity_[partType - 1],L);
