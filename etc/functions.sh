@@ -539,6 +539,12 @@ parCFDrun()
     #- change path
     cd $casePath/CFD
 
+    #- remove old data
+    rm -rf processor*
+
+    #- decompose case
+    decomposePar
+
     #- header
     echo 2>&1 | tee -a /$logpath/$logfileName
     echo "//   $headerText   //" 2>&1 | tee -a $logpath/$logfileName
