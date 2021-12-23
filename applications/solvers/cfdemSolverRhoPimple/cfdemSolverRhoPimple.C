@@ -121,6 +121,7 @@ int main(int argc, char *argv[])
         {
             #include "rhoEqn.H"
         }
+        rhoeps = rho*voidfraction;
 
         // --- Pressure-velocity PIMPLE corrector loop
         while (pimple.loop())
