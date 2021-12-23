@@ -15,21 +15,19 @@ if (pimple.nCorrPISO() <= 1)
     tUEqn.clear();
 }
 
+surfaceScalarField phiHbyA
+(
+    "phiHbyA",
+    fvc::interpolate(rhoeps)*fvc::flux(HbyA)
+  + rhorAUf*fvc::ddtCorr(rhoeps, U, phi)
+);
+
 if (pimple.transonic())
 {
 //  transonic version not implemented yet
 }
 else
 {
-    surfaceScalarField phiHbyA
-    (
-        "phiHbyA",
-        (
-            fvc::flux(rhoeps*HbyA)
-    //      + rhorAUf*fvc::ddtCorr(rho, U, phi)
-        )
-    );
-
     // flux without pressure gradient contribution
     phi = phiHbyA + phiUs;
 
