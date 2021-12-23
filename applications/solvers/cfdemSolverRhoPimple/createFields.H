@@ -65,6 +65,9 @@ Info<< "Reading thermophysical properties\n" << endl;
         dimensionedScalar("zero", dimensionSet(1,-1,-3,0,0,0,0), 0.0)
     );
 
+    volScalarField rhoeps("rhoeps", rho*voidfraction);
+    rhoeps.oldTime(); // switch on saving old time
+
     Info<< "\nCreating fluid-particle heat flux field\n" << endl;
     volScalarField Qsource
     (

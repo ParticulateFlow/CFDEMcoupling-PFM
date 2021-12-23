@@ -122,7 +122,6 @@ int main(int argc, char *argv[])
             #include "rhoEqn.H"
         }
 
-        volScalarField rhoeps("rhoeps",rho*voidfraction);
         // --- Pressure-velocity PIMPLE corrector loop
         while (pimple.loop())
         {
