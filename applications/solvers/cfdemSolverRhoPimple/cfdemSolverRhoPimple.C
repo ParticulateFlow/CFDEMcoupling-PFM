@@ -79,6 +79,7 @@ int main(int argc, char *argv[])
     while (runTime.run())
     {
         #include "readTimeControls.H"
+
         #include "compressibleCourantNo.H"
         #include "setDeltaT.H"
 
@@ -90,6 +91,7 @@ int main(int argc, char *argv[])
 
         // do particle stuff
         particleCloud.clockM().start(2,"Coupling");
+
         bool hasEvolved = particleCloud.evolve(voidfraction,Us,U);
 
         if(hasEvolved && smoothenForces)
@@ -109,6 +111,7 @@ int main(int argc, char *argv[])
         Info << "TotalForceImp: " << fImpTotal << endl;
 
         #include "solverDebugInfo.H"
+
         particleCloud.clockM().stop("Coupling");
 
         particleCloud.clockM().start(26,"Flow");
@@ -147,7 +150,6 @@ int main(int argc, char *argv[])
         particleCloud.clockM().stop("postFlow");
 
         runTime.write();
-
 
         Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
             << "  ClockTime = " << runTime.elapsedClockTime() << " s"
