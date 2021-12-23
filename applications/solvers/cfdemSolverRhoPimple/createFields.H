@@ -82,6 +82,28 @@ Info<< "Reading thermophysical properties\n" << endl;
          linearInterpolate(rho*U*voidfraction) & mesh.Sf()
     );
 
+    dimensionedScalar rhoMax
+    (
+        dimensionedScalar::lookupOrDefault
+        (
+            "rhoMax",
+            pimple.dict(),
+            dimDensity,
+            GREAT
+        )
+    );
+
+    dimensionedScalar rhoMin
+    (
+        dimensionedScalar::lookupOrDefault
+        (
+            "rhoMin",
+            pimple.dict(),
+            dimDensity,
+            0
+        )
+    );
+
     Info<< "\nCreating fluid-particle heat flux field\n" << endl;
     volScalarField Qsource
     (
@@ -156,28 +178,6 @@ Info<< "Reading thermophysical properties\n" << endl;
         ),
         mesh,
         dimensionedVector("zero", dimensionSet(1,-2,-2,0,0,0,0), vector::zero)
-    );
-
-    dimensionedScalar rhoMax
-    (
-        dimensionedScalar::lookupOrDefault
-        (
-            "rhoMax",
-            pimple.dict(),
-            dimDensity,
-            GREAT
-        )
-    );
-
-    dimensionedScalar rhoMin
-    (
-        dimensionedScalar::lookupOrDefault
-        (
-            "rhoMin",
-            pimple.dict(),
-            dimDensity,
-            0
-        )
     );
 
     bool smoothenForces
