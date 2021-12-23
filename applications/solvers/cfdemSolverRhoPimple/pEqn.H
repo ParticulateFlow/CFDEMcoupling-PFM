@@ -2,6 +2,7 @@ rho = thermo.rho();
 rho = max(rho, rhoMin);
 rho = min(rho, rhoMax);
 rho.relax();
+rhoeps = rho*voidfraction;
 
 volScalarField rAU(1.0/UEqn.A());
 surfaceScalarField rhorAUf("rhorAUf", fvc::interpolate(rhoeps*rAU));
@@ -85,6 +86,8 @@ else
 U.correctBoundaryConditions();
 fvOptions.correct(U);
 K = 0.5*magSqr(U);
+
+rhoeps = rho*voidfraction;
 
 if (thermo.dpdt())
 {

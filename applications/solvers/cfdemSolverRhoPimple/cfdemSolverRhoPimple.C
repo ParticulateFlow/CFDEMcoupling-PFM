@@ -133,7 +133,6 @@ int main(int argc, char *argv[])
             {
                 // besides this pEqn, OF offers a "pimple consistent"-option
                 #include "pEqn.H"
-                rhoeps=rho*voidfraction;
             }
 
             if (pimple.turbCorr())
