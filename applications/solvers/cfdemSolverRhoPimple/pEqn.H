@@ -67,14 +67,6 @@ else
 // Explicitly relax pressure for momentum corrector
 p.relax();
 
-// Recalculate density from the relaxed pressure
-rho = thermo.rho();
-rho = max(rho, rhoMin);
-rho = min(rho, rhoMax);
-rho.relax();
-Info<< "rho max/min : " << max(rho).value()
-    << " " << min(rho).value() << endl;
-
 if (modelType=="A")
 {
     U = HbyA - rAU*(voidfraction*fvc::grad(p)-Ksl*Us);
@@ -87,7 +79,15 @@ U.correctBoundaryConditions();
 fvOptions.correct(U);
 K = 0.5*magSqr(U);
 
+// Recalculate density from the relaxed pressure
+rho = thermo.rho();
+rho = max(rho, rhoMin);
+rho = min(rho, rhoMax);
+rho.relax();
 rhoeps = rho*voidfraction;
+
+Info<< "rho max/min/ave : " << max(rho).value()
+    << " " << min(rho).value() << " " << average(rho).value() << endl;
 
 if (thermo.dpdt())
 {
