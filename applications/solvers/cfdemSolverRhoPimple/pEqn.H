@@ -5,11 +5,7 @@ rho.relax();
 rhoeps = rho*voidfraction;
 
 volScalarField rAU(1.0/UEqn.A());
-surfaceScalarField rhorAUf("rhorAUf", fvc::interpolate(rhoeps*rAU));
-if (modelType=="A")
-{
-    rhorAUf *= fvc::interpolate(voidfraction);
-}
+surfaceScalarField rhorAUf("rhorAUf", (modelType=="A")?fvc::interpolate(voidfraction*rhoeps*rAU):fvc::interpolate(rhoeps*rAU));
 volVectorField HbyA(constrainHbyA(rAU*UEqn.H(), U, p));
 
 surfaceScalarField phiUs("phiUs", fvc::interpolate(rhoeps*rAU*Ksl*Us)& mesh.Sf());
