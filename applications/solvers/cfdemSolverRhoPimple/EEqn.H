@@ -52,7 +52,7 @@
 
     thermo.correct();
 
-    Info<< "T max/min : " << max(T).value() << " " << min(T).value() << endl;
+    Info<< "T max/min/ave : " << max(T).value() << " " << min(T).value() << " " << average(T).value() << endl;
 
     particleCloud.clockM().start(31,"energySolve");
     particleCloud.solve();
