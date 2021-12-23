@@ -32,6 +32,9 @@ Description
 #include "turbulentFluidThermoModel.H"
 #include "bound.H"
 #include "pimpleControl.H"
+#if OPENFOAM_VERSION_MAJOR >= 5
+#include "pressureControl.H"
+#endif
 #include "fvOptions.H"
 #include "localEulerDdtScheme.H"
 #include "fvcSmooth.H"
@@ -119,17 +122,23 @@ int main(int argc, char *argv[])
 
 #if OPENFOAM_VERSION_MAJOR < 6
         if (pimple.nCorrPIMPLE() <= 1)
-#else
-        if (pimple.nCorrPimple() <= 1)
-#endif
         {
             #include "rhoEqn.H"
         }
         rhoeps = rho*voidfraction;
+#endif
 
         // --- Pressure-velocity PIMPLE corrector loop
         while (pimple.loop())
         {
+#if OPENFOAM_VERSION_MAJOR >= 6
+            if (pimple.firstIter())
+            {
+                #include "rhoEqn.H"
+                rhoeps = rho*voidfraction;
+            }
+#endif
+
             #include "UEqn.H"
             #include "EEqn.H"
 

@@ -68,6 +68,7 @@ Info<< "Reading thermophysical properties\n" << endl;
          linearInterpolate(rho*U*voidfraction) & mesh.Sf()
     );
 
+#if OPENFOAM_VERSION_MAJOR < 5
     dimensionedScalar rhoMax
     (
         dimensionedScalar::lookupOrDefault
@@ -89,6 +90,9 @@ Info<< "Reading thermophysical properties\n" << endl;
             0
         )
     );
+#else
+    pressureControl pressureControl(p, rho, pimple.dict(), false);
+#endif
 
     Info<< "\nCreating fluid-particle heat flux field\n" << endl;
     volScalarField Qsource
