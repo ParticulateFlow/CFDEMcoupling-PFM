@@ -6,18 +6,6 @@
     particleCloud.energyContributions(Qsource);
     particleCloud.energyCoefficients(QCoeff);
 
-    addSource = fvc::ddt(rhoeps, K) + fvc::div(phi, K)
-      + (
-            he.name() == "e"
-          ? fvc::div
-            (
-                fvc::absolute(phi/fvc::interpolate(rho), voidfraction*U),
-                p,
-                "div(phiv,p)"
-            )
-          : -dpdt
-        );
-
     Cpv = he.name() == "e" ? thermo.Cv() : thermo.Cp();
 
 // For implict T terms in the energy/enthalpy transport equation, use
@@ -29,7 +17,17 @@
     fvScalarMatrix EEqn
     (
         fvm::ddt(rhoeps, he) + fvm::div(phi, he)
-      + addSource
+      + fvc::ddt(rhoeps, K) + fvc::div(phi, K)
+      + (
+            he.name() == "e"
+          ? fvc::div
+            (
+                fvc::absolute(phi/fvc::interpolate(rho), voidfraction*U),
+                p,
+                "div(phiv,p)"
+            )
+          : -dpdt
+        )
       - Qsource
       - QCoeff*T
       - fvm::Sp(QCoeff/Cpv, he)
