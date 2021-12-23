@@ -68,6 +68,20 @@ Info<< "Reading thermophysical properties\n" << endl;
     volScalarField rhoeps("rhoeps", rho*voidfraction);
     rhoeps.oldTime(); // switch on saving old time
 
+    Info<< "Reading/calculating face flux field phi\n" << endl;
+    surfaceScalarField phi
+    (
+        IOobject
+        (
+            "phi",
+            runTime.timeName(),
+            mesh,
+            IOobject::READ_IF_PRESENT,
+            IOobject::AUTO_WRITE
+         ),
+         linearInterpolate(rho*U*voidfraction) & mesh.Sf()
+    );
+
     Info<< "\nCreating fluid-particle heat flux field\n" << endl;
     volScalarField Qsource
     (
@@ -142,20 +156,6 @@ Info<< "Reading thermophysical properties\n" << endl;
         ),
         mesh,
         dimensionedVector("zero", dimensionSet(1,-2,-2,0,0,0,0), vector::zero)
-    );
-
-    Info<< "Reading/calculating face flux field phi\n" << endl;
-    surfaceScalarField phi
-    (
-        IOobject
-        (
-            "phi",
-            runTime.timeName(),
-            mesh,
-            IOobject::READ_IF_PRESENT,
-            IOobject::AUTO_WRITE
-         ),
-         linearInterpolate(rho*U*voidfraction) & mesh.Sf()
     );
 
     dimensionedScalar rhoMax
