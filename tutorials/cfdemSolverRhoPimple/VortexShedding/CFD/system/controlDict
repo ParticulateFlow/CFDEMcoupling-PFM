@@ -77,7 +77,7 @@ functions
             (0.0210  0.00225 0)
             (0.0250 -0.00275 0)
             (0.0250  0.00275 0)
-       );
+        );
 
         // Fields to be probed
         fields (p U T rho);
