@@ -58,29 +58,40 @@ protected:
     void weightsCumulation();
 
     void weightsNormalization();
-    
-    // correlation steps determine which temporal neighborhood is excluded from nearest-neighbor search
-    label correlationSteps_;
 
-    label meanIntervalSteps_;
-    
-    label minIntervalSteps_;
+    bool searchMinimum_;
+
+    label currentDatabase_;
 
     label numIntervals_;
 
     label recSteps_;
 
+    label stepsInCurrentDatabase_;
+
     label startIndex_;
+
+    labelList correlationSteps_;
 
     labelList intervalSizes_;
 
     labelList intervalSizesCumulative_;
 
-    scalar Pjump_;
+    labelList meanIntervalSteps_;
+
+    labelList minIntervalSteps_;
+
+    labelList minStepsWithinDatabase_;
+
+    labelList numberOfIntervalsInEachDatabase_;
 
     scalarList intervalWeights_;
 
     scalarList intervalWeightsCumulative_;
+
+    scalarList Pjump_;
+
+    scalarList timeSpentInEachDatabase_;
 
     Random ranGen;
 

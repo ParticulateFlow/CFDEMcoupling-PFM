@@ -102,8 +102,6 @@ protected:
 
     double h(double) const;
 
-
-
 public:
 
     //- Runtime type information

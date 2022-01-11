@@ -89,6 +89,15 @@ inline bool cfdemCloud::treatVoidCellsAsExplicitForce() const
     return treatVoidCellsAsExplicitForce_;
 }
 
+inline void cfdemCloud::scaleForce(int index, scalar factor)
+{
+    for (int i=0; i<3; ++i)
+    {
+        expForces_[index][i] *= factor;
+        impForces_[index][i] *= factor;
+    }
+}
+
 inline scalar cfdemCloud::cg() const
 {
     return cg_;
@@ -97,6 +106,11 @@ inline scalar cfdemCloud::cg() const
 inline bool cfdemCloud::ignore() const
 {
     return ignore_;
+}
+
+inline bool cfdemCloud::modelCheck() const
+{
+    return modelCheck_;
 }
 
 inline const fvMesh& cfdemCloud::mesh() const
@@ -112,6 +126,11 @@ inline bool cfdemCloud::solveFlow() const
 inline bool cfdemCloud::verbose() const
 {
     return verbose_;
+}
+
+inline bool cfdemCloud::multiphase() const
+{
+    return multiphase_;
 }
 
 inline const IOdictionary& cfdemCloud::couplingProperties() const
@@ -294,6 +313,27 @@ inline label cfdemCloud::particleType(label index) const
     else
     {
         return particleTypes_[index][0];
+    }
+}
+
+inline bool cfdemCloud::getParticleAngVels() const
+{
+    return getParticleAngVels_;
+}
+      
+inline double ** cfdemCloud::particleAngVels() const
+{
+    return particleAngVels_;
+}
+
+inline vector cfdemCloud::particleAngVel(label index) const
+{
+    if(!getParticleAngVels_) return vector::zero;
+    else
+    {
+        vector angVel;
+        for(int i=0;i<3;i++) angVel[i] = particleAngVels_[index][i];
+        return angVel;
     }
 }
 

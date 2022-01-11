@@ -1,0 +1,65 @@
+# particle properties
+#####################
+
+# ore
+fix     porosity_ore        all property/atom   porosity_ore       vector yes no no 0.61 0.34 0.19 0.17
+fix     tortuosity_ore      all property/global tortuosity_ore     scalar 3
+fix     pore_diameter_ore   all property/global pore_diameter_ore  scalar 1.e-7
+fix     layerDensities_ore  all property/global density_ore vector 7870. 5740. 5170. 5240.
+
+# fineore
+fix     porosity_fineore        all property/atom   porosity_fineore       vector yes no no 0.61 0.34 0.19 0.17
+fix     tortuosity_fineore      all property/global tortuosity_fineore     scalar 3
+fix     pore_diameter_fineore   all property/global pore_diameter_fineore  scalar 1.e-7
+fix     layerDensities_fineore  all property/global density_fineore vector 7870. 5740. 5170. 5240.
+
+# coke
+# coke porosity according to Ghosh et al. Int J Coal Sci Technol (2018) 5(4):473–485, assuming ash has similar pore structure
+fix     porosity_coke        all property/atom   porosity_coke       vector yes no no 0.5 0.5
+fix     pore_diameter_coke   all property/global pore_diameter_coke  scalar 1e-3
+fix     tortuosity_coke      all property/global tortuosity_coke     scalar 3
+fix     layerDensities_coke all property/global density_coke vector 500. 1900.
+
+# finecoke
+# coke porosity according to Ghosh et al. Int J Coal Sci Technol (2018) 5(4):473–485, assuming ash has similar pore structure
+fix     porosity_finecoke        all property/atom   porosity_finecoke       vector yes no no 0.5 0.5
+fix     pore_diameter_finecoke   all property/global pore_diameter_finecoke  scalar 1e-3
+fix     tortuosity_finecoke      all property/global tortuosity_finecoke     scalar 3
+fix     layerDensities_finecoke all property/global density_finecoke vector 500. 1900.
+
+
+# define layer properties
+fix     LayerRelRadii all property/atom relRadii vector yes no no  1.0 0.998 0.995 0.98
+
+# define fix for rho_eff and fracRed - initialize as zero
+fix     fracRed all property/atom fracRed vector yes no no 0. 0. 0.
+fix     rhoeff  all property/atom rhoeff vector yes no no 0. 0. 0. 0.
+
+# define fix for mass layer - initial testing
+fix     LayerMasses all property/atom massLayer vector yes no no 0. 0. 0. 0.
+
+
+# ore reactions
+###############
+# Activate for 3-layer unreacted core shrink model
+fix     chem0 ore chem/shrink/core speciesA CO molMassA 0.02801 speciesC CO2 molMassC 0.04401 screen no cg 10
+fix     chem1 fineore chem/shrink/core speciesA CO molMassA 0.02801 speciesC CO2 molMassC 0.04401 screen no cg 10
+#fix     chem1 ore chem/shrink/core speciesA H2 molMassA 0.00202 speciesC H2O molMassC 0.01801 screen no cg 10
+
+# Material properties for chemical reaction
+fix     k0_chem0 ore property/global k0_chem0 vector 17 25 2700
+fix     Ea_chem0 ore property/global Ea_chem0 vector 69488 95000 130940
+
+fix     k0_chem1 fineore property/global k0_chem1 vector 17 25 2700
+fix     Ea_chem1 fineore property/global Ea_chem1 vector 69488 95000 130940
+
+
+# coke reactions
+################
+# values for k0 and T0 according to Shen, Fuel 90 (2011) 728–738;
+# values have been scaled with 1/(nA * mMol) [nA = molar concentration at standard conditions], b.c. Shen uses x P / PA while LIGGGHTS implementation has x P / (RT) * mMol = x P / PA * nA * mMol
+fix     chem2 coke chem/shrink/core/single speciesA O2 molMassA 0.03199 nuA 1 speciesC CO molMassC 0.02801 nuC 2 molMassB 0.01201 nuB 2 rmin 0.0075 nevery 1 screen no k 2.5077e6 T 10855 Tmin 100 cg 4 layerDiffusion no heatToFluid yes shrink no limit_reactant_consumption yes maxReactantConsumptionFrac 0.6
+fix	chem3 coke chem/shrink/core/single speciesA CO2 molMassA 0.04401 nuA 1 speciesC CO molMassC 0.02801 nuC 2 molMassB 0.01201 nuB 1 rmin 0.0075 nevery 1 screen no k 2.6167e9 T 29018 Tmin 100 cg 4 layerDiffusion no heatToFluid yes shrink no limit_reactant_consumption yes maxReactantConsumptionFrac 0.6
+
+fix     chem4 finecoke chem/shrink/core/single speciesA O2 molMassA 0.03199 nuA 1 speciesC CO molMassC 0.02801 nuC 2 molMassB 0.01201 nuB 2 rmin 0.0075 nevery 1 screen no k 2.5077e6 T 10855 Tmin 100 cg 6 layerDiffusion no heatToFluid yes shrink no limit_reactant_consumption yes maxReactantConsumptionFrac 0.6
+fix	chem5 finecoke chem/shrink/core/single speciesA CO2 molMassA 0.04401 nuA 1 speciesC CO molMassC 0.02801 nuC 2 molMassB 0.01201 nuB 1 rmin 0.0075 nevery 1 screen no k 2.6167e9 T 29018 Tmin 100 cg 6 layerDiffusion no heatToFluid yes shrink no limit_reactant_consumption yes maxReactantConsumptionFrac 0.6

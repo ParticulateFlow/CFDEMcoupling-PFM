@@ -62,6 +62,24 @@ turbulentDispersion::turbulentDispersion
     ignoreCellsName_(propsDict_.lookupOrDefault<word>("ignoreCellsName","none")),
     ignoreCells_(),
     existIgnoreCells_(true),
+    usePreCalcNut_(propsDict_.lookupOrDefault<bool>("usePreCalcNut",false)),
+    nutName_(propsDict_.lookupOrDefault<word>("nutName","nut")),
+    usePreCalcK_(propsDict_.lookupOrDefault<bool>("usePreCalcK",false)),
+    kName_(propsDict_.lookupOrDefault<word>("kName","k")),
+    usePreCalcDispField_(propsDict_.lookupOrDefault<bool>("usePreCalcDispField",false)),
+    dispFieldName_(propsDict_.lookupOrDefault<word>("dispFieldName","dispVarField")),
+    nut_
+    (   IOobject
+        (
+            "nuTurb",
+            sm.mesh().time().timeName(),
+            sm.mesh(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        sm.mesh(),
+        dimensionedScalar("zero", dimensionSet(0,2,-1,0,0,0,0), 0.0)
+    ),
     wallIndicatorField_
     (   IOobject
         (
@@ -74,13 +92,23 @@ turbulentDispersion::turbulentDispersion
         sm.mesh(),
         dimensionedScalar("zero", dimensionSet(0,0,0,0,0,0,0), 0.0)
     ),
-    minTurbKineticEnergy_(propsDict_.lookupOrDefault<scalar>("minTurbKineticEnergy", 0.0)),
-    turbKineticEnergyFieldName_(propsDict_.lookupOrDefault<word>("turbKineticEnergyFieldName","")),
-    turbKineticEnergy_(NULL),
-    existTurbKineticEnergyInObjReg_(false),
+    delta_
+    (   IOobject
+        (
+            "delta",
+            sm.mesh().time().timeName(),
+            sm.mesh(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        sm.mesh(),
+        dimensionedScalar("delta", dimLength, 1.0)
+    ),
+    turbulentSchmidtNumber_(readScalar(propsDict_.lookup("turbulentSchmidtNumber"))),
     voidfractionFieldName_(propsDict_.lookupOrDefault<word>("voidfractionFieldName","voidfraction")),
     voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
     critVoidfraction_(propsDict_.lookupOrDefault<scalar>("critVoidfraction", 0.9)),
+    Ck_(propsDict_.lookupOrDefault<scalar>("turbKineticEnergyCoeff", 0.094)),
     ranGen_(clock::getTime()+pid())
 {
     if (ignoreCellsName_ != "none")
@@ -90,6 +118,16 @@ turbulentDispersion::turbulentDispersion
         " with " << ignoreCells_().size() << " cells." << endl;
     }
     else existIgnoreCells_ = false;
+
+    if ((usePreCalcNut_ && usePreCalcK_) || (usePreCalcNut_ && usePreCalcDispField_) || (usePreCalcDispField_ && usePreCalcK_))
+    {
+        FatalError<< "Cannot use more than one precalculated nut, k and displacement fluctuations at the same time. Choose one." << abort(FatalError);
+    }
+
+    if (usePreCalcK_)
+    {
+        delta_.primitiveFieldRef()=Foam::pow(mesh_.V(),1.0/3.0);
+    }
 
     // define a field to indicate if a cell is next to boundary
      label cellI = -1;
@@ -105,45 +143,18 @@ turbulentDispersion::turbulentDispersion
          }
      }
 
-    if (turbKineticEnergyFieldName_ != "")
-    {
-        existTurbKineticEnergyInObjReg_ = true;
-        volScalarField& k(const_cast<volScalarField&>(sm.mesh().lookupObject<volScalarField> (turbKineticEnergyFieldName_)));
-        turbKineticEnergy_ = &k;
-    }
-    else
-    {
-        turbKineticEnergy_ = new volScalarField
-        (
-            IOobject
-            (
-                "turbKinEnergy",
-                mesh_.time().timeName(),
-                mesh_,
-                IOobject::NO_READ,
-                IOobject::NO_WRITE
-            ),
-            mesh_,
-            dimensionedScalar("zero", dimensionSet(0,2,-2,0,0), 0)
-        );
-    }
-
-    // make sure this is the last force model in list so that fluid velocity does not get overwritten
-    label numLastForceModel = sm.nrForceModels();
-    word lastForceModel = sm.forceModels()[numLastForceModel-1];
-    if (lastForceModel != "turbulentDispersion")
-    {
-        FatalError <<"Force model 'turbulentDispersion' needs to be last in list!\n" << abort(FatalError);
-    }
+    scalar dtCFD = voidfraction_.mesh().time().deltaTValue();
+    scalar dtDEM = particleCloud_.dataExchangeM().DEMts();
+    // if CFD step is larger than DEM step, a corresponding number of DEM steps is taken to reach the CFD step;
+    // if DEM step is larger than CFD step, no update occurs so that full DEM step needs to be taken
+    dt_ = max(dtCFD, dtDEM);
 }
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 turbulentDispersion::~turbulentDispersion()
-{
-    if (!existTurbKineticEnergyInObjReg_) delete turbKineticEnergy_;
-}
+{}
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
 
@@ -157,71 +168,97 @@ bool turbulentDispersion::ignoreCell(label cell) const
 
 void turbulentDispersion::setForce() const
 {
-    if (!existTurbKineticEnergyInObjReg_)
+    if (!usePreCalcNut_ && !usePreCalcK_ && !usePreCalcDispField_)
     {
-        *turbKineticEnergy_ = particleCloud_.turbulence().k()();
+        nut_ = particleCloud_.turbulence().nut()();
+    }
+    else if (usePreCalcNut_)
+    {
+        volScalarField& nutRef (const_cast<volScalarField&>(mesh_.lookupObject<volScalarField> (nutName_)));
+        nut_ = nutRef;
+    }
+    else if (usePreCalcK_)
+    {
+        volScalarField& kRef (const_cast<volScalarField&>(mesh_.lookupObject<volScalarField> (kName_)));
+        nut_ = Ck_ * delta_ * sqrt(kRef);
+    }
+    else
+    {
+        volVectorField& dispFieldRef (const_cast<volVectorField&>(mesh_.lookupObject<volVectorField> (dispFieldName_)));
+        dispField_ = &dispFieldRef;
     }
 
     label cellI = -1;
     label patchID = -1;
     label faceIGlobal = -1;
     scalar flucProjection = 0.0;
-    scalar k = 0.0;
+    scalar D = 0.0;
+    scalar randScalar = 0.0;
     vector faceINormal = vector::zero;
     vector flucU = vector::zero;
     vector position = vector::zero;
     word patchName("");
 
-    interpolationCellPoint<scalar> turbKineticEnergyInterpolator_(*turbKineticEnergy_);
+    interpolationCellPoint<scalar> nutInterpolator_(nut_);
 
-    for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
+    for(int index = 0; index < particleCloud_.numberOfParticles(); ++index)
     {
         cellI = particleCloud_.cellIDs()[index][0];
         if (cellI > -1 && !ignoreCell(cellI))
         {
-            // particles in dilute regions follow fluid without fluctuations
-
-            if (voidfraction_[cellI] < critVoidfraction_)
+            if (usePreCalcDispField_)
+            {
+                for (label comp=0; comp<3; comp++)
+                {
+#if OPENFOAM_VERSION_MAJOR < 6
+                    randScalar = ranGen_.GaussNormal();
+#else
+                    randScalar = ranGen_.scalarNormal();
+#endif
+                    flucU.component(comp) = randScalar * (*dispField_)[cellI].component(comp);
+                }
+            }
+            else
             {
                 if (interpolate_)
                 {
                     position = particleCloud_.position(index);
-                    k = turbKineticEnergyInterpolator_.interpolate(position,cellI);
+                    D = nutInterpolator_.interpolate(position,cellI) / turbulentSchmidtNumber_;
                 }
                 else
                 {
-                    k = (*turbKineticEnergy_)[cellI];
+                    D = nut_[cellI] / turbulentSchmidtNumber_;
                 }
 
-                if (k < minTurbKineticEnergy_) k = minTurbKineticEnergy_;
+                // include concentration dependence on the diffusivity at this point if necessary
 
-                flucU=unitFlucDir()*Foam::sqrt(2.0*k);
+                flucU=unitFlucDir()*Foam::sqrt(6.0*D/dt_);
+            }
 
-                // prevent particles being pushed through walls by regulating velocity fluctuations
-                // check if cell is adjacent to wall and remove corresponding components
-                if (wallIndicatorField_[cellI] > 0.5)
+            // prevent particles being pushed through walls by regulating velocity fluctuations
+            // check if cell is adjacent to wall and remove corresponding components
+            if (wallIndicatorField_[cellI] > 0.5)
+            {
+                const cell& faces = mesh_.cells()[cellI];
+                forAll (faces, faceI)
                 {
-                    const cell& faces = mesh_.cells()[cellI];
-                    forAll (faces, faceI)
-                    {
-                        faceIGlobal = faces[faceI];
-                        patchID = mesh_.boundaryMesh().whichPatch(faceIGlobal);
-                        if (patchID < 0) continue;
-                        patchName = mesh_.boundary()[patchID].name();
+                    faceIGlobal = faces[faceI];
+                    patchID = mesh_.boundaryMesh().whichPatch(faceIGlobal);
+                    if (patchID < 0) continue;
+                    patchName = mesh_.boundary()[patchID].name();
 
-                        if (patchName.rfind("procB",0) == 0) continue;
+                    if (patchName.rfind("procB",0) == 0) continue;
 
-                        faceINormal = mesh_.Sf()[faceIGlobal];
-                        faceINormal /= mag(faceINormal);
-                        flucProjection = faceINormal&flucU;
-                        if (flucProjection > 0.0) flucU -= flucProjection*faceINormal;
-                    }
+                    faceINormal = mesh_.Sf()[faceIGlobal];
+                    faceINormal /= mag(faceINormal);
+                    flucProjection = faceINormal&flucU;
+                    if (flucProjection > 0.0) flucU -= flucProjection*faceINormal;
                 }
+            }
 
-                for(int j=0;j<3;j++)
-                {
-                    particleCloud_.fluidVels()[index][j] += flucU[j];
-                }
+            for(int j=0;j<3;j++)
+            {
+                particleCloud_.particleFlucVels()[index][j] += flucU[j];
             }
         }
     }

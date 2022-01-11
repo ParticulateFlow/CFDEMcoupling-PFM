@@ -1,3 +1,0 @@
-rBaseMirrorScalar.C
-
-EXE=$(CFDEM_APP_DIR)/rBaseMirrorScalar

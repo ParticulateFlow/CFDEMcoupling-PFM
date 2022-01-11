@@ -32,6 +32,9 @@ Description
 #include "turbulentFluidThermoModel.H"
 #include "bound.H"
 #include "pimpleControl.H"
+#if OPENFOAM_VERSION_MAJOR >= 5
+#include "pressureControl.H"
+#endif
 #include "fvOptions.H"
 #include "localEulerDdtScheme.H"
 #include "fvcSmooth.H"
@@ -69,16 +72,19 @@ int main(int argc, char *argv[])
     #include "checkModelType.H"
 
     turbulence->validate();
-    //#include "compressibleCourantNo.H"
-    //#include "setInitialDeltaT.H"
+
+    #include "compressibleCourantNo.H"
+    #include "setInitialDeltaT.H"
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
     Info<< "\nStarting time loop\n" << endl;
+    bool firstStep = true;
 
     while (runTime.run())
     {
         #include "readTimeControls.H"
+
         #include "compressibleCourantNo.H"
         #include "setDeltaT.H"
 
@@ -90,6 +96,7 @@ int main(int argc, char *argv[])
 
         // do particle stuff
         particleCloud.clockM().start(2,"Coupling");
+
         bool hasEvolved = particleCloud.evolve(voidfraction,Us,U);
 
         if(hasEvolved && smoothenForces)
@@ -109,23 +116,35 @@ int main(int argc, char *argv[])
         Info << "TotalForceImp: " << fImpTotal << endl;
 
         #include "solverDebugInfo.H"
+
         particleCloud.clockM().stop("Coupling");
 
         particleCloud.clockM().start(26,"Flow");
 
 #if OPENFOAM_VERSION_MAJOR < 6
         if (pimple.nCorrPIMPLE() <= 1)
-#else
-        if (pimple.nCorrPimple() <= 1)
-#endif
         {
             #include "rhoEqn.H"
         }
+        rhoeps = rho*voidfraction;
+#endif
 
-        volScalarField rhoeps("rhoeps",rho*voidfraction);
         // --- Pressure-velocity PIMPLE corrector loop
         while (pimple.loop())
         {
+#if OPENFOAM_VERSION_MAJOR >= 6
+            if (pimple.firstIter())
+            {
+                #include "rhoEqn.H"
+                if (firstStep)
+                {
+                    rhoeps.oldTime() = rho.oldTime()*voidfraction.oldTime();
+                    firstStep = false;
+                }
+                rhoeps = rho*voidfraction;
+            }
+#endif
+
             #include "UEqn.H"
             #include "EEqn.H"
 
@@ -134,7 +153,6 @@ int main(int argc, char *argv[])
             {
                 // besides this pEqn, OF offers a "pimple consistent"-option
                 #include "pEqn.H"
-                rhoeps=rho*voidfraction;
             }
 
             if (pimple.turbCorr())
@@ -148,7 +166,6 @@ int main(int argc, char *argv[])
         particleCloud.clockM().stop("postFlow");
 
         runTime.write();
-
 
         Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
             << "  ClockTime = " << runTime.elapsedClockTime() << " s"

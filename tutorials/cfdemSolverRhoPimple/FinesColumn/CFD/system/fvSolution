@@ -90,6 +90,8 @@ PIMPLE
     nNonOrthogonalCorrectors 0;
     rhoMin          rhoMin [ 1 -3 0 0 0 ] 0.5;
     rhoMax          rhoMax [ 1 -3 0 0 0 ] 2.0;
+    pMinFactor      0.5; // OF 6
+    pMaxFactor      2.0; // OF 6
 }
 
 PISO

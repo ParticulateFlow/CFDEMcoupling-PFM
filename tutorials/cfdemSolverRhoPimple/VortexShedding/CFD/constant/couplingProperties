@@ -1,0 +1,104 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  6
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      couplingProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+// sub-models & settings
+
+modelType "A"; // A or B
+
+couplingInterval 20;
+
+voidFractionModel centre;
+
+locateModel engine;
+
+meshMotionModel noMeshMotion;
+
+regionModel allRegion;
+
+IOModel off;
+
+probeModel off;
+
+dataExchangeModel twoWayMPI;
+
+averagingModel dilute;
+
+clockModel off;
+
+smoothingModel off;
+
+forceModels
+(
+    gradPForce
+    viscForce
+    noDrag
+);
+
+energyModels
+(
+);
+
+chemistryModels
+(
+    off
+);
+
+momCoupleModels
+(
+    deactivateCouple
+);
+
+thermCondModel SyamlalThermCond;
+
+turbulenceModelType "turbulenceProperties";
+
+
+// sub-model properties
+
+SyamlalThermCondProps
+{
+}
+
+gradPForceProps
+{
+    pFieldName "p";
+    voidfractionFieldName "voidfraction";
+    velocityFieldName "U";
+    interpolation true;
+}
+
+viscForceProps
+{
+    velocityFieldName "U";
+    interpolation true;
+}
+
+engineProps
+{
+    treeSearch true;
+}
+
+centreProps
+{
+    alphaMin 0.01;
+}
+
+twoWayMPIProps
+{
+    liggghtsPath "../DEM/in.liggghts_run";
+}
+
+// ************************************************************************* //

@@ -59,7 +59,32 @@ thermCondModel::thermCondModel
             IOobject::NO_WRITE
         )
     ),
-    kf0_(transportProperties_.lookup("kf")),
+    kf0Field_
+    (
+        IOobject
+        (
+            "kf0",
+            sm.mesh().time().timeName(),
+            sm.mesh(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        sm.mesh(),
+        dimensionedScalar("zero", dimensionSet(1,1,-3,-1,0,0,0), 0.)
+    ),
+    CpField_
+    (
+        IOobject
+        (
+            "Cp",
+            sm.mesh().time().timeName(),
+            sm.mesh(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        sm.mesh(),
+        dimensionedScalar("zero", dimensionSet(0,2,-2,-1,0,0,0), 0.)
+    ),
     thermCondField_(const_cast<volScalarField&>(sm.mesh().lookupObject<volScalarField> ("thCond"))),
     wallQFactor_
     (   IOobject
@@ -101,7 +126,39 @@ thermCondModel::thermCondModel
     ),
     hasWallHeatLoss_(false)
 {
-    if (wallQFactor_.headerOk())
+    // build constant fields for single phase case
+    if (!particleCloud_.multiphase())
+    {
+        kf0Field_ = volScalarField
+        (
+            IOobject
+            (
+                "kf0",
+                particleCloud_.mesh().time().timeName(),
+                particleCloud_.mesh(),
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+            ),
+            particleCloud_.mesh(),
+            dimensionedScalar(transportProperties_.lookup("kf"))
+        );
+
+        CpField_ = volScalarField
+        (
+            IOobject
+            (
+                "Cp",
+                particleCloud_.mesh().time().timeName(),
+                particleCloud_.mesh(),
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+            ),
+            particleCloud_.mesh(),
+            dimensionedScalar(transportProperties_.lookup("Cp"))
+        );
+    }
+
+if (wallQFactor_.headerOk())
     {
         Info << "Found field for scaling wall heat flux.\n" << endl;
         hasWallQFactor_ = true;
@@ -176,6 +233,30 @@ void thermCondModel::calcBoundaryCorrections()
                     (wallBoundaryLayerThickness_.boundaryField()[patchi][facei] * mesh_.deltaCoeffs().boundaryField()[patchi][facei]);
             }
         }
+    }
+}
+
+const volScalarField& thermCondModel::kf0Field() const
+{
+    if (particleCloud_.multiphase())
+    {
+        return particleCloud_.mesh().lookupObject<volScalarField>("kf");
+    }
+    else
+    {
+        return kf0Field_;
+    }
+}
+
+const volScalarField& thermCondModel::CpField() const
+{
+    if (particleCloud_.multiphase())
+    {
+        return particleCloud_.mesh().lookupObject<volScalarField>("Cp");
+    }
+    else
+    {
+        return CpField_;
     }
 }
 

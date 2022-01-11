@@ -1,6 +1,6 @@
 /*---------------------------------------------------------------------------*\
     CFDEMcoupling academic - Open Source CFD-DEM coupling
-    
+
     Contributing authors:
     Thomas Lichtenegger, Gerhard Holzinger
     Copyright (C) 2015- Johannes Kepler University, Linz
@@ -23,9 +23,9 @@ License
 
 Description
     Standard Recurrence Model
-    
-    This class sets limits for the length of a recurrence-sequence. As of now, 
-    such a sequence is between one 20-th and 5-th of the total number of data 
+
+    This class sets limits for the length of a recurrence-sequence. As of now,
+    such a sequence is between one 20-th and 5-th of the total number of data
     base entries.
 
 \*---------------------------------------------------------------------------*/
@@ -49,7 +49,7 @@ class standardRecModel
     public recModel
 {
 protected:
-  
+
     dictionary propsDict_;
     wordList dataBaseNames_;
     label numDataBases_;
@@ -59,31 +59,29 @@ protected:
     labelList numRecFields_;
     labelList cumulativeNumRecFields_;
     label totNumRecFields_;
-    
+
     bool storeAveragedFields_;
 
     // matrix that contains the recurrence ERROR
     SymmetricSquareMatrix<scalar> recurrenceMatrix_;
-    
+
     // create a data structure for the time indices
     //	constant will not be contained
     //	runTimeIndex -> continuousIndex
     HashTable<label,word> timeIndexList_;
-    
+
     // create a data structure for the time values
     //	constant will not be contained
     //	continuousIndex -> time.value()
     HashTable<label,scalar> timeValueList_;
-    
+
     label contTimeIndex;
-    
+
     label lowerSeqLim_;
     label upperSeqLim_;
 
     scalar recTimeDilationFactor_;
-    
-    scalar checkTimeStep();
-    
+
     inline label getVolScalarFieldIndex(word, label = 0) const;
     inline label getVolVectorFieldIndex(word, label = 0) const;
     inline label getSurfaceScalarFieldIndex(word, label = 0) const;
@@ -91,6 +89,8 @@ protected:
     void init();
 
     void averageFieldSeries();
+
+    void checkTimeStep();
 
     void readFieldSeries();
 
@@ -151,6 +151,7 @@ public:
     label numDataBaseFields() const;
     
     void updateRecFields();
+    label currentTimeIndex() const;
     
     void writeRecMatrix() const;
 	

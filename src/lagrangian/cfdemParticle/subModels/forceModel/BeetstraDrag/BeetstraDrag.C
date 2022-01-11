@@ -117,8 +117,8 @@ BeetstraDrag::BeetstraDrag
         rhoP_=scalar(readScalar(propsDict_.lookup("rhoP")));
         rho_=scalar(readScalar(propsDict_.lookup("rho")));
         nuf_=scalar(readScalar(propsDict_.lookup("nuf")));
-	    scalar ut = terminalVelocity(1., dPrim_, nuf_, rho_, rhoP_, g_);
-	    scalar Frp = ut*ut/g_/dPrim_;
+        scalar ut = terminalVelocity(1., dPrim_, nuf_, rho_, rhoP_, g_);
+        scalar Frp = ut*ut/g_/dPrim_;
         Lc2_ = ut*ut/g_*pow(Frp, -.6666667); // n is hardcoded as -2/3
         Info << "using grid coarsening correction with Lc2 = " << Lc2_ << " and ut = " << ut << " and Frp = " << Frp<< endl;
 
@@ -153,7 +153,6 @@ void BeetstraDrag::setForce() const
     else if (particleCloud_.cg() > 1)
     {
         scaleDia_=particleCloud_.cg();
-        typeCG_[0] = scaleDia_;
         Info << "Beetstra using scale from liggghts cg = " << scaleDia_ << endl;
     }
 
@@ -164,14 +163,14 @@ void BeetstraDrag::setForce() const
     scalar voidfraction(1);
     vector Ufluid(0,0,0);
     vector drag(0,0,0);
-    label cellI=0;
+    label  cellI = 0;
 
     vector Us(0,0,0);
     vector Ur(0,0,0);
     scalar ds(0);
     scalar ds_scaled(0);
     scalar dSauter(0);
-    scalar scaleDia3 = typeCG_[0]*typeCG_[0]*typeCG_[0];
+    scalar scaleDia3 = scaleDia_*scaleDia_*scaleDia_;
     scalar nuf(0);
     scalar rho(0);
     scalar magUr(0);
@@ -180,7 +179,7 @@ void BeetstraDrag::setForce() const
     scalar GCcorr(1.);
     scalar PCcorr(1.);
 
-    scalar cg = typeCG_[0];
+    scalar cg = scaleDia_;
     label partType = 1;
 
     vector dragExplicit(0,0,0);
@@ -210,6 +209,7 @@ void BeetstraDrag::setForce() const
                     Ufluid       = UInterpolator_.interpolate(position,cellI);
                     //Ensure interpolated void fraction to be meaningful
                     // Info << " --> voidfraction: " << voidfraction << endl;
+
                     if (voidfraction > 1.00) voidfraction = 1.0;
                     if (voidfraction < minVoidfraction_) voidfraction = minVoidfraction_;
                 }
@@ -281,6 +281,7 @@ void BeetstraDrag::setForce() const
                 {
                     Pout << "cellI = " << cellI << endl;
                     Pout << "index = " << index << endl;
+                    Pout << "Ufluid = " << Ufluid << endl;
                     Pout << "Us = " << Us << endl;
                     Pout << "Ur = " << Ur << endl;
                     Pout << "ds = " << ds << endl;
@@ -290,7 +291,7 @@ void BeetstraDrag::setForce() const
                     Pout << "voidfraction = " << voidfraction << endl;
                     Pout << "Rep = " << Rep << endl;
                     Pout << "GCcorr = " << GCcorr << endl;
-		            Pout << "PCcorr = " << PCcorr << endl;
+                    Pout << "PCcorr = " << PCcorr << endl;
                     Pout << "drag = " << drag << endl;
                 }
 
@@ -332,7 +333,7 @@ double BeetstraDrag::F(double voidfraction, double Rep) const
                          );
 
 }
- 
+
 
 /*********************************************************
  * "A drag model for filtered Euler-Lagange simulations  *

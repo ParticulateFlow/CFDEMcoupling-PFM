@@ -1,0 +1,38 @@
+#################
+# insertion setup
+#################
+
+variable outerRing equal 4.61
+variable innerRing equal 4.1
+region insRegTop1a block -${outerRing} -${innerRing} -0.59 0.59 26.125 26.95 units box
+region insRegTop1b block -${innerRing} ${innerRing} -0.59 0.59 26.125 26.95 units box
+region insRegTop1c block ${innerRing} ${outerRing} -0.59 0.59 26.125 26.95 units box
+region insRegTop2 block -${outerRing} ${outerRing} -0.59 0.59 26.95 27.57 units box
+
+region regTop union 4 insRegTop1a insRegTop1b insRegTop1c insRegTop2
+variable nTop equal count(all,regTop)
+
+group secHighestCoke empty
+group secHighestOre empty
+group secHighestFineMix empty
+group highestFineMix empty
+group highestCoke empty
+group highestOre empty
+
+# ensure reasonable initialization
+group secHighestCoke union all secHighestCoke
+group highestCoke union all highestCoke
+group highestFineMix union all highestFineMix
+variable zMaxSecHighCoke equal bound(secHighestCoke,zmax)
+
+variable Nins equal 1000
+variable counter loop 1000
+variable insertedCoke equal mass(highestCoke)
+variable insertedOre equal mass(highestOre)
+variable insertedFineMix equal mass(highestFineMix)
+fix eeIns all execute ${Nins} "../../CFDDEM/DEM/in.insert" file conditional nTop 0 0.1
+
+variable time equal step*dt
+variable np equal count(all)
+fix printN all print 4000 "${time} ${np}" file ../DEM/monitor/Npart_CFDDEMflow.txt title "#time   n_p"
+fix printM all print 4000 "${time} ${insertedCoke} ${insertedOre} ${insertedFineMix} " file ../DEM/monitor/Mpart_CFDDEMflow.txt title "#time   m_C m_O m_FM"

@@ -80,11 +80,13 @@ PIMPLE
     
     residualControl
     {
-        U
+        /*U
         {
             relTol          0;
             tolerance       0.00001;
-        }
+        }*/
+        relTol          0;
+        tolerance       0.00001;
     }
 }
 

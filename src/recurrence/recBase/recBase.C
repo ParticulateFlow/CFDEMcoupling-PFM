@@ -37,6 +37,18 @@ recBase::recBase
     const fvMesh& mesh
 )
 :
+  regIOobject
+  (
+      IOobject
+      (
+          "recurrenceBase",
+          mesh.time().timeName(),
+          mesh,
+          IOobject::NO_READ,
+          IOobject::NO_WRITE,
+          true
+      )
+  ),
     mesh_(mesh),
     recProperties_
     (
@@ -83,6 +95,7 @@ recBase::recBase
     ),
     couplingSubStep_(recProperties_.lookupOrDefault<label>("couplingSubStep",0))
 {
+
     recModel_        ->  readFieldSeries();
     if (!recStatAnalysis_->suppressMatrixAndPath())
     {
@@ -98,6 +111,80 @@ recBase::recBase
         recModel_        ->  writeRecPath();
     }
 }
+recBase::recBase
+(
+    const fvMesh& mesh,const word recDictName_
+)
+:
+     regIOobject
+  (
+      IOobject
+      (
+          "recurrenceBase",
+          mesh.time().timeName(),
+          mesh,
+          IOobject::NO_READ,
+          IOobject::NO_WRITE,
+          true
+      )
+  ),
+    mesh_(mesh),
+    recProperties_
+    (
+        IOobject
+        (
+            recDictName_,
+            mesh_.time().constant(),
+            mesh_,
+            IOobject::MUST_READ,
+            IOobject::NO_WRITE
+        )
+    ),
+    recModel_
+    (
+        recModel::New
+        (
+            recProperties_,
+            *this
+        )
+    ),
+    recNorm_
+    (
+        recNorm::New
+        (
+            recProperties_,
+            *this
+        )
+    ),
+    recPath_
+    (
+        recPath::New
+        (
+            recProperties_,
+            *this
+        )
+    ),
+    recStatAnalysis_
+    (
+        recStatAnalysis::New
+        (
+            recProperties_,
+            *this
+        )
+    ),
+    couplingSubStep_(recProperties_.lookupOrDefault<label>("couplingSubStep",0))
+{
+  recModel_        ->  readFieldSeries();
+  recNorm_         ->  computeRecMatrix();
+  recPath_         ->  getRecPath();
+
+  recModel_        ->  init();
+
+  recModel_        ->  writeRecMatrix();
+  recModel_        ->  writeRecPath();
+}
+
+
 
 // * * * * * * * * * * * * * * * * Destructors  * * * * * * * * * * * * * * //
 recBase::~recBase()

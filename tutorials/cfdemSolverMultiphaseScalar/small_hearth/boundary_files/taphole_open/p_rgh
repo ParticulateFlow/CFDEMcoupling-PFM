@@ -1,0 +1,48 @@
+    outlet
+    {
+        type		codedFixedValue;
+        value           uniform 0;
+
+	redirectType    tapholePressure;
+	code
+	#{
+            const fvPatch& patchI = patch();
+	    const fvsPatchField<scalar>& phi = patch().lookupPatchField<surfaceScalarField, scalar>("phi");
+	    const fvPatchField<scalar>& rho = patch().lookupPatchField<volScalarField, scalar>("rho");
+	    scalarField& field = *this;
+	    
+
+	    scalar tapholeDiam = 0.05; // m
+	    scalar tapholeArea = M_PI/4*tapholeDiam*tapholeDiam; // m2
+	    scalar p0 = 0.0;  // Pa
+	    scalar kf = 1.0; // friction factor
+
+	    // get total flowrate and average viscosity and density
+	    scalar patchFlow = 0.0; // m3/s
+	    scalar phiRho = 0.0; // phi*rho
+	    forAll(patchI, faceI)
+	    {
+	        patchFlow += phi[faceI];
+		phiRho += phi[faceI]*rho[faceI];
+            }
+	    reduce(patchFlow, sumOp<scalar>()); // sum across procs
+	    reduce(phiRho,    sumOp<scalar>()); // sum across procs
+
+	    // calculate pressure drop
+	    scalar dP = 0;
+	    if (patchFlow>0) {
+		scalar tapholeRho = phiRho/patchFlow; // kg/m3
+	        scalar tapholeVel = patchFlow/tapholeArea; // m/2
+
+		dP = 0.5*tapholeRho*kf*tapholeVel*tapholeVel; // pressure drop, Pa
+
+		Info << "dP = " << dP << endl;
+	    }
+
+	    // set value
+	    forAll(patchI, faceI)
+	    {
+	        field[faceI] = p0 + dP;
+	    }
+        #};
+    }

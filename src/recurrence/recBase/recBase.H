@@ -46,6 +46,8 @@ class recStatAnalysis;
 \*---------------------------------------------------------------------------*/
 
 class recBase
+ :
+  public regIOobject
 {
 
 protected:
@@ -65,6 +67,7 @@ protected:
     // in case of substepping: couple passive quantity at this substep
     label couplingSubStep_;
 
+
 public:
 
       // Constructors
@@ -73,6 +76,11 @@ public:
     recBase
     (
             const fvMesh& mesh
+    );
+    //- Construct from mesh and a list of recProperties
+    recBase
+    (
+            const fvMesh& mesh, const word recDictName_
     );
 
     //- Destructor
@@ -93,6 +101,12 @@ public:
     void updateRecFields();
 
     label couplingSubStep() const;
+
+   // Dummy function for regIOobject
+    bool writeData(Ostream&) const
+    {
+        return true;
+    }
 
 };
 

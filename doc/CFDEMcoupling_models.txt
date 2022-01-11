@@ -37,6 +37,7 @@ The "chemistryModels"_chemistryModel.html keyword is used to specify a list of
 models used for chemical reaction calculations.
 
 "diffusionCoefficients"_chemistryModel_diffusionCoefficients.html,
+initMultiLayers,
 "massTransferCoeff"_chemistryModel_massTransferCoeff.html,
 "off"_chemistryModel_noChemistry.html,
 "reactantPerParticle"_chemistryModel_reactantPerParticle.html,
@@ -65,18 +66,28 @@ that performs the data exchange between the DEM code and the CFD code.
 "twoWayOne2One"_dataExchangeModel_twoWayOne2One.html :tb(c=2,ea=c)
 
 
-6.6 Energy models :h4
+6.6 Diffusion coefficient models :h4
+
+The {diffCoeffModel} keyword entry specifies the model for the diffusion
+coefficient of dissolved spieces in the fluid phase in the presence of particles.
+
+SyamlalDiffCoeff,
+off :tb(c=2,ea=c)
+
+
+6.7 Energy models :h4
 
 The {energyModels} keyword specifies a list of energy models used for e.g.
 compressible, reacting flows.
 
-heatTransferGranConduction,
 heatTransferGunn,
+heatTransferInterGrain,
 heatTransferRanzMarshall,
-reactionHeat :tb(c=2,ea=c)
+reactionHeat,
+wallHeatTransferYagi :tb(c=2,ea=c)
 
 
-6.7 Force models :h4
+6.8 Force models :h4
 
 The "forceModels"_forceModel.html keyword specifies a list of models that exert
 a force on each DEM particle.
@@ -86,15 +97,15 @@ a force on each DEM particle.
 "BeetstraDrag"_forceModel_BeetstraDrag.html,
 BeetstraDragPoly,
 "DiFeliceDrag"_forceModel_DiFeliceDrag.html,
-"dSauter"_forceModel_dSauter.html,
 Fines,
 "GidaspowDrag"_forceModel_GidaspowDrag.html,
 "KochHillDrag"_forceModel_KochHillDrag.html,
 "LaEuScalarTemp"_forceModel_LaEuScalarTemp.html,
 "MeiLift"_forceModel_MeiLift.html,
+"ParmarBassetForce"_forceModel_ParmarBassetForce.html,
 "SchillerNaumannDrag"_forceModel_SchillerNaumannDrag.html,
 "ShirgaonkarIB"_forceModel_ShirgaonkarIB.html,
-dSauter,
+"dSauter"_forceModel_dSauter.html,
 deactivateForce,
 directedDiffusiveRelaxation,
 evaluateFluctuations,
@@ -112,12 +123,15 @@ particleDeformation,
 "pdCorrelation"_forceModel_pdCorrelation.html,
 potentialRelaxation,
 "surfaceTensionForce"_forceModel_surfaceTensionForce.html,
+terminalVelocity,
+turbulentDispersion,
+turbulentVelocityFluctuations,
 "virtualMassForce"_forceModel_virtualMassForce.html,
 "viscForce"_forceModel_viscForce.html,
 "volWeightedAverage"_forceModel_volWeightedAverage.html :tb(c=2,ea=c)
 
 
-6.7.1 Force sub-models :h5
+6.8.1 Force sub-models :h5
 
 The "forceSubModels"_forceSubModel.html keyword specifies a list
 of models that hold settings for a force model.
@@ -127,7 +141,7 @@ ScaleForce,
 scaleForceBoundary :tb(c=2,ea=c)
 
 
-6.8 LIGGGHTS command models :h4,link(lcm)
+6.9 LIGGGHTS command models :h4,link(lcm)
 
 The "liggghtsCommandModels"_liggghtsCommandModel.html keyword specifies a list
 of models that execute LIGGGHTS commands within a CFD run.
@@ -138,7 +152,7 @@ of models that execute LIGGGHTS commands within a CFD run.
 "writeLiggghts"_liggghtsCommandModel_writeLiggghts.html :tb(c=2,ea=c)
 
 
-6.9 Locate models :h4
+6.10 Locate models :h4
 
 The "locateModel"_locateModel.html keyword entry specifies the model used to
 search the CFD mesh for the CFD cell corresponding to a given position.
@@ -150,7 +164,15 @@ search the CFD mesh for the CFD cell corresponding to a given position.
 "turboEngine"_locateModel_turboEngineSearch.html :tb(c=2,ea=c)
 
 
-6.10 Mesh motion models :h4
+6.11 Mass transfer models :h4
+
+The {massTransferModels} keyword specifies a list of mass transfer models used
+for evaluating species transfer between particles and fluids.
+
+massTransferGunn :tb(c=2,ea=c)
+
+
+6.12 Mesh motion models :h4
 
 The "meshMotionModel"_meshMotionModel.html keyword entry specifies the model
 used to manipulate the CFD mesh according to the DEM mesh motion.
@@ -158,7 +180,7 @@ used to manipulate the CFD mesh according to the DEM mesh motion.
 "noMeshMotion"_meshMotionModel_noMeshMotion.html :tb(c=2,ea=c)
 
 
-6.11 Momentum coupling models :h4
+6.13 Momentum coupling models :h4
 
 The "momCoupleModels"_momCoupleModel.html keyword specifies a list of models
 used for momentum exchange between DEM and CFD simulation
@@ -169,17 +191,18 @@ deactivateCouple,
 "off"_momCoupleModel_noCouple.html :tb(c=2,ea=c)
 
 
-6.12 Other force models :h4
+6.14 Other force models :h4
 
 The {otherForceModels} keyword specifies a list of models that exert a force on
 each DEM particle.
 
 expParticleForces,
 gravity,
+secondaryPhaseInducedBuoyancy,
 weightSecondaryPhase :tb(c=2,ea=c)
 
 
-6.13 Probe models :h4
+6.15 Probe models :h4
 
 The "probeModel"_probeModel.html keyword entry specifies the probing features in
 CFDEMcoupling simulations.
@@ -188,7 +211,7 @@ CFDEMcoupling simulations.
 "particleProbe"_probeModel_particleProbe.html :tb(c=2,ea=c)
 
 
-6.14 Region models :h4
+6.16 Region models :h4
 
 The "regionModel"_regionModel.html keyword entry specifies the model used to
 select a certain region for coupled simulations.
@@ -196,17 +219,18 @@ select a certain region for coupled simulations.
 "allRegion"_regionModel_allRegion.html :tb(c=2,ea=c)
 
 
-6.15 Smoothing models :h4
+6.17 Smoothing models :h4
 
 The "smoothingModel"_smoothingModel.html keyword entry specifies the model for
 smoothing the exchange fields.
 
+"constDiffAndTemporalSmoothing"_smoothingModel_constDiffAndTemporalSmoothing.html,
 "constDiffSmoothing"_smoothingModel_constDiffSmoothing.html,
 "off"_smoothingModel_noSmoothing.html,
 "temporalSmoothing"_smoothingModel_temporalSmoothing.html :tb(c=2,ea=c)
 
 
-6.16 Thermal conductivity models :h4
+6.18 Thermal conductivity models :h4
 
 The {thermCondModel} keyword entry specifies the model for the thermal
 conductivity of the fluid phase in the presence of particles.
@@ -216,7 +240,7 @@ ZehnerSchluenderThermCond,
 off :tb(c=2,ea=c)
 
 
-6.17 Void fraction models :h4
+6.19 Void fraction models :h4
 
 The "voidFractionModel"_voidFractionModel.html keyword entry specifies the model
 accounting for the volume of the particles in the CFD domain.
@@ -228,4 +252,5 @@ accounting for the volume of the particles in the CFD domain.
 "divided"_voidFractionModel_dividedVoidFraction.html,
 off,
 trilinear :tb(c=2,ea=c)
+
 

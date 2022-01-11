@@ -43,17 +43,19 @@ class BeetstraDragPoly
 protected:
 
     const bool fines_;
-    
+
     scalar dFine_;
 
     volScalarField* alphaP_;
-    
+
     volScalarField* alphaSt_;
 
     volScalarField* dSauter_;
 
+    volScalarField* dSauterMix_;
+
     scalar effDiameter(double, label, label) const;
-    
+
     scalar meanSauterDiameter(double, label) const;
 
 public:

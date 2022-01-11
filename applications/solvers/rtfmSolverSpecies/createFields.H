@@ -132,4 +132,3 @@
 
     T.write();
 
-    scalar relaxCoeff(0.0);

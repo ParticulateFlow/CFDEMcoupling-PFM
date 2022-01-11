@@ -1,6 +1,6 @@
 /*---------------------------------------------------------------------------*\
     CFDEMcoupling academic - Open Source CFD-DEM coupling
-    
+
     Contributing authors:
     Thomas Lichtenegger
     Copyright (C) 2015- Johannes Kepler University, Linz
@@ -54,7 +54,34 @@ deactivateCouple::deactivateCouple
     cfdemCloud& sm
 )
 :
-    momCoupleModel(dict,sm)
+    momCoupleModel(dict,sm),
+    fEmpty_
+    (   IOobject
+        (
+            "fEmpty",
+            sm.mesh().time().timeName(),
+            sm.mesh(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        sm.mesh(),
+        dimensionedVector("zero", dimensionSet(1,-2,-2,0,0), vector::zero),
+        "zeroGradient"
+    ),
+    KslEmpty_
+    (
+        IOobject
+        (
+            "KslEmpty",
+            sm.mesh().time().timeName(),
+            sm.mesh(),
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        sm.mesh(),
+        dimensionedScalar("zero", dimensionSet(1,-3,-1,0,0), 0),
+        "zeroGradient"
+    )
 {}
 
 
@@ -65,9 +92,21 @@ deactivateCouple::~deactivateCouple()
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-void Foam::deactivateCouple::resetMomSourceField()
+void deactivateCouple::resetMomSourceField()
 {}
 
+tmp<volVectorField> deactivateCouple::expMomSource()
+{
+    tmp<volVectorField> tsource(fEmpty_);
+    return tsource;
+}
+
+tmp<volScalarField> deactivateCouple::impMomSource()
+{
+    tmp<volScalarField> tsource(KslEmpty_);
+    return tsource;
+
+}
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam

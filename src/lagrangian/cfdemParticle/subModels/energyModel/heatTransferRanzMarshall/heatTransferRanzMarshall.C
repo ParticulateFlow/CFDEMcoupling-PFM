@@ -54,6 +54,7 @@ heatTransferRanzMarshall::heatTransferRanzMarshall
     Tmax_(propsDict_.lookupOrDefault<scalar>("Tmax",1e6)),
     totalHeatFlux_(0.0),
     NusseltScalingFactor_(1.0),
+    NusseltConstParameter_(propsDict_.lookupOrDefault<scalar>("NusseltConstParameter",0.6)),
     QPartFluidName_(propsDict_.lookupOrDefault<word>("QPartFluidName","QPartFluid")),
     QPartFluid_
     (   IOobject
@@ -168,6 +169,15 @@ heatTransferRanzMarshall::heatTransferRanzMarshall
         Info << "NusseltScalingFactor set to: " << NusseltScalingFactor_ << endl;
     }
 
+    if (NusseltConstParameter_ < 0.6 || NusseltConstParameter_ > 1.8)
+    {
+        Warning << "NusseltConstParameter set to: " << NusseltConstParameter_ << " outside the range [0.6,1.8]" << endl;
+    }
+    else
+    {
+        Info << "NusseltConstParameter set to: " << NusseltConstParameter_ << endl;
+    }
+
     if (propsDict_.found("maxSource"))
     {
         maxSource_=readScalar(propsDict_.lookup ("maxSource"));
@@ -266,6 +276,9 @@ void heatTransferRanzMarshall::calcEnergyContribution()
        const volScalarField mufField = particleCloud_.turbulence().nu()*rho_;
     #endif
 
+    const volScalarField& CpField_ = CpField();
+    const volScalarField& kf0Field_ = kf0Field();
+
     if (typeCG_.size()>1 || typeCG_[0] > 1)
     {
         Info << "heatTransferRanzMarshall using scale = " << typeCG_ << endl;
@@ -284,7 +297,7 @@ void heatTransferRanzMarshall::calcEnergyContribution()
     vector Us(0,0,0);
     scalar ds(0);
     scalar ds_scaled(0);
-    scalar scaleDia3 = typeCG_[0]*typeCG_[0]*typeCG_[0];
+    scalar scaleDia3 = scaleDia_*scaleDia_*scaleDia_;
     scalar muf(0);
     scalar magUr(0);
     scalar Rep(0);
@@ -293,7 +306,7 @@ void heatTransferRanzMarshall::calcEnergyContribution()
     scalar Tsum(0.0);
     scalar Nsum(0.0);
 
-    scalar cg = typeCG_[0];
+    scalar cg = scaleDia_;
     label partType = 1;
 
     interpolationCellPoint<scalar> voidfractionInterpolator_(voidfraction_);
@@ -338,6 +351,9 @@ void heatTransferRanzMarshall::calcEnergyContribution()
                 ds = 2.*particleCloud_.radius(index);
                 ds_scaled = ds/cg;
 
+                scalar kf0 = kf0Field_[cellI];
+                scalar Cp  = CpField_[cellI];
+
                 if (expNusselt_)
                 {
                     Nup = NuField_[cellI];
@@ -350,7 +366,7 @@ void heatTransferRanzMarshall::calcEnergyContribution()
                     magUr = mag(Ufluid - Us);
                     muf = mufField[cellI];
                     Rep = ds_scaled * magUr * voidfraction * rho_[cellI]/ muf;
-                    Pr = max(SMALL, Cp_ * muf / kf0_);
+                    Pr = max(SMALL, Cp * muf / kf0);
                     Nup = Nusselt(voidfraction, Rep, Pr);
                 }
                 Nup *= NusseltScalingFactor_;
@@ -358,7 +374,7 @@ void heatTransferRanzMarshall::calcEnergyContribution()
                 Tsum += partTemp_[index][0];
                 Nsum += 1.0;
 
-                scalar h = kf0_ * Nup / ds_scaled;
+                scalar h = kf0 * Nup / ds_scaled;
                 scalar As = ds_scaled * ds_scaled * M_PI; // surface area of sphere
 
                 // calc convective heat flux [W]
@@ -485,7 +501,7 @@ void heatTransferRanzMarshall::addEnergyCoefficient(volScalarField& Qsource) con
 
 scalar heatTransferRanzMarshall::Nusselt(scalar voidfraction, scalar Rep, scalar Pr) const
 {
-    return (2 + 0.6 * Foam::pow(Rep,0.5) * Foam::pow(Pr,0.33));
+    return (2.0 + NusseltConstParameter_ * Foam::sqrt(Rep) * Foam::cbrt(Pr));
 }
 
 void heatTransferRanzMarshall::heatFlux(label index, scalar h, scalar As, scalar Tfluid, scalar cg3)

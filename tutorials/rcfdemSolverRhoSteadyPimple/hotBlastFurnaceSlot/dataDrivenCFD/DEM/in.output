@@ -1,0 +1,22 @@
+########
+# output
+########
+
+compute		1 all erotate/sphere
+thermo_style	custom step atoms ke c_1 vol 
+thermo		100
+thermo_modify	lost ignore norm no
+compute_modify	thermo_temp dynamic yes
+
+dump		dmp1 all custom/vtk ${Ndump} ../DEM/post/dump*.dataDrivenCFD.vtk id type radius x y z vx vy vz fx fy fz mass f_Temp[0] f_convectiveHeatFlux[0] f_vfluc[1] f_vfluc[2] f_vfluc[3]
+
+# calculate average particle temperature
+variable time equal step*dt
+variable currStep equal step
+region      total block INF INF INF INF INF INF units box
+variable np equal count(all,total)
+compute sumtemp all reduce/region total sum f_Temp[0]
+variable sumT1 equal c_sumtemp
+variable Tave equal v_sumT1/v_np
+
+fix printheat all print 120 "${time} ${Tave}" append ../DEM/monitor/temp_ave.txt title "#time   T_ave"

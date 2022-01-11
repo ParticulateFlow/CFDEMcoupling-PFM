@@ -52,7 +52,8 @@ BeetstraDragPoly::BeetstraDragPoly
     dFine_(1.0),
     alphaP_(NULL),
     alphaSt_(NULL),
-    dSauter_(NULL)
+    dSauter_(NULL),
+    dSauterMix_(NULL)
 {
     // if fines are present, take mixture dSauter, otherwise normal dSauter
     if (fines_)
@@ -63,13 +64,11 @@ BeetstraDragPoly::BeetstraDragPoly
         volScalarField& alphaSt(const_cast<volScalarField&>(sm.mesh().lookupObject<volScalarField> ("alphaSt")));
         alphaSt_ = &alphaSt;
         volScalarField& dSauter(const_cast<volScalarField&>(sm.mesh().lookupObject<volScalarField> ("dSauterMix")));
-        dSauter_ = &dSauter;
+        dSauterMix_ = &dSauter;
     }
-    else
-    {
-        volScalarField& dSauter(const_cast<volScalarField&>(sm.mesh().lookupObject<volScalarField> ("dSauter")));
-        dSauter_ = &dSauter;
-    }
+
+    volScalarField& dSauter(const_cast<volScalarField&>(sm.mesh().lookupObject<volScalarField> ("dSauter")));
+    dSauter_ = &dSauter;
 }
 
 
@@ -84,15 +83,19 @@ scalar BeetstraDragPoly::effDiameter(double d, label cellI, label index) const
 {
     scalar dS = (*dSauter_)[cellI];
     scalar effD = d*d / dS + 0.064*d*d*d*d / (dS*dS*dS);
-    
+
     if (fines_)
     {
-        scalar fineCorr = dFine_*dFine_ / dS + 0.064*dFine_*dFine_*dFine_*dFine_ / (dS*dS*dS);
-        fineCorr *= d*d*d / (dFine_*dFine_*dFine_) * (*alphaSt_)[cellI] / (*alphaP_)[cellI];
-        effD += fineCorr;
+        scalar dSMix = (*dSauterMix_)[cellI];
+        scalar aP = (*alphaP_)[cellI];
+        scalar aSt = (*alphaSt_)[cellI];
+
+        effD = d*d*dS + 0.064*d*d*d*d / dS;
+        effD *= 1.0 / (dSMix*dSMix);
+        effD *= (aP + aSt)/aP;
     }
-    
-    if (particleCloud_.getParticleEffVolFactors()) 
+
+    if (particleCloud_.getParticleEffVolFactors())
     {
         scalar effVolFac = particleCloud_.particleEffVolFactor(index);
         effD *= effVolFac;
@@ -103,7 +106,14 @@ scalar BeetstraDragPoly::effDiameter(double d, label cellI, label index) const
 
 scalar BeetstraDragPoly::meanSauterDiameter(double d, label cellI) const
 {
-    return (*dSauter_)[cellI];
+    if (fines_)
+    {
+        return (*dSauterMix_)[cellI];
+    }
+    else
+    {
+        return (*dSauter_)[cellI];
+    }
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

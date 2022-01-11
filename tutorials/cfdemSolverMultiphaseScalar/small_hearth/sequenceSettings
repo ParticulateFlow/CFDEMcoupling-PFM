@@ -1,0 +1,7 @@
+#stepName	startTime	endTime
+taphole_open	00.0		10.0
+taphole_closed	10.0		20.0
+taphole_open	20.0		30.0
+taphole_closed	30.0		40.0
+taphole_open	40.0		50.0
+taphole_closed	50.0		60.0

@@ -93,7 +93,11 @@ protected:
 
     const bool ignore_;
 
+    const bool multiphase_;
+
     bool allowCFDsubTimestep_;
+
+    const bool modelCheck_;
 
     const bool limitDEMForces_;
 
@@ -104,6 +108,12 @@ protected:
     const bool getParticleEffVolFactors_;
 
     const bool getParticleTypes_;
+
+    const bool getParticleAngVels_;
+
+    const bool streamingMode_;
+
+    const bool streamingFluc_;
 
     scalar maxDEMForce_;
 
@@ -138,6 +148,8 @@ protected:
     double **particleEffVolFactors_; // per particle volume factor
 
     int **particleTypes_; // per particle type
+
+    double **particleAngVels_; // particle angular velocities
 
     double **particleWeights_; // particle weights
 
@@ -291,6 +303,8 @@ public:
 
        label liggghtsCommandModelIndex(const word&) const;
 
+       inline void scaleForce(int, scalar);
+
        inline void setCG(double);
 
        inline scalar cg() const;
@@ -305,11 +319,15 @@ public:
 
        inline bool ignore() const;
 
+       inline bool modelCheck() const;
+
        inline const fvMesh& mesh() const;
 
        inline bool solveFlow() const;
 
        inline bool verbose() const;
+
+       inline bool multiphase() const;
 
        inline const IOdictionary& couplingProperties() const;
 
@@ -371,6 +389,10 @@ public:
        inline bool getParticleTypes() const;
        virtual inline int ** particleTypes() const;
        virtual inline label particleType(label index) const;
+
+       inline bool getParticleAngVels() const;
+       virtual inline double ** particleAngVels() const;
+       virtual vector particleAngVel(label index) const;
 
        //access to the particle's rotation and torque data
        virtual inline double ** DEMTorques() const {return NULL;}

@@ -43,6 +43,7 @@ Rules
 #include "cfdemCloudRec.H"
 #include "recBase.H"
 #include "recModel.H"
+#include "recPath.H"
 
 #include "cfdemCloud.H"
 #include "clockModel.H"
@@ -57,7 +58,8 @@ int main(int argc, char *argv[])
     #include "createMesh.H"
     #include "createControl.H"
     #include "createFields.H"
-    #include "createFvOptions.H"
+
+    #include "readGravitationalAcceleration.H"
 
     cfdemCloudRec<cfdemCloud> particleCloud(mesh);
     recBase recurrenceBase(mesh);
@@ -67,8 +69,8 @@ int main(int argc, char *argv[])
     Info << "\nCalculating particle trajectories based on recurrence statistics\n" << endl;
 
     label recTimeIndex = 0;
-    scalar recTimeStep = recurrenceBase.recM().recTimeStep();
-    scalar startTime = runTime.startTime().value();
+    label stepCounter = 0;
+    label recTimeStep2CFDTimeStep = recurrenceBase.recM().recTimeStep2CFDTimeStep();
 
     while (runTime.run())
     {
@@ -85,12 +87,16 @@ int main(int argc, char *argv[])
 
         particleCloud.clockM().stop("Coupling");
 
+        stepCounter++;
 
-        if ( runTime.timeOutputValue() - startTime - (recTimeIndex+1)*recTimeStep + 1.0e-5 > 0.0 )
+        if (stepCounter == recTimeStep2CFDTimeStep)
         {
+            Info << "updating recurrence fields at time " << runTime.timeName() << "with recTimeIndex = " << recTimeIndex << nl << endl;
             recurrenceBase.updateRecFields();
-            #include "readFields.H"
+            #include "updateFields.H"
             recTimeIndex++;
+            stepCounter = 0;
+            recTimeStep2CFDTimeStep = recurrenceBase.recM().recTimeStep2CFDTimeStep();
         }
 
         particleCloud.clockM().start(27,"Output");
@@ -102,7 +108,6 @@ int main(int argc, char *argv[])
         Info << "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
              << "  ClockTime = " << runTime.elapsedClockTime() << " s"
              << nl << endl;
-
     }
 
     Info << "End\n" << endl;

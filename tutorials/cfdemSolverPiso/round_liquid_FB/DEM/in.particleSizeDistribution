@@ -1,0 +1,59 @@
+# Particle size distribution for LIGGGHTS
+
+# normal distribution
+# mean radius = 0.000775 m 
+# standard deviation = 0.000080 m 
+# density = 2575 kg/m3 
+ 
+fix	pts1 all particletemplate/sphere 10007 atom_type 1 density constant 2575 radius constant 0.000540
+fix	pts2 all particletemplate/sphere 10009 atom_type 1 density constant 2575 radius constant 0.000549
+fix	pts3 all particletemplate/sphere 10037 atom_type 1 density constant 2575 radius constant 0.000559
+fix	pts4 all particletemplate/sphere 10039 atom_type 1 density constant 2575 radius constant 0.000569
+fix	pts5 all particletemplate/sphere 10061 atom_type 1 density constant 2575 radius constant 0.000578
+fix	pts6 all particletemplate/sphere 10067 atom_type 1 density constant 2575 radius constant 0.000588
+fix	pts7 all particletemplate/sphere 10069 atom_type 1 density constant 2575 radius constant 0.000597
+fix	pts8 all particletemplate/sphere 10079 atom_type 1 density constant 2575 radius constant 0.000607
+fix	pts9 all particletemplate/sphere 10091 atom_type 1 density constant 2575 radius constant 0.000617
+fix	pts10 all particletemplate/sphere 10093 atom_type 1 density constant 2575 radius constant 0.000626
+fix	pts11 all particletemplate/sphere 10099 atom_type 1 density constant 2575 radius constant 0.000636
+fix	pts12 all particletemplate/sphere 10103 atom_type 1 density constant 2575 radius constant 0.000645
+fix	pts13 all particletemplate/sphere 10111 atom_type 1 density constant 2575 radius constant 0.000655
+fix	pts14 all particletemplate/sphere 10133 atom_type 1 density constant 2575 radius constant 0.000665
+fix	pts15 all particletemplate/sphere 10139 atom_type 1 density constant 2575 radius constant 0.000674
+fix	pts16 all particletemplate/sphere 10141 atom_type 1 density constant 2575 radius constant 0.000684
+fix	pts17 all particletemplate/sphere 10151 atom_type 1 density constant 2575 radius constant 0.000693
+fix	pts18 all particletemplate/sphere 10159 atom_type 1 density constant 2575 radius constant 0.000703
+fix	pts19 all particletemplate/sphere 10163 atom_type 1 density constant 2575 radius constant 0.000713
+fix	pts20 all particletemplate/sphere 10169 atom_type 1 density constant 2575 radius constant 0.000722
+fix	pts21 all particletemplate/sphere 10177 atom_type 1 density constant 2575 radius constant 0.000732
+fix	pts22 all particletemplate/sphere 10181 atom_type 1 density constant 2575 radius constant 0.000741
+fix	pts23 all particletemplate/sphere 10193 atom_type 1 density constant 2575 radius constant 0.000751
+fix	pts24 all particletemplate/sphere 10211 atom_type 1 density constant 2575 radius constant 0.000761
+fix	pts25 all particletemplate/sphere 10223 atom_type 1 density constant 2575 radius constant 0.000770
+fix	pts26 all particletemplate/sphere 10243 atom_type 1 density constant 2575 radius constant 0.000780
+fix	pts27 all particletemplate/sphere 10247 atom_type 1 density constant 2575 radius constant 0.000789
+fix	pts28 all particletemplate/sphere 10253 atom_type 1 density constant 2575 radius constant 0.000799
+fix	pts29 all particletemplate/sphere 10259 atom_type 1 density constant 2575 radius constant 0.000809
+fix	pts30 all particletemplate/sphere 10267 atom_type 1 density constant 2575 radius constant 0.000818
+fix	pts31 all particletemplate/sphere 10271 atom_type 1 density constant 2575 radius constant 0.000828
+fix	pts32 all particletemplate/sphere 10273 atom_type 1 density constant 2575 radius constant 0.000837
+fix	pts33 all particletemplate/sphere 10289 atom_type 1 density constant 2575 radius constant 0.000847
+fix	pts34 all particletemplate/sphere 10301 atom_type 1 density constant 2575 radius constant 0.000857
+fix	pts35 all particletemplate/sphere 10303 atom_type 1 density constant 2575 radius constant 0.000866
+fix	pts36 all particletemplate/sphere 10313 atom_type 1 density constant 2575 radius constant 0.000876
+fix	pts37 all particletemplate/sphere 10321 atom_type 1 density constant 2575 radius constant 0.000885
+fix	pts38 all particletemplate/sphere 10331 atom_type 1 density constant 2575 radius constant 0.000895
+fix	pts39 all particletemplate/sphere 10333 atom_type 1 density constant 2575 radius constant 0.000905
+fix	pts40 all particletemplate/sphere 10337 atom_type 1 density constant 2575 radius constant 0.000914
+fix	pts41 all particletemplate/sphere 10343 atom_type 1 density constant 2575 radius constant 0.000924
+fix	pts42 all particletemplate/sphere 10357 atom_type 1 density constant 2575 radius constant 0.000933
+fix	pts43 all particletemplate/sphere 10369 atom_type 1 density constant 2575 radius constant 0.000943
+fix	pts44 all particletemplate/sphere 10391 atom_type 1 density constant 2575 radius constant 0.000953
+fix	pts45 all particletemplate/sphere 10399 atom_type 1 density constant 2575 radius constant 0.000962
+fix	pts46 all particletemplate/sphere 10427 atom_type 1 density constant 2575 radius constant 0.000972
+fix	pts47 all particletemplate/sphere 10429 atom_type 1 density constant 2575 radius constant 0.000981
+fix	pts48 all particletemplate/sphere 10433 atom_type 1 density constant 2575 radius constant 0.000991
+fix	pts49 all particletemplate/sphere 10453 atom_type 1 density constant 2575 radius constant 0.001001
+fix	pts50 all particletemplate/sphere 10457 atom_type 1 density constant 2575 radius constant 0.001010
+
+fix	pdd1 all particledistribution/discrete 10459 50 pts1 0.000637 pts2 0.000900 pts3 0.001254 pts4 0.001721 pts5 0.002329 pts6 0.003106 pts7 0.004084 pts8 0.005292 pts9 0.006760 pts10 0.008512 pts11 0.010564 pts12 0.012923 pts13 0.015584 pts14 0.018524 pts15 0.021703 pts16 0.025064 pts17 0.028532 pts18 0.032016 pts19 0.035412 pts20 0.038607 pts21 0.041490 pts22 0.043949 pts23 0.045890 pts24 0.047231 pts25 0.047916 pts26 0.047916 pts27 0.047231 pts28 0.045890 pts29 0.043949 pts30 0.041490 pts31 0.038607 pts32 0.035412 pts33 0.032016 pts34 0.028532 pts35 0.025064 pts36 0.021703 pts37 0.018524 pts38 0.015584 pts39 0.012923 pts40 0.010564 pts41 0.008512 pts42 0.006760 pts43 0.005292 pts44 0.004084 pts45 0.003106 pts46 0.002329 pts47 0.001721 pts48 0.001254 pts49 0.000900 pts50 0.000637
