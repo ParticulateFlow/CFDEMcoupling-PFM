@@ -4,5 +4,4 @@ cfdemSolverRhoPimple/dir
 cfdemSolverIB/dir
 cfdemSolverPisoScalar/dir
 cfdemSolverIBTorque/dir
-cfdemSolverPimpleIB/dir
 cfdemSolverIBRO/dir
