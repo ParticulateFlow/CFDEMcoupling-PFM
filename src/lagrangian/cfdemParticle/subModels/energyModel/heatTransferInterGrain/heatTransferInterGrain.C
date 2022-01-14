@@ -426,8 +426,6 @@ void heatTransferInterGrain::calcPartThermRad()
 
 scalar heatTransferInterGrain::FE(scalar voidfraction, scalar emissivity, scalar L)
 {
-    if (voidfraction < 1 - SMALL) return 1.0; // limit of voidfraction -> 1.0
-
     scalar B = 1.25 * pow((1-voidfraction)/voidfraction,1.111);
     scalar sqrt_aP = sqrt(1-voidfraction);
     scalar x = 2.0/emissivity - 1.0;

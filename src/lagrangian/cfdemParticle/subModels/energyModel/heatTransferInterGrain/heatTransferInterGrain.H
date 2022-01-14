@@ -104,7 +104,7 @@ protected:
 
     const scalar TMin = 10.0;
 
-    const scalar voidfracMax = 0.95;
+    const scalar voidfracMax = 0.8; // maximum voidfraction for which B-B correlation is valid; TODO: check value!
 
     const scalar voidfracMin = 0.05;
 
