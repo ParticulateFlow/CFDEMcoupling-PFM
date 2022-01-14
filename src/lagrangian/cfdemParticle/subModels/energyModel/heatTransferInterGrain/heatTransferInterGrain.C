@@ -283,8 +283,6 @@ void heatTransferInterGrain::calcEnergyContribution()
         if(cellI >= 0)
         {
             voidfraction = voidfraction_[cellI];
-            if (voidfraction < 0.01)
-                voidfraction = 0.01;
 
             partVolume = particleCloud_.particleVolume(index);
             QPartPart = QPartPart_[cellI];
