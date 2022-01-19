@@ -79,6 +79,7 @@ int main(int argc, char *argv[])
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
     Info<< "\nStarting time loop\n" << endl;
+    bool firstStep = true;
 
     while (runTime.run())
     {
@@ -135,6 +136,11 @@ int main(int argc, char *argv[])
             if (pimple.firstIter())
             {
                 #include "rhoEqn.H"
+                if (firstStep)
+                {
+                    rhoeps.oldTime() = rho.oldTime()*voidfraction.oldTime();
+                    firstStep = false;
+                }
                 rhoeps = rho*voidfraction;
             }
 #endif

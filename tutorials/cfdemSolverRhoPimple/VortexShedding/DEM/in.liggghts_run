@@ -10,6 +10,9 @@
 # copyright: 2021- JKU Linz                                                    #
 ################################################################################
 
+log             ../DEM/log.liggghts
+thermo_log      ../DEM/post/thermo.txt
+
 # define the attributes associated with the particles,
 # 'granular' (or 'sphere') style uses diameter, mass and angular velocity
 atom_style      granular
