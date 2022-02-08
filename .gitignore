@@ -8,7 +8,7 @@ log.*
 *.swp
 *.swo
 
-**/linux*Gcc*/
+**/linux*cc*/
 **/.vscode
 
 lnInclude
