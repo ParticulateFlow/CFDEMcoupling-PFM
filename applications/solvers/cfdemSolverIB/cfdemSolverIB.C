@@ -6,7 +6,8 @@
                                 Christoph Goniva, christoph.goniva@cfdem.com
                                 Copyright (C) 1991-2009 OpenCFD Ltd.
                                 Copyright (C) 2009-2012 JKU, Linz
-                                Copyright (C) 2012-     DCS Computing GmbH,Linz
+                                Copyright (C) 2012-2015 DCS Computing GmbH,Linz
+                                Copyright (C) 2015-     JKU, Linz
 -------------------------------------------------------------------------------
 License
     This file is part of CFDEMcoupling.
@@ -29,11 +30,14 @@ Application
 
 Description
     Transient solver for incompressible flow.
-    The code is an evolution of the solver pisoFoam in OpenFOAM(R) 1.6, 
+    The code is an evolution of the solver pisoFoam in OpenFOAM(R) 1.6,
     where additional functionality for CFD-DEM coupling using immersed body
     (fictitious domain) method is added.
 Contributions
     Alice Hager
+    Daniel Queteschiner
+    Thomas Lichtenegger
+    Achuth N. Balachandran Nair
 \*---------------------------------------------------------------------------*/
 
 

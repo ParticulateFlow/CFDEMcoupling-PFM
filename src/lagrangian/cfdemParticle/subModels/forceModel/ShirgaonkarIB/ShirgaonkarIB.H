@@ -5,7 +5,8 @@
     www.cfdem.com
                                 Christoph Goniva, christoph.goniva@cfdem.com
                                 Copyright 2009-2012 JKU Linz
-                                Copyright 2012-     DCS Computing GmbH, Linz
+                                Copyright 2012-2015 DCS Computing GmbH, Linz
+                                Copyright 2015-     JKU Linz
 -------------------------------------------------------------------------------
 License
     This file is part of CFDEMcoupling.

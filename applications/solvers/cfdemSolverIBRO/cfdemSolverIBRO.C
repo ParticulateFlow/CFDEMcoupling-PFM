@@ -3,10 +3,10 @@
 
     CFDEMcoupling is part of the CFDEMproject
     www.cfdem.com
-                                Christoph Goniva, christoph.goniva@cfdem.com
                                 Copyright (C) 1991-2009 OpenCFD Ltd.
                                 Copyright (C) 2009-2012 JKU, Linz
-                                Copyright (C) 2012-     DCS Computing GmbH,Linz
+                                Copyright (C) 2012-2015 DCS Computing GmbH,Linz
+                                Copyright (C) 2015-     JKU, Linz
 -------------------------------------------------------------------------------
 License
     This file is part of CFDEMcoupling.
@@ -25,15 +25,16 @@ License
     along with CFDEMcoupling.  If not, see <http://www.gnu.org/licenses/>.
 
 Application
-    cfdemSolverIB
+    cfdemSolverIBRO
 
 Description
     Transient solver for incompressible flow.
-    The code is an evolution of the solver pisoFoam in OpenFOAM(R) 1.6, 
+    The code is an evolution of the solver pisoFoam in OpenFOAM(R) 1.6,
     where additional functionality for CFD-DEM coupling using immersed body
-    (fictitious domain) method is added.
+    (fictitious domain) method and a continuous forcing approach is added.
 Contributions
     Alice Hager
+    Achuth N. Balachandran Nair
 \*---------------------------------------------------------------------------*/
 
 
