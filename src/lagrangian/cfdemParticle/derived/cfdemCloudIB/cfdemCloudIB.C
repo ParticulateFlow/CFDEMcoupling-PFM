@@ -83,7 +83,6 @@ cfdemCloudIB::~cfdemCloudIB()
 void cfdemCloudIB::getDEMdata()
 {
     cfdemCloud::getDEMdata();
-    Info << "=== cfdemCloudIB::getDEMdata() === particle rotation not considered in CFD" << endl;
     dataExchangeM().getData("omega","vector-atom",angularVelocities_);
 }
 
