@@ -48,7 +48,7 @@ namespace Foam
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 // Construct from components
-cfdemCloudIBmodified::cfdemCloudIBmodified
+cfdemCloudIBContinuousForcing::cfdemCloudIBContinuousForcing
 (
     const fvMesh& mesh
 )
@@ -70,14 +70,14 @@ cfdemCloudIBmodified::cfdemCloudIBmodified
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-cfdemCloudIBmodified::~cfdemCloudIBmodified()
+cfdemCloudIBContinuousForcing::~cfdemCloudIBContinuousForcing()
 {
 }
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-bool cfdemCloudIBmodified::evolve()
+bool cfdemCloudIBContinuousForcing::evolve()
 {
     numberOfParticlesChanged_ = false;
     arraysReallocated_=false;
@@ -134,7 +134,7 @@ bool cfdemCloudIBmodified::evolve()
     return doCouple;
 }
 
-void cfdemCloudIBmodified::calcForcingTerm(volVectorField& Us)
+void cfdemCloudIBContinuousForcing::calcForcingTerm(volVectorField& Us)
 {
     // set particle velocity field
     if(verbose_) Info << "- setVelocity(velocities_)" << endl;

@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
 
     // create cfdemCloud
     #include "readGravitationalAcceleration.H"
-    cfdemCloudIBmodified particleCloud(mesh);
+    cfdemCloudIBContinuousForcing particleCloud(mesh);
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

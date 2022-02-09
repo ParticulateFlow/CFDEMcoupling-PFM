@@ -31,15 +31,15 @@ Description
     cloud class managing DEM data for CFD-DEM coupling and IB representation
 
 Class
-    Foam::cfdemCloudIBmodified derived from cfdemCloud
+    Foam::cfdemCloudIBContinuousForcing derived from cfdemCloud
 
 SourceFiles
     cfdemCloudIBmodified.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef cfdemCloudIBmodified_H
-#define cfdemCloudIBmodified_H
+#ifndef cfdemCloudIBContinuousForcing_H
+#define cfdemCloudIBContinuousForcing_H
 
 #include "cfdemCloud.H"
 
@@ -49,10 +49,10 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class cfdemCloudIBmodified Declaration
+                Class cfdemCloudIBContinuousForcing Declaration
 \*---------------------------------------------------------------------------*/
 
-class cfdemCloudIBmodified
+class cfdemCloudIBContinuousForcing
 :
     public cfdemCloud
 {
@@ -69,14 +69,14 @@ public:
     // Constructors
 
         //- Construct from components
-        cfdemCloudIBmodified
+        cfdemCloudIBContinuousForcing
         (
             const fvMesh& mesh
         );
 
     // Destructor
 
-        ~cfdemCloudIBmodified();
+        ~cfdemCloudIBContinuousForcing();
 
     // Member Functions
 
