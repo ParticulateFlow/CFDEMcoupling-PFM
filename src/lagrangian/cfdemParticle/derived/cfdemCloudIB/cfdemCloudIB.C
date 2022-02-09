@@ -222,7 +222,7 @@ void cfdemCloudIB::calcVelocityCorrection
                     // calc particle velocity
                     for(int i=0;i<3;i++) rVec[i]=U.mesh().C()[cellI][i]-position(index)[i];
                     for(int i=0;i<3;i++) angVel[i]=angularVelocities()[index][i];
-                    velRot=angVel^rVec;                   
+                    velRot=angVel^rVec;
                     for(int i=0;i<3;i++) uParticle[i] = velocities()[index][i]+velRot[i];
 
                     // impose field velocity
