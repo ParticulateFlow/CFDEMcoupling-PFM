@@ -43,7 +43,7 @@ Contributions
 #include "turbulentTransportModel.H"
 #include "pisoControl.H"
 
-#include "cfdemCloudIBmodified.H"
+#include "cfdemCloudIBContinuousForcing.H"
 #include "implicitCouple.H"
 
 #include "averagingModel.H"

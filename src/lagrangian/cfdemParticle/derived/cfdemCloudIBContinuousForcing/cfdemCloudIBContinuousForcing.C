@@ -30,7 +30,7 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include "fileName.H"
-#include "cfdemCloudIBmodified.H"
+#include "cfdemCloudIBContinuousForcing.H"
 #include "voidFractionModel.H"
 #include "forceModel.H"
 #include "locateModel.H"
