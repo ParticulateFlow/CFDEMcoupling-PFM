@@ -157,24 +157,24 @@ public:
     // Member Functions
         void getData
         (
-            word name,
-            word type,
+            const word& name,
+            const word& type,
             double ** const& field,
             label step
         ) const;
 
         void getData
         (
-            word name,
-            word type,
+            const word& name,
+            const word& type,
             int ** const& field,
             label step
         ) const;
 
         void giveData
         (
-            word name,
-            word type,
+            const word& name,
+            const word& type,
             double ** const& field,
             const char* datatype
         ) const;
@@ -201,15 +201,14 @@ public:
         void inline destroy(int*) const;
         //==============
 
-        bool couple(int) const;
+        bool couple(int);
 
         int getNumberOfParticles() const;
         int getNumberOfClumps() const;
 
         void syncIDs() const;
         void locateParticle(int*, bool) const;
-        word myType() const { return typeName; }
-        void setCG() { particleCloud_.setCG(lmp->force->cg()); }
+        scalar getCG() const { return lmp->force->cg(); }
 };
 
 

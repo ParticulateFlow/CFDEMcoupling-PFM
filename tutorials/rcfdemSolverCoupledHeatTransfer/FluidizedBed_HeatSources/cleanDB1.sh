@@ -1,0 +1,1 @@
+./cleanDB.sh 1

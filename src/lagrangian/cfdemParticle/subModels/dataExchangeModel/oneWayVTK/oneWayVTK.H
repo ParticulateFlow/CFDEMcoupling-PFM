@@ -87,16 +87,16 @@ public:
     // Member Functions
         void getData
         (
-            word name,
-            word type,
+            const word& name,
+            const word& type,
             double ** const& field,
             label step
         ) const;
 
         void getData
         (
-            word name,
-            word type,
+            const word& name,
+            const word& type,
             int ** const& field,
             label step
         ) const
@@ -104,13 +104,12 @@ public:
 
         void giveData
         (
-            word name,
-            word type,
+            const word& name,
+            const word& type,
             double ** const& field,
             const char* datatype = ""
         ) const;
 
-        word myType() const{ return typeName; }
 };
 
 

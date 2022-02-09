@@ -65,17 +65,71 @@ constDiffSmoothing::constDiffSmoothing
     propsDict_(dict.subDict(typeName + "Props")),
     lowerLimit_(readScalar(propsDict_.lookup("lowerLimit"))),
     upperLimit_(readScalar(propsDict_.lookup("upperLimit"))),
-    smoothingLength_(dimensionedScalar("smoothingLength",dimensionSet(0,1,0,0,0,0,0), readScalar(propsDict_.lookup("smoothingLength")))),
-    smoothingLengthReferenceField_(dimensionedScalar("smoothingLengthReferenceField",dimensionSet(0,1,0,0,0,0,0), readScalar(propsDict_.lookup("smoothingLength")))),
-    DT_("DT", dimensionSet(0,2,-1,0,0), 0.),
-    verbose_(false)
+    smoothingLength_(propsDict_.lookupOrDefault<scalar>("smoothingLength", -1.0)),
+    smoothingLengthReference_(propsDict_.lookupOrDefault<scalar>("smoothingLengthReference",smoothingLength_)),
+    smoothingLengthFieldName_(propsDict_.lookupOrDefault<word>("smoothingLengthFieldName","smoothingLengthField")),
+    smoothingLengthField_
+    (   IOobject
+        (
+            smoothingLengthFieldName_,
+            sm.mesh().time().timeName(),
+            sm.mesh(),
+            IOobject::READ_IF_PRESENT,
+            IOobject::NO_WRITE
+        ),
+        sm.mesh(),
+        dimensionedScalar("smoothingLength", dimensionSet(0,1,0,0,0,0,0), smoothingLength_),
+        "zeroGradient"
+    ),
+    smoothingLengthReferenceFieldName_(propsDict_.lookupOrDefault<word>("smoothingLengthReferenceFieldName","smoothingLengthReferenceField")),
+    smoothingLengthReferenceField_
+    (   IOobject
+        (
+            smoothingLengthReferenceFieldName_,
+            sm.mesh().time().timeName(),
+            sm.mesh(),
+            IOobject::READ_IF_PRESENT,
+            IOobject::NO_WRITE
+        ),
+        sm.mesh(),
+        dimensionedScalar("smoothingLengthReference", dimensionSet(0,1,0,0,0,0,0), smoothingLengthReference_),
+        "zeroGradient"
+    ),
+    DT_
+    (   IOobject
+        (
+            "DT",
+            sm.mesh().time().timeName(),
+            sm.mesh(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        sm.mesh(),
+        dimensionedScalar("DT", dimensionSet(0,2,-1,0,0,0,0), 0.0),
+        "zeroGradient"
+    ),
+    verbose_(propsDict_.found("verbose"))
 {
+    // either use scalar or field parameters for smoothing
+    if (smoothingLength_ > 0.0 || smoothingLengthReference_ > 0.0)
+    {
+        if (smoothingLengthField_.headerOk() || smoothingLengthReferenceField_.headerOk())
+        {
+            FatalError <<"constDiffSmoothing: Either use scalar or field parameter for smoothing.\n" << abort(FatalError);
+        }
+    }
 
-    if(propsDict_.found("verbose"))
-        verbose_ = true;
-
-    if(propsDict_.found("smoothingLengthReferenceField"))
-       smoothingLengthReferenceField_.value() = double(readScalar(propsDict_.lookup("smoothingLengthReferenceField")));
+    if (smoothingLength_ < 0.0 && !smoothingLengthField_.headerOk())
+    {
+        FatalError <<"constDiffSmoothing: Provide scalar or field parameter for smoothing.\n" << abort(FatalError);
+    }
+  
+    // if no scalar length for smoothing wrt reference field is provided and no
+    // such field, use smoothingLengthField
+    if (smoothingLengthReference_ < 0.0 && !smoothingLengthReferenceField_.headerOk())
+    {
+        smoothingLengthReferenceField_ = smoothingLengthField_;
+    }
 
     checkFields(sSmoothField_);
     checkFields(vSmoothField_);
@@ -106,8 +160,8 @@ void constDiffSmoothing::smoothen(volScalarField& fieldSrc) const
     sSmoothField.oldTime()=fieldSrc;
     sSmoothField.oldTime().correctBoundaryConditions();
 
-    double deltaT = sSmoothField.mesh().time().deltaTValue();
-    DT_.value() = smoothingLength_.value() * smoothingLength_.value() / deltaT;
+    dimensionedScalar deltaT = sSmoothField.mesh().time().deltaT();
+    DT_ = smoothingLengthField_ * smoothingLengthField_ / deltaT;
 
     // do smoothing
     solve
@@ -147,8 +201,8 @@ void constDiffSmoothing::smoothen(volVectorField& fieldSrc) const
     vSmoothField.oldTime()=fieldSrc;
     vSmoothField.oldTime().correctBoundaryConditions();
 
-    double deltaT = vSmoothField_.mesh().time().deltaTValue();
-    DT_.value() = smoothingLength_.value() * smoothingLength_.value() / deltaT;
+    dimensionedScalar deltaT = vSmoothField.mesh().time().deltaT();
+    DT_ = smoothingLengthField_ * smoothingLengthField_ / deltaT;
 
     // do smoothing
     solve
@@ -185,9 +239,8 @@ void constDiffSmoothing::smoothenReferenceField(volVectorField& fieldSrc) const
     double sourceStrength = 1e5; //large number to keep reference values constant
 
     dimensionedScalar deltaT = vSmoothField.mesh().time().deltaT();
-    DT_.value() = smoothingLengthReferenceField_.value()
-                         * smoothingLengthReferenceField_.value() / deltaT.value();
-
+    DT_ = smoothingLengthReferenceField_ * smoothingLengthReferenceField_ / deltaT;
+        
     tmp<volScalarField> NLarge
     (
         new volScalarField

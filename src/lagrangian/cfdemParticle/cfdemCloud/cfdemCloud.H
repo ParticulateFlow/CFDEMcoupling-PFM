@@ -45,6 +45,7 @@ SourceFiles
 // choose version
 #include "OFversion.H"
 #include <vector>
+#include <typeinfo>
 
 #include "fvCFD.H"
 #include "IFstream.H"
@@ -86,47 +87,79 @@ protected:
 
     IOdictionary liggghtsCommandDict_;
 
-    Switch solveFlow_;
+    const bool solveFlow_;
 
-    bool verbose_;
+    const bool verbose_;
 
-    bool ignore_;
+    const bool ignore_;
+
+    const bool multiphase_;
 
     bool allowCFDsubTimestep_;
 
-    bool limitDEMForces_;
+    const bool modelCheck_;
+
+    const bool limitDEMForces_;
+
+    const bool phaseInForces_;
+
+    const bool getParticleDensities_;
+
+    const bool getParticleEffVolFactors_;
+
+    const bool getParticleTypes_;
+
+    const bool getParticleAngVels_;
+
+    const bool streamingMode_;
+
+    const bool streamingFluc_;
 
     scalar maxDEMForce_;
 
+    scalar phaseInForcesTime_;
+
     const word modelType_;
 
-    mutable double **positions_;
+    double **positions_; // particle positions
 
-    mutable double **velocities_;
+    double **velocities_; // particle velocities
 
-    mutable double **fluidVel_;
+    double **fluidVel_; // fluid velocities at particle positions
 
-    mutable double **fAcc_;
+    double **fAcc_; // accumulated implicit forces on particles (only used in Koch Hill drag model)
 
-    mutable double **impForces_;
+    double **impForces_;
 
-    mutable double **expForces_;
+    double **expForces_;
 
-    mutable double **DEMForces_;
+    double **DEMForces_;
 
-    mutable double **Cds_;
+    double **Cds_; // Ksl
 
-    mutable double **radii_;
+    double **radii_; // particle radii
 
-    mutable double **voidfractions_;
+    double **voidfractions_;
 
-    mutable int **cellIDs_;
+    int **cellIDs_; // ID of cell each particle is in
 
-    mutable double **particleWeights_;
+    double **particleDensities_; // particle densities
 
-    mutable double **particleVolumes_;
+    double **particleEffVolFactors_; // per particle volume factor
 
-    mutable double **particleV_;
+    int **particleTypes_; // per particle type
+
+    double **particleAngVels_; // particle angular velocities
+
+    double **particleWeights_; // particle weights
+
+    double **particleVolumes_; // particle volumes with subcell information
+
+    double **particleV_; // particle total volumes
+
+    double **particleConvVel_;
+
+    double **particleFlucVel_;
 
     int numberOfParticles_;
 
@@ -134,7 +167,7 @@ protected:
 
     bool numberOfParticlesChanged_;
 
-    mutable bool arraysReallocated_;
+    bool arraysReallocated_;
 
     const wordList forceModels_;
 
@@ -146,7 +179,7 @@ protected:
 
     const word turbulenceModelType_;
 
-    mutable scalar cg_;
+    scalar cg_;
 
     bool cgOK_;
 
@@ -154,25 +187,42 @@ protected:
 
     bool impDEMdragAcc_;
 
-    mutable scalar imExSplitFactor_;
+    const scalar imExSplitFactor_;
 
-    mutable bool treatVoidCellsAsExplicitForce_; //will treat the coupling force in cells with no Us data explicitly
+    const bool treatVoidCellsAsExplicitForce_; //will treat the coupling force in cells with no Us data explicitly
 
-    bool useDDTvoidfraction_;
+    const bool useDDTvoidfraction_;
 
-    mutable volScalarField ddtVoidfraction_;
+    volScalarField ddtVoidfraction_;
 
-    mutable Switch checkPeriodicCells_;
+    volScalarField particleDensityField_;
+
+    Switch checkPeriodicCells_;
 
     const turbulenceModel& turbulence_;
 
-    autoPtr<forceModel>* forceModel_;
+    struct particleProperty {
+        void** property;            // pointer to per-particle data; memory deallocation by cfdemCloud
+        const std::type_info* ti;   // type of particle data (int**, double**)
+        int size;                   // size of single particle data; memory allocation by cfdemCloud if size > 0
+        double initVal;             // initial property value
+        bool reset;                 // if true, data is reset to initial value every coupling step
+        template<typename T>
+        T& ref() {
+          if (*ti == typeid(T)) return *reinterpret_cast<T*>(&property);
+          else throw std::bad_cast();
+        }
+    };
+
+    HashTable<particleProperty> particlePropertyTable; // table of registered per-particle properties
+
+    autoPtr<dataExchangeModel> dataExchangeModel_;
+
+    PtrList<forceModel> forceModel_;
 
     autoPtr<locateModel> locateModel_;
 
-    autoPtr<momCoupleModel>* momCoupleModel_;
-
-    autoPtr<dataExchangeModel> dataExchangeModel_;
+    PtrList<momCoupleModel> momCoupleModel_;
 
     autoPtr<IOModel> IOModel_;
 
@@ -188,16 +238,14 @@ protected:
 
     autoPtr<meshMotionModel> meshMotionModel_;
 
-    autoPtr<liggghtsCommandModel>* liggghtsCommand_;
+    PtrList<liggghtsCommandModel> liggghtsCommand_;
 
-    autoPtr<otherForceModel>* otherForceModel_;
+    PtrList<otherForceModel> otherForceModel_;
 
 // Protected member functions
     virtual void getDEMdata();
 
     virtual void giveDEMdata();
-
-    virtual void setNumberOfParticles(int);
 
     virtual void findCells();
 
@@ -205,14 +253,11 @@ protected:
 
     virtual void setParticleForceField();
 
+    virtual void setScalarAverages();
+
     virtual void setVectorAverages();
 
 public:
-
-    friend class dataExchangeModel;
-    friend class voidFractionModel;
-    friend class forceModel;
-    friend class forceSubModel;
 
 // Constructors
 
@@ -228,13 +273,15 @@ public:
 // public Member Functions
 
     // Access
-       bool allowCFDsubTimestep() { return allowCFDsubTimestep_; }
+       bool allowCFDsubTimestep() const { return allowCFDsubTimestep_; }
 
        void setAllowCFDsubTimestep(bool b) { allowCFDsubTimestep_ = b; }
 
+       virtual void setNumberOfParticles(int numberOfParticles);
+
        void checkCG(bool);
 
-       void setPos(double **&);
+       void setPos(const double *const *);
 
        const word& modelType() const { return modelType_; }
 
@@ -246,8 +293,6 @@ public:
 
        vector expForce(int) const;
 
-       vector fluidVel(int) const;
-
        virtual const forceModel& forceM(int);
 
        virtual label nrForceModels() const;
@@ -256,7 +301,9 @@ public:
 
        scalar voidfraction(int) const;
 
-       label liggghtsCommandModelIndex(word) const;
+       label liggghtsCommandModelIndex(const word&) const;
+
+       inline void scaleForce(int, scalar);
 
        inline void setCG(double);
 
@@ -272,11 +319,15 @@ public:
 
        inline bool ignore() const;
 
+       inline bool modelCheck() const;
+
        inline const fvMesh& mesh() const;
 
        inline bool solveFlow() const;
 
        inline bool verbose() const;
+
+       inline bool multiphase() const;
 
        inline const IOdictionary& couplingProperties() const;
 
@@ -308,6 +359,10 @@ public:
 
        inline double ** particleWeights() const;
 
+       inline double ** particleConvVels() const;
+
+       inline double ** particleFlucVels() const;
+
        virtual inline label body(int) const;
 
        virtual inline double particleVolume(int) const;
@@ -323,18 +378,30 @@ public:
        virtual inline int maxType() {return -1;}
        virtual inline bool multipleTypesDMax() {return false;}
        virtual inline bool multipleTypesDMin() {return false;}
-       virtual inline double ** particleDensity() const {return NULL;}
-       virtual inline int ** particleTypes() const {return NULL;}
-       virtual label particleType(label index) const {return -1;}
+
+       inline bool getParticleDensities() const;
+       virtual inline double ** particleDensities() const;
+       virtual inline double particleDensity(label index) const;
+
+       inline bool getParticleEffVolFactors() const;
+       virtual inline double particleEffVolFactor(label index) const;
+
+       inline bool getParticleTypes() const;
+       virtual inline int ** particleTypes() const;
+       virtual inline label particleType(label index) const;
+
+       inline bool getParticleAngVels() const;
+       virtual inline double ** particleAngVels() const;
+       virtual vector particleAngVel(label index) const;
 
        //access to the particle's rotation and torque data
        virtual inline double ** DEMTorques() const {return NULL;}
        virtual inline double ** omegaArray() const {return NULL;}
-       virtual vector omega(int) const {return vector(0,0,0);}
+       virtual vector omega(int) const {return vector::zero;}
 
        //access to the particles' orientation information
        virtual inline double ** exArray() const {return NULL;}
-       virtual vector ex(int) const {return vector(0,0,0);}
+       virtual vector ex(int) const {return vector::zero;}
 
        //Detector if SRF module is enable or not
        virtual inline bool SRFOn(){return false;}
@@ -349,10 +416,12 @@ public:
 
        inline const wordList& forceModels() const;
 
+       inline voidFractionModel& voidFractionM();
        inline const voidFractionModel& voidFractionM() const;
 
        inline const locateModel& locateM() const;
 
+       inline momCoupleModel& momCoupleM(int);
        inline const momCoupleModel& momCoupleM(int) const;
 
        inline dataExchangeModel& dataExchangeM();
@@ -361,6 +430,7 @@ public:
 
        inline probeModel& probeM();
 
+       inline averagingModel& averagingM();
        inline const averagingModel& averagingM() const;
 
        inline const clockModel& clockM() const;
@@ -371,13 +441,19 @@ public:
 
        inline const wordList& liggghtsCommandModelList() const;
 
-       inline autoPtr<liggghtsCommandModel>* liggghtsCommand() const;
+       inline liggghtsCommandModel& liggghtsCommand(const label);
 
        inline const turbulenceModel& turbulence() const;
 
     // Write
 
       // write cfdemCloud internal data
+        inline void setPositions(label n,double* pos);
+        inline void setCellIDs(label n,int* ID);
+        inline void setCellIDs(DynamicList<label> const& IDs);
+        inline void setImpDEMdrag(bool flag) { impDEMdrag_ = flag; }
+        inline void setImpDEMdragAcc(bool flag) { impDEMdragAcc_ = flag; }
+
         virtual bool evolve(volScalarField&,volVectorField&,volVectorField&);
 
         virtual void postFlow() {}
@@ -385,16 +461,16 @@ public:
         virtual bool reAllocArrays();
 
     // IO
-        void writeScalarFieldToTerminal(double**&) const;
+        void writeScalarFieldToTerminal(const double *const *) const;
 
-        void writeVectorFieldToTerminal(double**&) const;
+        void writeVectorFieldToTerminal(const double *const *) const;
 
     // functions
         tmp<fvVectorMatrix> divVoidfractionTau(volVectorField& ,volScalarField&) const;
 
         tmp<volScalarField> ddtVoidfraction() const;
 
-        void calcDdtVoidfraction(volScalarField& voidfraction) const;
+        void calcDdtVoidfraction(volScalarField& voidfraction);
 
         //tmp<fvVectorMatrix> ddtVoidfractionU(volVectorField& ,volScalarField&) const;
 
@@ -404,7 +480,15 @@ public:
 
         void otherForces(volVectorField&);
 
-        bool checkPeriodicCells() { return checkPeriodicCells_; }
+        bool checkPeriodicCells() const { return checkPeriodicCells_; }
+
+        template<typename T>
+        void registerParticleProperty(const word& property, int size=0, double initVal=0.0, bool reset=true);
+        template<typename T>
+        T& getParticlePropertyRef(const word& property);
+protected:
+        virtual int**& getParticlePropertyImpl(const word& property, int**);
+        virtual double**& getParticlePropertyImpl(const word& property, double**);
 };
 
 

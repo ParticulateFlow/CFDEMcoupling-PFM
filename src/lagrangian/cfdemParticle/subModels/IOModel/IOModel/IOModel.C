@@ -30,6 +30,7 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include "error.H"
+#include "particle.H"
 #include "IOModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -59,14 +60,14 @@ bool IOModel::dumpNow() const
     return time_.outputTime();
 }
 
-fileName IOModel::createTimeDir(fileName path) const
+fileName IOModel::createTimeDir(const fileName& path) const
 {
     fileName timeDirPath(path/time_.timeName());
     mkDir(timeDirPath,0777);
     return timeDirPath;
 }
 
-fileName IOModel::createLagrangianDir(fileName path) const
+fileName IOModel::createLagrangianDir(const fileName& path) const
 {
     fileName lagrangianDirPath(path/"lagrangian");
     mkDir(lagrangianDirPath,0777);
@@ -75,7 +76,7 @@ fileName IOModel::createLagrangianDir(fileName path) const
     return cfdemCloudDirPath;
 }
 
-fileName IOModel::buildFilePath(word dirName) const
+fileName IOModel::buildFilePath(const word& dirName) const
 {
     // create file structure
     fileName path("");
@@ -94,20 +95,29 @@ fileName IOModel::buildFilePath(word dirName) const
     return path;
 }
 
-void IOModel::streamDataToPath(fileName path, double** array,int nPProc,word name,word type,word className) const
+void IOModel::streamDataToPath(const fileName& path, const double* const* array,int nPProc,const word& name,const word& type,const word& className) const
 {
     OFstream fileStream(path/name);
 
     fileStream
-        << "FoamFile\n{\n"
-        << "    version     " << fileStream.version() << ";\n"
-        << "    format      " << fileStream.format() << ";\n"
-        << "    class       " << className << ";\n"
-        << "    location    " << 0 << ";\n"
-        << "    object      " << name << ";\n"
-        << "}" << nl;
+        << "/*--------------------------------*- C++ -*----------------------------------*\\" << nl
+        << "  =========                 |" << nl
+        << "  \\\\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox" << nl
+        << "   \\\\    /   O peration     | Website:  https://openfoam.org" << nl
+        << "    \\\\  /    A nd           | Version:  " << FOAMversion << nl
+        << "     \\\\/     M anipulation  |" << nl
+        << "\\*---------------------------------------------------------------------------*/" << nl
+        << "FoamFile" << nl
+        << "{" << nl
+        << "    version     " << fileStream.version() << ";" << nl
+        << "    format      " << fileStream.format() << ";" << nl
+        << "    class       " << className << ";" << nl
+        << "    location    " << 0 << ";" << nl
+        << "    object      " << name << ";" << nl
+        << "}" << nl
+        << "// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //" << nl << nl;
 
-    fileStream << nPProc <<"\n";
+    fileStream << nPProc << "\n";
 
     if (type == "origProcId")
     {
@@ -118,7 +128,7 @@ void IOModel::streamDataToPath(fileName path, double** array,int nPProc,word nam
 
     fileStream << token::BEGIN_LIST << nl;
 
-    int ** cellIDs = particleCloud_.cellIDs();
+    const int * const* cellIDs = particleCloud_.cellIDs();
     for (int index = 0; index < particleCloud_.numberOfParticles(); ++index)
     {
         if (cellIDs[index][0] > -1) // particle Found
@@ -129,7 +139,19 @@ void IOModel::streamDataToPath(fileName path, double** array,int nPProc,word nam
             }
             else if (type == "position")
             {
-                fileStream << "( "<< array[index][0] << " " << array[index][1] << " " << array[index][2] << " ) " << cellIDs[index][0] << " \n";
+#if OPENFOAM_VERSION_MAJOR < 5
+                fileStream << "( " << array[index][0] << " " << array[index][1] << " " << array[index][2] << " ) " << cellIDs[index][0] << nl;
+#else
+                particle part
+                (
+                    particleCloud_.mesh(),
+                    vector(array[index][0],array[index][1],array[index][2]),
+                    cellIDs[index][0]
+                );
+
+                part.writePosition(fileStream);
+                fileStream << nl;
+#endif
             }
             else if (type == "vector")
             {
@@ -160,7 +182,7 @@ IOModel::IOModel
     parOutput_(true)
 {
     if (
-            particleCloud_.dataExchangeM().myType()=="oneWayVTK" ||
+            particleCloud_.dataExchangeM().type()=="oneWayVTK" ||
             dict_.found("serialOutput")
        )
     {

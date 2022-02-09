@@ -50,7 +50,7 @@ autoPtr<liggghtsCommandModel> liggghtsCommandModel::New
 )
 {
     Info<< "Selecting liggghtsCommandModel "
-         << liggghtsCommandType << " ,provide dicts, numbered from 0 to n" << endl;
+         << liggghtsCommandType << ", provide dicts, numbered from 0 to n" << endl;
 
     dictionaryConstructorTable::iterator cstrIter =
         dictionaryConstructorTablePtr_->find(liggghtsCommandType);

@@ -26,6 +26,7 @@ SourceFiles
 #define expParticleForces_H
 
 #include "otherForceModel.H"
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -45,7 +46,6 @@ protected:
     // Protected data
     //    dictionary propsDict_;
 
-    
 public:
 
     //- Runtime type information

@@ -1,0 +1,93 @@
+################################################################################
+# brief: 2 tiny spheres in a fluid to compare against OpenFOAM solution        #
+#                                                                              #
+# Cf. J. Guerrero, 2D Circular cylinder - Vortex shedding (c24)                #
+# https://wiki.openfoam.com/Vortex_shedding_by_Joel_Guerrero_2D                #
+# published under CC BY-SA license                                             #
+#                                                                              #
+# authors: Daniel Queteschiner                                                 #
+# date: Nov 2021                                                               #
+# copyright: 2021- JKU Linz                                                    #
+################################################################################
+
+log             ../DEM/log.liggghts
+thermo_log      ../DEM/post/thermo.txt
+
+# define the attributes associated with the particles,
+# 'granular' (or 'sphere') style uses diameter, mass and angular velocity
+atom_style      granular
+
+# use an array to map particle IDs to local storage index,
+atom_modify     map array
+
+# set simulation domain to be fixed in x y z
+boundary        f f f
+
+# save communication by turning off Newton's 3rd law for pairwise interaction,
+# note: this setting only influences communication between procs, Newton's
+# 3rd law is still used for contact force calculations
+newton          off
+
+# use a single value for ghost particle cutoff distance and
+# enable velocity to be communicated with ghost particles
+communicate     single vel yes
+
+# set unit system to SI
+units           si
+
+# define the region used as simulation domain (min/max X, min/max Y, min/max Z)
+region          domain block -0.02 0.03 -0.02 0.02 -0.0005 0.0005 units box
+
+# create the simulation domain and 1 material type for particle
+create_box      1 domain
+
+# specify the skin distance for neighbor list generation
+neighbor        0.001 bin
+neigh_modify    delay 0
+
+
+# particle properties
+variable rp     equal 0.00001 # [m]
+variable dp     equal 2*${rp}
+variable rho    equal 1000 # [kg/m^3]
+
+# define the material properties required for granular pair styles
+fix     m1 all property/global youngsModulus peratomtype 5.e8
+fix     m2 all property/global poissonsRatio peratomtype 0.3
+fix     m3 all property/global coefficientRestitution peratomtypepair 1 0.8
+fix     m4 all property/global coefficientFriction peratomtypepair 1 0.1
+
+# specify contact model to use
+pair_style gran model hertz tangential incremental_history
+pair_coeff * *
+
+timestep    0.000001
+
+# create particles
+create_atoms    1 single 0.027 -0.018 0.0 units box
+create_atoms    1 single 0.027  0.018 0.0 units box
+
+# set diameter and density
+set             atom 1 diameter ${dp} density ${rho}.
+set             atom 2 diameter ${dp} density ${rho}.
+
+# cfd coupling
+fix cfd1 all couple/cfd couple_every 10 mpi
+fix cfd2 all couple/cfd/force/implicit
+
+# output settings
+thermo_style    custom step atoms
+
+# set frequency of output
+thermo          100000
+
+# ignore particles leaving the simulation domain,
+# do not normalize thermodynamic output values by the number of atoms
+thermo_modify   lost ignore norm no
+
+# set dynamic to 'no' as number of particles does not change
+compute_modify  thermo_temp dynamic no
+
+run 1
+
+

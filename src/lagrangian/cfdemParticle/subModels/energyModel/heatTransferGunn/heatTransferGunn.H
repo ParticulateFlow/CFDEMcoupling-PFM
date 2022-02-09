@@ -15,7 +15,7 @@ License
     along with this code.  If not, see <http://www.gnu.org/licenses/>.
 
     Copyright (C) 2015- Thomas Lichtenegger, JKU Linz, Austria
-    
+
     Description
     Correlation for Nusselt number according to
     Gunn, D. J. International Journal of Heat and Mass Transfer 21.4 (1978)
@@ -28,6 +28,7 @@ License
 #include "fvCFD.H"
 #include "cfdemCloudEnergy.H"
 #include "energyModel.H"
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -44,67 +45,95 @@ class heatTransferGunn
 protected:
 
     dictionary propsDict_;
-    
+
+    bool multiTypes_;
+
+    bool expNusselt_;
+
     bool interpolation_;
-    
+
     bool verbose_;
-    
-    word QPartFluidName_;
-        
+
+    bool implicit_;
+
+    bool calcTotalHeatFlux_;
+
+    bool initPartTemp_;
+
+    scalar Tmin_;
+
+    scalar Tmax_;
+
+    scalar totalHeatFlux_;
+
+    scalar NusseltScalingFactor_;
+
+    const word QPartFluidName_;
+
     volScalarField QPartFluid_;
-    
-    volScalarField partTempField_;
-    
+
+    const word QPartFluidCoeffName_;
+
+    volScalarField QPartFluidCoeff_;
+
+    mutable volScalarField partTempField_;
+
     volScalarField partRelTempField_;
-    
+
     volScalarField ReField_;
-    
+
     volScalarField NuField_;
-    
+
     dimensionedScalar partRefTemp_;
-    
+
     bool calcPartTempField_;
 
-    word tempFieldName_;
+    dimensionedScalar partTempAve_;
 
-    const volScalarField& tempField_;            // ref to temperature field
+    const word tempFieldName_;
 
-    word voidfractionFieldName_;
+    const volScalarField& tempField_;           // ref to temperature field
 
-    const volScalarField& voidfraction_;    // ref to voidfraction field
+    const word voidfractionFieldName_;
 
-    scalar maxSource_;                           // max (limited) value of src field
+    const volScalarField& voidfraction_;        // ref to voidfraction field
 
-    word velFieldName_;
+    scalar maxSource_;                          // max (limited) value of src field
+
+    const word velFieldName_;
 
     const volVectorField& U_;
-    
-    word densityFieldName_;
-    
+
+    const word densityFieldName_;
+
     const volScalarField& rho_;
 
-    word partTempName_;
+    const word partTempName_;
 
-    mutable double **partTemp_;                          // Lagrangian array
+    const word partHeatFluxName_;
 
-    word partHeatFluxName_;
+    const word partHeatFluxCoeffRegName_;
 
-    mutable double **partHeatFlux_;              // Lagrangian array
-    
-    mutable double **partRe_;
-    
-    mutable double **partNu_;
+    const word partReRegName_;
 
-    void allocateMyArrays() const;
-    
+    const word partNuRegName_;
+
+    mutable scalar scaleDia_;
+
+    scalarList typeCG_;
+
+    const label maxTypeCG_;
+
+    void partTempField();
+
     scalar Nusselt(scalar, scalar, scalar) const;
-    
-    virtual void giveData(int);
-    
-    virtual void heatFlux(label, scalar, scalar, scalar);
-    
-    virtual void heatFluxCoeff(label, scalar, scalar);
-       
+
+    virtual void giveData();
+
+    virtual void heatFlux(label, scalar, scalar, scalar, scalar cg3 = 1.0);
+
+    virtual void initPartTemp();
+
 public:
 
     //- Runtime type information
@@ -128,10 +157,12 @@ public:
     // Member Functions
 
         void addEnergyContribution(volScalarField&) const;
-	
-	void addEnergyCoefficient(volScalarField&) const {}
-	
-	void calcEnergyContribution();
+
+        void addEnergyCoefficient(volScalarField&) const;
+
+        void calcEnergyContribution();
+
+        void postFlow();
 };
 
 

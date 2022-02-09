@@ -73,7 +73,7 @@ explicitCouple::explicitCouple
             IOobject::NO_WRITE
         ),
         sm.mesh(),
-        dimensionedVector("zero", dimensionSet(1,-2,-2,0,0), vector(0,0,0)), // N/m3
+        dimensionedVector("zero", dimensionSet(1,-2,-2,0,0), vector::zero), // N/m3
         "zeroGradient"
     ),
     fNext_
@@ -86,7 +86,7 @@ explicitCouple::explicitCouple
             IOobject::NO_WRITE
         ),
         sm.mesh(),
-        dimensionedVector("zero", dimensionSet(1,-2,-2,0,0), vector(0,0,0)), // N/m3
+        dimensionedVector("zero", dimensionSet(1,-2,-2,0,0), vector::zero), // N/m3
         "zeroGradient"
     ),
     fLimit_(1e10,1e10,1e10)
@@ -106,7 +106,7 @@ explicitCouple::~explicitCouple()
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-tmp<volVectorField> explicitCouple::expMomSource() const
+tmp<volVectorField> explicitCouple::expMomSource()
 {
     const scalar tsf = particleCloud_.dataExchangeM().timeStepFraction();
 
@@ -136,7 +136,7 @@ tmp<volVectorField> explicitCouple::expMomSource() const
     );
 }
 
-void explicitCouple::resetMomSourceField() const
+void explicitCouple::resetMomSourceField()
 {
     fPrev_.ref() = fNext_.ref();
     fNext_.primitiveFieldRef() = vector::zero;

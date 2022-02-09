@@ -28,12 +28,14 @@ boundaryField
         type            slip;
     }
 
-    inlet
+   inlet
     {
-        type               interstitialInletVelocity;
-        inletVelocity      uniform (0 0 0.1);
-        alpha              voidfraction;
-        value              $internalField;
+        type            uniformFixedValue;
+        uniformValue     table
+        (
+            (0.000 (0 0 0.002))
+            (2.000 (0 0 1.5))
+        );
     }
 
     outlet

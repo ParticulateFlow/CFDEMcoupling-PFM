@@ -1,4 +1,4 @@
- // get scalar source from DEM        
+ // get scalar source from DEM
         particleCloud.forceM(1).manipulateScalarField(Tsource);
         Tsource.correctBoundaryConditions();
 

@@ -6,7 +6,7 @@
                                 Christoph Goniva, christoph.goniva@cfdem.com
                                 Copyright 2009-2012 JKU Linz
                                 Copyright 2012-     DCS Computing GmbH, Linz
-                                Copyright (C) 2013-     Graz University of  
+                                Copyright (C) 2013-     Graz University of
                                                         Technology, IPPT
 -------------------------------------------------------------------------------
 License
@@ -60,12 +60,26 @@ class constDiffSmoothing
 private:
 
     dictionary propsDict_;
-    scalar lowerLimit_;
-    scalar upperLimit_;
-    dimensionedScalar smoothingLength_;
-    dimensionedScalar smoothingLengthReferenceField_;
-    mutable dimensionedScalar DT_;
-    bool verbose_;
+
+    const scalar lowerLimit_;
+
+    const scalar upperLimit_;
+
+    const scalar smoothingLength_;
+
+    const scalar smoothingLengthReference_;
+
+    word smoothingLengthFieldName_;
+
+    mutable volScalarField smoothingLengthField_;
+
+    word smoothingLengthReferenceFieldName_;
+
+    mutable volScalarField smoothingLengthReferenceField_;
+
+    mutable volScalarField DT_;
+
+    const bool verbose_;
 
 public:
 
@@ -91,7 +105,7 @@ public:
         bool doSmoothing() const;
 
         //void dSmoothing(volScalarField&) const;
-        
+
         void smoothen(volScalarField&) const;
 
         void smoothen(volVectorField&) const;

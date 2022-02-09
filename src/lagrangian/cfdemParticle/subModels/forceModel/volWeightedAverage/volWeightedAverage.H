@@ -60,7 +60,7 @@ private:
 
     const fvMesh& mesh_;
 
-    scalar startTime_;
+    const scalar startTime_;
 
     const wordList scalarFieldNames_;
 
@@ -70,11 +70,15 @@ private:
 
     mutable PtrList<volVectorField> vectorFields_;
 
-    mutable scalar upperThreshold_;
+    const scalar upperThreshold_;
 
-    mutable scalar lowerThreshold_;
+    const scalar lowerThreshold_;
 
-    Switch verbose_;
+    const Switch verbose_;
+
+    const Switch writeToFile_;
+
+    mutable autoPtr<OFstream> filePtr_;
 
 public:
 

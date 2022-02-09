@@ -71,6 +71,12 @@ private:
 
     const volVectorField& U_;
 
+    volScalarField* alphaP_;
+
+    volScalarField* alphaSt_;
+
+    bool fines_;
+
     bool useRho_;
 
     bool useU_;          // if false: substitution p=0.5*rho*U^2

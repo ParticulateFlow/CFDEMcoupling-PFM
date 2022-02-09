@@ -19,6 +19,12 @@ License
 
 Description
     model for thermal conductivity of fluid phase in presence of particles
+    special treatment for near-wall behavior:
+    a) wallQFactor can be used to impose scaling factor for thermal conductivity at the boundaries,
+    e.g. to model a thin boundary layer below grid resolution
+    b) explicitly specify a boundary layer thickness
+    c) specify given heat loss in W / (m K)
+    ATTENTION: if zeroGradient BC are used in thCondField, they cannot be overwritten with numerical data
 
 Class
     thermCondModel
@@ -33,6 +39,7 @@ SourceFiles
 
 #include "fvCFD.H"
 #include "cfdemCloud.H"
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -51,13 +58,31 @@ protected:
         const dictionary& dict_;
 
         cfdemCloud& particleCloud_;
-	
-	IOdictionary transportProperties_;
-	
-	dimensionedScalar kf0_;
-	
-	dimensionedScalar Cp_;
-	
+
+        const fvMesh& mesh_;
+
+        IOdictionary transportProperties_;
+
+        mutable volScalarField kf0Field_;
+        
+        mutable volScalarField CpField_;
+
+        volScalarField& thermCondField_;
+
+        // ratio of half-cell-size and near-wall film
+        mutable volScalarField wallQFactor_;
+
+        bool hasWallQFactor_;
+
+        // thickness of near-wall boundary layer, can be used instead of Q factor
+        mutable volScalarField wallBoundaryLayerThickness_;
+
+        bool hasWallBoundaryLayerThickness_;
+
+        // thickness of near-wall boundary layer, can be used instead of Q factor
+        mutable volScalarField wallHeatLoss_;
+
+        bool hasWallHeatLoss_;
 
 public:
 
@@ -104,11 +129,15 @@ public:
 
 
     // Member Functions
-	
-	virtual tmp<volScalarField> thermCond() const = 0;
-	
-	virtual tmp<volScalarField> thermDiff() const = 0;
-       
+
+        virtual void calcThermCond() {}
+
+        virtual void calcBoundaryCorrections();
+
+        const volScalarField& kf0Field() const;
+
+        const volScalarField& CpField() const;
+
 };
 
 

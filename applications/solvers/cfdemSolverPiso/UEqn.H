@@ -1,9 +1,13 @@
+particleCloud.otherForces(fOther);
+
 fvVectorMatrix UEqn
 (
     fvm::ddt(voidfraction,U) - fvm::Sp(fvc::ddt(voidfraction),U)
   + fvm::div(phi,U) - fvm::Sp(fvc::div(phi),U)
   + particleCloud.divVoidfractionTau(U, voidfraction)
+  - fOther/rho
   ==
+    fvOptions(U)
   - fvm::Sp(Ksl/rho,U)
 );
 
@@ -14,7 +18,7 @@ fvOptions.constrain(UEqn);
 if (piso.momentumPredictor() && (modelType=="B" || modelType=="Bfull"))
 {
     solve(UEqn == - fvc::grad(p) + Ksl/rho*Us);
-    fvOptions.correct(U);		    
+    fvOptions.correct(U);
 }
 else if (piso.momentumPredictor())
 {

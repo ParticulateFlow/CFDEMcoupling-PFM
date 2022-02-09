@@ -1,0 +1,77 @@
+"CFDEMproject Website"_lws - "Main Page"_main :c
+
+:link(lws,http://www.cfdem.com)
+:link(main,CFDEMcoupling_Manual.html)
+
+:line
+
+smoothingModel constDiffAndTemporalSmoothing command :h3
+
+[Syntax:]
+
+Defined in dictionary depending on the application.
+
+smoothingModel constDiffAndTemporalSmoothing;
+constDiffAndTemporalSmoothingProps
+\{
+    lowerLimit                    number1;
+    upperLimit                    number2;
+    smoothingLength               lengthScale;
+    smoothingLengthReferenceField lengthScaleRefField;
+    smoothingStrength             smoothingStrength;
+    correctBoundary               switch1;
+    verbose;
+\} :pre
+
+{number1} = scalar fields will be bound to this lower value :ulb,l
+{number2} = scalar fields will be bound to this upper value :l
+{lengthScale} = length scale over which the exchange fields will be smoothed out :l
+{lengthScaleRefField} = length scale over which reference fields (e.g., the average particle velocity) will be smoothed out. Should be always larger than lengthScale. If not specified, will be equal to lengthScale. :l
+{smoothingStrength} = control parameter gamma for the smoothing, lower value yields stronger smoothing (gamma = 1 results in an equal contribution from the un-smoothed and smoothed fields)  :l
+{correctBoundary} = (optional, default false) activate to use purely temporal smoothing on the boundary field, avoids interpolation errors near the domain boundary :l
+{verbose} = (optional, default false) flag for debugging output :l
+:ule
+
+[Examples:]
+
+constDiffAndTemporalSmoothingProps
+\{
+    lowerLimit       0.1;
+    upperLimit       1e10;
+    smoothingLength  1500e-6;
+    smoothingLengthReferenceField 9000e-6;
+    referenceField   "p";
+    gamma            1.0;
+\} :pre
+
+[Description:]
+
+The {constDiffAndTemporalSmoothing} model is a smoothing model that combines the
+spacial smoothing of "constDiffSmoothing"_smoothingModel_constDiffSmoothing.html and
+the temporal smoothing of "temporalSmoothing"_smoothingModel_temporalSmoothing.html for
+the relaxation of a desired quantity. This model can be used to filter out
+high-frequency fluctuations (e.g. numerical noise) controlled via the smoothing length
+and the temporal smoothing strength parameter gamma.
+
+For more details, see "Vångö et al. (2018)"_#Vångö2018 and "Nijssen et al. (2020)"_#Nijssen2020.
+
+:link(Vångö2018)
+[(Vångö2018)] M. Vångö, S. Pirker, T. Lichtenegger. (2018):
+"Unresolved CFD-DEM modeling of multiphase flow in densely packed particle beds",
+Applied Mathematical Modelling
+
+:link(Nijssen2020)
+[(Nijssen2020)] T.M.J. Nijssen, J.A.M. Kuipers, J. van der Stel, A.T. Adema, K.A. Buist. (2020):
+"Complete liquid-solid momentum coupling for unresolved CFD-DEM simulations",
+International Journal of Multiphase Flow
+
+[Restrictions:]
+
+This model is tested in a limited number of flow situations.
+
+[Related commands:]
+
+"smoothingModel"_smoothingModel.html
+"constDiffSmoothing"_smoothingModel_constDiffSmoothing.html
+"temporalSmoothing"_smoothingModel_temporalSmoothing.html
+

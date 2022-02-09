@@ -81,9 +81,29 @@ MeiLift::MeiLift
     propsDict_(dict.subDict(typeName + "Props")),
     velFieldName_(propsDict_.lookup("velFieldName")),
     U_(sm.mesh().lookupObject<volVectorField> (velFieldName_)),
-    useSecondOrderTerms_(false)
+    useShearInduced_(propsDict_.lookupOrDefault<bool>("useShearInduced",true)),
+    useSpinInduced_(propsDict_.lookupOrDefault<bool>("useSpinInduced",false)),
+    combineShearSpin_(propsDict_.lookupOrDefault<bool>("combineShearSpin",false))
 {
-    if (propsDict_.found("useSecondOrderTerms")) useSecondOrderTerms_=true;
+    // read switches
+
+    if(useShearInduced_)
+        Info << "Lift model: including shear-induced term.\n";
+
+    if(useSpinInduced_)
+    {
+        Info << "Lift model: including spin-induced term.\n";
+        Info << "Make sure to use a rolling friction model in LIGGGHTS!\n";
+        if(!dict.lookupOrDefault<bool>("getParticleAngVels",false))
+            FatalError << "Lift model: useSpinInduced=true requires getParticleAngVels=true in couplingProperties" << abort(FatalError);
+    }
+
+    if(combineShearSpin_)
+    {
+        Info << "Lift model: combining shear- and spin-terms by assuming equilibrium spin-rate.\n";
+        if(!useShearInduced_ || !useSpinInduced_)
+            FatalError << "Shear- and spin-induced lift must be activated in order to combine." << abort(FatalError);
+    }
 
     // init force sub model
     setForceSubModels(propsDict_);
@@ -100,10 +120,15 @@ MeiLift::MeiLift
     particleCloud_.probeM().initialize(typeName, typeName+".logDat");
     particleCloud_.probeM().vectorFields_.append("liftForce"); //first entry must the be the force
     particleCloud_.probeM().vectorFields_.append("Urel");      //other are debug
-    particleCloud_.probeM().vectorFields_.append("vorticity"); //other are debug
-    particleCloud_.probeM().scalarFields_.append("Rep");       //other are debug
-    particleCloud_.probeM().scalarFields_.append("Rew");       //other are debug
-    particleCloud_.probeM().scalarFields_.append("J_star");    //other are debug
+    particleCloud_.probeM().vectorFields_.append("vorticity");
+    particleCloud_.probeM().vectorFields_.append("Ang_velocity");
+    particleCloud_.probeM().scalarFields_.append("Rep");
+    particleCloud_.probeM().scalarFields_.append("Rew");
+    particleCloud_.probeM().scalarFields_.append("J*");
+    particleCloud_.probeM().scalarFields_.append("Cl(shear)");
+    particleCloud_.probeM().scalarFields_.append("Cl*(spin)");
+    particleCloud_.probeM().scalarFields_.append("Omega_eq");
+    particleCloud_.probeM().scalarFields_.append("Cl(combined)");
     particleCloud_.probeM().writeHeader();
 }
 
@@ -122,27 +147,44 @@ void MeiLift::setForce() const
     const volScalarField& nufField = forceSubM(0).nuField();
     const volScalarField& rhoField = forceSubM(0).rhoField();
 
+    // vectors
     vector position(0,0,0);
     vector lift(0,0,0);
     vector Us(0,0,0);
     vector Ur(0,0,0);
+    vector Omega(0,0,0);
+    vector vorticity(0,0,0);
+
+    // properties
     scalar magUr(0);
     scalar magVorticity(0);
+    scalar magOmega(0);
     scalar ds(0);
     scalar nuf(0);
     scalar rho(0);
     scalar voidfraction(1);
+
+    // dimensionless groups
     scalar Rep(0);
     scalar Rew(0);
-    scalar Cl(0);
-    scalar Cl_star(0);
-    scalar J_star(0);
-    scalar Omega_eq(0);
-    scalar alphaStar(0);
-    scalar epsilonSqr(0.0);
-    scalar epsilon(0);
+
+    // shear induced
     scalar omega_star(0);
-    vector vorticity(0,0,0);
+    scalar Clshear(0);
+    scalar J_star(0);
+    scalar alphaStar(0);
+    scalar epsilonSqr(0);
+    scalar epsilon(0);
+
+    // spin induced
+    scalar Omega_star(0);
+    scalar Clspin_star(0);
+
+    // shear-spin combination
+    scalar Omega_eq(0);
+    scalar Clcombined(0);
+
+
     volVectorField vorticityField = fvc::curl(U_);
 
     interpolationCellPoint<vector> UInterpolator_(U_);
@@ -152,14 +194,14 @@ void MeiLift::setForce() const
 
     for (int index = 0; index < particleCloud_.numberOfParticles(); ++index)
     {
-        //if(mask[index][0])
-        //{
             lift = vector::zero;
             label cellI = particleCloud_.cellIDs()[index][0];
 
             if (cellI > -1) // particle Found
             {
+                // properties
                 Us = particleCloud_.velocity(index);
+                Omega = particleCloud_.particleAngVel(index);
 
                 if (forceSubM(0).interpolation())
                 {
@@ -173,23 +215,23 @@ void MeiLift::setForce() const
                     vorticity = vorticityField[cellI];
                 }
 
-                magUr        = mag(Ur);
-                magVorticity = mag(vorticity);
+                ds      = 2. * particleCloud_.radius(index);
+                nuf     = nufField[cellI];
+                rho     = rhoField[cellI];
 
-                if (magUr > 0 && magVorticity > 0)
+                magUr   = mag(Ur);
+                Rep     = ds*magUr/nuf;
+
+                // shear-induced lift
+                if (useShearInduced_)
                 {
-                    ds  = 2. * particleCloud_.radius(index);
-                    nuf = nufField[cellI];
-                    rho = rhoField[cellI];
+                    magVorticity    = mag(vorticity);
+                    Rew             = magVorticity*ds*ds/nuf;
+                    omega_star      = magVorticity * ds / magUr;
+                    alphaStar       = 0.5 * omega_star;
+                    epsilonSqr      = omega_star / Rep;
+                    epsilon         = sqrt(epsilonSqr);
 
-                    // calc dimensionless properties
-                    Rep = ds*magUr/nuf;
-                    Rew = magVorticity*ds*ds/nuf;
-
-                    omega_star = magVorticity * ds / magUr;
-                    alphaStar = 0.5 * omega_star;
-                    epsilonSqr = omega_star / Rep;
-                    epsilon = sqrt(epsilonSqr);
 
                     //Basic model for the correction to the Saffman lift
                     //McLaughlin (1991), Mei (1992), Loth and Dorgan (2009)
@@ -212,35 +254,76 @@ void MeiLift::setForce() const
                                  * (1.0   + tanh(2.5 * (log10(epsilon) + 0.191)))
                                  * (0.667 + tanh(6.0 * (      epsilon  - 0.32 )));
                     }
-                    //Loth and Dorgan (2009), Eq (31): Saffman lift-coefficient: ClSaff = 12.92 / pi * epsilon ~ 4.11 * epsilon
-                    //Loth and Dorgan (2009), Eq (32)
-                    Cl = J_star * 4.11 * epsilon; //multiply correction to the basic Saffman model
 
-                    //Second order terms given by Loth and Dorgan (2009)
-                    if (useSecondOrderTerms_)
+                    //Loth and Dorgan (2009), Eq (31), Eq (32)
+                    Clshear = J_star * 4.11 * epsilon; //multiply correction to the basic Saffman model
+                }
+
+                if (useSpinInduced_)
+                {
+                    magOmega        = mag(Omega);
+                    Omega_star      = magOmega * ds / magUr;
+
+                    //Loth and Dorgan (2009), Eq (34)
+                    Clspin_star     = 1.0 - (0.675 + 0.15 * (1.0 + tanh(0.28 * (Omega_star - 2.0)))) * tanh(0.18 * sqrt(Rep));
+                }
+
+                if (combineShearSpin_)
+                {
+                    //Loth and Dorgan (2009), Eq (38)
+                    Omega_eq        = alphaStar * (1.0 - 0.0075 * Rew) * (1.0 - 0.062 * sqrt(Rep) - 0.001 * Rep);
+                    //Loth and Dorgan (2009), Eq (39)
+                    Clcombined      = Clshear + Clspin_star * Omega_eq;
+
+                    if (magUr>0.0 && magVorticity>0.0)
                     {
-                        scalar sqrtRep = sqrt(Rep);
-                        //Loth and Dorgan (2009), Eq (34)
-                        Cl_star = 1.0 - (0.675 + 0.15 * (1.0 + tanh(0.28 * (alphaStar - 2.0)))) * tanh(0.18 * sqrtRep);
-                        //Loth and Dorgan (2009), Eq (38)
-                        Omega_eq = alphaStar * (1.0 - 0.0075 * Rew) * (1.0 - 0.062 * sqrtRep - 0.001 * Rep);
-                        //Loth and Dorgan (2009), Eq (39)
-                        Cl += Omega_eq * Cl_star;
-                    }
-
-                    //Loth and Dorgan (2009), Eq (27)
-                    lift = 0.125 * constant::mathematical::pi
-                           * rho
-                           * Cl
-                           * magUr * Ur ^ vorticity / magVorticity
-                           * ds * ds;
-
-                    if (modelType_ == "B")
-                    {
-                        voidfraction = particleCloud_.voidfraction(index);
-                        lift /= voidfraction;
+                        //Loth and Dorgan (2009), Eq (27)
+                         // please note: in Loth and Dorgan Vrel = Vp-Uf, here Urel = Uf-Vp. Hence the reversed cross products.
+                        lift = 0.125 * constant::mathematical::pi
+                                * rho
+                                * Clcombined
+                                * magUr * magUr
+                                * (Ur ^ vorticity) / mag(Ur ^ vorticity) // force direction
+                                * ds * ds;
                     }
                 }
+                else
+                {
+                    //Loth and Dorgan (2009), Eq (36)
+                    // please note: in Loth and Dorgan Vrel = Vp-Uf, here Urel = Uf-Vp. Hence the reversed cross products.
+                    if (useShearInduced_)
+                    {
+                        if (magUr>0.0 && magVorticity>0.0)
+                        {
+                            //Loth and Dorgan (2009), Eq (27)
+                            lift += 0.125 * constant::mathematical::pi
+                                    * rho
+                                    * Clshear
+                                    * magUr * magUr
+                                    * (Ur ^ vorticity) / mag(Ur ^ vorticity) // force direction
+                                    * ds * ds;
+                        }
+                    }
+                    if (useSpinInduced_)
+                    {
+                        if (magUr>0.0 && magOmega>0.0)
+                        {
+                            //Loth and Dorgan (2009), Eq (33)
+                            lift += 0.125 * constant::mathematical::pi
+                                    * rho
+                                    * Clspin_star
+                                    * (Ur ^ Omega)
+                                    * ds * ds * ds;
+                        }
+                    }
+                }
+
+                if (modelType_ == "B")
+                {
+                    voidfraction = particleCloud_.voidfraction(index);
+                    lift /= voidfraction;
+                }
+
 
                 //**********************************
                 //SAMPLING AND VERBOSE OUTOUT
@@ -250,6 +333,7 @@ void MeiLift::setForce() const
                     Pout << "Us = " << Us << endl;
                     Pout << "Ur = " << Ur << endl;
                     Pout << "vorticity = " << vorticity << endl;
+                    Pout << "Omega = " << Omega << endl;
                     Pout << "ds = " << ds << endl;
                     Pout << "rho = " << rho << endl;
                     Pout << "nuf = " << nuf << endl;
@@ -258,6 +342,10 @@ void MeiLift::setForce() const
                     Pout << "alphaStar = " << alphaStar << endl;
                     Pout << "epsilon = " << epsilon << endl;
                     Pout << "J_star = " << J_star << endl;
+                    Pout << "Omega_eq = " << Omega_eq << endl;
+                    Pout << "Clshear = " <<  Clshear<< endl;
+                    Pout << "Clspin_star = " << Clspin_star << endl;
+                    Pout << "Clcombined = " << Clcombined << endl;
                     Pout << "lift = " << lift << endl;
                 }
 
@@ -268,9 +356,14 @@ void MeiLift::setForce() const
                     vValues.append(lift);   //first entry must the be the force
                     vValues.append(Ur);
                     vValues.append(vorticity);
+                    vValues.append(Omega);
                     sValues.append(Rep);
                     sValues.append(Rew);
                     sValues.append(J_star);
+                    sValues.append(Clshear);
+                    sValues.append(Clspin_star);
+                    sValues.append(Omega_eq);
+                    sValues.append(Clcombined);
                     particleCloud_.probeM().writeProbe(index, sValues, vValues);
                 }
                 // END OF SAMPLING AND VERBOSE OUTOUT
@@ -279,7 +372,6 @@ void MeiLift::setForce() const
             }
             // write particle based data to global array
             forceSubM(0).partToArray(index,lift,vector::zero);
-        //}
     }
 
 }

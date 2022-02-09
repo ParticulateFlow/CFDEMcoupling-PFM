@@ -34,12 +34,12 @@ Description
 #ifndef versionInfo_H
 #define versionInfo_H
 
-word CFDEMversion="PFM 17.08";
-word compatibleLIGGGHTSversion="PFM 17.08";
-word OFversion="4.x";
+word CFDEMversion="PFM 21.11";
+word compatibleLIGGGHTSversion="PFM 21.11";
+word OFversion="6";
 
 Info << "\nCFDEMcoupling version: " << CFDEMversion <<  endl;
-Info << ", compatible to LIGGGHTS version: " << compatibleLIGGGHTSversion <<  endl;
-Info << ", compatible to OpenFOAM version: " << OFversion <<  endl;
+Info << "compatible to LIGGGHTS version: " << compatibleLIGGGHTSversion <<  endl;
+Info << "compatible to OpenFOAM version: " << OFversion <<  endl;
 
 #endif

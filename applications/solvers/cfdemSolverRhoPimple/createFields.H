@@ -51,18 +51,48 @@ Info<< "Reading thermophysical properties\n" << endl;
         mesh
     );
 
-    volScalarField addSource
+    volScalarField rhoeps("rhoeps", rho*voidfraction);
+    rhoeps.oldTime(); // switch on saving old time
+
+    Info<< "Reading/calculating face flux field phi\n" << endl;
+    surfaceScalarField phi
     (
         IOobject
         (
-           "addSource",
-           runTime.timeName(),
-           mesh,
-           IOobject::MUST_READ,
-           IOobject::AUTO_WRITE
-        ),
-        mesh
+            "phi",
+            runTime.timeName(),
+            mesh,
+            IOobject::READ_IF_PRESENT,
+            IOobject::AUTO_WRITE
+         ),
+         linearInterpolate(rho*U*voidfraction) & mesh.Sf()
     );
+
+#if OPENFOAM_VERSION_MAJOR < 5
+    dimensionedScalar rhoMax
+    (
+        dimensionedScalar::lookupOrDefault
+        (
+            "rhoMax",
+            pimple.dict(),
+            dimDensity,
+            GREAT
+        )
+    );
+
+    dimensionedScalar rhoMin
+    (
+        dimensionedScalar::lookupOrDefault
+        (
+            "rhoMin",
+            pimple.dict(),
+            dimDensity,
+            0
+        )
+    );
+#else
+    pressureControl pressureControl(p, rho, pimple.dict(), false);
+#endif
 
     Info<< "\nCreating fluid-particle heat flux field\n" << endl;
     volScalarField Qsource
@@ -94,21 +124,6 @@ Info<< "Reading thermophysical properties\n" << endl;
         dimensionedScalar("zero", dimensionSet(1,-1,-3,-1,0,0,0), 0.0)
     );
 
-  /*  Info<< "\nCreating thermal diffusivity field\n" << endl;
-    volScalarField thDiff
-    (
-        IOobject
-        (
-            "thDiff",
-            runTime.timeName(),
-            mesh,
-            IOobject::NO_READ,
-            IOobject::AUTO_WRITE
-        ),
-        mesh,
-        dimensionedScalar("zero", dimensionSet(0,2,-1,0,0,0,0), 0.0)
-    );
-  */
     Info<< "\nCreating thermal conductivity field\n" << endl;
     volScalarField thCond
     (
@@ -117,11 +132,12 @@ Info<< "Reading thermophysical properties\n" << endl;
             "thCond",
             runTime.timeName(),
             mesh,
-            IOobject::NO_READ,
+            IOobject::READ_IF_PRESENT,
             IOobject::AUTO_WRITE
         ),
         mesh,
-        dimensionedScalar("zero", dimensionSet(1,1,-3,-1,0,0,0), 0.0)
+        dimensionedScalar("zero", dimensionSet(1,1,-3,-1,0,0,0), 0.0),
+        "zeroGradient"
     );
 
     Info<< "\nCreating heat capacity field\n" << endl;
@@ -154,41 +170,16 @@ Info<< "Reading thermophysical properties\n" << endl;
         dimensionedVector("zero", dimensionSet(1,-2,-2,0,0,0,0), vector::zero)
     );
 
-    Info<< "Reading/calculating face flux field phi\n" << endl;
-    surfaceScalarField phi
+    bool smoothenForces
     (
-        IOobject
+        pimple.dict().lookupOrDefault<bool>
         (
-            "phi",
-            runTime.timeName(),
-            mesh,
-            IOobject::READ_IF_PRESENT,
-            IOobject::AUTO_WRITE
-         ),
-         linearInterpolate(rho*U*voidfraction) & mesh.Sf()
-    );
-
-    dimensionedScalar rhoMax
-    (
-        dimensionedScalar::lookupOrDefault
-        (
-            "rhoMax",
-            pimple.dict(),
-            dimDensity,
-            GREAT
+            "smoothenForces",
+            false
         )
     );
-
-    dimensionedScalar rhoMin
-    (
-        dimensionedScalar::lookupOrDefault
-        (
-            "rhoMin",
-            pimple.dict(),
-            dimDensity,
-            0
-        )
-    );
+    if (smoothenForces) Info << "Smoothening implicit particle forces.\n" << endl;
+    else Info << "Not smoothening implicit particle forces.\n" << endl;
 
     Info<< "Creating turbulence model\n" << endl;
     autoPtr<compressible::turbulenceModel> turbulence

@@ -76,7 +76,7 @@ protected:
 
         wordList forceSubModels_;
 
-        autoPtr<forceSubModel>* forceSubModel_;
+        mutable PtrList<forceSubModel> forceSubModel_;
 
 public:
 
@@ -137,15 +137,10 @@ public:
 
         inline volVectorField& expParticleForces() const { return expParticleForces_; }
 
-        inline double ** impForces() const { return particleCloud_.impForces_; }
 
-        inline double ** expForces() const { return particleCloud_.expForces_; }
 
-        inline double ** DEMForces() const { return particleCloud_.DEMForces_; }
 
-        inline double ** Cds() const { return particleCloud_.Cds_; }
 
-        inline double ** fluidVel() const { return particleCloud_.fluidVel_; }
 
         inline bool coupleForce() const { return coupleForce_; }
 
@@ -157,7 +152,7 @@ public:
 
         inline const wordList& forceSubModels() { return forceSubModels_; }
 
-        inline forceSubModel& forceSubM(int i) const { return forceSubModel_[i](); }
+        inline forceSubModel& forceSubM(int i) const { return forceSubModel_[i]; }
 
         inline int nrForceSubModels() const { return forceSubModels_.size(); }
 

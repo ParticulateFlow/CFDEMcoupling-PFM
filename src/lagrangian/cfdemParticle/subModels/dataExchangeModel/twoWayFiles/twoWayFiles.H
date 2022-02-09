@@ -65,9 +65,9 @@ private:
 
   // private member functions
 
-    fileName getFilePath(word&, bool) const;
+    fileName getFilePath(const word&, bool) const;
 
-    void renameFilePath(fileName&,word&) const;
+    void renameFilePath(const fileName&, const word&) const;
 
 public:
 
@@ -92,29 +92,28 @@ public:
     // Member Functions
         void getData
         (
-            word name,
-            word type,
+            const word& name,
+            const word& type,
             double ** const& field,
             label step
         ) const;
 
         void getData
         (
-            word name,
-            word type,
+            const word& name,
+            const word& type,
             int ** const& field,
             label step
         ) const { FatalError<<"function not implemented !!! twoWayFiles::getData!!!\n" << abort(FatalError); }
 
         void giveData
         (
-            word name,
-            word type,
+            const word& name,
+            const word& type,
             double ** const& field,
             const char* datatype = ""
         ) const;
 
-        word myType() const{ return typeName; }
 };
 
 

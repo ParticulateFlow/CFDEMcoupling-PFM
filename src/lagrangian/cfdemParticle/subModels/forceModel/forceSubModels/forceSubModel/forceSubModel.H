@@ -82,6 +82,7 @@ protected:
 
         List<Switch> switchesList_;         // switches which are requested from dict
 
+        // a Switch is set to false in the default Switch constructor
         List<Switch> switches_;             // switch status
 
         mutable volScalarField nu_;
@@ -156,8 +157,6 @@ public:
         inline bool useFilteredDragModel() const { return switches_[SW_FILTERED_DRAG_MODEL]; }
 
         inline bool useParcelSizeDependentFilteredDrag() const { return switches_[SW_PARCEL_SIZE_DEPENDENT_FILTERED_DRAG]; }
-
-        virtual word myType() const = 0;
 
         inline forceModel& myForceM() const { return forceModel_; }
 

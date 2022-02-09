@@ -539,6 +539,12 @@ parCFDrun()
     #- change path
     cd $casePath/CFD
 
+    #- remove old data
+    rm -rf processor*
+
+    #- decompose case
+    decomposePar
+
     #- header
     echo 2>&1 | tee -a /$logpath/$logfileName
     echo "//   $headerText   //" 2>&1 | tee -a $logpath/$logfileName
@@ -691,6 +697,35 @@ collectLogCFDEMcoupling_sol()
         echo "$SOLVERNAME" >> $logpath/log_compile_results_success
     else
         echo "$SOLVERNAME" >> $logpath/log_compile_results_fail
+    fi
+}
+#==================================#
+
+#==================================#
+#- function to check compile results
+#- from logfiles
+
+checkLogCFDEMcoupling_sol()
+{
+    #--------------------------------------------------------------------------------#
+    #- define variables
+    logpath="$1"
+    logfileName="$2"
+    casePath="$3"
+    #--------------------------------------------------------------------------------#
+    # read name of solver
+    SOLVERNAME=$(basename $casePath)
+
+    # read last line of log
+    LASTLINE=`tac $logpath/$logfileName | egrep -m 1 .`
+    LASTSTRING=`echo ${LASTLINE##* }`
+    LASTWORD=$(basename $LASTSTRING)
+
+    # log if compilation was success
+    if [[ $LASTWORD == $SOLVERNAME ]]; then
+        echo 0
+    else
+        echo 1
     fi
 }
 #==================================#

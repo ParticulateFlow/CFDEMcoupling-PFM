@@ -1,15 +1,16 @@
-"CFDEMproject WWW Site"_lws - "CFDEM Commands"_lc :c
+"CFDEMproject Website"_lws - "Main Page"_main :c
 
 :link(lws,http://www.cfdem.com)
-:link(lc,CFDEMcoupling_Manual.html#comm)
+:link(main,CFDEMcoupling_Manual.html)
 
 :line
 
-forceModel_virtualMassForce command :h3
+forceModel virtualMassForce command :h3
 
 [Syntax:]
 
-Defined in couplingProperties dictionary.
+Defined in "couplingProperties"_CFDEMcoupling_dicts.html#couplingProperties
+dictionary.
 
 forceModels
 (
@@ -18,9 +19,29 @@ forceModels
 virtualMassForceProps
 \{
     velFieldName "U";
-\}; :pre
+    voidfractionFieldName "voidfraction";
+    UsFieldName "Us";
+    phiFieldName "phi";
+    splitUrelCalculation switch1;
+    useUs switch2;
+    useFelderhof switch3;
+    Cadd scalar1;
+    treatForceExplicit switch4;
+    interpolation switch5;
+    smoothingModel "smoothingModel";
+\} :pre
 
 {U} = name of the finite volume fluid velocity field :ulb,l
+{voidfraction} = name of the finite volume void fraction field :l
+{Us} = name of the finite volume cell averaged particle velocity field :l
+{phi} = name of the finite volume flux field :l
+{switch1} = (optional, default false) indicator to split calculation of Urel between CFDEM and LIGGGHTS :l
+{switch2} = (optional, default false) indicator to use the cell-averaged particle velocity Us for calculation of Urel :l
+{switch3} = (optional, default false) indicator to use the correlation by Felderhof for the virtual mass coefficient :l
+{scalar1} = (optional, default 0.5) virtual mass coefficient :l
+{switch4} = (optional, default true) sub model switch, see "forceSubModel"_forceSubModel.html for details :l
+{switch5} = (optional, default false) sub model switch, see "forceSubModel"_forceSubModel.html for details :l
+{smoothingModel} = name of smoothing model for the DU/Dt field :l
 :ule
 
 [Examples:]
@@ -32,15 +53,28 @@ forceModels
 virtualMassForceProps
 \{
     velFieldName "U";
+    voidfractionFieldName "voidfraction"
+    USFieldName "Us"
+    phiFieldName "phi";
+    smoothingModel off;
 \} :pre
 
 [Description:]
 
-The force model performs the calculation of forces (e.g. fluid-particle interaction forces) acting on each DEM particle. The virtualMassForce model calculates the virtual mass force for each particle.
+The force model performs the calculation of forces (e.g. fluid-particle
+interaction forces) acting on each DEM particle. The {virtualMassForce} model
+calculates the virtual mass force for each particle.
+
+For more detail, see "Nijssen et al. (2020)"_#Nijssen2020.
+
+:link(Nijssen2020)
+[(Nijssen2020)] T.M.J. Nijssen, J.A.M. Kuipers, J. van der Stel, A.T. Adema, K.A. Buist. (2020):
+"Complete liquid-solid momentum coupling for unresolved CFD-DEM simulations",
+International Journal of Multiphase Flow
 
 [Restrictions:]
 
-Model not validated!
+IMPORTANT NOTE: Model not validated!
 
 [Related commands:]
 

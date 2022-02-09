@@ -1,0 +1,99 @@
+"CFDEMproject Website"_lws - "Main Page"_main :c
+
+:link(lws,http://www.cfdem.com)
+:link(main,CFDEMcoupling_Manual.html)
+
+:line
+
+1. About CFDEMcoupling :link(1_1),h3
+
+<!-- HTML_ONLY -->
+CFDEMcoupling provides an open-source parallel coupled CFD-DEM framework
+combining the strengths of the "LIGGGHTS"_lig DEM code and the open-source CFD
+package "OpenFOAM&reg;"_of (*). The CFDEMcoupling toolbox allows to expand standard
+CFD solvers of "OpenFOAM&reg;"_of (*) to include a coupling to the DEM code
+"LIGGGHTS"_lig.
+
+<!-- END_HTML_ONLY -->
+
+<!-- RST
+
+CFDEMcoupling provides an open-source parallel coupled CFD-DEM framework
+combining the strengths of the `LIGGGHTS <http://www.cfdem.com>`_ DEM code and
+the open-source CFD package OpenFOAM\ |reg|\ (*).
+The CFDEMcoupling toolbox allows to expand standard CFD solvers of
+OpenFOAM\ |reg|\ (*) to include a coupling to the DEM code
+`LIGGGHTS <http://www.cfdem.com>`_.
+
+.. |reg|    unicode:: U+000AE .. REGISTERED SIGN
+
+END_RST -->
+
+In this toolbox the particle representation within the CFD
+solver is organized by "cloud" classes. Key functionalities are organized in
+sub-models (e.g. force models, data exchange models, etc.) which can easily be
+selected and combined by dictionary settings.
+
+The coupled solvers run fully parallel on distributed-memory clusters. Features
+are:
+
+its modular approach allows users to easily implement new models :ulb,l
+its MPI parallelization enables to use it for large scale problems :l
+the "forum"_lig on CFD-DEM gives the possibility to exchange with other users / developers :l
+the use of Git allows to easily update to the latest version :l
+basic documentation is provided :l
+:ule
+
+The file structure:
+
+{src} directory including the source files of the coupling toolbox and models :ulb,l
+{applications} directory including the solver files for coupled CFD-DEM simulations :l
+{doc} directory including the documentation of CFDEMcoupling :l
+{tutorials} directory including basic tutorial cases showing the functionality  :l
+:ule
+
+Details on installation are given on the "CFDEMproject Website"_lig .
+The functionality of this CFD-DEM framework is described via "tutorial
+cases"_CFDEMcoupling_tutorials.html showing how to use different solvers and
+models.
+
+CFDEMcoupling stands for Computational Fluid Dynamics (CFD) - Discrete Element
+Method (DEM) coupling.
+
+CFDEMcoupling is an open-source code, distributed freely under the terms of the
+"GNU Public License (GPL)"_https://www.gnu.org/licenses/gpl-3.0.en.html.
+
+Core development of the public version of CFDEMcoupling is done by Christoph
+Goniva and Christoph Kloss, both at DCS Computing GmbH.
+
+The original version of this documentation was written by Christoph Goniva, DCS
+Computing GmbH, 2012.
+
+:line
+
+<!-- HTML_ONLY -->
+NOTE:
+(*) This offering is not approved or endorsed by OpenCFD Limited, producer and
+distributor of the OpenFOAM software via www.openfoam.com, and owner of the
+OPENFOAM&reg; and OpenCFD&reg; trade marks.
+OPENFOAM&reg; is a registered trade mark of OpenCFD Limited, producer and
+distributor of the OpenFOAM software via www.openfoam.com.
+<!-- END_HTML_ONLY -->
+
+<!-- RST
+
+.. note::
+
+   (*) This offering is not approved or endorsed by OpenCFD Limited, producer
+   and distributor of the OpenFOAM software via www.openfoam.com, and owner of
+   the OPENFOAM\ |reg| and OpenCFD\ |reg| trade marks.
+   OPENFOAM\ |reg| is a registered trade mark of OpenCFD Limited, producer and
+   distributor of the OpenFOAM software via www.openfoam.com.
+
+.. |reg|    unicode:: U+000AE .. REGISTERED SIGN
+
+END_RST -->
+
+:link(of,http://www.openfoam.org)
+:link(lig,http://www.cfdem.com)
+

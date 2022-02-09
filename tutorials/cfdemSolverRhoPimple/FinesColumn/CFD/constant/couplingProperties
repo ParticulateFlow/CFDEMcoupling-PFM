@@ -32,13 +32,13 @@ couplingInterval 10;
 
 voidFractionModel divided;
 
-locateModel engine;//turboEngineM2M;//
+locateModel engine;//turboEngine;//
 
 meshMotionModel noMeshMotion;
 
 regionModel allRegion;
 
-IOModel "basicIO";
+IOModel "off";
 
 dataExchangeModel twoWayMPI;//twoWayM2M;//twoWayFiles;//oneWayVTK;//
 
@@ -55,7 +55,7 @@ forceModels
     dSauter
     Fines
     FanningDynFines
-    ErgunStatFines
+    BeetstraDragPoly
     gradPForce
     viscForce
 );
@@ -80,7 +80,10 @@ energyModels
 
 thermCondModel SyamlalThermCond;
 
-chemistryModel off;
+chemistryModels
+(
+    off
+);
 
 turbulenceModelType "turbulenceProperties";
 
@@ -137,13 +140,14 @@ viscForceProps
     interpolation;
 }
 
-ErgunStatFinesProps
+BeetstraDragProps
 {
+    fines true;
+    dFine 0.000388;
     velFieldName "U";
     granVelFieldName "Us";
     densityFieldName "rho";
     voidfractionFieldName "voidfraction";
-    phi 1;
 }
 
 FanningDynFinesProps
@@ -195,19 +199,16 @@ engineProps
     treeSearch true;
 }
 
-turboEngineM2MProps
+turboEngineProps
 {
-    turboEngineProps
-    {
-        treeSearch true;
-    }
+    treeSearch true;
 }
 
 dividedProps
 {
     alphaMin 0.25;
     scaleUpVol 1.0;
-    weight 1.0; //1.33;
+    weight 1.0;
     verbose;
 }
 

@@ -1,0 +1,70 @@
+"CFDEMproject Website"_lws - "Main Page"_main :c
+
+:link(lws,http://www.cfdem.com)
+:link(main,CFDEMcoupling_Manual.html)
+
+:line
+
+chemistryModel species command :h3
+
+[Syntax:]
+
+Defined in "couplingProperties"_CFDEMcoupling_dicts.html#couplingProperties
+dictionary.
+
+chemistryModels
+(
+    species
+);
+speciesProps
+\{
+    ChemistryFile           "$casePath/CFD/constant/foam.inp";
+    tempFieldName           "T";
+    densityFieldName        "rho";
+    voidfractionFieldName   "voidfraction";
+    totalMoleFieldName      "molarConc";
+    partTempName            "partTemp";
+    partRhoName             "partRho";
+    verbose                 switch1;
+    Nevery                  number1;
+\} :pre
+
+{ChemistryFile} = path to file, where the reacting species are listed  :ulb,l
+{T} = (optional, default "T") name of the finite volume temperature field :l
+{rho} = (optional, default "rho") name of the finite volume density field :l
+{voidfraction} = (optional, default "voidfraction") name of the finite volume void fraction field :l
+{molarConc} = (optional, default "molarConc") name of the finite volume molar concentration field :l
+{partTemp} = (optional, default "partTemp") name of the finite volume cell averaged particle temperature field :l
+{partRho} = (optional, default "partRho") name of the finite volume cell averaged density temperature field :l
+{switch1} = (optional, default false) flag to output verbose information :l
+{number1} = (optional, default 1) number to adjust execution interval :l
+:ule
+
+[Examples:]
+
+chemistryModels
+(
+    species
+);
+speciesProps
+\{
+     ChemistryFile     "$casePath/CFD/constant/foam.inp";
+     verbose           false;
+\} :pre
+
+[Description:]
+
+The chemistry model performs the calculation of chemical reactional effects
+acting on each DEM particle. The species model is the model, where the specified
+species fields (from the foam.inp folder) are initialized, and information such
+as temperature, density, molar concentration and more importantly the molar
+fractions are transferred to DEM side.
+
+[Restrictions:]
+
+none
+
+[Related commands:]
+
+"chemistryModel"_chemistryModel.html
+

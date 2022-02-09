@@ -3,6 +3,8 @@ sinclude $(RULES)/mplib$(WM_MPLIB)
 
 GIT_VERSION := $(shell git describe --dirty --always --tags)
 PFLAGS+= -DGITVERSION=\"$(GIT_VERSION)\"
+FOAM_VERSION_MAJOR := $(word 1,$(subst ., ,$(WM_PROJECT_VERSION)))
+PFLAGS+= -DOPENFOAM_VERSION_MAJOR=$(FOAM_VERSION_MAJOR)
 
 include $(CFDEM_ADD_LIBS_DIR)/additionalLibs
 
@@ -21,7 +23,8 @@ EXE_INC = \
     -I$(CFDEM_SRC_DIR)/cfdTools \
     -Wno-old-style-cast \
     -Wno-unused-result \
-    -Wno-literal-suffix
+    -Wno-literal-suffix \
+    -Wno-deprecated-copy
 
 
 LIB_LIBS = \
@@ -34,6 +37,4 @@ LIB_LIBS = \
     -lmpi_cxx \
     -Wl,-rpath,$(CFDEM_LIGGGHTS_BIN_DIR) \
     -L$(CFDEM_LIGGGHTS_BIN_DIR) \
-    -lliggghts \
-    -L$(CFDEM_Many2ManyLIB_PATH) \
-    -lcoupleMany2Many
+    -lliggghts

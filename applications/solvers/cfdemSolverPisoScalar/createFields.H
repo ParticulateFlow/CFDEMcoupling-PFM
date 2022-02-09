@@ -46,6 +46,21 @@
         //dimensionedScalar("0", dimensionSet(0, 0, -1, 0, 0), 1.0)
     );
 
+    Info<< "\nCreating body force field\n" << endl;
+    volVectorField fOther
+    (
+        IOobject
+        (
+            "fOther",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        mesh,
+        dimensionedVector("zero", dimensionSet(1,-2,-2,0,0,0,0), vector::zero)
+    );
+
     Info<< "\nReading voidfraction field voidfraction = (Vgas/Vparticle)\n" << endl;
     volScalarField voidfraction
     (
@@ -146,17 +161,17 @@
 #define createPhi_H
 Info<< "Reading/calculating face flux field phi\n" << endl;
 surfaceScalarField phi
- (
-     IOobject
-     (
+(
+    IOobject
+    (
         "phi",
         runTime.timeName(),
          mesh,
         IOobject::READ_IF_PRESENT,
         IOobject::AUTO_WRITE
-     ),
-     linearInterpolate(U*voidfraction) & mesh.Sf()
- );
+    ),
+    linearInterpolate(U*voidfraction) & mesh.Sf()
+);
 #endif
 
 

@@ -1,0 +1,209 @@
+# single particle chemistry test case
+log             ../DEM/log.liggghts
+thermo_log      ../DEM/post/thermo.txt
+
+atom_style      granular
+atom_modify     map array
+communicate     single vel yes
+
+boundary        f f f
+newton          off
+
+units           si
+processors      2 1 1
+
+# read the restart file
+read_restart    ../DEM/post/restart/liggghts.restart
+
+neighbor        0.0005 bin
+neigh_modify    delay 0
+
+# Material properties required for granular pair styles
+
+fix         m1 all property/global youngsModulus peratomtype 5.e6
+fix         m2 all property/global poissonsRatio peratomtype 0.45
+fix         m3 all property/global coefficientRestitution peratomtypepair 1 0.3
+fix         m4 all property/global coefficientFriction peratomtypepair 1 0.5
+
+# pair style
+pair_style  gran model hertz tangential history
+pair_coeff  * *
+
+# timestep, gravity
+timestep    0.02
+fix         gravi all gravity 9.81 vector 0.0 -1.0 0.0
+
+# walls
+fix     xwalls1 all wall/gran model hertz tangential history primitive type 1 xplane 0.0
+fix     xwalls2 all wall/gran model hertz tangential history primitive type 1 xplane 1.5
+fix     ywalls1 all wall/gran model hertz tangential history primitive type 1 yplane 0.0
+fix     ywalls2 all wall/gran model hertz tangential history primitive type 1 yplane 0.5
+fix     zwalls1 all wall/gran model hertz tangential history primitive type 1 zplane 0.0
+fix     zwalls2 all wall/gran model hertz tangential history primitive type 1 zplane 0.5
+
+# Thermal properties
+fix     ftco all property/global thermalConductivity peratomtype 1.4
+fix     ftca all property/global thermalCapacity peratomtype 3000
+
+###############################################
+
+# cfd coupling
+fix     cfd all couple/cfd couple_every 50 mpi
+fix     cfd2 all couple/cfd/force
+
+# this one invokes heat transfer calculation, transfers per-particle temperature and adds convective heat flux to particles
+fix     tconv all couple/cfd/convection T0 1221
+
+# this should invoke chemistry
+fix     cfd3 all couple/cfd/chemistry n_species 5 species_names H2 H2O CO CO2 N2 n_diff 2 diffusant_names CO H2
+
+# Activate for 3-layer unreacted core shrink model
+fix     cfd5 all chem/shrink/core speciesA CO molMassA 0.02801 speciesC CO2 molMassC 0.04401 scale_reduction_rate 10.0 screen yes
+fix     cfd6 all chem/shrink/core speciesA H2 molMassA 0.00202 speciesC H2O molMassC 0.01801 scale_reduction_rate 10.0 screen yes
+
+# Chemical properties for unreacted shrink core (activate only when chem/shrink/core is active)
+fix     k0_CO all property/atom k0_cfd5 vector yes no no 17 25 2700
+fix     Ea_CO all property/atom Ea_cfd5 vector yes no no 69488 73674 113859
+
+fix     k0_H2 all property/atom k0_cfd6 vector yes no no 30 23 160
+fix     Ea_H2 all property/atom Ea_cfd6 vector yes no no 63627 71162 92092
+
+# particle porosity/tortuosity/pore diameter
+fix     porosity        all property/global porosity_all        vector 0.65 0.31 0.16 0.15
+fix     tortuosity      all property/global tortuosity_all      scalar 3
+fix     pore_diameter   all property/global pore_diameter_all   scalar 7e-7
+fix     layerDensities  all property/global density_all         vector 7870. 5740. 5170. 5240.
+
+# define layer properties
+fix     LayerRelRadii all property/atom relRadii vector yes no no  1.0 0.998 0.995 0.98
+
+###############
+# Write data into files for post-processing
+
+variable WI   equal 10
+variable time equal time
+variable m1   equal mass[1]
+variable rp   equal radius[1]
+variable rho1 equal mass[1]/((4/3)*PI*radius[1]*radius[1]*radius[1])
+
+fix printmass all print ${WI} "${time} ${m1} ${rho1} ${rp}" file ../DEM/post/mass_rho_rad.txt title "#time mass rho rad_par"
+
+# compute kinetic energy of particles to see if they are moving changing
+compute  KinEn all ke
+variable ke_tot	equal c_KinEn
+
+# print total kinetic energy
+fix     printCompute all print ${WI} "${time} ${ke_tot}" file ../DEM/post/printKE.txt title "#time ke_tot"
+
+compute Ea_CO all reduce sum f_Ea_CO[1] f_Ea_CO[2] f_Ea_CO[3]
+fix     Ea    all ave/time 1 1 1 c_Ea_CO[1] c_Ea_CO[2] c_Ea_CO[3]
+variable Ea1    equal f_Ea[1]
+variable Ea2    equal f_Ea[2]
+variable Ea3    equal f_Ea[3]
+
+compute k0CO all reduce sum f_k0_CO[1] f_k0_CO[2] f_k0_CO[3]
+fix     k0   all ave/time 1 1 1 c_k0CO[1] c_k0CO[2] c_k0CO[3]
+variable k01 equal f_k0[1]
+variable k02 equal f_k0[2]
+variable k03 equal f_k0[3]
+
+fix     printk0Ea all print ${WI} "${time} ${Ea1} ${Ea2} ${Ea3} ${k01} ${k02} ${k03}" file ../DEM/post/k0Ea.dat title "#time Ea1 Ea2 Ea3 k01 k02 k03"
+
+###############
+# Print out values affecting chemical reduction into specified folder for given time
+# Diffusion Coefficient for CO and H2
+
+compute COdiff all reduce sum f_CO_diffCoeff
+fix     diffField_CO all ave/time 1 1 1 c_COdiff
+variable CO_diffCo equal f_diffField_CO
+
+fix     printDCoeff all print ${WI} "${time} ${CO_diffCo}" file ../DEM/post/DiffCoeff.dat title "#time CO_diffCoeff"
+
+###############
+# Specific Resistance terms depending on reacting gases
+
+compute ACOd1 all reduce sum f_Aterm_cfd5[1] f_Aterm_cfd5[2] f_Aterm_cfd5[3]
+fix     ACOd1 all ave/time 1 1 1 c_ACOd1[1] c_ACOd1[2] c_ACOd1[3]
+variable a_CO_1 equal f_ACOd1[1]
+variable a_CO_2 equal f_ACOd1[2]
+variable a_CO_3 equal f_ACOd1[3]
+
+compute BCOd1 all reduce sum f_Bterm_cfd5[1] f_Bterm_cfd5[2] f_Bterm_cfd5[3]
+fix     BCOd1 all ave/time 10 1 10 c_BCOd1[1] c_BCOd1[2] c_BCOd1[3]
+variable b_CO_1 equal f_BCOd1[1]
+variable b_CO_2 equal f_BCOd1[2]
+variable b_CO_3 equal f_BCOd1[3]
+
+compute MCOd1 all reduce sum f_Massterm_cfd5
+fix     MTCOd1 all ave/time 10 1 10 c_MCOd1
+variable mt_CO equal f_MTCOd1
+
+fix     printAterm all print ${WI} "${time} ${a_CO_1} ${a_CO_2} ${a_CO_3}" file ../DEM/post/Aterm.dat title "#time a_CO_1 aCO_2 a_CO_3"
+
+fix     printBterm all print ${WI} "${time} ${b_CO_1} ${b_CO_2} ${b_CO_3}" file ../DEM/post/Bterm.dat title "#time b_CO_1 b_CO_2 b_CO_3"
+
+fix     printMassTerm all print ${WI} "${time} ${mt_CO}" file ../DEM/post/MassTerm.dat title "#time mt_CO"
+
+# Print out fractional reduction for specific diameter ranges as well as total fractional reduction
+
+###############
+# print out rate change of mass for gaseous reactant
+compute dmdot all reduce sum f_dmA_cfd5[1] f_dmA_cfd5[2] f_dmA_cfd5[3]
+fix     dmA_val all ave/time 1 1 1 c_dmdot[1] c_dmdot[2] c_dmdot[3]
+variable dmdot_1 equal f_dmA_val[1]
+variable dmdot_2 equal f_dmA_val[2]
+variable dmdot_3 equal f_dmA_val[3]
+
+fix     printdmdot all print ${WI} "${time} ${dmdot_1} ${dmdot_2} ${dmdot_3}" file ../DEM/post/dmdot.dat title "#time dmdot_1 dmdot_2 dmdot_3"
+
+compute dmdot_H2 all reduce sum f_dmA_cfd6[1] f_dmA_cfd6[2] f_dmA_cfd6[3]
+fix     dmA_valH2 all ave/time 1 1 1 c_dmdot_H2[1] c_dmdot_H2[2] c_dmdot_H2[3]
+variable dmdot_H2_1 equal f_dmA_valH2[1]
+variable dmdot_H2_2 equal f_dmA_valH2[2]
+variable dmdot_H2_3 equal f_dmA_valH2[3]
+
+fix     printdmdotH2 all print ${WI} "${time} ${dmdot_H2_1} ${dmdot_H2_2} ${dmdot_H2_3}" file ../DEM/post/dmdotH2.dat title "#time dmdot_1 dmdot_2 dmdot_3"
+
+compute fr_1 all reduce sum f_fracRed[1] f_fracRed[2] f_fracRed[3]
+fix     fr_d1 all ave/time 1 1 1 c_fr_1[1] c_fr_1[2] c_fr_1[3]
+variable fr_d1_1 equal f_fr_d1[1]
+variable fr_d1_2 equal f_fr_d1[2]
+variable fr_d1_3 equal f_fr_d1[3]
+
+# Calculate total fractional reduction to be written into the dump file for postProcessing/graphical representation
+variable frOV_d1 equal 1/9*(f_fr_d1[3])+2/9*(f_fr_d1[2])+6/9*(f_fr_d1[1])
+
+fix     printfr1 all print ${WI} "${time} ${fr_d1_1} ${fr_d1_2} ${fr_d1_3} ${frOV_d1}" file ../DEM/post/fr_d1.dat title "#time fr_d1_1 fr_d1_2 fr_d1_3 fr_overall_d1"
+
+###############################################
+## Check Layer Radii and Write them to files ###
+compute layerRad1 all reduce sum f_LayerRelRadii[1]
+fix     redRad1 all ave/time 1 1 1 c_layerRad1
+variable rr1 equal f_redRad1
+
+compute layerRad2 all reduce sum f_LayerRelRadii[2]
+fix     redRad2 all ave/time 1 1 1 c_layerRad2
+variable rr2 equal f_redRad2
+
+compute layerRad3 all reduce sum f_LayerRelRadii[3]
+fix     redRad3 all ave/time 1 1 1 c_layerRad3
+variable rr3 equal f_redRad3
+
+compute layerRad4 all reduce sum f_LayerRelRadii[4]
+fix     redRad4 all ave/time 1 1 1 c_layerRad4
+variable rr4 equal f_redRad4
+
+fix     printRelRadii all print ${WI} "${time} ${rr1} ${rr2} ${rr3} ${rr4}" file ../DEM/post/relRadii.dat title "#time relRad_1 relRad_2 relRad_3 relRad_4"
+###############
+
+# screen output
+compute         rke all erotate/sphere
+thermo_style    custom step atoms ke c_rke vol
+thermo          10
+thermo_modify   lost ignore norm no
+compute_modify  thermo_temp dynamic no extra 0
+
+dump    dmp all custom 100 ../DEM/post/dump*.liggghts_run id type x y z vx vy vz fx fy fz radius mass f_fracRed[1] f_fracRed[2] f_fracRed[3]
+
+run     1
+

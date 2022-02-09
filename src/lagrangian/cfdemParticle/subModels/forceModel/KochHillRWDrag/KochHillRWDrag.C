@@ -64,24 +64,20 @@ KochHillRWDrag::KochHillRWDrag
 :
     forceModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
-    verbose_(false),
+    verbose_(propsDict_.found("verbose")),
     velFieldName_(propsDict_.lookup("velFieldName")),
     U_(sm.mesh().lookupObject<volVectorField> (velFieldName_)),
     voidfractionFieldName_(propsDict_.lookup("voidfractionFieldName")),
     voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
     UsFieldName_(propsDict_.lookupOrDefault("granVelFieldName",word("Us"))),
     UsField_(sm.mesh().lookupObject<volVectorField> (UsFieldName_)),
-    interpolation_(false),
+    interpolation_(propsDict_.found("interpolation")),
     scale_(1.),
-    randomTauE_(false),
-    partTime_(NULL),
-    partUfluct_(NULL),
+    randomTauE_(propsDict_.found("randomTauE")),
+    partTimeRegName_(typeName + "partTime"),
+    partUfluctRegName_(typeName + "partUfluct"),
     RanGen_(label(0))
 {
-
-    if (propsDict_.found("verbose")) verbose_ = true;
-    if (propsDict_.found("interpolation")) interpolation_ = true;
-    if (propsDict_.found("randomTauE")) randomTauE_ = true;
 
     // init force sub model
     setForceSubModels(propsDict_);
@@ -103,16 +99,8 @@ KochHillRWDrag::KochHillRWDrag
     if (propsDict_.found("rhoP"))
         rhoP_= readScalar(propsDict_.lookup("rhoP"));
 
-
-//    if (particleCloud_.dataExchangeM().maxNumberOfParticles() > 0)
-//    {
-        //allocate memory
-        particleCloud_.dataExchangeM().allocateArray(partTime_,0.,1);
-        particleCloud_.dataExchangeM().allocateArray(partUfluct_,0.,3);
-//    }
-
-    //Pout << "RW-TEST: maxNumberOfParticles() == " << particleCloud_.dataExchangeM().maxNumberOfParticles() << endl; // TEST-Output
-
+    particleCloud_.registerParticleProperty<double**>(partTimeRegName_,1,0.0,false);
+    particleCloud_.registerParticleProperty<double**>(partUfluctRegName_,3,0.0,false);
 }
 
 
@@ -120,18 +108,12 @@ KochHillRWDrag::KochHillRWDrag
 
 KochHillRWDrag::~KochHillRWDrag()
 {
-    particleCloud_.dataExchangeM().destroy(partTime_, 1);
-    particleCloud_.dataExchangeM().destroy(partUfluct_, 3);
 }
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 void KochHillRWDrag::setForce() const
 {
-
-    // realloc the arrays
-    reAllocArrays();
-
     if (scale_ > 1.0)
     {
         Info << "KochHillRW using scale = " << scale_ << endl;
@@ -193,6 +175,9 @@ void KochHillRWDrag::setForce() const
     interpolationCellPoint<scalar> voidfractionInterpolator_(voidfraction_);
     interpolationCellPoint<vector> UInterpolator_(U_);
 
+    double**& partTime_ = particleCloud_.getParticlePropertyRef<double**>(partTimeRegName_);
+    double**& partUfluct_ = particleCloud_.getParticlePropertyRef<double**>(partUfluctRegName_);
+
     //Info << "RW-TEST: We are in setForce() at t = " << t << endl; // TEST-Output
 
     for (int index = 0; index<particleCloud_.numberOfParticles(); ++index)
@@ -200,12 +185,12 @@ void KochHillRWDrag::setForce() const
         //if (mask[index][0])
         //{
             cellI = particleCloud_.cellIDs()[index][0];
-            drag = vector(0,0,0);
-            dragExplicit = vector(0,0,0);
+            drag = vector::zero;
+            dragExplicit = vector::zero;
             dragCoefficient = 0;
             betaP = 0;
             Vs = 0;
-            Ufluid = vector(0,0,0);
+            Ufluid = vector::zero;
 
             // Pout << "RW-TEST: cellI = " << cellI << endl; // TEST-Output
             if (cellI > -1) // particle Found
@@ -295,7 +280,11 @@ void KochHillRWDrag::setForce() const
                     // modify current fluid velocity
                     for (int dim=0; dim<3; dim++)
                     {
+#if OPENFOAM_VERSION_MAJOR < 6
                         partUfluct_[index][dim] = RanGen_.GaussNormal()*sqrt(2.*k/3.);
+#else
+                        partUfluct_[index][dim] = RanGen_.scalarNormal()*sqrt(2.*k/3.);
+#endif
                         //Pout << "RW-TEST: Ufluid[" << dim << "] = " << Ufluid[dim] << " Ufluct = " << partUfluct_[index][dim] << " k = " << k << endl; // TEST-Output
                         Ufluid[dim] = Ufluid[dim] + partUfluct_[index][dim];
                     }
@@ -378,16 +367,6 @@ void KochHillRWDrag::setForce() const
             // write particle based data to global array
             forceSubM(0).partToArray(index,drag,dragExplicit,Ufluid,dragCoefficient);
         //}
-    }
-}
-
-
-void KochHillRWDrag::reAllocArrays() const
-{
-    if (particleCloud_.numberOfParticlesChanged())
-    {
-        particleCloud_.dataExchangeM().allocateArray(partTime_,0.0,1);  // field/initVal/with/lenghtFromLigghts
-        particleCloud_.dataExchangeM().allocateArray(partUfluct_,0.0,3);
     }
 }
 

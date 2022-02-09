@@ -1,0 +1,110 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.0                                   |
+|   \\  /    A nd           | Web:      http://www.OpenFOAM.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+version  2.0;
+format   ascii;
+class       dictionary;
+object      blockMeshDict;
+}
+// ************************************
+
+
+
+
+
+
+   meshGenApp blockMesh;
+   convertToMeters 0.01;
+
+    //64 mm column diameter
+    //15 cm length
+   
+   
+   
+    //Width of middle square section
+   
+   
+   
+   
+    //how many cells in the square section
+    //how many cells from square section to perimeter
+    // how many cells from top to bottom
+
+   vertices
+   (
+        (0 0 0)
+        (20 0 0)
+        (20 10 0)
+        (0 10 0)
+        (0 0 30)
+        (20 0 30)
+        (20 10 30)
+        (0 10 30)
+   );				
+
+   blocks
+   (
+    hex (0 1 2 3 4 5 6 7) (40 20 60) simpleGrading (1 1 1)
+   );
+
+   edges
+   (
+   );
+
+   boundary
+   (
+    atmosphere
+    {
+        type patch;
+        faces
+        (
+            (4 5 6 7)
+        );
+    }
+/*    frontAndBack
+    {
+        type empty;
+        faces
+        (
+            (0 1 5 4)
+            (4 5 9 8)
+	    (8 9 13 12)
+            (3 7 6 2)
+            (7 11 10 6)
+            (11 15 14 10)
+
+        );
+    }
+
+    outlet
+    {
+	type patch;
+	faces
+	(
+	    (5 6 10 9)
+	);
+    }
+*/
+    walls
+    {
+        type wall;
+        faces
+        (
+            (0 3 2 1)
+            (0 4 7 3)
+            (3 7 6 2)
+            (1 2 6 5)
+            (0 1 5 4)
+        );  
+    }
+);
+
+mergePatchPairs
+(
+);

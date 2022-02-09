@@ -1,0 +1,22 @@
+# ignore log files
+log.*
+*.log
+
+# ignore mesh
+polyMesh/
+
+# ignore time steps
+[0-9]
+[1-9]*
+[0-9].[0-9]*
+
+# ignore latex-related files
+*.aux
+*.pdf
+myDistMatrix.tex
+
+# ignore recurrence data
+recurrenceMatrix
+recurrencePath
+rec_jump.dat
+myMatrix.txt

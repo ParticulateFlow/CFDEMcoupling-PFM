@@ -43,13 +43,6 @@ defineTypeNameAndDebug(dataExchangeModel, 0);
 
 defineRunTimeSelectionTable(dataExchangeModel, dictionary);
 
-// * * * * * * * * * * * * * * protected Member Functions  * * * * * * * * * * * * * //
-
-void dataExchangeModel::setNumberOfParticles(int numberOfParticles) const
-{
-    particleCloud_.setNumberOfParticles(numberOfParticles);
-}
-
 // * * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * * //
 
 //====
@@ -195,7 +188,7 @@ void dataExchangeModel::destroy(double* array) const
 //====
 
 
-bool dataExchangeModel::couple(int i) const
+bool dataExchangeModel::couple(int i)
 {
     bool coupleNow = false;
     if (doCoupleNow())
@@ -209,7 +202,7 @@ bool dataExchangeModel::couple(int i) const
 scalar dataExchangeModel::timeStepFraction() const
 {
     //return fraction between previous coupling TS and actual TS
-    return ( particleCloud_.mesh().time().value()-particleCloud_.mesh().time().startTime().value() - (couplingStep_-1) * couplingTime() ) / couplingTime();
+    return clamp( (particleCloud_.mesh().time().timeIndex() - timeIndexOffset_) * particleCloud_.mesh().time().deltaTValue() / couplingTime() - (couplingStep_ - 1) );
 }
 
 int dataExchangeModel::getNumberOfParticles() const
@@ -249,7 +242,8 @@ dataExchangeModel::dataExchangeModel
     maxNumberOfParticles_(0),
     couplingStep_(0),
     DEMts_(-1.),
-    couplingInterval_(readScalar(dict_.lookup("couplingInterval")))
+    couplingInterval_(readScalar(dict_.lookup("couplingInterval"))),
+    timeIndexOffset_(particleCloud_.mesh().time().timeIndex())
 {}
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //

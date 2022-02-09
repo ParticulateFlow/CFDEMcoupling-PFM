@@ -28,6 +28,10 @@ Description
     This code is designed to realize coupled CFD-DEM simulations using LIGGGHTS
     and OpenFOAM(R). Note: this code is not part of OpenFOAM(R) (see DISCLAIMER).
 
+Reference
+    Crowe, Clayton T.; Sommerfeld, Martin; Tsuji, Yutaka (1998).
+    "Multiphase flows with droplets and particles"
+
 Class
     virtualMassForce
 
@@ -63,17 +67,32 @@ private:
 
     const volVectorField& U_;
 
+    word voidfractionFieldName_;
+
+    const volScalarField& voidfraction_;
+
+    word UsFieldName_;
+
+    const volVectorField& Us_;
+
     word phiFieldName_;
 
     const surfaceScalarField& phi_;
 
-    mutable double **UrelOld_;
+    const word UrelOldRegName_;
 
-    mutable bool splitUrelCalculation_;    //indicator to split calculation of Urel between CFDEM and LIGGGHTS
+    const bool splitUrelCalculation_;      //indicator to split calculation of Urel between CFDEM and LIGGGHTS
                                            //requires the integration fix to take dv/dt into account!
 
-    mutable double Cadd_;                  //indicator to split calculation of Urel between CFDEM and LIGGGHTS
-                                           //requires the integration fix to take dv/dt into account!
+    mutable bool useUs_;                   //indicator to use averaged Us instead of v_p
+
+    mutable bool useFelderhof_;            //indicator to use Cadd values from Felderhof
+
+    mutable double Cadd_;                  //custom Cadd value
+
+    mutable volVectorField DDtUrel_;
+
+    autoPtr<smoothingModel> smoothingModel_;
 
 public:
 
@@ -98,7 +117,10 @@ public:
     // Member Functions
         void setForce() const;
 
-        void reAllocArrays() const;
+        inline const smoothingModel& smoothingM() const
+        {
+            return smoothingModel_;
+        }
 };
 
 

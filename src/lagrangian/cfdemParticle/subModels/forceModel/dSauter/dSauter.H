@@ -43,21 +43,21 @@ private:
 
     dictionary propsDict_;
 
-    mutable double **d2_;
-    
-    mutable double **d3_;
+    bool multiTypes_;
 
-    mutable scalar scaleDia_;      // scaling due to coarse graining
+    const word d2RegName_;
 
-    mutable scalar scaleDiaDist_;  // scaling due to modified particle size distribution
-    
+    const word d3RegName_;
+
+    label maxTypeCG_;
+
+    scalarList typeCG_;
+
     mutable volScalarField d2Field_;
-    
-    mutable volScalarField d3Field_;
-    
-    mutable volScalarField dSauter_;
 
-    void allocateMyArrays() const;
+    mutable volScalarField d3Field_;
+
+    mutable volScalarField dSauter_;
 
 public:
 

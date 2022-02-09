@@ -40,7 +40,9 @@ namespace Foam
 {
 // forward declarations
 class energyModel;
+class massTransferModel;
 class thermCondModel;
+class diffCoeffModel;  
 class chemistryModel;
 /*---------------------------------------------------------------------------*\
                            Class cfdemCloudEnergy Declaration
@@ -54,23 +56,37 @@ protected:
 
     const wordList energyModels_;
 
+    const wordList massTransferModels_;
+
     bool implicitEnergyModel_;
+
+    bool implicitMassTransferModel_;
 
     const wordList chemistryModels_;
 
-    autoPtr<energyModel>* energyModel_;
+    PtrList<energyModel> energyModel_;
+
+    PtrList<massTransferModel> massTransferModel_;
 
     autoPtr<thermCondModel> thermCondModel_;
 
-    autoPtr<chemistryModel> chemistryModel_;
+    autoPtr<diffCoeffModel> diffCoeffModel_;
+
+    PtrList<chemistryModel> chemistryModel_;
 
     void calcEnergyContributions();
+
+    void calcMassContributions();
 
     void speciesExecute();
 
 public:
 
     friend class energyModel;
+
+    friend class massTransferModel;
+
+    friend class chemistryModel;
 
     // Constructors
 
@@ -90,23 +106,43 @@ public:
 
        const energyModel& energyM(int);
 
+       const massTransferModel& massTransferM(int);
+
        const thermCondModel& thermCondM();
 
-       const chemistryModel& chemistryM();
+       const diffCoeffModel& diffCoeffM();
+
+       const chemistryModel& chemistryM(int);
 
        label nrEnergyModels() const;
 
-       inline const wordList& energyModels() const;
+       label nrMassTransferModels() const;
 
        bool implicitEnergyModel() const;
+
+       bool implicitMassTransferModel() const;
+
+       int nrChemistryModels();
+
+       inline const wordList& energyModels() const;
+
+       inline const wordList& massTransferModels() const;
+
+       inline const wordList& chemistryModels() const;
 
        void energyContributions(volScalarField&);
 
        void energyCoefficients(volScalarField&);
 
+       void massContributions(volScalarField&);
+
+       void massCoefficients(volScalarField&);
+
        bool evolve(volScalarField&,volVectorField&,volVectorField&);
 
        void postFlow();
+
+       void solve();
 
 };
 

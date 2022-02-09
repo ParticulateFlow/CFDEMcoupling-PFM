@@ -31,12 +31,12 @@ constrainPressure(p, Uvoidfraction, phiHbyA, rAUvoidfraction, MRF);
 while (piso.correctNonOrthogonal())
 {
     // Pressure corrector
-  
+
     fvScalarMatrix pEqn
     (
         fvm::laplacian(rAUvoidfraction, p) == fvc::div(phi) + particleCloud.ddtVoidfraction()
     );
-    
+
     pEqn.setReference(pRefCell, pRefValue);
 
     pEqn.solve(mesh.solver(p.select(piso.finalInnerIter())));

@@ -1,15 +1,16 @@
-"CFDEMproject WWW Site"_lws - "CFDEM Commands"_lc :c
+"CFDEMproject Website"_lws - "Main Page"_main :c
 
 :link(lws,http://www.cfdem.com)
-:link(lc,CFDEMcoupling_Manual.html#comm)
+:link(main,CFDEMcoupling_Manual.html)
 
 :line
 
-liggghtsCommandModel_readLiggghtsData command :h3
+liggghtsCommandModel readLiggghtsData command :h3
 
 [Syntax:]
 
-Defined in liggghtsCommmands dictionary.
+Defined in "liggghtsCommmands"_CFDEMcoupling_dicts.html#liggghtsCommands
+dictionary.
 
 liggghtsCommandModels
 (
@@ -17,30 +18,58 @@ liggghtsCommandModels
 );
 readLiggghtsDataProps0
 \{
-    ???
+    startIndex scalar1;
+    verbose;
+    exactTiming;
+    filePath 
+    (
+        "word"
+    );
+    startTime    scalar2;
+    endTime      scalar3;
+    timeInterval scalar4;
 \} :pre
 
+{scalar1} = start index of data file to be read; the index is appended to {filePath} :ulb,l
+{verbose} = (default off) flag for verbose run :l
+{exactTiming} = flag indicating that start time should be kept even during a coupling interval :l
+{filePath} = path to LIGGGHTS data file. Each word starts in a new line; special characters, i.e. dots and slashes, need special treatment (e.g. dotdot will be replaced by "..") :l
+{scalar2} = start reading at this time :l
+{scalar3} = end reading at this time :l
+{scalar4} = repeat reading at this time interval while increasing the data file index :l
+:ule
 
 [Examples:]
 
 liggghtsCommandModels
 (
    readLiggghtsData
-   readLiggghtsData
 );
 readLiggghtsDataProps0
 \{
-    ???
+    startIndex 0;
+    exactTiming;
+    filePath 
+    (
+        dotdot
+        slash
+        DEM
+        slash
+        packing.data
+    );
+    startTime    0.002;
+    endTime      0.012;
+    timeInterval 0.001;
 \} :pre
 
 [Description:]
 
-The readLiggghtsData liggghtsCommand Model can be used to ???
+The {readLiggghtsData} liggghtsCommandModel can be used to read LIGGGHTS data
+files into LIGGGHTS during runtime of a coupled simulation. This corresponds to
+the {read_data} command in LIGGGHTS with the {add} option, i.e. read in
+particles are added to existing particles.
 
-
-[Restrictions:]
-
-Note: Model is not up to date.
+IMPORTANT NOTE: Model is outdated.
 
 [Related commands:]
 

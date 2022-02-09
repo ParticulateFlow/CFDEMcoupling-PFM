@@ -58,14 +58,14 @@ class cfdemCloudIB
 {
 protected:
 
-    mutable double **angularVelocities_;
+    double **angularVelocities_;
     label pRefCell_;
     scalar pRefValue_;
 
     double **DEMTorques_;
 
-    mutable bool haveEvolvedOnce_;
-    mutable bool skipLagrangeToEulerMapping_;
+    bool haveEvolvedOnce_;
+    bool skipLagrangeToEulerMapping_;
 
 public:
 

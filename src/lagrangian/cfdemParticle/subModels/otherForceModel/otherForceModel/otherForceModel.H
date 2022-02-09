@@ -28,6 +28,7 @@ SourceFiles
 #include "fvCFD.H"
 #include "cfdemCloud.H"
 #include "probeModel.H"
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -47,7 +48,6 @@ protected:
 
         cfdemCloud& particleCloud_;
 
-        
 public:
 
     //- Runtime type information
@@ -94,7 +94,6 @@ public:
 
 
     // Member Functions
-
 
         virtual tmp<volVectorField> exportForceField() = 0;
 

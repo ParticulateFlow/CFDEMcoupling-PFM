@@ -6,10 +6,18 @@
     particleCloud.energyContributions(Qsource);
     particleCloud.energyCoefficients(QCoeff);
 
-    //thDiff=particleCloud.thermCondM().thermDiff();   
-    thCond=particleCloud.thermCondM().thermCond(); 
+    Cpv = he.name() == "e" ? thermo.Cv() : thermo.Cp();
 
-    addSource = fvc::ddt(rhoeps, K) + fvc::div(phi, K)
+// For implict T terms in the energy/enthalpy transport equation, use
+// (he_n+1 - he_n) / (T_n+1 - T_n) = Cpv to eliminate T_n+1 with he_n+1.
+// This formula is valid for ideal gases with e=e(T) and h=h(T). For
+// incompressible fluids, e=e(T) holds, too, but enthalpy would need correction
+// terms accounting for pressure variations.
+
+    fvScalarMatrix EEqn
+    (
+        fvm::ddt(rhoeps, he) + fvm::div(phi, he)
+      + fvc::ddt(rhoeps, K) + fvc::div(phi, K)
       + (
             he.name() == "e"
           ? fvc::div
@@ -19,27 +27,18 @@
                 "div(phiv,p)"
             )
           : -dpdt
-        );
-
-    Cpv = he.name() == "e" ? thermo.Cv() : thermo.Cp();
-
-
-    fvScalarMatrix EEqn
-    (
-        fvm::ddt(rhoeps, he) + fvm::div(phi, he)
-      + addSource
-     // net heat transfer from particles to fluid
+        )
       - Qsource
+      - QCoeff*T
       - fvm::Sp(QCoeff/Cpv, he)
-     // thermal conduction of the fluid with effective conductivity
-     // - fvm::laplacian(rhoeps*thDiff,he)
+      + QCoeff/Cpv*he
+      - fvc::laplacian(voidfraction*thCond,T)
       - fvm::laplacian(voidfraction*thCond/Cpv,he)
-      // + particle-fluid energy transfer due to work
-      // + fluid energy dissipation due to shearing
+      + fvc::laplacian(voidfraction*thCond/Cpv,he)
      ==
         fvOptions(rho, he)
     );
-    
+
 
     EEqn.relax();
 
@@ -51,9 +50,9 @@
 
     thermo.correct();
 
-    Info<< "T max/min : " << max(T).value() << " " << min(T).value() << endl;
+    Info<< "T max/min/ave : " << max(T).value() << " " << min(T).value() << " " << average(T).value() << endl;
 
-    particleCloud.clockM().start(31,"postFlow");
-    particleCloud.postFlow();
-    particleCloud.clockM().stop("postFlow");
+    particleCloud.clockM().start(31,"energySolve");
+    particleCloud.solve();
+    particleCloud.clockM().stop("energySolve");
 }

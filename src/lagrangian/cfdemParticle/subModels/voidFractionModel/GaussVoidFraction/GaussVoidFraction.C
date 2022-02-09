@@ -73,7 +73,7 @@ GaussVoidFraction::GaussVoidFraction
     //reading maxCellsPerParticle from dictionary
     maxCellsPerParticle_=readLabel(propsDict_.lookup("maxCellsPerParticle"));
 
-    if(alphaMin_ > 1 || alphaMin_ < 0.01){ FatalError<< "alphaMin shloud be > 1 and < 0.01." << abort(FatalError); }
+    if(alphaMin_ > 1 || alphaMin_ < 0.01) { FatalError << "alphaMin must have a value between 0.01 and 1.0." << abort(FatalError); }
 
     checkWeightNporosity(propsDict_);
 }
@@ -87,15 +87,13 @@ GaussVoidFraction::~GaussVoidFraction()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void GaussVoidFraction::setvoidFraction(double** const& mask,double**& voidfractions,double**& particleWeights,double**& particleVolumes,double**& particleV) const
+void GaussVoidFraction::setvoidFraction(double** const& mask,double**& voidfractions,double**& particleWeights,double**& particleVolumes,double**& particleV)
 {
-    reAllocArrays();
-
     voidfractionNext_.ref()=1;
 
     scalar radius(-1);
     scalar volume(0);
-    scalar scaleVol= weight();
+    scalar scaleVol = weight();
     scalar scaleRadius = pow(porosity(),1./3.);
 
     for(int index=0; index< particleCloud_.numberOfParticles(); index++)
@@ -103,18 +101,19 @@ void GaussVoidFraction::setvoidFraction(double** const& mask,double**& voidfract
         //if(mask[index][0])
         //{
             //reset
-            for(int subcell=0;subcell<cellsPerParticle_[index][0];subcell++)
+            for(int subcell=0;subcell<cellsPerParticle()[index][0];subcell++)
             {
                 particleWeights[index][subcell]=0;
                 particleVolumes[index][subcell]=0;
             }
-            cellsPerParticle_[index][0]=1;
+            cellsPerParticle()[index][0]=1;
             particleV[index][0]=0;
 
             //collecting data
             label particleCenterCellID=particleCloud_.cellIDs()[index][0];
 
             radius = particleCloud_.radius(index);
+            if (multiWeights_) scaleVol = weight(index);
             volume = constant::mathematical::fourPiByThree*radius*radius*radius*scaleVol;
             radius *= scaleRadius;
 
@@ -141,7 +140,7 @@ void GaussVoidFraction::setvoidFraction(double** const& mask,double**& voidfract
                 }
                 else if (hashSetLength > 0)
                 {
-                    cellsPerParticle_[index][0]=hashSetLength;
+                    cellsPerParticle()[index][0]=hashSetLength;
 
                     //making sure that the cell containing the center is the first subcell
                     particleCloud_.cellIDs()[index][0]=particleCenterCellID;
@@ -199,7 +198,7 @@ void GaussVoidFraction::setvoidFraction(double** const& mask,double**& voidfract
     //bringing eulerian field to particle array
     for(label index=0; index< particleCloud_.numberOfParticles(); index++)
     {
-        for(label subcell=0;subcell<cellsPerParticle_[index][0];subcell++)
+        for(label subcell=0;subcell<cellsPerParticle()[index][0];subcell++)
         {
             label cellID = particleCloud_.cellIDs()[index][subcell];
 

@@ -1,0 +1,10 @@
+print 'Performing insertion.' screen yes
+
+read_dump ../DEM/initOre 0 x y z radius mass density bruteadd yes retaintimestep yes exactstep no
+read_dump ../DEM/initCoke 0 x y z radius mass density bruteadd yes retaintimestep yes exactstep no
+read_dump ../DEM/initFineMix 0 x y z radius mass density bruteadd yes retaintimestep yes exactstep no
+
+group coke type 1
+group finecoke type 2
+group ore type 3
+group fineore type 4

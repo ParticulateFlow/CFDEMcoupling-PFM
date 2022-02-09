@@ -81,7 +81,7 @@ void averagingModel::undoVectorAverage
 
                     if(weightField[cellI] == weightP)
                     {
-                        fieldNext[cellI] = vector(0,0,0);
+                        fieldNext[cellI] = vector::zero;
                     }else
                     {
                         fieldNext[cellI] = (fieldNext[cellI]*weightField[cellI]-valueVec*weightP)/(weightField[cellI]-weightP);
@@ -229,6 +229,31 @@ void averagingModel::setScalarSum
     field.correctBoundaryConditions();
 }
 
+void averagingModel::setScalarSumCentre
+(
+    volScalarField& field,
+    double**& value,
+    double**const& weight,
+    double**const& mask
+) const
+{
+    label cellI;
+    scalar valueScal;
+
+    for(int index=0; index< particleCloud_.numberOfParticles(); index++)
+    {
+        cellI = particleCloud_.cellIDs()[index][0];
+        if (cellI >= 0)
+        {
+            valueScal = value[index][0];
+            field[cellI] += valueScal;
+        }
+    }
+
+    // correct cell values to patches
+    field.correctBoundaryConditions();
+}
+
 void averagingModel::setDSauter
 (
     volScalarField& dSauter,
@@ -307,13 +332,13 @@ void averagingModel::resetVectorAverage(volVectorField& prev,volVectorField& nex
     next.primitiveFieldRef() = vector::zero;
 }
 
-void averagingModel::resetWeightFields() const
+void averagingModel::resetWeightFields()
 {
     UsWeightField_.ref() = 0;
 }
 
 
-void averagingModel::undoWeightFields(double**const& mask) const
+void averagingModel::undoWeightFields(double**const& mask)
 {
     for(int index=0; index< particleCloud_.numberOfParticles(); index++)
     {
@@ -369,9 +394,9 @@ averagingModel::averagingModel
             IOobject::READ_IF_PRESENT,//MUST_READ,
             IOobject::AUTO_WRITE
         ),
-        sm.mesh().lookupObject<volVectorField> ("Us")
-        /*sm.mesh(),
-        dimensionedVector("zero", dimensionSet(0,1,-1,0,0),vector::zero)*/
+      //  sm.mesh().lookupObject<volVectorField> ("Us")
+        sm.mesh(),
+        dimensionedVector("zero", dimensionSet(0,1,-1,0,0),vector::zero)
     ),
     UsNext_
     (   IOobject
@@ -382,11 +407,19 @@ averagingModel::averagingModel
             IOobject::READ_IF_PRESENT,//MUST_READ,
             IOobject::AUTO_WRITE
         ),
-        sm.mesh().lookupObject<volVectorField> ("Us")
-        /*sm.mesh(),
-        dimensionedVector("zero", dimensionSet(0,1,-1,0,0),vector::zero)*/
+    //    sm.mesh().lookupObject<volVectorField> ("Us")
+        sm.mesh(),
+        dimensionedVector("zero", dimensionSet(0,1,-1,0,0),vector::zero)
     )
-{}
+{
+    const objectRegistry& db = UsWeightField_.db();
+    if (db.foundObject<volVectorField>("Us"))
+    {
+        const volVectorField& Usref(db.lookupObject<volVectorField>("Us"));
+        UsNext_ = Usref;
+        UsPrev_ = Usref;
+    }
+}
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //

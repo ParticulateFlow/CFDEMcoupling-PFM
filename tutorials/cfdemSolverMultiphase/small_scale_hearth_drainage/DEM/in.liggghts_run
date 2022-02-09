@@ -1,0 +1,142 @@
+###############################################
+#geometry
+variable cylRadius equal 0.1
+variable cylHeight equal 0.08
+
+# Radiuses of servo wall for force calculation
+variable r1 equal 0.02
+variable r2 equal 0.04
+variable r3 equal 0.06
+variable r4 equal 0.08
+variable r5 equal 0.1
+
+#particle variables
+variable rho equal 1500 			# particle density
+
+# time parameters
+variable dt equal 0.00005		# Time step
+variable outInterval equal 0.5	# Dump interval to be consistent with controlDict
+
+# DEM-parameters
+variable yM equal 5.e6          # Young's modulus
+variable pR equal 0.45          # Poisson ratio
+variable rest equal 0.3         # coefficient of restitution
+variable fric equal 0.5         # coefficient of friction
+variable cV equal 0.1           # characteristic velocity
+variable skin equal 0.001
+
+# variables for the servo wall
+#Pressure acting on the servo wall (Pa)
+variable p1 equal 800 
+variable p2 equal 800
+variable p3 equal 800
+variable p4 equal 800
+variable p5 equal 800
+
+variable A1 equal PI*${r1}^2
+variable A2 equal PI*(${r2}^2-${r1}^2)
+variable A3 equal PI*(${r3}^2-${r2}^2)
+variable A4 equal PI*(${r4}^2-${r3}^2)
+variable A5 equal PI*(${r5}^2-${r4}^2)
+
+variable ctrlForceR1 equal -${p1}*${A1}   # target value of the force
+variable ctrlForceR2 equal -${p2}*${A2}   # target value of the force
+variable ctrlForceR3 equal -${p3}*${A3}   # target value of the force
+variable ctrlForceR4 equal -${p4}*${A4}   # target value of the force
+variable ctrlForceR5 equal -${p5}*${A5}   # target value of the force
+
+variable maxVel equal 0.25*${skin}/${dt}
+
+# controller parameter (servo wall)
+variable    ctrlKp          equal   1e-2
+variable    ctrlKi          equal   0.0
+variable    ctrlKd          equal   0.0
+
+# particle settling loop parameters
+variable vthre equal 0.01
+
+# calculated parameters
+variable dumpInterval equal ${outInterval}/${dt}
+
+
+###############################################
+
+log             ../DEM/log.liggghts
+thermo_log      ../DEM/post/thermo.txt
+
+atom_style      granular
+atom_modify     map array
+communicate     single vel yes
+
+boundary        f f f
+newton          off
+
+units           si
+processors      2 2 1
+
+# read the restart file
+read_restart    ../DEM/post/restart/liggghts.restart
+
+neighbor        ${skin} bin
+neigh_modify    delay 0
+
+# Material properties required for granular pair styles
+
+fix         m1 all property/global youngsModulus peratomtype ${yM}
+fix         m2 all property/global poissonsRatio peratomtype ${pR}
+fix         m3 all property/global coefficientRestitution peratomtypepair 1 ${rest}
+fix         m4 all property/global coefficientFriction peratomtypepair 1 ${fric}
+
+# pair style
+pair_style  gran model hertz tangential history # Hertzian without cohesion
+pair_coeff  * *
+
+# timestep, gravity
+timestep    ${dt}
+fix         gravi all gravity 9.81 vector 0.0 0.0 -1.0
+
+# walls
+fix cylWall all wall/gran model hertz tangential history primitive type 1 zcylinder 0.1 0 0
+fix botWall all wall/gran model hertz tangential history primitive type 1 zplane 0
+
+fix servoR1 all mesh/surface/stress/servo file ../DEM/stls/r1.stl type 1 scale 1. com 0 0 0 ctrlPV force axis 0. 0. 1. target_val ${ctrlForceR1} vel_max ${maxVel} kp ${ctrlKp} ki ${ctrlKi} kd ${ctrlKd} #verbose no move 0.0 0.0 7.8
+
+fix servoR2 all mesh/surface/stress/servo file ../DEM/stls/r2.stl type 1 scale 1. com 0 0 0 ctrlPV force axis 0. 0. 1. target_val ${ctrlForceR2} vel_max ${maxVel} kp ${ctrlKp} ki ${ctrlKi} kd ${ctrlKd} #verbose no move 0.0 0.0 7.8
+
+fix servoR3 all mesh/surface/stress/servo file ../DEM/stls/r3.stl type 1 scale 1. com 0 0 0 ctrlPV force axis 0. 0. 1. target_val ${ctrlForceR3} vel_max ${maxVel} kp ${ctrlKp} ki ${ctrlKi} kd ${ctrlKd} #verbose no move 0.0 0.0 7.8
+
+fix servoR4 all mesh/surface/stress/servo file ../DEM/stls/r4.stl type 1 scale 1. com 0 0 0 ctrlPV force axis 0. 0. 1. target_val ${ctrlForceR4} vel_max ${maxVel} kp ${ctrlKp} ki ${ctrlKi} kd ${ctrlKd} #verbose no move 0.0 0.0 7.8
+
+fix servoR5 all mesh/surface/stress/servo file ../DEM/stls/r5.stl type 1 scale 1. com 0 0 0 ctrlPV force axis 0. 0. 1. target_val ${ctrlForceR5} vel_max ${maxVel} kp ${ctrlKp} ki ${ctrlKi} kd ${ctrlKd} #verbose no move 0.0 0.0 7.8
+
+fix walls all wall/gran model hertz tangential history mesh n_meshes 5 meshes servoR1 servoR2 servoR3 servoR4 servoR5
+
+# change the particles density
+set         group all density ${rho}
+
+# cfd coupling
+fix         cfd all couple/cfd couple_every 100000000 mpi
+fix         cfd2 all couple/cfd/force/implicit
+
+# apply nve integration to all particles that are inserted as single particles
+fix         integr all nve/sphere
+
+# center of mass
+compute     centerOfMass all com
+
+# compute total dragforce
+compute     dragtotal all reduce sum f_dragforce[1] f_dragforce[2] f_dragforce[3]
+
+# screen output
+compute         rke all erotate/sphere
+thermo_style    custom step atoms ke c_rke vol c_centerOfMass[3] c_dragtotal[1] c_dragtotal[2] c_dragtotal[3]
+thermo          100
+thermo_modify   lost ignore norm no
+compute_modify  thermo_temp dynamic yes
+
+#compute		position all property/atom x y z
+fix ts_check all check/timestep/gran 100 0.1 0.1
+dump            dmp all custom ${dumpInterval} ../DEM/post/dump*.liggghts_run id type x y z vx vy vz fx fy fz f_dragforce[1] f_dragforce[2] f_dragforce[3] radius
+dump		servoWall all mesh/stl ${dumpInterval} ../DEM/post/dump*.servoWall.stl servoR1 servoR2 servoR3 servoR4 servoR5
+
+run             1

@@ -19,6 +19,7 @@ License
 #include "expParticleForces.H"
 #include "mathExtra.H"
 #include "addToRunTimeSelectionTable.H"
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -69,18 +70,18 @@ tmp<volVectorField> expParticleForces::exportForceField()
             particleCloud_.mesh(),
             dimensionedVector
             (
-                "zero",dimensionSet(1, -2, -2, 0, 0),vector(0,0,0)
+                "zero",dimensionSet(1, -2, -2, 0, 0),vector::zero
             )
         )
     );
-    
+
     volVectorField& source = tsource.ref();
-    
+
     // negative sign in sum because force on particles = - force on fluid
     for(int i=0; i<particleCloud_.nrMomCoupleModels(); i++)
         if (particleCloud_.momCoupleM(i).type() == "explicitCouple")
             source -= particleCloud_.momCoupleM(i).expMomSource();
-    
+
     return tsource;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

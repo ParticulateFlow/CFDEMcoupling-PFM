@@ -1,0 +1,88 @@
+"CFDEMproject Website"_lws - "Main Page"_main :c
+
+:link(lws,http://www.cfdem.com)
+:link(main,CFDEMcoupling_Manual.html)
+
+:line
+
+forceModel ParmarBassetForce command :h3
+
+[Syntax:]
+
+Defined in "couplingProperties"_CFDEMcoupling_dicts.html#couplingProperties
+dictionary.
+
+forceModels
+(
+    ParmarBassetForce
+);
+ParmarBassetForceProps
+\{
+    velFieldName        "U";
+    UsFieldName         "Us";
+    nIntegral           scalar1;
+    discretisationOrder scalar2;
+    treatForceExplicit  switch1;
+    interpolation       switch2;
+    smoothingModel      "smoothingModel";
+\} :pre
+
+{U} = name of the finite volume fluid velocity field :ulb,l
+{Us} = name of the finite volume cell averaged particle velocity field :l
+{scalar1} = number of timesteps considered in the near history :l
+{scalar2} = (1 or 2) discretisation order of the far history differential equations :l
+{switch1} = (optional, default true) sub model switch, see "forceSubModel"_forceSubModel.html for details :l
+{switch2} = (optional, default false) sub model switch, see "forceSubModel"_forceSubModel.html for details :l
+{smoothingModel} = name of smoothing model for the dU/dt field :l
+:ule
+
+[Examples:]
+
+forceModels
+(
+    ParmarBassetForce
+);
+ParmarBassetForceProps
+\{
+    velFieldName        "U";
+    USFieldName         "Us"
+    nIntegral           10;
+    discretisationOrder 1;
+    smoothingModel      constDiffAndTemporalSmoothing;
+    constDiffAndTemporalSmoothingProps
+    \{
+        lowerLimit          1e-8;
+        upperLimit          1e8;
+        smoothingLength     0.1;
+        smoothingStrength   0.001;
+        correctBoundary     true;
+    \}
+\} :pre
+
+[Description:]
+
+The force model performs the calculation of forces (e.g. fluid-particle
+interaction forces) acting on each DEM particle. The {ParmarBassetForce} model
+calculates the Basset history force for each particle, based on the method by
+"Parmar et al. (2018)"_#Parmar2018.
+
+For more detail, see "Nijssen et al. (2020)"_#Nijssen2020.
+
+:link(Parmar2018)
+[(Parmar2018)] M. Parmar, S. Annamalai, S. Balachandar, A. Prosperetti. (2018):
+"Differential Formulation of the Viscous History Force on a Particle for Efficient and Accurate Computation",
+Journal of Fluid Mechanics
+
+:link(Nijssen2020)
+[(Nijssen2020)] T.M.J. Nijssen, J.A.M. Kuipers, J. van der Stel, A.T. Adema, K.A. Buist. (2020):
+"Complete liquid-solid momentum coupling for unresolved CFD-DEM simulations",
+International Journal of Multiphase Flow
+
+[Restrictions:]
+
+IMPORTANT NOTE: Model not validated!
+
+[Related commands:]
+
+"forceModel"_forceModel.html
+

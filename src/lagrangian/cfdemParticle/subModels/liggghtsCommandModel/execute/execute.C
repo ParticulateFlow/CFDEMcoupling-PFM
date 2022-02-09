@@ -63,36 +63,44 @@ execute::execute
 :
     liggghtsCommandModel(dict,sm,i),
     nrModel_(i),
-    myName_("notYetGiven"),
-    propsDict_(dict),
-    commandList_(0),
+    propsDict_(),
+    commandList_(),
     command_(""),
     scalarList_(0),
     labelList_(0),
     timeStamp_(false)
 {
-    // define dictionary
-    char h[80];
-    sprintf(h,"%d",nrModel_);
-    myName_=word(typeName + "Props" + h);
-    propsDict_=dictionary(dict.subDict(myName_));
+    // read propsDict
+    OStringStream oStrStream;
+    oStrStream << nrModel_;
 
-    // read command from dict
+    propsDict_ = dict.subOrEmptyDict(typeName + "Props" + oStrStream.str());
+
+    // read command list
     commandList_ = wordList(propsDict_.lookup("command"));
 
     // read list of scalars
-    if(propsDict_.found("scalars")) scalarList_ = scalarList(propsDict_.lookup("scalars"));
+    if (propsDict_.found("scalars"))
+    {
+        scalarList_ = scalarList(propsDict_.lookup("scalars"));
+    }
 
     // read list of labels
-    if(propsDict_.found("labels")) labelList_ = labelList(propsDict_.lookup("labels"));
+    if (propsDict_.found("labels"))
+    {
+        labelList_ = labelList(propsDict_.lookup("labels"));
+    }
 
     // check if verbose
-    if (propsDict_.found("verbose")) verbose_=true;
+    if (propsDict_.found("verbose"))
+    {
+        verbose_ = true;
+    }
 
     parseCommandList(commandList_, labelList_, scalarList_, command_, propsDict_, timeStamp_);
     Info << "liggghtsCommand " << command_ << endl;
 
-    strCommand_=string(command_);
+    strCommand_ = command_;
 
     checkTimeMode(propsDict_);
 
@@ -115,7 +123,7 @@ const char* execute::command(int commandLine)
 
 bool execute::runCommand(int couplingStep)
 {
-    if(timeStamp_) strCommand_=addTimeStamp(command_);
+    if (timeStamp_) strCommand_ = addTimeStamp(command_);
     checkTimeSettings(propsDict_);
 
     return runThisCommand(couplingStep);

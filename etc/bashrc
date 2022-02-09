@@ -17,7 +17,7 @@
 #------------------------------------------------------------------------------
 
 export CFDEM_PROJECT=CFDEM
-export CFDEM_VERSION=17.08
+export CFDEM_VERSION=21.11
 
 ################################################################################
 # USER EDITABLE PART: Changes made here may be lost with the next upgrade
@@ -25,7 +25,7 @@ export CFDEM_VERSION=17.08
 # Please set to the appropriate path if the default is not correct.
 #
 # activate compatible OpenFOAM version
-. $HOME/OpenFOAM/OpenFOAM-4.x/etc/bashrc
+. $HOME/OpenFOAM/OpenFOAM-6/etc/bashrc
 #
 # CFDEMcoupling
 export CFDEM_INST_DIR=$HOME/$CFDEM_PROJECT
@@ -199,6 +199,9 @@ alias cfdemCleanCFDEM='bash $CFDEM_PROJECT_DIR/etc/cleanCFDEMcoupling.sh'
 #- shortcut to compile LIGGGHTS + sublibraries
 alias cfdemCompLIG='bash $CFDEM_PROJECT_DIR/etc/compileLIGGGHTS.sh'
 
+#- shortcut to compile LIGGGHTS sublibraries
+alias cfdemCompLIGlib='bash $CFDEM_PROJECT_DIR/etc/compileLIGGGHTS_lib.sh'
+
 #- shortcut to compile CFDEMcoupling +LIGGGHTS
 alias cfdemCompCFDEMall='bash $CFDEM_PROJECT_DIR/etc/compileCFDEMcoupling_all.sh'
 
@@ -218,7 +221,7 @@ alias cfdemCompCFDEMuti='bash $CFDEM_PROJECT_DIR/etc/compileCFDEMcoupling_uti.sh
 alias cfdemTestTUT='bash $CFDEM_PROJECT_DIR/etc/testTutorials.sh'
 
 #- shortcut to visualize the clock model data
-alias vizClock='python $CFDEM_UT_DIR/vizClock/matPlot.py'
+alias vizClock='python2 $CFDEM_UT_DIR/vizClock/matPlot.py'
 
 #- recursive touch of current directory
 alias touchRec='find ./* -exec touch {} \;'

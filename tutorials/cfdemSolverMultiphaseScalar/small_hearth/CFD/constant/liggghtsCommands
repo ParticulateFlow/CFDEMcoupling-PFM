@@ -1,0 +1,140 @@
+/*---------------------------------------------------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.4                                   |
+|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+
+    root            "";
+    case            "";
+    instance        "";
+    local           "";
+
+    class           dictionary;
+    object          liggghtsCommands;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+liggghtsCommandModels
+(
+    execute
+    execute
+    execute
+    execute
+    runLiggghts
+    writeLiggghts
+);
+// ************************************************************************* //
+
+/*runLiggghtsProps
+{
+    preNo false;
+}*/
+
+writeLiggghtsProps
+{
+    writeLast off;
+    writeName "post/restart/liggghts.restartCFDEM";
+    overwrite on;
+}
+
+executeProps0
+{
+	command
+	(
+		delete_atoms
+		porosity
+		raceways
+		noBlanks
+		dollar
+		curlyOpen
+		fDelRun
+		curlyClose
+		blanks
+		label
+		compress
+		no
+	);
+	labels
+	(
+		123457
+	);
+	runFirst		off;
+	runLast			off;
+	runEveryCouplingStep	off;
+	runEveryWriteStep	off;
+	startTime           	0.0;
+	endTime			10000;
+	timeInterval		0.1;
+}
+
+executeProps1
+{
+	command
+	(
+		write_restart
+		noBlanks
+		dotdot
+		slash
+		DEM
+		slash
+		post
+		slash
+		restart
+		slash
+		liggghts.restartSequence
+	);
+	runFirst		off;
+	runLast			on;
+	runEveryCouplingStep	off;
+	runEveryWriteStep	off;
+}
+
+executeProps2
+{
+	command
+	(
+		delete_atoms
+		region
+		freeboard
+		compress
+		no
+	);
+	runFirst		off;
+	runLast			off;
+	runEveryCouplingStep	on;
+	runEveryWriteStep	off;
+}
+
+executeProps3
+{
+	command
+	(
+		set
+		region
+		raceways
+		noBlanks
+		property
+		slash
+		atom
+		blanks
+		Temp
+		noBlanks
+		dollar
+		curlyOpen
+		Tinlet
+		curlyClose
+	);
+	runFirst		off;
+	runLast			off;
+	runEveryCouplingStep	on;
+	runEveryWriteStep	off;
+}

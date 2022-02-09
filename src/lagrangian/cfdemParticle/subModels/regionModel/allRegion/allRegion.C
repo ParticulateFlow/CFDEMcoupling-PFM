@@ -78,7 +78,6 @@ allRegion::~allRegion()
 
 void allRegion::defineRegion() const
 {
-    reAllocArrays();
     // do nothing
 }
 

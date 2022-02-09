@@ -1,0 +1,18 @@
+FOAM_VERSION_MAJOR := $(word 1,$(subst ., ,$(WM_PROJECT_VERSION)))
+PFLAGS+= -DOPENFOAM_VERSION_MAJOR=$(FOAM_VERSION_MAJOR)
+
+EXE_INC = \
+     $(PFLAGS) \
+    -IalphaContactAngle \
+    -I$(LIB_SRC)/transportModels \
+    -I$(LIB_SRC)/transportModels/incompressible/lnInclude \
+    -I$(LIB_SRC)/transportModels/interfaceProperties/lnInclude \
+    -I$(LIB_SRC)/finiteVolume/lnInclude \
+    -I$(LIB_SRC)/meshTools/lnInclude \
+    -Wno-deprecated-copy
+
+LIB_LIBS = \
+    -linterfaceProperties \
+    -lincompressibleTransportModels \
+    -lfiniteVolume \
+    -lmeshTools

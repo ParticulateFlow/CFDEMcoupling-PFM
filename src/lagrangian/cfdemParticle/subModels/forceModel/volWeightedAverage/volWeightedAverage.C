@@ -64,25 +64,19 @@ volWeightedAverage::volWeightedAverage
     forceModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
     mesh_(particleCloud_.mesh()),
-    startTime_(0.),
+    startTime_(propsDict_.lookupOrDefault<scalar>("startTime", 0.)),
     scalarFieldNames_(propsDict_.lookup("scalarFieldNames")),
     vectorFieldNames_(propsDict_.lookup("vectorFieldNames")),
     upperThreshold_(readScalar(propsDict_.lookup("upperThreshold"))),
     lowerThreshold_(readScalar(propsDict_.lookup("lowerThreshold"))),
-    verbose_(false)
+    verbose_(propsDict_.found("verbose")),
+    writeToFile_(propsDict_.lookupOrDefault<Switch>("writeToFile", false)),
+    filePtr_()
 {
-    if (propsDict_.found("startTime")){
-        startTime_=readScalar(propsDict_.lookup("startTime"));
-    }
-
-    if (propsDict_.found("verbose")){
-        verbose_ = true;
-    }
-
     // create vol weighted average scalar fields
     scalarFields_.setSize(scalarFieldNames_.size());
 
-    for (int i=0;i < scalarFieldNames_.size(); i++)
+    for (int i=0; i < scalarFieldNames_.size(); i++)
     {
         word fieldName = "volAverage_" + scalarFieldNames_[i];
 
@@ -132,6 +126,13 @@ volWeightedAverage::volWeightedAverage
             )
         );
     }
+
+    // create the path and output file
+    if(writeToFile_)
+    {
+        fileName path(particleCloud_.IOM().createTimeDir("postProcessing/volWeightedAverage"));
+        filePtr_.set(new OFstream(path/"volWeightedAverage.txt"));
+    }
 }
 
 
@@ -148,6 +149,8 @@ void volWeightedAverage::setForce() const
     if(mesh_.time().value() >= startTime_)
     {
         if(verbose_) Info << "volWeightedAverage.C - setForce()" << endl;
+
+        if(writeToFile_) filePtr_() << mesh_.time().value() << " ";
 
         for (int i=0;i < scalarFieldNames_.size(); i++)
         {
@@ -179,7 +182,7 @@ void volWeightedAverage::setForce() const
             MPI_Allreduce(&totVol, &totVol_all, 3, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
             integralValue = gSum(scalarFields_[i]);
             volWeightedAverage = integralValue / (totVol_all+SMALL);
-            scalarFields_[i].ref() = volWeightedAverage;
+            scalarFields_[i].primitiveFieldRef() = volWeightedAverage;
 
             if(verbose_)
             {
@@ -192,6 +195,8 @@ void volWeightedAverage::setForce() const
                      << ",\n considering cells where the field < " << upperThreshold_
                      << ", and > " << lowerThreshold_ << endl;
             }
+
+            if(writeToFile_) filePtr_() << volWeightedAverage << " ";
         }
 
         for (int i=0;i < vectorFieldNames_.size(); i++)
@@ -233,7 +238,11 @@ void volWeightedAverage::setForce() const
                      << ",\n considering cells where the mag(field) < " << upperThreshold_
                      << ", and > " << lowerThreshold_ << endl;
             }
+
+            if(writeToFile_) filePtr_() << volWeightedAverage << " ";
         }
+
+        if(writeToFile_) filePtr_() << endl;
     }// end if time >= startTime_
 }
 

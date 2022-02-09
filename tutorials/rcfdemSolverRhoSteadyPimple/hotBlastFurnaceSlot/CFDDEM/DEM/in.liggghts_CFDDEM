@@ -1,0 +1,42 @@
+# material properties
+include ../DEM/DEMparameters
+
+
+###############################################
+atom_style		granular
+atom_modify		map array
+communicate	single vel yes
+
+boundary		f p f
+newton			off
+units			si
+processors      1 1 8
+
+read_restart 		../DEM/liggghts.restart
+reset_timestep 0
+
+neighbor	${skin} bin
+neigh_modify	delay 0
+
+timestep    ${dt}
+
+include ../DEM/in.material_settings
+include ../DEM/in.regions
+include ../DEM/in.RW
+include ../DEM/in.coupling_integration
+include ../DEM/in.output
+
+run	1
+
+include ../DEM/in.set_polydisp
+include ../DEM/in.insertion_setup
+
+# conditionally stop simulation
+variable tmin equal 20.0
+variable zmaxCFD equal 26.0
+variable zminCFD equal 25.8
+variable abort equal (v_time>=${tmin})&&(v_zMaxSecHighCoke<=${zmaxCFD})&&(v_zMaxSecHighCoke>=${zminCFD})
+fix printAbort all print 4000 "${time} ${zMaxSecHighCoke} ${abort}" file ../DEM/monitor/Nabort.txt title "#time   z_max_2 abort"
+fix eeAbort all execute 1000 "../DEM/in.abort" file conditional abort 1 0.1
+
+restart 200000 ../DEM/restart.A ../DEM/restart.B

@@ -26,6 +26,7 @@ SourceFiles
 #define gravity_H
 
 #include "otherForceModel.H"
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -48,14 +49,15 @@ protected:
         word voidfractionFieldName_;
 
         const volScalarField& voidfraction_;
-    
+
         word rhoGFieldName_;
 
         const volScalarField& rhoG_;
 
-        const dimensionedVector g_;
+        word gravityFieldName_;
 
-    
+        const uniformDimensionedVectorField& g_;    // ref to gravity
+
 public:
 
     //- Runtime type information

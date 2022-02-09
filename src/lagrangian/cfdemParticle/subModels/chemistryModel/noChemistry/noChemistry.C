@@ -15,12 +15,15 @@ License
     along with this code.  If not, see <http://www.gnu.org/licenses/>.
 
     Copyright (C) 2015- Thomas Lichtenegger, JKU Linz, Austria
+                        M. Efe Kinaci, JKU Linz, Austria
 
 \*---------------------------------------------------------------------------*/
 
 #include "error.H"
 #include "noChemistry.H"
 #include "addToRunTimeSelectionTable.H"
+
+#include "IFstream.H"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -54,19 +57,64 @@ noChemistry::~noChemistry()
 
 // * * * * * * * * * * * * * * * * Member Fct  * * * * * * * * * * * * * * * //
 
+tmp<volScalarField> noChemistry::Smi(label i) const
+{
+    tmp<volScalarField> Smi_
+    (
+        new volScalarField
+        (
+            IOobject
+            (
+                "smi_",
+                particleCloud_.mesh().time().timeName(),
+                particleCloud_.mesh(),
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+             ),
+             particleCloud_.mesh(),
+             dimensionedScalar
+             (
+              "zero",
+              dimMass/(dimVol*dimTime),
+              0.0
+             )
+        )
+    );
+
+    return Smi_;
+}
+
+tmp<volScalarField> noChemistry::Sm() const
+{
+    tmp<volScalarField> Sm_
+    (
+        new volScalarField
+        (
+            IOobject
+            (
+                "Sm_",
+                particleCloud_.mesh().time().timeName(),
+                particleCloud_.mesh(),
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+             ),
+             particleCloud_.mesh(),
+             dimensionedScalar
+             (
+              "zero",
+              dimMass/(dimVol*dimTime),
+              0.0
+             )
+        )
+    );
+
+    return Sm_;
+}
+
 void noChemistry::execute()
-{}
-
-//tmp<Foam::fvScalarMatrix> noChemistry::Smi(const label i) const
-//{
-//    return tmp<fvScalarMatrix>(new fvScalarMatrix(0, dimMass/dimTime)); 
-//}
-
-//tmp<Foam::fvScalarMatrix> noChemistry::Sm() const
-//{
-//    return tmp<fvScalarMatrix>(new fvScalarMatrix(0, dimMass/dimTime)); 
-//}
-
+{
+    //do nothing
+}
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

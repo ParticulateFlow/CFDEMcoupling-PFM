@@ -1,0 +1,53 @@
+"CFDEMproject Website"_lws - "Main Page"_main :c
+
+:link(lws,http://www.cfdem.com)
+:link(main,CFDEMcoupling_Manual.html)
+
+:line
+
+chemistryModel massTransferCoeff command :h3
+
+[Syntax:]
+
+Defined in "couplingProperties"_CFDEMcoupling_dicts.html#couplingProperties
+dictionary.
+
+chemistryModels
+(
+    massTransferCoeff
+);
+massTransferCoeffProps
+\{
+    verbose         switch1;
+\} :pre
+
+{switch1} = (optional, default false) flag to output verbose information :l
+:ule
+
+[Examples:]
+
+chemistryModels
+(
+    massTransferCoeff
+);
+massTransferCoeffProps
+\{
+     verbose        false;
+\} :pre
+
+[Description:]
+
+The chemistry model performs the calculation of chemical reactional effects
+acting on each DEM particle. The coefficients needed to calculate the mass
+transfer coefficients are transferred to the DEM side, where it is used in the
+{fix chem/shrink/core} module.
+
+[Restrictions:]
+
+The "species"_chemistryModel_species.html model needs to be active.
+
+[Related commands:]
+
+"chemistryModel"_chemistryModel.html,
+"chemistryModel species"_chemistryModel_species.html
+

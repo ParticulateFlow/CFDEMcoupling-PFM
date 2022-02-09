@@ -1,0 +1,7 @@
+#stepName	variable        operator	value	interval	nRunsMax
+taphole_open	liquidLevel	<=		0.30	5.0		20
+taphole_closed	liquidLevel	>=		0.40	5.0		20
+taphole_open	liquidLevel	<=		0.30	5.0		20
+taphole_closed	liquidLevel	>=		0.40	5.0		20
+taphole_open	liquidLevel	<=		0.30	5.0		20
+taphole_closed	liquidLevel	>=		0.40	5.0		20

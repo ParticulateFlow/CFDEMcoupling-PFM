@@ -24,6 +24,7 @@ License
 #include "fvCFD.H"
 #include "cfdemCloudEnergy.H"
 #include "energyModel.H"
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -47,17 +48,21 @@ protected:
 
     bool interpolation_;
 
+    bool verbose_;
+
+    bool execution_;
+
     const fvMesh& mesh_;
 
     scalar maxSource_;
 
     word reactionHeatName_;
 
-    mutable double **reactionHeat_;
-
     volScalarField reactionHeatField_;
 
-    void allocateMyArrays() const;
+    label Nevery_;
+
+    scalar couplingTimestep_;
 
 public:
 
@@ -66,24 +71,24 @@ public:
 
     // Constructors
 
-    //- Construct from components
-    reactionHeat
-    (
-        const dictionary& dict,
-        cfdemCloudEnergy& sm
-    );
+        //- Construct from components
+        reactionHeat
+        (
+            const dictionary& dict,
+            cfdemCloudEnergy& sm
+        );
 
     // Destructor
 
-    virtual ~reactionHeat();
+        virtual ~reactionHeat();
 
     // Member Functions
 
-    void addEnergyContribution(volScalarField&) const;
+        void addEnergyContribution(volScalarField&) const;
 
-    void addEnergyCoefficient(volScalarField&) const {}
+        void addEnergyCoefficient(volScalarField&) const {}
 
-    void calcEnergyContribution();
+        void calcEnergyContribution();
 };
 
 

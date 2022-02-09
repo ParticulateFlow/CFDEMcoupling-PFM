@@ -60,7 +60,7 @@ private:
 
     const fvMesh& mesh_;
 
-    scalar startTime_;
+    const scalar startTime_;
 
     const word scalarFieldName_;
 
@@ -72,7 +72,11 @@ private:
 
     mutable scalar lowerThreshold_;
 
-    Switch verbose_;
+    const Switch verbose_;
+
+    const Switch writeToFile_;
+
+    mutable autoPtr<OFstream> filePtr_;
 
 public:
 

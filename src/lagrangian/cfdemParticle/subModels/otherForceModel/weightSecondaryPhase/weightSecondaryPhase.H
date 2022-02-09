@@ -26,6 +26,7 @@ SourceFiles
 #define weightSecondaryPhase_H
 
 #include "otherForceModel.H"
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -48,12 +49,14 @@ protected:
         word volfracFieldName_;
 
         const volScalarField& alpha_;
-    
+
         dimensionedScalar rho_;
 
-        const dimensionedVector g_;
+        word gravityFieldName_;
 
-    
+        const uniformDimensionedVectorField& g_;    // ref to gravity
+
+
 public:
 
     //- Runtime type information
@@ -72,7 +75,6 @@ public:
     // Destructor
 
         virtual ~weightSecondaryPhase();
-
 
 
     // Member Functions

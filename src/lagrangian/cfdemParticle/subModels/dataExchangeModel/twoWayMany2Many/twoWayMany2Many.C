@@ -163,6 +163,12 @@ twoWayMany2Many::~twoWayMany2Many()
     delete lmp2foam_vec_;
     delete foam2lmp_vec_;
     delete foam2lmp_;
+
+    if (propsDict_.found("liggghtsEndOfRunPath"))
+    {
+        const fileName liggghtsEndOfRunPath(propsDict_.lookup("liggghtsEndOfRunPath"));
+        lmp->input->file(liggghtsEndOfRunPath.c_str());
+    }
     delete lmp;
 }
 
@@ -172,8 +178,8 @@ twoWayMany2Many::~twoWayMany2Many()
 // * * * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * * //
 void twoWayMany2Many::getData
 (
-    word name,
-    word type,
+    const word& name,
+    const word& type,
     double ** const& field,
     label /*step*/
 ) const
@@ -225,8 +231,8 @@ void twoWayMany2Many::getData
 
 void twoWayMany2Many::getData
 (
-    word name,
-    word type,
+    const word& name,
+    const word& type,
     int ** const& field,
     label /*step*/
 ) const
@@ -236,8 +242,8 @@ void twoWayMany2Many::getData
 
 void twoWayMany2Many::giveData
 (
-    word name,
-    word type,
+    const word& name,
+    const word& type,
     double ** const& field,
     const char* /*datatype*/
 ) const
@@ -384,7 +390,7 @@ void inline twoWayMany2Many::destroy(int* array) const
 //==============
 
 
-bool twoWayMany2Many::couple(int i) const
+bool twoWayMany2Many::couple(int i)
 {
     bool coupleNow = false;
     if (i==0)
@@ -401,12 +407,12 @@ bool twoWayMany2Many::couple(int i) const
             forAll(particleCloud_.liggghtsCommandModelList(),i)
             {
 
-                if (particleCloud_.liggghtsCommand()[i]().runCommand(couplingStep()))
+                if (particleCloud_.liggghtsCommand(i).runCommand(couplingStep()))
                 {
-                    label commandLines = particleCloud_.liggghtsCommand()[i]().commandLines();
+                    label commandLines = particleCloud_.liggghtsCommand(i).commandLines();
                     for (int j=0; j<commandLines; j++)
                     {
-                        const char* command = particleCloud_.liggghtsCommand()[i]().command(j);
+                        const char* command = particleCloud_.liggghtsCommand(i).command(j);
                         Info << "Executing command: '" << command << "'" << endl;
                         lmp->input->one(command);
                     }
@@ -417,7 +423,7 @@ bool twoWayMany2Many::couple(int i) const
         }
 
         double newNpart = liggghts_get_maxtag(lmp);
-        setNumberOfParticles(newNpart);
+        particleCloud_.setNumberOfParticles(newNpart);
 
         if (Npart_ != newNpart)
         {
@@ -430,13 +436,13 @@ bool twoWayMany2Many::couple(int i) const
         firstRun_=false;
         particleCloud_.clockM().stop("CoupleSyncIDs()");
 
-        setNumberOfParticles(nlocal_foam_);
+        particleCloud_.setNumberOfParticles(nlocal_foam_);
 
         // re-allocate arrays of cloud
         particleCloud_.reAllocArrays();
 
-        setPositions(nlocal_foam_,pos_foam_);
-        setCellIDs(nlocal_foam_,cellID_foam_);
+        particleCloud_.setPositions(nlocal_foam_,pos_foam_);
+        particleCloud_.setCellIDs(nlocal_foam_,cellID_foam_);
 
         Info <<"Foam::twoWayMany2Many::couple(i) done." << endl;
     }

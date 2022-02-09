@@ -1,0 +1,94 @@
+/*---------------------------------------------------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.4                                   |
+|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+
+    root            "";
+    case            "";
+    instance        "";
+    local           "";
+
+    class           dictionary;
+    object          recProperties;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+//===========================================================================//
+// sub-models & settings
+
+
+//recModel standardRecModel;
+recModel lruRecModel;
+
+verbose false;
+
+recNorm sqrDiffNorm;
+
+recPath simpleRandomPath;
+
+
+volScalarFields
+(
+);
+
+volVectorFields
+(
+    U
+);
+
+surfaceScalarFields
+(
+);
+
+//verbose;
+
+
+
+//===========================================================================//
+// sub-model properties
+
+standardRecModelProps
+{
+    dataBase    ".";
+    
+    skipZero    on;
+}
+
+lruRecModelProps
+{
+    dataBase    ".";
+    
+    skipZero    on;
+    
+    numDataBaseFields   11;
+    
+    verboseVacate on;
+}
+
+sqrDiffNormProps
+{
+  fieldType "volVectorField";
+  fieldName U;
+  
+  //verbose   false;
+}
+
+simpleRandomPathProps
+{
+}
+
+noRecStatAnalysis
+{
+}
+
+// ************************************************************************* //

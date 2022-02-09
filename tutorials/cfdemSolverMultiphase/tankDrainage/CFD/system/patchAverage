@@ -1,0 +1,22 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     |
+    \\  /    A nd           | Web:      www.OpenFOAM.org
+     \\/     M anipulation  |
+-------------------------------------------------------------------------------
+Description
+    Calculates the average value of one or more fields on a patch.
+
+\*---------------------------------------------------------------------------*/
+
+name    outlet;
+fields  (alpha.air alpha.water alpha.oil);
+
+operation average;
+// OF4
+//#includeEtc "caseDicts/postProcessing/surfaceRegion/patch.cfg"
+// OF5,OF6
+#includeEtc "caseDicts/postProcessing/surfaceFieldValue/patch.cfg"
+
+// ************************************************************************* //

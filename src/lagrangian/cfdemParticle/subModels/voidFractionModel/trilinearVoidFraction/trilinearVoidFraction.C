@@ -88,13 +88,11 @@ trilinearVoidFraction::~trilinearVoidFraction()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void trilinearVoidFraction::setvoidFraction(double** const& mask,double**& voidfractions,double**& particleWeights,double**& particleVolumes,double**& particleV) const
+void trilinearVoidFraction::setvoidFraction(double** const& mask,double**& voidfractions,double**& particleWeights,double**& particleVolumes,double**& particleV)
 {
-    reAllocArrays();
-
     scalar radius(-1.);
     scalar volume(0.);
-    const scalar scaleVol = weight();
+    scalar scaleVol = weight();
 
     vector partPos(0.,0.,0.);
     vector pt(0.,0.,0.);
@@ -131,7 +129,7 @@ void trilinearVoidFraction::setvoidFraction(double** const& mask,double**& voidf
     for(int index = 0; index < particleCloud_.numberOfParticles(); ++index)
     {
         // reset
-        cellsPerParticle_[index][0] = 8;
+        cellsPerParticle()[index][0] = 8;
         //TODO do we need to set particleVolumes, particleV?
         // ===
 
@@ -140,6 +138,7 @@ void trilinearVoidFraction::setvoidFraction(double** const& mask,double**& voidf
         if (cellI >= 0)  // particel centre is in domain
         {
             radius = particleCloud_.radius(index);
+            if (multiWeights_) scaleVol = weight(index);
             volume = constant::mathematical::fourPiByThree * radius * radius * radius * scaleVol;
 
             // store volume for each particle
@@ -260,9 +259,9 @@ void trilinearVoidFraction::setvoidFraction(double** const& mask,double**& voidf
             // find x,y,z
             // TODO changes needed here when generalized for quader cells
             offsetOrigin = particleCloud_.mesh().C()[i000] - (partPos + posShift);
-            x = mag(offsetOrigin[0]) / cellLength_;
-            y = mag(offsetOrigin[1]) / cellLength_;
-            z = mag(offsetOrigin[2]) / cellLength_;
+            x = std::min(1.0, mag(offsetOrigin[0]) / cellLength_);
+            y = std::min(1.0, mag(offsetOrigin[1]) / cellLength_);
+            z = std::min(1.0, mag(offsetOrigin[2]) / cellLength_);
 
             // calculate the mapping coeffs
             C000 = (1 - x) * (1 - y) * (1 - z);
@@ -349,12 +348,6 @@ void trilinearVoidFraction::setvoidFraction(double** const& mask,double**& voidf
                 alphaLimited = true;
             }
             if(index==0 && alphaLimited) Info<<"alpha limited to" <<alphaMin_<<endl;*/
-
-            // store voidFraction for each particle
-            voidfractions[index][0] = voidfractionNext_[cellI];
-
-            // store cellweight for each particle  - this should not live here
-            particleWeights[index][0] = 1.;
         }
     }
     voidfractionNext_.correctBoundaryConditions();
@@ -362,23 +355,18 @@ void trilinearVoidFraction::setvoidFraction(double** const& mask,double**& voidf
     // bring voidfraction from Eulerian Field to particle array
     for (int index = 0; index < particleCloud_.numberOfParticles(); ++index)
     {
-        label cellID = particleCloud_.cellIDs()[index][0];
+        for (int subcell = 0; subcell < maxCellsPerParticle_; ++subcell)
+        {
+            label cellID = particleCloud_.cellIDs()[index][subcell];
 
-        if (cellID >= 0)
-        {
-            voidfractions[index][0] = voidfractionNext_[i000];
-            voidfractions[index][1] = voidfractionNext_[i100];
-            voidfractions[index][2] = voidfractionNext_[i110];
-            voidfractions[index][3] = voidfractionNext_[i010];
-            voidfractions[index][4] = voidfractionNext_[i001];
-            voidfractions[index][5] = voidfractionNext_[i101];
-            voidfractions[index][6] = voidfractionNext_[i111];
-            voidfractions[index][7] = voidfractionNext_[i011];
-        }
-        else
-        {
-            for (int i = 0; i < 8; ++i)
-                voidfractions[index][i] = -1.;
+            if (cellID >= 0)
+            {
+                voidfractions[index][subcell] = voidfractionNext_[cellID];
+            }
+            else
+            {
+                voidfractions[index][subcell] = -1.;
+            }
         }
     }
 }

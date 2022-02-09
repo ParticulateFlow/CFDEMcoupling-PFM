@@ -64,35 +64,25 @@ dividedVoidFraction::dividedVoidFraction
 :
     voidFractionModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
-    verbose_(false),
+    verbose_(propsDict_.found("verbose")),
     procBoundaryCorrection_(propsDict_.lookupOrDefault<Switch>("procBoundaryCorrection", false)),
     alphaMin_(readScalar(propsDict_.lookup("alphaMin"))),
     alphaLimited_(0),
     tooMuch_(0.0),
-    interpolation_(false),
-    cfdemUseOnly_(false)
+    interpolation_(propsDict_.found("interpolation"))
 {
     maxCellsPerParticle_ = numberOfMarkerPoints;
 
     if (alphaMin_ > 1.0 || alphaMin_ < 0.01)
         Warning << "alphaMin should be < 1 and > 0.01 !!!" << endl;
 
-    if (propsDict_.found("interpolation"))
+    if (interpolation_)
     {
-        interpolation_ = true;
         Warning << "interpolation for dividedVoidFraction does not yet work correctly!" << endl;
         Info << "Using interpolated voidfraction field - do not use this in combination with interpolation in drag model!" << endl;
     }
 
     checkWeightNporosity(propsDict_);
-
-    if (propsDict_.found("verbose"))
-        verbose_ = true;
-
-    if (propsDict_.found("cfdemUseOnly"))
-    {
-        cfdemUseOnly_ = readBool(propsDict_.lookup("cfdemUseOnly"));
-    }
 
     if (procBoundaryCorrection_)
     {
@@ -165,12 +155,8 @@ dividedVoidFraction::~dividedVoidFraction()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfractions,double**& particleWeights,double**& particleVolumes, double**& particleV) const
+void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfractions,double**& particleWeights,double**& particleVolumes, double**& particleV)
 {
-    if (cfdemUseOnly_)
-        reAllocArrays(particleCloud_.numberOfParticles());
-    else
-        reAllocArrays();
 
     vector position(0.,0.,0.);
     label cellID = -1;
@@ -189,17 +175,18 @@ void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfra
         //{
             // reset
 
-            for (int subcell=0; subcell < cellsPerParticle_[index][0]; subcell++)
+            for (int subcell=0; subcell < cellsPerParticle()[index][0]; subcell++)
             {
                 particleWeights[index][subcell] = 0.;
                 particleVolumes[index][subcell] = 0.;
             }
             particleV[index][0] = 0.;
 
-            cellsPerParticle_[index][0] = 1;
+            cellsPerParticle()[index][0] = 1;
             position = particleCloud_.position(index);
             cellID = particleCloud_.cellIDs()[index][0];
             radius = particleCloud_.radius(index);
+            if (multiWeights_) scaleVol = weight(index);
             volume = Vp(index,radius,scaleVol);
             radius *= scaleRadius;
             cellVol = 0;
@@ -278,7 +265,7 @@ void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfra
     for(int index=0; index < particleCloud_.numberOfParticles(); index++)
     {
         {
-            for (int subcell=0; subcell < cellsPerParticle_[index][0]; subcell++)
+            for (int subcell=0; subcell < cellsPerParticle()[index][0]; subcell++)
             {
                 label cellID = particleCloud_.cellIDs()[index][subcell];
 

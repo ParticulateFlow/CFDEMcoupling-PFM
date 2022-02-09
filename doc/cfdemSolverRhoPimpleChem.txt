@@ -1,0 +1,63 @@
+<!-- HTML_ONLY -->
+<HEAD>
+  <META CHARSET="utf-8">
+</HEAD>
+<!-- END_HTML_ONLY -->
+"CFDEMproject Website"_lws - "Main Page"_main :c
+
+:link(lws,http://www.cfdem.com)
+:link(main,CFDEMcoupling_Manual.html)
+
+:line
+
+cfdemSolverRhoPimpleChem command :h3
+
+[Description:]
+
+<!-- HTML_ONLY -->
+"cfdemSolverRhoPimpleChem" is a coupled CFD-DEM solver using the CFDEMcoupling
+framework. Based on the OpenFOAM&reg;(*) solver rhoPimpleFoam, this is a
+transient solver for compressible flow using the flexible PIMPLE (PISO-SIMPLE)
+algorithm, coupled with the DEM code LIGGGHTS for solid particles.
+Compared to cfdemSolverRhoPimple this solver adds functionality for chemical
+reactions.
+
+<!-- END_HTML_ONLY -->
+
+<!-- RST
+
+"cfdemSolverRhoPimpleChem" is a coupled CFD-DEM solver using the CFDEMcoupling
+framework. Based on the OpenFOAM\ |reg|\ (*) solver rhoPimpleFoam, this is a
+transient solver for compressible flow using the flexible PIMPLE (PISO-SIMPLE)
+algorithm, coupled with the DEM code LIGGGHTS for solid particles.
+Compared to cfdemSolverRhoPimple this solver adds functionality for chemical
+reactions.
+
+.. |reg|    unicode:: U+000AE .. REGISTERED SIGN
+
+END_RST -->
+
+:line
+
+<!-- HTML_ONLY -->
+NOTE:
+(*) This offering is not approved or endorsed by OpenCFD Limited, producer and
+distributor of the OpenFOAM software via www.openfoam.com, and owner of the
+OPENFOAM&reg; and OpenCFD&reg; trade marks.
+OPENFOAM&reg; is a registered trade mark of OpenCFD Limited, producer and
+distributor of the OpenFOAM software via www.openfoam.com.
+<!-- END_HTML_ONLY -->
+
+<!-- RST
+
+.. note::
+
+   (*) This offering is not approved or endorsed by OpenCFD Limited, producer
+   and distributor of the OpenFOAM software via www.openfoam.com, and owner of
+   the OPENFOAM\ |reg| and OpenCFD\ |reg| trade marks.
+   OPENFOAM\ |reg| is a registered trade mark of OpenCFD Limited, producer and
+   distributor of the OpenFOAM software via www.openfoam.com.
+
+.. |reg|    unicode:: U+000AE .. REGISTERED SIGN
+
+END_RST -->

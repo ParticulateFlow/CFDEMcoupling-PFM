@@ -48,25 +48,14 @@ class SyamlalThermCond
 :
     public thermCondModel
 {
-  
+
 private:
-  
+
     dictionary propsDict_;
-  
+
     word voidfractionFieldName_;
-  
+
     const volScalarField& voidfraction_;
-    
-    word rhoFieldName_;
-    
-    const volScalarField& rho_;
-    
-    word wallQFactorName_;
-    
-    // ratio of half-cell-size and near-wall film
-    mutable volScalarField wallQFactor_;
-    
-    bool hasWallQFactor_;
 
 public:
 
@@ -89,12 +78,8 @@ public:
 
 
     // Member Functions
-	
-	tmp<volScalarField> thermCond() const;
-	
-	tmp<volScalarField> thermDiff() const;
-       
-       
+
+        void calcThermCond();
 };
 
 

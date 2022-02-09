@@ -61,9 +61,9 @@ class ShirgaonkarIB
 private:
     dictionary propsDict_;
 
-    bool verbose_;
+    const bool verbose_;
 
-    bool twoDimensional_;
+    const bool twoDimensional_;
 
     bool depth_;
 

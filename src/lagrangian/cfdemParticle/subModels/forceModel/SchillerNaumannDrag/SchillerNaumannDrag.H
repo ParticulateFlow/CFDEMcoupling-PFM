@@ -60,11 +60,15 @@ class SchillerNaumannDrag
 private:
     dictionary propsDict_;
 
-    bool verbose_;
+    const bool verbose_;
 
     word velFieldName_;
 
     const volVectorField& U_;
+
+    mutable scalar scaleDia_;
+
+    mutable scalar scaleDrag_;
 
 public:
 

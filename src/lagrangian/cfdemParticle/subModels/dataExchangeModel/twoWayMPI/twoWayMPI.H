@@ -41,27 +41,16 @@ SourceFiles
 #ifndef twoWayMPI_H
 #define twoWayMPI_H
 
+#include <mpi.h>
+
 #include "dataExchangeModel.H"
-#include "liggghtsCommandModel.H"
-#include "OFstream.H"
-#include <sys/stat.h>
-#include "pair.h"
-#include "force.h"
-#include "forceModel.H"
+#include "scalarIOList.H"
 
 //=================================//
 //LAMMPS/LIGGGHTS
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <mpi.h>
 #include <lammps.h>         // these are LAMMPS include files
-#include <input.h>
-#include <atom.h>
-#include <library.h>
-#include <error.h>
-#include <library_cfd_coupling.h>
-#include <update.h>
+#include <pair.h>
+#include <force.h>
 //=================================//
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -83,7 +72,14 @@ private:
     dictionary propsDict_;
     MPI_Comm comm_liggghts;
 
+    wordList DEMVariableNames_;
+
+    scalarIOList DEMVariables_; 
+
   // private member functions
+    double DEMVariableValue(word);
+
+    void updateDEMVariables();
 
 protected:
     LAMMPS_NS::LAMMPS *lmp;
@@ -111,24 +107,24 @@ public:
     // Member Functions
         void getData
         (
-            word name,
-            word type,
+            const word& name,
+            const word& type,
             double ** const& field,
             label step
         ) const;
 
         void getData
         (
-            word name,
-            word type,
+            const word& name,
+            const word& type,
             int ** const& field,
             label step
         ) const;
 
         void giveData
         (
-            word name,
-            word type,
+            const word& name,
+            const word& type,
             double ** const& field,
             const char* datatype
         ) const;
@@ -151,16 +147,14 @@ public:
         void destroy(int*) const;
         //==============
 
-        bool couple(int) const;
+        bool couple(int);
 
         int getNumberOfParticles() const;
         int getNumberOfClumps() const;
         int getNumberOfTypes() const;
         double* getTypeVol() const;
 
-        word myType() const { return typeName; }
-
-        void setCG() { particleCloud_.setCG(lmp->force->cg()); }
+        scalar getCG() const { return lmp->force->cg(); }
 };
 
 

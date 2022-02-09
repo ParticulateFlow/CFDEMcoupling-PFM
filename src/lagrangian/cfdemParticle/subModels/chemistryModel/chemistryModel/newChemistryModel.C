@@ -32,13 +32,10 @@ namespace Foam
 autoPtr<chemistryModel> chemistryModel::New
 (
     const dictionary& dict,
-    cfdemCloudEnergy& sm
+    cfdemCloudEnergy& sm,
+    word chemistryModelType
 )
 {
-    word chemistryModelType
-    (
-        dict.lookup("chemistryModel")
-    );
     Info<< "Selecting chemistryModel "
          << chemistryModelType << endl;
 

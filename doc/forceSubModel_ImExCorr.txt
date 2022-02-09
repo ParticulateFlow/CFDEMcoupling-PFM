@@ -1,25 +1,25 @@
-"CFDEMproject WWW Site"_lws - "CFDEM Commands"_lc :c
+"CFDEMproject Website"_lws - "Main Page"_main :c
 
 :link(lws,http://www.cfdem.com)
-:link(lc,CFDEMcoupling_Manual.html#comm)
+:link(main,CFDEMcoupling_Manual.html)
 
 :line
 
-forceSubModel_ImExCorr command :h3
+forceSubModel ImExCorr command :h3
 
 [Syntax:]
 
-Defined in couplingProperties sub-dictionary of the force model in use.
+Defined in "couplingProperties"_CFDEMcoupling_dicts.html#couplingProperties
+sub-dictionary of the force model in use.
 
 forceSubModels
 (
     ImExCorr;
 );
-
 treatExplicit true;  // optional for some force models.
 treatDEM true;       // optional for some force models.
 implDEM true;        // optional for some force models.
-explicitInterpCorr true; // optional for some force models.
+explicitInterpCorr true; // optional for some force models. :pre
 
 [Examples:]
 
@@ -27,15 +27,17 @@ forceSubModels
 (
     ImExCorr;
 );
-treatExplicit true;  // optional for some force models.
+treatExplicit true;  // optional for some force models. :pre
 
 [Description:]
 
- Same as ImEx, but it additionally reads "explicitInterpCorr" to correct the error steming from interpolation of Ufluid and averaging of Uparticles.
+Same as "ImEx"_forceSubModel_ImEx.html, but it additionally reads
+"explicitInterpCorr" to correct the error steming from interpolation of Ufluid
+and averaging of Uparticles.
 
 [Restrictions:]
 
-none.
+none
 
 [Related commands:]
 

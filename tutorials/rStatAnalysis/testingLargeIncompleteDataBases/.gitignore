@@ -1,0 +1,16 @@
+[0-9]*
+!0.org
+
+*/polyMesh
+
+*.log
+log.*
+
+*.txt
+*.aux
+*.pdf
+*.dat
+recMat/myDistMatrix.tex
+
+recurrenceMatrix
+recurrencePath

@@ -51,30 +51,8 @@ SyamlalThermCond::SyamlalThermCond
     thermCondModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
     voidfractionFieldName_(propsDict_.lookupOrDefault<word>("voidfractionFieldName","voidfraction")),
-    voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
-    rhoFieldName_(propsDict_.lookupOrDefault<word>("rhoFieldName","rho")),
-    rho_(sm.mesh().lookupObject<volScalarField> (rhoFieldName_)),
-    wallQFactorName_(propsDict_.lookupOrDefault<word>("wallQFactorName","wallQFactor")),
-    wallQFactor_
-    (   IOobject
-        (
-            wallQFactorName_,
-            sm.mesh().time().timeName(),
-            sm.mesh(),
-            IOobject::READ_IF_PRESENT,
-            IOobject::AUTO_WRITE
-        ),
-        sm.mesh(),
-        dimensionedScalar("zero", dimensionSet(0,0,0,0,0,0,0), 1.0)
-    ),
-    hasWallQFactor_(false)
-{
-    if (wallQFactor_.headerOk())
-    {
-        Info << "Found field for scaling wall heat flux.\n" << endl;
-        hasWallQFactor_ = true;
-    }
-}
+    voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_))
+{}
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
@@ -84,48 +62,23 @@ SyamlalThermCond::~SyamlalThermCond()
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-
-tmp<volScalarField> SyamlalThermCond::thermCond() const
+void SyamlalThermCond::calcThermCond()
 {
-    tmp<volScalarField> tvf
-    (
-        new volScalarField
-        (
-            IOobject
-            (
-                "tmpThCond",
-                voidfraction_.instance(),
-                voidfraction_.mesh(),
-                IOobject::NO_READ,
-                IOobject::NO_WRITE
-            ),
-            voidfraction_.mesh(),
-            dimensionedScalar("zero", dimensionSet(1,1,-3,-1,0,0,0), 0.0)
-        )
-    );
+    const volScalarField& kf0Field_ = kf0Field();
 
-    volScalarField& svf = tvf.ref();
-
-    svf = (1-sqrt(1-voidfraction_+SMALL)) / (voidfraction_) * kf0_;
-
-    // if a wallQFactor field is present, use it to scale heat transport through a patch
-    if (hasWallQFactor_)
+    forAll(thermCondField_,cellI)
     {
-        wallQFactor_.correctBoundaryConditions();
-        forAll(wallQFactor_.boundaryField(), patchi)
-            svf.boundaryFieldRef()[patchi] *= wallQFactor_.boundaryField()[patchi];
+        scalar kf0 = kf0Field_[cellI];
+
+        if (1-voidfraction_[cellI] < SMALL) thermCondField_[cellI] = kf0;
+        else if (voidfraction_[cellI] < SMALL) thermCondField_[cellI] = 0.0;
+        else thermCondField_[cellI] = (1-sqrt(1-voidfraction_[cellI]+SMALL)) / (voidfraction_[cellI]) * kf0;
     }
 
-    return tvf;
+    thermCondField_.correctBoundaryConditions();
+
+    calcBoundaryCorrections();
 }
-
-tmp<volScalarField> SyamlalThermCond::thermDiff() const
-{
-    return thermCond()/(rho_*Cp_);
-}
-
-
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam

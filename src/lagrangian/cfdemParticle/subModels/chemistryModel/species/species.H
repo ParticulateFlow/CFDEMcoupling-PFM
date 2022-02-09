@@ -15,7 +15,8 @@ License
     along with this code.  If not, see <http://www.gnu.org/licenses/>.
 
     Copyright (C) 2015- Thomas Lichtenegger, JKU Linz, Austria
-    
+                        M. Efe Kinaci, JKU Linz, Austria
+
     Description
     Model to communicate species concentration and changes due to reactions
 
@@ -27,6 +28,7 @@ License
 #include "fvCFD.H"
 #include "cfdemCloudEnergy.H"
 #include "chemistryModel.H"
+#include "diffusionCoefficients.H"
 
 #include "HashPtrTable.H"
 
@@ -55,51 +57,60 @@ private:
 
     const fvMesh& mesh_;
 
+    bool verbose_;
+
     // Species dictionary - To be read where the species are from
     dictionary specDict_;
 
     wordList speciesNames_;
-    
+
     wordList mod_spec_names_;
 
-    PtrList<volScalarField> Y_;
-
-    mutable List<double**> concentrations_;
-    
-    mutable List<double**> changeOfSpeciesMass_;
+    UPtrList<volScalarField> X_;
 
     PtrList<volScalarField> changeOfSpeciesMassFields_;
-    
+
     volScalarField changeOfGasMassField_;
-    
-    word tempFieldName_;
+
+    const word tempFieldName_;
 
     const volScalarField& tempField_;              // ref to gas temperature field
 
-    word partTempName_;
+    const word partTempName_;
 
-    mutable double **partTemp_;                    // gas temperature at particle positions
-
-    word densityFieldName_;
+    const word densityFieldName_;
 
     const volScalarField& rho_;
 
-    word partRhoName_;
-    
-    mutable double **partRho_;                     // gas density at particle positions
-    
-    //word velFieldName_;                          // when velocity is to be calculated in the species source code
+    const word partRhoName_;
 
-    //const volVectorField& U_;
+    const word voidfractionFieldName_;
 
-    //word voidfractionFieldName_;                 // when voidfraction is to be calculated in the species source code
+    const volScalarField& voidfraction_;
 
-    //const volScalarField& voidfraction_;
+    // total mole field
+    const word molarConcFieldName_;
 
+    const volScalarField& molarConc_;
 
-    void allocateMyArrays() const;
-       
+    const word partMolarConcName_;
+
+    label loopCounter_;
+
+    label Nevery_;
+
+    scalar couplingTimestep_;
+
+    scalar massSourceCurr_;
+
+    scalar massSourceTot_;
+
+    bool initialized_;
+
+    void init();
+
 public:
+
 
     //- Runtime type information
     TypeName("species");
@@ -113,22 +124,16 @@ public:
             cfdemCloudEnergy& sm
         );
 
-
     // Destructor
 
         virtual ~species();
 
-
     // Member Functions
+        void execute();
 
-    void execute();
+        tmp <volScalarField> Smi(const label i) const;
 
-    /*tmp<fvScalarMatrix> Smi(const label i) const;
-
-    tmp<fvScalarMatrix> Sm() const;*/
-    
-    
-
+        tmp <volScalarField> Sm() const;
 
 };
 

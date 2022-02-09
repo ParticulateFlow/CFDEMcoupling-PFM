@@ -53,10 +53,11 @@ dSauter::dSauter
 :
     forceModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
-    d2_(NULL),
-    d3_(NULL),
-    scaleDia_(1.0),
-    scaleDiaDist_(1.0),
+    multiTypes_(false),
+    d2RegName_(typeName + "d2"),
+    d3RegName_(typeName + "d3"),
+    maxTypeCG_(1),
+    typeCG_(propsDict_.lookupOrDefault<scalarList>("coarseGrainingFactors",scalarList(1,1.0))),
     d2Field_
     (   IOobject
         (
@@ -95,17 +96,19 @@ dSauter::dSauter
         "zeroGradient"
     )
 {
-    allocateMyArrays();
-    dSauter_.write();
+    if (typeCG_.size()>1)
+    {
+        multiTypes_ = true;
+        maxTypeCG_ = typeCG_.size();
+    }
 
+    particleCloud_.registerParticleProperty<double**>(d2RegName_,1);
+    particleCloud_.registerParticleProperty<double**>(d3RegName_,1);
+
+    dSauter_.write();
 
     // init force sub model
     setForceSubModels(propsDict_);
-
-    if (propsDict_.found("scaleCG"))
-        scaleDia_ = scalar(readScalar(propsDict_.lookup("scaleCG")));
-    if (propsDict_.found("scaleDist"))
-        scaleDiaDist_ = scalar(readScalar(propsDict_.lookup("scaleDist")));
 }
 
 
@@ -113,48 +116,51 @@ dSauter::dSauter
 
 dSauter::~dSauter()
 {
-    particleCloud_.dataExchangeM().destroy(d2_,1);
-    particleCloud_.dataExchangeM().destroy(d3_,1);
 }
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
 
-void dSauter::allocateMyArrays() const
-{
-    // get memory for 2d arrays
-    double initVal = 0.0;
-    particleCloud_.dataExchangeM().allocateArray(d2_,initVal,1);  // field/initVal/with/lenghtFromLigghts
-    particleCloud_.dataExchangeM().allocateArray(d3_,initVal,1);
-}
 
 // * * * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * * //
 
 void dSauter::setForce() const
 {
-    if (scaleDia_ > 1)
+    if (typeCG_.size()>1 || typeCG_[0] > 1.0)
     {
-        Info << "dSauter using scaleCG = " << scaleDia_ << endl;
-    }
-    else if (particleCloud_.cg() > 1)
-    {
-        scaleDia_ = particleCloud_.cg();
-        Info << "dSauter using scaleCG from liggghts cg = " << scaleDia_ << endl;
+        Info << "dSauter using CG factor(s) = " << typeCG_ << endl;
     }
 
-    allocateMyArrays();
+    double**& d2_ = particleCloud_.getParticlePropertyRef<double**>(d2RegName_);
+    double**& d3_ = particleCloud_.getParticlePropertyRef<double**>(d3RegName_);
 
-    label cellI=0;
-    scalar ds(0);
-    scalar scale = scaleDiaDist_/scaleDia_;
+    label cellI = 0;
+    label partType = 1;
+    scalar cg = typeCG_[0];
+    scalar ds = 0.0;
+    scalar effVolFac = 1.0;
+
 
     for(int index = 0; index < particleCloud_.numberOfParticles(); ++index)
     {
         cellI = particleCloud_.cellIDs()[index][0];
         if (cellI >= 0)
         {
+            if (particleCloud_.getParticleEffVolFactors())
+            {
+                effVolFac = particleCloud_.particleEffVolFactor(index);
+            }
+            if (multiTypes_)
+            {
+                partType = particleCloud_.particleType(index);
+                if (partType > maxTypeCG_)
+                {
+                    FatalError<< "Too few coarse-graining factors provided." << abort(FatalError);
+                }
+                cg = typeCG_[partType - 1];
+            }
             ds = particleCloud_.d(index);
-            d2_[index][0] = ds*ds;
-            d3_[index][0] = ds*ds*ds;
+            d2_[index][0] = ds*ds*effVolFac*cg;
+            d3_[index][0] = ds*ds*ds*effVolFac;
         }
     }
 
@@ -181,7 +187,7 @@ void dSauter::setForce() const
     {
         if (d2Field_[cellI] > ROOTVSMALL)
         {
-            dSauter_[cellI] = d3Field_[cellI] / d2Field_[cellI] * scale;
+            dSauter_[cellI] = d3Field_[cellI] / d2Field_[cellI];
         }
         else
         {
