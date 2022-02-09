@@ -1,3 +1,0 @@
-cfdemSolverIBTorque.C
-
-EXE=$(CFDEM_APP_DIR)/cfdemSolverIBTorque
