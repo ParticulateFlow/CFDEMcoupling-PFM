@@ -3,4 +3,4 @@ cfdemSolverPiso/dir
 cfdemSolverRhoPimple/dir
 cfdemSolverIB/dir
 cfdemSolverPisoScalar/dir
-cfdemSolverIBRO/dir
+cfdemSolverIBContinuousForcing/dir

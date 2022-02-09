@@ -25,7 +25,7 @@ License
     along with CFDEMcoupling.  If not, see <http://www.gnu.org/licenses/>.
 
 Application
-    cfdemSolverIBRO
+    cfdemSolverIBContinuousForcing
 
 Description
     Transient solver for incompressible flow.
@@ -50,11 +50,11 @@ Contributions
 #include "regionModel.H"
 #include "voidFractionModel.H"
 
-#include "dynamicFvMesh.H" //dyM
+#include "dynamicFvMesh.H"
 
 #include "cellSet.H"
 
-#include "fvOptions.H"  // added the fvOptions library
+#include "fvOptions.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
