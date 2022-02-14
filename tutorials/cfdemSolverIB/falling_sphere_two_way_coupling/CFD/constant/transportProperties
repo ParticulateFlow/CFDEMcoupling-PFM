@@ -1,9 +1,9 @@
 /*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.6                                   |
-|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
-|    \\/     M anipulation  |                                                 |
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  6
+     \\/     M anipulation  |
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
@@ -19,7 +19,7 @@ FoamFile
 transportModel  Newtonian;
 
 // Fluid properties of  plasma // dextran
-nu              nu [ 0 2 -1 0 0 0 0 ] 5e-06;//0.99048;4.9524;
+nu              nu [ 0 2 -1 0 0 0 0 ] 5e-06;
 
 CrossPowerLawCoeffs
 {
