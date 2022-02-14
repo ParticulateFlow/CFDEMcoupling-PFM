@@ -67,7 +67,7 @@ private:
 
     bool depth_;
 
-    bool multisphere_;
+    const bool multisphere_;
 
     word velFieldName_;
 

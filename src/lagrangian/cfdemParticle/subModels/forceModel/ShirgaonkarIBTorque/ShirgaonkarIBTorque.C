@@ -63,30 +63,26 @@ ShirgaonkarIBTorque::ShirgaonkarIBTorque
 :
     forceModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
-    verbose_(false),
-    twoDimensional_(false),
+    verbose_(propsDict_.found("verbose")),
+    twoDimensional_(propsDict_.found("twoDimensional")),
     depth_(1),
     velFieldName_(propsDict_.lookup("velFieldName")),
     U_(sm.mesh().lookupObject<volVectorField> (velFieldName_)),
     pressureFieldName_(propsDict_.lookup("pressureFieldName")),
     p_(sm.mesh().lookupObject<volScalarField> (pressureFieldName_)),
-    useTorque_(false)
+    useTorque_(propsDict_.found("useTorque"))
 {
     //Append the field names to be probed
     particleCloud_.probeM().initialize(typeName, typeName+".logDat");
     particleCloud_.probeM().vectorFields_.append("dragForce"); //first entry must the be the force
     particleCloud_.probeM().writeHeader();
 
-    if (propsDict_.found("verbose")) verbose_=true;
-    if (propsDict_.found("twoDimensional"))
+    if (twoDimensional_)
     {
-        twoDimensional_=true;
         depth_ = propsDict_.lookup("depth");
         Info << "2-dimensional simulation - make sure DEM side is 2D" << endl;
         Info << "depth of domain is assumed to be :" << depth_ << endl;
     }
-
-    if(propsDict_.found("useTorque")) useTorque_ = true;
 
     // init force sub model
     setForceSubModels(propsDict_);

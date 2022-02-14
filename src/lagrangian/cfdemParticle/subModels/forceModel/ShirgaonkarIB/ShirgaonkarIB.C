@@ -67,7 +67,7 @@ ShirgaonkarIB::ShirgaonkarIB
     verbose_(propsDict_.found("verbose")),
     twoDimensional_(propsDict_.found("twoDimensional")),
     depth_(1),
-    multisphere_(false), //  drag for a multisphere particle
+    multisphere_(propsDict_.found("multisphere")), //  drag for a multisphere particle
     velFieldName_(propsDict_.lookup("velFieldName")),
     U_(sm.mesh().lookupObject<volVectorField> (velFieldName_)),
     pressureFieldName_(propsDict_.lookup("pressureFieldName")),
@@ -86,9 +86,6 @@ ShirgaonkarIB::ShirgaonkarIB
         Info << "2-dimensional simulation - make sure DEM side is 2D" << endl;
         Info << "depth of domain is assumed to be :" << depth_ << endl;
     }
-
-    // Switch to initiate the multisphere calculation
-    if(propsDict_.found("multisphere")) multisphere_=true;
 
     // init force sub model
     setForceSubModels(propsDict_);
