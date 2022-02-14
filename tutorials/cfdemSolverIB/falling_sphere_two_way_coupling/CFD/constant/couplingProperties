@@ -58,7 +58,7 @@ smoothingModel off;
 
 forceModels
 (
-    ShirgaonkarIBTorque
+    ShirgaonkarIB
     ArchimedesIB
 );
 
@@ -71,7 +71,7 @@ turbulenceModelType "turbulenceProperties";
 //===========================================================================//
 // sub-model properties
 
-ShirgaonkarIBTorqueProps
+ShirgaonkarIBProps
 {
     velFieldName "U";
     pressureFieldName "p";

@@ -68,6 +68,7 @@ ShirgaonkarIB::ShirgaonkarIB
     twoDimensional_(propsDict_.found("twoDimensional")),
     depth_(1),
     multisphere_(propsDict_.found("multisphere")), //  drag for a multisphere particle
+    useTorque_(propsDict_.found("useTorque")),
     velFieldName_(propsDict_.lookup("velFieldName")),
     U_(sm.mesh().lookupObject<volVectorField> (velFieldName_)),
     pressureFieldName_(propsDict_.lookup("pressureFieldName")),
@@ -113,6 +114,7 @@ void ShirgaonkarIB::setForce() const
 
     label cellI;
     vector drag;
+    vector torque;
 
     volVectorField h=forceSubM(0).IBDragPerV(U_,p_);
 
@@ -123,6 +125,7 @@ void ShirgaonkarIB::setForce() const
         //if(mask[index][0])
         //{
             drag=vector::zero;
+            torque=vector::zero;
 
             for(int subCell=0;subCell<particleCloud_.voidFractionM().cellsPerParticle()[index][0];subCell++)
             {
@@ -132,6 +135,12 @@ void ShirgaonkarIB::setForce() const
                 if (cellI > -1) // particle Found
                 {
                     drag += h[cellI]*h.mesh().V()[cellI];
+                    if(useTorque_)
+                    {
+                        vector rc = particleCloud_.mesh().C()[cellI];
+                        vector positionCenter = particleCloud_.position(index);
+                        torque += (rc - positionCenter)^h[cellI]*h.mesh().V()[cellI];
+                    }
                 }
 
             }
@@ -154,6 +163,12 @@ void ShirgaonkarIB::setForce() const
                               << ","            << particleCloud_.impForces()[index][1]
                               << ","            << particleCloud_.impForces()[index][2]
                               << endl;
+
+            if(useTorque_)
+            {
+                for(int j=0;j<3;j++) particleCloud_.DEMTorques()[index][j] = torque[j]; // Adding to the particle torque;
+                if(verbose_) Info << "DEMTorques = " << particleCloud_.DEMTorques()[index][0] << "," << particleCloud_.DEMTorques()[index][1] << "," << particleCloud_.DEMTorques()[index][2] << endl;
+            }
         //}
     }
 

@@ -69,6 +69,8 @@ private:
 
     const bool multisphere_;
 
+    const bool useTorque_;
+
     word velFieldName_;
 
     const volVectorField& U_;

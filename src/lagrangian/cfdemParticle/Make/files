@@ -102,7 +102,6 @@ $(forceModels)/Fines/FinesFields.C
 $(forceModels)/Fines/FanningDynFines.C
 $(forceModels)/Fines/ErgunStatFines.C
 $(forceModels)/granKineticEnergy/granKineticEnergy.C
-$(forceModels)/ShirgaonkarIBTorque/ShirgaonkarIBTorque.C
 $(forceModels)/pdCorrelation/pdCorrelation.C
 $(forceModels)/surfaceTensionForce/surfaceTensionForce.C
 $(forceModels)/gradPForceSmooth/gradPForceSmooth.C
