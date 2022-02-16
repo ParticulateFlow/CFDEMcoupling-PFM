@@ -93,6 +93,8 @@ public:
 
         bool evolve(volVectorField&);
 
+        void calcForcingTerm(volVectorField&);
+
         void calcVelocityCorrection(volScalarField&,volVectorField&,volScalarField&,volScalarField&); // this could be moved to an IB mom couple model
 
       // Access

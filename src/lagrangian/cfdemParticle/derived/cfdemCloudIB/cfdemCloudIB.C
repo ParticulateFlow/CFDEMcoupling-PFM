@@ -154,27 +154,7 @@ bool cfdemCloudIB::evolve(volVectorField& Us)
 
         // set particle velocity field
         if(verbose_) Info << "- setVelocity(velocities_)" << endl;
-        label cell = 0;
-        vector uP(0,0,0);
-        vector rVec(0,0,0);
-        vector velRot(0,0,0);
-        vector angVel(0,0,0);
-        for (int index = 0; index < numberOfParticles(); ++index){
-            for(int subCell = 0; subCell < voidFractionM().cellsPerParticle()[index][0]; subCell++)
-            {
-                cell = cellIDs()[index][subCell];
-
-                if(cell >=0){
-                    // calc particle velocity
-                    for(int i=0;i<3;i++) rVec[i]=Us.mesh().C()[cell][i]-position(index)[i];
-                    for(int i=0;i<3;i++) angVel[i]=angularVelocities()[index][i];
-                    velRot=angVel^rVec;
-                    for(int i=0;i<3;i++) uP[i] = velocities()[index][i]+velRot[i];
-                    Us[cell] = (1-voidfractions_[index][subCell])*uP;
-                }
-            }
-        }
-        if(verbose_) Info << "setVelocity done." << endl;
+        calcForcingTerm(Us); // only needed for continuous forcing
 
         // write DEM data
         if(verbose_) Info << " -giveDEMdata()" << endl;
@@ -192,6 +172,32 @@ bool cfdemCloudIB::evolve(volVectorField& Us)
     IOM().dumpDEMdata();
 
     return doCouple;
+}
+
+void cfdemCloudIB::calcForcingTerm(volVectorField& Us)
+{
+    label cell = 0;
+    vector uP(0,0,0);
+    vector rVec(0,0,0);
+    vector velRot(0,0,0);
+    vector angVel(0,0,0);
+    for (int index = 0; index < numberOfParticles(); ++index)
+    {
+        for (int subCell = 0; subCell < voidFractionM().cellsPerParticle()[index][0]; subCell++)
+        {
+            cell = cellIDs()[index][subCell];
+
+            if (cell >=0)
+            {
+                // calc particle velocity
+                for (int i=0;i<3;i++) rVec[i]=Us.mesh().C()[cell][i]-position(index)[i];
+                for (int i=0;i<3;i++) angVel[i]=angularVelocities()[index][i];
+                velRot=angVel^rVec;
+                for (int i=0;i<3;i++) uP[i] = velocities()[index][i]+velRot[i];
+                Us[cell] = (1-voidfractions_[index][subCell])*uP;
+            }
+        }
+    }
 }
 
 void cfdemCloudIB::calcVelocityCorrection
