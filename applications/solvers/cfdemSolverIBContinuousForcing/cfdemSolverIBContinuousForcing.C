@@ -43,7 +43,7 @@ Contributions
 #include "turbulentTransportModel.H"
 #include "pisoControl.H"
 
-#include "cfdemCloudIBContinuousForcing.H"
+#include "cfdemCloudIB.H"
 #include "implicitCouple.H"
 
 #include "averagingModel.H"
@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
 
     // create cfdemCloud
     #include "readGravitationalAcceleration.H"
-    cfdemCloudIBContinuousForcing particleCloud(mesh);
+    cfdemCloudIB particleCloud(mesh);
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -92,9 +92,7 @@ int main(int argc, char *argv[])
 
         // do particle stuff
         Info << "- evolve()" << endl;
-        particleCloud.evolve();
-        particleCloud.calcForcingTerm(Us);
-        Us.correctBoundaryConditions();
+        particleCloud.evolve(Us);
 
         volScalarField voidfractionNext=mesh.lookupObject<volScalarField>("voidfractionNext");
 
