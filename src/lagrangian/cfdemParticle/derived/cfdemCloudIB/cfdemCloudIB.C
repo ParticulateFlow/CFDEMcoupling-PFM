@@ -198,6 +198,7 @@ void cfdemCloudIB::calcForcingTerm(volVectorField& Us)
             }
         }
     }
+    Us.correctBoundaryConditions();
 }
 
 void cfdemCloudIB::calcVelocityCorrection
