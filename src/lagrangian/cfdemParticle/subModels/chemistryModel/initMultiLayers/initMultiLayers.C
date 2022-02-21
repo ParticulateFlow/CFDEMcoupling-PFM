@@ -59,6 +59,7 @@ initMultiLayers::initMultiLayers
     maxNumLayers_(0),
     numLayers_(propsDict_.lookupOrDefault<labelList>("numLayers",labelList(1,-1))),
     partTypes_(propsDict_.lookupOrDefault<labelList>("partTypes",labelList(1,-1))),
+    searchLayers_(propsDict_.lookupOrDefault<labelList>("searchLayers",labelList(1,-1))),
     relRadiiRegName_(typeName + "relRadii"),
     filepath_(string(propsDict_.lookup("filepath"))),
     initialized_(false)
@@ -178,8 +179,8 @@ bool initMultiLayers::init()
             if(cellK >= 0 && partType == type)
             {
                 // look for the nearest occupied cell
-                cellKoccupied = findNearestCellWithValue(cellK, particlesInCell);
                 listIndex = getListIndex(partType);
+                cellKoccupied = findNearestCellWithValue(cellK, particlesInCell,searchLayers_[listIndex]);
                 if (cellKoccupied >= 0)
                 {
                     relRadiiLoopVar = relRadiiField[cellKoccupied];
@@ -215,7 +216,7 @@ void initMultiLayers::execute()
     }
 }
 
-label initMultiLayers::findNearestCellWithValue(label refCell, volScalarField &particlesInCell) const
+label initMultiLayers::findNearestCellWithValue(label refCell, volScalarField &particlesInCell, label searchLayers) const
 {
     if (particlesInCell[refCell] > 0.5) return refCell;
 
@@ -225,6 +226,8 @@ label initMultiLayers::findNearestCellWithValue(label refCell, volScalarField &p
 
     neighbors.insert(refCell);
     recentNeighbors.insert(refCell);
+
+    label layersSearched = 0;
 
     while(true)
     {
@@ -250,6 +253,8 @@ label initMultiLayers::findNearestCellWithValue(label refCell, volScalarField &p
         recentNeighbors.clear();
         recentNeighbors = newNeighbors;
         newNeighbors.clear();
+        layersSearched++;
+        if (layersSearched >= searchLayers && searchLayers > 0) return -1;
     }
 }
 

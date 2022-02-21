@@ -64,6 +64,8 @@ private:
 
     labelList partTypes_;
 
+    labelList searchLayers_;
+
     vector defaultRelRadii_;
 
     const word relRadiiRegName_;
@@ -76,7 +78,7 @@ private:
 
     void readDump(std::string, label, labelList &, vectorList &, vectorList &);
 
-    label findNearestCellWithValue(label, volScalarField &) const;
+    label findNearestCellWithValue(label, volScalarField &, label) const;
 
     label getListIndex(label) const;
 
