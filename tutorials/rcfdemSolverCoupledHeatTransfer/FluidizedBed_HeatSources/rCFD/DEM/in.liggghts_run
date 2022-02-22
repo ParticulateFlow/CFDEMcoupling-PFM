@@ -59,11 +59,7 @@ group           empty subtract all all
 atom_modify first empty
 
 neighbor	${skin} bin
-#neigh_modify	delay 10 include empty
-
-
-#neighbor	${skin} bin
-neigh_modify	delay 0
+neigh_modify	delay 0 no_build yes
 
 #Material properties required for new pair styles
 
@@ -135,6 +131,3 @@ dump		dmp all custom/vtk 10000 ../DEM/post/dump*.liggghts_coupled.vtk id type x 
 
 run	1
 set         region total property/atom Temp ${Tpart}
-
-# for one-2-one communication
-#neigh_modify delay 0 no_build yes
