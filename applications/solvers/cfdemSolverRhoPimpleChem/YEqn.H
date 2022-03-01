@@ -60,13 +60,13 @@ tmp<fv::convectionScheme<scalar> > mvConvection
 
     if (propagateInertSpecie)
     {
-        if (inertIndex!=-1) Yt /= (1-Y[inertIndex] + VSMALL);
+        if (inertIndex!=-1) Yt /= (1-Y[inertIndex] + ROOTVSMALL);
         forAll(Y,i)
         {
             if (i!=inertIndex)
             {
                 volScalarField& Yi = Y[i];
-                Yi = Yi/(Yt+VSMALL);
+                Yi = Yi/(Yt+ROOTVSMALL);
             }
         }
     }
