@@ -59,6 +59,8 @@ private:
     bool verbose_;
 
     label maxNumLayers_;
+    
+    label maxNumParticlesPerType_;
 
     labelList numLayers_;
 
@@ -76,7 +78,7 @@ private:
 
     bool init();
 
-    void readDump(std::string, label, labelList &, vectorList &, vectorList &);
+    label readDump(std::string, label, labelList &, vectorList &, vectorList &);
 
     label findNearestCellWithValue(label, volScalarField &, label) const;
 
