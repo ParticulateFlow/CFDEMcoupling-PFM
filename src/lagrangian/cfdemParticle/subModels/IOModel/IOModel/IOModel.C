@@ -125,6 +125,14 @@ void IOModel::streamDataToPath(const fileName& path, const double* const* array,
         else fileStream << "{}" << "\n";
         return;
     }
+#if OPENFOAM_VERSION_MAJOR > 4
+    else if (type == "position")
+    {
+        // Force construction of face-diagonal decomposition before construction
+        // of particle which uses parallel transfers.
+        (void)particleCloud_.mesh().tetBasePtIs();
+    }
+#endif
 
     fileStream << token::BEGIN_LIST << nl;
 
@@ -139,19 +147,24 @@ void IOModel::streamDataToPath(const fileName& path, const double* const* array,
             }
             else if (type == "position")
             {
-#if OPENFOAM_VERSION_MAJOR < 5
-                fileStream << "( " << array[index][0] << " " << array[index][1] << " " << array[index][2] << " ) " << cellIDs[index][0] << nl;
-#else
-                particle part
-                (
-                    particleCloud_.mesh(),
-                    vector(array[index][0],array[index][1],array[index][2]),
-                    cellIDs[index][0]
-                );
+#if OPENFOAM_VERSION_MAJOR > 4
+                if (true)
+                {
+                    particle part
+                    (
+                        particleCloud_.mesh(),
+                        vector(array[index][0],array[index][1],array[index][2]),
+                        cellIDs[index][0]
+                    );
 
-                part.writePosition(fileStream);
-                fileStream << nl;
+                    part.writePosition(fileStream);
+                    fileStream << nl;
+                }
+                else
 #endif
+                {
+                    fileStream << "( " << array[index][0] << " " << array[index][1] << " " << array[index][2] << " ) " << cellIDs[index][0] << nl;
+                }
             }
             else if (type == "vector")
             {
