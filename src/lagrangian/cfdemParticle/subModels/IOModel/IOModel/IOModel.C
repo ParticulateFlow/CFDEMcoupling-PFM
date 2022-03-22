@@ -126,7 +126,7 @@ void IOModel::streamDataToPath(const fileName& path, const double* const* array,
         return;
     }
 #if OPENFOAM_VERSION_MAJOR > 4
-    else if (type == "position")
+    else if (barycentricOutput_ && type == "position")
     {
         // Force construction of face-diagonal decomposition before construction
         // of particle which uses parallel transfers.
@@ -148,7 +148,7 @@ void IOModel::streamDataToPath(const fileName& path, const double* const* array,
             else if (type == "position")
             {
 #if OPENFOAM_VERSION_MAJOR > 4
-                if (true)
+                if (barycentricOutput_)
                 {
                     particle part
                     (
@@ -192,7 +192,8 @@ IOModel::IOModel
     dict_(dict),
     particleCloud_(sm),
     time_(sm.mesh().time()),
-    parOutput_(true)
+    parOutput_(true),
+    barycentricOutput_(true)
 {
     if (
             particleCloud_.dataExchangeM().type()=="oneWayVTK" ||
@@ -201,6 +202,11 @@ IOModel::IOModel
     {
         parOutput_ = false;
         Warning << "IO model is in serial write mode, only data on proc 0 is written" << endl;
+    }
+
+    if (dict_.found("cartesianOutput"))
+    {
+        barycentricOutput_ = false;
     }
 }
 
