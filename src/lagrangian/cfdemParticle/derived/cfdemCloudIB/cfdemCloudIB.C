@@ -181,6 +181,7 @@ void cfdemCloudIB::calcForcingTerm(volVectorField& Us)
     vector rVec(0,0,0);
     vector velRot(0,0,0);
     vector angVel(0,0,0);
+    Us.primitiveFieldRef() = vector::zero;
     for (int index = 0; index < numberOfParticles(); ++index)
     {
         for (int subCell = 0; subCell < voidFractionM().cellsPerParticle()[index][0]; subCell++)
