@@ -17,7 +17,8 @@ IOModel basicIO; :pre
 [Examples:]
 
 IOModel basicIO;
-serialOutput; :pre
+serialOutput;
+cartesianOutput; :pre
 
 [Description:]
 
@@ -28,6 +29,11 @@ Using the keyword {serialOutput;} in the
 "couplingProperties"_CFDEMcoupling_dicts.html#couplingProperties dictionary,
 the IO is serial to the directory {$casePath/CFD/lagrangian}. In this case
 only the data on processor 0 is written!
+
+Using the keyword {cartesianOutput;} in the
+"couplingProperties"_CFDEMcoupling_dicts.html#couplingProperties dictionary,
+particle positions will be written as cartesian coordinates instead of
+barycentric coordinates.
 
 Data is written every write time of the CFD simulation.
 

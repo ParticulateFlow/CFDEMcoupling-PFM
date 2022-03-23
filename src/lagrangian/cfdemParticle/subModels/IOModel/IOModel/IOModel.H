@@ -65,6 +65,8 @@ protected:
 
         bool parOutput_;
 
+        bool barycentricOutput_;
+
 public:
 
     //- Runtime type information
