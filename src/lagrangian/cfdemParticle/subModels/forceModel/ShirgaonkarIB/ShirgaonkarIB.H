@@ -83,6 +83,8 @@ private:
 
     const volScalarField& lambda_;
 
+    void calcForce() const;
+
 public:
 
     //- Runtime type information
@@ -105,7 +107,6 @@ public:
 
     // Member Functions
         void setForce() const;
-        void calcForce() const;
 };
 
 
