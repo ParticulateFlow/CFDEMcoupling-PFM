@@ -40,7 +40,7 @@ for i in range(len(t)):
 	min_eig.append(eig)
 
 plt.plot(t,min_eig,linewidth = 1)
-plt.xlim([0,1.25])
+plt.xlim([0,0.5])
 plt.xlabel('Time (s)')
 plt.ylabel('Min. eigen value of G')
 plt.minorticks_on()
