@@ -1,21 +1,18 @@
 #!/bin/bash
-
-#===================================================================#
-# allclean script for testcase
+#------------------------------------------------------------------------------
+# Allclean script for falling sphere test case
 # clean CFD and DEM part
-# Achuth N. Balachandran Nair - Oct. 2018
-#===================================================================#
+# Achuth N. Balachandran Nair - October 2018
+#------------------------------------------------------------------------------
 
-#- source CFDEM env vars
+#- source environment variables
 . ~/.bashrc
 
-#- include functions
+#- source CFDEM functions
 source $CFDEM_PROJECT_DIR/etc/functions.sh
 
-#--------------------------------------------------------------------------------#
 #- define variables
 casePath="$(dirname "$(readlink -f ${BASH_SOURCE[0]})")"
-#--------------------------------------------------------------------------------#
 
 #- clean up case
 echo "deleting data at: $casePath"

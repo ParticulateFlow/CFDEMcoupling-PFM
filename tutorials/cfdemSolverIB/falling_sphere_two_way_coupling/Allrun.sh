@@ -1,10 +1,9 @@
 #!/bin/bash
-
-#===================================================================#
-# allrun script for testcase
+#------------------------------------------------------------------------------
+# allrun script for falling sphere testcase
 # run falling_sphere_two_way_coupling
 # Achuth N. Balachandran Nair - Oct. 2018
-#===================================================================#
+#------------------------------------------------------------------------------
 
 source $CFDEM_PROJECT_DIR/etc/functions.sh
 
@@ -22,6 +21,5 @@ else
     blockMesh
 fi
 
-
-#gnome-terminal --title='cfdemSolverIB twoSpheresGlowinskiMPI CFD' -e "bash $casePath/parCFDDEMrun.sh"
+#- run parallel CFD-DEM
 bash $casePath/parCFDDEMrun.sh

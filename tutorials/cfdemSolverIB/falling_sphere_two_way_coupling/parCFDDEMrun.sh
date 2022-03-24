@@ -1,10 +1,9 @@
 #!/bin/bash
-
-#===================================================================#
-# CFDDEMrun script for testcase
+#------------------------------------------------------------------------------
+# parCFDDEMrun script for falling sphere testcase
 # run falling_sphere_two_way_coupling
 # Achuth N. Balachandran Nair - Oct. 2018
-#===================================================================#
+#------------------------------------------------------------------------------
 
 #- source CFDEM env vars
 . ~/.bashrc
@@ -12,7 +11,7 @@
 #- include functions
 source $CFDEM_PROJECT_DIR/etc/functions.sh
 
-#--------------------------------------------------------------------------------#
+#------------------------------------------------------------------------------
 #- define variables
 casePath="$(dirname "$(readlink -f ${BASH_SOURCE[0]})")"
 logpath=$casePath
@@ -25,7 +24,7 @@ debugMode="off"          # on | off| strict
 testHarnessPath="$CFDEM_TEST_HARNESS_PATH"
 runOctave="false"
 postproc="false"
-#--------------------------------------------------------------------------------#
+#------------------------------------------------------------------------------
 
 #- call function to run a parallel CFD-DEM case
 parCFDDEMrun $logpath $logfileName $casePath $headerText $solverName $nrProcs $machineFileName $debugMode
