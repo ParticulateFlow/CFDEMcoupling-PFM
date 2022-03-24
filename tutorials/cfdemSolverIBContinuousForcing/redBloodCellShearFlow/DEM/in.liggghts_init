@@ -1,0 +1,113 @@
+# Insert a RBC into a box, then induce shear flow
+log         ../DEM/log.liggghts
+thermo_log  ../DEM/post/thermo.txt
+
+# bond parameter setup
+variable rp equal 1.955         # sphere radius
+variable ro equal 1             # bond outer radius multiplier
+variable ri equal 0             # bond inner radius multiplier
+variable rb equal 2*${ro}*${rp} # bond radius
+variable lb equal 0.3090        # bond length multiplier
+variable damp equal 300         # damping coefficient
+
+# material properties
+variable G equal 0.005333       # in-plane shear modulus of the membrane
+variable Y equal 0.020426       # in-plane Young's modulus of the membrane
+variable Sn equal $Y/3.91       # analogous Youngs modulus of the parallel bond
+variable St equal $G/3.91       # analogous shear modulus of the parallel bond
+variable Sben equal ${Sn}*10    # analogous bending modulus of the parallel bond
+variable Stor equal ${Sn}*10    # analogous torsional modulus of the parallel bond
+
+
+# atom type and style
+atom_style  hybrid granular bond/gran n_bondtypes 1 bonds_per_atom 6
+atom_modify map array
+
+# boundary
+boundary    p f p
+
+# communication
+newton      off
+communicate single vel yes
+
+# units
+units       micro
+
+#region and box creation
+region      domain block 0 45 0 22.5 0 22.5 units box
+create_box  2 domain
+
+# neighbors
+neighbor        1 bin
+neigh_modify    exclude molecule all
+neigh_modify    delay 0
+
+# material properties
+fix m1 all property/global youngsModulus peratomtype 7.5e02 7.5e03 
+fix m2 all property/global poissonsRatio peratomtype 0.5 0.5
+fix m3 all property/global coefficientRestitution peratomtypepair 2 1e-06 1e-03 1e-03 1e-06 
+fix m4 all property/global coefficientFriction peratomtypepair 2 0.3 0.1 0.1 0.3
+
+# pair style
+pair_style  gran model hertz tangential history
+pair_coeff  * *
+
+# bond parameters
+bond_style  gran
+# N ro ri lb Sn_bond St_bond s_bend s_tor damp bn bt TYPE_OF_BOND sigma_break tau_break
+bond_coeff  1 ${ro} ${ri} ${lb} ${Sn} ${St} ${Sben} ${Stor} ${damp} 2.65 0.0 1 1e50 1e50
+
+
+# particle template, insertion region and bond formation
+fix pts1 all particletemplate/multiplespheres 15485863 atom_type 1 &
+density constant 1098 nspheres 10 ntry 1000000 spheres file ../DEM/data/spheres.txt scale 1 &
+bonded	yes/explicit &
+nbond_pairs 10 &
+1 2 &
+2 3 &
+3 4 &
+4 5 &
+5 6 &
+6 7 &
+7 8 &
+8 9 &
+9 10 &
+10 1 &
+bond_type 1
+
+fix pdd1 all particledistribution/discrete 32452843 1 pts1 1.0
+
+region bc1 block 0 45 0 22.5 0 22.5  units box
+
+fix ins1 all insert/pack seed 32452867 distributiontemplate pdd1 &
+    maxattempt 10000 insert_every once overlapcheck yes vel constant 0.0 0.0 0.0 &
+    region bc1 particles_in_region 1 pos 22.5 11.25 11.25 ntry_mc 100000
+
+run             1000
+
+# set timestep
+timestep        0.001
+
+# check timestep
+fix ts_check all check/timestep/gran 1000 0.1 0.1
+
+# screen output
+thermo_style    custom step atoms numbond
+thermo          10000
+thermo_modify   lost ignore norm no
+compute_modify  thermo_temp dynamic yes
+
+dump    dmp all custom 1000 ../DEM/post/dump*.liggghts &
+        id mol type x y z vx vy vz fx fy fz omegax omegay omegaz radius
+compute b1 all property/local &
+        batom1x batom1y batom1z batom2x batom2y batom2z &
+        batom1 batom2 btype bforceX bforceY bforceZ
+# x1 y1 z1 x2 y2 z2 id1 id2 bondtype f_bond[1] f_bond[2] f_bond[3]
+dump    bnd all local 1000 ../DEM/post/bonds*.bond1 &
+        c_b1[1] c_b1[2] c_b1[3] c_b1[4] c_b1[5] c_b1[6] &
+        c_b1[7] c_b1[8] c_b1[9] c_b1[10] c_b1[11] c_b1[12]
+
+run		100000
+
+write_restart   ../DEM/post/restart/liggghts.restart
+

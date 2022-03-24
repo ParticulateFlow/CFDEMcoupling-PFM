@@ -1,0 +1,92 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  6
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      couplingProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+// sub-models & settings
+
+modelType none;
+
+checkPeriodicCells;
+
+couplingInterval 10;
+
+depth 0;
+
+voidFractionModel IB;
+
+locateModel engineIB;
+
+meshMotionModel noMeshMotion;
+
+regionModel allRegion;
+
+dataExchangeModel twoWayMPI;
+
+IOModel off;
+
+probeModel off;
+
+averagingModel dilute;
+
+clockModel off;
+
+smoothingModel off;
+
+forceModels
+(
+    ShirgaonkarIB
+);
+
+momCoupleModels
+(
+);
+
+turbulenceModelType "turbulenceProperties";
+
+
+// sub-model properties
+
+ShirgaonkarIBProps
+{
+    velFieldName "U";
+    pressureFieldName "p";
+    densityFieldName "rho";
+    solidVolFractionName "lambda";
+    useTorque;
+}
+
+IBProps
+{
+    maxCellsPerParticle 20000;
+    alphaMin 0.30;
+    scaleUpVol 1.0;
+}
+
+engineIBProps
+{
+    engineProps
+    {
+        treeSearch true;
+    }
+    zSplit 8;
+    xySplit 16;
+}
+
+twoWayMPIProps
+{
+    liggghtsPath "../DEM/in.liggghts_run";
+}
+
+// ************************************************************************* //
