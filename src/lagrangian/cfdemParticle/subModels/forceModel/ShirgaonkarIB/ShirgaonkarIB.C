@@ -190,8 +190,7 @@ void ShirgaonkarIB::calcForce() const
         else dragMS = dragMS;
     }
 
-    //Info << "Drag force on particle clump = " << dragMS[0] << ", " << dragMS[1] << ", " << dragMS[2] << endl;
-    printf("Drag force on particle clump = %f, %f, %f\n",dragMS[0],dragMS[1],dragMS[2]);
+    Pout << "Drag force on particle clump = " << dragMS[0] << ", " << dragMS[1] << ", " << dragMS[2] << endl;
 }
 
 
