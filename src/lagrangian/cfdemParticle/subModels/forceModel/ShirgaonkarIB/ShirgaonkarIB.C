@@ -73,8 +73,8 @@ ShirgaonkarIB::ShirgaonkarIB
     U_(sm.mesh().lookupObject<volVectorField> (velFieldName_)),
     pressureFieldName_(propsDict_.lookup("pressureFieldName")),
     p_(sm.mesh().lookupObject<volScalarField> (pressureFieldName_)),
-    solidVolFractionName_(propsDict_.lookup("solidVolFractionName")),
-    lambda_(sm.mesh().lookupObject<volScalarField> (solidVolFractionName_))
+    solidVolFractionName_(multisphere_?propsDict_.lookup("solidVolFractionName"):word::null),
+    lambda_(multisphere_?sm.mesh().lookupObject<volScalarField>(solidVolFractionName_):volScalarField::null())
 {
     //Append the field names to be probed
     particleCloud_.probeM().initialize(typeName, typeName+".logDat");
