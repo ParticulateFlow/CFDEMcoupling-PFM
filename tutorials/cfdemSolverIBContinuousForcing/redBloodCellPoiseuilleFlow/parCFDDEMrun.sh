@@ -31,8 +31,7 @@ parCFDDEMrun $logpath $logfileName $casePath $headerText $solverName $nrProcs $m
 
 if [ $runPython == "true" ]
   then
-
-    cd $casePath/CFD/octave
+    cd $casePath
     python results.py
 fi
 
