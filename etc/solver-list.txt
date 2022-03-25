@@ -10,6 +10,7 @@ cfdemSolverPiso/dir
 cfdemSolverRhoPimple/dir
 cfdemSolverIB/dir
 cfdemSolverPisoScalar/dir
+cfdemSolverIBContinuousForcing/dir
 cfdemSolverRhoPimpleChem/dir
 cfdemSolverMultiphase/dir
 cfdemSolverMultiphaseScalar/dir

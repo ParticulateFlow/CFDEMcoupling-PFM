@@ -1,0 +1,82 @@
+"CFDEMproject Website"_lws - "Main Page"_main :c
+
+:link(lws,http://www.cfdem.com)
+:link(main,CFDEMcoupling_Manual.html)
+
+:line
+
+cfdemSolverIBContinuousForcing command :h3
+
+[Description:]
+
+"cfdemSolverIBContinuousForcing" is a coupled CFD-DEM solver using CFDEMcoupling,
+an open-source parallel coupled CFD-DEM framework, for calculating the dynamics
+between immersed bodies and the surrounding fluid. Being an implementation of a
+continuous forcing immersed boundary method it allows tackling problems where
+the body diameter exceeds the maximal size of a fluid cell.
+
+<!-- HTML_ONLY -->
+Using the toolbox of OpenFOAM&reg;(*) the governing equations of the fluid are
+computed and the corrections of velocity and pressure field with respect to the
+body-movement information, gained from LIGGGHTS, are incorporated.
+<!-- END_HTML_ONLY -->
+
+<!-- RST
+
+Using the toolbox of OpenFOAM\ |reg|\ (*) the governing equations of the fluid are
+computed and the corrections of velocity and pressure field with respect to the
+body-movement information, gained from LIGGGHTS, are incorporated.
+
+.. |reg|    unicode:: U+000AE .. REGISTERED SIGN
+
+END_RST -->
+
+The code of this solver was contributed by A.N. Balachandran Nair, JKU. For more
+details, see "Balachandran Nair et al. (2021)"_#BalachandranNair2021
+
+[Use:]
+
+The solver is realized within the open-source framework CFDEMcoupling. Just as
+for the unresolved CFD-DEM solver cfdemSolverPiso the file
+CFD/constant/couplingProperties contains information about the settings for the
+different models. While IOmodel, DataExchangeModel etc. are applicable for all
+CFDEMcoupling-solvers, special locate-, force- and void fraction models were
+designed for this solver:
+
+"engineSearchIB"_locateModel_engineSearchIB.html,
+"ArchimedesIB"_forceModel_ArchimedesIB.html,
+"ShirgaonkarIB"_forceModel_ShirgaonkarIB.html,
+"IBVoidfraction"_voidFractionModel_IBVoidFraction.html
+
+:line
+
+:link(BalachandranNair2021)
+[(Balachandran Nair, 2021)] Balachandran Nair, A.N., Pirker, S. and Saeedipour, M.,
+"Resolved CFD-DEM simulation of blood flow with a reduced-order RBC model",
+Comp. Part. Mech. (2021)
+
+:line
+
+<!-- HTML_ONLY -->
+NOTE:
+(*) This offering is not approved or endorsed by OpenCFD Limited, producer and
+distributor of the OpenFOAM software via www.openfoam.com, and owner of the
+OPENFOAM&reg; and OpenCFD&reg; trade marks.
+OPENFOAM&reg; is a registered trade mark of OpenCFD Limited, producer and
+distributor of the OpenFOAM software via www.openfoam.com.
+<!-- END_HTML_ONLY -->
+
+<!-- RST
+
+.. note::
+
+   (*) This offering is not approved or endorsed by OpenCFD Limited, producer
+   and distributor of the OpenFOAM software via www.openfoam.com, and owner of
+   the OPENFOAM\ |reg| and OpenCFD\ |reg| trade marks.
+   OPENFOAM\ |reg| is a registered trade mark of OpenCFD Limited, producer and
+   distributor of the OpenFOAM software via www.openfoam.com.
+
+.. |reg|    unicode:: U+000AE .. REGISTERED SIGN
+
+END_RST -->
+

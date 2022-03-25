@@ -6,7 +6,8 @@
                                 Christoph Goniva, christoph.goniva@cfdem.com
                                 Copyright (C) 1991-2009 OpenCFD Ltd.
                                 Copyright (C) 2009-2012 JKU, Linz
-                                Copyright (C) 2012-     DCS Computing GmbH,Linz
+                                Copyright (C) 2012-2015 DCS Computing GmbH,Linz
+                                Copyright (C) 2015-     JKU, Linz
 -------------------------------------------------------------------------------
 License
     This file is part of CFDEMcoupling.
@@ -29,11 +30,14 @@ Application
 
 Description
     Transient solver for incompressible flow.
-    The code is an evolution of the solver pisoFoam in OpenFOAM(R) 1.6, 
+    The code is an evolution of the solver pisoFoam in OpenFOAM(R) 1.6,
     where additional functionality for CFD-DEM coupling using immersed body
     (fictitious domain) method is added.
 Contributions
     Alice Hager
+    Daniel Queteschiner
+    Thomas Lichtenegger
+    Achuth N. Balachandran Nair
 \*---------------------------------------------------------------------------*/
 
 
@@ -53,23 +57,21 @@ Contributions
 
 #include "cellSet.H"
 
+#include "fvOptions.H"  // added the fvOptions library
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 int main(int argc, char *argv[])
 {
+
     #include "setRootCase.H"
-
     #include "createTime.H"
-
     #include "createDynamicFvMesh.H"
-
     #include "createControl.H"
-
     #include "createTimeControls.H"
-
     #include "createFields.H"
-
     #include "initContinuityErrs.H"
+    #include "createFvOptions.H"
 
     // create cfdemCloud
     #include "readGravitationalAcceleration.H"
@@ -93,24 +95,31 @@ int main(int argc, char *argv[])
 
         // do particle stuff
         Info << "- evolve()" << endl;
-        particleCloud.evolve();
+        particleCloud.evolve(Us);
 
         // Pressure-velocity PISO corrector
         {
+            MRF.correctBoundaryVelocity(U);
+
             // Momentum predictor
 
             fvVectorMatrix UEqn
             (
-                fvm::ddt(voidfraction,U)
+                fvm::ddt(voidfraction,U) + MRF.DDt(U)
               + fvm::div(phi, U)
               + turbulence->divDevReff(U)
+             ==
+                fvOptions(U)
             );
 
             UEqn.relax();
 
+            fvOptions.constrain(UEqn);
+
             if (piso.momentumPredictor())
             {
                 solve(UEqn == -fvc::grad(p));
+                fvOptions.correct(U);
             }
 
             // --- PISO loop
@@ -125,6 +134,7 @@ int main(int argc, char *argv[])
                     + rUAf*fvc::ddtCorr(U, phi);
 
                 adjustPhi(phi, U, p);
+
 
                 while (piso.correctNonOrthogonal())
                 {
@@ -152,11 +162,14 @@ int main(int argc, char *argv[])
             }
         }
 
+        laminarTransport.correct();
         turbulence->correct();
 
         Info << "particleCloud.calcVelocityCorrection() " << endl;
         volScalarField voidfractionNext=mesh.lookupObject<volScalarField>("voidfractionNext");
         particleCloud.calcVelocityCorrection(p,U,phiIB,voidfractionNext);
+
+        fvOptions.correct(U);
 
         runTime.write();
 
