@@ -87,7 +87,7 @@ fix     pore_diameter   ore property/global pore_diameter_ore   scalar 1.e-7
 fix     layerDensities  ore property/global density_ore         vector 7870. 5740. 5170. 5240.
 
 # define layer properties
-fix     LayerRelRadii ore property/atom relRadii vector yes no no  1.0 0.998 0.995 0.98
+fix     LayerRelRadii ore property/atom relRadii vector yes no no  1.0 0.999 0.998 0.001
 
 ###############
 # Write data into files for post-processing
