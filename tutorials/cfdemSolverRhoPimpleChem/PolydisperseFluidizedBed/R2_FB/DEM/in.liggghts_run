@@ -106,7 +106,7 @@ thermo          25
 thermo_modify   lost ignore norm no
 compute_modify  thermo_temp dynamic yes
 
-dump dmp all custom/vtk ${WI} ../DEM/post/liggghts_run*.vtk id type x y z vx vy vz &
+dump dmp all custom ${WI} ../DEM/post/dump*.liggghts_run id type x y z vx vy vz &
      fx fy fz radius mass f_fracRed[1] f_fracRed[2] f_fracRed[3]
 
 run 1
