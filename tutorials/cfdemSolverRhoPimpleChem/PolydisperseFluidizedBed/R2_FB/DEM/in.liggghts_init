@@ -1,4 +1,13 @@
-# Particle insertion into domain
+################################################################################
+# brief: chemistry in fluidized bed - particle insertion into domain           #
+#                                                                              #
+# Cf. M.E. Kinaci,T. Lichtenegger,S. Schneiderbauer, Chem. Eng. Sci. 227 (2020)#
+#                                                                              #
+# authors: M.E. Kinaci, D. Queteschiner                                        #
+# date: Mar 2022                                                               #
+# copyright: 2022- JKU Linz                                                    #
+################################################################################
+
 coarsegraining  7.0 model_check error
 atom_style      granular
 atom_modify     map array
@@ -38,48 +47,48 @@ fix     cylwalls all wall/gran model hertz tangential history primitive type 1 y
 # particle distributions and insertion 
 region  insreg1 cylinder y 0.0 0.0 0.034 0.00 0.15 units box
 
-#insert Quartz particles
+# iron-ore range
+fix     pts1 all particletemplate/sphere 51 atom_type 1 density constant 4300 radius constant 6.25e-05
+fix     pts2 all particletemplate/sphere 41 atom_type 1 density constant 4300 radius constant 0.000125
+fix     pts3 all particletemplate/sphere 31 atom_type 1 density constant 4300 radius constant 0.000188
+fix     pts4 all particletemplate/sphere 21 atom_type 1 density constant 4300 radius constant 0.000375
+
+fix     pdd1 all particledistribution/discrete 1 4 pts1 0.154 pts2 0.332 pts3 0.286 pts4 0.228
+
+# quartz particles
 fix     pts5 all particletemplate/sphere 61 atom_type 2 density constant 2630 radius constant 0.00025
 fix     pdd2 all particledistribution/discrete 1 1 pts5 1.0
-
-#insert iron-ore range
-fix     pts1 all particletemplate/sphere 21 atom_type 1 density constant 4300 radius constant 0.000375
-fix     pts2 all particletemplate/sphere 31 atom_type 1 density constant 4300 radius constant 0.000188
-fix     pts3 all particletemplate/sphere 41 atom_type 1 density constant 4300 radius constant 0.000125
-fix     pts4 all particletemplate/sphere 51 atom_type 1 density constant 4300 radius constant 6.25E-05
-
-fix     pdd1 all particledistribution/discrete 1 4 pts1 0.228 pts2 0.286 pts3 0.332 pts4 0.154
 
 fix     ts_check all check/timestep/gran 10 0.1 0.1
 
 # apply nve integration to all particles that are inserted as single particles
 fix     integr all nve/sphere
 
+# make groups
+group ore type 1
+group quartz type 2
+
+# screen output
+thermo_style    custom step atoms ke
+thermo          1000
+thermo_modify   lost ignore norm no
+compute_modify  thermo_temp dynamic yes
+
+# insert quartz particles
 fix     ins2 all insert/pack seed 5331 distributiontemplate pdd2 &
           maxattempt 1000 insert_every once overlapcheck yes all_in yes vel constant 0.0 0.0 0.0 &
           region insreg1 mass_in_region 0.2
 
 run     150000
 
+# insert iron-ore particles
 fix     ins1 all insert/pack seed 5330 distributiontemplate pdd1 &
           maxattempt 1000 insert_every once overlapcheck yes all_in yes vel constant 0.0 0.0 0.0 &
           region insreg1 mass_in_region 0.365
 
-# make groups
-group ore type 1
-group quartz type 2
-
-# screen output
-compute         rke all erotate/sphere
-thermo_style    custom step atoms ke c_rke vol
-thermo          1000
-thermo_modify   lost ignore norm no
-compute_modify  thermo_temp dynamic yes
-
-# insert the first particles so that dump is not empty
-run     1
 dump    dmp all custom 5000 post/dump.liggghts_init id type x y z vx vy vz fx fy fz radius mass
 
 run     300000 upto
 
 write_restart   ../DEM/post/restart/liggghts.restart
+

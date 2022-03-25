@@ -1,7 +1,18 @@
-# chemistry in fluidized bed
+################################################################################
+# brief: chemistry in fluidized bed - reduce Fe3O4 to FeO at 1023K (750 °C)    #
+#                                                                              #
+# Cf. M.E. Kinaci,T. Lichtenegger,S. Schneiderbauer, Chem. Eng. Sci. 227 (2020)#
+# Note that reaction rate is scaled x10                                        #
+#                                                                              #
+# authors: M.E. Kinaci, D. Queteschiner                                        #
+# date: Mar 2022                                                               #
+# copyright: 2022- JKU Linz                                                    #
+################################################################################
+
 log             ../DEM/log.liggghts
 thermo_log      ../DEM/post/thermo.txt
 
+variable rate_scale equal 10.0
 variable cg equal 7.0
 coarsegraining  ${cg} model_check error
 
@@ -19,9 +30,9 @@ processors      2 * 2
 read_restart    ../DEM/post/restart/liggghts.restart
 
 neighbor        1e-4 bin
-neigh_modify    delay 0 
+neigh_modify    delay 0
 
-# Material properties required for granular pair styles
+# material properties for granular pair styles
 fix         m1 all property/global youngsModulus peratomtype 5.e6 5.e6
 fix         m2 all property/global poissonsRatio peratomtype 0.45 0.45
 fix         m3 all property/global coefficientRestitution peratomtypepair 2 0.3 0.3 0.3 0.3
@@ -44,37 +55,28 @@ fix     cylwalls all wall/gran model hertz tangential history primitive type 1 y
 fix     ftco all property/global thermalConductivity peratomtype 1.4 1.4
 fix     ftca all property/global thermalCapacity peratomtype 3000 5000
 
+fix     integr all nve/sphere
+
 # re-make groups
 group   ore type 1
 group   quartz type 2
 
-###############################################
-fix ts_check all check/timestep/gran 10 0.1 0.1
-
-###############
+################################################################################
 # cfd coupling
 fix     cfd all couple/cfd couple_every 50 mpi
 fix     cfd2 all couple/cfd/force
+# transfer per-particle temperature and add convective heat flux
+fix     tconv all couple/cfd/convection T0 1023
 
-# apply nve integration to all particles that are inserted as single particles
-fix     integr all nve/sphere 
-
-#compute kinetic energy of particles to see if they are moving changing
-compute  KinEn all ke
-variable ke_tot	equal c_KinEn
-
-# this one invokes heat transfer calculation, transfers per-particle temperature and adds convective heat flux to particles
-fix     tconv all couple/cfd/convection T0 1022
-
-###############
-# this should invoke chemistry
+################################################################################
+# invoke chemistry coupling
 fix     cfd3 ore couple/cfd/chemistry n_species 5 species_names H2 H2O CO CO2 N2 n_diff 2 diffusant_names CO H2
 
-# Activate for 3-layer unreacted core shrink model
-fix     cfd5 ore chem/shrink/core speciesA CO molMassA 0.02801 speciesC CO2 molMassC 0.04401 scale_reduction_rate 10.0 screen no
-fix     cfd6 ore chem/shrink/core speciesA H2 molMassA 0.00202 speciesC H2O molMassC 0.01801 scale_reduction_rate 10.0 screen no
+# activate for 3-layer unreacted core shrink model
+fix     cfd5 ore chem/shrink/core speciesA CO molMassA 0.02801 speciesC CO2 molMassC 0.04401 scale_reduction_rate ${rate_scale}
+fix     cfd6 ore chem/shrink/core speciesA H2 molMassA 0.00202 speciesC H2O molMassC 0.01801 scale_reduction_rate ${rate_scale}
 
-# Material properties for chemical reaction
+# material properties for chemical reaction
 fix     k0_CO ore property/atom k0_cfd5 vector yes no no 17 25 2700
 fix     Ea_CO ore property/atom Ea_cfd5 vector yes no no 69488 95000 130940
 
@@ -99,12 +101,13 @@ include ../DEM/in.liggghts_compute_output
 
 ################################################################################
 # screen output
-compute         rke all erotate/sphere
-thermo_style    custom step atoms ke c_rke vol
-thermo          10
+thermo_style    custom step atoms ke
+thermo          25
 thermo_modify   lost ignore norm no
 compute_modify  thermo_temp dynamic yes
 
-dump        dmp all custom ${WI} ../DEM/post/dump*.liggghts_run id type x y z vx vy vz fx fy fz radius mass f_fracRed[1] f_fracRed[2] f_fracRed[3]
+dump dmp all custom/vtk ${WI} ../DEM/post/liggghts_run*.vtk id type x y z vx vy vz &
+     fx fy fz radius mass f_fracRed[1] f_fracRed[2] f_fracRed[3]
 
-run         1
+run 1
+
