@@ -359,7 +359,7 @@ cleanCFDEMcase()
     cd $casePath/CFD
     cleanCase
     rm -r $casePath/DEM/post/*
-    echo "dummyfile" >> $casePath/DEM/post/dummy
+    touch $casePath/DEM/post/.gitignore
     cd $casePath
     echo "done"
 }
