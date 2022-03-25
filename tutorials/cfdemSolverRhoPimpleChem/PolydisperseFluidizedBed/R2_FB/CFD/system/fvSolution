@@ -1,9 +1,9 @@
 /*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  2.3.0                                 |
-|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
-|    \\/     M anipulation  |                                                 |
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  6
+     \\/     M anipulation  |
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
@@ -22,17 +22,6 @@ solvers
         preconditioner  DIC;
         tolerance       1e-6;
         relTol          0.01;
-        /*solver          GAMG;
-        tolerance       1e-06;
-        relTol          0.01;
-        smoother        GaussSeidel;
-        nPreSweeps      0;
-        nPostSweeps     2;
-        nFinestSweeps   2;
-        cacheAgglomeration on;
-        nCellsInCoarsestLevel 10;
-        agglomerator    faceAreaPair;
-        mergeLevels     1; */
     }
 
     pFinal
@@ -48,11 +37,6 @@ solvers
         preconditioner  DIC;
         tolerance       1e-6;
         relTol          0.01;
-        /*solver      smoothSolver;
-        smoother    symGaussSeidel;
-        tolerance   1e-6;
-        relTol      0.1;
-        nSweeps     3;*/
     }
 
     "(rho|G)Final"

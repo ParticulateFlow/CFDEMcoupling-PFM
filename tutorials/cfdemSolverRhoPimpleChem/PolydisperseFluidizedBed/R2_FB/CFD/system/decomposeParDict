@@ -1,9 +1,9 @@
 /*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  2.3.0                                 |
-|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
-|    \\/     M anipulation  |                                                 |
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  6
+     \\/     M anipulation  |
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
@@ -17,7 +17,6 @@ FoamFile
 
 numberOfSubdomains 4;
 
-//method          scotch;
 method simple;
 
 simpleCoeffs
@@ -26,21 +25,8 @@ simpleCoeffs
     delta           0.001;
 }
 
-hierarchicalCoeffs
-{
-    n               ( 1 1 1 );
-    delta           0.001;
-    order           xyz;
-}
-
-manualCoeffs
-{
-    dataFile        "";
-}
-
 distributed     no;
 
 roots           ( );
-
 
 // ************************************************************************* //
