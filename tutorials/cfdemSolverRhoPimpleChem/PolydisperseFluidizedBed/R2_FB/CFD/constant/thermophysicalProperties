@@ -1,9 +1,9 @@
 /*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  2.3.0                                 |
-|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
-|    \\/     M anipulation  |                                                 |
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  6
+     \\/     M anipulation  |
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
@@ -18,9 +18,9 @@ FoamFile
 thermoType
 {
     type            heRhoThermo; //hePsiThermo;
-    mixture         reactingMixture;    //species and reactions are listed in chemistry file
-    transport       const; //sutherland;         //calcualtes viscosity as a function of temperature from Stuherland coefficient As and Ts
-    thermo          hConst; //janaf;
+    mixture         reactingMixture; //species and reactions are listed in chemistry file
+    transport       const; //sutherland; //calcualtes viscosity as a function of temperature from Stuherland coefficient As and Ts
+    thermo          hConst;
     equationOfState perfectGas;
     energy          sensibleInternalEnergy; //sensibleEnthalpy;
     specie          specie;
