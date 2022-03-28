@@ -5,7 +5,7 @@ clear all
 close all
 clc
 
-dirfile = '../DEM/post';
+dirfile = '../../DEM/post';
 filepattern = '*.dat';
 
 % time column in the data matrix
