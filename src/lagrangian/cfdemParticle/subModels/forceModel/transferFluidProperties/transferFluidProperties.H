@@ -24,6 +24,7 @@ SourceFiles
 #define transferFluidProperties_H
 
 #include "forceModel.H"
+#include "interpolationCellPoint.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -41,8 +42,6 @@ class transferFluidProperties
 private:
 
     dictionary propsDict_;
-
-    bool verbose_;
 
 public:
 

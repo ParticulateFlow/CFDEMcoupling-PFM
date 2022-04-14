@@ -52,14 +52,17 @@ transferFluidProperties::transferFluidProperties
 )
 :
     forceModel(dict,sm),
-    propsDict_(dict.subDict(typeName + "Props")),
-    verbose_(propsDict_.lookupOrDefault<bool>("verbose",false))
+    propsDict_(dict.subDict(typeName + "Props"))
 {
     particleCloud_.registerParticleProperty<double**>("fluidDensity",1);
     particleCloud_.registerParticleProperty<double**>("fluidViscosity",1);
 
     // init force sub model
     setForceSubModels(propsDict_);
+    // define switches which can be read from dict
+    forceSubM(0).setSwitchesList(SW_VERBOSE,true); // activate search for verbose switch
+    forceSubM(0).setSwitchesList(SW_INTERPOLATION,true); // activate search for interpolate switch
+    forceSubM(0).readSwitches();
 }
 
 
@@ -82,22 +85,40 @@ void transferFluidProperties::setForce() const
     const volScalarField& rhoField = forceSubM(0).rhoField();
     const volScalarField& nufField = forceSubM(0).nuField();
 
+    interpolationCellPoint<scalar> rhoInterpolator_(rhoField);
+    interpolationCellPoint<scalar> nufInterpolator_(nufField);
+
     label cellI = 0;
+    double rho = 0.;
+    double nuf = 0.;
+    vector position(0,0,0);
 
     for(int index = 0; index < particleCloud_.numberOfParticles(); ++index)
     {
         cellI = particleCloud_.cellIDs()[index][0];
         if (cellI >= 0)
         {
-            fluidDensity_[index][0] = rhoField[cellI];
-            fluidViscosity_[index][0] = nufField[cellI] * rhoField[cellI];
+            if(forceSubM(0).interpolation())
+            {
+                position = particleCloud_.position(index);
+                rho = rhoInterpolator_.interpolate(position,cellI);
+                nuf = nufInterpolator_.interpolate(position,cellI);
+            }
+            else
+            {
+                rho = rhoField[cellI];
+                nuf = nufField[cellI];
+            }
+
+            fluidDensity_[index][0]   = rho;
+            fluidViscosity_[index][0] = nuf*rho;
         }
     }
 
     particleCloud_.dataExchangeM().giveData("fluidDensity","scalar-atom",fluidDensity_);
     particleCloud_.dataExchangeM().giveData("fluidViscosity","scalar-atom",fluidViscosity_);
     
-    if (verbose_) Info << "give data done" << endl;
+    if (forceSubM(0).verbose()) Info << "give data done" << endl;
 }
 
 
