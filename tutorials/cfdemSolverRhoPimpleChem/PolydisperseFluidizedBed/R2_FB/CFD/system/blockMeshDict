@@ -1,10 +1,9 @@
-// blockMesh :  Block mesh description file
 /*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  2.3.0                                 |
-|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
-|    \\/     M anipulation  |                                                 |
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  6
+     \\/     M anipulation  |
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
@@ -16,21 +15,20 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-   meshGenApp blockMesh;
-   convertToMeters 1.0;
+meshGenApp blockMesh;
+convertToMeters 1.0;
 
-    //68 mm column diameter
-    //150 mm length
+//  68 mm column diameter
+// 150 mm column length
 
+// Width of middle square section 17 mm
+//  7 cells in the square section
+//  3 cells from square section to perimeter
+// 24 cells from top to bottom
 
-    //Width of middle square section
-
-    //how many cells in the square section
-    //how many cells from square section to perimeter
-    // how many cells from top to bottom
-
-   vertices
-   (
+vertices
+(
+    // bottom
     ( 0.017 0.0  0.017) // Vertex fiveoclocksqb = 0
     (-0.017 0.0  0.017) // Vertex sevenoclocksqb = 1
     (-0.017 0.0 -0.017) // Vertex elevenoclocksqb = 2
@@ -41,6 +39,7 @@ FoamFile
     (-0.0240416305819187 0.0 -0.0240416305387665) // Vertex elevenoclockcb = 6
     ( 0.0240416305819187 0.0 -0.0240416305387665) // Vertex oneoclockcb = 7
 
+    // top
     ( 0.017 0.150  0.017) // Vertex fiveoclocksqt = 8
     (-0.017 0.150  0.017) // Vertex sevenoclocksqt = 9
     (-0.017 0.150 -0.017) // Vertex elevenoclocksqt = 10
@@ -50,56 +49,30 @@ FoamFile
     (-0.0240416305819187 0.150  0.0240416305387665) // Vertex sevenoclockct = 13
     (-0.0240416305819187 0.150 -0.0240416305387665) // Vertex elevenoclockct = 14
     ( 0.0240416305819187 0.150 -0.0240416305387665) // Vertex oneoclockct = 15
-   );
+);
 
-   blocks
-   (
-    //square block
-    hex (
-       1 0 3 2
-       9 8 11 10
-       )
-    (7 7 24)
-    simpleGrading (1 1 1)
+blocks
+(
+    // square block
+    hex ( 1  0  3  2  9  8 11 10) (7 7 24) simpleGrading (1 1 1)
 
-    //slice1
-    hex (
-       5 4 0 1
-       13 12 8 9
-       )
-    (7 3 24)
-    simpleGrading (1 1 1)
+    // slice1
+    hex ( 5  4  0  1 13 12  8  9) (7 3 24) simpleGrading (1 1 1)
 
     //slice2
-    hex (
-       1 2 6 5
-       9 10 14 13
-       )
-   (7 3 24)
-   simpleGrading (1 1 1)
+    hex ( 1  2  6  5  9 10 14 13) (7 3 24) simpleGrading (1 1 1)
 
-   //slice3
-   hex (
-         2 3 7 6
-         10 11 15 14
-       )
-   (7 3 24)
-   simpleGrading (1 1 1)
+    // slice3
+    hex ( 2  3  7  6 10 11 15 14) (7 3 24) simpleGrading (1 1 1)
 
-   //slice4
-   hex (
-         3 0 4 7
-         11 8 12 15
-       )
-   (7 3  24)
-   simpleGrading (1 1 1)
-
-   );
+    //slice4
+    hex ( 3  0  4  7 11 8 12 15) (7 3  24) simpleGrading (1 1 1)
+);
 
 
-   //create the quarter circles
-   edges
-   (
+// create the quarter circles
+edges
+(
     arc 4 5 (0.0 0.0 0.034)
     arc 5 6 (-0.034 0.0 0.0)
     arc 6 7 (0.0 0.0 -0.034)
@@ -109,36 +82,34 @@ FoamFile
     arc 13 14 (-0.034 0.150 0.0)
     arc 14 15 (0.0 0.150 -0.034)
     arc 15 12 (0.034 0.150 0.0)
+);
 
-   );
-
-   patches
-   (
+patches
+(
     patch inlet
     (
-    (0 3 2 1)
-     (0 4 7 3)
-     (4 0 1 5)
-     (1 2 6 5)
-     (3 7 6 2)
+        (0 3 2 1)
+        (0 4 7 3)
+        (4 0 1 5)
+        (1 2 6 5)
+        (3 7 6 2)
     )
 
     patch outlet
     (
-     (8 11 10 9)
-     (8 12 15 11)
-     (12 8 9 13)
-     (9 10 14 13)
-     (11 15 14 10)
+        (8 11 10 9)
+        (8 12 15 11)
+        (12 8 9 13)
+        (9 10 14 13)
+        (11 15 14 10)
     )
 
     wall side-walls
     (
-     (5 4 12 13)
-     (5 13 14 6)
-     (6 14 15 7)
-     (7 15 12 4)
+        (5 4 12 13)
+        (5 13 14 6)
+        (6 14 15 7)
+        (7 15 12 4)
     )
-
 );
 
