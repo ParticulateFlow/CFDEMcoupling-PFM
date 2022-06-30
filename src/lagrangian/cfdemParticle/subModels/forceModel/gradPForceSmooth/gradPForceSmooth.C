@@ -96,7 +96,7 @@ gradPForceSmooth::gradPForceSmooth
 
     if (modelType_ == "B")
     {
-        FatalError <<"using  model gradPForceSmooth with model type B is not valid\n" << abort(FatalError);
+        FatalError <<"using model gradPForceSmooth with model type B is not valid\n" << abort(FatalError);
     }
     else if (modelType_ == "Bfull")
     {
@@ -135,6 +135,11 @@ gradPForceSmooth::gradPForceSmooth
     particleCloud_.probeM().scalarFields_.append("Vs");
     particleCloud_.probeM().scalarFields_.append("rho");
     particleCloud_.probeM().writeHeader();
+
+    if (!(smoothingM().type() == "temporalSmoothing") && !(smoothingM().type() == "constDiffAndTemporalSmoothing"))
+    {
+        FatalError <<"using model gradPForceSmooth with invalid smoothing model\n" << abort(FatalError);
+    }
 }
 
 

@@ -65,8 +65,9 @@ private:
     dimensionedScalar smoothingLength_;
     dimensionedScalar smoothingLengthReferenceField_;
     mutable dimensionedScalar DT_;
+    word refFieldName_;
     scalar gamma_;
-    bool correctBoundary_;
+//    bool correctBoundary_;
     bool verbose_;
 
 public:
