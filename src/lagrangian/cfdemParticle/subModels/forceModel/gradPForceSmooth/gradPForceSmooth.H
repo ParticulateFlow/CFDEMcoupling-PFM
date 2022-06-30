@@ -62,6 +62,8 @@ private:
 
     bool useU_;          // if false: substitution p=0.5*rho*U^2
 
+    bool temporalSmoothing_;
+
     mutable double addedMassCoeff_; //added mass coefficient
 
     autoPtr<smoothingModel> smoothingModel_;

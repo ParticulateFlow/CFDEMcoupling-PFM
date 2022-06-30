@@ -61,6 +61,7 @@ gradPForceSmooth::gradPForceSmooth
     U_(sm.mesh().lookupObject<volVectorField> (velocityFieldName_)),
     useRho_(false),
     useU_(false),
+    temporalSmoothing_(false),
     addedMassCoeff_(0.0),
     smoothingModel_
     (
@@ -136,9 +137,9 @@ gradPForceSmooth::gradPForceSmooth
     particleCloud_.probeM().scalarFields_.append("rho");
     particleCloud_.probeM().writeHeader();
 
-    if (!(smoothingM().type() == "temporalSmoothing") && !(smoothingM().type() == "constDiffAndTemporalSmoothing"))
+    if ((smoothingM().type() == "temporalSmoothing") || (smoothingM().type() == "constDiffAndTemporalSmoothing"))
     {
-        FatalError <<"using model gradPForceSmooth with invalid smoothing model\n" << abort(FatalError);
+        temporalSmoothing_ = true;
     }
 }
 
@@ -155,6 +156,11 @@ gradPForceSmooth::~gradPForceSmooth()
 void gradPForceSmooth::setForce() const
 {
     volVectorField gradPField = fvc::grad(p_);
+
+    // if temporal smoothing is used, let pSmooth evolve on its own - smoothing model itself looks up p
+    // else, set pSmooth to current p and apply spatial smoothing
+    if (!temporalSmoothing_) pSmooth_ = p_;
+
     if (pFieldName_ == "p_rgh")
     {
         const volScalarField& rho_ = particleCloud_.mesh().lookupObject<volScalarField>("rho");
