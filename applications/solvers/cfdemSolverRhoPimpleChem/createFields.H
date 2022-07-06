@@ -303,18 +303,4 @@
         mesh,
         dimensionedScalar("zero",dimensionSet(0, -3, 0, 0, 1),0)
     );
-
-    volScalarField dSauter
-    (
-        IOobject
-        (
-            "dSauter",
-            runTime.timeName(),
-            mesh,
-            IOobject::READ_IF_PRESENT,
-            IOobject::AUTO_WRITE
-        ),
-        mesh,
-        dimensionedScalar("zero",dimensionSet(0, 1, 0, 0, 0,0,0),0)
-    );
 //===============================
