@@ -18,7 +18,7 @@ constDiffSmoothingProps
     lowerLimit                        number1;
     upperLimit                        number2;
     smoothingLength                   lengthScale;
-    smoothingLengthReferenceField     lengthScaleRefField;
+    smoothingLengthReference          lengthScaleRefField;
     smoothingLengthFieldName          fieldName1;
     smoothingLengthReferenceFieldName fieldName2;
     verbose;
