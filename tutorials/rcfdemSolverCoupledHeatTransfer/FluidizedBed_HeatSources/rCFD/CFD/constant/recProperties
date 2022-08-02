@@ -52,7 +52,7 @@ surfaceScalarFields
 
 //verbose true;
 
-couplingSubStep 3;
+couplingSubStep 7;
 
 initialRecSteps 150;
 
