@@ -1,4 +1,4 @@
-    volScalarField rhoeps = rhoRec*voidfractionRec;
+    rhoeps = rhoRec*voidfractionRec;
 
     particleCloud.energyContributions(Qsource);
 
@@ -23,9 +23,16 @@
         fvOptions(rhoeps, T)    // no fvOptions support yet
     );
 
-    fvOptions.constrain(TEqn); // no fvOptions support yet
+ //   fvOptions.constrain(TEqn); // no fvOptions support yet
+
+    TEqn.relax();
 
     TEqn.solve();
+
+    T = max(T, TMin);
+    T = min(T, TMax);
+
+    Info<< "T max/min/ave : " << max(T).value() << " " << min(T).value() << " " << average(T).value() << endl;
 
     particleCloud.clockM().start(31,"postFlow");
     counter++;

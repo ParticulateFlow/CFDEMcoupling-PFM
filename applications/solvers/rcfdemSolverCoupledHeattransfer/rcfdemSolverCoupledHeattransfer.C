@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
 
         particleCloud.clockM().start(26,"Flow");
         #include "updateRho.H"
-        #include "TEqImp.H"
+        #include "TEqn.H"
         particleCloud.clockM().stop("Flow");
 
         stepCounter++;
