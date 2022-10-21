@@ -75,19 +75,19 @@ private:
 
     label FHistSize_;
 
-    mutable List<double**> ddtUrelHist_;
+    const word ddtUrelHistRegName_;
 
-    mutable List<double**> rHist_;
+    const word rHistRegName_;
 
-    mutable List<List<double**>> FHist_;
+    const word FHistRegName_;
 
-    mutable double** gH0_;
+    const word gH0RegName_;
 
-    mutable double** tRef_;
+    const word tRefRegName_;
 
-    mutable double** mRef_;
+    const word mRefRegName_;
 
-    mutable double** lRef_;
+    const word lRefRegName_;
 
     mutable volVectorField Urel_;
 
@@ -101,17 +101,15 @@ private:
 
     scalar trapWeight(int i, int n) const;
 
-    void update_ddtUrelHist(const vector& ddtUrel, int index) const;
+    void update_ddtUrelHist(double**& ddtUrelHist_, const vector& ddtUrel, int index) const;
 
-    void update_rHist(scalar r, int index) const;
+    void update_rHist(double**& rHist_, scalar r, int index) const;
 
-    void update_FHist(const vector& F1, const vector& F2, int index) const;
+    void update_FHist(double**& FHist_, const vector& F1, const vector& F2, int index) const;
 
     void calculateCoeffs(int k, scalar t0, scalar r, double c[2][4][3], double chi[2][4][2], double C[4]) const;
 
-    void solveFlongODE(int k, double C[4], scalar dt, int index) const;
-
-    void rescaleHist(scalar tScale, scalar mScale, scalar lScale, scalar rScale, int index) const;
+    void solveFlongODE(double**& FHist_, double**& ddtUrelHist_, int k, double C[4], scalar dt, int index) const;
 
 public:
 
@@ -135,9 +133,6 @@ public:
 
     // Member Functions
         void setForce() const;
-
-
-        void reAllocArrays() const;
 
         inline const smoothingModel& smoothingM() const
         {
