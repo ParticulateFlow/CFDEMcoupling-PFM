@@ -34,7 +34,6 @@ Description
 #include "ParmarBassetForce.H"
 #include "addToRunTimeSelectionTable.H"
 #include "smoothingModel.H"
-#include "constDiffSmoothing.H"
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
