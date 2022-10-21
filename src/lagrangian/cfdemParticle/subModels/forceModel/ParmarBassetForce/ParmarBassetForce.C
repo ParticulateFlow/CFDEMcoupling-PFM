@@ -134,10 +134,6 @@ ParmarBassetForce::ParmarBassetForce
     particleCloud_.probeM().vectorFields_.append("ParmarBassetForce"); //first entry must the be the force
     particleCloud_.probeM().vectorFields_.append("Urel");
     particleCloud_.probeM().vectorFields_.append("ddtUrel");
-    //
-    particleCloud_.probeM().vectorFields_.append("UrelNoSmooth");
-    particleCloud_.probeM().vectorFields_.append("ddtUrelNoSmooth");
-    //
     particleCloud_.probeM().vectorFields_.append("Fshort");
     particleCloud_.probeM().vectorFields_.append("Flong1");
     particleCloud_.probeM().vectorFields_.append("Flong2");
@@ -220,21 +216,11 @@ void ParmarBassetForce::setForce() const
     Urel_ = Us_ - U_;
     ddtUrel_ = fvc::ddt(Us_) - fvc::ddt(U_) - (Us_ & fvc::grad(U_));
 
-    //
-    volVectorField UrelNoSmooth_ = Urel_;
-    volVectorField ddtUrelNoSmooth_ = ddtUrel_;
-    //
-
     smoothingM().smoothen(Urel_);
     smoothingM().smoothen(ddtUrel_);
 
     interpolationCellPoint<vector> UrelInterpolator_(Urel_);
     interpolationCellPoint<vector> ddtUrelInterpolator_(ddtUrel_);
-
-    //
-    interpolationCellPoint<vector> UrelNoSmoothInterpolator_(UrelNoSmooth_);
-    interpolationCellPoint<vector> ddtUrelNoSmoothInterpolator_(ddtUrelNoSmooth_);
-    //
 
     for(int index = 0;index <  particleCloud_.numberOfParticles(); index++)
     {
@@ -412,34 +398,10 @@ void ParmarBassetForce::setForce() const
                         Flong2[i] = FHist_[1][0][index][i];
                     }
 
-                    //
-                    // relative velocity (m/s)
-                    vector UrelNoSmooth;
-                    vector ddtUrelNoSmooth;
-
-                    if(forceSubM(0).interpolation())
-                        UrelNoSmooth = UrelNoSmoothInterpolator_.interpolate(position,cellI);
-                    else
-                        UrelNoSmooth = UrelNoSmooth_[cellI];
-
-                    // acceleration (m/s2)
-                    if(forceSubM(0).interpolation())
-                        ddtUrelNoSmooth = ddtUrelNoSmoothInterpolator_.interpolate(position,cellI);
-                    else
-                        ddtUrelNoSmooth = ddtUrelNoSmooth_[cellI];
-
-                    UrelNoSmooth /= mps;
-                    ddtUrelNoSmooth /= mpss;
-                    //
-
                     #include "setupProbeModelfields.H"
                     vValues.append(ParmarBassetForce);           //first entry must the be the force
                     vValues.append(Urel);
                     vValues.append(ddtUrel);
-                    //
-                    vValues.append(UrelNoSmooth);
-                    vValues.append(ddtUrelNoSmooth);
-                    //
                     vValues.append(Fshort);
                     vValues.append(Flong1);
                     vValues.append(Flong2);
