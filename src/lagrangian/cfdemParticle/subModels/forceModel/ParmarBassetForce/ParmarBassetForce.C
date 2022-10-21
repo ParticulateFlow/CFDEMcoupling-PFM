@@ -129,6 +129,7 @@ ParmarBassetForce::ParmarBassetForce
     // define switches which can be read from dict
     forceSubM(0).setSwitchesList(SW_TREAT_FORCE_EXPLICIT,true); // activate treatExplicit switch
     forceSubM(0).setSwitchesList(SW_INTERPOLATION,true); // activate search for interpolate switch
+    forceSubM(0).setSwitchesList(SW_VERBOSE,true); // activate search for verbose switch
     forceSubM(0).readSwitches();
 
     //Extra switches/settings
@@ -371,6 +372,25 @@ void ParmarBassetForce::setForce() const
                         ParmarBassetForce[i] += FHist_[index][i*FHistSize_*2+k];
                 }
                 ParmarBassetForce *= newton;
+
+                if (forceSubM(0).verbose() && index >= 0 && index < 2)
+                {
+                    vector Flong1(0,0,0);
+                    vector Flong2(0,0,0);
+
+                    for (int i=0; i<3; i++) // loop over dimensions
+                    {
+                        Flong1[i] = FHist_[index][i*FHistSize_*2  ]*newton;
+                        Flong2[i] = FHist_[index][i*FHistSize_*2+1]*newton;
+                    }
+
+                    Pout << "cellI = " << cellI << endl;
+                    Pout << "index = " << index << endl;
+                    Pout << "Fshort = " << Fshort*newton << endl;
+                    Pout << "Flong1 = " << Flong1 << endl;
+                    Pout << "Flong2 = " << Flong2 << endl;
+                    Pout << "Ftotal = " << ParmarBassetForce << endl;
+                }
 
                 // Set value fields and write the probe
                 if(probeIt_)
