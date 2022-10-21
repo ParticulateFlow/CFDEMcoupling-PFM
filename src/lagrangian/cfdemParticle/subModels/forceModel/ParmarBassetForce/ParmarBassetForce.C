@@ -184,8 +184,6 @@ void ParmarBassetForce::setForce() const
     vector Urel(0,0,0);
     vector ddtUrel(0,0,0);
 
-    scalar t0min    = 0.00;
-
     const volScalarField& nufField = forceSubM(0).nuField();
     const volScalarField& rhoField = forceSubM(0).rhoField();
 
@@ -293,14 +291,6 @@ void ParmarBassetForce::setForce() const
                 // update ddtUrel  and r history
                 update_ddtUrelHist(ddtUrel,index); // add current dim.less ddtUrel to history
                 update_rHist(r,index); // add current r to history
-
-                // warning and reset for too small t0
-                if (t0<t0min)
-                {
-                    Pout << "ParmarBassetForce WARNING: t0 = " << t0 << " at ID = " << index <<  endl;
-                    gH0_[index][0]            = NOTONCPU; //reset reference
-                    ddtUrelHist_[0][index][0] = NOTONCPU; //reset ddtU history (only component used for checking nKnown)
-                }
 
                 // check length of known history
                 int nKnown = 0;
