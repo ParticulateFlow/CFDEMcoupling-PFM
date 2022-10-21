@@ -73,7 +73,7 @@ ParmarBassetForce::ParmarBassetForce
     nInt_(readLabel(propsDict_.lookup("nIntegral"))),
     discOrder_(readLabel(propsDict_.lookup("discretisationOrder"))),
     nHist_(nInt_+discOrder_+1),
-    FHistSize_(2*discOrder_+1),
+    FHistSize_(2*discOrder_),
     ddtUrelHistRegName_(typeName + "ddtUrelHist"),  // indexed as: ddtUrelHist_[particle ID][iDim*nHist_+iHist]
     rHistRegName_(typeName + "rHist"),              // indexed as: rHist_[particle ID][iHist]
     FHistRegName_(typeName + "FHist"),              // indexed as: ddtUrelHist_[particle ID][iDim*FHistSize_*2+iHist*2+k]
@@ -223,6 +223,7 @@ void ParmarBassetForce::setForce() const
     {
             vector ParmarBassetForce(0,0,0);
             vector Fshort(0,0,0);
+            vector Flong[2]={vector::zero, vector::zero};
             label  cellI = particleCloud_.cellIDs()[index][0];
 
             if (cellI > -1) // particle Found
@@ -328,9 +329,6 @@ void ParmarBassetForce::setForce() const
 
                 //********* long term force computing (differential form) *********//
 
-                // update F1, F2 history
-                update_FHist(FHist_,vector::zero,vector::zero,index);
-
                 // initialise ddtUrel(t0) and Flong(:) as 0 and r(t0) as 1
                 if (nKnown == nInt_)
                 {
@@ -358,37 +356,28 @@ void ParmarBassetForce::setForce() const
                         calculateCoeffs(k,t0,rHist_[index][nInt_],c,chi,C);
 
                         // solve Eq. 3.20
-                        solveFlongODE(FHist_,ddtUrelHist_,k,C,dt,index);
+                        Flong[k] = solveFlongODE(FHist_,ddtUrelHist_,k,C,dt,index);
                     }
                 }
+
+                // update F1, F2 history
+                update_FHist(FHist_,Flong[0],Flong[1],index);
 
                 //********* total force *********//
 
                 // sum and convert to N
-                for (int i=0; i<3; i++) // loop over dimensions
-                {
-                    ParmarBassetForce[i] = Fshort[i];
-                    for (int k=0; k<2; k++) // loop over F1, F2
-                        ParmarBassetForce[i] += FHist_[index][i*FHistSize_*2+k];
-                }
+                ParmarBassetForce = Fshort;
+                for (int k=0; k<2; k++) // loop over F1, F2
+                    ParmarBassetForce += Flong[k];
                 ParmarBassetForce *= newton;
 
                 if (forceSubM(0).verbose() && index >= 0 && index < 2)
                 {
-                    vector Flong1(0,0,0);
-                    vector Flong2(0,0,0);
-
-                    for (int i=0; i<3; i++) // loop over dimensions
-                    {
-                        Flong1[i] = FHist_[index][i*FHistSize_*2  ]*newton;
-                        Flong2[i] = FHist_[index][i*FHistSize_*2+1]*newton;
-                    }
-
                     Pout << "cellI = " << cellI << endl;
                     Pout << "index = " << index << endl;
                     Pout << "Fshort = " << Fshort*newton << endl;
-                    Pout << "Flong1 = " << Flong1 << endl;
-                    Pout << "Flong2 = " << Flong2 << endl;
+                    Pout << "Flong1 = " << Flong[0]*newton << endl;
+                    Pout << "Flong2 = " << Flong[1]*newton << endl;
                     Pout << "Ftotal = " << ParmarBassetForce << endl;
                 }
 
@@ -397,22 +386,13 @@ void ParmarBassetForce::setForce() const
                 {
                     scalar ReRef = 0.75/(gH0_[index][0]-0.105);
 
-                    vector Flong1(0,0,0);
-                    vector Flong2(0,0,0);
-
-                    for (int i=0; i<3; i++) // loop over dimensions
-                    {
-                        Flong1[i] = FHist_[index][i*FHistSize_*2  ];
-                        Flong2[i] = FHist_[index][i*FHistSize_*2+1];
-                    }
-
                     #include "setupProbeModelfields.H"
                     vValues.append(ParmarBassetForce);           //first entry must the be the force
                     vValues.append(Urel);
                     vValues.append(ddtUrel);
                     vValues.append(Fshort);
-                    vValues.append(Flong1);
-                    vValues.append(Flong2);
+                    vValues.append(Flong[0]);
+                    vValues.append(Flong[1]);
                     sValues.append(ReRef);
                     sValues.append(tRef_[index][0]);
                     sValues.append(mRef_[index][0]);
@@ -513,16 +493,18 @@ void Foam::ParmarBassetForce::calculateCoeffs(int k, scalar t0, scalar r, double
     }
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-void Foam::ParmarBassetForce::solveFlongODE(double**& FHist_, double**& ddtUrelHist_, int k, double C[4], scalar dt, int index) const
+vector Foam::ParmarBassetForce::solveFlongODE(double**& FHist_, double**& ddtUrelHist_, int k, double C[4], scalar dt, int index) const
 {
+    vector Flong = vector::zero;
+
     if (discOrder_==1)
     {
         for (int i=0; i<3; i++) // loop over dimensions
         {
-            FHist_[index][i*FHistSize_*2+k] =
+            Flong[i] = 
                     (
-                        (     C[1]/dt+2/(dt*dt)) * FHist_[index][i*FHistSize_*2+1*2+k]
-                      - (             1/(dt*dt)) * FHist_[index][i*FHistSize_*2+2*2+k]
+                        (     C[1]/dt+2/(dt*dt)) * FHist_[index][i*FHistSize_*2  +k]
+                      - (             1/(dt*dt)) * FHist_[index][i*FHistSize_*2+2+k]
                       - (C[2]+C[3]/dt        ) * ddtUrelHist_[index][i*nHist_+nInt_  ]
                       + (     C[3]/dt        ) * ddtUrelHist_[index][i*nHist_+nInt_+1]
                     ) / (C[0]+C[1]/dt+1/(dt*dt)); // Eq. 3.20 using first order temporal discretisation
@@ -532,12 +514,12 @@ void Foam::ParmarBassetForce::solveFlongODE(double**& FHist_, double**& ddtUrelH
     {
         for (int i=0; i<3; i++) // loop over dimensions
         {
-            FHist_[index][i*FHistSize_*2+k] =
+            Flong[i] = 
                     (
-                        (       4*C[1]/(2*dt) + 24/(4*dt*dt)) * FHist_[index][i*FHistSize_*2+1*2+k]
-                      - (         C[1]/(2*dt) + 22/(4*dt*dt)) * FHist_[index][i*FHistSize_*2+2*2+k]
-                      + (                        8/(4*dt*dt)) * FHist_[index][i*FHistSize_*2+3*2+k]
-                      - (                        1/(4*dt*dt)) * FHist_[index][i*FHistSize_*2+4*2+k]
+                        (       4*C[1]/(2*dt) + 24/(4*dt*dt)) * FHist_[index][i*FHistSize_*2  +k]
+                      - (         C[1]/(2*dt) + 22/(4*dt*dt)) * FHist_[index][i*FHistSize_*2+2+k]
+                      + (                        8/(4*dt*dt)) * FHist_[index][i*FHistSize_*2+4+k]
+                      - (                        1/(4*dt*dt)) * FHist_[index][i*FHistSize_*2+6+k]
 
                       - (C[2] + 3*C[3]/(2*dt)               ) * ddtUrelHist_[index][i*nHist_+nInt_  ]
                       + (       4*C[3]/(2*dt)               ) * ddtUrelHist_[index][i*nHist_+nInt_+1]
@@ -545,6 +527,7 @@ void Foam::ParmarBassetForce::solveFlongODE(double**& FHist_, double**& ddtUrelH
                     ) / (C[0] + 3*C[1]/(2*dt) +  9/(4*dt*dt)); // Eq. 3.20 using second order temporal discretisation
         }
     }
+    return Flong;
 }
 
 } // End namespace Foam
