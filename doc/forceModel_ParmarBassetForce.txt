@@ -23,7 +23,8 @@ ParmarBassetForceProps
     nIntegral           scalar1;
     discretisationOrder scalar2;
     treatForceExplicit  switch1;
-    interpolation       switch2;
+    verbose             switch2;
+    interpolation       switch3;
     smoothingModel      "smoothingModel";
 \} :pre
 
@@ -33,6 +34,7 @@ ParmarBassetForceProps
 {scalar2} = (1 or 2) discretisation order of the far history differential equations :l
 {switch1} = (optional, default true) sub model switch, see "forceSubModel"_forceSubModel.html for details :l
 {switch2} = (optional, default false) sub model switch, see "forceSubModel"_forceSubModel.html for details :l
+{switch3} = (optional, default false) sub model switch, see "forceSubModel"_forceSubModel.html for details :l
 {smoothingModel} = name of smoothing model for the dU/dt field :l
 :ule
 
