@@ -71,9 +71,11 @@ private:
 
     label discOrder_;                       //ODE discretisation order
 
-    label nHist_;                           //no of timesteps to save ddtUrel history for
+    label ddtUrelHistSize_;                 //no of timesteps to save ddtUrel history for
 
-    label FHistSize_;
+    label rHistSize_;                       //no of timesteps to save r history for
+
+    label FHistSize_;                       //no of timesteps to save Flong history for
 
     const word ddtUrelHistRegName_;
 

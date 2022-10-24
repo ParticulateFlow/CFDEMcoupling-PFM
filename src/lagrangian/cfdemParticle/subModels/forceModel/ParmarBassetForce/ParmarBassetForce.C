@@ -72,9 +72,10 @@ ParmarBassetForce::ParmarBassetForce
     Us_(sm.mesh().lookupObject<volVectorField> (UsFieldName_)),
     nInt_(readLabel(propsDict_.lookup("nIntegral"))),
     discOrder_(readLabel(propsDict_.lookup("discretisationOrder"))),
-    nHist_(nInt_+discOrder_),
+    ddtUrelHistSize_(nInt_+discOrder_),
+    rHistSize_(nInt_),
     FHistSize_(2*discOrder_),
-    ddtUrelHistRegName_(typeName + "ddtUrelHist"),  // indexed as: ddtUrelHist_[particle ID][iDim*nHist_+iHist]
+    ddtUrelHistRegName_(typeName + "ddtUrelHist"),  // indexed as: ddtUrelHist_[particle ID][iDim*ddtUrelHistSize_+iHist]
     rHistRegName_(typeName + "rHist"),              // indexed as: rHist_[particle ID][iHist]
     FHistRegName_(typeName + "FHist"),              // indexed as: ddtUrelHist_[particle ID][iDim*FHistSize_*2+iHist*2+k]
     gH0RegName_(typeName + "gH0"),
@@ -116,13 +117,13 @@ ParmarBassetForce::ParmarBassetForce
 {
 
     // allocate particle properties
-    particleCloud_.registerParticleProperty<double**>(ddtUrelHistRegName_,    3*nHist_,NOTONCPU,false);
-    particleCloud_.registerParticleProperty<double**>(      rHistRegName_,      nHist_,NOTONCPU,false);
-    particleCloud_.registerParticleProperty<double**>(      FHistRegName_,6*FHistSize_,NOTONCPU,false);
-    particleCloud_.registerParticleProperty<double**>(        gH0RegName_,          1 ,NOTONCPU,false);
-    particleCloud_.registerParticleProperty<double**>(       tRefRegName_,          1 ,NOTONCPU,false);
-    particleCloud_.registerParticleProperty<double**>(       mRefRegName_,          1 ,NOTONCPU,false);
-    particleCloud_.registerParticleProperty<double**>(       lRefRegName_,          1 ,NOTONCPU,false);
+    particleCloud_.registerParticleProperty<double**>(ddtUrelHistRegName_,3*ddtUrelHistSize_,NOTONCPU,false);
+    particleCloud_.registerParticleProperty<double**>(      rHistRegName_,        rHistSize_,NOTONCPU,false);
+    particleCloud_.registerParticleProperty<double**>(      FHistRegName_,      6*FHistSize_,NOTONCPU,false);
+    particleCloud_.registerParticleProperty<double**>(        gH0RegName_,                1 ,NOTONCPU,false);
+    particleCloud_.registerParticleProperty<double**>(       tRefRegName_,                1 ,NOTONCPU,false);
+    particleCloud_.registerParticleProperty<double**>(       mRefRegName_,                1 ,NOTONCPU,false);
+    particleCloud_.registerParticleProperty<double**>(       lRefRegName_,                1 ,NOTONCPU,false);
 
     // init force sub model
     setForceSubModels(propsDict_);
@@ -288,7 +289,7 @@ void ParmarBassetForce::setForce() const
 
                 // check length of known history
                 int nKnown = 1; // we always know the current step
-                for (int j=0; j<nHist_; j++) // loop over past times
+                for (int j=0; j<ddtUrelHistSize_; j++) // loop over past times
                 {
                     if (ddtUrelHist_[index][j] == NOTONCPU)
                         break;
@@ -314,7 +315,7 @@ void ParmarBassetForce::setForce() const
                         scalar K  = pow((pow(xi,.25) + rHist_[index][j]*xi),-2.); // Eq. 3.4
 
                         for (int i=0; i<3; i++) // loop over dimensions
-                            Fshort[i] -= trapWeight(j,nShort-1) * K * ddtUrelHist_[index][i*nHist_+j] * dt;
+                            Fshort[i] -= trapWeight(j,nShort-1) * K * ddtUrelHist_[index][i*ddtUrelHistSize_+j] * dt;
                     }
                 }
 
@@ -324,22 +325,22 @@ void ParmarBassetForce::setForce() const
                 if (nKnown == nInt_)
                 {
                     // initialise the histories beyond nInt
-                    for (int j=nInt_-1; j<nHist_; j++) // loop over past times
-                    {
+                    for (int j=nInt_-1; j<rHistSize_; j++) // loop over past times
                         rHist_[index][j] = 1.;
+
+                    for (int j=nInt_-1; j<ddtUrelHistSize_; j++) // loop over past times
                         for (int i=0; i<3; i++) // loop over dimensions
-                            ddtUrelHist_[index][i*nHist_+j] = 0.0;
-                    }
+                            ddtUrelHist_[index][i*ddtUrelHistSize_+j] = 0.0;
 
                     for (int k=0; k<2; k++) // loop over F1, F2
                         for (int j=0; j<FHistSize_; j++) // loop over past times
                             for (int i=0; i<3; i++) // loop over dimensions
                                 FHist_[index][i*FHistSize_*2+j*2+k] = 0.0;
-                    nKnown = nHist_+1;
+                    nKnown = ddtUrelHistSize_+1;
                 }
 
                 // solve ODEs
-                if (nKnown == nHist_+1)
+                if (nKnown == ddtUrelHistSize_+1)
                 {
                     for (int k=0; k<2; k++) // loop over F1, F2
                     {
@@ -447,17 +448,17 @@ void Foam::ParmarBassetForce::update_ddtUrelHist(double**& ddtUrelHist_, const v
 {
     for (int i=0; i<3; i++) // loop over dimensions
     {
-        for (int j=nHist_-1; j>0; j--) // loop over past times
-            ddtUrelHist_[index][i*nHist_+j] = ddtUrelHist_[index][i*nHist_+j-1];
+        for (int j=ddtUrelHistSize_-1; j>0; j--) // loop over past times
+            ddtUrelHist_[index][i*ddtUrelHistSize_+j] = ddtUrelHist_[index][i*ddtUrelHistSize_+j-1];
 
-        ddtUrelHist_[index][i*nHist_] = ddtUrel[i];
+        ddtUrelHist_[index][i*ddtUrelHistSize_] = ddtUrel[i];
     }
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 void Foam::ParmarBassetForce::update_rHist(double**& rHist_, scalar r, int index) const
 {
-    for (int j=nHist_-1; j>0; j--) // loop over past times
+    for (int j=rHistSize_-1; j>0; j--) // loop over past times
         rHist_[index][j] = rHist_[index][j-1];
 
     rHist_[index][0] = r;
@@ -499,8 +500,8 @@ vector Foam::ParmarBassetForce::solveFlongODE(double**& FHist_, double**& ddtUre
                     (
                         (     C[1]/dt+2/(dt*dt)) * FHist_[index][i*FHistSize_*2  +k]
                       - (             1/(dt*dt)) * FHist_[index][i*FHistSize_*2+2+k]
-                      - (C[2]+C[3]/dt        ) * ddtUrelHist_[index][i*nHist_+nInt_-1]
-                      + (     C[3]/dt        ) * ddtUrelHist_[index][i*nHist_+nInt_  ]
+                      - (C[2]+C[3]/dt        ) * ddtUrelHist_[index][i*ddtUrelHistSize_+nInt_-1]
+                      + (     C[3]/dt        ) * ddtUrelHist_[index][i*ddtUrelHistSize_+nInt_  ]
                     ) / (C[0]+C[1]/dt+1/(dt*dt)); // Eq. 3.20 using first order temporal discretisation
         }
     }
@@ -515,9 +516,9 @@ vector Foam::ParmarBassetForce::solveFlongODE(double**& FHist_, double**& ddtUre
                       + (                        8/(4*dt*dt)) * FHist_[index][i*FHistSize_*2+4+k]
                       - (                        1/(4*dt*dt)) * FHist_[index][i*FHistSize_*2+6+k]
 
-                      - (C[2] + 3*C[3]/(2*dt)               ) * ddtUrelHist_[index][i*nHist_+nInt_-1]
-                      + (       4*C[3]/(2*dt)               ) * ddtUrelHist_[index][i*nHist_+nInt_  ]
-                      - (         C[3]/(2*dt)               ) * ddtUrelHist_[index][i*nHist_+nInt_+1]
+                      - (C[2] + 3*C[3]/(2*dt)               ) * ddtUrelHist_[index][i*ddtUrelHistSize_+nInt_-1]
+                      + (       4*C[3]/(2*dt)               ) * ddtUrelHist_[index][i*ddtUrelHistSize_+nInt_  ]
+                      - (         C[3]/(2*dt)               ) * ddtUrelHist_[index][i*ddtUrelHistSize_+nInt_+1]
                     ) / (C[0] + 3*C[1]/(2*dt) +  9/(4*dt*dt)); // Eq. 3.20 using second order temporal discretisation
         }
     }
