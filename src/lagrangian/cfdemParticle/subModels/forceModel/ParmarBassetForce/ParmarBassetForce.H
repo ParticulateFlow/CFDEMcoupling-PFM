@@ -59,23 +59,23 @@ class ParmarBassetForce
 private:
     dictionary propsDict_;
 
-    word velFieldName_;
+    const word velFieldName_;
 
     const volVectorField& U_;
 
-    word UsFieldName_;
+    const word UsFieldName_;
 
     const volVectorField& Us_;
 
-    label nInt_;                            //no of timesteps to solve full integral
+    const int nInt_;                            //no of timesteps to solve full integral
 
-    label discOrder_;                       //ODE discretisation order
+    const int discOrder_;                       //ODE discretisation order
 
-    label ddtUrelHistSize_;                 //no of timesteps to save ddtUrel history for
+    const int ddtUrelHistSize_;                 //no of timesteps to save ddtUrel history for
 
-    label rHistSize_;                       //no of timesteps to save r history for
+    const int rHistSize_;                       //no of timesteps to save r history for
 
-    label FHistSize_;                       //no of timesteps to save Flong history for
+    const int FHistSize_;                       //no of timesteps to save Flong history for
 
     const word ddtUrelHistRegName_;
 

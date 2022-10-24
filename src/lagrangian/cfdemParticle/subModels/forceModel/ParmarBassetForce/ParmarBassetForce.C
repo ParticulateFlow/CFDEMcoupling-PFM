@@ -70,8 +70,8 @@ ParmarBassetForce::ParmarBassetForce
     U_(sm.mesh().lookupObject<volVectorField> (velFieldName_)),
     UsFieldName_(propsDict_.lookup("granVelFieldName")),
     Us_(sm.mesh().lookupObject<volVectorField> (UsFieldName_)),
-    nInt_(readLabel(propsDict_.lookup("nIntegral"))),
-    discOrder_(readLabel(propsDict_.lookup("discretisationOrder"))),
+    nInt_(propsDict_.lookupOrDefault<int>("nIntegral", -1)),
+    discOrder_(propsDict_.lookupOrDefault<int>("discretisationOrder", 1)),
     ddtUrelHistSize_(nInt_+discOrder_),
     rHistSize_(nInt_),
     FHistSize_(2*discOrder_),
@@ -115,16 +115,6 @@ ParmarBassetForce::ParmarBassetForce
         )
     )
 {
-
-    // allocate particle properties
-    particleCloud_.registerParticleProperty<double**>(ddtUrelHistRegName_,3*ddtUrelHistSize_,NOTONCPU,false);
-    particleCloud_.registerParticleProperty<double**>(      rHistRegName_,        rHistSize_,NOTONCPU,false);
-    particleCloud_.registerParticleProperty<double**>(      FHistRegName_,      6*FHistSize_,NOTONCPU,false);
-    particleCloud_.registerParticleProperty<double**>(        gH0RegName_,                1 ,NOTONCPU,false);
-    particleCloud_.registerParticleProperty<double**>(       tRefRegName_,                1 ,NOTONCPU,false);
-    particleCloud_.registerParticleProperty<double**>(       mRefRegName_,                1 ,NOTONCPU,false);
-    particleCloud_.registerParticleProperty<double**>(       lRefRegName_,                1 ,NOTONCPU,false);
-
     // init force sub model
     setForceSubModels(propsDict_);
     // define switches which can be read from dict
@@ -138,6 +128,18 @@ ParmarBassetForce::ParmarBassetForce
 
     if (discOrder_ < 1 || discOrder_ > 2)
         FatalError << "Parmar Basset Force: Discretisation order > 2 not implemented!" << abort(FatalError);
+
+    if (nInt_ < 1)
+        FatalError << "Parmar Basset Force: nIntegral missing or invalid, must be > 1" << abort(FatalError);
+
+    // allocate particle properties
+    particleCloud_.registerParticleProperty<double**>(ddtUrelHistRegName_,3*ddtUrelHistSize_,NOTONCPU,false);
+    particleCloud_.registerParticleProperty<double**>(      rHistRegName_,        rHistSize_,NOTONCPU,false);
+    particleCloud_.registerParticleProperty<double**>(      FHistRegName_,      6*FHistSize_,NOTONCPU,false);
+    particleCloud_.registerParticleProperty<double**>(        gH0RegName_,                1 ,NOTONCPU,false);
+    particleCloud_.registerParticleProperty<double**>(       tRefRegName_,                1 ,NOTONCPU,false);
+    particleCloud_.registerParticleProperty<double**>(       mRefRegName_,                1 ,NOTONCPU,false);
+    particleCloud_.registerParticleProperty<double**>(       lRefRegName_,                1 ,NOTONCPU,false);
 
     //Append the field names to be probed
     particleCloud_.probeM().initialize(typeName, typeName+".logDat");
