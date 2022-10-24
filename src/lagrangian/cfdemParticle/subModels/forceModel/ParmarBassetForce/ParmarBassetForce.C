@@ -72,7 +72,7 @@ ParmarBassetForce::ParmarBassetForce
     Us_(sm.mesh().lookupObject<volVectorField> (UsFieldName_)),
     nInt_(readLabel(propsDict_.lookup("nIntegral"))),
     discOrder_(readLabel(propsDict_.lookup("discretisationOrder"))),
-    nHist_(nInt_+discOrder_+1),
+    nHist_(nInt_+discOrder_),
     FHistSize_(2*discOrder_),
     ddtUrelHistRegName_(typeName + "ddtUrelHist"),  // indexed as: ddtUrelHist_[particle ID][iDim*nHist_+iHist]
     rHistRegName_(typeName + "rHist"),              // indexed as: rHist_[particle ID][iHist]
@@ -282,18 +282,12 @@ void ParmarBassetForce::setForce() const
                 scalar dt     = U_.mesh().time().deltaT().value() / tRef_[index][0];  // dim.less
                 scalar t0     = nInt_*dt; // dim.less
 
-                //********* update histories *********//
-
                 // non-dimensionlise
                 Urel    /= mps;
                 ddtUrel /= mpss;
 
-                // update ddtUrel  and r history
-                update_ddtUrelHist(ddtUrelHist_,ddtUrel,index); // add current dim.less ddtUrel to history
-                update_rHist(rHist_,r,index); // add current r to history
-
                 // check length of known history
-                int nKnown = 0;
+                int nKnown = 1; // we always know the current step
                 for (int j=0; j<nHist_; j++) // loop over past times
                 {
                     if (ddtUrelHist_[index][j] == NOTONCPU)
@@ -308,22 +302,19 @@ void ParmarBassetForce::setForce() const
                 int nShort = min(nKnown,nInt_+1);
 
                 // int_0^dt K(r,xi) dxi * ddtU(t) dxi (singularity treated by assuming constant acceleration)
-                if (nShort>0)
-                {
-                    for (int i=0; i<3; i++) // loop over dimensions
-                        Fshort[i] = -calculateK0(r,dt) * ddtUrelHist_[index][i*nHist_];
-                }
+                for (int i=0; i<3; i++) // loop over dimensions
+                    Fshort[i] = -calculateK0(r,dt) * ddtUrel[i];
 
                 // int_dt^t0 K(r,xi) * ddtU(t-xi) dxi (trapezoid rule)
                 if (nShort>2)
                 {
-                    for (int j=1; j<nShort; j++)
+                    for (int j=0; j<(nShort-1); j++) // we don't use the current step here, hence nShort-1
                     {
-                        scalar xi = j*dt;
+                        scalar xi = (j+1)*dt;
                         scalar K  = pow((pow(xi,.25) + rHist_[index][j]*xi),-2.); // Eq. 3.4
 
                         for (int i=0; i<3; i++) // loop over dimensions
-                            Fshort[i] -= trapWeight(j,nShort) * K * ddtUrelHist_[index][i*nHist_+j] * dt;
+                            Fshort[i] -= trapWeight(j,nShort-1) * K * ddtUrelHist_[index][i*nHist_+j] * dt;
                     }
                 }
 
@@ -332,7 +323,8 @@ void ParmarBassetForce::setForce() const
                 // initialise ddtUrel(t0) and Flong(:) as 0 and r(t0) as 1
                 if (nKnown == nInt_)
                 {
-                    for (int j=nInt_; j<nHist_; j++) // loop over past times
+                    // initialise the histories beyond nInt
+                    for (int j=nInt_-1; j<nHist_; j++) // loop over past times
                     {
                         rHist_[index][j] = 1.;
                         for (int i=0; i<3; i++) // loop over dimensions
@@ -343,24 +335,26 @@ void ParmarBassetForce::setForce() const
                         for (int j=0; j<FHistSize_; j++) // loop over past times
                             for (int i=0; i<3; i++) // loop over dimensions
                                 FHist_[index][i*FHistSize_*2+j*2+k] = 0.0;
-                    nKnown = nHist_;
+                    nKnown = nHist_+1;
                 }
 
                 // solve ODEs
-                if (nKnown == nHist_)
+                if (nKnown == nHist_+1)
                 {
                     for (int k=0; k<2; k++) // loop over F1, F2
                     {
                         //calculate coefficients
                         double C[4];
-                        calculateCoeffs(k,t0,rHist_[index][nInt_],c,chi,C);
+                        calculateCoeffs(k,t0,rHist_[index][nInt_-1],c,chi,C);
 
                         // solve Eq. 3.20
                         Flong[k] = solveFlongODE(FHist_,ddtUrelHist_,k,C,dt,index);
                     }
                 }
 
-                // update F1, F2 history
+                //********* update histories *********//
+                update_ddtUrelHist(ddtUrelHist_,ddtUrel,index); // add current dim.less ddtUrel to history
+                update_rHist(rHist_,r,index); // add current r to history
                 update_FHist(FHist_,Flong[0],Flong[1],index);
 
                 //********* total force *********//
@@ -442,7 +436,7 @@ scalar Foam::ParmarBassetForce::calculateK0(scalar r, scalar dt) const
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 scalar Foam::ParmarBassetForce::trapWeight(int i, int n) const
 {
-    if ( (i==1) || (i==(n-1)) )
+    if ( (i==0) || (i==(n-1)) )
         return 0.5;
     else
         return 1.0;
@@ -505,8 +499,8 @@ vector Foam::ParmarBassetForce::solveFlongODE(double**& FHist_, double**& ddtUre
                     (
                         (     C[1]/dt+2/(dt*dt)) * FHist_[index][i*FHistSize_*2  +k]
                       - (             1/(dt*dt)) * FHist_[index][i*FHistSize_*2+2+k]
-                      - (C[2]+C[3]/dt        ) * ddtUrelHist_[index][i*nHist_+nInt_  ]
-                      + (     C[3]/dt        ) * ddtUrelHist_[index][i*nHist_+nInt_+1]
+                      - (C[2]+C[3]/dt        ) * ddtUrelHist_[index][i*nHist_+nInt_-1]
+                      + (     C[3]/dt        ) * ddtUrelHist_[index][i*nHist_+nInt_  ]
                     ) / (C[0]+C[1]/dt+1/(dt*dt)); // Eq. 3.20 using first order temporal discretisation
         }
     }
@@ -521,9 +515,9 @@ vector Foam::ParmarBassetForce::solveFlongODE(double**& FHist_, double**& ddtUre
                       + (                        8/(4*dt*dt)) * FHist_[index][i*FHistSize_*2+4+k]
                       - (                        1/(4*dt*dt)) * FHist_[index][i*FHistSize_*2+6+k]
 
-                      - (C[2] + 3*C[3]/(2*dt)               ) * ddtUrelHist_[index][i*nHist_+nInt_  ]
-                      + (       4*C[3]/(2*dt)               ) * ddtUrelHist_[index][i*nHist_+nInt_+1]
-                      - (         C[3]/(2*dt)               ) * ddtUrelHist_[index][i*nHist_+nInt_+2]
+                      - (C[2] + 3*C[3]/(2*dt)               ) * ddtUrelHist_[index][i*nHist_+nInt_-1]
+                      + (       4*C[3]/(2*dt)               ) * ddtUrelHist_[index][i*nHist_+nInt_  ]
+                      - (         C[3]/(2*dt)               ) * ddtUrelHist_[index][i*nHist_+nInt_+1]
                     ) / (C[0] + 3*C[1]/(2*dt) +  9/(4*dt*dt)); // Eq. 3.20 using second order temporal discretisation
         }
     }
