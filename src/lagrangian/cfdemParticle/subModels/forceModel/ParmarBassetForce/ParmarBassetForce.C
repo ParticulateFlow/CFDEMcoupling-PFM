@@ -255,7 +255,8 @@ void ParmarBassetForce::setForce() const
 
                 if (gH0_[index][0]!=NOTONCPU)
                 {
-                    r = pow(gH0_[index][0]/gH,1.5); // Eq. 3.4
+                    scalar gHratio = gH0_[index][0]/gH;
+                    r = gHratio*sqrt(gHratio); // gHratio^1.5, Eq. 3.4
 
                     if (r<0.25 || r>2.0)
                     {
@@ -314,7 +315,8 @@ void ParmarBassetForce::setForce() const
                     for (int j=0; j<(nShort-1); j++) // we don't use the current step here, hence nShort-1
                     {
                         scalar xi = (j+1)*dt;
-                        scalar K  = pow((pow(xi,.25) + rHist_[index][j]*xi),-2.); // Eq. 3.4
+                        scalar invsqrtK = sqrt(sqrt(xi)) + rHist_[index][j]*xi; // K^-0.5
+                        scalar K  = 1./(invsqrtK*invsqrtK); // Eq. 3.4
 
                         for (int i=0; i<3; i++) // loop over dimensions
                             Fshort[i] -= trapWeight(j,nShort-1) * K * ddtUrelHist_[index][i*ddtUrelHistSize_+j] * dt;
@@ -416,7 +418,7 @@ void ParmarBassetForce::setForce() const
 scalar Foam::ParmarBassetForce::calculateK0(scalar r, scalar dt) const
 {
     scalar cbrtr = cbrt(r); // cube root of r
-    scalar gamma = cbrtr*pow(dt,0.25);
+    scalar gamma = cbrtr*sqrt(sqrt(dt));
 
     /*
     scalar K0 = 2./(9.*pow(r,0.666)) *
