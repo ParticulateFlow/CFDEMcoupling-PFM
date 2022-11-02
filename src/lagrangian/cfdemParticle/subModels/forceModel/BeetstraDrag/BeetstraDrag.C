@@ -77,7 +77,6 @@ BeetstraDrag::BeetstraDrag
     particleCloud_.probeM().vectorFields_.append("dragForce"); //first entry must  be the force
     particleCloud_.probeM().vectorFields_.append("Urel");
     particleCloud_.probeM().scalarFields_.append("Rep");
-    particleCloud_.probeM().scalarFields_.append("betaP");
     particleCloud_.probeM().scalarFields_.append("voidfraction");
     particleCloud_.probeM().writeHeader();
 
