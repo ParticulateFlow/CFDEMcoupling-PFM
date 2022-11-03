@@ -98,11 +98,17 @@ species::species
     partMolarConcName_(propsDict_.lookupOrDefault<word>("partMoleName","partMolarConc")),
     loopCounter_(-1),
     Nevery_(propsDict_.lookupOrDefault<label>("Nevery",1)),
+    couplingTimestep_(0.0),
     massSourceCurr_(0.0),
     massSourceTot_(0.0),
     initialized_(false)
 {
     particleCloud_.checkCG(false);
+
+    scalar dtDEM = particleCloud_.dataExchangeM().DEMts();
+    scalar dtCFD = mesh_.time().deltaTValue();
+    couplingTimestep_ = max(dtDEM,dtCFD);
+
     particleCloud_.registerParticleProperty<double**>(partTempName_,1);
     particleCloud_.registerParticleProperty<double**>(partRhoName_,1);
     particleCloud_.registerParticleProperty<double**>(partMolarConcName_,1);
@@ -268,7 +274,6 @@ void species::execute()
 
     // pull changeOfSpeciesMass_, transform onto fields changeOfSpeciesMassFields_, add them up on changeOfGasMassField_
     {
-        scalar timestep = mesh_.time().deltaTValue();
         changeOfGasMassField_.primitiveFieldRef() = 0.0;
         changeOfGasMassField_.boundaryFieldRef() = 0.0;
         for (int i=0; i<speciesNames_.size();i++)
@@ -291,17 +296,17 @@ void species::execute()
 
             // take care for implementation in LIGGGHTS: species produced from particles defined positive
             // changeOf...Fields need to be mass per volume per timestep
-            changeOfSpeciesMassFields_[i].primitiveFieldRef() /= (changeOfSpeciesMassFields_[i].mesh().V() * Nevery_ * timestep);
+            changeOfSpeciesMassFields_[i].primitiveFieldRef() /= (changeOfSpeciesMassFields_[i].mesh().V() * Nevery_ * couplingTimestep_);
             changeOfSpeciesMassFields_[i].correctBoundaryConditions();
             changeOfGasMassField_ += changeOfSpeciesMassFields_[i];
 
             if (verbose_)
             {
                 Info << "total conversion of species" << speciesNames_[i] << " = "
-                     << gSum(changeOfSpeciesMassFields_[i]*1.0*changeOfSpeciesMassFields_[i].mesh().V() * Nevery_ * timestep) << endl;
+                     << gSum(changeOfSpeciesMassFields_[i]*1.0*changeOfSpeciesMassFields_[i].mesh().V() * Nevery_ * couplingTimestep_) << endl;
             }
         }
-        massSourceCurr_ = gSum(changeOfGasMassField_*1.0*changeOfGasMassField_.mesh().V() * Nevery_ * timestep);
+        massSourceCurr_ = gSum(changeOfGasMassField_*1.0*changeOfGasMassField_.mesh().V() * Nevery_ * couplingTimestep_);
         massSourceTot_ += massSourceCurr_;
 
         if (verbose_)

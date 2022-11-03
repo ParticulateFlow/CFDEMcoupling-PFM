@@ -147,7 +147,6 @@ surfaceScalarField phiRec
     
     fvScalarMatrix TEqn(T, dimless*dimVolume/(dimTime));
 
-    scalar relaxCoeff(0.0);
 
  Info<< "reading clockProperties\n" << endl;
 

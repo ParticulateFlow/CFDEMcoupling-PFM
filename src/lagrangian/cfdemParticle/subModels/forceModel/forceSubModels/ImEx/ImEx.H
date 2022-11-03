@@ -77,10 +77,6 @@ public:
 
         ~ImEx();
 
-
-    // Member Functions
-
-        word myType() const{return typeName; };
 };
 
 

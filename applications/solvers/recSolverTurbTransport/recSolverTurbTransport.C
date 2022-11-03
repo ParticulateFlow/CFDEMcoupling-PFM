@@ -1,6 +1,6 @@
 /*---------------------------------------------------------------------------*\
     CFDEMcoupling academic - Open Source CFD-DEM coupling
-    
+
     Contributing authors:
     Thomas Lichtenegger, Gerhard Holzinger
     Copyright (C) 2015- Johannes Kepler University, Linz
@@ -29,9 +29,9 @@ Description
     for a solver based on recurrence statistics
 
 Rules
-	Solution data to compute the recurrence statistics from, needs to 
-		reside in $CASE_ROOT/dataBase
-	Time step data in dataBase needs to be evenly spaced in time
+    Solution data to compute the recurrence statistics from, needs to
+    reside in $CASE_ROOT/dataBase
+    Time step data in dataBase needs to be evenly spaced in time
 
 \*---------------------------------------------------------------------------*/
 
@@ -55,34 +55,40 @@ int main(int argc, char *argv[])
     #include "createControl.H"
     #include "createFields.H"
     #include "createFvOptions.H"
-  
+    scalar relaxCoeff(0.0);
+
     recBase recurrenceBase(mesh);
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
     Info<< "\nCalculating particle trajectories based on recurrence statistics\n" << endl;
-    
+
     label recTimeIndex(0);
-    scalar recTimeStep_=recurrenceBase.recM().recTimeStep();
-    
+    label stepCounter = 0;
+    label recTimeStep2CFDTimeStep = recurrenceBase.recM().recTimeStep2CFDTimeStep();
+
     while (runTime.run())
     {
 
         myClock().start(1,"Global");
 
         runTime++;
-        
+
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
         myClock().start(2,"fieldUpdate");
-        
-        if ( runTime.timeOutputValue() - (recTimeIndex+1)*recTimeStep_ + 1.0e-5 > 0.0 )
+
+        stepCounter++;
+
+        if (stepCounter == recTimeStep2CFDTimeStep)
         {
-	    Info << "Updating fields at run time " << runTime.timeOutputValue()
-	        << " corresponding to recurrence time " << (recTimeIndex+1)*recTimeStep_ << ".\n" << endl;
+            Info<< "Updating fields at run time " << runTime.timeOutputValue()
+                << " with recTimeIndex " << recTimeIndex << ".\n" << endl;
             recurrenceBase.updateRecFields();
             #include "readFields.H"
             recTimeIndex++;
+            stepCounter = 0;
+            recTimeStep2CFDTimeStep = recurrenceBase.recM().recTimeStep2CFDTimeStep();
         }
 
         myClock().stop("fieldUpdate");
@@ -92,15 +98,15 @@ int main(int argc, char *argv[])
         myClock().stop("speciesEqn");
 
         runTime.write();
-        
+
         Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
-        << "  ClockTime = " << runTime.elapsedClockTime() << " s"
-        << nl << endl;
-        
+            << "  ClockTime = " << runTime.elapsedClockTime() << " s"
+            << nl << endl;
+
         myClock().stop("Global");
 
     }
-    
+
     myClock().evalPar();
     myClock().normHist();
 

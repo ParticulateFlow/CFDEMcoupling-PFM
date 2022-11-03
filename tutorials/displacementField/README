@@ -1,0 +1,7 @@
+displacementField reads a series of LIGGGHTS dump files and calculates the field of displacements from one time instance to the next. If necessary, holes in the resulting field can be filled by interpolating between the N nearest neighbors.
+
+Use the following format to generate index-ordered dump files:
+
+dump            dmp1 all custom 10 ../DEM/displacements/dump*.liggghts_run id x y z
+dump_modify     dmp1 sort id pad 7
+

@@ -58,15 +58,29 @@ protected:
 
     bool existIgnoreCells_;
 
-    mutable volScalarField wallIndicatorField_;
+    bool usePreCalcNut_;
 
-    scalar minTurbKineticEnergy_;
+    word nutName_;
 
-    word turbKineticEnergyFieldName_;
+    bool usePreCalcK_;
 
-    volScalarField* turbKineticEnergy_;
+    word kName_;
 
-    bool existTurbKineticEnergyInObjReg_;
+    bool usePreCalcDispField_;
+
+    word dispFieldName_;
+
+    mutable volVectorField* dispField_;
+
+    mutable volScalarField nut_;
+
+    volScalarField wallIndicatorField_;
+
+    volScalarField delta_;
+
+    scalar dt_;
+
+    scalar turbulentSchmidtNumber_;
 
     word voidfractionFieldName_;
 
@@ -74,9 +88,11 @@ protected:
 
     scalar critVoidfraction_;
 
-    virtual vector unitFlucDir() const;
+    scalar Ck_;
 
     mutable Random ranGen_;
+
+    virtual vector unitFlucDir() const;
 
     bool ignoreCell(label) const;
 

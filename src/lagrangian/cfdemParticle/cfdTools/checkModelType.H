@@ -1,8 +1,10 @@
+// check model type
+// referring to: Zhou et al. 2010,JFM
 
-    // check model type
-    // referring to: Zhou et al. 2010,JFM
-    word modelType = particleCloud.modelType();
+word modelType = particleCloud.modelType();
 
+if (particleCloud.modelCheck())
+{
     //Warning << "model type not being checked" << endl;
     if (modelType=="Bfull"){
         Info << "solving volume averaged Navier Stokes equations of type B\n"<< endl;
@@ -102,3 +104,8 @@
 
     if (particleCloud.smoothingM().type() == "temporalSmoothing")
         FatalError << "the temporalSmoothing model does not support smoothing of the exchange fields, please see documentation!" << endl;
+}
+else
+{
+    Warning << "Model check deactivated." << endl;
+}

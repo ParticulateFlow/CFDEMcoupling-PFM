@@ -67,8 +67,8 @@ int main(int argc, char *argv[])
     Info << "\nCalculating particle trajectories based on recurrence statistics\n" << endl;
 
     label recTimeIndex = 0;
-    scalar recTimeStep = recurrenceBase.recM().recTimeStep();
-    scalar startTime = runTime.startTime().value();
+    label stepCounter = 0;
+    label recTimeStep2CFDTimeStep = recurrenceBase.recM().recTimeStep2CFDTimeStep();
 
     // control coupling behavior in case of substepping
     // assumes constant timestep size
@@ -101,12 +101,16 @@ int main(int argc, char *argv[])
         #include "TEqImp.H"
         particleCloud.clockM().stop("Flow");
 
+        stepCounter++;
+
         particleCloud.clockM().start(32,"ReadFields");
-        if ( runTime.timeOutputValue() - startTime - (recTimeIndex+1)*recTimeStep + 1.0e-5 > 0.0 )
+        if (stepCounter == recTimeStep2CFDTimeStep)
         {
             recurrenceBase.updateRecFields();
             #include "updateFields.H"
             recTimeIndex++;
+            stepCounter = 0;
+            recTimeStep2CFDTimeStep = recurrenceBase.recM().recTimeStep2CFDTimeStep();
         }
         particleCloud.clockM().stop("ReadFields");
 

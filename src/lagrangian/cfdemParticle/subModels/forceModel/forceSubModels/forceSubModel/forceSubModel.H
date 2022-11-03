@@ -158,8 +158,6 @@ public:
 
         inline bool useParcelSizeDependentFilteredDrag() const { return switches_[SW_PARCEL_SIZE_DEPENDENT_FILTERED_DRAG]; }
 
-        virtual word myType() const = 0;
-
         inline forceModel& myForceM() const { return forceModel_; }
 
         inline const List<Switch>& switches() const { return switches_; }

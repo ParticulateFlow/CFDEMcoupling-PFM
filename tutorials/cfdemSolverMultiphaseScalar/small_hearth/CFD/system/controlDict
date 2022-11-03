@@ -1,0 +1,129 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.6                                   |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+application     pisoFoam;
+
+startFrom       startTime;
+
+startTime       0;
+
+stopAt          endTime;
+
+endTime         60.0;
+
+deltaT          0.0005;
+
+writeControl    adjustableRunTime;
+
+writeInterval   0.5;
+
+purgeWrite      0;
+
+writeFormat     ascii;
+
+writePrecision  6;
+
+writeCompression uncompressed;
+
+timeFormat      general;
+
+timePrecision   6;
+
+runTimeModifiable yes;
+
+adjustTimeStep  no;
+
+maxCo           0.1;
+maxAlphaCo	0.1;
+
+
+libs
+(
+
+);
+
+functions
+{
+   #includeFunc flowRatePatch(name=inlet)
+   #includeFunc flowRatePatch(name=outlet)
+   #includeFunc patchAverage(alpha.iron,name=inlet)
+   #includeFunc patchAverage(alpha.iron,name=outlet)
+  
+    liquidLevel
+    {
+        functionObjectLibs ("libutilityFunctionObjects.so");
+        type            coded;
+        name            integral;
+        executeControl  writeTime;
+	executeInterval 1;
+	writeControl    writeTime;
+	writeInterval   1;
+       
+        codeExecute
+        #{
+	    scalar hearthRadius = 0.5;
+	    scalar hearthArea = M_PI*hearthRadius*hearthRadius;
+	    const volScalarField& alphaIron = mesh().lookupObject<volScalarField>("alpha.iron");
+
+	    scalar liquidVol = 0;
+	    forAll (mesh().V(), cellI)
+	    {
+	      liquidVol += alphaIron[cellI]*mesh().V()[cellI];
+            }
+
+	    reduce(liquidVol, sumOp<scalar>());
+	    
+	    scalar liquidLevel = liquidVol/hearthArea;
+ 
+            Info << "liquid level: " << liquidLevel << " m" << endl;
+
+	    if(Pstream::master()) {
+	    
+	        // output file
+	        if(!isDir(mesh().time().path()/".."/"postProcessing"))
+		    mkDir(mesh().time().path()/".."/"postProcessing");
+
+		fileName outputFile(mesh().time().path()/".."/"postProcessing"/"liquidLevel.dat");
+
+		std::ofstream file;
+
+		// header
+		if(!isFile(outputFile)) {
+		    file.open(outputFile,ios_base::out);
+		    file << "#time(s) \t liquid_lev(m)" << std::endl;
+		    file.close();
+		}
+
+		// output to file
+		file.open(outputFile,ios_base::out | ios_base::app);
+		file << mesh().time().value() << " \t";
+		file << liquidLevel << std::endl;
+		file.close();
+	    }
+      
+        #};
+    }
+}
+
+
+
+
+
+
+
+
+// ************************************************************************* //

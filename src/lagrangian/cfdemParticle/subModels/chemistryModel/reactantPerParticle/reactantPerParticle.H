@@ -56,6 +56,8 @@ private:
 
     bool verbose_;
 
+    bool multiTypes_;
+
     const word partReactantName_;
 
     const word voidfractionFieldName_;
@@ -67,6 +69,13 @@ private:
     label loopCounter_;
 
     label Nevery_;
+
+    mutable label maxTypeCG_;
+
+    mutable scalarList typeCG_;
+
+    mutable scalar scaleDia_;
+
 
 public:
 

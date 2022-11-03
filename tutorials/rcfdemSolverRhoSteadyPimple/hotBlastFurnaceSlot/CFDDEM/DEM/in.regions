@@ -1,0 +1,30 @@
+#########
+# regions
+#########
+
+# raceways
+variable RWradFreeze equal 0.35
+region RW1Freeze cylinder x 0 0 ${RWradFreeze} -6.0 -4.0 
+region RW2Freeze cylinder x 0 0 ${RWradFreeze} 4.0 6.0
+region RW union 2 RW1Freeze RW2Freeze
+group RW dynamic all region RW every 100
+
+variable RWrad equal 0.4
+region RW1 cylinder x 0 0 ${RWrad} -6.0 -4.0 
+region RW2 cylinder x 0 0 ${RWrad} 4.0 6.0
+region RWs union 2 RW1 RW2
+
+# deadman
+variable DMheight equal 3
+variable DMslope equal -0.8
+region DMwall1 plane 0 0 ${DMheight} 1 0 ${DMslope}
+region DMwall2 plane 0 0 ${DMheight} -1 0 ${DMslope}
+region DM intersect 2 DMwall1 DMwall2
+group DMcoke region DM
+
+# hearth
+variable DMheight1 equal ${DMheight}+1
+region hearth block -7 7 -0.59 0.59 -2 ${DMheight1}
+
+delete_atoms region RW1
+delete_atoms region RW2

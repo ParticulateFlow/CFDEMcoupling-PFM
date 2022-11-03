@@ -17,7 +17,7 @@
 #------------------------------------------------------------------------------
 
 export CFDEM_PROJECT=CFDEM
-export CFDEM_VERSION=21.03
+export CFDEM_VERSION=21.11
 
 ################################################################################
 # USER EDITABLE PART: Changes made here may be lost with the next upgrade
@@ -221,7 +221,7 @@ alias cfdemCompCFDEMuti='bash $CFDEM_PROJECT_DIR/etc/compileCFDEMcoupling_uti.sh
 alias cfdemTestTUT='bash $CFDEM_PROJECT_DIR/etc/testTutorials.sh'
 
 #- shortcut to visualize the clock model data
-alias vizClock='python $CFDEM_UT_DIR/vizClock/matPlot.py'
+alias vizClock='python2 $CFDEM_UT_DIR/vizClock/matPlot.py'
 
 #- recursive touch of current directory
 alias touchRec='find ./* -exec touch {} \;'

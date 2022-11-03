@@ -51,19 +51,48 @@ Info<< "Reading thermophysical properties\n" << endl;
         mesh
     );
 
-    volScalarField addSource
+    volScalarField rhoeps("rhoeps", rho*voidfraction);
+    rhoeps.oldTime(); // switch on saving old time
+
+    Info<< "Reading/calculating face flux field phi\n" << endl;
+    surfaceScalarField phi
     (
         IOobject
         (
-           "addSource",
-           runTime.timeName(),
-           mesh,
-           IOobject::READ_IF_PRESENT,
-           IOobject::AUTO_WRITE
-        ),
-        mesh,
-        dimensionedScalar("zero", dimensionSet(1,-1,-3,0,0,0,0), 0.0)
+            "phi",
+            runTime.timeName(),
+            mesh,
+            IOobject::READ_IF_PRESENT,
+            IOobject::AUTO_WRITE
+         ),
+         linearInterpolate(rho*U*voidfraction) & mesh.Sf()
     );
+
+#if OPENFOAM_VERSION_MAJOR < 5
+    dimensionedScalar rhoMax
+    (
+        dimensionedScalar::lookupOrDefault
+        (
+            "rhoMax",
+            pimple.dict(),
+            dimDensity,
+            GREAT
+        )
+    );
+
+    dimensionedScalar rhoMin
+    (
+        dimensionedScalar::lookupOrDefault
+        (
+            "rhoMin",
+            pimple.dict(),
+            dimDensity,
+            0
+        )
+    );
+#else
+    pressureControl pressureControl(p, rho, pimple.dict(), false);
+#endif
 
     Info<< "\nCreating fluid-particle heat flux field\n" << endl;
     volScalarField Qsource
@@ -139,42 +168,6 @@ Info<< "Reading thermophysical properties\n" << endl;
         ),
         mesh,
         dimensionedVector("zero", dimensionSet(1,-2,-2,0,0,0,0), vector::zero)
-    );
-
-    Info<< "Reading/calculating face flux field phi\n" << endl;
-    surfaceScalarField phi
-    (
-        IOobject
-        (
-            "phi",
-            runTime.timeName(),
-            mesh,
-            IOobject::READ_IF_PRESENT,
-            IOobject::AUTO_WRITE
-         ),
-         linearInterpolate(rho*U*voidfraction) & mesh.Sf()
-    );
-
-    dimensionedScalar rhoMax
-    (
-        dimensionedScalar::lookupOrDefault
-        (
-            "rhoMax",
-            pimple.dict(),
-            dimDensity,
-            GREAT
-        )
-    );
-
-    dimensionedScalar rhoMin
-    (
-        dimensionedScalar::lookupOrDefault
-        (
-            "rhoMin",
-            pimple.dict(),
-            dimDensity,
-            0
-        )
     );
 
     bool smoothenForces

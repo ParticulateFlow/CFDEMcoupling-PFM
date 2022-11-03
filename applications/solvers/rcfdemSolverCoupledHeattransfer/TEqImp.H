@@ -10,6 +10,7 @@
     // main contribution due to gas expansion, not due to transport of kinetic energy
     // fvc::ddt(rhoeps, K) + fvc::div(phiRec, K)
 
+    // assuming constant Cv such that e = Cv * T
     fvScalarMatrix TEqn =
     (
         fvm::ddt(rhoeps, T)

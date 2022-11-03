@@ -1,0 +1,7 @@
+print 'latestTimeStep = ${currStep}' screen yes
+print "variable latestTimeStep equal ${currStep}" file ../DEM/latestTimeStep
+
+write_dump          coke custom ../DEM/dump.relRadii1 id type x y z f_LayerRelRadii[1] f_LayerRelRadii[2] f_LayerRelRadii[3] f_LayerRelRadii[4]
+write_dump          finecoke custom ../DEM/dump.relRadii2 id type x y z f_LayerRelRadii[1] f_LayerRelRadii[2] f_LayerRelRadii[3] f_LayerRelRadii[4]
+write_dump          ore custom ../DEM/dump.relRadii3 id type x y z f_LayerRelRadii[1] f_LayerRelRadii[2] f_LayerRelRadii[3] f_LayerRelRadii[4]
+write_dump          fineore custom ../DEM/dump.relRadii4 id type x y z f_LayerRelRadii[1] f_LayerRelRadii[2] f_LayerRelRadii[3] f_LayerRelRadii[4]

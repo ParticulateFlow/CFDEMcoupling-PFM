@@ -66,6 +66,9 @@ gradPForce::gradPForce
     p_(sm.mesh().lookupObject<volScalarField> (pFieldName_)),
     velocityFieldName_(propsDict_.lookup("velocityFieldName")),
     U_(sm.mesh().lookupObject<volVectorField> (velocityFieldName_)),
+    alphaP_(NULL),
+    alphaSt_(NULL),
+    fines_(propsDict_.lookupOrDefault<bool>("fines",false)),
     useRho_(false),
     useU_(false),
     addedMassCoeff_(0.0)
@@ -100,6 +103,14 @@ gradPForce::gradPForce
             Info << "Using treatForceDEM true!" << endl;
             forceSubM(0).setSwitches(SW_TREAT_FORCE_DEM,true); // treatForceDEM = true
         }
+    }
+
+    if (fines_)
+    {
+        volScalarField& alphaP(const_cast<volScalarField&>(sm.mesh().lookupObject<volScalarField> ("alphaP")));
+        alphaP_ = &alphaP;
+        volScalarField& alphaSt(const_cast<volScalarField&>(sm.mesh().lookupObject<volScalarField> ("alphaSt")));
+        alphaSt_ = &alphaSt;
     }
 
     if (propsDict_.found("useU"))
@@ -148,6 +159,8 @@ void gradPForce::setForce() const
     vector gradP;
     scalar Vs;
     scalar rho;
+    scalar aP;
+    scalar aSt;
     vector position;
     vector force;
     label cellI;
@@ -178,6 +191,13 @@ void gradPForce::setForce() const
 
                 Vs = particleCloud_.particleVolume(index);
                 rho = forceSubM(0).rhoField()[cellI];
+
+                if (fines_)
+                {
+                    aP = (*alphaP_)[cellI];
+                    aSt = (*alphaSt_)[cellI];
+                    Vs *= (1+aSt/aP);
+                }
 
                 // calc particle's pressure gradient force
                 if (useRho_)

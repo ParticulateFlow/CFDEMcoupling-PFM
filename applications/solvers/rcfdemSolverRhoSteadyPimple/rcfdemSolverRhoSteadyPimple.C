@@ -63,7 +63,6 @@ int main(int argc, char *argv[])
     #include "createControl.H"
     #include "createTimeControls.H"
     #include "createRDeltaT.H"
-    #include "initContinuityErrs.H"
     #include "createFields.H"
     #include "createFieldRefs.H"
     #include "createFvOptions.H"
@@ -82,13 +81,13 @@ int main(int argc, char *argv[])
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
     label recTimeIndex = 0;
-    scalar recTimeStep = recurrenceBase.recM().recTimeStep();
-    scalar startTime = runTime.startTime().value();
+    label stepCounter = 0;
+    label recTimeStep2CFDTimeStep = recurrenceBase.recM().recTimeStep2CFDTimeStep();
 
     const IOdictionary& couplingProps = particleCloud.couplingProperties();
     label nEveryFlow(couplingProps.lookupOrDefault<label>("nEveryFlow",1));
     Info << "Solving flow equations every " << nEveryFlow << " steps.\n" << endl;
-    label stepcounter = 0;
+    label totalStepCounter = 0;
 
     Info<< "\nStarting time loop\n" << endl;
 
@@ -132,7 +131,7 @@ int main(int argc, char *argv[])
 
         particleCloud.clockM().start(26,"Flow");
         volScalarField rhoeps("rhoeps",rho*voidfractionRec);
-        if (stepcounter%nEveryFlow==0)
+        if (totalStepCounter%nEveryFlow==0)
         {
             while (pimple.loop())
             {
@@ -165,7 +164,7 @@ int main(int argc, char *argv[])
                 }
             }
         }
-        stepcounter++;
+        totalStepCounter++;
         particleCloud.clockM().stop("Flow");
 
         particleCloud.clockM().start(31,"postFlow");
@@ -173,11 +172,16 @@ int main(int argc, char *argv[])
         particleCloud.clockM().stop("postFlow");
 
         particleCloud.clockM().start(32,"ReadFields");
-        if ( runTime.timeOutputValue() - startTime - (recTimeIndex+1)*recTimeStep + 1.0e-5 > 0.0 )
+
+        stepCounter++;
+
+        if (stepCounter == recTimeStep2CFDTimeStep)
         {
             recurrenceBase.updateRecFields();
             #include "updateFields.H"
             recTimeIndex++;
+            stepCounter = 0;
+            recTimeStep2CFDTimeStep = recurrenceBase.recM().recTimeStep2CFDTimeStep();
         }
         particleCloud.clockM().stop("ReadFields");
 

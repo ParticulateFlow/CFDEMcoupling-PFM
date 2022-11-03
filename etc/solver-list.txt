@@ -1,5 +1,7 @@
 rcfdemSolverRhoSteadyPimple/dir
+rcfdemSolverRhoSteadyPimpleChem/dir
 rcfdemSolverCoupledHeattransfer/dir
+rcfdemSolverForcedTracers/dir
 rStatAnalysis/dir
 rcfdemSolverBase/dir
 rtfmSolverSpecies/dir
@@ -10,3 +12,7 @@ cfdemSolverIB/dir
 cfdemSolverPisoScalar/dir
 cfdemSolverRhoPimpleChem/dir
 cfdemSolverMultiphase/dir
+cfdemSolverMultiphaseScalar/dir
+rctfSpeciesTransport/dir
+cfdemSolverPisoFreeStreaming/dir
+

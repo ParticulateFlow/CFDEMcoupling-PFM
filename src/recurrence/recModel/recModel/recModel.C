@@ -83,6 +83,8 @@ recModel::recModel
     timeStep_(readScalar(controlDict_.lookup("deltaT"))),
     recStartTime_(-1.0),
     recEndTime_(-1.0),
+    recTimeStep_(scalarList(1,-1.0)),
+    recTimeStep2CFDTimeStep_(labelList(1,1)),
     totRecSteps_(recProperties_.lookupOrDefault<label>("initialRecSteps",-1)),
     sequenceStart(0),
     sequenceEnd(0),
@@ -97,7 +99,6 @@ recModel::recModel
     recMatName_(dict.lookupOrDefault<word>("recMatName", "recurrenceMatrix")),
     pathFile_("recurrencePath")
 {
-    recTimeStep_ = -1.0;
     lastJumpTime_.add("lastJumpTime",startTime_);
 }
 

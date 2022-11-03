@@ -50,6 +50,8 @@ protected:
 
     bool verbose_;
 
+    bool execution_;
+
     const fvMesh& mesh_;
 
     scalar maxSource_;
@@ -57,6 +59,10 @@ protected:
     word reactionHeatName_;
 
     volScalarField reactionHeatField_;
+
+    label Nevery_;
+
+    scalar couplingTimestep_;
 
 public:
 

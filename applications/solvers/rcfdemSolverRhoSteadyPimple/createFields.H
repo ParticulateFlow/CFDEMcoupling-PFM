@@ -168,6 +168,8 @@ Info<< "Reading thermophysical properties\n" << endl;
          linearInterpolate(rho*U*voidfraction) & mesh.Sf()
     );
 
+    Switch transientEEqn(pimple.dict().lookupOrDefault<bool>("transientEEqn",false));
+
     dimensionedScalar rhoMax
     (
         dimensionedScalar::lookupOrDefault

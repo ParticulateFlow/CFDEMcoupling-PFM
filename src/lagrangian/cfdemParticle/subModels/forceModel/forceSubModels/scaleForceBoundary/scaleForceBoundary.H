@@ -85,7 +85,6 @@ public:
 
         void partToArray(label, vector&, const vector&, const vector& Ufluid=vector::zero, scalar Cd=scalar(0)) const;
 
-        word myType() const {return typeName; }
 };
 
 

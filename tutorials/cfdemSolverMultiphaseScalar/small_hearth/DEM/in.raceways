@@ -1,0 +1,26 @@
+# Raceway definition for LIGGGHTS
+
+# reactor radius = 0.500000 m 
+# raceway height = 0.500000 m 
+# raceway diameter = 0.100000 m 
+# raceway length = 0.100000 m 
+# number of raceways = 8
+ 
+variable angle1 equal 0.000000
+region raceway1 cylinder x 0.000000 0.500000 0.050000 0.400000 0.500000 rotate v_angle1 0 0 0 0 0 1
+variable angle2 equal 0.785398
+region raceway2 cylinder x 0.000000 0.500000 0.050000 0.400000 0.500000 rotate v_angle2 0 0 0 0 0 1
+variable angle3 equal 1.570796
+region raceway3 cylinder x 0.000000 0.500000 0.050000 0.400000 0.500000 rotate v_angle3 0 0 0 0 0 1
+variable angle4 equal 2.356194
+region raceway4 cylinder x 0.000000 0.500000 0.050000 0.400000 0.500000 rotate v_angle4 0 0 0 0 0 1
+variable angle5 equal 3.141593
+region raceway5 cylinder x 0.000000 0.500000 0.050000 0.400000 0.500000 rotate v_angle5 0 0 0 0 0 1
+variable angle6 equal 3.926991
+region raceway6 cylinder x 0.000000 0.500000 0.050000 0.400000 0.500000 rotate v_angle6 0 0 0 0 0 1
+variable angle7 equal 4.712389
+region raceway7 cylinder x 0.000000 0.500000 0.050000 0.400000 0.500000 rotate v_angle7 0 0 0 0 0 1
+variable angle8 equal 5.497787
+region raceway8 cylinder x 0.000000 0.500000 0.050000 0.400000 0.500000 rotate v_angle8 0 0 0 0 0 1
+
+region raceways union 8 raceway1 raceway2 raceway3 raceway4 raceway5 raceway6 raceway7 raceway8 

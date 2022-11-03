@@ -3,9 +3,11 @@ cfdemCloud = $(path)/cfdemCloud
 derived = $(path)/derived
 cfdTools = $(path)/cfdTools
 energyModels = $(path)/subModels/energyModel
+massTransferModels = $(path)/subModels/massTransferModel
 forceModels = $(path)/subModels/forceModel
 forceSubModels = $(path)/subModels/forceModel/forceSubModels
 thermCondModels = $(path)/subModels/thermCondModel
+diffCoeffModels = $(path)/subModels/diffCoeffModel
 chemistryModels = $(path)/subModels/chemistryModel
 IOModels = $(path)/subModels/IOModel
 voidFractionModels = $(path)/subModels/voidFractionModel
@@ -35,19 +37,30 @@ $(chemistryModels)/noChemistry/noChemistry.C
 $(chemistryModels)/diffusionCoefficients/diffusionCoefficients.C
 $(chemistryModels)/massTransferCoeff/massTransferCoeff.C
 $(chemistryModels)/reactantPerParticle/reactantPerParticle.C
+$(chemistryModels)/initMultiLayers/initMultiLayers.C
 
 $(energyModels)/energyModel/energyModel.C
 $(energyModels)/energyModel/newEnergyModel.C
 $(energyModels)/heatTransferGunn/heatTransferGunn.C
 $(energyModels)/heatTransferRanzMarshall/heatTransferRanzMarshall.C
-$(energyModels)/heatTransferGranConduction/heatTransferGranConduction.C
+$(energyModels)/heatTransferInterGrain/heatTransferInterGrain.C
+$(energyModels)/wallHeatTransferYagi/wallHeatTransferYagi.C
 $(energyModels)/reactionHeat/reactionHeat.C
+
+$(massTransferModels)/massTransferModel/massTransferModel.C
+$(massTransferModels)/massTransferModel/newMassTransferModel.C
+$(massTransferModels)/massTransferGunn/massTransferGunn.C
 
 $(thermCondModels)/thermCondModel/thermCondModel.C
 $(thermCondModels)/thermCondModel/newThermCondModel.C
 $(thermCondModels)/SyamlalThermCond/SyamlalThermCond.C
 $(thermCondModels)/ZehnerSchluenderThermCond/ZehnerSchluenderThermCond.C
 $(thermCondModels)/noTherm/noThermCond.C
+
+$(diffCoeffModels)/diffCoeffModel/diffCoeffModel.C
+$(diffCoeffModels)/diffCoeffModel/newDiffCoeffModel.C
+$(diffCoeffModels)/SyamlalDiffCoeff/SyamlalDiffCoeff.C
+$(diffCoeffModels)/noDiff/noDiffCoeff.C
 
 $(forceModels)/forceModel/forceModel.C
 $(forceModels)/forceModel/newForceModel.C
@@ -64,6 +77,7 @@ $(forceModels)/ShirgaonkarIB/ShirgaonkarIB.C
 $(forceModels)/KochHillDrag/KochHillDrag.C
 $(forceModels)/LaEuScalarTemp/LaEuScalarTemp.C
 $(forceModels)/virtualMassForce/virtualMassForce.C
+$(forceModels)/ParmarBassetForce/ParmarBassetForce.C
 $(forceModels)/gradPForce/gradPForce.C
 $(forceModels)/viscForce/viscForce.C
 $(forceModels)/MeiLift/MeiLift.C
@@ -83,6 +97,7 @@ $(forceModels)/Fines/ErgunStatFines.C
 $(forceModels)/granKineticEnergy/granKineticEnergy.C
 $(forceModels)/particleDeformation/particleDeformation.C
 $(forceModels)/turbulentDispersion/turbulentDispersion.C
+$(forceModels)/turbulentVelocityFluctuations/turbulentVelocityFluctuations.C
 
 $(forceSubModels)/forceSubModel/newForceSubModel.C
 $(forceSubModels)/forceSubModel/forceSubModel.C
@@ -95,6 +110,7 @@ $(otherForceModels)/otherForceModel/newOtherForceModel.C
 $(otherForceModels)/gravity/gravity.C
 $(otherForceModels)/weightSecondaryPhase/weightSecondaryPhase.C
 $(otherForceModels)/expParticleForces/expParticleForces.C
+$(otherForceModels)/secondaryPhaseInducedBuoyancy/secondaryPhaseInducedBuoyancy.C
 
 $(probeModels)/probeModel/probeModel.C
 $(probeModels)/probeModel/newProbeModel.C

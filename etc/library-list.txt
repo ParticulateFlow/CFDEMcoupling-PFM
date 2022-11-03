@@ -3,3 +3,4 @@ lagrangian/cfdemParticleComp/dir
 recurrence/dir
 finiteVolume/dir
 ../applications/solvers/cfdemSolverMultiphase/multiphaseMixture/dir
+../applications/solvers/cfdemSolverMultiphaseScalar/multiphaseMixture/dir

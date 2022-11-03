@@ -24,7 +24,7 @@
     volScalarField W(thermo.W());
 #endif
 
-    bool propagateInertSpecie = true;
+    Switch propagateInertSpecie(true);
 
     const word inertSpecie(thermo.lookup("inertSpecie"));
 
@@ -40,9 +40,9 @@
             << exit(FatalError);
     }
 
+    Info<< "inert will be bounded in [" << inertLowerBound << "," << inertUpperBound << "]" << endl;
+
     volScalarField& p = thermo.p();
-    const volScalarField& T = thermo.T();
-    const volScalarField& psi = thermo.psi();
 
     multivariateSurfaceInterpolationScheme<scalar>::fieldTable fields;
 

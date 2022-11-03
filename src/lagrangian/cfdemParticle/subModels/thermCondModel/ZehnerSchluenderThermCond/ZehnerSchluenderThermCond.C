@@ -83,6 +83,7 @@ ZehnerSchluenderThermCond::~ZehnerSchluenderThermCond()
 
 void ZehnerSchluenderThermCond::calcThermCond()
 {
+    const volScalarField& kf0Field_ = kf0Field();
     calcPartKsField();
     scalar A = 0.0;
     scalar B = 0.0;
@@ -98,12 +99,13 @@ void ZehnerSchluenderThermCond::calcThermCond()
         if(voidfraction > 1.0 - SMALL || partKsField_[cellI] < SMALL) partKsField_[cellI] = 0.0;
         else
         {
-            A = partKsField_[cellI]/kf0_.value();
+            scalar kf0 = kf0Field_[cellI];
+            A = partKsField_[cellI]/kf0;
             B = 1.25 * Foam::pow((1 - voidfraction) / voidfraction, 1.11);
             InvOnemBoA = 1.0/(1.0 - B/A);
             C = (A - 1) * InvOnemBoA * InvOnemBoA * B/A * log(A/B) - (B - 1) * InvOnemBoA - 0.5 * (B + 1);
             C *= 2.0 * InvOnemBoA;
-            k = Foam::sqrt(1 - voidfraction) * (w * A + (1 - w) * C) * kf0_.value();
+            k = Foam::sqrt(1 - voidfraction) * (w * A + (1 - w) * C) * kf0;
             partKsField_[cellI] = k / (1 - voidfraction);
         }
     }

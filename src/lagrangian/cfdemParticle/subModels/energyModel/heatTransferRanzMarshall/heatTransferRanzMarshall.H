@@ -67,6 +67,8 @@ protected:
 
     scalar NusseltScalingFactor_;
 
+    const scalar NusseltConstParameter_;
+
     const word QPartFluidName_;
 
     volScalarField QPartFluid_;
