@@ -96,6 +96,7 @@ $(forceModels)/potentialRelaxation/potentialRelaxation.C
 $(forceModels)/BeetstraDrag/BeetstraDrag.C
 $(forceModels)/BeetstraDragPoly/BeetstraDragPoly.C
 $(forceModels)/dSauter/dSauter.C
+$(forceModels)/transferFluidProperties/transferFluidProperties.C
 $(forceModels)/Fines/Fines.C
 $(forceModels)/Fines/FinesFields.C
 $(forceModels)/Fines/FanningDynFines.C
