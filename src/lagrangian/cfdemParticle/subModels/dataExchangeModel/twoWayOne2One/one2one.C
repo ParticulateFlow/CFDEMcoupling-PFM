@@ -100,6 +100,7 @@ void One2One::setup
     comm_
   );
 
+  // count number of receives
   ncollected_ = 0;
   int nrequests = 0;
   for (int i = 0; i < nsrc_procs_; i++)
@@ -109,6 +110,18 @@ void One2One::setup
       ncollected_ += natoms_[src_procs_[i]];
 
       if (src_procs_[i] != me_) // no receive for on-proc info
+      {
+        nrequests++;
+      }
+    }
+  }
+
+  // count number of sends
+  if (nlocal_ > 0)
+  {
+    for (int i = 0; i < ndst_procs_; i++)
+    {
+      if (dst_procs_[i] != me_)
       {
         nrequests++;
       }
@@ -175,11 +188,7 @@ void One2One::exchange(T *&src, T *&dst, int data_length)
     offset += natoms_[src_procs_[i]]*data_length;
   }
 
-  // make sure all receives are posted
-  MPI_Barrier(comm_);
-
-  // blocking sends - do nonblocking instead
-  //                  since doing many-2-many here?
+  // nonblocking sends
   // only do sends if I have particles
   if (nlocal_ > 0)
   {
@@ -195,15 +204,17 @@ void One2One::exchange(T *&src, T *&dst, int data_length)
              << " data_length " << data_length
              << std::endl;
     #endif
-        MPI_Send
+        MPI_Isend
         (
           src,
           nlocal_*data_length,
           wrap.mpi_type,
           dst_procs_[i],
           tag,
-          comm_
+          comm_,
+          &request_[requesti]
         );
+        requesti++;
       }
     }
   }
@@ -226,6 +237,9 @@ void One2One::exchange(T *&src, T *&dst, int data_length)
       dst[locali+offset_local] = src[locali];
     }
   }
+
+  // wait for all procs to complete data exchange
+  MPI_Barrier(comm_);
 }
 
 template void One2One::exchange<int>(int*&, int*&, int);
