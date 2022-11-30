@@ -143,6 +143,8 @@ void One2One::exchange(T *&src, T *&dst, int data_length)
     {
       if (src_procs_[i] != me_)
       {
+        int tag = (src_procs_[i] << 16) | me_;
+
   #ifdef O2ODEBUG
   std::cout<< "[" << me_ << "]"
            << " RCV " << i
@@ -159,7 +161,7 @@ void One2One::exchange(T *&src, T *&dst, int data_length)
           natoms_[src_procs_[i]]*data_length,
           wrap.mpi_type,
           src_procs_[i],
-          MPI_ANY_TAG,
+          tag,
           comm_,
           &request_[requesti]
         );
@@ -185,6 +187,7 @@ void One2One::exchange(T *&src, T *&dst, int data_length)
     {
       if (dst_procs_[i] != me_)
       {
+        int tag = (me_ << 16) | dst_procs_[i];
     #ifdef O2ODEBUG
     std::cout<< "[" << me_ << "]"
              << " SEND to: " << dst_procs_[i]
@@ -198,7 +201,7 @@ void One2One::exchange(T *&src, T *&dst, int data_length)
           nlocal_*data_length,
           wrap.mpi_type,
           dst_procs_[i],
-          0,
+          tag,
           comm_
         );
       }
