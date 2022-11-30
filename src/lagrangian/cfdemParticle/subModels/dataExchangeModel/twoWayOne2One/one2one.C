@@ -158,16 +158,18 @@ void One2One::exchange(T *&src, T *&dst, int data_length)
       {
         int tag = (src_procs_[i] << 16) | me_;
 
-  #ifdef O2ODEBUG
-  std::cout<< "[" << me_ << "]"
-           << " RCV " << i
-           << " of "  << nsrc_procs_
-           << " from: " << src_procs_[i]
-           << " natoms_[src_procs_[i]] " << natoms_[src_procs_[i]]
-           << " datalength " << data_length
-           << " offset " << offset
-           << std::endl;
-  #endif
+        #ifdef O2ODEBUG
+        std::cout<< "[" << me_ << "]"
+                << " RCV " << (i+1)
+                << " of "  << nsrc_procs_
+                << " from: " << src_procs_[i]
+                << " natoms_[src_procs_[i]] " << natoms_[src_procs_[i]]
+                << " data_length " << data_length
+                << " offset " << offset
+                << " tag " << tag
+                << std::endl;
+        #endif
+
         MPI_Irecv
         (
           &dst[offset],
@@ -183,8 +185,30 @@ void One2One::exchange(T *&src, T *&dst, int data_length)
       else // data is available on-proc
       {
         offset_local = offset;
+
+        #ifdef O2ODEBUG
+        std::cout<< "[" << me_ << "]"
+                << " RCV " << (i+1)
+                << " of "  << nsrc_procs_
+                << " from: " << src_procs_[i]
+                << " skipped (self)"
+                << " offset_local " << offset_local
+                << std::endl;
+        #endif
       }
     }
+    #ifdef O2ODEBUG
+    else
+    {
+      std::cout<< "[" << me_ << "]"
+              << " RCV " << (i+1)
+              << " of "  << nsrc_procs_
+              << " from: " << src_procs_[i]
+              << " skipped (no data)" 
+              << std::endl;      
+    }
+    #endif
+
     offset += natoms_[src_procs_[i]]*data_length;
   }
 
@@ -197,13 +221,16 @@ void One2One::exchange(T *&src, T *&dst, int data_length)
       if (dst_procs_[i] != me_)
       {
         int tag = (me_ << 16) | dst_procs_[i];
-    #ifdef O2ODEBUG
-    std::cout<< "[" << me_ << "]"
-             << " SEND to: " << dst_procs_[i]
-             << " nlocal_ " << nlocal_
-             << " data_length " << data_length
-             << std::endl;
-    #endif
+
+        #ifdef O2ODEBUG
+        std::cout<< "[" << me_ << "]"
+                << " SEND to: " << dst_procs_[i]
+                << " nlocal_ " << nlocal_
+                << " data_length " << data_length
+                << " tag " << tag
+                << std::endl;
+        #endif
+
         MPI_Isend
         (
           src,
@@ -216,12 +243,39 @@ void One2One::exchange(T *&src, T *&dst, int data_length)
         );
         requesti++;
       }
+      #ifdef O2ODEBUG
+      else
+      {
+        std::cout<< "[" << me_ << "]"
+                << " SEND to: " << dst_procs_[i]
+                << " skipped (self)" << std::endl;
+      }
+      #endif
     }
   }
+  #ifdef O2ODEBUG
+  else
+  {
+    std::cout<< "[" << me_ << "]" << " SEND skipped (no data)" << std::endl;
+  }
+  #endif
 
   // only wait if requests were actually posted
   if (requesti > 0)
+  {
+    #ifdef O2ODEBUG
+    std::cout<< "[" << me_ << "]"
+            << " WAIT for: " << requesti << " requests" << std::endl;
+    #endif
+
     MPI_Waitall(requesti, request_, status_);
+  }
+  #ifdef O2ODEBUG
+  else
+  {
+    std::cout<< "[" << me_ << "]" << " WAIT skipped (no requests)" << std::endl;
+  }
+  #endif
 
   // copy on-proc data
   if (offset_local > -1)
@@ -239,6 +293,10 @@ void One2One::exchange(T *&src, T *&dst, int data_length)
   }
 
   // wait for all procs to complete data exchange
+  #ifdef O2ODEBUG
+  std::cout<< "[" << me_ << "] BARRIER" << std::endl;
+  #endif
+
   MPI_Barrier(comm_);
 }
 
