@@ -26,7 +26,7 @@ Class
 
 Description
     Single incompressible phase derived from the phase-fraction.
-    Used as part of the multiPhaseMixture for interface-capturing multi-phase
+    Used as part of the multiphaseMixtureScalar for interface-capturing multi-phase
     simulations.
 
 SourceFiles

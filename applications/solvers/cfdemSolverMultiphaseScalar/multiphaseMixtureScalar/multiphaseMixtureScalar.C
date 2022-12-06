@@ -18,7 +18,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "multiphaseMixture.H"
+#include "multiphaseMixtureScalar.H"
 #include "alphaContactAngleFvPatchScalarField.H"
 #include "Time.H"
 #include "subCycle.H"
@@ -31,13 +31,13 @@ License
 
 // * * * * * * * * * * * * * * * Static Member Data  * * * * * * * * * * * * //
 
-const Foam::scalar Foam::multiphaseMixture::convertToRad =
+const Foam::scalar Foam::multiphaseMixtureScalar::convertToRad =
     Foam::constant::mathematical::pi/180.0;
 
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
-void Foam::multiphaseMixture::calcAlphas()
+void Foam::multiphaseMixtureScalar::calcAlphas()
 {
     scalar level = 0.0;
     alphas_ == 0.0;
@@ -51,7 +51,7 @@ void Foam::multiphaseMixture::calcAlphas()
 
 
 Foam::tmp<Foam::volScalarField>
-Foam::multiphaseMixture::calcNu() const
+Foam::multiphaseMixtureScalar::calcNu() const
 {
     PtrDictionary<phase>::const_iterator iter = phases_.begin();
 
@@ -74,7 +74,7 @@ Foam::multiphaseMixture::calcNu() const
 }
 
 Foam::tmp<Foam::surfaceScalarField>
-Foam::multiphaseMixture::calcStf() const
+Foam::multiphaseMixtureScalar::calcStf() const
 {
     tmp<surfaceScalarField> tstf
     (
@@ -134,7 +134,7 @@ Foam::multiphaseMixture::calcStf() const
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-Foam::multiphaseMixture::multiphaseMixture
+Foam::multiphaseMixtureScalar::multiphaseMixtureScalar
 (
     const volVectorField& U,
     const surfaceScalarField& phi,
@@ -230,7 +230,7 @@ Foam::multiphaseMixture::multiphaseMixture
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
 Foam::tmp<Foam::volScalarField>
-Foam::multiphaseMixture::rho() const
+Foam::multiphaseMixtureScalar::rho() const
 {
     PtrDictionary<phase>::const_iterator iter = phases_.begin();
 
@@ -247,7 +247,7 @@ Foam::multiphaseMixture::rho() const
 
 
 Foam::tmp<Foam::scalarField>
-Foam::multiphaseMixture::rho(const label patchi) const
+Foam::multiphaseMixtureScalar::rho(const label patchi) const
 {
     PtrDictionary<phase>::const_iterator iter = phases_.begin();
 
@@ -264,9 +264,9 @@ Foam::multiphaseMixture::rho(const label patchi) const
 
 
 Foam::tmp<Foam::volScalarField>
-Foam::multiphaseMixture::mu() const
+Foam::multiphaseMixtureScalar::mu() const
 {
-    Info << "In multiphasemixture mu()" << endl;
+    Info << "In multiphaseMixtureScalar mu()" << endl;
     return rho()*nu();
 //    PtrDictionary<phase>::const_iterator iter = phases_.begin();
 
@@ -283,7 +283,7 @@ Foam::multiphaseMixture::mu() const
 
 
 Foam::tmp<Foam::scalarField>
-Foam::multiphaseMixture::mu(const label patchi) const
+Foam::multiphaseMixtureScalar::mu(const label patchi) const
 {
     PtrDictionary<phase>::const_iterator iter = phases_.begin();
 
@@ -306,7 +306,7 @@ Foam::multiphaseMixture::mu(const label patchi) const
 
 
 Foam::tmp<Foam::surfaceScalarField>
-Foam::multiphaseMixture::muf() const
+Foam::multiphaseMixtureScalar::muf() const
 {
 
     return nuf()*fvc::interpolate(rho());
@@ -327,13 +327,13 @@ Foam::multiphaseMixture::muf() const
 
 
 Foam::tmp<Foam::volScalarField>
-Foam::multiphaseMixture::nu() const
+Foam::multiphaseMixtureScalar::nu() const
 {
     return nu_;
 }
 
 Foam::tmp<Foam::scalarField>
-Foam::multiphaseMixture::nu(const label patchi) const
+Foam::multiphaseMixtureScalar::nu(const label patchi) const
 {
     //return nu_.boundaryField()[patchi];
     PtrDictionary<phase>::const_iterator iter = phases_.begin();
@@ -355,7 +355,7 @@ Foam::multiphaseMixture::nu(const label patchi) const
 
 
 Foam::tmp<Foam::surfaceScalarField>
-Foam::multiphaseMixture::nuf() const
+Foam::multiphaseMixtureScalar::nuf() const
 {
     //return muf()/fvc::interpolate(rho());
     PtrDictionary<phase>::const_iterator iter = phases_.begin();
@@ -374,7 +374,7 @@ Foam::multiphaseMixture::nuf() const
 }
 
 Foam::tmp<Foam::volScalarField>
-Foam::multiphaseMixture::Cp() const
+Foam::multiphaseMixtureScalar::Cp() const
 {
     PtrDictionary<phase>::const_iterator iter = phases_.begin();
 
@@ -395,7 +395,7 @@ Foam::multiphaseMixture::Cp() const
 }
 
 Foam::tmp<Foam::volScalarField>
-Foam::multiphaseMixture::kf() const
+Foam::multiphaseMixtureScalar::kf() const
 {
     PtrDictionary<phase>::const_iterator iter = phases_.begin();
 
@@ -417,7 +417,7 @@ Foam::multiphaseMixture::kf() const
 }
 
 Foam::tmp<Foam::volScalarField>
-Foam::multiphaseMixture::D() const
+Foam::multiphaseMixtureScalar::D() const
 {
     PtrDictionary<phase>::const_iterator iter = phases_.begin();
 
@@ -439,7 +439,7 @@ Foam::multiphaseMixture::D() const
 }
 
 Foam::tmp<Foam::volScalarField>
-Foam::multiphaseMixture::Cs() const
+Foam::multiphaseMixtureScalar::Cs() const
 {
     PtrDictionary<phase>::const_iterator iter = phases_.begin();
 
@@ -456,7 +456,7 @@ Foam::multiphaseMixture::Cs() const
 }
 
 Foam::tmp<Foam::surfaceScalarField>
-Foam::multiphaseMixture::diffusionCorrection() const
+Foam::multiphaseMixtureScalar::diffusionCorrection() const
 {
 
     surfaceScalarField numerator
@@ -517,7 +517,7 @@ Foam::multiphaseMixture::diffusionCorrection() const
     return correction;
 }
 
-void Foam::multiphaseMixture::solve()
+void Foam::multiphaseMixtureScalar::solve()
 {
     correct();
 
@@ -570,7 +570,7 @@ void Foam::multiphaseMixture::solve()
 }
 
 
-void Foam::multiphaseMixture::correct()
+void Foam::multiphaseMixtureScalar::correct()
 {
     forAllIter(PtrDictionary<phase>, phases_, iter)
     {
@@ -579,7 +579,7 @@ void Foam::multiphaseMixture::correct()
 }
 
 
-Foam::tmp<Foam::surfaceVectorField> Foam::multiphaseMixture::nHatfv
+Foam::tmp<Foam::surfaceVectorField> Foam::multiphaseMixtureScalar::nHatfv
 (
     const volScalarField& alpha1,
     const volScalarField& alpha2
@@ -605,7 +605,7 @@ Foam::tmp<Foam::surfaceVectorField> Foam::multiphaseMixture::nHatfv
 }
 
 
-Foam::tmp<Foam::surfaceScalarField> Foam::multiphaseMixture::nHatf
+Foam::tmp<Foam::surfaceScalarField> Foam::multiphaseMixtureScalar::nHatf
 (
     const volScalarField& alpha1,
     const volScalarField& alpha2
@@ -622,7 +622,7 @@ Foam::tmp<Foam::surfaceScalarField> Foam::multiphaseMixture::nHatf
 // The dynamic contact angle is calculated from the component of the
 // velocity on the direction of the interface, parallel to the wall.
 
-void Foam::multiphaseMixture::correctContactAngle
+void Foam::multiphaseMixtureScalar::correctContactAngle
 (
     const phase& alpha1,
     const phase& alpha2,
@@ -726,7 +726,7 @@ void Foam::multiphaseMixture::correctContactAngle
 }
 
 
-Foam::tmp<Foam::volScalarField> Foam::multiphaseMixture::K
+Foam::tmp<Foam::volScalarField> Foam::multiphaseMixtureScalar::K
 (
     const phase& alpha1,
     const phase& alpha2
@@ -742,7 +742,7 @@ Foam::tmp<Foam::volScalarField> Foam::multiphaseMixture::K
 
 
 Foam::tmp<Foam::volScalarField>
-Foam::multiphaseMixture::nearInterface() const
+Foam::multiphaseMixtureScalar::nearInterface() const
 {
     tmp<volScalarField> tnearInt
     (
@@ -768,7 +768,7 @@ Foam::multiphaseMixture::nearInterface() const
 }
 
 
-void Foam::multiphaseMixture::solveAlphas
+void Foam::multiphaseMixtureScalar::solveAlphas
 (
     const scalar cAlpha
 )
@@ -901,7 +901,7 @@ void Foam::multiphaseMixture::solveAlphas
 }
 
 
-bool Foam::multiphaseMixture::read()
+bool Foam::multiphaseMixtureScalar::read()
 {
     if (transportModel::read())
     {

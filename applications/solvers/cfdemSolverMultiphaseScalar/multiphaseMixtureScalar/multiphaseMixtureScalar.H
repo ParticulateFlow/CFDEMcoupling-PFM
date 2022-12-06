@@ -17,10 +17,10 @@ License
     Copyright (C) 2018- Mathias Vångö, JKU Linz, Austria
 
 Class
-    multiphaseMixture
+    multiphaseMixtureScalar
 
 Description
-    This class is based on the OpenFOAM(R) Foam::multiphaseMixture class,
+    This class is based on the OpenFOAM(R) Foam::multiphaseMixtureScalar class,
     which is an incompressible multi-phase mixture with built in solution
     for the phase fractions with interface compression for interface-capturing.
     It has been extended to include the void fraction in the volume fraction
@@ -33,11 +33,11 @@ Description
     between each phase-pair.
 
 SourceFiles
-    multiphaseMixture.C
+    multiphaseMixtureScalar.C
 \*---------------------------------------------------------------------------*/
 
-#ifndef multiphaseMixture_H
-#define multiphaseMixture_H
+#ifndef multiphaseMixtureScalar_H
+#define multiphaseMixtureScalar_H
 
 #include "incompressible/transportModel/transportModel.H"
 #include "IOdictionary.H"
@@ -52,10 +52,10 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                      Class multiphaseMixture Declaration
+                      Class multiphaseMixtureScalar Declaration
 \*---------------------------------------------------------------------------*/
 
-class multiphaseMixture
+class multiphaseMixtureScalar
 :
     public IOdictionary,
     public transportModel
@@ -191,7 +191,7 @@ public:
     // Constructors
 
         //- Construct from components
-        multiphaseMixture
+        multiphaseMixtureScalar
         (
             const volVectorField& U,
             const surfaceScalarField& phi,
@@ -200,7 +200,7 @@ public:
 
 
     //- Destructor
-    virtual ~multiphaseMixture()
+    virtual ~multiphaseMixtureScalar()
     {}
 
 
