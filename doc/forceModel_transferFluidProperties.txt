@@ -1,0 +1,42 @@
+"CFDEMproject Website"_lws - "Main Page"_main :c
+
+:link(lws,http://www.cfdem.com)
+:link(main,CFDEMcoupling_Manual.html)
+
+:line
+
+forceModel transferFluidProperties command :h3
+
+[Syntax:]
+
+Defined in "couplingProperties"_CFDEMcoupling_dicts.html#couplingProperties
+dictionary.
+
+forceModels
+(
+    transferFluidProperties
+);
+transferFluidPropertiesProps
+\{
+    verbose       switch1;
+    interpolation switch2;
+\} :pre
+
+{switch1} = (optional, default false) sub model switch, see "forceSubModel"_forceSubModel.html for details :ulb,l
+{switch2} = (optional, default false) sub model switch, see "forceSubModel"_forceSubModel.html for details :l
+:ule
+
+[Description:]
+
+This "force model" does not influence the particles or the flow - it transfer to fluid density and (dynamic)
+viscosity from OpenFOAM to LIGGGHTS.
+
+
+[Restrictions:]
+
+This model requires {fix cfd/coupling/fluidproperties} to work.
+
+[Related commands:]
+
+"forceModel"_forceModel.html
+

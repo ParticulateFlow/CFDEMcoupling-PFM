@@ -37,11 +37,19 @@ Application
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 void findPairs(labelList &, labelList &, labelPairList &);
 void findPairsUnordered(labelList &, labelList &, labelPairList &);
-void fillEmptyCells(fvMesh &, label, label, labelList &, volVectorField &, volVectorField &, scalarList &, volVectorField &, volVectorField &, bool, scalar);
-void nearestNeighborCells(fvMesh &, label, label, label, labelList &, labelList &);
-void normalizeFields(labelList &, volVectorField &, volVectorField &);
-void readDump(std::string, labelList &, vectorList &);
+void fillEmptyCells(fvMesh &, label, label, scalarList &, volVectorField &, volVectorField &, scalarList &, volVectorField &, volVectorField &, bool, scalar);
+void nearestNeighborCells(fvMesh &, label, label, label, scalarList &, labelList &);
+void normalizeFields(scalarList &, volVectorField &, volVectorField &);
+void readDump(std::string, labelList &, scalarList &, vectorList &);
 scalar weightFun(scalar);
+label maxNumParticles = 1000000;
+scalar minVol = 1e-12;
+scalar Pi43 = 4.1888;
+label posIndex = -1;
+label posRad = -1;
+label posX = -1;
+label posY = -1;
+label posZ = -1;
 
 int main(int argc, char *argv[])
 {
@@ -88,6 +96,11 @@ int main(int argc, char *argv[])
     label dumpIndexDisplacementIncrement(readLabel(displacementProperties.lookup("dumpIndexDisplacementIncrement")));
     label nNeighMin(readLabel(displacementProperties.lookup("nNeighMin")));
     label maxSearchLayers(displacementProperties.lookupOrDefault<label>("maxSearchLayers",0));
+    posIndex = readLabel(displacementProperties.lookup("posIndex"));
+    posRad = readLabel(displacementProperties.lookup("posRad"));
+    posX = readLabel(displacementProperties.lookup("posX"));
+    posY = readLabel(displacementProperties.lookup("posY"));
+    posZ = readLabel(displacementProperties.lookup("posZ"));
     scalar timePerInputStep(readScalar(displacementProperties.lookup("timePerInputStep")));
     scalar timePerDisplacementStep(readScalar(displacementProperties.lookup("timePerDisplacementStep")));
     scalar startTime(readScalar(displacementProperties.lookup("startTime")));
@@ -95,7 +108,7 @@ int main(int argc, char *argv[])
     std::string fileext=string(displacementProperties.lookupOrDefault<string>("fileextension",""));
     bool interpolate=bool(displacementProperties.lookupOrDefault<bool>("fillEmptyCells",true));
     bool averageMode=bool(displacementProperties.lookupOrDefault<bool>("averageMode",false));
-    
+
     volVectorField defaultUs
     (
         IOobject
@@ -110,11 +123,11 @@ int main(int argc, char *argv[])
         dimensionedVector("zero", dimensionSet(0,1,-1,0,0), vector::zero)
     );
 
-    volVectorField defaultUsDirectedVariance
+    volVectorField defaultUsDirectedStdDev
     (
         IOobject
         (
-            "defaultUDispDirectedVariance",
+            "defaultUDispDirectedStdDev",
             runTime.timeName(),
             mesh,
             IOobject::READ_IF_PRESENT,
@@ -172,11 +185,11 @@ int main(int argc, char *argv[])
         dimensionedVector("zero", dimensionSet(0,1,-1,0,0), vector::zero)
     );
 
-    volVectorField UsDirectedVariance
+    volVectorField UsDirectedStdDev
     (
         IOobject
         (
-            "UDispDirectedVariance",
+            "UDispDirectedStdDev",
             runTime.timeName(),
             mesh,
             IOobject::NO_READ,
@@ -186,7 +199,7 @@ int main(int argc, char *argv[])
         dimensionedVector("zero", dimensionSet(0,1,-1,0,0), vector::zero)
     );
 
-    labelList particlesInCell(mesh.nCells(), 0);
+    scalarList particleVolInCell(mesh.nCells(), 0.0);
 
     scalar currTime=startTime + thisProc * timePerInputStep;
     label timeIndex=thisProc;
@@ -196,6 +209,7 @@ int main(int argc, char *argv[])
         runTime.setTime(currTime,timeIndex);
         // read dump files and check which particle indices are present in both
         labelList indices1, indices2;
+        scalarList radii1, radii2;
         vectorList positions1, positions2;
 
         std::stringstream ss;
@@ -209,13 +223,13 @@ int main(int argc, char *argv[])
         {
             if (averageMode)
             {
-                normalizeFields(particlesInCell, Us, UsDirectedVariance);
-                fillEmptyCells(mesh,nNeighMin,maxSearchLayers,particlesInCell,Us,UsDirectedVariance,boundaries,defaultUs,defaultUsDirectedVariance,interpolate,timePerDisplacementStep);
+                normalizeFields(particleVolInCell, Us, UsDirectedStdDev);
+                fillEmptyCells(mesh,nNeighMin,maxSearchLayers,particleVolInCell,Us,UsDirectedStdDev,boundaries,defaultUs,defaultUsDirectedStdDev,interpolate,timePerDisplacementStep);
 
                 Us /= timePerDisplacementStep;
-                UsDirectedVariance /= timePerDisplacementStep;
+                UsDirectedStdDev /= timePerDisplacementStep;
                 Us.write();
-                UsDirectedVariance.write();
+                UsDirectedStdDev.write();
             }
             break;
         }
@@ -225,8 +239,8 @@ int main(int argc, char *argv[])
         Info << "\t" << filename2 << endl;
         Info << "corresponding to time = " << currTime << "." << endl;
 
-        readDump(filename1, indices1, positions1);
-        readDump(filename2, indices2, positions2);
+        readDump(filename1, indices1, radii1, positions1);
+        readDump(filename2, indices2, radii2, positions2);
 
         labelPairList pairs;
         findPairs(indices1,indices2,pairs);
@@ -234,15 +248,16 @@ int main(int argc, char *argv[])
         // average particle displacements and their variance
         Info << "Binning particle displacements on mesh." << endl;
         vector position, displacement;
+        scalar radius, volume;
         label line1, line2;
         label cellI;
 
         if (!averageMode)
         {
             Us *= 0.0;
-            UsDirectedVariance *= 0.0;
-            particlesInCell.clear();
-            particlesInCell.setSize(mesh.nCells(), 0);
+            UsDirectedStdDev *= 0.0;
+            particleVolInCell.clear();
+            particleVolInCell.setSize(mesh.nCells(), 0);
         }
 
         for (label partI = 0; partI < pairs.size(); partI++)
@@ -250,27 +265,29 @@ int main(int argc, char *argv[])
             line1 = pairs[partI].first();
             line2 = pairs[partI].second();
             position = positions1[line1];
-            displacement = positions2[line2] - positions1[line1];
             cellI = mesh.findCell(position);
             if (cellI < 0)  continue;
-            particlesInCell[cellI] += 1;
-            Us[cellI] += displacement;
+            displacement = positions2[line2] - positions1[line1];
+            radius = radii1[line1];
+            volume = Pi43 * radius * radius * radius;
+            particleVolInCell[cellI] += volume;
+            Us[cellI] += displacement*volume;
 
             for (label comp=0;comp<3;comp++)
             {
-                UsDirectedVariance[cellI].component(comp) += displacement.component(comp)*displacement.component(comp);
+                UsDirectedStdDev[cellI].component(comp) += displacement.component(comp)*displacement.component(comp)*volume;
             }
         }
 
         if (!averageMode)
         {
-            normalizeFields(particlesInCell, Us, UsDirectedVariance);
-            fillEmptyCells(mesh,nNeighMin,maxSearchLayers,particlesInCell,Us,UsDirectedVariance,boundaries,defaultUs,defaultUsDirectedVariance,interpolate,timePerDisplacementStep);
+            normalizeFields(particleVolInCell, Us, UsDirectedStdDev);
+            fillEmptyCells(mesh,nNeighMin,maxSearchLayers,particleVolInCell,Us,UsDirectedStdDev,boundaries,defaultUs,defaultUsDirectedStdDev,interpolate,timePerDisplacementStep);
 
             Us /= timePerDisplacementStep;
-            UsDirectedVariance /= timePerDisplacementStep;
+            UsDirectedStdDev /= timePerDisplacementStep;
             Us.write();
-            UsDirectedVariance.write();
+            UsDirectedStdDev.write();
         }
 
         if (averageMode && monitorProbes)
@@ -280,7 +297,7 @@ int main(int argc, char *argv[])
             {
                 vector pos = probePoints[p];
                 label cellP = mesh.findCell(pos);
-                monitoringDataFile << " " << particlesInCell[cellP] << " " << Us[cellP]/timePerDisplacementStep << " " << UsDirectedVariance[cellP]/(timePerDisplacementStep*timePerDisplacementStep);
+                monitoringDataFile << " " << particleVolInCell[cellP] << " " << Us[cellP]/timePerDisplacementStep << " " << UsDirectedStdDev[cellP]/(timePerDisplacementStep*timePerDisplacementStep);
             }
             monitoringDataFile << endl;
         }
@@ -293,36 +310,79 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-void readDump(std::string filename, labelList &indices, vectorList &positions)
+void readDump(std::string filename, labelList &indices, scalarList &radii, vectorList &positions)
 {
     #include <fstream>
 
     const label leadingLines = 9;
     label lineCounter = 0;
     label partIndex;
-    scalar x, y, z;
+    scalar r = 1.0, x = 0.0, y = 0.0, z = 0.0;
 
     indices.clear();
+    radii.clear();
     positions.clear();
+
+    indices.setSize(maxNumParticles);
+    radii.setSize(maxNumParticles);
+    positions.setSize(maxNumParticles);
 
     std::ifstream file(filename);
     std::string str;
+    std::string word;
+    label wordcounter;
     while (std::getline(file, str))
     {
         if (lineCounter >= leadingLines)
         {
-            sscanf(str.c_str(), "%d %lf %lf %lf", &partIndex, &x, &y, &z);
-            indices.append(partIndex);
-            positions.append(vector(x,y,z));
+            std::istringstream ss(str);
+            wordcounter = 0;
+            while (ss >> word)
+            {
+                if (wordcounter == posIndex)
+                {
+                    partIndex = stoi(word);
+                }
+                else if (wordcounter == posRad)
+                {
+                    r = stod(word);
+                }
+                else if (wordcounter == posX)
+                {
+                    x = stod(word);
+                }
+                else if (wordcounter == posY)
+                {
+                    y = stod(word);
+                }
+                else if (wordcounter == posZ)
+                {
+                    z = stod(word);
+                }
+                wordcounter++;
+            }
+//            sscanf(str.c_str(), "%d %lf %lf %lf", &partIndex, &x, &y, &z);
+            indices[lineCounter-leadingLines] = partIndex;
+            radii[lineCounter-leadingLines] = r;
+            positions[lineCounter-leadingLines] = vector(x,y,z);
         }
         lineCounter++;
     }
+
+    label readLines = lineCounter - leadingLines;
+    indices.resize(readLines);
+    radii.resize(readLines);
+    positions.resize(readLines);
 }
 
 void findPairs(labelList &indices1, labelList &indices2, labelPairList &pairs)
 {
     // remove all entries from first list if they are not present in second list
     // this assumes ordered entries
+
+    pairs.clear();
+    pairs.setSize(maxNumParticles);
+    label pairCounter = 0;
 
     if (indices2.size() == 0) return;
 
@@ -339,18 +399,23 @@ void findPairs(labelList &indices1, labelList &indices2, labelPairList &pairs)
             else if (indices2[jmid] < index1) j1 = jmid;
             else
             {
-                pairs.append(labelPair(i,jmid));
+                pairs[pairCounter]=labelPair(i,jmid);
+                pairCounter++;
                 break;
             }
             if (j2-j1 == 1) break;
         }
     }
+    pairs.resize(pairCounter);
     Info << "findPairs: " << pairs.size() << " pairs found." << endl;
 }
 
 void findPairsUnordered(labelList &indices1, labelList &indices2, labelPairList &pairs)
 {
     // remove all entries from first list if they are not present in second list
+    pairs.clear();
+    pairs.setSize(maxNumParticles);
+    label pairCounter = 0;
 
     for (label i=0;i<indices1.size();i++)
     {
@@ -358,15 +423,17 @@ void findPairsUnordered(labelList &indices1, labelList &indices2, labelPairList 
         {
             if (indices1[i] == indices2[j])
             {
-                pairs.append(labelPair(i,j));
+                pairs[pairCounter]=labelPair(i,j);
+                pairCounter++;
                 break;
             }
         }
     }
+    pairs.resize(pairCounter);
     Info << "findPairs: " << pairs.size() << " pairs found." << endl;
 }
 
-void fillEmptyCells(fvMesh &mesh, label nNeighMin, label maxSearchLayers, labelList &particlesInCell, volVectorField &Us, volVectorField& UsDirectedVariance,scalarList& boundaries, volVectorField &defaultUs, volVectorField &defaultUsDirectedVariance, bool interpolate, scalar dt)
+void fillEmptyCells(fvMesh &mesh, label nNeighMin, label maxSearchLayers, scalarList &particleVolInCell, volVectorField &Us, volVectorField& UsDirectedStdDev,scalarList& boundaries, volVectorField &defaultUs, volVectorField &defaultUsDirectedStdDev, bool interpolate, scalar dt)
 {
     labelList neighborsWithValues;
     scalar neighborSqrDistance;
@@ -377,7 +444,7 @@ void fillEmptyCells(fvMesh &mesh, label nNeighMin, label maxSearchLayers, labelL
     Info << "Filling empty cells." << endl;
     forAll(mesh.C(), cellI)
     {
-        if (particlesInCell[cellI] > 0) continue;
+        if (particleVolInCell[cellI] > minVol) continue;
 
         vector position = mesh.C()[cellI];
         label outsideBox = 0;
@@ -388,11 +455,11 @@ void fillEmptyCells(fvMesh &mesh, label nNeighMin, label maxSearchLayers, labelL
         if (outsideBox > 0 || !interpolate)
         {
             Us[cellI] = defaultUs[cellI]*dt;
-            UsDirectedVariance[cellI] = defaultUsDirectedVariance[cellI]*dt;
+            UsDirectedStdDev[cellI] = defaultUsDirectedStdDev[cellI]*dt;
             continue;
         }
 
-        nearestNeighborCells(mesh, cellI, nNeighMin, maxSearchLayers, particlesInCell, neighborsWithValues);
+        nearestNeighborCells(mesh, cellI, nNeighMin, maxSearchLayers, particleVolInCell, neighborsWithValues);
         weightSum = 0.0;
         weights.clear();
         for (label neighI=0; neighI<neighborsWithValues.size(); neighI++)
@@ -406,13 +473,13 @@ void fillEmptyCells(fvMesh &mesh, label nNeighMin, label maxSearchLayers, labelL
         {
             weight = weights[neighI]/weightSum;
             Us[cellI] += weight*Us[neighborsWithValues[neighI]];
-            UsDirectedVariance[cellI] += weight*UsDirectedVariance[neighborsWithValues[neighI]];
+            UsDirectedStdDev[cellI] += weight*UsDirectedStdDev[neighborsWithValues[neighI]];
         }
-        
+
         if (neighborsWithValues.size() == 0)
         {
             Us[cellI] = defaultUs[cellI]*dt;
-            UsDirectedVariance[cellI] = defaultUsDirectedVariance[cellI]*dt;
+            UsDirectedStdDev[cellI] = defaultUsDirectedStdDev[cellI]*dt;
         }
 
         // make sure no particles are placed outside of domain
@@ -429,7 +496,7 @@ void fillEmptyCells(fvMesh &mesh, label nNeighMin, label maxSearchLayers, labelL
     }
 }
 
-void nearestNeighborCells(fvMesh &mesh, label refCell, label nNeighMin, label maxSearchLayers, labelList &particlesInCell, labelList &neighborsWithValues)
+void nearestNeighborCells(fvMesh &mesh, label refCell, label nNeighMin, label maxSearchLayers, scalarList &particleVolInCell, labelList &neighborsWithValues)
 {
     label numSearchLayers = 0;
     std::set<label> neighbors;
@@ -455,11 +522,11 @@ void nearestNeighborCells(fvMesh &mesh, label refCell, label nNeighMin, label ma
                 {
                     newNeighbors.insert(adj);
                     neighbors.insert(adj);
-                    if (particlesInCell[adj] > 0) neighborsWithValues.append(adj);
+                    if (particleVolInCell[adj] > minVol) neighborsWithValues.append(adj);
                 }
             }
         }
-        
+
         numSearchLayers++;
         if (numSearchLayers > maxSearchLayers && maxSearchLayers > 0) return;
 
@@ -470,18 +537,18 @@ void nearestNeighborCells(fvMesh &mesh, label refCell, label nNeighMin, label ma
     }
 }
 
-void normalizeFields(labelList& particlesInCell, volVectorField& Us, volVectorField & UsDirectedVariance)
+void normalizeFields(scalarList& particleVolInCell, volVectorField& Us, volVectorField & UsDirectedStdDev)
 {
-    for (label cellJ = 0; cellJ<particlesInCell.size(); cellJ++)
+    for (label cellJ = 0; cellJ<particleVolInCell.size(); cellJ++)
     {
-        if (particlesInCell[cellJ] > 0)
+        if (particleVolInCell[cellJ] > minVol)
         {
-            Us[cellJ] /= particlesInCell[cellJ];
-            UsDirectedVariance[cellJ] /= particlesInCell[cellJ];
+            Us[cellJ] /= particleVolInCell[cellJ];
+            UsDirectedStdDev[cellJ] /= particleVolInCell[cellJ];
             for (label comp=0;comp<3;comp++)
             {
-                UsDirectedVariance[cellJ].component(comp) -= Us[cellJ].component(comp)*Us[cellJ].component(comp);
-                if (UsDirectedVariance[cellJ].component(comp) > 0) UsDirectedVariance[cellJ].component(comp) = Foam::sqrt(UsDirectedVariance[cellJ].component(comp));
+                UsDirectedStdDev[cellJ].component(comp) -= Us[cellJ].component(comp)*Us[cellJ].component(comp);
+                if (UsDirectedStdDev[cellJ].component(comp) > 0) UsDirectedStdDev[cellJ].component(comp) = Foam::sqrt(UsDirectedStdDev[cellJ].component(comp));
             }
         }
     }

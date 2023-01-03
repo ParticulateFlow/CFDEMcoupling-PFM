@@ -88,7 +88,7 @@ surfaceScalarField phi
      linearInterpolate(U*voidfraction) & mesh.Sf()
  );
 
-multiphaseMixture mixture(U, phi, voidfraction);
+multiphaseMixtureScalar mixture(U, phi, voidfraction);
 
 // Need to store rho for ddt(rho, U)
 volScalarField rho
