@@ -177,8 +177,7 @@ void twoWayOne2One::createProcMap()
     // calculate bounding box of LIG subdomain
     // this may have to move to couple when dynamic LB occurs
     List<boundBox> ligBoxes(Pstream::nProcs());
-    double** ligbb = new double*[2];
-    o2o_liggghts_get_boundingbox(lmp,ligbb);
+    double** ligbb = o2o_liggghts_get_boundingbox(lmp);
     boundBox thisLigBox
     (
         point(ligbb[0][0], ligbb[0][1], ligbb[0][2]),
