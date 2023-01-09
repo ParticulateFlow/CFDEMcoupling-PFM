@@ -68,9 +68,9 @@ constDiffAndTemporalSmoothing::constDiffAndTemporalSmoothing
     smoothingLength_(dimensionedScalar("smoothingLength",dimensionSet(0,1,0,0,0,0,0), readScalar(propsDict_.lookup("smoothingLength")))),
     smoothingLengthReferenceField_(dimensionedScalar("smoothingLengthReferenceField",dimensionSet(0,1,0,0,0,0,0), readScalar(propsDict_.lookup("smoothingLength")))),
     DT_("DT", dimensionSet(0,2,-1,0,0), 0.),
-    refFieldName_(propsDict_.lookup("refField")),
+    refFieldName_(propsDict_.lookupOrDefault<word>("refField","")),
     gamma_(readScalar(propsDict_.lookup("smoothingStrength"))),
-//    correctBoundary_(propsDict_.lookupOrDefault<bool>("correctBoundary",false)),
+    correctBoundary_(propsDict_.lookupOrDefault<bool>("correctBoundary",false)),
     verbose_(false)
 {
 
@@ -111,15 +111,44 @@ void constDiffAndTemporalSmoothing::smoothen(volScalarField& fieldSrc) const
 
     double deltaT = sSmoothField.mesh().time().deltaTValue();
     DT_.value() = smoothingLength_.value() * smoothingLength_.value() / deltaT;
-    const volScalarField& refField = particleCloud_.mesh().lookupObject<volScalarField>(refFieldName_);
 
-    // do smoothing
-    solve
-    (
-        fvm::ddt(sSmoothField)
-       -fvm::laplacian(DT_, sSmoothField)
-       -gamma_/deltaT * (refField - fvm::Sp(1.0,sSmoothField))
-    );
+    if(refFieldName_.empty())
+    {
+        // do spatial smoothing
+        solve
+        (
+            fvm::ddt(sSmoothField)
+           -fvm::laplacian(DT_, sSmoothField)
+        );
+
+        // create fields for temporal smoothing
+        volScalarField refField = sSmoothField;
+
+        sSmoothField.ref()=fieldSrc.oldTime().internalField();
+        sSmoothField.correctBoundaryConditions();
+        sSmoothField.oldTime()=fieldSrc.oldTime();
+        sSmoothField.oldTime().correctBoundaryConditions();
+
+        // do temporal smoothing
+        solve
+        (
+            fvm::ddt(sSmoothField)
+            -
+            gamma_/deltaT * (refField - fvm::Sp(1.0,sSmoothField))
+        );
+    }
+    else
+    {
+        const volScalarField& refField = particleCloud_.mesh().lookupObject<volScalarField>(refFieldName_);
+
+        // do spatial and temporal smoothing
+        solve
+        (
+            fvm::ddt(sSmoothField)
+           -fvm::laplacian(DT_, sSmoothField)
+           -gamma_/deltaT * (refField - fvm::Sp(1.0,sSmoothField))
+        );
+    }
 
     // bound sSmoothField_
     forAll(sSmoothField,cellI)
@@ -154,19 +183,48 @@ void constDiffAndTemporalSmoothing::smoothen(volVectorField& fieldSrc) const
 
     dimensionedScalar deltaT = vSmoothField.mesh().time().deltaT();
     DT_.value() = smoothingLength_.value() * smoothingLength_.value() / deltaT.value();
-    const volVectorField& refField = particleCloud_.mesh().lookupObject<volVectorField>(refFieldName_);
 
-    // do spatial and temporal smoothing
-    solve
-    (
-        fvm::ddt(vSmoothField)
-       -fvm::laplacian(DT_, vSmoothField)
-       -gamma_/deltaT * (refField - fvm::Sp(1.0,vSmoothField))
-    );
+    if(refFieldName_.empty())
+    {
+        // do spatial smoothing
+        solve
+        (
+            fvm::ddt(vSmoothField)
+           -fvm::laplacian(DT_, vSmoothField)
+        );
+
+        // create fields for temporal smoothing
+        volVectorField refField = vSmoothField;
+
+        vSmoothField.ref()=fieldSrc.oldTime().internalField();
+        vSmoothField.correctBoundaryConditions();
+        vSmoothField.oldTime()=fieldSrc.oldTime();
+        vSmoothField.oldTime().correctBoundaryConditions();
+
+        // do temporal smoothing
+        solve
+        (
+            fvm::ddt(vSmoothField)
+            -
+            gamma_/deltaT * (refField - fvm::Sp(1.0,vSmoothField))
+        );
+    }
+    else
+    {
+        const volVectorField& refField = particleCloud_.mesh().lookupObject<volVectorField>(refFieldName_);
+
+        // do spatial and temporal smoothing
+        solve
+        (
+            fvm::ddt(vSmoothField)
+           -fvm::laplacian(DT_, vSmoothField)
+           -gamma_/deltaT * (refField - fvm::Sp(1.0,vSmoothField))
+        );
+    }
 
     // create temporally smoothened boundary field
-    // if (correctBoundary_)
-    //    vSmoothField.boundaryFieldRef() = 1/(1+gamma_)*fieldSrc.oldTime().boundaryField() + gamma_/(1+gamma_)*fieldSrc.boundaryField();
+    if (correctBoundary_)
+        vSmoothField.boundaryFieldRef() = 1/(1+gamma_)*fieldSrc.oldTime().boundaryField() + gamma_/(1+gamma_)*fieldSrc.boundaryField();
 
     // get data from working vSmoothField
     fieldSrc=vSmoothField;
