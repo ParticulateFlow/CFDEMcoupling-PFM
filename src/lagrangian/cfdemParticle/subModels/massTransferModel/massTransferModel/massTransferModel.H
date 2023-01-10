@@ -105,8 +105,6 @@ public:
 
         virtual void postFlow() {}
 
-        virtual void solve() {}
-
         const volScalarField& D0Field() const;
 
         const volScalarField& CsField() const;

@@ -285,18 +285,6 @@ void cfdemCloudEnergy::postFlow()
     }
 }
 
-void cfdemCloudEnergy::solve()
-{
-    forAll(energyModel_, modeli)
-    {
-        energyModel_[modeli].solve();
-    }
-    forAll(massTransferModel_, modeli)
-    {
-        massTransferModel_[modeli].solve();
-    }
-}
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
