@@ -61,8 +61,8 @@ fix     cfd3 all couple/cfd/chemistry n_species 3 species_names CO CO2 N2 n_diff
 fix     cfd5 all chem/shrink/core speciesA CO molMassA 0.02801 speciesC CO2 molMassC 0.04401 scale_reduction_rate 10.0 screen yes
 
 # Chemical properties for unreacted shrink core (activate only when chem/shrink/core is active)
-fix     k0_CO all property/atom k0_cfd5 vector yes no no 17 25 2700
-fix     Ea_CO all property/atom Ea_cfd5 vector yes no no 69488 73674 113859
+fix     k0_CO all property/global k0_cfd5 vector 17 25 2700
+fix     Ea_CO all property/global Ea_cfd5 vector 69488 73674 113859
 
 # particle porosity/tortuosity/pore diameter
 fix     porosity        all property/global porosity_all        vector 0.65 0.31 0.16 0.15
@@ -90,20 +90,6 @@ variable ke_tot equal c_KinEn
 
 # print total kinetic energy
 fix     printCompute all print ${WI} "${time} ${ke_tot}" file ../DEM/post/printKE.txt title "#time ke_tot"
-
-compute Ea_CO all reduce sum f_Ea_CO[1] f_Ea_CO[2] f_Ea_CO[3]
-fix     Ea    all ave/time 1 1 1 c_Ea_CO[1] c_Ea_CO[2] c_Ea_CO[3]
-variable Ea1 equal f_Ea[1]
-variable Ea2 equal f_Ea[2]
-variable Ea3 equal f_Ea[3]
-
-compute k0CO all reduce sum f_k0_CO[1] f_k0_CO[2] f_k0_CO[3]
-fix     k0   all ave/time 1 1 1 c_k0CO[1] c_k0CO[2] c_k0CO[3]
-variable k01 equal f_k0[1]
-variable k02 equal f_k0[2]
-variable k03 equal f_k0[3]
-
-fix printk0Ea all print ${WI} "${time} ${Ea1} ${Ea2} ${Ea3} ${k01} ${k02} ${k03}" file ../DEM/post/k0Ea.dat title "#time Ea1 Ea2 Ea3 k01 k02 k03"
 
 ###############
 # Print out values affecting chemical reduction into specified folder for given time
