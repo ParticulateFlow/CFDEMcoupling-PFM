@@ -55,8 +55,4 @@ fvScalarMatrix EEqn
     Info << "Cpv :" << max(Cpv).value() << " " << min(Cpv).value() << endl;
     Info<<  "T max/min : " << max(T).value() << " " << min(T).value() << endl;
     Info << "he max/min : " << max(he).value() << "  " << min(he).value() << endl;
-
-    particleCloud.clockM().start(31,"energySolve");
-    particleCloud.solve();
-    particleCloud.clockM().stop("energySolve");
 }

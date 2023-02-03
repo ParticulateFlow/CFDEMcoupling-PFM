@@ -1,33 +1,39 @@
 clear all;
 clc;
 
-%% Script to plot the angular velocities and the particle positions
+% plot the angular velocity and the particle position
 
-A = importdata('../../DEM/post/angular_velocity_no_coupling.txt',' ',1);
-B = importdata('../../DEM/post/position_no_coupling.txt',' ',1);
-C = importdata('../../DEM/post/angular_velocity.txt',' ',1);
-D = importdata('../../DEM/post/position.txt',' ',1);
+A = importdata('../../DEM/post/angular_velocity.txt',' ',1);
+B = importdata('../../DEM/post/position.txt',' ',1);
 
-pos1 = B.data();
-omega1 = A.data();
-pos2 = D.data();
-omega2 = C.data();
+omega = A.data();
+pos = B.data();
 
-time = omega1(:,1);
-omegax1 = omega1(:,2);
-omegay1 = omega1(:,3);
-omegaz1 = omega1(:,4);
+time1 = omega(:,1);
+omegax = omega(:,2);
+omegay = omega(:,3);
+omegaz = omega(:,4);
 
-time2 = omega2(:,1);
-omegax2 = omega2(:,2);
-omegay2 = omega2(:,3);
-omegaz2 = omega2(:,4);
+time2 = pos(:,1);
+posx = pos(:,2);
+posy = pos(:,3);
+posz = pos(:,4);
 
-figure
-plot(time,omegaz1,'-.-',time2,omegaz2,'Linewidth',1.5)
+figure(1)
+plot(time1,omegaz,'-.-','Linewidth',1.5)
 xlabel('Time (s)')
 ylabel('Angular velocity (1/s)')
-legend('One-way coupling','Two-way coupling')
+legend('Two-way torque coupling')
 axis([0 0.5 0 11])
 set(gca,'FontSize',12)
-print('angular_velocity_compare.eps')
+print('angular_velocity.eps')
+
+figure(2)
+plot(time2,posy,'-.-','Linewidth',1.5)
+xlabel('Time (s)')
+ylabel('Y-position (m)')
+legend('Two-way torque coupling')
+axis([0 0.5 0 0.1])
+set(gca,'FontSize',12)
+print('position.eps')
+

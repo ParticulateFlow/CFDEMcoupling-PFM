@@ -42,7 +42,7 @@ namespace Foam
 class energyModel;
 class massTransferModel;
 class thermCondModel;
-class diffCoeffModel;  
+class diffCoeffModel;
 class chemistryModel;
 /*---------------------------------------------------------------------------*\
                            Class cfdemCloudEnergy Declaration
@@ -141,8 +141,6 @@ public:
        bool evolve(volScalarField&,volVectorField&,volVectorField&);
 
        void postFlow();
-
-       void solve();
 
 };
 

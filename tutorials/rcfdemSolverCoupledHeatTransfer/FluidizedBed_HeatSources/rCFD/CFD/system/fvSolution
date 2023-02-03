@@ -17,40 +17,12 @@ FoamFile
 
 solvers
 {
-    "(p|rho)"
-    {
-        solver          PCG;
-        preconditioner  DIC;
-        tolerance       1e-6;
-        relTol          0.01;
-    }
-
    "(correctedField)"
     {
         solver          PCG;
         preconditioner  DIC;
         tolerance       1e-5;
         relTol          0.05;
-    }
-
-    "(p|rho)Final"
-    {
-        $p;
-        relTol          0;
-    }
-
-    "(U|k|e|epsilon|R|nuTilda|c)"
-    {
-        solver          smoothSolver;
-        smoother        GaussSeidel;
-        tolerance       1e-05;
-        relTol          0;
-    }
-
-    "(U|e|k|nuTilda)Final"
-    {
-        $U;
-        relTol          0;
     }
 
     T

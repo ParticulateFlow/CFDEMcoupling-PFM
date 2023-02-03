@@ -1,118 +1,69 @@
 /*---------------------------------------------------------------------------*\
 License
-
     This is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
-
     This code is distributed in the hope that it will be useful, but WITHOUT
     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
     FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
     for more details.
-
     You should have received a copy of the GNU General Public License
     along with this code.  If not, see <http://www.gnu.org/licenses/>.
 
     Copyright (C) 2015- Thomas Lichtenegger, JKU Linz, Austria
 
+Description
+    transfer fluid properties to LIGGGHTS
+
+SourceFiles
+    transferFluidProperties.C
 \*---------------------------------------------------------------------------*/
 
-#ifndef energyModel_H
-#define energyModel_H
+#ifndef transferFluidProperties_H
+#define transferFluidProperties_H
 
-#include "fvCFD.H"
-#include "cfdemCloudEnergy.H"
-#include "probeModel.H"
+#include "forceModel.H"
 #include "interpolationCellPoint.H"
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class energyModel Declaration
+                    Class transferFluidProperties Declaration
 \*---------------------------------------------------------------------------*/
 
-class energyModel
+class transferFluidProperties
+:
+    public forceModel
 {
+private:
 
-protected:
-
-    // Protected data
-        const dictionary& dict_;
-
-        cfdemCloudEnergy& particleCloud_;
-
-        IOdictionary transportProperties_;
-
-        mutable volScalarField kf0Field_;
-
-        mutable volScalarField CpField_;
+    dictionary propsDict_;
 
 public:
 
     //- Runtime type information
-    TypeName("energyModel");
-
-    // Declare runtime constructor selection table
-
-        declareRunTimeSelectionTable
-        (
-            autoPtr,
-            energyModel,
-            dictionary,
-            (
-                const dictionary& dict,
-                cfdemCloudEnergy& sm
-            ),
-            (dict,sm)
-        );
-
+    TypeName("transferFluidProperties");
 
     // Constructors
 
         //- Construct from components
-        energyModel
+        transferFluidProperties
         (
             const dictionary& dict,
-            cfdemCloudEnergy& sm
+            cfdemCloud& sm
         );
-
 
     // Destructor
 
-        virtual ~energyModel();
-
-
-    // Selector
-
-        static autoPtr<energyModel> New
-        (
-            const dictionary& dict,
-            cfdemCloudEnergy& sm,
-            word energyType
-        );
+        ~transferFluidProperties();
 
 
     // Member Functions
-
-        virtual void addEnergyContribution(volScalarField&) const = 0;
-
-        virtual void addEnergyCoefficient(volScalarField&) const = 0;
-
-        virtual void calcEnergyContribution() = 0;
-
-        virtual void postFlow() {}
-
-        const volScalarField& kf0Field() const;
-
-        const volScalarField& CpField() const;
-
-        virtual scalar aveTpart() const
-        {
-            return 0.0;
-        }
+        void setForce() const;
 
 };
 

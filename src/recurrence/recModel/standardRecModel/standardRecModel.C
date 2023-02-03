@@ -159,7 +159,24 @@ standardRecModel::standardRecModel
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 standardRecModel::~standardRecModel()
-{}
+{
+    const objectRegistry& objReg = base_.mesh().thisDb();
+
+    for(int j=0; j<volScalarFieldNames_.size(); j++)
+    {
+        objReg.checkOut(volScalarFieldList_[j][virtualTimeIndex]);
+    }
+
+    for(int j=0; j<volVectorFieldNames_.size(); j++)
+    {
+        objReg.checkOut(volVectorFieldList_[j][virtualTimeIndex]);
+    }
+
+    for(int j=0; j<surfaceScalarFieldNames_.size(); j++)
+    {
+        objReg.checkOut(surfaceScalarFieldList_[j][virtualTimeIndex]);
+    }
+}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //

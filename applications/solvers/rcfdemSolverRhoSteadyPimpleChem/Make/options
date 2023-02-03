@@ -27,6 +27,7 @@ EXE_INC = \
     -I$(LIB_SRC)/ODE/lnInclude \
     -I$(LIB_SRC)/combustionModels/lnInclude \
     -I$(CFDEM_SRC_DIR)/recurrence/lnInclude \
+    -Wno-deprecated-copy
 
 EXE_LIBS = \
     -L$(CFDEM_LIB_DIR)\

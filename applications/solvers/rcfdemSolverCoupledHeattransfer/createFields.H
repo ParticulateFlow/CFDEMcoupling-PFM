@@ -73,6 +73,9 @@
         dimensionedVector("zero", dimensionSet(0, 1, -1, 0, 0), vector::zero)
     );
 
+    volScalarField rhoeps("rhoeps", rhoRec*voidfractionRec);
+    rhoeps.oldTime(); // switch on saving old time
+
     // heat transfer fields
     Info << "\nCreating heat transfer fields.\n" << endl;
 
@@ -228,3 +231,25 @@
         )
     );
     weightDict.add("weights",scalarList(1,1.0));
+
+    dimensionedScalar TMax
+    (
+        dimensionedScalar::lookupOrDefault
+        (
+            "TMax",
+            transportProps,
+            dimTemperature,
+            GREAT
+        )
+    );
+
+    dimensionedScalar TMin
+    (
+        dimensionedScalar::lookupOrDefault
+        (
+            "TMin",
+            transportProps,
+            dimTemperature,
+            0.0
+        )
+    );

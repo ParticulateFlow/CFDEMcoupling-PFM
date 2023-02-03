@@ -183,6 +183,7 @@ void twoWayOne2One::createProcMap()
         point(ligbb[0][0], ligbb[0][1], ligbb[0][2]),
         point(ligbb[1][0], ligbb[1][1], ligbb[1][2])
     );
+    delete [] ligbb;
     if (boundBoxMargin_ > 0.)
     {
         thisLigBox.max() = thisLigBox.max() + boundBoxMargin_ * vector::one;
@@ -230,6 +231,7 @@ twoWayOne2One::~twoWayOne2One()
 {
     delete foam2lig_;
     delete lig2foam_;
+    delete [] lig2foam_mask_;
 
     destroy(lig2foam_ids_);
     destroy(foam2lig_ids_);
@@ -777,10 +779,7 @@ void twoWayOne2One::locateParticles()
         lig2foam_->exchange(my_prev_cell_ids, prev_cell_ids_);
     }
 
-    if (lig2foam_mask_)
-    {
-        delete [] lig2foam_mask_;
-    }
+    delete [] lig2foam_mask_;
     lig2foam_mask_ = new bool[lig2foam_->ncollected_];
 
     DynamicList<label> cellIds;

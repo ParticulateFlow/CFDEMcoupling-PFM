@@ -45,7 +45,7 @@ plt.xlabel('Time (s)')
 plt.ylabel('Min. eigen value of G')
 plt.minorticks_on()
 plt.grid()
-plt.savefig('RBC_Posieuille_Gyration.eps')
+plt.savefig('RBC_Poiseuille_Gyration.eps')
 plt.show()
 
 

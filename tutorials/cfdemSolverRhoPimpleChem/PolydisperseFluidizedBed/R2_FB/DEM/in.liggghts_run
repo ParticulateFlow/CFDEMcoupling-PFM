@@ -77,11 +77,11 @@ fix     cfd5 ore chem/shrink/core speciesA CO molMassA 0.02801 speciesC CO2 molM
 fix     cfd6 ore chem/shrink/core speciesA H2 molMassA 0.00202 speciesC H2O molMassC 0.01801 scale_reduction_rate ${rate_scale}
 
 # material properties for chemical reaction
-fix     k0_CO ore property/atom k0_cfd5 vector yes no no 17 25 2700
-fix     Ea_CO ore property/atom Ea_cfd5 vector yes no no 69488 95000 130940
+fix     k0_CO ore property/global k0_cfd5 vector 17 25 2700
+fix     Ea_CO ore property/global Ea_cfd5 vector 69488 95000 130940
 
-fix     k0_H2 ore property/atom k0_cfd6 vector yes no no 30 23 160
-fix     Ea_H2 ore property/atom Ea_cfd6 vector yes no no 63627 85000 105908
+fix     k0_H2 ore property/global k0_cfd6 vector 30 23 160
+fix     Ea_H2 ore property/global Ea_cfd6 vector 63627 85000 105908
 
 # particle parameters
 fix     porosity        ore property/global porosity_ore        vector 0.61 0.34 0.19 0.17

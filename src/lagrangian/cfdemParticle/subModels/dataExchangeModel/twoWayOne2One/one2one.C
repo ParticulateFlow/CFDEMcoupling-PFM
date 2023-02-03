@@ -100,6 +100,7 @@ void One2One::setup
     comm_
   );
 
+  // count number of receives
   ncollected_ = 0;
   int nrequests = 0;
   for (int i = 0; i < nsrc_procs_; i++)
@@ -109,6 +110,18 @@ void One2One::setup
       ncollected_ += natoms_[src_procs_[i]];
 
       if (src_procs_[i] != me_) // no receive for on-proc info
+      {
+        nrequests++;
+      }
+    }
+  }
+
+  // count number of sends
+  if (nlocal_ > 0)
+  {
+    for (int i = 0; i < ndst_procs_; i++)
+    {
+      if (dst_procs_[i] != me_)
       {
         nrequests++;
       }
@@ -143,23 +156,27 @@ void One2One::exchange(T *&src, T *&dst, int data_length)
     {
       if (src_procs_[i] != me_)
       {
-  #ifdef O2ODEBUG
-  std::cout<< "[" << me_ << "]"
-           << " RCV " << i
-           << " of "  << nsrc_procs_
-           << " from: " << src_procs_[i]
-           << " natoms_[src_procs_[i]] " << natoms_[src_procs_[i]]
-           << " datalength " << data_length
-           << " offset " << offset
-           << std::endl;
-  #endif
+        int tag = (src_procs_[i] << 16) | me_;
+
+        #ifdef O2ODEBUG
+        std::cout<< "[" << me_ << "]"
+                << " RCV " << (i+1)
+                << " of "  << nsrc_procs_
+                << " from: " << src_procs_[i]
+                << " natoms_[src_procs_[i]] " << natoms_[src_procs_[i]]
+                << " data_length " << data_length
+                << " offset " << offset
+                << " tag " << tag
+                << std::endl;
+        #endif
+
         MPI_Irecv
         (
           &dst[offset],
           natoms_[src_procs_[i]]*data_length,
           wrap.mpi_type,
           src_procs_[i],
-          MPI_ANY_TAG,
+          tag,
           comm_,
           &request_[requesti]
         );
@@ -168,16 +185,34 @@ void One2One::exchange(T *&src, T *&dst, int data_length)
       else // data is available on-proc
       {
         offset_local = offset;
+
+        #ifdef O2ODEBUG
+        std::cout<< "[" << me_ << "]"
+                << " RCV " << (i+1)
+                << " of "  << nsrc_procs_
+                << " from: " << src_procs_[i]
+                << " skipped (self)"
+                << " offset_local " << offset_local
+                << std::endl;
+        #endif
       }
     }
+    #ifdef O2ODEBUG
+    else
+    {
+      std::cout<< "[" << me_ << "]"
+              << " RCV " << (i+1)
+              << " of "  << nsrc_procs_
+              << " from: " << src_procs_[i]
+              << " skipped (no data)" 
+              << std::endl;      
+    }
+    #endif
+
     offset += natoms_[src_procs_[i]]*data_length;
   }
 
-  // make sure all receives are posted
-  MPI_Barrier(comm_);
-
-  // blocking sends - do nonblocking instead
-  //                  since doing many-2-many here?
+  // nonblocking sends
   // only do sends if I have particles
   if (nlocal_ > 0)
   {
@@ -185,29 +220,62 @@ void One2One::exchange(T *&src, T *&dst, int data_length)
     {
       if (dst_procs_[i] != me_)
       {
-    #ifdef O2ODEBUG
-    std::cout<< "[" << me_ << "]"
-             << " SEND to: " << dst_procs_[i]
-             << " nlocal_ " << nlocal_
-             << " data_length " << data_length
-             << std::endl;
-    #endif
-        MPI_Send
+        int tag = (me_ << 16) | dst_procs_[i];
+
+        #ifdef O2ODEBUG
+        std::cout<< "[" << me_ << "]"
+                << " SEND to: " << dst_procs_[i]
+                << " nlocal_ " << nlocal_
+                << " data_length " << data_length
+                << " tag " << tag
+                << std::endl;
+        #endif
+
+        MPI_Isend
         (
           src,
           nlocal_*data_length,
           wrap.mpi_type,
           dst_procs_[i],
-          0,
-          comm_
+          tag,
+          comm_,
+          &request_[requesti]
         );
+        requesti++;
       }
+      #ifdef O2ODEBUG
+      else
+      {
+        std::cout<< "[" << me_ << "]"
+                << " SEND to: " << dst_procs_[i]
+                << " skipped (self)" << std::endl;
+      }
+      #endif
     }
   }
+  #ifdef O2ODEBUG
+  else
+  {
+    std::cout<< "[" << me_ << "]" << " SEND skipped (no data)" << std::endl;
+  }
+  #endif
 
   // only wait if requests were actually posted
   if (requesti > 0)
+  {
+    #ifdef O2ODEBUG
+    std::cout<< "[" << me_ << "]"
+            << " WAIT for: " << requesti << " requests" << std::endl;
+    #endif
+
     MPI_Waitall(requesti, request_, status_);
+  }
+  #ifdef O2ODEBUG
+  else
+  {
+    std::cout<< "[" << me_ << "]" << " WAIT skipped (no requests)" << std::endl;
+  }
+  #endif
 
   // copy on-proc data
   if (offset_local > -1)
@@ -223,6 +291,13 @@ void One2One::exchange(T *&src, T *&dst, int data_length)
       dst[locali+offset_local] = src[locali];
     }
   }
+
+  // wait for all procs to complete data exchange
+  #ifdef O2ODEBUG
+  std::cout<< "[" << me_ << "] BARRIER" << std::endl;
+  #endif
+
+  MPI_Barrier(comm_);
 }
 
 template void One2One::exchange<int>(int*&, int*&, int);
