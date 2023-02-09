@@ -8,7 +8,8 @@
 # copyright: 2022- JKU Linz                                                    #
 ################################################################################
 
-coarsegraining  7.0 model_check error
+variable cg equal 7.0
+coarsegraining  ${cg} model_check error
 atom_style      granular
 atom_modify     map array
 
@@ -25,7 +26,7 @@ create_box      2 reg
 neighbor        1e-4 bin
 neigh_modify    delay 0
 
-# Material properties required for granular pair styles
+# material properties for granular pair styles
 fix         m1 all property/global youngsModulus peratomtype 5.e6 5.e6
 fix         m2 all property/global poissonsRatio peratomtype 0.45 0.45
 fix         m3 all property/global coefficientRestitution peratomtypepair 2 0.3 0.3 0.3 0.3
@@ -44,27 +45,29 @@ fix     zwalls1  all wall/gran model hertz tangential history primitive type 1 y
 fix     zwalls2  all wall/gran model hertz tangential history primitive type 1 yplane 0.15
 fix     cylwalls all wall/gran model hertz tangential history primitive type 1 ycylinder 0.034 0. 0.
 
-# particle distributions and insertion 
+# region for particle insertion
 region  insreg1 cylinder y 0.0 0.0 0.034 0.00 0.15 units box
 
+# particle templates and distributions
+
 # iron-ore range
-fix     pts1 all particletemplate/sphere 51 atom_type 1 density constant 4300 radius constant 6.25e-05
-fix     pts2 all particletemplate/sphere 41 atom_type 1 density constant 4300 radius constant 0.000125
+fix     pts1 all particletemplate/sphere 51 atom_type 1 density constant 4300 radius constant 0.000060
+fix     pts2 all particletemplate/sphere 41 atom_type 1 density constant 4300 radius constant 0.000105
 fix     pts3 all particletemplate/sphere 31 atom_type 1 density constant 4300 radius constant 0.000188
 fix     pts4 all particletemplate/sphere 21 atom_type 1 density constant 4300 radius constant 0.000375
 
-fix     pdd1 all particledistribution/discrete 1 4 pts1 0.154 pts2 0.332 pts3 0.286 pts4 0.228
+fix     pdd1 all particledistribution/discrete 74671 4 pts1 0.154 pts2 0.332 pts3 0.286 pts4 0.228
 
 # quartz particles
-fix     pts5 all particletemplate/sphere 61 atom_type 2 density constant 2630 radius constant 0.00025
+fix     pts5 all particletemplate/sphere 61 atom_type 2 density constant 2630 radius constant 0.000250
 fix     pdd2 all particledistribution/discrete 1 1 pts5 1.0
 
 fix     ts_check all check/timestep/gran 10 0.1 0.1
 
-# apply nve integration to all particles that are inserted as single particles
+# apply nve integration to all particles
 fix     integr all nve/sphere
 
-# make groups
+# create groups
 group ore type 1
 group quartz type 2
 
