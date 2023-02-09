@@ -2,8 +2,9 @@
 # write data to files for post-processing
 
 variable rad1cg equal 0.000063*${cg}
-variable rad2cg equal 0.000126*${cg}
+variable rad2cg equal 0.000125*${cg}
 variable rad3cg equal 0.000245*${cg}
+#inert particle radcg 0.000250*${cg}
 variable rad4cg equal 0.000255*${cg}
 variable d1condition atom (radius<v_rad1cg)
 variable d2condition atom (radius>v_rad1cg)&&(radius<v_rad2cg)
@@ -314,19 +315,19 @@ variable dY_H2_1 equal f_dY_H2_Output[1]
 variable dY_H2_2 equal f_dY_H2_Output[2]
 variable dY_H2_3 equal f_dY_H2_Output[3]
 
-compute xA_CO ore reduce sum f_X_CO
+compute xA_CO ore reduce ave f_X_CO
 fix     molarFractionA_CO ore ave/time ${Nevery} ${Nrepeat} ${WI} c_xA_CO
 variable xA_CO_1 equal f_molarFractionA_CO
 
-compute xA_H2 ore reduce sum f_X_H2
+compute xA_H2 ore reduce ave f_X_H2
 fix     molarFractionA_H2 ore ave/time ${Nevery} ${Nrepeat} ${WI} c_xA_H2
 variable xA_H2_1 equal f_molarFractionA_H2
 
-compute xC_CO2 ore reduce sum f_X_CO2
+compute xC_CO2 ore reduce ave f_X_CO2
 fix     molarFractionC_CO2 ore ave/time ${Nevery} ${Nrepeat} ${WI} c_xC_CO2
 variable xC_CO2_1 equal f_molarFractionC_CO2
 
-compute xC_H2O ore reduce sum f_X_H2O
+compute xC_H2O ore reduce ave f_X_H2O
 fix     molarFractionC_H2O ore ave/time ${Nevery} ${Nrepeat} ${WI} c_xC_H2O
 variable xC_H2O_1 equal f_molarFractionC_H2O
 
@@ -347,7 +348,7 @@ variable dij_CO_1 equal f_effDiffBinary1[1]
 variable dij_CO_2 equal f_effDiffBinary1[2]
 variable dij_CO_3 equal f_effDiffBinary1[3]
 
-compute effDiffBinary_red_H2 ore reduce sum f_effDiffBinary_cfd6[1] f_effDiffBinary_cfd6[2] f_effDiffBinary_cfd6[3]
+compute effDiffBinary_red_H2 ore reduce ave f_effDiffBinary_cfd6[1] f_effDiffBinary_cfd6[2] f_effDiffBinary_cfd6[3]
 fix     effDiffBinary2 ore ave/time ${Nevery} ${Nrepeat} ${WI} c_effDiffBinary_red_H2[1] c_effDiffBinary_red_H2[2] c_effDiffBinary_red_H2[3]
 variable dij_H2_1 equal f_effDiffBinary2[1]
 variable dij_H2_2 equal f_effDiffBinary2[2]
