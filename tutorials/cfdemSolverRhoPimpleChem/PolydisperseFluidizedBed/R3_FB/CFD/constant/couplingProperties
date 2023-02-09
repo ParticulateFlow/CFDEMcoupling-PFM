@@ -1,0 +1,170 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  6
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "constant";;
+    object      couplingProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+// sub-models & settings
+
+modelType "A"; // A or B or Bfull
+
+couplingInterval 50;
+
+voidFractionModel divided;
+
+locateModel engine;
+
+meshMotionModel noMeshMotion;
+
+regionModel allRegion;
+
+IOModel basicIO;
+
+probeModel off;
+
+dataExchangeModel twoWayMPI;
+
+averagingModel dense;
+
+clockModel off;
+
+smoothingModel off;
+
+forceModels
+(
+    GidaspowDrag
+    gradPForce
+    viscForce
+);
+
+energyModels
+(
+    heatTransferGunn
+    reactionHeat
+);
+
+thermCondModel SyamlalThermCond;
+
+chemistryModels
+(
+    species
+    diffusionCoefficients
+    massTransferCoeff
+);
+
+momCoupleModels
+(
+    implicitCouple
+);
+
+turbulenceModelType "turbulenceProperties";
+
+// sub-model properties
+
+reactionHeatProps
+{
+    reactionHeatName    "reactionHeat";
+    verbose             false;
+}
+
+heatTransferGunnProps
+{
+    partTempName "Temp";
+    partHeatFluxName "convectiveHeatFlux";
+    calcPartTempField true;
+    partRefTemp 753;
+    implicit true;
+    interpolation false;
+}
+
+speciesProps
+{
+    ChemistryFile   "$FOAM_CASE/constant/foam.inp";
+    Nevery          1;
+    verbose         false;
+    interpolation   false;
+}
+
+diffusionCoefficientsProps
+{
+    verbose         false;
+    interpolation   false;
+    ChemistryFile   "$FOAM_CASE/constant/foam.inp";
+    diffusantGasNames       (    CO
+                                 H2
+                            );
+}
+
+massTransferCoeffProps
+{
+    verbose         false;
+    interpolation   false;
+}
+
+reactantPerParticleProps
+{
+}
+
+SyamlalThermCondProps
+{
+    voidfractionFieldName   "voidfraction";
+}
+
+implicitCoupleProps
+{
+    velFieldName "U";
+    granVelFieldName "Us";
+    voidfractionFieldName "voidfraction";
+}
+
+gradPForceProps
+{
+    pFieldName "p";
+    voidfractionFieldName "voidfraction";
+    velocityFieldName "U";
+    interpolation true;
+}
+
+viscForceProps
+{
+    velocityFieldName "U";
+    interpolation true;
+}
+
+GidaspowDragProps
+{
+    velFieldName "U";
+    granVelFieldName "Us";
+    voidfractionFieldName "voidfraction";
+    interpolation true;
+    phi 1;
+}
+
+engineProps
+{
+    treeSearch true;
+}
+
+dividedProps
+{
+    alphaMin 0.01;
+    scaleUpVol 1.0;
+}
+
+twoWayMPIProps
+{
+    liggghtsPath "../DEM/in.liggghts_run";
+}
+
+// ************************************************************************* //
