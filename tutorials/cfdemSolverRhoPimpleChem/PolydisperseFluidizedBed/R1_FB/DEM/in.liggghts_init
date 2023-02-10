@@ -1,0 +1,97 @@
+################################################################################
+# brief: chemistry in fluidized bed - particle insertion into domain           #
+#                                                                              #
+# Cf. M.E. Kinaci,T. Lichtenegger,S. Schneiderbauer, Chem. Eng. Sci. 227 (2020)#
+#                                                                              #
+# authors: D. Queteschiner                                                     #
+# date: Mar 2022                                                               #
+# copyright: 2022- JKU Linz                                                    #
+################################################################################
+
+variable cg equal 7.0
+coarsegraining  ${cg} model_check error
+atom_style      granular
+atom_modify     map array
+
+communicate     single vel yes
+boundary        f f f
+newton          off
+
+units           si
+processors      * 1 2
+
+region          reg block -0.034 0.034 0.000 0.15 -0.034 0.034
+create_box      2 reg
+
+neighbor        1e-4 bin
+neigh_modify    delay 0
+
+# material properties for granular pair styles
+fix m1 all property/global youngsModulus peratomtype 5.e6 5.e6
+fix m2 all property/global poissonsRatio peratomtype 0.45 0.45
+fix m3 all property/global coefficientRestitution peratomtypepair 2 0.3 0.3 0.3 0.3
+fix m4 all property/global coefficientFriction peratomtypepair 2 0.5 0.5 0.5 0.5
+
+# pair style
+pair_style  gran model hertz tangential history
+pair_coeff  * *
+
+# timestep, gravity
+timestep    1e-6
+fix         gravi all gravity 9.81 vector 0.0 -1.0 0.0
+
+# walls
+fix zwalls1  all wall/gran model hertz tangential history primitive type 1 yplane 0.000
+fix zwalls2  all wall/gran model hertz tangential history primitive type 1 yplane 0.15
+fix cylwalls all wall/gran model hertz tangential history primitive type 1 ycylinder 0.034 0. 0.
+
+# region for particle insertion
+region  insreg1 cylinder y 0.0 0.0 0.034 0.00 0.15 units box
+
+# particle templates and distributions
+
+# iron-ore range
+fix pts1 all particletemplate/sphere 51 atom_type 1 density constant 4300 radius constant 0.000060
+fix pts2 all particletemplate/sphere 41 atom_type 1 density constant 4300 radius constant 0.000105
+fix pts3 all particletemplate/sphere 31 atom_type 1 density constant 4300 radius constant 0.000188
+fix pts4 all particletemplate/sphere 21 atom_type 1 density constant 4300 radius constant 0.000375
+
+fix pdd1 all particledistribution/discrete 74671 4 pts1 0.154 pts2 0.332 pts3 0.286 pts4 0.228
+
+# quartz particles
+fix pts5 all particletemplate/sphere 61 atom_type 2 density constant 2630 radius constant 0.000250
+fix pdd2 all particledistribution/discrete 1 1 pts5 1.0
+
+fix ts_check all check/timestep/gran 10 0.1 0.1
+
+# apply nve integration to all particles
+fix integr all nve/sphere
+
+# create groups
+group ore type 1
+group quartz type 2
+
+# screen output
+thermo_style    custom step atoms ke
+thermo          1000
+thermo_modify   lost ignore norm no
+compute_modify  thermo_temp dynamic yes
+
+# insert quartz particles
+fix ins2 all insert/pack seed 5331 distributiontemplate pdd2 &
+    maxattempt 1000 insert_every once overlapcheck yes all_in yes vel constant 0.0 0.0 0.0 &
+    region insreg1 mass_in_region 0.2
+
+run 150000
+
+# insert iron-ore particles
+fix ins1 all insert/pack seed 5330 distributiontemplate pdd1 &
+    maxattempt 1000 insert_every once overlapcheck yes all_in yes vel constant 0.0 0.0 0.0 &
+    region insreg1 mass_in_region 0.365
+
+dump    dmp all custom 5000 post/dump.liggghts_init id type x y z vx vy vz fx fy fz radius mass
+
+run     300000 upto
+
+write_restart   ../DEM/post/restart/liggghts.restart
+
