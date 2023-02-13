@@ -1,0 +1,82 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  6
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      fvSchemes;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+ddtSchemes
+{
+    default         Euler;
+}
+
+gradSchemes
+{
+    default         Gauss linear;
+    grad(p)         cellMDLimited leastSquares 0.5;
+    grad(U)         cellMDLimited leastSquares 0.5;
+    grad(h)         cellMDLimited leastSquares 0.5;
+    grad(e)         cellMDLimited leastSquares 0.5;
+}
+
+divSchemes
+{
+    default         Gauss linear;
+
+    div(phi,U)         Gauss limitedLinear 1;
+    div(phid,p)        Gauss limitedLinear 1;
+    div(phi,K)         Gauss limitedLinear 1;
+    div(phi,h)         Gauss limitedLinear 1;
+    div(phi,k)         Gauss limitedLinear 1;
+    div(phi,epsilon)   Gauss limitedLinear 1;
+    div(U)             Gauss limitedLinear 1;
+    div(phi,Yi_h)   Gauss multivariateSelection
+    {
+        CO limitedLinear01 1;
+        H2 limitedLinear01 1;
+        N2 limitedLinear01 1;
+        H2O limitedLinear01 1;
+        CO2 limitedLinear01 1;
+        h limitedLinear 1;
+        e limitedLinear 1;
+    }
+    div((viscousTerm*dev2(grad(U).T())))    Gauss linear;
+    div((thermo:mu*dev(grad(U).T())))       Gauss linear;
+    div((nuEff*dev2(T(grad(U)))))           Gauss linear;
+    div(phi,T)      Gauss limitedLinear 1;
+}
+
+laplacianSchemes
+{
+    default         Gauss linear corrected;
+}
+
+interpolationSchemes
+{
+    default         linear;
+    interpolate(U)  linear;
+}
+
+snGradSchemes
+{
+    default         corrected;
+}
+
+fluxRequired
+{
+    default         no;
+    p               ;
+}
+
+
+// ************************************************************************* //

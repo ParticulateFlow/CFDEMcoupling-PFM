@@ -1,9 +1,9 @@
 /*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  2.3.0                                 |
-|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
-|    \\/     M anipulation  |                                                 |
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  6
+     \\/     M anipulation  |
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
@@ -24,7 +24,7 @@ gradSchemes
 {
     default         Gauss linear;
     grad(p)         cellMDLimited leastSquares 0.5;
-    grad(U)         cellMDLimited leastSquares 0.5; //cellLimited Gauss linear 1; //
+    grad(U)         cellMDLimited leastSquares 0.5;
     grad(h)         cellMDLimited leastSquares 0.5;
     grad(e)         cellMDLimited leastSquares 0.5;
 }
@@ -33,12 +33,12 @@ divSchemes
 {
     default         Gauss linear;
 
-    div(phi,U)         Gauss limitedLinear 1; //Gauss linear; //Gauss limitedLinear 1; // //Gauss limitedLinearV 1; //
-    div(phid,p)        Gauss limitedLinear 1; //Gauss upwind; //Gauss limitedLinearV 1;
+    div(phi,U)         Gauss limitedLinear 1;
+    div(phid,p)        Gauss limitedLinear 1;
     div(phi,K)         Gauss limitedLinear 1;
-    div(phi,h)         Gauss limitedLinear 1; //Gauss upwind;
-    div(phi,k)         Gauss limitedLinear 1; //Gauss upwind;
-    div(phi,epsilon)   Gauss limitedLinear 1; //Gauss upwind;
+    div(phi,h)         Gauss limitedLinear 1;
+    div(phi,k)         Gauss limitedLinear 1;
+    div(phi,epsilon)   Gauss limitedLinear 1;
     div(U)             Gauss limitedLinear 1;
     div(phi,Yi_h)   Gauss multivariateSelection
     {
@@ -50,7 +50,6 @@ divSchemes
         h limitedLinear 1;
         e limitedLinear 1;
     }
-    // div((muEff*dev2(T(grad(U)))))        Gauss linear;
     div((viscousTerm*dev2(grad(U).T())))    Gauss linear;
     div((thermo:mu*dev(grad(U).T())))       Gauss linear;
     div((nuEff*dev2(T(grad(U)))))           Gauss linear;
@@ -59,7 +58,7 @@ divSchemes
 
 laplacianSchemes
 {
-    default         Gauss linear corrected; //Gauss linear orthogonal;
+    default         Gauss linear corrected;
 }
 
 interpolationSchemes
@@ -70,7 +69,7 @@ interpolationSchemes
 
 snGradSchemes
 {
-    default         corrected; //orthogonal;
+    default         corrected;
 }
 
 fluxRequired
@@ -78,6 +77,5 @@ fluxRequired
     default         no;
     p               ;
 }
-
 
 // ************************************************************************* //
