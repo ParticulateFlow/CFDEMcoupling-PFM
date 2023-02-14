@@ -246,8 +246,6 @@ void diffusionCoefficient::execute()
         double**& diffusionCoefficients_ = particleCloud_.getParticlePropertyRef<double**>(diffusantGasNames_[j]);
         particleCloud_.dataExchangeM().giveData(pushName,"scalar-atom",diffusionCoefficients_);
     }
-
-    Info << "give data done" << endl;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

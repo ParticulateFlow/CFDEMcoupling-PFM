@@ -164,7 +164,8 @@ bool cfdemCloudIB::evolve(volVectorField& Us)
 
         haveEvolvedOnce_=true;
     }
-    Info << "evolve done." << endl;
+
+    if(verbose_) Info << "evolve done." << endl;
 
     //if(verbose_)    #include "debugInfo.H";
 
