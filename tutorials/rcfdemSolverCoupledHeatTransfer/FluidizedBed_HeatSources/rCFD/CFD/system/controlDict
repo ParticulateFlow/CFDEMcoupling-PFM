@@ -51,6 +51,63 @@ libs (
 
 functions
 {
+    Tave
+    {
+        type            volFieldValue;
+        libs            ("libfieldFunctionObjects.so");
+
+        log             true;
+        writeControl    timeStep;
+        writeInterval   10;
+        writeFields     false;
+
+        regionType      all;
+        operation       volAverage;
+
+        weightField     voidfractionRec;
+
+        fields
+        (
+          T
+        );
+    }
+
+    fluxprobe0
+    {
+        type            surfaceFieldValue;
+        libs ("libfieldFunctionObjects.so");
+        writeControl    timeStep;
+        writeInterval   100;
+        log             true;
+        writeFields     false;
+        regionType      faceZone;
+        name            fzcenter;
+        operation       sum;
+
+        fields
+        (
+          phi
+        );
+    }
+  
+    fluxprobe1
+    {
+        type            surfaceFieldValue;
+        libs ("libfieldFunctionObjects.so");
+        writeControl   timeStep;
+        writeInterval  100;
+        log            true;
+        writeFields    false;
+        regionType     faceZone;
+        name           fz0;
+        operation      sum;
+
+        fields
+        (
+          phi
+        );
+    }
+
     fieldAverage1
     {
         type            fieldAverage;
@@ -125,13 +182,12 @@ functions
         );
     }
 
-
     fieldOutput
     {
         type writeObjects;
         functionObjectLibs ( "libutilityFunctionObjects.so" );
         exclusiveWriting     true;
-        objects ("rhoRecMean" "voidfraction" "voidfractionRec" "voidfractionMean" "voidfractionRecMean" "addSourceMean" "phiSMean" "TMean" "T" "particleTemp" "particleTempMean");
+        objects ("rhoRecMean" "voidfraction" "voidfractionRec" "voidfractionMean" "voidfractionRecMean" "addSourceMean" "TMean" "T" "partTemp" "partTempMean");
         writeControl timeStep;
         writeInterval       40000;
     }
@@ -177,10 +233,10 @@ functions
             scalarList newWeights(2);
             newWeights[0] = w0;
             newWeights[1] = 1-w0;
-/*
-            scalarList newWeights(1);
-            newWeights[0] = 1.0;
-*/
+
+//            scalarList newWeights(1);
+//            newWeights[0] = 1.0;
+
             weightDict.set("weights",newWeights); 
         #};
     }

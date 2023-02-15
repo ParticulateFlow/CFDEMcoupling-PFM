@@ -130,7 +130,7 @@ void Foam::temporalSmoothing::smoothen(volVectorField& fieldSrc) const
     vSmoothField.oldTime()=fieldSrc;
     vSmoothField.oldTime().correctBoundaryConditions();
 
-    volVectorField refField = particleCloud_.mesh().lookupObject<volVectorField>(refFieldName_);
+    const volVectorField& refField = particleCloud_.mesh().lookupObject<volVectorField>(refFieldName_);
 
     dimensionedScalar deltaT = vSmoothField.mesh().time().deltaT();
     solve

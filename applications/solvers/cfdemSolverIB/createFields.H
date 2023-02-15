@@ -26,21 +26,6 @@
         ),
         mesh
     );
-    //mod by alice
-    Info<< "Reading physical velocity field U" << endl;
-    Info<< "Note: only if voidfraction at boundary is 1, U is superficial velocity!!!\n" << endl;
-    volVectorField Us
-    (
-        IOobject
-        (
-            "Us",
-            runTime.timeName(),
-            mesh,
-            IOobject::MUST_READ,
-            IOobject::AUTO_WRITE
-        ),
-        mesh
-    );
 
 //========================
 // drag law modelling
@@ -76,9 +61,8 @@
         mesh
     );
 
-
     //mod by alice
-    Info<< "Reading field phiIB\n" << endl;
+    Info<< "Reading field voidfraction\n" << endl;
     volScalarField voidfraction
     (
         IOobject
@@ -91,6 +75,21 @@
         ),
         mesh
     );
+
+    Info<< "Reading particle velocity field Us\n" << endl;
+    volVectorField Us
+    (
+        IOobject
+        (
+            "Us",
+            runTime.timeName(),
+            mesh,
+            IOobject::MUST_READ,
+            IOobject::AUTO_WRITE
+        ),
+        mesh
+    );
+
 //========================
 
 #   include "createPhi.H"
@@ -126,3 +125,5 @@
     );
 
 //===========================
+
+#include "createMRF.H"

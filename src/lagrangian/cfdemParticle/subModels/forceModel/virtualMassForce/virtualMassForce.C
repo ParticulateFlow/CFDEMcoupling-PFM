@@ -99,7 +99,12 @@ virtualMassForce::virtualMassForce
         )
     )
 {
-    particleCloud_.registerParticleProperty<double**>(UrelOldRegName_,3,NOTONCPU,false);
+    // allocate UrelOld only if needed
+    int UrelOldSize = 0;
+    if(!splitUrelCalculation_ || !useUs_ )
+        UrelOldSize = 3;
+
+    particleCloud_.registerParticleProperty<double**>(UrelOldRegName_,UrelOldSize,NOTONCPU,false);
 
     // init force sub model
     setForceSubModels(propsDict_);

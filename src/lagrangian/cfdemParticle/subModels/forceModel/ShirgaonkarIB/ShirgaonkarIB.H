@@ -5,7 +5,8 @@
     www.cfdem.com
                                 Christoph Goniva, christoph.goniva@cfdem.com
                                 Copyright 2009-2012 JKU Linz
-                                Copyright 2012-     DCS Computing GmbH, Linz
+                                Copyright 2012-2015 DCS Computing GmbH, Linz
+                                Copyright 2015-     JKU Linz
 -------------------------------------------------------------------------------
 License
     This file is part of CFDEMcoupling.
@@ -66,6 +67,10 @@ private:
 
     bool depth_;
 
+    const bool multisphere_;
+
+    const bool useTorque_;
+
     word velFieldName_;
 
     const volVectorField& U_;
@@ -73,6 +78,12 @@ private:
     word pressureFieldName_;
 
     const volScalarField& p_;
+
+    word solidVolFractionName_;
+
+    const volScalarField& lambda_;
+
+    void calcForce() const;
 
 public:
 

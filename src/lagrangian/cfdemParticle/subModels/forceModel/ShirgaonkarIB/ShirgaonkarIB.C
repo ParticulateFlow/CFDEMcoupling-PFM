@@ -5,7 +5,8 @@
     www.cfdem.com
                                 Christoph Goniva, christoph.goniva@cfdem.com
                                 Copyright 2009-2012 JKU Linz
-                                Copyright 2012-     DCS Computing GmbH, Linz
+                                Copyright 2012-2015 DCS Computing GmbH, Linz
+                                Copyright 2015-     JKU Linz
 -------------------------------------------------------------------------------
 License
     This file is part of CFDEMcoupling.
@@ -66,10 +67,14 @@ ShirgaonkarIB::ShirgaonkarIB
     verbose_(propsDict_.found("verbose")),
     twoDimensional_(propsDict_.found("twoDimensional")),
     depth_(1),
+    multisphere_(propsDict_.found("multisphere")), //  drag for a multisphere particle
+    useTorque_(propsDict_.found("useTorque")),
     velFieldName_(propsDict_.lookup("velFieldName")),
     U_(sm.mesh().lookupObject<volVectorField> (velFieldName_)),
     pressureFieldName_(propsDict_.lookup("pressureFieldName")),
-    p_(sm.mesh().lookupObject<volScalarField> (pressureFieldName_))
+    p_(sm.mesh().lookupObject<volScalarField> (pressureFieldName_)),
+    solidVolFractionName_(multisphere_?propsDict_.lookup("solidVolFractionName"):word::null),
+    lambda_(multisphere_?sm.mesh().lookupObject<volScalarField>(solidVolFractionName_):volScalarField::null())
 {
     //Append the field names to be probed
     particleCloud_.probeM().initialize(typeName, typeName+".logDat");
@@ -109,6 +114,7 @@ void ShirgaonkarIB::setForce() const
 
     label cellI;
     vector drag;
+    vector torque;
 
     volVectorField h=forceSubM(0).IBDragPerV(U_,p_);
 
@@ -119,6 +125,7 @@ void ShirgaonkarIB::setForce() const
         //if(mask[index][0])
         //{
             drag=vector::zero;
+            torque=vector::zero;
 
             for(int subCell=0;subCell<particleCloud_.voidFractionM().cellsPerParticle()[index][0];subCell++)
             {
@@ -128,6 +135,12 @@ void ShirgaonkarIB::setForce() const
                 if (cellI > -1) // particle Found
                 {
                     drag += h[cellI]*h.mesh().V()[cellI];
+                    if(useTorque_)
+                    {
+                        vector rc = particleCloud_.mesh().C()[cellI];
+                        vector positionCenter = particleCloud_.position(index);
+                        torque += (rc - positionCenter)^h[cellI]*h.mesh().V()[cellI];
+                    }
                 }
 
             }
@@ -150,9 +163,37 @@ void ShirgaonkarIB::setForce() const
                               << ","            << particleCloud_.impForces()[index][1]
                               << ","            << particleCloud_.impForces()[index][2]
                               << endl;
+
+            if(useTorque_)
+            {
+                for(int j=0;j<3;j++) particleCloud_.DEMTorques()[index][j] = torque[j]; // Adding to the particle torque;
+                if(verbose_) Info << "DEMTorques = " << particleCloud_.DEMTorques()[index][0] << "," << particleCloud_.DEMTorques()[index][1] << "," << particleCloud_.DEMTorques()[index][2] << endl;
+            }
         //}
     }
+
+    // Calculate the force if the particle is multisphere template
+    if(multisphere_) calcForce();
 }
+
+void ShirgaonkarIB::calcForce() const
+{
+    vector dragMS;
+
+    volVectorField h=forceSubM(0).IBDragPerV(U_,p_);
+
+    dragMS = vector::zero;
+
+    forAll(lambda_,cellI)
+    {
+        if(lambda_[cellI] > 0) dragMS += h[cellI]*h.mesh().V()[cellI];
+        else dragMS = dragMS;
+    }
+
+    Pout << "Drag force on particle clump = " << dragMS[0] << ", " << dragMS[1] << ", " << dragMS[2] << endl;
+}
+
+
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -1,0 +1,427 @@
+################################################################################
+# write data to files for post-processing
+
+variable rad1cg equal 0.000063*${cg}
+variable rad2cg equal 0.000125*${cg}
+variable rad3cg equal 0.000245*${cg}
+#inert particle radcg 0.000250*${cg}
+variable rad4cg equal 0.000255*${cg}
+variable d1condition atom (radius<v_rad1cg)
+variable d2condition atom (radius>v_rad1cg)&&(radius<v_rad2cg)
+variable d3condition atom (radius>v_rad2cg)&&(radius<v_rad3cg)
+variable d4condition atom (radius>v_rad4cg)
+
+group d1 variable d1condition
+group d2 variable d2condition
+group d3 variable d3condition
+group d4 variable d4condition
+
+variable Nevery equal 1000
+variable Nrepeat equal 10
+variable time equal time
+
+################################################################################
+# compute fractional reduction
+# d1
+compute fr_d1 d1 reduce ave f_fracRed[1] f_fracRed[2] f_fracRed[3]
+fix     fr_d1 d1 ave/time ${Nevery} ${Nrepeat} ${WI} c_fr_d1[1] c_fr_d1[2] c_fr_d1[3]
+variable fr_d1_1 equal f_fr_d1[1]
+variable fr_d1_2 equal f_fr_d1[2]
+variable fr_d1_3 equal f_fr_d1[3]
+variable fr_d1_OV equal 1/9*(f_fr_d1[3])+2/9*(f_fr_d1[2])+6/9*(f_fr_d1[1])
+
+fix printfr1 all print ${WI} "${time} ${fr_d1_1} ${fr_d1_2} ${fr_d1_3} ${fr_d1_OV}" &
+    file ../DEM/post/fr_d1.dat title "#time fr_d1_1 fr_d1_2 fr_d1_3 fr_d1_overall" screen no
+
+# d2
+compute fr_d2 d2 reduce ave f_fracRed[1] f_fracRed[2] f_fracRed[3]
+fix     fr_d2 d2 ave/time ${Nevery} ${Nrepeat} ${WI} c_fr_d2[1] c_fr_d2[2] c_fr_d2[3]
+variable fr_d2_1 equal f_fr_d2[1]
+variable fr_d2_2 equal f_fr_d2[2]
+variable fr_d2_3 equal f_fr_d2[3]
+variable fr_d2_OV equal 1/9*(f_fr_d2[3])+2/9*(f_fr_d2[2])+6/9*(f_fr_d2[1])
+
+fix printfr2 all print ${WI} "${time} ${fr_d2_1} ${fr_d2_2} ${fr_d2_3} ${fr_d2_OV}" &
+    file ../DEM/post/fr_d2.dat title "#time fr_d2_1 fr_d2_2 fr_d2_3 fr_d2_overall" screen no
+
+# d3
+compute fr_d3 d3 reduce ave f_fracRed[1] f_fracRed[2] f_fracRed[3]
+fix     fr_d3 d3 ave/time ${Nevery} ${Nrepeat} ${WI} c_fr_d3[1] c_fr_d3[2] c_fr_d3[3]
+variable fr_d3_1 equal f_fr_d3[1]
+variable fr_d3_2 equal f_fr_d3[2]
+variable fr_d3_3 equal f_fr_d3[3]
+variable fr_d3_OV equal 1/9*(f_fr_d3[3])+2/9*(f_fr_d3[2])+6/9*(f_fr_d3[1])
+
+fix printfr3 all print ${WI} "${time} ${fr_d3_1} ${fr_d3_2} ${fr_d3_3} ${fr_d3_OV}" &
+    file ../DEM/post/fr_d3.dat title "#time fr_d3_1 fr_d3_2 fr_d3_3 fr_d3_overall" screen no
+
+# d4
+compute fr_d4 d4 reduce ave f_fracRed[1] f_fracRed[2] f_fracRed[3]
+fix     fr_d4 d4 ave/time ${Nevery} ${Nrepeat} ${WI} c_fr_d4[1] c_fr_d4[2] c_fr_d4[3]
+variable fr_d4_1 equal f_fr_d4[1]
+variable fr_d4_2 equal f_fr_d4[2]
+variable fr_d4_3 equal f_fr_d4[3]
+variable fr_d4_OV equal 1/9*(f_fr_d4[3])+2/9*(f_fr_d4[2])+6/9*(f_fr_d4[1])
+
+fix printfr4 all print ${WI} "${time} ${fr_d4_1} ${fr_d4_2} ${fr_d4_3} ${fr_d4_OV}" &
+    file ../DEM/post/fr_d4.dat title "#time fr_d4_1 fr_d4_2 fr_d4_3 fr_d4_overall" screen no
+
+# mass-based average of all diameters
+variable fr_ave_OV equal 0.154*v_fr_d1_OV+0.332*v_fr_d2_OV+0.286*v_fr_d3_OV+0.228*v_fr_d4_OV
+
+# overall fractional reduction of individual and average of all diameters
+fix printfrOV all print ${WI} "${time} ${fr_d1_OV} ${fr_d2_OV} ${fr_d3_OV} ${fr_d4_OV} ${fr_ave_OV}" &
+    file ../DEM/post/fr_OV.dat title "#time fr_d1_OV fr_d2_OV fr_d3_OV fr_d4_OV fr_ave_OV" screen no
+
+################################################################################
+# reactant gas mass change
+compute dma_CO ore reduce sum f_dmA_cfd5[1] f_dmA_cfd5[2] f_dmA_cfd5[3]
+fix     dmA_f_CO ore ave/time ${Nevery} ${Nrepeat} ${WI} c_dma_CO[1] c_dma_CO[2] c_dma_CO[3]
+variable dmA_CO_1 equal f_dmA_f_CO[1]
+variable dmA_CO_2 equal f_dmA_f_CO[2]
+variable dmA_CO_3 equal f_dmA_f_CO[3]
+
+compute dma_H2 ore reduce sum f_dmA_cfd6[1] f_dmA_cfd6[2] f_dmA_cfd6[3]
+fix     dmA_f_H2 ore ave/time ${Nevery} ${Nrepeat} ${WI} c_dma_H2[1] c_dma_H2[2] c_dma_H2[3]
+variable dmA_H2_1 equal f_dmA_f_H2[1]
+variable dmA_H2_2 equal f_dmA_f_H2[2]
+variable dmA_H2_3 equal f_dmA_f_H2[3]
+
+# write mass change to file
+fix printdmA all print ${WI} "${time} ${dmA_CO_1} ${dmA_CO_2} ${dmA_CO_3} ${dmA_H2_1} ${dmA_H2_2} ${dmA_H2_3}" &
+    file ../DEM/post/dmA.dat title "#time dmA_CO_1 dmA_CO_2 dmA_CO_3 dmA_H2_1 dmA_H2_2 dmA_H2_3" screen no
+
+################################################################################
+# compute average resistance terms for d1
+compute Aterm_CO_d1 d1 reduce ave f_Aterm_cfd5[1] f_Aterm_cfd5[2] f_Aterm_cfd5[3]
+fix     Aterm_CO_d1 d1 ave/time ${Nevery} ${Nrepeat} ${WI} c_Aterm_CO_d1[1] c_Aterm_CO_d1[2] c_Aterm_CO_d1[3]
+variable a_CO_d1_1 equal f_Aterm_CO_d1[1]
+variable a_CO_d1_2 equal f_Aterm_CO_d1[2]
+variable a_CO_d1_3 equal f_Aterm_CO_d1[3]
+
+compute Aterm_H2_d1 d1 reduce ave f_Aterm_cfd6[1] f_Aterm_cfd6[2] f_Aterm_cfd6[3]
+fix     Aterm_H2_d1 d1 ave/time ${Nevery} ${Nrepeat} ${WI} c_Aterm_H2_d1[1] c_Aterm_H2_d1[2] c_Aterm_H2_d1[3]
+variable a_H2_d1_1 equal f_Aterm_H2_d1[1]
+variable a_H2_d1_2 equal f_Aterm_H2_d1[2]
+variable a_H2_d1_3 equal f_Aterm_H2_d1[3]
+
+compute Bterm_CO_d1 d1 reduce ave f_Bterm_cfd5[1] f_Bterm_cfd5[2] f_Bterm_cfd5[3]
+fix     Bterm_CO_d1 d1 ave/time ${Nevery} ${Nrepeat} ${WI} c_Bterm_CO_d1[1] c_Bterm_CO_d1[2] c_Bterm_CO_d1[3]
+variable b_CO_d1_1 equal f_Bterm_CO_d1[1]
+variable b_CO_d1_2 equal f_Bterm_CO_d1[2]
+variable b_CO_d1_3 equal f_Bterm_CO_d1[3]
+
+compute Bterm_H2_d1 d1 reduce ave f_Bterm_cfd6[1] f_Bterm_cfd6[2] f_Bterm_cfd6[3]
+fix     Bterm_H2_d1 d1 ave/time ${Nevery} ${Nrepeat} ${WI} c_Bterm_H2_d1[1] c_Bterm_H2_d1[2] c_Bterm_H2_d1[3]
+variable b_H2_d1_1 equal f_Bterm_H2_d1[1]
+variable b_H2_d1_2 equal f_Bterm_H2_d1[2]
+variable b_H2_d1_3 equal f_Bterm_H2_d1[3]
+
+compute Massterm_CO_d1 d1 reduce ave f_Massterm_cfd5
+fix     Massterm_CO_d1 d1 ave/time ${Nevery} ${Nrepeat} ${WI} c_Massterm_CO_d1
+variable mt_CO_d1 equal f_Massterm_CO_d1
+
+compute Massterm_H2_d1 d1 reduce ave f_Massterm_cfd6
+fix     Massterm_H2_d1 d1 ave/time ${Nevery} ${Nrepeat} ${WI} c_Massterm_H2_d1
+variable mt_H2_d1 equal f_Massterm_H2_d1
+
+fix printAtermd1 all print ${WI} "${time} ${a_CO_d1_1} ${a_CO_d1_2} ${a_CO_d1_3} ${a_H2_d1_1} ${a_H2_d1_2} ${a_H2_d1_3}" &
+    file ../DEM/post/Aterm_d1.dat title "#time a_CO_d1_1 a_CO_d1_2 a_CO_d1_3 a_H2_d1_1 a_H2_d1_2 a_H2_d1_3" screen no
+
+fix printBtermd1 all print ${WI} "${time} ${b_CO_d1_1} ${b_CO_d1_2} ${b_CO_d1_3} ${b_H2_d1_1} ${b_H2_d1_2} ${b_H2_d1_3}" &
+    file ../DEM/post/Bterm_d1.dat title "#time b_CO_d1_1 b_CO_d1_2 b_CO_d1_3 b_H2_d1_1 b_H2_d1_2 b_H2_d1_3" screen no
+
+fix printMtermd1 all print ${WI} "${time} ${mt_CO_d1} ${mt_H2_d1}" &
+    file ../DEM/post/Mterm_d1.dat title "#time mt_CO_d1 mt_H2_d1" screen no
+
+################################################################################
+# compute average resistance terms for d2
+compute Aterm_CO_d2 d2 reduce ave f_Aterm_cfd5[1] f_Aterm_cfd5[2] f_Aterm_cfd5[3]
+fix     Aterm_CO_d2 d2 ave/time ${Nevery} ${Nrepeat} ${WI} c_Aterm_CO_d2[1] c_Aterm_CO_d2[2] c_Aterm_CO_d2[3]
+variable a_CO_d2_1 equal f_Aterm_CO_d2[1]
+variable a_CO_d2_2 equal f_Aterm_CO_d2[2]
+variable a_CO_d2_3 equal f_Aterm_CO_d2[3]
+
+compute Aterm_H2_d2 d2 reduce ave f_Aterm_cfd6[1] f_Aterm_cfd6[2] f_Aterm_cfd6[3]
+fix     Aterm_H2_d2 d2 ave/time ${Nevery} ${Nrepeat} ${WI} c_Aterm_H2_d2[1] c_Aterm_H2_d2[2] c_Aterm_H2_d2[3]
+variable a_H2_d2_1 equal f_Aterm_H2_d2[1]
+variable a_H2_d2_2 equal f_Aterm_H2_d2[2]
+variable a_H2_d2_3 equal f_Aterm_H2_d2[3]
+
+compute Bterm_CO_d2 d2 reduce ave f_Bterm_cfd5[1] f_Bterm_cfd5[2] f_Bterm_cfd5[3]
+fix     Bterm_CO_d2 d2 ave/time ${Nevery} ${Nrepeat} ${WI} c_Bterm_CO_d2[1] c_Bterm_CO_d2[2] c_Bterm_CO_d2[3]
+variable b_CO_d2_1 equal f_Bterm_CO_d2[1]
+variable b_CO_d2_2 equal f_Bterm_CO_d2[2]
+variable b_CO_d2_3 equal f_Bterm_CO_d2[3]
+
+compute Bterm_H2_d2 d2 reduce ave f_Bterm_cfd6[1] f_Bterm_cfd6[2] f_Bterm_cfd6[3]
+fix     Bterm_H2_d2 d2 ave/time ${Nevery} ${Nrepeat} ${WI} c_Bterm_H2_d2[1] c_Bterm_H2_d2[2] c_Bterm_H2_d2[3]
+variable b_H2_d2_1 equal f_Bterm_H2_d2[1]
+variable b_H2_d2_2 equal f_Bterm_H2_d2[2]
+variable b_H2_d2_3 equal f_Bterm_H2_d2[3]
+
+compute Massterm_CO_d2 d2 reduce ave f_Massterm_cfd5
+fix     Massterm_CO_d2 d2 ave/time ${Nevery} ${Nrepeat} ${WI} c_Massterm_CO_d2
+variable mt_CO_d2 equal f_Massterm_CO_d2
+
+compute Massterm_H2_d2 d2 reduce ave f_Massterm_cfd6
+fix     Massterm_H2_d2 d2 ave/time ${Nevery} ${Nrepeat} ${WI} c_Massterm_H2_d2
+variable mt_H2_d2 equal f_Massterm_H2_d2
+
+fix printAtermd2 all print ${WI} "${time} ${a_CO_d2_1} ${a_CO_d2_2} ${a_CO_d2_3} ${a_H2_d2_1} ${a_H2_d2_2} ${a_H2_d2_3}" &
+    file ../DEM/post/Aterm_d2.dat title "#time a_CO_d2_1 a_CO_d2_2 a_CO_d2_3 a_H2_d2_1 a_H2_d2_2 a_H2_d2_3" screen no
+
+fix printBtermd2 all print ${WI} "${time} ${b_CO_d2_1} ${b_CO_d2_2} ${b_CO_d2_3} ${b_H2_d2_1} ${b_H2_d2_2} ${b_H2_d2_3}" &
+    file ../DEM/post/Bterm_d2.dat title "#time b_CO_d2_1 b_CO_d2_2 b_CO_d2_3 b_H2_d2_1 b_H2_d2_2 b_H2_d2_3" screen no
+
+fix printMtermd2 all print ${WI} "${time} ${mt_CO_d2} ${mt_H2_d2}" &
+    file ../DEM/post/Mterm_d2.dat title "#time mt_CO_d2 mt_H2_d2" screen no
+
+################################################################################
+# compute average resistance terms for d3
+compute Aterm_CO_d3 d3 reduce ave f_Aterm_cfd5[1] f_Aterm_cfd5[2] f_Aterm_cfd5[3]
+fix     Aterm_CO_d3 d3 ave/time ${Nevery} ${Nrepeat} ${WI} c_Aterm_CO_d3[1] c_Aterm_CO_d3[2] c_Aterm_CO_d3[3]
+variable a_CO_d3_1 equal f_Aterm_CO_d3[1]
+variable a_CO_d3_2 equal f_Aterm_CO_d3[2]
+variable a_CO_d3_3 equal f_Aterm_CO_d3[3]
+
+compute Aterm_H2_d3 d3 reduce ave f_Aterm_cfd6[1] f_Aterm_cfd6[2] f_Aterm_cfd6[3]
+fix     Aterm_H2_d3 d3 ave/time ${Nevery} ${Nrepeat} ${WI} c_Aterm_H2_d3[1] c_Aterm_H2_d3[2] c_Aterm_H2_d3[3]
+variable a_H2_d3_1 equal f_Aterm_H2_d3[1]
+variable a_H2_d3_2 equal f_Aterm_H2_d3[2]
+variable a_H2_d3_3 equal f_Aterm_H2_d3[3]
+
+compute Bterm_CO_d3 d3 reduce ave f_Bterm_cfd5[1] f_Bterm_cfd5[2] f_Bterm_cfd5[3]
+fix     Bterm_CO_d3 d3 ave/time ${Nevery} ${Nrepeat} ${WI} c_Bterm_CO_d3[1] c_Bterm_CO_d3[2] c_Bterm_CO_d3[3]
+variable b_CO_d3_1 equal f_Bterm_CO_d3[1]
+variable b_CO_d3_2 equal f_Bterm_CO_d3[2]
+variable b_CO_d3_3 equal f_Bterm_CO_d3[3]
+
+compute Bterm_H2_d3 d3 reduce ave f_Bterm_cfd6[1] f_Bterm_cfd6[2] f_Bterm_cfd6[3]
+fix     Bterm_H2_d3 d3 ave/time ${Nevery} ${Nrepeat} ${WI} c_Bterm_H2_d3[1] c_Bterm_H2_d3[2] c_Bterm_H2_d3[3]
+variable b_H2_d3_1 equal f_Bterm_H2_d3[1]
+variable b_H2_d3_2 equal f_Bterm_H2_d3[2]
+variable b_H2_d3_3 equal f_Bterm_H2_d3[3]
+
+compute Massterm_CO_d3 d3 reduce ave f_Massterm_cfd5
+fix     Massterm_CO_d3 d3 ave/time ${Nevery} ${Nrepeat} ${WI} c_Massterm_CO_d3
+variable mt_CO_d3 equal f_Massterm_CO_d3
+
+compute Massterm_H2_d3 d3 reduce ave f_Massterm_cfd6
+fix     Massterm_H2_d3 d3 ave/time ${Nevery} ${Nrepeat} ${WI} c_Massterm_H2_d3
+variable mt_H2_d3 equal f_Massterm_H2_d3
+
+fix printAtermd3 all print ${WI} "${time} ${a_CO_d3_1} ${a_CO_d3_2} ${a_CO_d3_3} ${a_H2_d3_1} ${a_H2_d3_2} ${a_H2_d3_3}" &
+    file ../DEM/post/Aterm_d3.dat title "#time a_CO_d3_1 a_CO_d3_2 a_CO_d3_3 a_H2_d3_1 a_H2_d3_2 a_H2_d3_3" screen no
+
+fix printBtermd3 all print ${WI} "${time} ${b_CO_d3_1} ${b_CO_d3_2} ${b_CO_d3_3} ${b_H2_d3_1} ${b_H2_d3_2} ${b_H2_d3_3}" &
+    file ../DEM/post/Bterm_d3.dat title "#time b_CO_d3_1 b_CO_d3_2 b_CO_d3_3 b_H2_d3_1 b_H2_d3_2 b_H2_d3_3" screen no
+
+fix printMtermd3 all print ${WI} "${time} ${mt_CO_d3} ${mt_H2_d3}" &
+    file ../DEM/post/Mterm_d3.dat title "#time mt_CO_d3 mt_H2_d3" screen no
+
+################################################################################
+# compute average resistance terms for d4
+compute Aterm_CO_d4 d4 reduce ave f_Aterm_cfd5[1] f_Aterm_cfd5[2] f_Aterm_cfd5[3]
+fix     Aterm_CO_d4 d4 ave/time ${Nevery} ${Nrepeat} ${WI} c_Aterm_CO_d4[1] c_Aterm_CO_d4[2] c_Aterm_CO_d4[3]
+variable a_CO_d4_1 equal f_Aterm_CO_d4[1]
+variable a_CO_d4_2 equal f_Aterm_CO_d4[2]
+variable a_CO_d4_3 equal f_Aterm_CO_d4[3]
+
+compute Aterm_H2_d4 d4 reduce ave f_Aterm_cfd6[1] f_Aterm_cfd6[2] f_Aterm_cfd6[3]
+fix     Aterm_H2_d4 d4 ave/time ${Nevery} ${Nrepeat} ${WI} c_Aterm_H2_d4[1] c_Aterm_H2_d4[2] c_Aterm_H2_d4[3]
+variable a_H2_d4_1 equal f_Aterm_H2_d4[1]
+variable a_H2_d4_2 equal f_Aterm_H2_d4[2]
+variable a_H2_d4_3 equal f_Aterm_H2_d4[3]
+
+compute Bterm_CO_d4 d4 reduce ave f_Bterm_cfd5[1] f_Bterm_cfd5[2] f_Bterm_cfd5[3]
+fix     Bterm_CO_d4 d4 ave/time ${Nevery} ${Nrepeat} ${WI} c_Bterm_CO_d4[1] c_Bterm_CO_d4[2] c_Bterm_CO_d4[3]
+variable b_CO_d4_1 equal f_Bterm_CO_d4[1]
+variable b_CO_d4_2 equal f_Bterm_CO_d4[2]
+variable b_CO_d4_3 equal f_Bterm_CO_d4[3]
+
+compute Bterm_H2_d4 d4 reduce ave f_Bterm_cfd6[1] f_Bterm_cfd6[2] f_Bterm_cfd6[3]
+fix     Bterm_H2_d4 d4 ave/time ${Nevery} ${Nrepeat} ${WI} c_Bterm_H2_d4[1] c_Bterm_H2_d4[2] c_Bterm_H2_d4[3]
+variable b_H2_d4_1 equal f_Bterm_H2_d4[1]
+variable b_H2_d4_2 equal f_Bterm_H2_d4[2]
+variable b_H2_d4_3 equal f_Bterm_H2_d4[3]
+
+compute Massterm_CO_d4 d4 reduce ave f_Massterm_cfd5
+fix     Massterm_CO_d4 d4 ave/time ${Nevery} ${Nrepeat} ${WI} c_Massterm_CO_d4
+variable mt_CO_d4 equal f_Massterm_CO_d4
+
+compute Massterm_H2_d4 d4 reduce ave f_Massterm_cfd6
+fix     Massterm_H2_d4 d4 ave/time ${Nevery} ${Nrepeat} ${WI} c_Massterm_H2_d4
+variable mt_H2_d4 equal f_Massterm_H2_d4
+
+fix printAtermd4 all print ${WI} "${time} ${a_CO_d4_1} ${a_CO_d4_2} ${a_CO_d4_3} ${a_H2_d4_1} ${a_H2_d4_2} ${a_H2_d4_3}" &
+    file ../DEM/post/Aterm_d4.dat title "#time a_CO_d4_1 a_CO_d4_2 a_CO_d4_3 a_H2_d4_1 a_H2_d4_2 a_H2_d4_3" screen no
+
+fix printBtermd4 all print ${WI} "${time} ${b_CO_d4_1} ${b_CO_d4_2} ${b_CO_d4_3} ${b_H2_d4_1} ${b_H2_d4_2} ${b_H2_d4_3}" &
+    file ../DEM/post/Bterm_d4.dat title "#time b_CO_d4_1 b_CO_d4_2 b_CO_d4_3 b_H2_d4_1 b_H2_d4_2 b_H2_d4_3" screen no
+
+fix printMtermd4 all print ${WI} "${time} ${mt_CO_d4} ${mt_H2_d4}" &
+    file ../DEM/post/Mterm_d4.dat title "#time mt_CO_d4 mt_H2_d4" screen no
+
+################################################################################
+# compute mass-based average resistance terms for all diameters
+variable a_CO_ave_1 equal 0.154*v_a_CO_d1_1+0.332*v_a_CO_d2_1+0.286*v_a_CO_d3_1+0.228*v_a_CO_d4_1
+variable a_CO_ave_2 equal 0.154*v_a_CO_d1_2+0.332*v_a_CO_d2_2+0.286*v_a_CO_d3_2+0.228*v_a_CO_d4_2
+variable a_CO_ave_3 equal 0.154*v_a_CO_d1_3+0.332*v_a_CO_d2_3+0.286*v_a_CO_d3_3+0.228*v_a_CO_d4_3
+
+variable a_H2_ave_1 equal 0.154*v_a_H2_d1_1+0.332*v_a_H2_d2_1+0.286*v_a_H2_d3_1+0.228*v_a_H2_d4_1
+variable a_H2_ave_2 equal 0.154*v_a_H2_d1_2+0.332*v_a_H2_d2_2+0.286*v_a_H2_d3_2+0.228*v_a_H2_d4_2
+variable a_H2_ave_3 equal 0.154*v_a_H2_d1_3+0.332*v_a_H2_d2_3+0.286*v_a_H2_d3_3+0.228*v_a_H2_d4_3
+
+variable b_CO_ave_1 equal 0.154*v_b_CO_d1_1+0.332*v_b_CO_d2_1+0.286*v_b_CO_d3_1+0.228*v_b_CO_d4_1
+variable b_CO_ave_2 equal 0.154*v_b_CO_d1_2+0.332*v_b_CO_d2_2+0.286*v_b_CO_d3_2+0.228*v_b_CO_d4_2
+variable b_CO_ave_3 equal 0.154*v_b_CO_d1_3+0.332*v_b_CO_d2_3+0.286*v_b_CO_d3_3+0.228*v_b_CO_d4_3
+
+variable b_H2_ave_1 equal 0.154*v_b_H2_d1_1+0.332*v_b_H2_d2_1+0.286*v_b_H2_d3_1+0.228*v_b_H2_d4_1
+variable b_H2_ave_2 equal 0.154*v_b_H2_d1_2+0.332*v_b_H2_d2_2+0.286*v_b_H2_d3_2+0.228*v_b_H2_d4_2
+variable b_H2_ave_3 equal 0.154*v_b_H2_d1_3+0.332*v_b_H2_d2_3+0.286*v_b_H2_d3_3+0.228*v_b_H2_d4_3
+
+variable mt_CO_ave equal 0.154*v_mt_CO_d1+0.332*v_mt_CO_d2+0.286*v_mt_CO_d3+0.228*v_mt_CO_d4
+variable mt_H2_ave equal 0.154*v_mt_H2_d1+0.332*v_mt_H2_d2+0.286*v_mt_H2_d3+0.228*v_mt_H2_d4
+
+fix printAtermAve all print ${WI} "${time} ${a_CO_ave_1} ${a_CO_ave_2} ${a_CO_ave_3} ${a_H2_ave_1} ${a_H2_ave_2} ${a_H2_ave_3}" &
+    file ../DEM/post/AtermAve.dat title "#time a_CO_ave_1 a_CO_ave_2 a_CO_ave_3 a_H2_ave_1 a_H2_ave_2 a_H2_ave_3" screen no
+
+fix printBtermAve all print ${WI} "${time} ${b_CO_ave_1} ${b_CO_ave_2} ${b_CO_ave_3} ${b_H2_ave_1} ${b_H2_ave_2} ${b_H2_ave_3}" &
+    file ../DEM/post/BtermAve.dat title "#time b_CO_ave_1 b_CO_ave_2 b_CO_ave_3 b_H2_ave_1 b_H2_ave_2 b_H2_ave_3" screen no
+
+fix printMtermAve all print ${WI} "${time} ${mt_CO_ave} ${mt_H2_ave}" &
+    file ../DEM/post/MtermAve.dat title "#time mt_CO_ave mt_H2_ave" screen no
+
+
+################################################################################
+# compute layer masses
+compute mass_layer ore reduce sum f_LayerMasses[1] f_LayerMasses[2] f_LayerMasses[3] f_LayerMasses[4]
+fix     massLayerPrintout ore ave/time ${Nevery} ${Nrepeat} ${WI} c_mass_layer[1] c_mass_layer[2] c_mass_layer[3] c_mass_layer[4]
+variable mL1 equal f_massLayerPrintout[1]
+variable mL2 equal f_massLayerPrintout[2]
+variable mL3 equal f_massLayerPrintout[3]
+variable mL4 equal f_massLayerPrintout[4]
+
+compute dY_CO ore reduce sum f_dY_cfd5[1] f_dY_cfd5[2] f_dY_cfd5[3]
+fix dY_CO_Output ore ave/time  ${Nevery} ${Nrepeat} ${WI} c_dY_CO[1] c_dY_CO[2] c_dY_CO[3]
+variable dY_CO_1 equal f_dY_CO_Output[1]
+variable dY_CO_2 equal f_dY_CO_Output[2]
+variable dY_CO_3 equal f_dY_CO_Output[3]
+
+compute dY_H2 ore reduce sum f_dY_cfd6[1] f_dY_cfd6[2] f_dY_cfd6[3]
+fix dY_H2_Output ore ave/time ${Nevery} ${Nrepeat} ${WI} c_dY_H2[1] c_dY_H2[2] c_dY_H2[3]
+variable dY_H2_1 equal f_dY_H2_Output[1]
+variable dY_H2_2 equal f_dY_H2_Output[2]
+variable dY_H2_3 equal f_dY_H2_Output[3]
+
+compute xA_CO ore reduce ave f_X_CO
+fix     molarFractionA_CO ore ave/time ${Nevery} ${Nrepeat} ${WI} c_xA_CO
+variable xA_CO_1 equal f_molarFractionA_CO
+
+compute xA_H2 ore reduce ave f_X_H2
+fix     molarFractionA_H2 ore ave/time ${Nevery} ${Nrepeat} ${WI} c_xA_H2
+variable xA_H2_1 equal f_molarFractionA_H2
+
+compute xC_CO2 ore reduce ave f_X_CO2
+fix     molarFractionC_CO2 ore ave/time ${Nevery} ${Nrepeat} ${WI} c_xC_CO2
+variable xC_CO2_1 equal f_molarFractionC_CO2
+
+compute xC_H2O ore reduce ave f_X_H2O
+fix     molarFractionC_H2O ore ave/time ${Nevery} ${Nrepeat} ${WI} c_xC_H2O
+variable xC_H2O_1 equal f_molarFractionC_H2O
+
+fix printMassLayer all print ${WI} "${time} ${mL1} ${mL2} ${mL3} ${mL4}" &
+    file ../DEM/post/MassLayers.dat title "#time mL_Fe mL_w mL_m mL_h"
+
+fix printdmYLayer all print ${WI} "${time} ${dY_CO_1} ${dY_CO_2} ${dY_CO_3} ${dY_H2_1} ${dY_H2_2} ${dY_H2_3}" &
+    file ../DEM/post/dmY.dat title "#time dY_CO_1 dY_CO_2 dY_CO_3 dY_H2_1 dY_H2_2 dY_H2_3" screen no
+
+fix molarFractions all print ${WI} "${time} ${xA_CO_1} ${xA_H2_1} ${xC_CO2_1} ${xC_H2O_1}" &
+    file ../DEM/post/molarFractions.dat title "#time x_CO x_H2 x_CO2 x_H2O" screen no
+
+################################################################################
+# compute effective diffusivity
+compute effDiffBinary_red_CO ore reduce ave f_effDiffBinary_cfd5[1] f_effDiffBinary_cfd5[2] f_effDiffBinary_cfd5[3]
+fix     effDiffBinary1 ore ave/time ${Nevery} ${Nrepeat} ${WI} c_effDiffBinary_red_CO[1] c_effDiffBinary_red_CO[2] c_effDiffBinary_red_CO[3]
+variable dij_CO_1 equal f_effDiffBinary1[1]
+variable dij_CO_2 equal f_effDiffBinary1[2]
+variable dij_CO_3 equal f_effDiffBinary1[3]
+
+compute effDiffBinary_red_H2 ore reduce ave f_effDiffBinary_cfd6[1] f_effDiffBinary_cfd6[2] f_effDiffBinary_cfd6[3]
+fix     effDiffBinary2 ore ave/time ${Nevery} ${Nrepeat} ${WI} c_effDiffBinary_red_H2[1] c_effDiffBinary_red_H2[2] c_effDiffBinary_red_H2[3]
+variable dij_H2_1 equal f_effDiffBinary2[1]
+variable dij_H2_2 equal f_effDiffBinary2[2]
+variable dij_H2_3 equal f_effDiffBinary2[3]
+
+compute effDiffKnud_red_CO ore reduce ave f_effDiffKnud_cfd5[1] f_effDiffKnud_cfd5[2] f_effDiffKnud_cfd5[3]
+fix     effDiffKnud1 ore ave/time ${Nevery} ${Nrepeat} ${WI} c_effDiffKnud_red_CO[1] c_effDiffKnud_red_CO[2] c_effDiffKnud_red_CO[3]
+variable dik_CO_1 equal f_effDiffKnud1[1]
+variable dik_CO_2 equal f_effDiffKnud1[2]
+variable dik_CO_3 equal f_effDiffKnud1[3]
+
+compute effDiffKnud_red_H2 ore reduce ave f_effDiffKnud_cfd6[1] f_effDiffKnud_cfd6[2] f_effDiffKnud_cfd6[3]
+fix     effDiffKnud2 ore ave/time ${Nevery} ${Nrepeat} ${WI} c_effDiffKnud_red_H2[1] c_effDiffKnud_red_H2[2] c_effDiffKnud_red_H2[3]
+variable dik_H2_1 equal f_effDiffKnud2[1]
+variable dik_H2_2 equal f_effDiffKnud2[2]
+variable dik_H2_3 equal f_effDiffKnud2[3]
+
+fix printDiffTerms all print ${WI} "${time} ${dij_CO_1} ${dij_CO_2} ${dij_CO_3} ${dij_H2_1} ${dij_H2_2} ${dij_H2_3} ${dik_CO_1} ${dik_CO_2} ${dik_CO_3} ${dik_H2_1} ${dik_H2_2} ${dik_H2_3}" &
+    file ../DEM/post/DiffTerm.dat title "#time dij_CO_1 dij_CO_2 dij_CO_3 dij_H2_1 dij_H2_2 dij_H2_3 dik_CO_1 dik_CO_2 dik_CO_3 dik_H2_1 dik_H2_2 dik_H2_3" screen no
+
+################################################################################
+# compute relative layer radii
+# d1
+compute layerRad_d1 d1 reduce ave f_LayerRelRadii[1] f_LayerRelRadii[2] f_LayerRelRadii[3] f_LayerRelRadii[4]
+fix     layerRad_d1 d1 ave/time ${Nevery} ${Nrepeat} ${WI} c_layerRad_d1[1] c_layerRad_d1[2] c_layerRad_d1[3] c_layerRad_d1[4]
+variable rr1_d1 equal f_layerRad_d1[1]
+variable rr2_d1 equal f_layerRad_d1[2]
+variable rr3_d1 equal f_layerRad_d1[3]
+variable rr4_d1 equal f_layerRad_d1[4]
+
+fix printRelRadiid1 all print ${WI} "${time} ${rr1_d1} ${rr2_d1} ${rr3_d1} ${rr4_d1}" &
+    file ../DEM/post/relRadii_d1.dat title "#time relRad_d1_1 relRad_d1_2 relRad_d1_3 relRad_d1_4" screen no
+
+# d2
+compute layerRad_d2 d2 reduce ave f_LayerRelRadii[1] f_LayerRelRadii[2] f_LayerRelRadii[3] f_LayerRelRadii[4]
+fix     layerRad_d2 d2 ave/time ${Nevery} ${Nrepeat} ${WI} c_layerRad_d2[1] c_layerRad_d2[2] c_layerRad_d2[3] c_layerRad_d2[4]
+variable rr1_d2 equal f_layerRad_d2[1]
+variable rr2_d2 equal f_layerRad_d2[2]
+variable rr3_d2 equal f_layerRad_d2[3]
+variable rr4_d2 equal f_layerRad_d2[4]
+
+fix printRelRadiid2 all print ${WI} "${time} ${rr1_d2} ${rr2_d2} ${rr3_d2} ${rr4_d2}" &
+    file ../DEM/post/relRadii_d2.dat title "#time relRad_d2_1 relRad_d2_2 relRad_d2_3 relRad_d2_4" screen no
+
+#d3
+compute layerRad_d3 d3 reduce ave f_LayerRelRadii[1] f_LayerRelRadii[2] f_LayerRelRadii[3] f_LayerRelRadii[4]
+fix     layerRad_d3 d3 ave/time ${Nevery} ${Nrepeat} ${WI} c_layerRad_d3[1] c_layerRad_d3[2] c_layerRad_d3[3] c_layerRad_d3[4]
+variable rr1_d3 equal f_layerRad_d3[1]
+variable rr2_d3 equal f_layerRad_d3[2]
+variable rr3_d3 equal f_layerRad_d3[3]
+variable rr4_d3 equal f_layerRad_d3[4]
+
+fix printRelRadiid3 all print ${WI} "${time} ${rr1_d3} ${rr2_d3} ${rr3_d3} ${rr4_d3}" &
+    file ../DEM/post/relRadii_d3.dat title "#time relRad_d3_1 relRad_d3_2 relRad_d3_3 relRad_d3_4" screen no
+
+# d4
+compute layerRad_d4 d4 reduce ave f_LayerRelRadii[1] f_LayerRelRadii[2] f_LayerRelRadii[3] f_LayerRelRadii[4]
+fix     layerRad_d4 d4 ave/time ${Nevery} ${Nrepeat} ${WI} c_layerRad_d4[1] c_layerRad_d4[2] c_layerRad_d4[3] c_layerRad_d4[4]
+variable rr1_d4 equal f_layerRad_d4[1]
+variable rr2_d4 equal f_layerRad_d4[2]
+variable rr3_d4 equal f_layerRad_d4[3]
+variable rr4_d4 equal f_layerRad_d4[4]
+
+fix printRelRadiid4 all print ${WI} "${time} ${rr1_d4} ${rr2_d4} ${rr3_d4} ${rr4_d4}" &
+    file ../DEM/post/relRadii_d4.dat title "#time relRad_d4_1 relRad_d4_2 relRad_d4_3 relRad_d4_4" screen no
+
+# mass-based averages of all diameters
+variable rr1_ave equal 0.154*v_rr1_d1+0.332*v_rr1_d2+0.286*v_rr1_d3+0.228*v_rr1_d4
+variable rr2_ave equal 0.154*v_rr2_d1+0.332*v_rr2_d2+0.286*v_rr2_d3+0.228*v_rr2_d4
+variable rr3_ave equal 0.154*v_rr3_d1+0.332*v_rr3_d2+0.286*v_rr3_d3+0.228*v_rr3_d4
+variable rr4_ave equal 0.154*v_rr4_d1+0.332*v_rr4_d2+0.286*v_rr4_d3+0.228*v_rr4_d4
+
+fix printRelRadiiAve all print ${WI} "${time} ${rr1_ave} ${rr2_ave} ${rr3_ave} ${rr4_ave}" &
+    file ../DEM/post/relRadiiAve.dat title "#time relRad_1 relRad_2 relRad_3 relRad_4" screen no
+
+

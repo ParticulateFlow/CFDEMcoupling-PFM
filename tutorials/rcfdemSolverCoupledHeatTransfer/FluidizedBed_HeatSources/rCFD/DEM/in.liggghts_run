@@ -39,7 +39,6 @@ variable rfPW2		equal	0.1
 variable Tpart equal 330
 
 variable dt equal 0.0025
-#0.001
 variable skin equal 0.0005
 ###############################################
 
@@ -59,11 +58,7 @@ group           empty subtract all all
 atom_modify first empty
 
 neighbor	${skin} bin
-#neigh_modify	delay 10 include empty
-
-
-#neighbor	${skin} bin
-neigh_modify	delay 0
+neigh_modify	delay 0 no_build yes
 
 #Material properties required for new pair styles
 
@@ -116,12 +111,8 @@ variable Tave equal v_sumT1/v_np
 
 fix printheat all print 10 "${time} ${Tave}" file ../DEM/temp_ave.txt title "#time   T_ave"
 
-#fix tdist1 all ave/histo 1000 1 1000 324 380 56 f_Temp[0] mode vector file ../DEM/temp_histo.txt title1 "Particle temperatures [K]"
-#fix tdist2 all ave/histo 1000 1 1000 324 380 448 f_Temp[0] mode vector file ../DEM/temp_histo_fine.txt title1 "Particle temperatures [K]"
-
 fix tdist1 all ave/histo 400 1 400 324 380 56 f_Temp[0] mode vector file ../DEM/temp_histo.txt title1 "Particle temperatures [K]"
 fix tdist2 all ave/histo 400 1 400 324 380 448 f_Temp[0] mode vector file ../DEM/temp_histo_fine.txt title1 "Particle temperatures [K]"
-
 
 fix		integr all nve/sphere
 
@@ -136,5 +127,5 @@ dump		dmp all custom/vtk 10000 ../DEM/post/dump*.liggghts_coupled.vtk id type x 
 run	1
 set         region total property/atom Temp ${Tpart}
 
-# for one-2-one communication
-#neigh_modify delay 0 no_build yes
+# heat sources are already set in the restart file; if they would not have been - or if restarting in a different way -, set them now
+#set region insReg property/atom heatSource 3.3379e-04 # = V_p x \dot{q}

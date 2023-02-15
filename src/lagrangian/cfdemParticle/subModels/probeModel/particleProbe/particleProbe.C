@@ -219,7 +219,7 @@ void particleProbe::writeProbe(int index, Field<scalar> sValues, Field<vector> v
         *sPtr << setprecision(writePrecision_);
         forAll(vValues, iter)
         {
-            // if(!probeDebug_ && iter>0) break;
+            if(!probeDebug_ && iter>0) break;
             *sPtr << vValues[iter][0] << "   ";
             *sPtr << vValues[iter][1] << "   ";
             *sPtr << vValues[iter][2] << "   ";

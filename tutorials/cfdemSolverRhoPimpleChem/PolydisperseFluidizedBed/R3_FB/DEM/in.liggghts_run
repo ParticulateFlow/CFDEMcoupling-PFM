@@ -1,0 +1,114 @@
+################################################################################
+# brief: chemistry in fluidized bed - reduce Fe2O3 to Fe3O4 at 753 K (480 C)   #
+#                                                                              #
+# Cf. M.E. Kinaci,T. Lichtenegger,S. Schneiderbauer, Chem. Eng. Sci. 227 (2020)#
+# Note that the reaction rate is scaled x10 and the reaction point R3 has been #
+# shifted from 0.434 to 0.516 (cf. mass fractions in CFD setup)                #
+#                                                                              #
+# authors: D. Queteschiner                                                     #
+# date: Mar 2022                                                               #
+# copyright: 2022- JKU Linz                                                    #
+################################################################################
+
+log         ../DEM/log.liggghts
+thermo_log  ../DEM/post/thermo.txt
+
+variable rate_scale equal 10.0
+variable cg equal 7.0
+coarsegraining  ${cg} model_check error
+
+atom_style  granular
+atom_modify map array
+communicate single vel yes
+
+boundary    f f f
+newton      off
+
+units       si
+processors  2 * 2
+
+# read the restart file
+read_restart    ../DEM/post/restart/liggghts.restart
+
+neighbor        1e-4 bin
+neigh_modify    delay 0
+
+# material properties for granular pair styles
+fix m1 all property/global youngsModulus peratomtype 5.e6 5.e6
+fix m2 all property/global poissonsRatio peratomtype 0.45 0.45
+fix m3 all property/global coefficientRestitution peratomtypepair 2 0.3 0.3 0.3 0.3
+fix m4 all property/global coefficientFriction peratomtypepair 2 0.5 0.5 0.5 0.5
+
+# pair style
+pair_style  gran model hertz tangential history
+pair_coeff  * *
+
+# timestep, gravity
+timestep    0.000005
+fix         gravi all gravity 9.81 vector 0.0 -1.0 0.0
+
+# walls
+fix zwalls1  all wall/gran model hertz tangential history primitive type 1 yplane 0.00
+fix zwalls2  all wall/gran model hertz tangential history primitive type 1 yplane 0.15
+fix cylwalls all wall/gran model hertz tangential history primitive type 1 ycylinder 0.034 0.0 0.0
+
+# thermal properties
+fix ftco all property/global thermalConductivity peratomtype 1.4 3.0 # [W/(K*m)]
+fix ftca all property/global thermalCapacity peratomtype 1000 800    # [J/(kg*K)]
+
+fix integr all nve/sphere
+
+# re-create groups
+group   ore type 1
+group   quartz type 2
+
+################################################################################
+# cfd coupling
+fix cfd   all couple/cfd couple_every 50 mpi
+fix cfd2  all couple/cfd/force
+# transfer per-particle temperature and add convective heat flux
+fix tconv all couple/cfd/convection T0 753
+
+################################################################################
+# invoke chemistry coupling
+fix cfd3 ore couple/cfd/chemistry n_species 5 species_names H2 H2O CO CO2 N2 n_diff 2 diffusant_names CO H2
+
+# activate for 3-layer unreacted core shrink model
+fix cfd5 ore chem/shrink/core speciesA CO molMassA 0.02801 speciesC CO2 molMassC 0.04401 scale_reduction_rate ${rate_scale}
+fix cfd6 ore chem/shrink/core speciesA H2 molMassA 0.00202 speciesC H2O molMassC 0.01801 scale_reduction_rate ${rate_scale}
+
+# material properties for chemical reaction
+fix k0_CO ore property/global k0_cfd5 vector 17 25 2700
+fix Ea_CO ore property/global Ea_cfd5 vector 100000 73674 113859
+
+fix k0_H2 ore property/global k0_cfd6 vector 17 23 160
+fix Ea_H2 ore property/global Ea_cfd6 vector 85000 71162 92092
+
+# particle parameters
+fix porosity        ore property/global porosity_ore        vector 0.613 0.318 0.187 0.17
+fix tortuosity      ore property/global tortuosity_ore      scalar 3
+fix pore_diameter   ore property/global pore_diameter_ore   scalar 1.e-6
+fix layerDensities  ore property/global density_ore         vector 7870. 5740. 5170. 5240.
+
+# define initial relative layer radii
+fix LayerRelRadii   ore property/atom relRadii vector yes no no 1.0 0.999 0.998 0.997
+
+################################################################################
+# write data to files for post-processing
+
+variable WI equal 100000
+
+include ../DEM/in.liggghts_compute_output
+
+################################################################################
+# screen output
+thermo_style    custom step atoms ke
+thermo          250
+thermo_modify   lost ignore norm no
+compute_modify  thermo_temp dynamic yes
+
+dump dmp all custom ${WI} ../DEM/post/dump*.liggghts_run id type x y z vx vy vz &
+     fx fy fz radius mass f_fracRed[1] f_fracRed[2] f_fracRed[3]
+
+run 1
+

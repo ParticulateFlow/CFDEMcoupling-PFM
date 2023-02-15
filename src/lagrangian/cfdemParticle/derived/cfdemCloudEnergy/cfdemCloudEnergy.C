@@ -274,6 +274,8 @@ bool cfdemCloudEnergy::evolve
 
 void cfdemCloudEnergy::postFlow()
 {
+    if (ignore()) return;
+
     cfdemCloud::postFlow();
     forAll(energyModel_, modeli)
     {
@@ -282,18 +284,6 @@ void cfdemCloudEnergy::postFlow()
     forAll(massTransferModel_, modeli)
     {
         massTransferModel_[modeli].postFlow();
-    }
-}
-
-void cfdemCloudEnergy::solve()
-{
-    forAll(energyModel_, modeli)
-    {
-        energyModel_[modeli].solve();
-    }
-    forAll(massTransferModel_, modeli)
-    {
-        massTransferModel_[modeli].solve();
     }
 }
 

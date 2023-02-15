@@ -31,6 +31,14 @@ dumpIndexDisplacementIncrement 8000;
 
 dumpIndexInputIncrement 4000;
 
+posIndex 0;
+
+posX 1;
+
+posY 2;
+
+posZ 3;
+
 nNeighMin 3;
 
 timePerDisplacementStep 0.1;

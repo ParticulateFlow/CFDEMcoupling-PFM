@@ -59,7 +59,7 @@ if [ $cleanUp == "true" ]
     cleanCase
     rm -r $casePath/CFD/clockData
     rm -r $casePath/DEM/post/*
-    (cd $casePath/DEM/post && touch dummy)
+    touch $casePath/DEM/post/.gitignore
     echo "done"
 fi
 

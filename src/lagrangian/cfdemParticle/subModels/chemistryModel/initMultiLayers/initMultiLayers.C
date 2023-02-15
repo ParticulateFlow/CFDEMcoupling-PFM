@@ -57,8 +57,10 @@ initMultiLayers::initMultiLayers
     mesh_(sm.mesh()),
     verbose_(propsDict_.lookupOrDefault<bool>("verbose",false)),
     maxNumLayers_(0),
+    maxNumParticlesPerType_(propsDict_.lookupOrDefault<label>("maxNumParticlesPerType",1000000)),
     numLayers_(propsDict_.lookupOrDefault<labelList>("numLayers",labelList(1,-1))),
     partTypes_(propsDict_.lookupOrDefault<labelList>("partTypes",labelList(1,-1))),
+    searchLayers_(propsDict_.lookupOrDefault<labelList>("searchLayers",labelList(1,-1))),
     relRadiiRegName_(typeName + "relRadii"),
     filepath_(string(propsDict_.lookup("filepath"))),
     initialized_(false)
@@ -107,7 +109,7 @@ bool initMultiLayers::init()
         }
         Info << "\nReading" << endl;
         Info << "\t" << filename << endl;
-        readDump(filename, type, indices, positions, relradii);
+        label numLines = readDump(filename, type, indices, positions, relradii);
 
         Info << "Binning particle displacements on mesh for type " << type << endl;
 
@@ -144,7 +146,7 @@ bool initMultiLayers::init()
         );
 
         label cellI = -1;
-        for (label lineI = 0; lineI < indices.size(); lineI++)
+        for (label lineI = 0; lineI < numLines; lineI++)
         {
             position = positions[lineI];
             relrad = relradii[lineI];
@@ -178,8 +180,8 @@ bool initMultiLayers::init()
             if(cellK >= 0 && partType == type)
             {
                 // look for the nearest occupied cell
-                cellKoccupied = findNearestCellWithValue(cellK, particlesInCell);
                 listIndex = getListIndex(partType);
+                cellKoccupied = findNearestCellWithValue(cellK, particlesInCell,searchLayers_[listIndex]);
                 if (cellKoccupied >= 0)
                 {
                     relRadiiLoopVar = relRadiiField[cellKoccupied];
@@ -215,7 +217,7 @@ void initMultiLayers::execute()
     }
 }
 
-label initMultiLayers::findNearestCellWithValue(label refCell, volScalarField &particlesInCell) const
+label initMultiLayers::findNearestCellWithValue(label refCell, volScalarField &particlesInCell, label searchLayers) const
 {
     if (particlesInCell[refCell] > 0.5) return refCell;
 
@@ -225,6 +227,8 @@ label initMultiLayers::findNearestCellWithValue(label refCell, volScalarField &p
 
     neighbors.insert(refCell);
     recentNeighbors.insert(refCell);
+
+    label layersSearched = 0;
 
     while(true)
     {
@@ -250,6 +254,8 @@ label initMultiLayers::findNearestCellWithValue(label refCell, volScalarField &p
         recentNeighbors.clear();
         recentNeighbors = newNeighbors;
         newNeighbors.clear();
+        layersSearched++;
+        if (layersSearched >= searchLayers && searchLayers > 0) return -1;
     }
 }
 
@@ -264,7 +270,7 @@ label initMultiLayers::getListIndex(label testElement) const
     return -1;
 }
 
-void initMultiLayers::readDump(std::string filename, label type, labelList &indices, vectorList &positions, vectorList &relradii)
+label initMultiLayers::readDump(std::string filename, label type, labelList &indices, vectorList &positions, vectorList &relradii)
 {
     #include <fstream>
 
@@ -281,6 +287,10 @@ void initMultiLayers::readDump(std::string filename, label type, labelList &indi
     positions.clear();
     relradii.clear();
 
+    indices.setSize(maxNumParticlesPerType_);
+    positions.setSize(maxNumParticlesPerType_);
+    relradii.setSize(maxNumParticlesPerType_);
+
     std::ifstream file(filename);
     std::string str;
     while (std::getline(file, str))
@@ -292,12 +302,17 @@ void initMultiLayers::readDump(std::string filename, label type, labelList &indi
             {
                 FatalError<< "Particle of type " << partType << " detected in " << filename << abort(FatalError);
             }
-            indices.append(partIndex);
-            positions.append(vector(x,y,z));
-            relradii.append(vector(r1,r2,r3));
+
+            indices[lineCounter-leadingLines] = partIndex;
+            positions[lineCounter-leadingLines] = vector(x,y,z);
+            relradii[lineCounter-leadingLines] = vector(r1,r2,r3);
         }
         lineCounter++;
+        if (lineCounter == maxNumParticlesPerType_) break;
     }
+
+    label readLines = lineCounter - leadingLines;
+    return readLines;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

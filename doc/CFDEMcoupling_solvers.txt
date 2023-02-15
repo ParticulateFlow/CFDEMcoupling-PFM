@@ -10,6 +10,7 @@
 This section lists all CFDEMcoupling solvers alphabetically.
 
 "cfdemSolverIB"_cfdemSolverIB.html,
+"cfdemSolverIBContinuousForcing"_cfdemSolverIBContinuousForcing.html,
 "cfdemSolverMultiphase"_cfdemSolverMultiphase.html,
 "cfdemSolverMultiphaseScalar"_cfdemSolverMultiphaseScalar.html,
 "cfdemSolverPiso"_cfdemSolverPiso.html,

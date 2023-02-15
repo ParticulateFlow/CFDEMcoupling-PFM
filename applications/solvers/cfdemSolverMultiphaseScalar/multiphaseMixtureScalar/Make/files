@@ -1,0 +1,5 @@
+phase/phase.C
+alphaContactAngle/alphaContactAngleFvPatchScalarField.C
+multiphaseMixtureScalar.C
+
+LIB = $(CFDEM_LIB_DIR)/libcfdemMultiphaseInterFoamScalar

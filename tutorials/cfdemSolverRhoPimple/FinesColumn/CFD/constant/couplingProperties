@@ -173,6 +173,9 @@ FinesFieldsProps
     poresizeWidth 0.2;
     verbose true;
     diffCoeff 0.005;
+    tauRelease 0.1;
+    depositionLength 0.1;
+    kineticClogging true;
 }
 
 gravityProps

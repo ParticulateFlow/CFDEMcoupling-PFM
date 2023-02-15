@@ -103,7 +103,6 @@ interface::~interface()
 
 void interface::setForce() const
 {
-Info << "interface::setForce" << endl;
     for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
     {
         //if(mask[index][0])
@@ -193,7 +192,6 @@ Info << "interface::setForce" << endl;
             } // end if particle found on proc domain
         //}// end if in mask
     }// end loop particles
-Info << "interface::setForce - done" << endl;
 }
 
 

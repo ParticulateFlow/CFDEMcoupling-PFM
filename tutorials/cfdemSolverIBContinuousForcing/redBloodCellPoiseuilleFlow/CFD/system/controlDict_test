@@ -1,0 +1,121 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  6
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+application     pisoFoam;
+
+startFrom       latestTime;
+
+startTime       0;
+
+stopAt          endTime;
+
+endTime         50000;
+
+deltaT          10;
+
+writeControl    adjustableRunTime;
+
+writeInterval   10000;
+
+purgeWrite      0;
+
+writeFormat     ascii;
+
+writePrecision  6;
+
+writeCompression uncompressed;
+
+timeFormat      general;
+
+timePrecision   6;
+
+runTimeModifiable yes;
+
+adjustTimeStep  no;
+
+maxCo           1.0;
+
+maxDeltaT       10;
+
+
+// ************************************************************************* //
+DimensionedConstants
+{
+    unitSet	micro; // SI;
+
+    SICoeffs
+    {
+        universal
+        {
+            c               c [ 0 1 -1 0 0 0 0 ] 2.99792e+08;
+            G               G [ -1 3 -2 0 0 0 0 ] 6.67429e-11;
+            h               h [ 1 2 -1 0 0 0 0 ] 6.62607e-34;
+        }
+        electromagnetic
+        {
+            e               e [ 0 0 1 0 0 1 0 ] 1.60218e-19;
+        }
+        atomic
+        {
+            me              me [ 1 0 0 0 0 0 0 ] 9.10938e-31;
+            mp              mp [ 1 0 0 0 0 0 0 ] 1.67262e-27;
+        }
+        physicoChemical
+        {
+            mu              mu [ 1 0 0 0 0 0 0 ] 1.66054e-27;
+            k               k [ 1 2 -2 -1 0 0 0 ] 1.38065e-23;
+        }
+        standard
+        {
+            //- Standard pressure [Pa]
+            Pstd            Pstd [ 1 -1 -2 0 0 0 0 ] 100000;
+            //- Standard temperature [degK]
+            Tstd            Tstd [ 0 0 0 1 0 0 0 ] 298.15;
+        }
+    }
+
+    microCoeffs
+    {
+        universal
+        {
+            c               c [ 0 1 -1 0 0 0 0 ] 2.99792e+08;
+            G               G [ -1 3 -2 0 0 0 0 ] 6.67429e-20;
+            h               h [ 1 2 -1 0 0 0 0 ] 6.62607e-13;
+        }
+        electromagnetic
+        {
+            e               e [ 0 0 1 0 0 1 0 ] 1.60218e-19;
+        }
+        atomic
+        {
+            me              me [ 1 0 0 0 0 0 0 ] 9.10938e-16;
+            mp              mp [ 1 0 0 0 0 0 0 ] 1.67262e-12;
+        }
+        physicoChemical
+        {
+            mu              mu [ 1 0 0 0 0 0 0 ] 1.66054e-12;
+            k               k [ 1 2 -2 -1 0 0 0 ] 1.38065e-23;
+        }
+        standard
+        {
+            //- Standard pressure [Pa]
+            Pstd            Pstd [ 1 -1 -2 0 0 0 0 ] 100000;
+            //- Standard temperature [degK]
+            Tstd            Tstd [ 0 0 0 1 0 0 0 ] 298.15;
+        }
+    }
+}
