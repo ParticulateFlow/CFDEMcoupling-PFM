@@ -169,8 +169,6 @@ void reactantPerParticle::execute()
 
     // give DEM data
     particleCloud_.dataExchangeM().giveData(partReactantName_, "scalar-atom", reactantPerParticle_);
-
-    Info << "give data done" << endl;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

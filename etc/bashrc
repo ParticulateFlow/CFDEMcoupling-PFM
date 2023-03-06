@@ -17,7 +17,7 @@
 #------------------------------------------------------------------------------
 
 export CFDEM_PROJECT=CFDEM
-export CFDEM_VERSION=21.11
+export CFDEM_VERSION=23.02
 
 ################################################################################
 # USER EDITABLE PART: Changes made here may be lost with the next upgrade

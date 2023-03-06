@@ -1,5 +1,5 @@
 ################################################################################
-# brief: chemistry in fluidized bed - reduce FeO to Fe at 993 K (720 °C)       #
+# brief: chemistry in fluidized bed - reduce FeO to Fe at 993 K (720 C)        #
 #                                                                              #
 # Cf. M.E. Kinaci,T. Lichtenegger,S. Schneiderbauer, Chem. Eng. Sci. 227 (2020)#
 # Note that reaction rate is scaled x10                                        #
