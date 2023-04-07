@@ -98,7 +98,7 @@ run 1
 dump dmp all custom/vtk 5000 post/liggghts_init_*.vtk id type x y z vx vy vz &
      fx fy fz omegax omegay omegaz radius
 
-# run up to 160000 time steps (0.8s)
+# run up to 200000 time steps (0.8s)
 run 200000 upto
 
 # write the restart file
