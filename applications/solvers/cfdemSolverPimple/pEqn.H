@@ -1,10 +1,10 @@
-volScalarField rUAvoidfraction("(voidfraction2|A(U))",rUA*voidfraction);
+volScalarField rAUvoidfraction("(voidfraction2|A(U))",rAU*voidfraction);
 
-surfaceScalarField rUAfvoidfraction("(voidfraction2|A(U)F)", fvc::interpolate(rUAvoidfraction));
+surfaceScalarField rAUfvoidfraction("(voidfraction2|A(U)F)", fvc::interpolate(rAUvoidfraction));
 
 volVectorField HbyA("HbyA", U);
 
-HbyA = rUA*UEqn.H();
+HbyA = rAU*UEqn.H();
 
 phi = voidfractionf*phiByVoidfraction;
 
@@ -14,27 +14,27 @@ surfaceScalarField phiHbyA
 	(
 	    (fvc::interpolate(HbyA) & mesh.Sf() )
 	    + phicForces                               //explicit contribution
-	    + rUAfvoidfraction*fvc::ddtCorr(U, phiByVoidfraction) //correction
+	    + rAUfvoidfraction*fvc::ddtCorr(U, phiByVoidfraction) //correction
 	)
 );
 
 if (modelType=="A")
-    rUAvoidfraction = volScalarField("(voidfraction2|A(U))",rUA*voidfraction*voidfraction);
+    rAUvoidfraction = volScalarField("(voidfraction2|A(U))",rAU*voidfraction*voidfraction);
     
 // Update the fixedFluxPressure BCs to ensure flux consistency
 if (modelType=="A")
 {
-	volScalarField rUsed = rUA*voidfraction;
+	volScalarField rUsed = rAU*voidfraction;
 	constrainPressure(p, U, phiHbyA, rUsed,MRF);
 }
-else constrainPressure(p, U, phiHbyA, rUA,MRF);
+else constrainPressure(p, U, phiHbyA, rAU,MRF);
 
 while (pimple.correctNonOrthogonal())
 {
     // Pressure corrector
     fvScalarMatrix pEqn
     (
-        fvm::laplacian(rUAvoidfraction, p) == fvc::div(voidfractionf*phiHbyA) + particleCloud.ddtVoidfraction()
+        fvm::laplacian(rAUvoidfraction, p) == fvc::div(voidfractionf*phiHbyA) + particleCloud.ddtVoidfraction()
     );
     pEqn.setReference(pRefCell, pRefValue);
     
@@ -51,7 +51,7 @@ while (pimple.correctNonOrthogonal())
 	    p.relax();
 
 	    U = fvc::reconstruct(phiHbyA)
-	      - rUA*fvc::reconstruct(pEqn.flux()/voidfractionf/rUAf);
+	      - rAU*fvc::reconstruct(pEqn.flux()/voidfractionf/rAUf);
 
 	    U.correctBoundaryConditions();
 	    fvOptions.correct(U);

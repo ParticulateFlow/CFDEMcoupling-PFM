@@ -16,25 +16,25 @@ UEqn.relax();
 
 fvOptions.constrain(UEqn);
 
-volScalarField rUA = 1.0/UEqn.A();
+volScalarField rAU = 1.0/UEqn.A();
 
-surfaceScalarField rUAf("(1|A(U))", fvc::interpolate(rUA));
+surfaceScalarField rAUf("(1|A(U))", fvc::interpolate(rAU));
 
 surfaceScalarField voidfractionf = fvc::interpolate(voidfraction);
 
 surfaceScalarField phicForces
 (
-    fvc::interpolate(rUA*(Ksl*Us)/rho) & mesh.Sf()
+    fvc::interpolate(rAU*(Ksl*Us)/rho) & mesh.Sf()
 );
 
 if (pimple.momentumPredictor() && (modelType=="B" || modelType=="Bfull"))
 {
-    solve(UEqn == fvc::reconstruct(phicForces/rUAf - fvc::snGrad(p)*mesh.magSf()));
+    solve(UEqn == fvc::reconstruct(phicForces/rAUf - fvc::snGrad(p)*mesh.magSf()));
     fvOptions.correct(U);
 }
 else if (pimple.momentumPredictor())
 {
-    solve(UEqn == fvc::reconstruct(phicForces/rUAf - fvc::snGrad(p)*voidfractionf*mesh.magSf()));
+    solve(UEqn == fvc::reconstruct(phicForces/rAUf - fvc::snGrad(p)*voidfractionf*mesh.magSf()));
     fvOptions.correct(U);
 }
 
