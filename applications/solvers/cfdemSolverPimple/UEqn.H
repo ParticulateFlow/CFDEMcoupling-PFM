@@ -3,7 +3,7 @@ particleCloud.otherForces(fOther);
 tmp<fvVectorMatrix> tUEqn
 (
     fvm::ddt(voidfraction,U) - fvm::Sp(fvc::ddt(voidfraction),U)
-  + fvm::div(phi,U) - fvm::Sp(fvc::div(phi),U) 
+  + fvm::div(phi,U) - fvm::Sp(fvc::div(phi),U)
   - fOther/rho
   ==
     fvOptions(U)
@@ -24,7 +24,7 @@ surfaceScalarField voidfractionf = fvc::interpolate(voidfraction);
 
 surfaceScalarField phicForces
 (
-	fvc::interpolate(rUA*(Ksl*Us)/rho) & mesh.Sf()
+    fvc::interpolate(rUA*(Ksl*Us)/rho) & mesh.Sf()
 );
 
 if (pimple.momentumPredictor() && (modelType=="B" || modelType=="Bfull"))

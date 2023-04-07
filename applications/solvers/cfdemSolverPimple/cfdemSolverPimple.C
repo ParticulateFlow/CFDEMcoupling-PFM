@@ -32,6 +32,7 @@ Description
     Turbulence modelling is generic, i.e. laminar, RAS or LES may be selected.
     The code is an evolution of the solver pimpleFoam in OpenFOAM(R) 6.0,
     where additional functionality for CFD-DEM coupling is added.
+
 \*---------------------------------------------------------------------------*/
 
 #include "fvCFD.H"
@@ -104,7 +105,7 @@ int main(int argc, char *argv[])
             while (pimple.loop())
             {
                 // Momentum predictor
-                 #include "UEqn.H"
+                #include "UEqn.H"
 
                 // --- Inner PIMPLE loop
 
@@ -123,7 +124,7 @@ int main(int argc, char *argv[])
         }
 
         runTime.write();
-        
+
         Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
             << "  ClockTime = " << runTime.elapsedClockTime() << " s"
             << nl << endl;

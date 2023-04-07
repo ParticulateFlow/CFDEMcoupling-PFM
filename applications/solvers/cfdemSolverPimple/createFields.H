@@ -1,7 +1,7 @@
 //===============================
 // Fluid Fields
-//===============================      
-   
+//===============================
+
    Info<< "Reading field p\n" << endl;
     volScalarField p
     (
@@ -110,34 +110,34 @@
 
 #ifndef createPhi_H
 #define createPhi_H
-Info<< "Reading/calculating face flux field phi\n" << endl;
-surfaceScalarField phi
-(
-    IOobject
+    Info<< "Reading/calculating face flux field phi\n" << endl;
+    surfaceScalarField phi
     (
-        "phi",
-        runTime.timeName(),
-         mesh,
-        IOobject::READ_IF_PRESENT,
-        IOobject::AUTO_WRITE
-    ),
-    linearInterpolate(U*voidfraction) & mesh.Sf()
-);
+        IOobject
+        (
+            "phi",
+            runTime.timeName(),
+             mesh,
+            IOobject::READ_IF_PRESENT,
+            IOobject::AUTO_WRITE
+        ),
+        linearInterpolate(U*voidfraction) & mesh.Sf()
+    );
 #endif
 
- Info<< "Generating interstitial flux field phiByVoidfraction (this is the INTERSTITIAL field!)\n" << endl;
- surfaceScalarField phiByVoidfraction
- (
-     IOobject
-     (
-        "phiByVoidfraction",
-        runTime.timeName(),
-        mesh,
-        IOobject::NO_READ,
-        IOobject::NO_WRITE
-     ),
-     linearInterpolate(U) & mesh.Sf()
- );
+    Info<< "Generating interstitial(!) flux field phiByVoidfraction\n" << endl;
+    surfaceScalarField phiByVoidfraction
+    (
+        IOobject
+        (
+            "phiByVoidfraction",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        linearInterpolate(U) & mesh.Sf()
+    );
 
 
     label pRefCell = 0;
