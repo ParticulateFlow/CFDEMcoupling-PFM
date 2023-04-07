@@ -27,10 +27,10 @@ boundaryField
 
     inlet
     {
-       type            interstitialInletVelocity;
-        inletVelocity      uniform (0 0 0.9);
-        alpha              voidfraction;
-        value              $internalField;
+        type            interstitialInletVelocity;
+        inletVelocity   uniform (0 0 0.9);
+        alpha           voidfraction;
+        value           $internalField;
     }
 
     outlet

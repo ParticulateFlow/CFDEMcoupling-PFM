@@ -64,7 +64,7 @@ functions
                  mean        on;
                  prime2Mean  off;
                  base        time;
-		 window      18.0;
+                 window      18.0;
             }
 
 
@@ -73,17 +73,17 @@ functions
                  mean        on;
                  prime2Mean  off;
                  base        time;
-		 window      18.0;
+                 window      18.0;
             }
-            
+
             p
             {
                  mean        on;
                  prime2Mean  off;
                  base        time;
-		 window      18.0;
+                 window      18.0;
             }
-         );   
-       }      
+         );
+       }
 }
 // ************************************************************************* //
