@@ -42,6 +42,17 @@ Info<< "Reading thermophysical properties\n" << endl;
 
     Info<< "inert will be bounded in [" << inertLowerBound << "," << inertUpperBound << "]" << endl;
 
+    #include "OFstream.H"
+    OFstream Hf("Hf");
+    Hf << "# species  Hf (J/kg)" << endl;
+    Info << "\nspecies-specific heat of formation (J/kg):" << endl;
+    forAll(composition.species(),i)
+    {
+        Info << composition.species()[i] << " " <<  composition.Hc(i) << endl;
+        Hf << composition.species()[i] << " " <<  composition.Hc(i) << endl;
+    }
+    Info << "\n" << endl;
+
     volScalarField& p = thermo.p();
 
     multivariateSurfaceInterpolationScheme<scalar>::fieldTable fields;
