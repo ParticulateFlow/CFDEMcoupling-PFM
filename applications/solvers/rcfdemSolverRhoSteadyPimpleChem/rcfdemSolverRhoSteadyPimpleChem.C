@@ -76,16 +76,12 @@ int main(int argc, char *argv[])
     #include "createFieldRefs.H"
     #include "createFvOptions.H"
 
-    // create cfdemCloud
-    //#include "readGravitationalAcceleration.H"
     cfdemCloudRec<cfdemCloudEnergy> particleCloud(mesh);
     #include "checkModelType.H"
     recBase recurrenceBase(mesh);
     #include "updateFields.H"
 
     turbulence->validate();
-    //#include "compressibleCourantNo.H"
-    //#include "setInitialDeltaT.H"
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -104,6 +100,8 @@ int main(int argc, char *argv[])
     scalar m0(0.0);
     label counter(0);
     p.storePrevIter();
+    const dimensionedScalar psmall("psmall", dimPressure, small);
+    const dimensionedScalar Yismall("Yismall", dimless, small);
 
     while (runTime.run())
     {
@@ -120,9 +118,6 @@ int main(int argc, char *argv[])
         // do particle stuff
         particleCloud.clockM().start(2,"Coupling");
         bool hasEvolved = particleCloud.evolve(voidfraction,Us,U);
-
-        //voidfraction = voidfractionRec;
-        //Us = UsRec;
 
         if(hasEvolved)
         {
@@ -160,8 +155,8 @@ int main(int argc, char *argv[])
 
             // --- Pressure-velocity PIMPLE corrector loop
 
-
             #include "UEqn.H"
+            #include "YEqn.H"
             #include "EEqn.H"
 
             // --- Pressure corrector loop
@@ -172,15 +167,12 @@ int main(int argc, char *argv[])
                 #include "pEqn.H"
                 rhoeps=rho*voidfractionRec;
             }
-            #include "YEqn.H"
 
             if (pimple.turbCorr())
             {
                 turbulence->correct();
             }
         }
-
-        #include "monitorMass.H"
 
         totalStepCounter++;
         particleCloud.clockM().stop("Flow");

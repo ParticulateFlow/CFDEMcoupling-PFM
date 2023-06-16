@@ -20,6 +20,7 @@ tmp<fv::convectionScheme<scalar> > mvConvection
 #endif
     label inertIndex = -1;
     volScalarField Yt(0.0*Y[0]);
+    Sm *= 0.0;
 
     forAll(Y, i)
     {
@@ -28,13 +29,17 @@ tmp<fv::convectionScheme<scalar> > mvConvection
         {
             volScalarField& Yi = Y[i];
 
+            volScalarField sourceField(particleCloud.chemistryM(0).Smi(i));
+            volScalarField Smi0(neg(sourceField)*sourceField/(Yi + Yismall));
+            volScalarField Smi1(pos0(sourceField)*sourceField);
             fvScalarMatrix YiEqn
             (
                 mvConvection->fvmDiv(phi, Yi)
               - fvm::laplacian(voidfractionRec*turbulence->muEff(), Yi)
               ==
                 combustion->R(Yi)
-              + particleCloud.chemistryM(0).Smi(i)*p/p.prevIter()
+                + fvm::Sp(Smi0,Yi)
+                + Smi1
               + fvOptions(rho, Yi)
             );
 
@@ -48,8 +53,11 @@ tmp<fv::convectionScheme<scalar> > mvConvection
 
             fvOptions.correct(Yi);
 
+            #include "monitorMassSinks.H"
             Yi.max(0.0);
             if (Y[i].name() != inertSpecie) Yt += Yi;
+            #include "monitorMassSources.H"
+            Sm += Smi0*Yi+Smi1;
         }
     }
 

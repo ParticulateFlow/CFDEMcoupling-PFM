@@ -22,6 +22,7 @@ License
 #include "reactionHeat.H"
 #include "addToRunTimeSelectionTable.H"
 #include "dataExchangeModel.H"
+#include "smoothingModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -48,6 +49,7 @@ reactionHeat::reactionHeat
     interpolation_(propsDict_.lookupOrDefault<bool>("interpolation",false)),
     verbose_(propsDict_.lookupOrDefault<bool>("verbose",false)),
     execution_(true),
+    smoothen_(propsDict_.lookupOrDefault<bool>("smoothen",false)),
     mesh_(sm.mesh()),
     maxSource_(1e30),
     reactionHeatName_(propsDict_.lookupOrDefault<word>("reactionHeatName","reactionHeat")),
@@ -123,6 +125,10 @@ void reactionHeat::calcEnergyContribution()
     );
 
     reactionHeatField_.primitiveFieldRef() /= (reactionHeatField_.mesh().V() * Nevery_ * couplingTimestep_);
+    if (smoothen_)
+    {
+        particleCloud_.smoothingM().smoothen(reactionHeatField_);
+    }
 
     forAll(reactionHeatField_,cellI)
     {
@@ -134,11 +140,8 @@ void reactionHeat::calcEnergyContribution()
         }
     }
 
-    if (verbose_)
-    {
-        Info << "reaction heat per unit time = "
-                     << gSum(reactionHeatField_*1.0*reactionHeatField_.mesh().V()) << endl;
-    }
+    Info << "reaction heat per unit time = "
+                 << gSum(reactionHeatField_*1.0*reactionHeatField_.mesh().V()) << endl;
 
     reactionHeatField_.correctBoundaryConditions();
 }

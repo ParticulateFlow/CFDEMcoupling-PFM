@@ -69,7 +69,8 @@ smoothingModel::smoothingModel
             IOobject::NO_WRITE
         ),
         particleCloud_.mesh(),
-        dimensionedVector("zero", dimensionSet(0,0,0,0,0), vector::zero)
+        dimensionedVector("zero", dimensionSet(0,0,0,0,0), vector::zero),
+        "zeroGradient"
     ),
     sSmoothField_
     (
@@ -82,7 +83,8 @@ smoothingModel::smoothingModel
             IOobject::NO_WRITE
         ),
         particleCloud_.mesh(),
-        dimensionedScalar("zero", dimensionSet(0,0,0,0,0), 0)
+        dimensionedScalar("zero", dimensionSet(0,0,0,0,0), 0),
+        "zeroGradient"
     )
 {}
 

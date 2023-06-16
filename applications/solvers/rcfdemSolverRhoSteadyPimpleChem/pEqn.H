@@ -37,7 +37,8 @@ else
     // Update the pressure BCs to ensure flux consistency
     constrainPressure(p, rhoeps, U, phi, rhorAUf);
 
-    volScalarField SmbyP(particleCloud.chemistryM(0).Sm() / p);
+    volScalarField Sm0(neg(Sm)*Sm/(p + psmall));
+    volScalarField Sm1(pos0(Sm)*Sm);
 
     while (pimple.correctNonOrthogonal())
     {
@@ -47,7 +48,8 @@ else
             fvc::div(phi)
           - fvm::laplacian(rhorAUf, p)
           ==
-            fvm::Sp(SmbyP, p)
+            fvm::Sp(Sm0,p)
+          + Sm1
           + fvOptions(psi, p, rho.name())
         );
 
@@ -60,6 +62,7 @@ else
             phi += pEqn.flux();
         }
     }
+    #include "monitorMassSource.H"
 }
 
 #include "rhoEqn.H"

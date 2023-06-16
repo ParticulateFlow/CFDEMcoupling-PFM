@@ -52,6 +52,8 @@ protected:
 
     bool execution_;
 
+    bool smoothen_;
+
     const fvMesh& mesh_;
 
     scalar maxSource_;
