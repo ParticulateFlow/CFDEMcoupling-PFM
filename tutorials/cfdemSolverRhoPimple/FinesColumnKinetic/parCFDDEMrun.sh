@@ -16,7 +16,7 @@ source $CFDEM_PROJECT_DIR/etc/functions.sh
 #- define variables
 casePath="$(dirname "$(readlink -f ${BASH_SOURCE[0]})")"
 logpath=$casePath
-headerText="run_parallel_cfdemSolverPiso_ErgunTestMPI_CFDDEM"
+headerText="run_parallel_cfdemSolverRhoPimple_FinesColumnKinetic_CFDDEM"
 logfileName="log_$headerText"
 solverName="cfdemSolverRhoPimple"
 nrProcs="4"
