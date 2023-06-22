@@ -1,0 +1,29 @@
+# DEM-parameters
+variable partDens equal 1000                # density
+variable partDensHeavy equal 8000                # density
+#variable partRad equal 0.001              # particle radius
+variable partRad equal 0.0024             # particle radius
+variable partVol equal 4*3.14/3*${partRad}^3
+variable yM equal 5.e6                      # Young's modulus
+variable pR equal 0.25                      # Poisson ratio
+variable rest equal 0.66                    # coefficient of restitution
+variable fric equal 0.95                    # coefficient of friction
+variable roll equal 0.15                    # for particles and walls with friction
+variable noRoll equal 0                     # for frictionless walls
+variable cV equal 0.1                       # characteristic velocity
+
+variable Tpart equal 298
+
+variable dt equal 0.00005
+variable skin equal 0.005
+
+# particle settling loop parameters
+variable vthre equal 0.0001
+
+# Geometry
+variable cylrad equal 0.05
+variable fillH equal 0.35
+variable fillH1 equal ${fillH}-0.025
+variable fillH2 equal ${fillH1}+2*0.0024
+variable fillV equal ${fillH}*${cylrad}^2*3.14
+variable nPart equal ceil(${fillV}*0.7/${partVol})

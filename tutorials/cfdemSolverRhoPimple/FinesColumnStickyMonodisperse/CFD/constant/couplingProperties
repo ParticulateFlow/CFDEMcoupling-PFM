@@ -1,0 +1,242 @@
+/*---------------------------------------------------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.4                                   |
+|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+
+    root            "";
+    case            "";
+    instance        "";
+    local           "";
+
+    class           dictionary;
+    object          couplingProperties;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+//===========================================================================//
+// sub-models & settings
+
+modelType "A";
+
+couplingInterval 5;
+
+voidFractionModel divided;
+
+locateModel engine;//turboEngine;//
+
+meshMotionModel noMeshMotion;
+
+regionModel allRegion;
+
+IOModel "off";
+
+dataExchangeModel twoWayMPI;
+
+averagingModel dense;
+
+clockModel standardClock;
+
+smoothingModel constDiffSmoothing;
+
+probeModel off;
+
+forceModels
+(
+    dSauter
+    Fines
+    BeetstraDragPoly
+    gradPForce
+    viscForce
+);
+
+momCoupleModels
+(
+    implicitCouple
+    explicitCouple
+);
+
+otherForceModels
+(
+    gravity
+    expParticleForces
+);
+
+energyModels
+(
+    heatTransferGunn
+);
+
+thermCondModel SyamlalThermCond;
+
+chemistryModels
+(
+    off
+);
+
+turbulenceModelType "turbulenceProperties";
+
+//===========================================================================//
+// sub-model properties
+
+#include "../dustParameters";
+
+implicitCoupleProps
+{
+    velFieldName "U";
+    granVelFieldName "Us";
+    voidfractionFieldName "voidfraction";
+}
+
+explicitCoupleProps
+{
+    fLimit (1e3 1e3 1e3);
+}
+
+dSauterProps
+{
+
+}
+gradPForceProps
+{
+    fines true;
+    pFieldName "p";
+    densityFieldName "rho";
+    voidfractionFieldName "voidfraction";
+    velocityFieldName "U";
+}
+
+GidaspowDragProps
+{
+    verbose false;
+    velFieldName "U";
+    granVelFieldName "Us";
+    voidfractionFieldName "voidfraction";
+    interpolation true;
+    phi 1;
+}
+
+heatTransferGunnProps
+{
+    partTempName "Temp";
+    partHeatFluxName "convectiveHeatFlux";
+    calcPartTempField false;
+    partRefTemp 293;
+    interpolation false;
+}
+
+viscForceProps
+{
+    velocityFieldName "U";
+    densityFieldName "rho";
+    interpolation;
+}
+
+BeetstraDragProps
+{
+    fines true;
+    dFine 0.000098;
+    velFieldName "U";
+    granVelFieldName "Us";
+    densityFieldName "rho";
+    voidfractionFieldName "voidfraction";
+}
+
+FanningDynFinesProps
+{
+    velFieldName "U";
+    granVelFieldName "Us";
+    densityFieldName "rho";
+    voidfractionFieldName "voidfraction";
+}
+
+FinesFieldsProps
+{
+    velFieldName "U";
+    granVelFieldName "Us";
+    densityFieldName "rho";
+    voidfractionFieldName "voidfraction";
+    kineticClogging false;
+    stickyClogging true;
+    movingBed true;
+    dFine 0.000098;
+    rhoFine 2500;
+    alphaMax 0.9;
+    critVoidfraction 0.1;
+    nCrit 2.25;
+    poresizeWidth 0.2;
+    diffCoeff 0.01;
+    depositionLength 0.05;
+    tauRelease 0.1;
+    uBindHigh $u2;
+    uBindLow $u1;
+    verbose false;
+}
+
+gravityProps
+{
+}
+
+weightSecondaryPhaseProps
+{
+    volfracFieldName "alphaDyn";
+    rho 2500;
+}
+
+SyamlalThermCondProps
+{
+}
+
+centreProps
+{
+    alphaMin 0.10;
+}
+
+engineProps
+{
+    treeSearch true;
+}
+
+turboEngineProps
+{
+    treeSearch true;
+}
+
+dividedProps
+{
+    alphaMin 0.25;
+    scaleUpVol 1.0;
+    weight 1.0; //1.33;
+    verbose;
+}
+
+constDiffSmoothingProps
+{
+    verbose;
+    lowerLimit 0.25;
+    upperLimit 1.0;
+    smoothingLength 0.006;
+}
+
+twoWayMPIProps
+{
+    maxNumberOfParticles 50000;
+    liggghtsPath "../DEM/in.liggghts_resume";
+ //   DEMVariables (motion ekin)
+}
+
+
+particleProbeProps
+{
+        particleIDsToSample "0";
+}
+// ************************************************************************* //
