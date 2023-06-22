@@ -51,6 +51,9 @@ heatTransferGunn::heatTransferGunn
     implicit_(propsDict_.lookupOrDefault<bool>("implicit",true)),
     calcTotalHeatFlux_(propsDict_.lookupOrDefault<bool>("calcTotalHeatFlux",true)),
     initPartTemp_(propsDict_.lookupOrDefault<bool>("initPartTemp",false)),
+    scaleNuCellsName_(propsDict_.lookupOrDefault<word>("scaleNuCellsName","all")),
+    scaleNuCells_(),
+    allScaleNuCells_(false),
     Tmin_(propsDict_.lookupOrDefault<scalar>("Tmin",0.0)),
     Tmax_(propsDict_.lookupOrDefault<scalar>("Tmax",1e6)),
     totalHeatFlux_(0.0),
@@ -166,7 +169,12 @@ heatTransferGunn::heatTransferGunn
     if (propsDict_.found("NusseltScalingFactor"))
     {
         NusseltScalingFactor_=readScalar(propsDict_.lookup ("NusseltScalingFactor"));
-        Info << "NusseltScalingFactor set to: " << NusseltScalingFactor_ << endl;
+        if(scaleNuCellsName_ != "all")
+        {
+            scaleNuCells_.set(new cellSet(particleCloud_.mesh(),scaleNuCellsName_));
+        }
+        else allScaleNuCells_ = true;
+        Info << "NusseltScalingFactor set to: " << NusseltScalingFactor_ << " in cellSet " << scaleNuCellsName_ << endl;
     }
 
     if (propsDict_.found("maxSource"))
@@ -237,6 +245,11 @@ heatTransferGunn::~heatTransferGunn()
 }
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
+bool heatTransferGunn::scaleNuCell(label cell) const
+{
+    if (allScaleNuCells_) return true;
+    else return scaleNuCells_()[cell];
+}
 
 // * * * * * * * * * * * * * * * * Member Fct  * * * * * * * * * * * * * * * //
 
@@ -359,7 +372,11 @@ void heatTransferGunn::calcEnergyContribution()
                     Pr = max(SMALL, Cp * muf / kf0);
                     Nup = Nusselt(voidfraction, Rep, Pr);
                 }
-                Nup *= NusseltScalingFactor_;
+
+                if (scaleNuCell(cellI))
+                {
+                    Nup *= NusseltScalingFactor_;
+                }
 
                 Tsum += partTemp_[index][0];
                 Nsum += 1.0;

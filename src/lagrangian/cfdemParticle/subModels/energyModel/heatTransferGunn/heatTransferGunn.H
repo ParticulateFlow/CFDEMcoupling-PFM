@@ -28,6 +28,8 @@ License
 #include "fvCFD.H"
 #include "cfdemCloudEnergy.H"
 #include "energyModel.H"
+#include "autoPtr.H"
+#include "cellSet.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -59,6 +61,12 @@ protected:
     bool calcTotalHeatFlux_;
 
     bool initPartTemp_;
+
+    word scaleNuCellsName_;
+
+    autoPtr<cellSet> scaleNuCells_;
+
+    bool allScaleNuCells_;
 
     scalar Tmin_;
 
@@ -127,6 +135,8 @@ protected:
     void partTempField();
 
     scalar Nusselt(scalar, scalar, scalar) const;
+
+    bool scaleNuCell(label) const;
 
     virtual void giveData();
 
