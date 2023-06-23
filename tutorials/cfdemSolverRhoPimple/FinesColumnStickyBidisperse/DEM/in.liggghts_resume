@@ -1,0 +1,106 @@
+###############################################
+# material properties
+include ../DEM/DEMparameters
+
+variable dt equal 0.0000125
+variable skin equal 0.005
+###############################################
+
+atom_style      granular
+atom_modify     map array
+communicate     single vel yes
+
+boundary        f f f
+newton          off
+units           si
+processors      1 1 8
+
+read_restart    ../DEM/liggghts.restart
+reset_timestep  0
+
+neighbor        0.01 bin
+neigh_modify    delay 0
+
+#Material properties required for granular pair styles
+fix         m1 all property/global youngsModulus peratomtype ${yM} ${yM}
+fix         m2 all property/global poissonsRatio peratomtype ${pR} ${pR}
+fix         m3 all property/global coefficientRestitution peratomtypepair 2 ${rest} ${rest} ${rest} ${rest}
+fix         m4 all property/global coefficientFriction peratomtypepair 2 ${fric} ${fric} ${fric} ${fric}
+fix         m5 all property/global coefficientRollingFriction peratomtypepair 2 ${roll} ${roll} ${roll} ${roll}
+fix         m6 all property/global characteristicVelocity scalar ${cV} ${cV}
+fix         m7 all property/global cohesionEnergyDensity peratomtypepair 2 0 0 0 ${coh}
+
+fix         ftco all property/global thermalConductivity peratomtype 1.4 1.4
+fix         ftca all property/global thermalCapacity peratomtype 840. 840.
+fix         heattransfer all heat/gran initial_temperature 293.
+
+
+
+#pair style
+pair_style  gran model hertz tangential history cohesion sjkr rolling_friction cdt
+pair_coeff  * *
+
+#timestep, gravity
+timestep    ${dt}
+fix         gravi all gravity 9.81 vector 0.0 0.0 -1.0
+
+fix zwall     all wall/gran model hertz tangential history primitive type 1 zplane 0.0
+fix zwall_top all wall/gran model hertz tangential history primitive type 1 zplane ${fillH}
+fix cylwalls  all wall/gran model hertz tangential history cohesion sjkr rolling_friction cdt primitive type 1 zcylinder ${cylrad} 0. 0.
+
+#cfd coupling
+fix         cfd all couple/cfd couple_every 20 mpi
+fix         cfd2 all couple/cfd/force/implicit
+fix         cfd3 all couple/cfd/convection T0 ${Tpart}
+
+fix         integr all nve/sphere
+fix         limV all limit/vel 0.5
+
+variable np equal count(all)
+variable time equal step*dt
+include ../DEM/in.removal
+include ../DEM/in.insertion_setup
+
+#fix lb all balance 2000 z 10 1.05 out tmp.balance
+
+#screen output
+variable totmass equal mass(all)
+compute         erot all erotate/sphere
+thermo_style    custom step atoms ke c_erot vol v_totmass 
+thermo          100
+thermo_modify   lost ignore norm no
+compute_modify  thermo_temp dynamic yes
+
+
+#insert the first particles so that dump is not empty
+variable Ndump equal 80000
+dump            dmp all custom/vtk ${Ndump} ../DEM/post/dump*.liggghts_coupled.vtk id type x y z vx vy vz fx fy fz radius mass f_dragforce[1] f_dragforce[2] f_dragforce[3]
+
+region lowerBlock cylinder z 0 0 0.051 0.05 0.07
+#region lowerBlock cylinder z 0 0 0.045 0.05 0.1
+#region lowerBlock block -0.05 0 -0.05 0.05 0.05 0.1
+group lowerPart region lowerBlock
+set group lowerPart type 2
+
+#compute cContactArea lowerPart pair/gran/local contactArea
+#compute cTotContactArea lowerPart reduce sum c_cContactArea[1]
+#variable totContactArea equal c_cTotContactArea
+#variable nLowerPart equal count(lowerPart)
+#variable contactAreaPerPart equal v_totContactArea/v_nLowerPart
+#variable totMass equal mass(lowerPart)
+#variable relCohesionForce equal v_totContactArea*${coh}/(9.81*v_totMass)
+#fix printCohesionstrength all print 1000 "${time} ${contactAreaPerPart} ${relCohesionForce}" file ../DEM/monitor/cohesionstrength.txt title "#time 	contact area per particle	relative cohesion strength"
+
+variable ekin equal ke(all)
+variable vcmz equal vcm(all,z)
+variable motion equal v_ekin>1e-4
+variable Nfastdump equal 250
+
+fix printEnergy all print 400 "${time} ${ekin} ${vcmz}" file ../DEM/monitor/motion.txt title "#time	E_kin v_cm"
+fix printRem all print 2000 "${time} ${removedMass}" file ../DEM/monitor/Mremoved.txt title "#time   m_removed"
+
+#fix eeMotion1 all execute 1 " dump_modify dmp every ${Nfastdump} " conditional motion 1.0 0.1
+#fix eeMotion2 all execute 1 " dump_modify dmp every ${Ndump} " conditional motion 0.0 0.1
+
+
+run 1
