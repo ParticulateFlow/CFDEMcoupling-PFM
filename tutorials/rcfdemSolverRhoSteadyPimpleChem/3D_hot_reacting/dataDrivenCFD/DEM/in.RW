@@ -1,0 +1,45 @@
+#################################
+# remove particles from RW region
+#################################
+
+variable tau equal ${dt}*${Nremove}
+variable initStep equal 2*${Ncouple}+${latestTimeStep}
+
+# coke
+variable nCokeBelowCZRef equal 0
+variable nCokeBelowCZ equal 0
+
+fix ex0 all execute ${initStep} "variable nCokeBelowCZRef equal count(cokeBelowCZ)" once
+fix ex1 all execute ${initStep} "variable nCokeBelowCZ equal ${nCokeBelowCZRef}" once
+
+variable mCokePart equal 2.2
+variable massCokeRWremove1 equal ${mCokePart}*(v_nCokeBelowCZRef-v_nCokeBelowCZ)/${tau}
+variable massCokeRWremove equal ((v_massCokeRWremove1>0)-1e-10)*v_massCokeRWremove1
+# remove coke from RW with estimated charging rate
+fix deleteCokeRW cokeBelowCZ  remove nevery ${Nremove} massratevariable massCokeRWremove style delete seed 10007143 region RW restart_read no integrated_error no atomtype 1 minmass ${mCokePart} monitor_heat yes
+# if there is too much coke remaining in region below CZ, remove it first around RW, then everywhere
+fix deleteCokeRWOuter cokeBelowCZ remove nevery ${Nremove} massratevariable massCokeRWremove style delete seed 10007145 region RWOuter restart_read no integrated_error no atomtype 1 minmass ${mCokePart} monitor_heat yes
+# remove excess of coke outside of RWs
+fix deleteCokeHearth cokeBelowCZ remove nevery ${Nremove} massratevariable massCokeRWremove style delete seed 10007142 restart_read no integrated_error no atomtype 1 minmass ${mCokePart} monitor_heat yes
+
+# fine coke
+
+#variable nFineCokeRWRef equal count(finecoke,fineCokeRefRegion)
+variable nFineCokeBelowCZRef equal 0
+variable nFineCokeBelowCZ equal 0
+
+fix ex2 all execute ${initStep} "variable nFineCokeBelowCZRef equal count(finecokeBelowCZ)" once
+fix ex3 all execute ${initStep} "variable nFineCokeBelowCZ equal ${nFineCokeBelowCZRef}" once
+
+variable mFineCokePart equal 2.85
+variable massFineCokeRWremove1 equal ${mFineCokePart}*(v_nFineCokeBelowCZRef-v_nFineCokeBelowCZ)/${tau}
+variable massFineCokeRWremove equal ((v_massFineCokeRWremove1>0)-1e-10)*v_massFineCokeRWremove1
+fix deleteFineCokeRW finecokeBelowCZ remove nevery ${Nremove} massratevariable massFineCokeRWremove style delete seed 10007144 region RW restart_read no integrated_error no atomtype 2 minmass ${mFineCokePart} monitor_heat yes
+# remove excess of fine coke outside of RWs
+fix deleteFineCokeHearth finecokeBelowCZ remove nevery ${Nremove} massratevariable massFineCokeRWremove style delete seed 10007146 restart_read no integrated_error no atomtype 2 minmass ${mFineCokePart} monitor_heat yes
+
+####
+# trickling - remove liquid iron from bottom of furnace
+#region bottomReg block INF INF INF INF INF -0.5
+#fix deleteLiquidIron fullyDeformed remove nevery ${Nremove} massrate 10000 style delete seed 5143 region bottomReg monitor_heat yes
+####

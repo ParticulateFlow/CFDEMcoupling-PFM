@@ -1,0 +1,29 @@
+variable time equal step*dt
+
+# particle count
+################
+variable np equal count(all)
+variable ncoke equal count(coke)
+variable nore equal count(ore)
+variable nfinecoke equal count(finecoke)
+variable nfineore equal count(fineore)
+
+region belowTopReg cylinder z 0.0 0.0 8 -1 22 units box
+variable nBelowTop equal count(all,belowTopReg)
+
+variable VCMall equal vcm(all,z)
+variable VCMBelowTop equal vcm(all,z,belowTopReg)
+
+fix printN all print ${Nmonitor} "${time} ${np} ${nTop} ${nBelowTop} ${ncoke} ${nfinecoke} ${nore} ${nfineore}" file ../DEM/monitor/Npart_CFDDEMflow.txt title "#time   n_p   n_p_top   n_p_belowtop   n_coke   n_finecoke   n_ore   n_fineore"
+fix printM all print ${Nmonitor} "${time} ${insertedCoke} ${insertedOre} ${insertedFineMix} " file ../DEM/monitor/M_inserted_CFDDEMflow.txt title "#time   m_C m_O m_FM"
+fix printVCM all print ${Nmonitor} "${time} ${VCMall} ${VCMBelowTop} " file ../DEM/monitor/VCM.txt title "#time    vcm_all    vcm_belowTop"
+
+# removal count
+###############
+
+variable removedCokeMassRW equal f_delRW[1]
+variable removedCokeMassRWOuter equal f_delRWOuter[1]
+variable removedCokeMass equal v_removedCokeMassRW+v_removedCokeMassRWOuter
+variable removedOreMass equal f_cfd5[1]
+
+fix printremovedmass all print ${Nmonitor} "${time} ${removedCokeMass} ${removedOreMass} " append ${dumppath}/monitor/removedmassRW.txt title "# time   mass_coke   mass_ore" 

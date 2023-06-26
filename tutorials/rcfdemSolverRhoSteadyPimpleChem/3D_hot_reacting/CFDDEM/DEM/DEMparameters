@@ -1,0 +1,106 @@
+#variable dumppath string /scratch/k3b02/k3b1677/Cases/BF/dataDrivenCFD/DEM
+variable dumppath string ../DEM
+
+variable dt equal 0.000025
+variable skin equal 0.001
+variable Ndump equal 100000
+variable NsetDM equal 1000
+variable Nmonitor equal 400
+
+
+#variable rCMass equal 200 # fast, for initialization
+variable rCMass equal 50
+variable NRW equal 1000
+
+# DEM-parameters COKE
+variable yM_C equal 5.e7          # Young's modulus
+variable pR_C equal 0.25          # Poisson ratio
+variable rest_C equal 0.5         # coefficient of restitution
+variable fric_C equal 0.9         # coefficient of friction
+variable roll_C equal 0.5         # coefficient of rolling friction
+
+# values according to information from VAS
+# mean diameter coke = 0.044 m
+# mean density coke = 950
+# bulk density = 500
+
+variable dens_C equal 950	  # density
+variable rad_C equal 0.088	  # c.g. radius (cg = 4)
+variable poly_C equal 0.81	  # polydisp factor
+
+
+# DEM-parameters FINE COKE
+variable yM_fC equal 5.e7          # Young's modulus
+variable pR_fC equal 0.25          # Poisson ratio
+variable rest_fC equal 0.5         # coefficient of restitution
+variable fric_fC equal 0.9         # coefficient of friction
+variable roll_fC equal 0.5         # coefficient of rolling friction
+
+# mean diameter fine coke = 0.02 m
+# mean density fine coke = 950
+# bulk density fine coke = 570
+
+variable dens_fC equal 950	  # density
+variable rad_fC equal 0.08	  # c.g. radius (cg = 8)
+#variable poly_fC equal 0.92	  # polydisp factor
+variable poly_fC equal 1.2      # polydisp factor accounting for near-wall inaccuracy
+
+
+
+# DEM-parameters ORE (represents the mixture of sinter, pellets and actual ore)
+variable yM_O equal 5.e7          # Young's modulus
+variable pR_O equal 0.25          # Poisson ratio
+variable rest_O equal 0.5         # coefficient of restitution
+variable fric_O equal 0.8         # coefficient of friction
+variable roll_O equal 0.4        # coefficient of rolling friction
+
+# values according to Modern Blast Furnace Ironmaking
+# mean diameter ore mixture = 0.015 m
+# mean density ore mixture = 3300
+# bulk density = 2200
+
+variable dens_O equal 3300	  # density
+variable rad_O equal 0.0825	  # c.g. radius (cg = 11)
+variable poly_O equal 1.03	  # polydisp factor
+
+
+# DEM-parameters FINE ORE (represents the mixture of sinter, pellets and actual ore)
+variable yM_fO equal 5.e7          # Young's modulus
+variable pR_fO equal 0.25          # Poisson ratio
+variable rest_fO equal 0.5         # coefficient of restitution
+variable fric_fO equal 0.8         # coefficient of friction
+variable roll_fO equal 0.4        # coefficient of rolling friction
+
+# values according to G. Holzinger's literature study
+# mean diameter fine ore mixture = 0.006 m
+# mean density fine ore mixture = 3300
+# bulk density = 2200
+
+variable dens_fO equal 3300	  # density
+variable rad_fO equal 0.072	  # c.g. radius (cg = 24)
+#variable poly_fO equal 1.03	  # polydisp factor
+variable poly_fO equal 1.2       # polydisp factor accounting for near-wall inaccuracy
+
+
+
+
+# DEM-parameters wall
+variable yM_W equal 5.e6          # Young's modulus
+variable pR_W equal 0.25          # Poisson ratio
+variable rest_W equal 0.5         # coefficient of restitution
+variable fric_W equal 0.85         # coefficient of friction
+variable roll_W equal 0.45        # coefficient of rolling friction
+
+# DEM-parameters mixed
+variable rest_CO equal 0.2         # coefficient of restitution
+variable rest_WO equal 0.2         # coefficient of restitution
+variable rest_CW equal 0.5         # coefficient of restitution
+variable fric_CO equal 0.8         # coefficient of friction
+variable fric_WO equal 0.2         # coefficient of friction
+variable fric_CW equal 0.5         # coefficient of friction
+variable roll_CO equal 0.02         # for particles and walls with friction
+variable roll_WO equal 0.02         # for particles and walls with friction
+variable roll_CW equal 0.02         # for particles and walls with friction
+
+
+variable cV equal 0.1           # characteristic velocity

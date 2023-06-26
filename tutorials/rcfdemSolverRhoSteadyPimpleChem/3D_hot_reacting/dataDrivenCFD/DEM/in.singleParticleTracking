@@ -1,0 +1,36 @@
+
+region topcenter cylinder z 0.0 0.0 0.25 20 25 units box
+group trackParticle empty
+
+variable ee equal 1080000
+fix ee0 all execute ${ee} "group topcenterall region topcenter" once
+fix ee1 all execute ${ee} "group topcenterore intersect topcenterall ore" once
+fix ee2 all execute ${ee} "variable highestcenterore equal boundid(topcenterore,zmax)" once
+fix ee3 all execute ${ee} "group trackParticle id ${highestcenterore} ${highestcenterore}" once
+# if more than a single grain, normalize variables below
+
+variable zi equal xcm(trackParticle,z)
+compute cm1 trackParticle reduce sum f_LayerMasses[1]
+variable m1 equal c_cm1
+compute cm2 trackParticle reduce sum f_LayerMasses[2]
+variable m2 equal c_cm2
+compute cm3 trackParticle reduce sum f_LayerMasses[3]
+variable m3 equal c_cm3
+compute cm4 trackParticle reduce sum f_LayerMasses[4]
+variable m4 equal c_cm4
+variable mtot equal v_m1+v_m2+v_m3+v_m4+1e-10
+variable mm1 equal v_m1/v_mtot
+variable mm2 equal v_m2/v_mtot
+variable mm3 equal v_m3/v_mtot
+variable mm4 equal v_m4/v_mtot
+
+compute cTi trackParticle reduce sum f_Temp
+variable Ti equal c_cTi
+compute cTgi trackParticle reduce sum f_partTemp
+variable Tgi equal c_cTgi
+compute cCOi trackParticle reduce sum f_X_CO
+variable COi equal c_cCOi
+compute cCO2i trackParticle reduce sum f_X_CO2
+variable CO2i equal c_cCO2i
+
+fix trackSingleParticle all print ${Nmonitor} "${time} ${zi} ${Ti} ${Tgi} ${COi} ${CO2i} ${mm1} ${mm2} ${mm3} ${mm4}" file ${dumppath}/monitor/trackSingleParticle.txt title "# time z Tp Tg X_CO X_CO2 m_Fe m_Wu m_Ma m_He"

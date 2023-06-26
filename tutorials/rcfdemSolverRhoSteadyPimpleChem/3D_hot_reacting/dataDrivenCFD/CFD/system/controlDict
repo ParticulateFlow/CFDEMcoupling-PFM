@@ -1,0 +1,227 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.3.0                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+application     potentialFoam;
+
+startFrom       latestTime;
+
+startTime       0;
+
+stopAt          endTime;
+
+endTime         36000.0;
+
+deltaT          2.0;
+
+writeControl    timeStep;
+
+writeInterval   4500;
+
+purgeWrite      0;
+
+writeFormat     binary;
+
+writePrecision  6;
+
+writeCompression off;
+
+timeFormat      general;
+
+timePrecision   6;
+
+runTimeModifiable true;
+
+adjustTimeStep no;
+
+functions
+{
+    #include "monitorPressureWork"
+
+    conditionalStop
+    {
+        type abort;
+        libs    ("libutilityFunctionObjects.so");
+        action writeNow;
+        file "ABORT";
+    }
+
+    moleFrac
+    {
+        type    rhoReactionThermoMoleFractions;
+    }
+
+    fieldAverage1
+    {
+        type            fieldAverage;
+        libs            ("libfieldFunctionObjects.so");
+        writeControl    writeTime;
+
+        fields
+        (
+            U
+            {
+                mean        on;
+                prime2Mean  off;
+                base        time;
+                window	    60.0001;
+            }
+	    Us
+            {
+                mean        on;
+                prime2Mean  off;
+                base        time;
+                window	    60.0001;
+            }
+	    voidfraction
+            {
+                mean        on;
+                prime2Mean  off;
+                base        time;
+                window	    60.0001;
+            }
+            partTemp
+            {
+                mean        on;
+                prime2Mean  off;
+                base        time;
+                window	    60.0001;
+            }
+            T
+            {
+                mean        on;
+                prime2Mean  off;
+                base        time;
+                window	    60.0001;
+            }
+            reactionHeatField
+            {
+                mean        on;
+                prime2Mean  on;
+                base        time;
+                window      3600.0001;
+            }
+        );
+    }
+
+   probes1
+	{
+		type probes;
+
+		functionObjectLibs ("libsampling.so");
+
+		#include "probesDict1";
+	}
+	
+   probes2
+	{
+		type probes;
+
+		functionObjectLibs ("libsampling.so");
+
+		#include "probesDict2";
+	}
+
+        massInflow
+        {
+            type            surfaceFieldValue;
+            libs ("libfieldFunctionObjects.so");
+            writeControl   timeStep;
+            writeInterval   20;
+            log             true;
+            writeFields     false;
+            regionType      patch;
+            name            inlet;
+            operation       sum;
+            fields
+            (
+                phi
+            );
+        }
+
+        massOutflow
+        {
+            $massInflow;
+            name      top;
+        }
+
+        energyAndSpeciesInflow
+        {
+            type            surfaceFieldValue;
+            libs ("libfieldFunctionObjects.so");
+            writeControl   timeStep;
+            writeInterval   20;
+            log             true;
+            writeFields     false;
+            regionType      patch;
+            name            inlet;
+            operation       weightedSum;
+            weightField     phi;
+            fields
+            (
+                e
+                CO
+                CO2
+                N2
+                O2
+            );
+        }
+
+        energyAndSpeciesOutflow
+        {
+            $energyAndSpeciesInflow;
+            name      top;
+        }
+
+    wallheatFluxes
+    {
+        type            volFieldValue;
+        libs            ("libfieldFunctionObjects.so");
+
+        log             true;
+        writeControl    timeStep;
+        writeInterval   20;
+        writeFields     false;
+        regionType      all;
+        operation       volIntegrate;
+
+        fields
+        (
+            QFluidCond
+            QPartPart
+        );
+    }
+    
+    totReactionHeatField
+    {
+        type            volFieldValue;
+        libs            ("libfieldFunctionObjects.so");
+
+        log             true;
+        writeControl    timeStep;
+        writeInterval   1;
+        writeFields     false;
+        regionType      all;
+        operation       volIntegrate;
+
+        fields
+        (
+            reactionHeatField
+        );
+    }
+}
+
+// ************************************************************************* //

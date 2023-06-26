@@ -1,0 +1,84 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.3.0                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      fvOptions;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+source1
+{
+    type        limitTemperature;
+    active          yes;
+    limitTemperatureCoeffs
+    {
+        active          yes;
+        selectionMode   all;
+        min     300;
+        max     3450;
+    }
+}
+
+/*
+source2
+{
+    type            fixedTemperatureConstraint;
+
+    selectionMode   cellSet;
+    cellSet         rw_left;
+
+    mode            uniform;
+    temperature     3450;
+}
+
+source3
+{
+    type            fixedTemperatureConstraint;
+
+    selectionMode   cellSet;
+    cellSet         rw_right;
+
+    mode            uniform;
+    temperature     3450;
+}
+*/
+/*
+    heatSource1
+    {
+        type            scalarSemiImplicitSource;
+
+        selectionMode   cellSet;
+        cellSet         rw_left;
+        volumeMode      absolute; //specific;
+
+        injectionRateSuSp
+        {
+            // dm/dt = 1.65 kg / s / RW, C = 850, T = 2100
+            e          (3e6 0);
+        }
+    }
+
+    heatSource2
+    {
+        type            scalarSemiImplicitSource;
+
+        selectionMode   cellSet;
+        cellSet         rw_right;
+        volumeMode      absolute; //specific;
+
+        injectionRateSuSp
+        {
+            // dm/dt = 1.65 kg / s / RW, C = 850, T = 2100
+            e          (3e6 0);
+        }
+    }
+*/

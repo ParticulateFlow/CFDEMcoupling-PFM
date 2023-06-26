@@ -1,0 +1,295 @@
+/*---------------------------------------------------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.4                                   |
+|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+
+    root            "";
+    case            "";
+    instance        "";
+    local           "";
+
+    class           dictionary;
+    object          couplingProperties;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+//===========================================================================//
+// sub-models & settings
+
+modelType "A";
+
+couplingInterval 40;
+
+voidFractionModel divided;
+
+locateModel engine;
+
+meshMotionModel noMeshMotion;
+
+regionModel allRegion;
+
+IOModel "off";
+
+dataExchangeModel twoWayMPI;
+
+averagingModel dense;
+
+clockModel standardClock;
+
+smoothingModel constDiffSmoothing;
+
+probeModel off;
+
+forceModels
+(
+    particleDeformation
+    freeStreaming
+//    isotropicFluctuations
+//    directedDiffusiveRelaxation
+    dSauter
+    BeetstraDragPoly
+    gradPForce
+    viscForce
+);
+
+momCoupleModels
+(
+    implicitCouple
+);
+
+energyModels
+(
+    heatTransferRanzMarshall
+    heatTransferInterGrain
+    reactionHeat
+);
+
+thermCondModel SyamlalThermCond;
+
+chemistryModels
+(
+    species
+    diffusionCoefficients
+    massTransferCoeff
+    reactantPerParticle
+    initMultiLayers
+);
+
+turbulenceModelType "turbulenceProperties";
+
+
+getParticleTypes true;
+getParticleDensities true;
+getParticleEffVolFactors true;
+
+coupleRecFluc false;
+coupleRecForce false;
+setForceField true;
+
+nEveryFlow 1;
+//===========================================================================//
+// sub-model properties
+
+implicitCoupleProps
+{
+    velFieldName "U";
+    granVelFieldName "UsRec";
+    voidfractionFieldName "voidfractionRec";
+}
+
+gradPForceProps
+{
+    pFieldName "p";
+    densityFieldName "rho";
+    voidfractionFieldName "voidfractionRec";
+    velocityFieldName "U";
+}
+
+viscForceProps
+{
+    velocityFieldName "U";
+    densityFieldName "rho";
+}
+
+
+BeetstraDragProps
+{
+    velFieldName "U";
+    granVelFieldName "UsRec";
+    densityFieldName "rho";
+    voidfractionFieldName "voidfractionRec";
+    phi 1;
+    coarseGrainingFactors (4.0 8.0 11.0 24.0);
+}
+
+dSauterProps
+{
+    coarseGrainingFactors (4.0 8.0 11.0 24.0);
+}
+
+freeStreamingProps
+{
+    critVoidfraction 1.5;
+    // density can be chosen arbitrarily
+    particleDensity 667;
+    ballisticVelLimit 0.0;
+    // operational descent velocity
+    scalingFactor 110.04;
+    interpolation true;
+}
+
+isotropicFluctuationsProps
+{
+    critVoidfraction 1.1;
+    D0 5e-4;
+    measureDiff true;
+    maxDisplacement 0.05;
+    ignoreCellsName "aboveCZ";
+}
+
+directedDiffusiveRelaxationProps
+{
+    critVoidfraction 1.1;
+    D0 1e-1;
+    measureDiff false;
+    maxDisplacement 0.01;
+    ignoreCellsName "aboveCZ";
+}
+
+particleDeformationProps
+{
+    refFieldName "partTempRef";
+//    partTypes (3 4);
+    partTypes (1 2 3 4);
+    defaultDeformCellsName "noOreReg";
+// same as Huo et al. (2017)
+//    lowerBounds (1475 1475);
+//    upperBounds (1675 1675);
+    lowerBounds (1475 1475 1475 1475); 
+    upperBounds (1675 1675 1675 1675);
+//    backgroundVoidage 0.05; // ATTENTION: if coke is also deformed, full hearth gets background voidage
+    voidfractionFieldName "voidfractionRec";
+}
+
+heatTransferRanzMarshallProps
+{
+    partTempName "Temp";
+    partHeatFluxName "convectiveHeatFlux";
+    calcPartTempField true;
+    partRefTemp 293;
+    interpolation false;
+    voidfractionFieldName "voidfractionRec";
+    coarseGrainingFactors (4.0 8.0 11.0 24.0);
+    initPartTemp true;
+    Tmin 293;
+    Tmax 3000;
+    NusseltScalingFactor 0.4;
+    scaleNuCellsName "lowerReg";
+}
+
+heatTransferInterGrainProps
+{
+    prescribedVoidfractionFieldName "voidfractionRec";
+// data taken from Hou et al. Powder Technology 314 (2017)
+    thermalConductivities (1.7 1.7 80.0 80.0);
+    calcTotalHeatFlux true;
+    radiativeHeatTransfer true;
+    thermalEmissivities (0.8 0.8 0.8 0.8);
+    partTempName "Temp";
+    coarseGrainingFactors (4.0 8.0 11.0 24.0);
+    verbose true;
+    kMax 1e3;
+    implicit true;
+    thermalCapacities (850 850 600 600);
+}
+
+SyamlalThermCondProps
+{
+    voidfractionFieldName "voidfractionRec";
+}
+
+speciesProps
+{
+    ChemistryFile   "$FOAM_CASE/constant/foam.inp";
+    Nevery          1;
+    verbose         false;
+    interpolation   false;
+}
+
+diffusionCoefficientsProps
+{
+    verbose         false;
+    interpolation   false;
+    ChemistryFile   "$FOAM_CASE/constant/foam.inp";
+    diffusantGasNames       (
+                                CO CO2 O2
+                            ); 
+}
+
+massTransferCoeffProps
+{
+    verbose         false;
+    interpolation   false;
+}
+
+reactionHeatProps
+{
+}
+
+reactantPerParticleProps
+{
+    coarseGrainingFactors (4.0 8.0 11.0 24.0);
+    voidfractionFieldName "voidfractionRec";
+}
+
+initMultiLayersProps
+{
+    partTypes (1 2 3 4);
+    numLayers (2 2 4 4);
+    searchLayers (1 1 0 0);
+    filepath "../DEM/dump.relRadii";
+}
+
+constDiffSmoothingProps
+{
+    lowerLimit -1e10;
+    upperLimit 1e10;
+    smoothingLength 0.5;
+}
+
+centreProps
+{
+    alphaMin 0.10;
+}
+
+engineProps
+{
+    treeSearch true;
+}
+
+dividedProps
+{
+    alphaMin -20;
+    scaleUpVol 1.0;
+    weight 1.0;
+    verbose;
+}
+
+twoWayMPIProps
+{
+    liggghtsPath "../DEM/in.liggghts_dataDrivenCFD";
+    liggghtsEndOfRunPath "../DEM/in.final";
+}
+
+
+// ************************************************************************* //

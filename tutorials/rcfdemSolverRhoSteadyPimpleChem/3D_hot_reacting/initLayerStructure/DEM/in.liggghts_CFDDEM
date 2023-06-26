@@ -1,0 +1,39 @@
+# material properties
+include ../../CFDDEM/DEM/DEMparameters
+
+
+###############################################
+atom_style		granular
+atom_modify		map array
+communicate	single vel yes
+
+boundary		f f f
+newton			off
+units			si
+processors      2 2 8
+
+read_restart 		../DEM/liggghts.restart_fill
+reset_timestep 0
+#read_restart           ../DEM/liggghts.restartCFDEM_150
+
+neighbor	${skin} bin
+neigh_modify	delay 0
+
+timestep    ${dt}
+
+include ../../CFDDEM/DEM/in.material_settings
+include ../../CFDDEM/DEM/in.regions
+include ../../CFDDEM/DEM/in.RWRemoval
+include ../../CFDDEM/DEM/in.coupling_integration
+include ../../CFDDEM/DEM/in.output
+
+run	1
+
+include ../../CFDDEM/DEM/in.set_polydisp
+include ../DEM/in.insertion_setup_uniform_layers
+#include ../DEM/in.insertion_setup_orefree_center
+
+restart 80000 ../DEM/restart.A ../DEM/restart.B
+
+region tmp block -8 8 -8 8 26 30 units box
+delete_atoms region tmp

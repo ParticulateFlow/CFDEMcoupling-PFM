@@ -1,0 +1,27 @@
+#################
+# insertion setup
+#################
+
+include ../../CFDDEM/DEM/zInsLower
+#region regTop block -4.65 4.65 -4.65 4.65 ${zInsLower} 26.25 units box
+region regTop cylinder z 0.0 0.0 4.7 ${zInsLower} 26.25 units box
+variable nTot equal count(all,regTop)
+variable Nins equal 100
+variable ncurr equal count(aboveCZ)
+variable counter loop 1000
+fix eeIns all execute ${Nins} "../DEM/in.insert" file conditional nTot 0 0.1
+
+fix controlTop all setforce 0.0 0.0 0.0 region regTop
+variable zControl equal ${zInsLower}-0.5
+region regBelowTop cylinder z 0.0 0.0 5.5 ${zControl} ${zInsLower} units box
+variable negfz atom fz*(fz<0)
+fix controlBelowTop all setforce NULL NULL v_negfz region regBelowTop
+
+#region regMid cylinder z 0.0 0.0 15.0 1.0 ${zControl} units box
+#variable downwardsfz atom fz*(fz<0)+v_softnessfactor*fz*(fz>0)
+#fix controlMid all setforce NULL NULL v_downwardsfz region regMid
+
+variable aboveCZBelowTopIndicator atom (v_aboveCZIndicator)*(z<${zControl})
+group aboveCZBelowTop dynamic all var aboveCZBelowTopIndicator every ${Ncouple}
+variable downwardsfz atom fz*(fz<0)+v_softnessfactor*fz*(fz>0)
+fix controlMid aboveCZBelowTop setforce NULL NULL v_downwardsfz

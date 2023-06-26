@@ -1,0 +1,118 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.3.0                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      topoSetDict;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+actions
+(
+ {
+    name    sphere0;
+    type    cellSet;
+    action  new;
+    source sphereToCell;
+    sourceInfo
+    {
+        centre (0.0 0.0 2.0);
+        radius 0.3;
+    }
+  }
+
+ {
+    name    sphere1;
+    type    cellSet;
+    action  new;
+    source sphereToCell;
+    sourceInfo
+    {
+        centre (0.0 0.0 2.0);
+        radius 0.45;
+    }
+  }
+
+ {
+    name    sphere2;
+    type    cellSet;
+    action  new;
+    source sphereToCell;
+    sourceInfo
+    {
+        centre (0.0 0.0 2.0);
+        radius 0.55;
+    }
+  }
+
+ {
+    name    sphere3;
+    type    cellSet;
+    action  new;
+    source sphereToCell;
+    sourceInfo
+    {
+        centre (0.0 0.0 2.0);
+        radius 0.65;
+    }
+  }
+
+{
+    name        sphere0;
+    type        cellZoneSet;
+    action      new;
+
+    source      setToCellZone;
+    sourceInfo
+    {
+        set         sphere0;
+    }
+}
+
+{
+    name        sphere1;
+    type        cellZoneSet;
+    action      new;
+
+    source      setToCellZone;
+    sourceInfo
+    {
+        set         sphere1;
+    }
+}
+
+{
+    name        sphere2;
+    type        cellZoneSet;
+    action      new;
+
+    source      setToCellZone;
+    sourceInfo
+    {
+        set         sphere2;
+    }
+}
+
+{
+    name        sphere3;
+    type        cellZoneSet;
+    action      new;
+
+    source      setToCellZone;
+    sourceInfo
+    {
+        set         sphere3;
+    }
+}
+
+
+);
+
+// ************************************************************************* //

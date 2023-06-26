@@ -1,0 +1,188 @@
+############
+# monitoring
+############
+
+variable np equal count(all)
+
+variable nlargeore equal count(ore)
+variable nfineore equal count(fineore)
+variable nallore equal count(allore)
+variable nLiq equal count(fullyDeformed)
+
+fix printOres all print ${Nmonitor} "${time} ${nlargeore} ${nfineore} ${nallore} ${nLiq}" append ${dumppath}/monitor/N_ore.txt title "#time n_ore n_fineore n_allore n_liq"
+
+fix printN all print ${Nmonitor} "${time} ${np} ${nTot}" append ${dumppath}/monitor/Npart_dataDrivenCFD.txt title "#time   n_p n_upper"
+
+# coke in lower part
+variable nCokeBelowCZ equal 0
+variable nCokeBelowCZRef equal 0
+variable nFineCokeBelowCZ equal 0
+variable nFineCokeBelowCZRef equal 0
+variable nCokeRW equal count(coke,RW)
+variable nCokeRWOuter equal count(coke,RWOuter)
+
+fix printcokelower all print ${Nmonitor} "${time} ${nCokeBelowCZ} ${nCokeBelowCZRef} ${nFineCokeBelowCZ} ${nFineCokeBelowCZRef} ${nCokeRW} ${nCokeRWOuter}" append ${dumppath}/monitor/Npart_coke_lower_dataDrivenCFD.txt title "#time   N_coke_start   N_coke_curr N_finecoke_start N_finecoke_curr N_coke_RW N_coke_RWOuter"
+
+region outerhearth cylinder z 0 0 7 -2 3 units box
+region innerhearth cylinder z 0 0 3.2 -2 3 units box
+region invinnerhearth cylinder z 0 0 3.2 -2 3 side out units box
+region hearthring intersect 2 outerhearth invinnerhearth
+
+variable nouterhearth equal count(coke,outerhearth)
+variable ninnerhearth equal count(coke,innerhearth)
+variable nhearthring equal count(coke,hearthring)
+
+fix printcokehearth all print ${Nmonitor} "${time} ${nouterhearth} ${ninnerhearth} ${nhearthring}" append ${dumppath}/monitor/Npart_coke_hearth.txt title "#time n_outerhearth n_hearthinner n_hearthring"
+
+
+# coke and ore in upper part
+variable nAboveCZ equal count(aboveCZ)
+fix printPartupper all print ${Nmonitor} "${time} ${nAboveCZ}" append ${dumppath}/monitor/Npart_upper.txt title "#time   N_all_upper"
+
+compute heatsumcoke coke reduce sum f_reactionHeat
+variable heatpertimecoke equal c_heatsumcoke
+
+compute heatsumfinecoke finecoke reduce sum f_reactionHeat
+variable heatpertimefinecoke equal c_heatsumfinecoke
+
+compute heatsumore ore reduce sum f_reactionHeat
+variable heatpertimeore equal c_heatsumore
+
+compute heatsumfineore fineore reduce sum f_reactionHeat
+variable heatpertimefineore equal c_heatsumfineore
+
+fix printheatcoke all print ${Nmonitor} "${time} ${heatpertimecoke} ${heatpertimefinecoke} ${heatpertimeore} ${heatpertimefineore}" append ${dumppath}/monitor/heatcoke.txt title "#time   dH_coke/dt   dH_finecoke/dt   dH_ore/dt   dH_fineore/dt"
+
+# masses per second
+compute o2bycoke coke reduce sum f_Modified_O2
+variable masso2bycoke equal c_o2bycoke
+
+compute o2byfinecoke finecoke reduce sum f_Modified_O2
+variable masso2byfinecoke equal c_o2byfinecoke
+
+compute co2bycoke coke reduce sum f_Modified_CO2
+variable massco2bycoke equal c_co2bycoke
+
+compute co2byfinecoke finecoke reduce sum f_Modified_CO2
+variable massco2byfinecoke equal c_co2byfinecoke
+
+compute co2byore ore reduce sum f_Modified_CO2
+variable massco2byore equal c_co2byore
+
+compute co2byfineore fineore reduce sum f_Modified_CO2
+variable massco2byfineore equal c_co2byfineore
+
+compute cobycoke coke reduce sum f_Modified_CO
+variable masscobycoke equal c_cobycoke
+
+compute cobyfinecoke finecoke reduce sum f_Modified_CO
+variable masscobyfinecoke equal c_cobyfinecoke
+
+compute cobyore ore reduce sum f_Modified_CO
+variable masscobyore equal c_cobyore 
+
+compute cobyfineore fineore reduce sum f_Modified_CO
+variable masscobyfineore equal c_cobyfineore
+
+
+fix printremoved2 all print ${Nmonitor} "${time} ${masso2bycoke} ${masso2byfinecoke} ${massco2bycoke} ${massco2byfinecoke} ${massco2byore} ${massco2byfineore} ${masscobycoke} ${masscobyfinecoke} ${masscobyore} ${masscobyfineore}" append ${dumppath}/monitor/mass_reacted_pertime.txt title "#time   m_O2(coke)   m_O2(fine coke)   m_CO2(coke)   m_CO2(finecoke)  m_CO2(ore)   m_CO2(fineore)  m_CO(coke)   m_CO(finecoke)  m_CO(ore)   m_CO(fineore)"
+
+# test for reaction resistances
+
+compute cAO2ToCO coke reduce sum f_Aterm_chem2[0]
+variable AO2ToCO equal c_cAO2ToCO
+
+compute cMO2ToCO coke reduce sum f_Massterm_chem2[0]
+variable MO2ToCO equal c_cMO2ToCO
+
+compute cACO2ToCO coke reduce sum f_Aterm_chem3[0]
+variable ACO2ToCO equal c_cACO2ToCO
+
+compute cMCO2ToCO coke reduce sum f_Massterm_chem3[0]
+variable MCO2ToCO equal c_cMCO2ToCO
+
+fix printreactionresistances all print ${Nmonitor} "${time} ${AO2ToCO} ${MO2ToCO} ${ACO2ToCO} ${MCO2ToCO}" append ${dumppath}/monitor/reactionresistances.txt title "#time   AO2ToCO   MO2ToCO   ACO2ToCO   MCO2ToCO"
+
+# removed mass and heat removed along with it
+
+variable removedCokeMassRW equal f_deleteCokeRW[1]
+variable removedCokeHeatRW equal f_deleteCokeRW[2]
+
+variable removedCokeMassRWOuter equal f_deleteCokeRWOuter[1]
+variable removedCokeHeatRWOuter equal f_deleteCokeRWOuter[2]
+
+variable removedCokeMassHearth equal f_deleteCokeHearth[1]
+variable removedCokeHeatHearth equal f_deleteCokeHearth[2]
+
+variable removedFineCokeMassRW equal f_deleteFineCokeRW[1]
+variable removedFineCokeHeatRW equal f_deleteFineCokeRW[2]
+
+variable removedFineCokeMassHearth equal f_deleteFineCokeHearth[1]
+variable removedFineCokeHeatHearth equal f_deleteFineCokeHearth[2]
+
+variable removedCokeMass equal v_removedCokeMassRW+v_removedCokeMassRWOuter+v_removedCokeMassHearth+v_removedFineCokeMassRW+v_removedFineCokeMassHearth
+variable removedCokeHeat equal v_removedCokeHeatRW+v_removedCokeHeatRWOuter+v_removedCokeHeatHearth+v_removedFineCokeHeatRW+v_removedFineCokeHeatHearth
+
+####
+# no trickling
+variable removedOreMass equal f_cfd5[1]
+variable removedOreHeat equal f_cfd5[2]
+# trickling
+#variable removedOreMass equal f_deleteLiquidIron[1]
+#variable removedOreHeat equal f_deleteLiquidIron[2]
+####
+variable removedOreLatentHeat equal f_cfd5[3]
+
+fix printremovedmassandheat all print ${Nmonitor} "${time} ${removedCokeMass} ${removedCokeHeat} ${removedOreMass} ${removedOreHeat} ${removedOreLatentHeat}" append ${dumppath}/monitor/removedmassandheat.txt title "# time   coke mass   coke heat   ore mass   ore heat   ore latent heat"
+
+
+####
+# monitor total heat capacity
+variable CpMass atom f_ftca*mass
+compute cCpMassSum all reduce sum v_CpMass
+variable CpTotal equal c_cCpMassSum
+fix printCp all print ${Nmonitor} "${time} ${CpTotal}" append ${dumppath}/monitor/CpTotal.txt title "# time Cp"
+####
+
+# monitor minminum ore mass
+variable pMass atom mass
+compute cminOreMass ore reduce min v_pMass
+variable minOreMass equal c_cminOreMass
+fix printMinOreMass all print ${Nmonitor} "${time} ${minOreMass}" append ${dumppath}/monitor/minOreMass.txt title "# time minOreMass"
+#####
+
+
+#region topcenter cylinder z 0.0 0.0 0.25 20 24.5 units box
+#group topcenterall region topcenter
+#group topcenterore intersect topcenterall ore
+#variable highestcenterore equal boundid(topcenterore,zmax)
+#variable highestcenterore0 equal ${highestcenterore}
+#group trackParticle id ${highestcenterore} ${highestcenterore}
+#variable zi equal xcm(trackParticle,z)
+#compute cm1 trackParticle reduce sum f_LayerMasses[1]
+#variable m1 equal c_cm1
+#compute cm4 trackParticle reduce sum f_LayerMasses[4]  
+#variable m4 equal c_cm4
+
+
+
+#variable zi equal z[${highestcenterore}]
+#variable zi0 equal z[${highestcenterore0}]
+#variable typei equal type[${highestcenterore}]
+#variable typei0 equal type[${highestcenterore0}]
+#variable Ti equal f_Temp[${highestcenterore}]
+#variable Tgi equal f_partTemp[${highestcenterore}]
+#variable COi equal f_X_CO[${highestcenterore}]
+#variable CO2i equal f_X_CO2[${highestcenterore}]
+#variable m1 equal f_LayerMasses[${highestcenterore}][1]
+#variable m2 equal f_LayerMasses[${highestcenterore}][2]
+#variable m3 equal f_LayerMasses[${highestcenterore}][3]
+#variable m4 equal f_LayerMasses[${highestcenterore}][4]
+#variable mtot equal v_m1+v_m2+v_m3+v_m4
+#variable mm1 equal v_m1/v_mtot
+#variable mm2 equal v_m2/v_mtot
+#variable mm3 equal v_m3/v_mtot
+#variable mm4 equal v_m4/v_mtot
+
+#fix trackSingleParticle all print 20 "${time} ${highestcenterore} ${highestcenterore0} ${zi} ${m1}" file ${dumppath}/monitor/trackSingleParticle.txt title "# time z Tp Tg X_CO X_CO2 m_Fe m_Wu m_Ma m_He"
+#fix trackSingleParticle all print ${Nmonitor} "${time} ${zi} ${Ti} ${Tgi} ${COi} ${CO2i} ${mm1} ${mm2} ${mm3} ${mm4}" file ${dumppath}/monitor/trackSingleParticle.txt title "# time z Tp Tg X_CO X_CO2 m_Fe m_Wu m_Ma m_He" 

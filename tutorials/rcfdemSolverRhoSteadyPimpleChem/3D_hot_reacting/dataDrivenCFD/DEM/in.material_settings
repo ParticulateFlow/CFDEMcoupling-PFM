@@ -1,0 +1,54 @@
+##################################################
+# material properties required for new pair styles
+##################################################
+
+#fix 		m1 all property/global youngsModulus peratomtype ${yM_C} ${yM_C} ${yM_O} ${yM_O} ${yM_W}
+#fix 		m2 all property/global poissonsRatio peratomtype ${pR_C} ${pR_C} ${pR_O} ${pR_O} ${pR_W}
+#fix 		m3 all property/global coefficientRestitution peratomtypepair 5 ${rest_C} ${rest_C} ${rest_CO} ${rest_CO} ${rest_CW} ${rest_C} ${rest_C} ${rest_CO} ${rest_CO} ${rest_CW} ${rest_CO} ${rest_CO} ${rest_O} ${rest_O} ${rest_WO}  ${rest_CO} ${rest_CO} ${rest_O} ${rest_O} ${rest_WO} ${rest_CW} ${rest_CW} ${rest_WO} ${rest_WO} ${rest_W}
+#fix 		m4 all property/global coefficientFriction peratomtypepair 5 ${fric_C} ${fric_C} ${fric_CO} ${fric_CO} ${fric_CW} ${fric_C} ${fric_C} ${fric_CO} ${fric_CO} ${fric_CW} ${fric_CO} ${fric_CO} ${fric_O} ${fric_O} ${fric_WO} ${fric_CO} ${fric_CO} ${fric_O} ${fric_O} ${fric_WO} ${fric_CW} ${fric_CW}  ${fric_WO} ${fric_WO} ${fric_W}
+#fix         	m5 all property/global coefficientRollingFriction peratomtypepair 5 ${roll_C} ${roll_C} ${roll_CO} ${roll_CO} ${roll_CW} ${roll_C} ${roll_C} ${roll_CO} ${roll_CO} ${roll_CW} ${roll_CO} ${roll_CO} ${roll_O} ${roll_O} ${roll_WO} ${roll_CO} ${roll_CO} ${roll_O} ${roll_O} ${roll_WO} ${roll_CW} ${roll_CW} ${roll_WO} ${roll_WO} ${roll_W}
+#fix         	m6 all property/global characteristicVelocity scalar ${cV}
+
+fix 		m1 all property/global kn peratomtypepair 5 ${kn} ${kn} ${kn} ${kn} ${knW} ${kn} ${kn} ${kn} ${kn} ${knW} ${kn} ${kn} ${kn} ${kn} ${knW} ${kn} ${kn} ${kn} ${kn} ${knW} ${knW} ${knW} ${knW} ${knW} ${knW}
+fix 		m2 all property/global kt peratomtypepair 5 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+fix 		m3 all property/global gamman peratomtypepair 5 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+fix 		m4 all property/global gammat peratomtypepair 5 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+fix 		m5 all property/global coefficientFriction peratomtypepair 5 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+fix 		m6 all property/global coefficientRollingFriction peratomtypepair 5 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+
+
+fix 		ftco all property/global thermalConductivity peratomtype 1.7 1.7 80 80 1.0
+# constant Cp
+#fix 		ftca all property/global thermalCapacity peratomtype 850 850 600 600 1.0 
+# variable Cp
+fix		ftca all property/atom thermalCapacity scalar yes no no 600
+
+# do we need this? should be constructed by fix_cfd_convection; heat/gran results in heat/gran/cond with possibly undesired side effects
+#fix             heattransfer all heat/gran initial_temperature 293
+
+# pair style
+#pair_style gran model hertz tangential history rolling_friction cdt
+pair_style gran model hooke/stiffness
+pair_coeff  * *
+
+fix         bottom all mesh/surface file ../../CFDDEM/DEM/stl_files/surface_bottom.stl type 5
+fix         wall all mesh/surface file ../../CFDDEM/DEM/stl_files/surface_walls.stl type 5
+
+#fix granwalls all wall/gran model hertz tangential history mesh n_meshes 2 meshes bottom wall
+fix granwalls all wall/gran model hooke/stiffness mesh n_meshes 2 meshes bottom wall
+
+#################################
+# particle types and distribution
+#################################
+
+group coke type 1
+group finecoke type 2
+group ore type 3
+group fineore type 4
+
+####
+# no need to set polydispersity if particle data is read from dump file
+####
+#fix	    fp all property/atom/polydispparcel effvolfactor ${poly_C} ${poly_fC} ${poly_O} ${poly_fO} 1.0
+
+run 0

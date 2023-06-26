@@ -1,0 +1,82 @@
+    pressureWork
+    {
+        // Load the library containing the 'coded' functionObject
+        libs ("libutilityFunctionObjects.so");
+
+        type coded;
+
+        // Name of on-the-fly generated functionObject
+        name monitorPressureWork;
+
+        codeOptions
+        #{
+            -I$(LIB_SRC)/finiteVolume/lnInclude \
+            -I$(LIB_SRC)/meshTools/lnInclude
+        #};
+
+        codeExecute
+        #{
+            label nevery = 20;
+
+            static label counter = 0;
+
+            label timeInd = mesh().time().timeIndex();
+            if (timeInd % nevery > 0) return 0;
+
+            scalar t = mesh().time().timeOutputValue();
+
+            const fvPatchList& patches = mesh().boundary();
+            const surfaceScalarField& phi = mesh().lookupObject<surfaceScalarField>("phi");
+            const volScalarField& p = mesh().lookupObject<volScalarField>("p");
+            const volScalarField& rho = mesh().lookupObject<volScalarField>("rho");
+
+            scalar inpU = 0.0;
+            scalar outpU = 0.0;
+
+            forAll(patches, patchi)
+            {
+                const fvPatch& curPatch = patches[patchi];
+              
+                word patchName = mesh().boundary()[patchi].name();
+                if (patchName == "inlet")
+                {
+                    forAll(curPatch, facei)
+                    {
+                        label faceCelli = curPatch.faceCells()[facei];
+		         inpU += phi.boundaryField()[patchi][facei] * p.boundaryField()[patchi][facei] / rho.boundaryField()[patchi][facei];
+                    }
+                }
+                else if (patchName == "top")
+                {
+                    forAll(curPatch, facei)
+                    {
+                        label faceCelli = curPatch.faceCells()[facei];
+		         outpU += phi.boundaryField()[patchi][facei] * p.boundaryField()[patchi][facei] / rho.boundaryField()[patchi][facei];
+                    }
+                }
+            }
+
+            reduce(inpU, sumOp<scalar>());
+            reduce(outpU, sumOp<scalar>());
+
+            //- Now printing out the results
+            if(Pstream::master())
+            {
+                std::ofstream fs;
+                fs.open ("postProcessing/pressureWork", std::fstream::app);
+                fs.precision(5);
+                if (counter == 0)
+                {
+                    fs << "# time\t\tinpU\t\toutpU\n";
+                    fs << "#---------------------------------------------------------------------------------------------------------------------------------------------------------\n";
+                }
+                fs << t << "\t\t"
+                << inpU << "\t\t" << outpU << "\n";
+                fs.close();
+            }
+
+            counter++;
+
+        #};
+    }
+
