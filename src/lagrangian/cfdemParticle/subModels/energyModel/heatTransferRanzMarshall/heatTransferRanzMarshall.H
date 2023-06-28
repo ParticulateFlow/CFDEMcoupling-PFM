@@ -67,6 +67,8 @@ protected:
 
     bool allScaleNuCells_;
 
+    bool scaleNu_;
+
     scalar Tmin_;
 
     scalar Tmax_;

@@ -53,6 +53,7 @@ heatTransferRanzMarshall::heatTransferRanzMarshall
     scaleNuCellsName_(propsDict_.lookupOrDefault<word>("scaleNuCellsName","all")),
     scaleNuCells_(),
     allScaleNuCells_(false),
+    scaleNu_(false),
     Tmin_(propsDict_.lookupOrDefault<scalar>("Tmin",0.0)),
     Tmax_(propsDict_.lookupOrDefault<scalar>("Tmax",1e6)),
     totalHeatFlux_(0.0),
@@ -168,6 +169,7 @@ heatTransferRanzMarshall::heatTransferRanzMarshall
 
     if (propsDict_.found("NusseltScalingFactor"))
     {
+        scaleNu_ = true;
         NusseltScalingFactor_=readScalar(propsDict_.lookup ("NusseltScalingFactor"));
         if(scaleNuCellsName_ != "all")
         {
@@ -383,9 +385,12 @@ void heatTransferRanzMarshall::calcEnergyContribution()
                     Nup = Nusselt(voidfraction, Rep, Pr);
                 }
 
-                if (scaleNuCell(cellI))
+                if (scaleNu_)
                 {
-                    Nup *= NusseltScalingFactor_;
+                    if (scaleNuCell(cellI))
+                    {
+                        Nup *= NusseltScalingFactor_;
+                    }
                 }
 
                 Tsum += partTemp_[index][0];
