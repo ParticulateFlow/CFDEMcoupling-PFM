@@ -3,7 +3,7 @@
 #===================================================================#
 # DEM run script for FinesColumn testcase
 # init FinesColumn
-# Thomas Lichtenegger - January 2017
+# Thomas Lichtenegger - June 2023
 #===================================================================#
 
 #- source CFDEM env vars
