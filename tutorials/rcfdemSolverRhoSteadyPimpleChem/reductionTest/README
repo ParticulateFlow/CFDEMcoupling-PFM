@@ -1,8 +1,8 @@
 Test case for ore reduction in a small cylinder
 
-1) fill a cylinder with sperical particles (parDEMrun.sh)
+1) fill a cylinder with sperical particles (initCase.sh)
 2) create CFD mesh (mesh.sh)
-3) introduce gas flow to reduce ore (parCFDDEMrun.sh)
+3) introduce gas flow to reduce ore (runCase.sh)
 
 
 Comments:

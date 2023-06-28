@@ -80,7 +80,7 @@ variable vcmz equal vcm(all,z)
 variable vave equal sqrt(v_vcmx*v_vcmx+v_vcmy*v_vcmy+v_vcmz*v_vcmz)
 print ${vave}
 
-run     1000000
+run     100000
 
 #======================================================================
 region      delReg block -${cylrad} ${cylrad} -${cylrad} ${cylrad} 0.2 INF units box
