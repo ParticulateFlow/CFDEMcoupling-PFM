@@ -63,7 +63,7 @@ compute layerRadC2 coke reduce sum f_LayerRelRadii[2]
 fix     redRadC2 coke ave/time 1 1 1 c_layerRadC2
 variable rrC2 equal f_redRadC2/v_ncoke
 
-variable reductionDegree atom 1./9.*f_fracRed[1]+2./9.*f_fracRed[2]+6./9.*f_fracRed[3]
+variable reductionDegree atom 1./9.*f_fracRed[3]+2./9.*f_fracRed[2]+6./9.*f_fracRed[1]
 
 
 fix printRelRadiiOre all print ${Nmonitor} "${time} ${rrO1} ${rrO2} ${rrO3} ${rrO4}" append ${dumppath}/post/relRadiiOre.txt title "#time relRadO_1 relRadO_2 relRadO_3 relRadO_4"
