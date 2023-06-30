@@ -7,6 +7,9 @@ variable skin equal 0.005
 
 # particle settling loop parameters
 variable vthre equal 0.0001
+
+shell mkdir ../DEM/post
+shell mkdir ../DEM/monitor
 ###############################################
 
 atom_style      granular

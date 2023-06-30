@@ -2,6 +2,8 @@
 # material properties
 include ../DEM/DEMparameters
 
+shell mkdir ../DEM/post
+shell mkdir ../DEM/monitor
 ###############################################
 
 atom_style      granular
