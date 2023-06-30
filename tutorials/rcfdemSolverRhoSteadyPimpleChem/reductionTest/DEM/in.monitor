@@ -9,7 +9,8 @@ variable lmass2 equal f_layermasses[2]
 variable lmass3 equal f_layermasses[3]
 variable lmass4 equal f_layermasses[4]
 variable lmasstot equal f_layermasses[1]+f_layermasses[2]+f_layermasses[3]+f_layermasses[4]
+variable massloss equal ${m1}-v_lmasstot
 
-fix printmasslayer all print 80 "${time} ${m1} ${lmass1} ${lmass2} ${lmass3} ${lmass4} ${lmasstot}" &
-    file ../DEM/monitor/mass_layer.dat title "#time mass lmass1 lmass2 lmass3 lmass4 lmass_{tot}" screen no
+fix printmasslayer all print 80 "${time} ${massloss} ${lmass1} ${lmass2} ${lmass3} ${lmass4} ${lmasstot}" &
+    file ../DEM/monitor/mass_layer.dat title "#time massloss lmass1 lmass2 lmass3 lmass4 lmass_{tot} " screen no
 
