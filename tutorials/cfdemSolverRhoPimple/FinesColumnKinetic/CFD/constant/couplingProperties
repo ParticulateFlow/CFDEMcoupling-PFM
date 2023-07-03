@@ -1,38 +1,28 @@
-/*---------------------------------------------------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.4                                   |
-|   \\  /    A nd           | Web:      http://www.openfoam.org               |
-|    \\/     M anipulation  |                                                 |
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  6
+     \\/     M anipulation  |
 \*---------------------------------------------------------------------------*/
-
-
 FoamFile
 {
     version         2.0;
     format          ascii;
-
-    root            "";
-    case            "";
-    instance        "";
-    local           "";
-
     class           dictionary;
     object          couplingProperties;
 }
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-//===========================================================================//
 // sub-models & settings
 
-modelType "A"; // A or B
+modelType "A"; // A or B or Bfull
 
 couplingInterval 10;
 
 voidFractionModel divided;
 
-locateModel engine;//turboEngine;//
+locateModel engine;
 
 meshMotionModel noMeshMotion;
 
@@ -40,11 +30,11 @@ regionModel allRegion;
 
 IOModel "off";
 
-dataExchangeModel twoWayMPI;//twoWayM2M;//twoWayFiles;//oneWayVTK;//
+dataExchangeModel twoWayMPI;
 
-averagingModel dense;//dilute;//
+averagingModel dense;
 
-clockModel standardClock;//off;
+clockModel standardClock;
 
 smoothingModel constDiffSmoothing;
 
@@ -87,7 +77,7 @@ chemistryModels
 
 turbulenceModelType "turbulenceProperties";
 
-//===========================================================================//
+
 // sub-model properties
 
 implicitCoupleProps
@@ -104,24 +94,14 @@ explicitCoupleProps
 
 dSauterProps
 {
-
 }
+
 gradPForceProps
 {
     pFieldName "p";
     densityFieldName "rho";
     voidfractionFieldName "voidfraction";
     velocityFieldName "U";
-}
-
-GidaspowDragProps
-{
-    verbose false;
-    velFieldName "U";
-    granVelFieldName "Us";
-    voidfractionFieldName "voidfraction";
-    interpolation true;
-    phi 1;
 }
 
 heatTransferGunnProps
@@ -192,17 +172,7 @@ SyamlalThermCondProps
 {
 }
 
-centreProps
-{
-    alphaMin 0.10;
-}
-
 engineProps
-{
-    treeSearch true;
-}
-
-turboEngineProps
 {
     treeSearch true;
 }
@@ -223,31 +193,14 @@ constDiffSmoothingProps
     smoothingLength 0.005;
 }
 
-oneWayVTKProps
-{
-    couplingFilename "vtk_out%4.4d.vtk";
-    maxNumberOfParticles 50000;
-}
-
-twoWayFilesProps
-{
-    maxNumberOfParticles 50000;
-}
-
 twoWayMPIProps
 {
-    maxNumberOfParticles 50000;
     liggghtsPath "../DEM/in.liggghts_resume";
 }
-
-twoWayM2MProps
-{
-    maxNumberOfParticles 50000;
-    liggghtsPath "../DEM/in.liggghts_resume";
- }
 
 particleProbeProps
 {
-        particleIDsToSample "0";
+    particleIDsToSample "0";
 }
+
 // ************************************************************************* //

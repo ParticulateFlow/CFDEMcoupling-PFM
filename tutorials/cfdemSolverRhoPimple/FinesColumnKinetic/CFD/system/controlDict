@@ -1,9 +1,9 @@
 /*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  2.3.0                                 |
-|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
-|    \\/     M anipulation  |                                                 |
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  6
+     \\/     M anipulation  |
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
@@ -48,62 +48,62 @@ runTimeModifiable true;
 
 functions
 {
-        probes1
-	{
-		type probes;
+    probes1
+    {
+        type probes;
 
-		functionObjectLibs ("libsampling.so");
+        functionObjectLibs ("libsampling.so");
 
-		#include "probesDict";
-	}
+        #include "probesDict";
+    }
 
-        volInt
-	{
-        	type            volFieldValue;
-	 	functionObjectLibs ("libfieldFunctionObjects.so");
-		writeControl   timeStep;
-                log             true;
-        	writeFields     false;
-                regionType      all;
-   //     	name            all;
-        	operation       volIntegrate;
+    volInt
+    {
+        type            volFieldValue;
+        functionObjectLibs ("libfieldFunctionObjects.so");
+        writeControl    timeStep;
+        log             true;
+        writeFields     false;
+        regionType      all;
+        //name            all;
+        operation       volIntegrate;
 
-        	fields
-        	(
-            		alphaSt
-        	);
-    	}
+        fields
+        (
+            alphaSt
+        );
+    }
 
-        inflow
-        {
-            type            surfaceFieldValue;
-            libs ("libfieldFunctionObjects.so");
-            writeControl   timeStep;
-            log             true;
-            // Output field values as well
-            writeFields     false;
-            regionType      patch;
-            name            inlet;
-            operation       sum;//areaIntegrate;
+    inflow
+    {
+        type            surfaceFieldValue;
+        libs ("libfieldFunctionObjects.so");
+        writeControl    timeStep;
+        log             true;
+        // Output field values as well
+        writeFields     false;
+        regionType      patch;
+        name            inlet;
+        operation       sum;//areaIntegrate;
 
-            fields
-            (
-                massFluxDyn
-            );
-        }
+        fields
+        (
+            massFluxDyn
+        );
+    }
 
-        outflow
-        {
-            $inflow;
-            name      outlet;
-        }
+    outflow
+    {
+        $inflow;
+        name      outlet;
+    }
 
-        throughflow
-        {
-            $inflow;
-            regionType    faceZone;
-            name          plane1;
-        }
+    throughflow
+    {
+        $inflow;
+        regionType    faceZone;
+        name          plane1;
+    }
 }
 
 // ************************************************************************* //

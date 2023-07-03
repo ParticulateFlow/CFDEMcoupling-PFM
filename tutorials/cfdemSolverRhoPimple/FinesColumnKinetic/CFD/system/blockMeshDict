@@ -1,9 +1,9 @@
 /*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  2.3.0                                 |
-|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
-|    \\/     M anipulation  |                                                 |
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  6
+     \\/     M anipulation  |
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
@@ -13,6 +13,7 @@ FoamFile
     object      blockMeshDict;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
 #include "../geometry"
 convertToMeters 1;
 
@@ -29,12 +30,12 @@ vertices #codeStream
         points[0]  = point($mr2, $mr2, $zmin);
         points[1]  = point($r2, $mr2, $zmin);
         points[2]  = point($r2,$r2,$zmin);
-	points[3] = point($mr2,$r2,$zmin);
-	points[4]  = point($hsqrt2*$mr1, $hsqrt2*$mr1, $zmin);
-	points[5]  = point($hsqrt2*$r1, $hsqrt2*$mr1, $zmin);
-	points[6]  = point($hsqrt2*$r1, $hsqrt2*$r1, $zmin);
-	points[7]  = point($hsqrt2*$mr1, $hsqrt2*$r1, $zmin);
-	
+        points[3]  = point($mr2,$r2,$zmin);
+        points[4]  = point($hsqrt2*$mr1, $hsqrt2*$mr1, $zmin);
+        points[5]  = point($hsqrt2*$r1, $hsqrt2*$mr1, $zmin);
+        points[6]  = point($hsqrt2*$r1, $hsqrt2*$r1, $zmin);
+        points[7]  = point($hsqrt2*$mr1, $hsqrt2*$r1, $zmin);
+
 
         // Duplicate z points
         label sz = points.size();
@@ -99,7 +100,7 @@ boundary
         );
     }
     walls
-    { 
+    {
         type wall;
         faces
         (

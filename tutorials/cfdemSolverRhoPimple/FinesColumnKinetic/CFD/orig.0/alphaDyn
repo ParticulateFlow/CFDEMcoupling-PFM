@@ -1,9 +1,9 @@
 /*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.6                                   |
-|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
-|    \\/     M anipulation  |                                                 |
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  6
+     \\/     M anipulation  |
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
@@ -25,11 +25,13 @@ boundaryField
     {
         type            zeroGradient;
     }
+
     inlet
     {
         type            fixedValue;
         value           uniform 0.01;
-   /*     type groovyBC;
+/*
+        type groovyBC;
         uDyn uDyn;
         variables "gF=0.03;rhoF=1396;";
         valueExpression "gF/(rhoF*mag(uDyn)+0.01)";
