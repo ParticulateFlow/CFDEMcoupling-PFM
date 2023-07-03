@@ -1,9 +1,9 @@
 # DEM-parameters
 variable partDens equal 1000                # density
 variable partDensHeavy equal 8000           # density
-variable partRad1 equal 0.0024             # particle radius
-variable partRad2 equal 0.0012             # particle radius
-variable partRadBig equal 0.005              # particle radius
+variable partRad1 equal 0.0024              # particle radius
+variable partRad2 equal 0.0012              # particle radius
+variable partRadBig equal 0.005             # particle radius
 variable partVol equal 4*3.14/3*${partRad2}^3
 variable partVolBig equal 4*3.14/3*${partRad1}^3
 variable yM equal 5.e6                      # Young's modulus
@@ -13,7 +13,7 @@ variable fric equal 0.95                    # coefficient of friction
 variable roll equal 0.15                    # for particles and walls with friction
 variable noRoll equal 0                     # for frictionless walls
 variable cV equal 0.1                       # characteristic velocity
-variable coh equal 50000		      # cohesion energy density
+variable coh equal 50000                    # cohesion energy density
 
 variable Tpart equal 298
 

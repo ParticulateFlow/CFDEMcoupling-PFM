@@ -13,13 +13,13 @@ FoamFile
     location    "system";
     object      setFieldsDict;
 }
-// *
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 defaultFieldValues
 (
     volScalarFieldValue smoothingLengthField 0
 );
- 
+
 regions
 (
     boxToCell

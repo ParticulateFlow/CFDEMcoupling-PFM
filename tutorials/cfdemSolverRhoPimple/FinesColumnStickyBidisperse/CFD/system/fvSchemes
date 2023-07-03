@@ -1,9 +1,9 @@
 /*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.6                                   |
-|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
-|    \\/     M anipulation  |                                                 |
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  6
+     \\/     M anipulation  |
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
@@ -24,7 +24,7 @@ gradSchemes
 {
     default         Gauss linear;
     grad(p)         cellLimited Gauss linear 1;
-    // grad(U)         Gauss linear;
+    //grad(U)         Gauss linear;
     grad(U)         cellLimited Gauss linear 1;
 }
 
@@ -32,7 +32,7 @@ divSchemes
 {
     default         Gauss linear;
     div(phi,U)      Gauss upwind;
-   // div(phi,U)      bounded Gauss linearUpwindV grad(U);
+    //div(phi,U)      bounded Gauss linearUpwindV grad(U);
     div(phi,k)      Gauss limitedLinear 1;
     div(phi,epsilon) Gauss limitedLinear 1;
     div(phi,R)      Gauss limitedLinear 1;
@@ -68,7 +68,7 @@ interpolationSchemes
 
 snGradSchemes
 {
-    // default         corrected;
+    //default         corrected;
     default         limited 0.333;
 }
 

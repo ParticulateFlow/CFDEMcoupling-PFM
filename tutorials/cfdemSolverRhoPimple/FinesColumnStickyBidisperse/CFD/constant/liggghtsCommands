@@ -1,24 +1,16 @@
-/*---------------------------------------------------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.4                                   |
-|   \\  /    A nd           | Web:      http://www.openfoam.org               |
-|    \\/     M anipulation  |                                                 |
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  6
+     \\/     M anipulation  |
 \*---------------------------------------------------------------------------*/
-
-
 FoamFile
 {
-    version         2.0;
-    format          ascii;
-
-    root            "";
-    case            "";
-    instance        "";
-    local           "";
-
-    class           dictionary;
-    object          liggghtsCommands;
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      liggghtsCommands;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -28,15 +20,5 @@ liggghtsCommandModels
    runLiggghts
    writeLiggghts
 );
+
 // ************************************************************************* //
-
-/*runLiggghtsProps
-{
-    preNo false;
-}
-
-writeLiggghtsProps
-{
-    writeLast off;
-    overwrite off;
-}*/

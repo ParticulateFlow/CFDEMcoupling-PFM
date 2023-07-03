@@ -1,9 +1,9 @@
 /*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  2.3.0                                 |
-|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
-|    \\/     M anipulation  |                                                 |
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  6
+     \\/     M anipulation  |
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
@@ -13,6 +13,7 @@ FoamFile
     object      uDyn;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
 #include "../inletVelocity"
 
 dimensions      [0 1 -1 0 0 0 0];
@@ -38,11 +39,11 @@ boundaryField
 
     inlet
     {
- //       type            calculated;
- //       value           $internalField;
-// same as U
-        type surfaceNormalFixedValue;
-        refValue uniform $vin;
+        //type            calculated;
+        //value           $internalField;
+        // same as U
+        type            surfaceNormalFixedValue;
+        refValue        uniform $vin;
     }
 
     outlet
