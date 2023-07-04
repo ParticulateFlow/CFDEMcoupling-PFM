@@ -1,9 +1,9 @@
 /*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  2.3.0                                 |
-|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
-|    \\/     M anipulation  |                                                 |
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  6
+     \\/     M anipulation  |
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
@@ -15,18 +15,18 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-// OF 6
-
 source1
 {
-    type        limitTemperature;
+    type            limitTemperature;
     active          yes;
     limitTemperatureCoeffs
     {
         active          yes;
         selectionMode   all;
-        min     1222;
-        max     1224;
+        Tmin    1222; // OF4
+        Tmax    1224; // OF4
+        min     $Tmin; // OF5,OF6
+        max     $Tmax; // OF5,OF6
     }
 }
 

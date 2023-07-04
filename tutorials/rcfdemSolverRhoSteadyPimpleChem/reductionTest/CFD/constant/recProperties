@@ -1,31 +1,20 @@
-/*---------------------------------------------------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.4                                   |
-|   \\  /    A nd           | Web:      http://www.openfoam.org               |
-|    \\/     M anipulation  |                                                 |
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  6
+     \\/     M anipulation  |
 \*---------------------------------------------------------------------------*/
-
-
 FoamFile
 {
-    version         2.0;
-    format          ascii;
-
-    root            "";
-    case            "";
-    instance        "";
-    local           "";
-
-    class           dictionary;
-    object          recProperties;
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      recProperties;
 }
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-//===========================================================================//
 // sub-models & settings
-
 
 recModel standardRecModel;
 
@@ -47,17 +36,16 @@ volVectorFields
 
 surfaceScalarFields
 (
-  //  phi
+    //phi
 );
 
 //verbose true;
 
 //couplingSubStep 1;
 
-initialRecSteps 20000; //10;
+initialRecSteps 20000;
 
 
-//===========================================================================//
 // sub-model properties
 
 standardRecModelProps
@@ -70,7 +58,6 @@ standardRecModelProps
 EuclideanNormProps
 {
     fieldType "volScalarField";
- //   fieldName "partType";
     fieldName "voidfraction";
 }
 

@@ -1,29 +1,19 @@
-/*---------------------------------------------------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.4                                   |
-|   \\  /    A nd           | Web:      http://www.openfoam.org               |
-|    \\/     M anipulation  |                                                 |
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  6
+     \\/     M anipulation  |
 \*---------------------------------------------------------------------------*/
-
-
 FoamFile
 {
-    version         2.0;
-    format          ascii;
-
-    root            "";
-    case            "";
-    instance        "";
-    local           "";
-
-    class           dictionary;
-    object          couplingProperties;
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      couplingProperties;
 }
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-//===========================================================================//
 // sub-models & settings
 
 modelType "A";
@@ -32,7 +22,7 @@ couplingInterval 1;
 
 voidFractionModel divided;
 
-locateModel engine;//turboEngine;//
+locateModel engine;
 
 meshMotionModel noMeshMotion;
 
@@ -87,7 +77,7 @@ turbulenceModelType "turbulenceProperties";
 coupleRecFluc false;
 coupleRecForce false;
 
-//===========================================================================//
+
 // sub-model properties
 
 freeStreamingProps
@@ -118,22 +108,13 @@ dSauterProps
 {
 
 }
+
 gradPForceProps
 {
     pFieldName "p";
     densityFieldName "rho";
     voidfractionFieldName "voidfraction";
     velocityFieldName "U";
-}
-
-GidaspowDragProps
-{
-    verbose false;
-    velFieldName "U";
-    granVelFieldName "Us";
-    voidfractionFieldName "voidfraction";
-    interpolation true;
-    phi 1;
 }
 
 heatTransferGunnProps
@@ -168,17 +149,7 @@ SyamlalThermCondProps
 {
 }
 
-centreProps
-{
-    alphaMin 0.10;
-}
-
 engineProps
-{
-    treeSearch true;
-}
-
-turboEngineProps
 {
     treeSearch true;
 }
@@ -201,14 +172,13 @@ constDiffSmoothingProps
 
 twoWayMPIProps
 {
-    maxNumberOfParticles 50000;
     liggghtsPath "../DEM/in.liggghts_dataDrivenCFD";
 }
 
 
 particleProbeProps
 {
-        particleIDsToSample "0";
+    particleIDsToSample "0";
 }
 
 speciesProps

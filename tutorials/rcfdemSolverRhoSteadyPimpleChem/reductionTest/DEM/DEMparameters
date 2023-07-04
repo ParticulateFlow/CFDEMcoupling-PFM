@@ -1,8 +1,8 @@
 # DEM-parameters
 variable partDens equal 3300                # density
-variable partDensHeavy equal 8000                # density
-#variable partRad equal 0.001              # particle radius
-variable partRad equal 0.0055             # particle radius
+variable partDensHeavy equal 8000           # density
+#variable partRad equal 0.001               # particle radius
+variable partRad equal 0.0055               # particle radius
 variable partVol equal 4*3.14/3*${partRad}^3
 variable yM equal 5.e6                      # Young's modulus
 variable pR equal 0.25                      # Poisson ratio
