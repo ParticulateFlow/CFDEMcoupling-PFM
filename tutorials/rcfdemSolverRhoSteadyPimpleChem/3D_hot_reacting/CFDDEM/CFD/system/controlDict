@@ -1,9 +1,9 @@
 /*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  2.3.0                                 |
-|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
-|    \\/     M anipulation  |                                                 |
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  6
+     \\/     M anipulation  |
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
@@ -54,7 +54,7 @@ functions
         type            fieldAverage;
         libs            ("libfieldFunctionObjects.so");
         writeControl    writeTime;
-        timeStart	18.0;
+        timeStart       18.0;
 
         fields
         (
@@ -65,14 +65,14 @@ functions
                 base        time;
                 window	    5.0001;
             }
-	    Us
+            Us
             {
                 mean        on;
                 prime2Mean  off;
                 base        time;
                 window	    5.0001;
             }
-	    voidfraction
+            voidfraction
             {
                 mean        on;
                 prime2Mean  off;
@@ -95,7 +95,7 @@ functions
                 window	    2.0001;
                 windowName w1;
             }
-	    voidfraction
+            voidfraction
             {
                 mean        on;
                 prime2Mean  off;
@@ -110,9 +110,9 @@ functions
     {
         type writeObjects;
         functionObjectLibs ( "libutilityFunctionObjects.so" );
-        exclusiveWriting     true;
+        exclusiveWriting    true;
         objects ("Us" "UsMean" "voidfraction" "voidfractionMean" "partType" "dSauter" "dSauterMean");
-        writeControl timeStep;
+        writeControl        timeStep;
         writeInterval       10000;
     }
 
@@ -120,9 +120,9 @@ functions
     {
         type probes;
 
-	functionObjectLibs ("libsampling.so");
+        functionObjectLibs ("libsampling.so");
 
-	#include "probesDict";
+        #include "probesDict";
     }
 
     cellObj1
@@ -148,10 +148,9 @@ functions
     {
         type abort;
         libs    ("libutilityFunctionObjects.so");
-        action writeNow;
-        file "ABORT";
+        action  writeNow;
+        file    "ABORT";
     }
-
 }
 
 // ************************************************************************* //

@@ -1,9 +1,9 @@
 /*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  2.3.0                                 |
-|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
-|    \\/     M anipulation  |                                                 |
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  6
+     \\/     M anipulation  |
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
@@ -12,11 +12,11 @@ FoamFile
     class       dictionary;
     object      topoSetDict;
 }
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
 actions
 (
- {
+{
     name    sphere0;
     type    cellSet;
     action  new;
@@ -26,9 +26,9 @@ actions
         centre (0.0 0.0 2.0);
         radius 0.3;
     }
-  }
+}
 
- {
+{
     name    sphere1;
     type    cellSet;
     action  new;
@@ -38,9 +38,9 @@ actions
         centre (0.0 0.0 2.0);
         radius 0.45;
     }
-  }
+}
 
- {
+{
     name    sphere2;
     type    cellSet;
     action  new;
@@ -50,9 +50,9 @@ actions
         centre (0.0 0.0 2.0);
         radius 0.55;
     }
-  }
+}
 
- {
+{
     name    sphere3;
     type    cellSet;
     action  new;
@@ -62,7 +62,7 @@ actions
         centre (0.0 0.0 2.0);
         radius 0.65;
     }
-  }
+}
 
 {
     name        sphere0;
@@ -111,8 +111,6 @@ actions
         set         sphere3;
     }
 }
-
-
 );
 
 // ************************************************************************* //

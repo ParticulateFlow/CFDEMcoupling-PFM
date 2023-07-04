@@ -1,29 +1,19 @@
-/*---------------------------------------------------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.4                                   |
-|   \\  /    A nd           | Web:      http://www.openfoam.org               |
-|    \\/     M anipulation  |                                                 |
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  6
+     \\/     M anipulation  |
 \*---------------------------------------------------------------------------*/
-
-
 FoamFile
 {
     version         2.0;
     format          ascii;
-
-    root            "";
-    case            "";
-    instance        "";
-    local           "";
-
     class           dictionary;
     object          couplingProperties;
 }
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-//===========================================================================//
 // sub-models & settings
 
 modelType "A";
@@ -78,7 +68,8 @@ turbulenceModelType "turbulenceProperties";
 getParticleTypes true;
 getParticleDensities false;
 getParticleEffVolFactors true;
-//===========================================================================//
+
+
 // sub-model properties
 
 implicitCoupleProps
@@ -101,7 +92,6 @@ viscForceProps
     velocityFieldName "U";
     densityFieldName "rho";
 }
-
 
 BeetstraDragProps
 {
@@ -146,12 +136,6 @@ heatTransferRanzMarshallProps
 
 SyamlalThermCondProps
 {
-}
-
-
-centreProps
-{
-    alphaMin 0.10;
 }
 
 engineProps

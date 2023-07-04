@@ -3,23 +3,23 @@
 include ../DEM/DEMparameters
 
 ###############################################
-atom_style		granular
-atom_modify		map array
-communicate	single vel yes
+atom_style      granular
+atom_modify     map array
+communicate     single vel yes
 
-boundary		f f f
-newton			off
-units			si
+boundary        f f f
+newton          off
+units           si
 processors      2 2 8
-#processors       1 1 8
+#processors      1 1 8
 
 # either (A) start new simulation and read dump or (B) restart simulation with restart file
 # option A
-region		reg block -7.5 7.5 -7.5 7.5 -1.15 30 units box
-create_box	5 reg
+region      reg block -7.5 7.5 -7.5 7.5 -1.15 30 units box
+create_box  5 reg
 
 fix         fp all property/atom/polydispparcel effvolfactor ${poly_C} ${poly_fC} ${poly_O} ${poly_fO} 1.0
-read_dump ../DEM/initFullState 0 x y z radius mass density bruteadd yes retaintimestep yes exactstep no
+read_dump   ../DEM/initFullState 0 x y z radius mass density bruteadd yes retaintimestep yes exactstep no
 group coke type 1
 group finecoke type 2
 group ore type 3
@@ -34,10 +34,10 @@ include ../DEM/latestTimeStep
 reset_timestep ${latestTimeStep}
 
 
-neighbor	${skin} bin
-neigh_modify	delay 0
+neighbor        ${skin} bin
+neigh_modify    delay 0
 group fullyDeformed empty
-neigh_modify	exclude group fullyDeformed all
+neigh_modify    exclude group fullyDeformed all
 
 timestep    ${dt}
 

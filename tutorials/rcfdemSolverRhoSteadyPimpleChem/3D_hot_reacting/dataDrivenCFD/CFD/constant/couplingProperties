@@ -1,29 +1,19 @@
-/*---------------------------------------------------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.4                                   |
-|   \\  /    A nd           | Web:      http://www.openfoam.org               |
-|    \\/     M anipulation  |                                                 |
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  6
+     \\/     M anipulation  |
 \*---------------------------------------------------------------------------*/
-
-
 FoamFile
 {
-    version         2.0;
-    format          ascii;
-
-    root            "";
-    case            "";
-    instance        "";
-    local           "";
-
-    class           dictionary;
-    object          couplingProperties;
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      couplingProperties;
 }
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-//===========================================================================//
 // sub-models & settings
 
 modelType "A";
@@ -87,7 +77,6 @@ chemistryModels
 
 turbulenceModelType "turbulenceProperties";
 
-
 getParticleTypes true;
 getParticleDensities true;
 getParticleEffVolFactors true;
@@ -97,7 +86,8 @@ coupleRecForce false;
 setForceField true;
 
 nEveryFlow 1;
-//===========================================================================//
+
+
 // sub-model properties
 
 implicitCoupleProps
@@ -120,7 +110,6 @@ viscForceProps
     velocityFieldName "U";
     densityFieldName "rho";
 }
-
 
 BeetstraDragProps
 {
@@ -169,13 +158,10 @@ directedDiffusiveRelaxationProps
 particleDeformationProps
 {
     refFieldName "partTempRef";
-//    partTypes (3 4);
     partTypes (1 2 3 4);
     defaultDeformCellsName "noOreReg";
 // same as Huo et al. (2017)
-//    lowerBounds (1475 1475);
-//    upperBounds (1675 1675);
-    lowerBounds (1475 1475 1475 1475); 
+    lowerBounds (1475 1475 1475 1475);
     upperBounds (1675 1675 1675 1675);
 //    backgroundVoidage 0.05; // ATTENTION: if coke is also deformed, full hearth gets background voidage
     voidfractionFieldName "voidfractionRec";
@@ -233,7 +219,7 @@ diffusionCoefficientsProps
     ChemistryFile   "$FOAM_CASE/constant/foam.inp";
     diffusantGasNames       (
                                 CO CO2 O2
-                            ); 
+                            );
 }
 
 massTransferCoeffProps
@@ -265,11 +251,6 @@ constDiffSmoothingProps
     lowerLimit -1e10;
     upperLimit 1e10;
     smoothingLength 0.5;
-}
-
-centreProps
-{
-    alphaMin 0.10;
 }
 
 engineProps

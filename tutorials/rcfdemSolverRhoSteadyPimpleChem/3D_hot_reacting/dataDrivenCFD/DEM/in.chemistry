@@ -61,17 +61,17 @@ fix     Ea_chem1 fineore property/global Ea_chem1 vector 69488 73674 113859
 # values for k0 and T0 according to Shen, Fuel 90 (2011) 728–738;
 # values have been scaled with 1/(nA * mMol) [nA = molar concentration at standard conditions], b.c. Shen uses x P / PA while LIGGGHTS implementation has x P / (RT) * mMol = x P / PA * nA * mMol
 fix     chem2 coke chem/shrink/core/single speciesA O2 molMassA 0.03199 nuA 1 speciesC CO molMassC 0.02801 nuC 2 molMassB 0.01201 nuB 2 molMassD 0.001201 nuD 2 rmin 0.0075 nevery ${Nchem} screen no k 3.1e6 T 10855 Tmin 100 cg 4 layerDiffusion no heatToFluid yes shrink no
-fix	chem3 coke chem/shrink/core/single speciesA CO2 molMassA 0.04401 nuA 1 speciesC CO molMassC 0.02801 nuC 2 molMassB 0.01201 nuB 1 molMassD 0.001201 nuD 1 rmin 0.0075 nevery ${Nchem} screen no k 9.4e9 T 29018 Tmin 100 cg 4 layerDiffusion no heatToFluid yes shrink no
+fix     chem3 coke chem/shrink/core/single speciesA CO2 molMassA 0.04401 nuA 1 speciesC CO molMassC 0.02801 nuC 2 molMassB 0.01201 nuB 1 molMassD 0.001201 nuD 1 rmin 0.0075 nevery ${Nchem} screen no k 9.4e9 T 29018 Tmin 100 cg 4 layerDiffusion no heatToFluid yes shrink no
 
 fix     chem4 finecoke chem/shrink/core/single speciesA O2 molMassA 0.03199 nuA 1 speciesC CO molMassC 0.02801 nuC 2 molMassB 0.01201 nuB 2 molMassD 0.001201 nuD 2 rmin 0.0075 nevery ${Nchem} screen no k 3.1e6 T 10855 Tmin 100 cg 8 layerDiffusion no heatToFluid yes shrink no
-fix	chem5 finecoke chem/shrink/core/single speciesA CO2 molMassA 0.04401 nuA 1 speciesC CO molMassC 0.02801 nuC 2 molMassB 0.01201 nuB 1 molMassD 0.001201 nuD 1 rmin 0.0075 nevery ${Nchem} screen no k 9.4e9 T 29018 Tmin 100 cg 8 layerDiffusion no heatToFluid yes shrink no
+fix     chem5 finecoke chem/shrink/core/single speciesA CO2 molMassA 0.04401 nuA 1 speciesC CO molMassC 0.02801 nuC 2 molMassB 0.01201 nuB 1 molMassD 0.001201 nuD 1 rmin 0.0075 nevery ${Nchem} screen no k 9.4e9 T 29018 Tmin 100 cg 8 layerDiffusion no heatToFluid yes shrink no
 
 ######
 # Zhuo and Shen, Applied Energy 261 (2020) 114456
 # with the additional assumption that all O2 is transformed into CO upon reaction with coke
 ######
 #fix     chem2 coke chem/shrink/core/single speciesA O2 molMassA 0.03199 nuA 1 speciesC CO molMassC 0.02801 nuC 2 molMassB 0.01201 nuB 2 molMassD 0.001201 nuD 2 rmin 0.0075 nevery ${Nchem} screen no nPreFactor 1 k 0.685 T 9000 Tmin 100 cg 4 layerDiffusion no heatToFluid yes shrink no
-#fix	chem3 coke chem/shrink/core/single speciesA CO2 molMassA 0.04401 nuA 1 speciesC CO molMassC 0.02801 nuC 2 molMassB 0.01201 nuB 1 molMassD 0.001201 nuD 1 rmin 0.0075 nevery ${Nchem} screen no nPreFactor 1  k 589 T 26800 Tmin 100 cg 4 layerDiffusion no heatToFluid yes shrink no
+#fix     chem3 coke chem/shrink/core/single speciesA CO2 molMassA 0.04401 nuA 1 speciesC CO molMassC 0.02801 nuC 2 molMassB 0.01201 nuB 1 molMassD 0.001201 nuD 1 rmin 0.0075 nevery ${Nchem} screen no nPreFactor 1  k 589 T 26800 Tmin 100 cg 4 layerDiffusion no heatToFluid yes shrink no
 
 #fix     chem4 finecoke chem/shrink/core/single speciesA O2 molMassA 0.03199 nuA 1 speciesC CO molMassC 0.02801 nuC 2 molMassB 0.01201 nuB 2 molMassD 0.001201 nuD 2 rmin 0.0075 nevery ${Nchem} screen no nPreFactor 1 k 0.685 T 9000 Tmin 100 cg 8 layerDiffusion no heatToFluid yes shrink no
-#fix	chem5 finecoke chem/shrink/core/single speciesA CO2 molMassA 0.04401 nuA 1 speciesC CO molMassC 0.02801 nuC 2 molMassB 0.01201 nuB 1 molMassD 0.001201 nuD 1 rmin 0.0075 nevery ${Nchem} screen no nPreFactor 1 k 589 T 26800 Tmin 100 cg 8 layerDiffusion no heatToFluid yes shrink no
+#fix     chem5 finecoke chem/shrink/core/single speciesA CO2 molMassA 0.04401 nuA 1 speciesC CO molMassC 0.02801 nuC 2 molMassB 0.01201 nuB 1 molMassD 0.001201 nuD 1 rmin 0.0075 nevery ${Nchem} screen no nPreFactor 1 k 589 T 26800 Tmin 100 cg 8 layerDiffusion no heatToFluid yes shrink no

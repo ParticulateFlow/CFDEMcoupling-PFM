@@ -2,11 +2,11 @@
 # output
 ########
 
-#compute		1 all erotate/sphere
-#thermo_style	custom step atoms ke c_1 vol c_csumMT
-#thermo		100
-#thermo_modify	lost ignore norm no
-#compute_modify	thermo_temp dynamic yes
+#compute         1 all erotate/sphere
+#thermo_style    custom step atoms ke c_1 vol c_csumMT
+#thermo          100
+#thermo_modify   lost ignore norm no
+#compute_modify  thermo_temp dynamic yes
 
 
 # average particle temperature
@@ -72,13 +72,13 @@ fix printRelRadiiCoke all print ${Nmonitor} "${time} ${rrC1} ${rrC2}" append ${d
 # dump data
 ###########
 
-dump            dmp1 all custom/vtk ${Ndump} ${dumppath}/post/dump*.dataDrivenCFD.vtk id type radius x y z vx vy vz fx fy fz mass f_Temp[0] f_convectiveHeatFlux[0] f_fracRed[1] f_fracRed[2] f_fracRed[3] f_LayerRelRadii[1] f_LayerRelRadii[2] f_LayerRelRadii[3] f_LayerRelRadii[4] f_Aterm_chem0[1] f_Aterm_chem0[2] f_Aterm_chem0[3] f_Bterm_chem0[1] f_Bterm_chem0[2] f_Bterm_chem0[3] f_Massterm_chem0[0] f_Aterm_chem1[1] f_Aterm_chem1[2] f_Aterm_chem1[3] f_Bterm_chem1[1] f_Bterm_chem1[2] f_Bterm_chem1[3] f_Massterm_chem1[0] f_Aterm_chem2[0] f_Bterm_chem2[0] f_Massterm_chem2[0] f_Aterm_chem3[0] f_Bterm_chem3[0] f_Massterm_chem3[0] f_Aterm_chem4[0] f_Bterm_chem4[0] f_Massterm_chem4[0] f_Aterm_chem5[0] f_Bterm_chem5[0] f_Massterm_chem5[0] f_heatFlux[0] f_conductiveHeatFlux[0] v_reductionDegree f_reactionHeat[0]
+dump    dmp1 all custom/vtk ${Ndump} ${dumppath}/post/dump*.dataDrivenCFD.vtk id type radius x y z vx vy vz fx fy fz mass f_Temp[0] f_convectiveHeatFlux[0] f_fracRed[1] f_fracRed[2] f_fracRed[3] f_LayerRelRadii[1] f_LayerRelRadii[2] f_LayerRelRadii[3] f_LayerRelRadii[4] f_Aterm_chem0[1] f_Aterm_chem0[2] f_Aterm_chem0[3] f_Bterm_chem0[1] f_Bterm_chem0[2] f_Bterm_chem0[3] f_Massterm_chem0[0] f_Aterm_chem1[1] f_Aterm_chem1[2] f_Aterm_chem1[3] f_Bterm_chem1[1] f_Bterm_chem1[2] f_Bterm_chem1[3] f_Massterm_chem1[0] f_Aterm_chem2[0] f_Bterm_chem2[0] f_Massterm_chem2[0] f_Aterm_chem3[0] f_Bterm_chem3[0] f_Massterm_chem3[0] f_Aterm_chem4[0] f_Bterm_chem4[0] f_Massterm_chem4[0] f_Aterm_chem5[0] f_Bterm_chem5[0] f_Massterm_chem5[0] f_heatFlux[0] f_conductiveHeatFlux[0] v_reductionDegree f_reactionHeat[0]
 
-dump      dmp2    coke custom ${Nrestart} ${dumppath}/restart/dump*.relRadii1 id type x y z f_LayerRelRadii[1] f_LayerRelRadii[2] f_LayerRelRadii[3] f_LayerRelRadii[4]
-dump      dmp3    finecoke custom ${Nrestart} ${dumppath}/restart/dump*.relRadii2 id type x y z f_LayerRelRadii[1] f_LayerRelRadii[2] f_LayerRelRadii[3] f_LayerRelRadii[4]
-dump      dmp4    ore custom ${Nrestart} ${dumppath}/restart/dump*.relRadii3 id type x y z f_LayerRelRadii[1] f_LayerRelRadii[2] f_LayerRelRadii[3] f_LayerRelRadii[4]
-dump      dmp5    fineore custom ${Nrestart} ${dumppath}/restart/dump*.relRadii4 id type x y z f_LayerRelRadii[1] f_LayerRelRadii[2] f_LayerRelRadii[3] f_LayerRelRadii[4]
-dump      dmp6    all custom ${Nrestart} ${dumppath}/restart/initFullState* id type radius mass density x y z
+dump    dmp2    coke custom ${Nrestart} ${dumppath}/restart/dump*.relRadii1 id type x y z f_LayerRelRadii[1] f_LayerRelRadii[2] f_LayerRelRadii[3] f_LayerRelRadii[4]
+dump    dmp3    finecoke custom ${Nrestart} ${dumppath}/restart/dump*.relRadii2 id type x y z f_LayerRelRadii[1] f_LayerRelRadii[2] f_LayerRelRadii[3] f_LayerRelRadii[4]
+dump    dmp4    ore custom ${Nrestart} ${dumppath}/restart/dump*.relRadii3 id type x y z f_LayerRelRadii[1] f_LayerRelRadii[2] f_LayerRelRadii[3] f_LayerRelRadii[4]
+dump    dmp5    fineore custom ${Nrestart} ${dumppath}/restart/dump*.relRadii4 id type x y z f_LayerRelRadii[1] f_LayerRelRadii[2] f_LayerRelRadii[3] f_LayerRelRadii[4]
+dump    dmp6    all custom ${Nrestart} ${dumppath}/restart/initFullState* id type radius mass density x y z
 
 compute         1 all erotate/sphere
 thermo_style    custom step atoms ke c_1 vol c_csumMT c_cm1 c_cm2 c_cm3 c_cm4 c_cTi c_cTgi c_cCOi c_cCO2i

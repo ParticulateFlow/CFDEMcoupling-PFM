@@ -3,23 +3,23 @@ include ../DEM/DEMparameters
 
 
 ###############################################
-atom_style		granular
-atom_modify		map array
-communicate	single vel yes
+atom_style      granular
+atom_modify     map array
+communicate     single vel yes
 
-boundary		f f f
-newton			off
-units			si
+boundary        f f f
+newton          off
+units           si
 processors      2 2 8
 
-read_restart ../DEM/liggghts.restart
-reset_timestep 0
+read_restart    ../DEM/liggghts.restart
+reset_timestep  0
 
-#read_restart ../DEM/restart.B
-#reset_timestep 400000
+#read_restart    ../DEM/restart.B
+#reset_timestep  400000
 
-neighbor	${skin} bin
-neigh_modify	delay 0
+neighbor        ${skin} bin
+neigh_modify    delay 0
 
 timestep    ${dt}
 

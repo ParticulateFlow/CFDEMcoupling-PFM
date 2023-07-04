@@ -1,9 +1,9 @@
 /*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  2.3.0                                 |
-|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
-|    \\/     M anipulation  |                                                 |
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  6
+     \\/     M anipulation  |
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
@@ -79,14 +79,14 @@ functions
                 base        time;
                 window	    60.0001;
             }
-	    Us
+            Us
             {
                 mean        on;
                 prime2Mean  off;
                 base        time;
                 window	    60.0001;
             }
-	    voidfraction
+            voidfraction
             {
                 mean        on;
                 prime2Mean  off;
@@ -117,74 +117,74 @@ functions
         );
     }
 
-   probes1
-	{
-		type probes;
+    probes1
+    {
+        type probes;
 
-		functionObjectLibs ("libsampling.so");
+        functionObjectLibs ("libsampling.so");
 
-		#include "probesDict1";
-	}
-	
-   probes2
-	{
-		type probes;
+        #include "probesDict1";
+    }
 
-		functionObjectLibs ("libsampling.so");
+    probes2
+    {
+        type probes;
 
-		#include "probesDict2";
-	}
+        functionObjectLibs ("libsampling.so");
 
-        massInflow
-        {
-            type            surfaceFieldValue;
-            libs ("libfieldFunctionObjects.so");
-            writeControl   timeStep;
-            writeInterval   20;
-            log             true;
-            writeFields     false;
-            regionType      patch;
-            name            inlet;
-            operation       sum;
-            fields
-            (
-                phi
-            );
-        }
+        #include "probesDict2";
+    }
 
-        massOutflow
-        {
-            $massInflow;
-            name      top;
-        }
+    massInflow
+    {
+        type            surfaceFieldValue;
+        libs ("libfieldFunctionObjects.so");
+        writeControl    timeStep;
+        writeInterval   20;
+        log             true;
+        writeFields     false;
+        regionType      patch;
+        name            inlet;
+        operation       sum;
+        fields
+        (
+            phi
+        );
+    }
 
-        energyAndSpeciesInflow
-        {
-            type            surfaceFieldValue;
-            libs ("libfieldFunctionObjects.so");
-            writeControl   timeStep;
-            writeInterval   20;
-            log             true;
-            writeFields     false;
-            regionType      patch;
-            name            inlet;
-            operation       weightedSum;
-            weightField     phi;
-            fields
-            (
-                e
-                CO
-                CO2
-                N2
-                O2
-            );
-        }
+    massOutflow
+    {
+        $massInflow;
+        name      top;
+    }
 
-        energyAndSpeciesOutflow
-        {
-            $energyAndSpeciesInflow;
-            name      top;
-        }
+    energyAndSpeciesInflow
+    {
+        type            surfaceFieldValue;
+        libs ("libfieldFunctionObjects.so");
+        writeControl    timeStep;
+        writeInterval   20;
+        log             true;
+        writeFields     false;
+        regionType      patch;
+        name            inlet;
+        operation       weightedSum;
+        weightField     phi;
+        fields
+        (
+            e
+            CO
+            CO2
+            N2
+            O2
+        );
+    }
+
+    energyAndSpeciesOutflow
+    {
+        $energyAndSpeciesInflow;
+        name      top;
+    }
 
     wallheatFluxes
     {
@@ -204,7 +204,7 @@ functions
             QPartPart
         );
     }
-    
+
     totReactionHeatField
     {
         type            volFieldValue;

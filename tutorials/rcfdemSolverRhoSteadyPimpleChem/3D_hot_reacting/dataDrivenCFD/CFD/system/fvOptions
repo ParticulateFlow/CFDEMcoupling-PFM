@@ -1,9 +1,9 @@
 /*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  2.3.0                                 |
-|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
-|    \\/     M anipulation  |                                                 |
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  6
+     \\/     M anipulation  |
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
@@ -17,7 +17,7 @@ FoamFile
 
 source1
 {
-    type        limitTemperature;
+    type            limitTemperature;
     active          yes;
     limitTemperatureCoeffs
     {
@@ -28,57 +28,3 @@ source1
     }
 }
 
-/*
-source2
-{
-    type            fixedTemperatureConstraint;
-
-    selectionMode   cellSet;
-    cellSet         rw_left;
-
-    mode            uniform;
-    temperature     3450;
-}
-
-source3
-{
-    type            fixedTemperatureConstraint;
-
-    selectionMode   cellSet;
-    cellSet         rw_right;
-
-    mode            uniform;
-    temperature     3450;
-}
-*/
-/*
-    heatSource1
-    {
-        type            scalarSemiImplicitSource;
-
-        selectionMode   cellSet;
-        cellSet         rw_left;
-        volumeMode      absolute; //specific;
-
-        injectionRateSuSp
-        {
-            // dm/dt = 1.65 kg / s / RW, C = 850, T = 2100
-            e          (3e6 0);
-        }
-    }
-
-    heatSource2
-    {
-        type            scalarSemiImplicitSource;
-
-        selectionMode   cellSet;
-        cellSet         rw_right;
-        volumeMode      absolute; //specific;
-
-        injectionRateSuSp
-        {
-            // dm/dt = 1.65 kg / s / RW, C = 850, T = 2100
-            e          (3e6 0);
-        }
-    }
-*/

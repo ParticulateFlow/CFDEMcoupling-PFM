@@ -3,39 +3,39 @@ include ../../CFDDEM/DEM/DEMparameters
 
 
 ###############################################
-atom_style		granular
-atom_modify		map array
-communicate	single vel yes
+atom_style      granular
+atom_modify     map array
+communicate     single vel yes
 
-boundary		f f f
-newton			off
-units			si
+boundary        f f f
+newton          off
+units           si
 processors      2 2 8
 
-region		reg block -7.5 7.5 -7.5 7.5 -1.15 30 units box
-create_box	5 reg
+region          reg block -7.5 7.5 -7.5 7.5 -1.15 30 units box
+create_box      5 reg
 
-neighbor	0.001 bin
-neigh_modify	delay 0
+neighbor        0.001 bin
+neigh_modify    delay 0
 
 timestep    ${dt}
 
 include ../../CFDDEM/DEM/in.material_settings
 
-fix         pts1 all particletemplate/sphere 2 atom_type 1 density constant ${dens_C} radius constant ${rad_C}
-fix	    pdd1 all particledistribution/discrete 1.0 1 pts1 1.0
+fix     pts1 all particletemplate/sphere 2 atom_type 1 density constant ${dens_C} radius constant ${rad_C}
+fix     pdd1 all particledistribution/discrete 1.0 1 pts1 1.0
 
-fix	    fp all property/atom/polydispparcel effvolfactor ${poly_C} ${poly_fC} ${poly_O} ${poly_fO} 1.0
+fix    fp all property/atom/polydispparcel effvolfactor ${poly_C} ${poly_fC} ${poly_O} ${poly_fO} 1.0
 
-fix	    integr all nve/sphere
+fix    integr all nve/sphere
 
 
 #screen output
-compute		1 all erotate/sphere
-thermo_style	custom step atoms ke c_1 vol 
-thermo		10000
-thermo_modify	lost ignore norm no
-compute_modify	thermo_temp dynamic yes
+compute         1 all erotate/sphere
+thermo_style    custom step atoms ke c_1 vol
+thermo          10000
+thermo_modify   lost ignore norm no
+compute_modify  thermo_temp dynamic yes
 
 # insertion
 ###########
@@ -44,32 +44,32 @@ compute_modify	thermo_temp dynamic yes
 
 # first, fill entire volume and let particles settle
 
-region		insReg0 cylinder z 0.0 0.0 7.4 -0.9 30 units box
-fix ins0 all insert/pack/dense seed 123 region insReg0 distributiontemplate pdd1 volumefraction_region 0.56
-run 70000
+region  insReg0 cylinder z 0.0 0.0 7.4 -0.9 30 units box
+fix     ins0 all insert/pack/dense seed 123 region insReg0 distributiontemplate pdd1 volumefraction_region 0.56
+run     70000
 
-write_dump	all custom/vtk ../DEM/post/dump.fill1.vtk id type radius mass x y z vx vy vz fx fy fz
+write_dump  all custom/vtk ../DEM/post/dump.fill1.vtk id type radius mass x y z vx vy vz fx fy fz
 
 variable partzmax equal bound(all,zmax)
-region		insReg1 cylinder z 0.0 0.0 4.5 ${partzmax} 28 units box
-fix ins1 all insert/pack/dense seed 123 region insReg1 distributiontemplate pdd1 volumefraction_region 0.56
-run 80000
+region  insReg1 cylinder z 0.0 0.0 4.5 ${partzmax} 28 units box
+fix     ins1 all insert/pack/dense seed 123 region insReg1 distributiontemplate pdd1 volumefraction_region 0.56
+run     80000
 
 # remove material above 26 m and material outside (i.e. moving downwards)
 
 
 #region insReg0 delete
-region		delReg0 block INF INF INF INF 26 INF units box
-group		delGroup0 region delReg0
+region  delReg0 block INF INF INF INF 26 INF units box
+group   delGroup0 region delReg0
 delete_atoms group delGroup0
 
-variable	vZ1 atom vz<-1.0
-group		delGroup1 variable vZ1
+variable vZ1 atom vz<-1.0
+group   delGroup1 variable vZ1
 delete_atoms group delGroup1
 
-write_dump	all custom/vtk ../DEM/post/dump.fill2.vtk id type radius mass x y z vx vy vz fx fy fz
+write_dump  all custom/vtk ../DEM/post/dump.fill2.vtk id type radius mass x y z vx vy vz fx fy fz
 
-run 30000
+run     30000
 
-write_dump	all custom/vtk ../DEM/post/dump.fill3.vtk id type radius mass x y z vx vy vz fx fy fz
-write_restart  	liggghts.restart_fill
+write_dump  all custom/vtk ../DEM/post/dump.fill3.vtk id type radius mass x y z vx vy vz fx fy fz
+write_restart   liggghts.restart_fill

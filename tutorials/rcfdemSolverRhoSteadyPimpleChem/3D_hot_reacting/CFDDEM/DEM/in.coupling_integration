@@ -7,18 +7,18 @@ variable Tin equal 293
 
 group fullyDeformed empty
 
-fix		cfd1 all couple/cfd couple_every ${Ncouple} mpi
-fix		cfd2 all couple/cfd/force/implicit transfer_density no transfer_type yes transfer_property name effvolfactor type scalar-atom
-fix		cfd3 all couple/cfd/convection T0 293
-fix		cfd4 all couple/cfd/parttempfield T0 293
-fix		cfd5 all couple/cfd/deform rmin 0.01
+fix     cfd1 all couple/cfd couple_every ${Ncouple} mpi
+fix     cfd2 all couple/cfd/force/implicit transfer_density no transfer_type yes transfer_property name effvolfactor type scalar-atom
+fix     cfd3 all couple/cfd/convection T0 293
+fix     cfd4 all couple/cfd/parttempfield T0 293
+fix     cfd5 all couple/cfd/deform rmin 0.01
 
 # make sure particle outside CFD domain are initialized with reasonable temperature
-# this is executed at the beginning of each run 
+# this is executed at the beginning of each run
 region outsideCFD block INF INF INF INF 26.0 INF units box
 variable NFixTemp equal ${Ncouple}+2
-fix eeTemp all execute ${NFixTemp} " set region outsideCFD property/atom Temp ${Tin} " once
+fix     eeTemp all execute ${NFixTemp} " set region outsideCFD property/atom Temp ${Tin} " once
 
-fix		integr all nve/sphere
-fix		limV1 all limit/vel 1.0
-fix		limV2 RW limit/vel 0.01
+fix     integr all nve/sphere
+fix     limV1 all limit/vel 1.0
+fix     limV2 RW limit/vel 0.01

@@ -14,4 +14,3 @@ group DMcoke region DM
 variable DMheight05 equal ${DMheight}+0.5
 region hearth block -7 7 -7 7 -1.0 ${DMheight05}
 
-

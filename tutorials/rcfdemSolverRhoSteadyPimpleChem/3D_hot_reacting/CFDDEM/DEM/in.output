@@ -3,10 +3,10 @@
 ########
 
 #screen output
-compute		1 all erotate/sphere
-thermo_style	custom step atoms ke c_1 vol 
-thermo		10000
-thermo_modify	lost ignore norm no
-compute_modify	thermo_temp dynamic yes
+compute         1 all erotate/sphere
+thermo_style    custom step atoms ke c_1 vol
+thermo          10000
+thermo_modify   lost ignore norm no
+compute_modify  thermo_temp dynamic yes
 
-dump		dmp1 all custom/vtk ${Ndump} ../DEM/post/dump*.CFDDEM.vtk id type radius x y z vx vy vz fx fy fz mass f_Temp[0] f_partDeformations[0]
+dump            dmp1 all custom/vtk ${Ndump} ../DEM/post/dump*.CFDDEM.vtk id type radius x y z vx vy vz fx fy fz mass f_Temp[0] f_partDeformations[0]

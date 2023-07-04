@@ -1,9 +1,9 @@
 /*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  2.3.0                                 |
-|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
-|    \\/     M anipulation  |                                                 |
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  6
+     \\/     M anipulation  |
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
@@ -62,21 +62,21 @@ functions
                 mean        on;
                 prime2Mean  off;
                 base        time;
-                window	    10.0001;
+                window      10.0001;
             }
-	    Us
+            Us
             {
                 mean        on;
                 prime2Mean  off;
                 base        time;
-                window	    10.0001;
+                window      10.0001;
             }
-	    voidfraction
+            voidfraction
             {
                 mean        on;
                 prime2Mean  off;
                 base        time;
-                window	    10.0001;
+                window      10.0001;
             }
         );
     }
@@ -88,17 +88,17 @@ functions
         exclusiveWriting     true;
         objects ("Us" "UsMean" "voidfraction" "voidfractionMean" "partType" "dSauter" "dSauterMean");
         writeControl timeStep;
-        writeInterval       16000;//20000;
+        writeInterval       16000;
     }
 
-   probes1
-	{
-		type probes;
+    probes1
+    {
+        type probes;
 
-		functionObjectLibs ("libsampling.so");
+        functionObjectLibs ("libsampling.so");
 
-		#include "probesDict";
-	} 
+        #include "probesDict";
+    }
 }
 
 // ************************************************************************* //

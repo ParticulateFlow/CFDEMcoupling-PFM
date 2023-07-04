@@ -36,14 +36,14 @@
             forAll(patches, patchi)
             {
                 const fvPatch& curPatch = patches[patchi];
-              
+
                 word patchName = mesh().boundary()[patchi].name();
                 if (patchName == "inlet")
                 {
                     forAll(curPatch, facei)
                     {
                         label faceCelli = curPatch.faceCells()[facei];
-		         inpU += phi.boundaryField()[patchi][facei] * p.boundaryField()[patchi][facei] / rho.boundaryField()[patchi][facei];
+                        inpU += phi.boundaryField()[patchi][facei] * p.boundaryField()[patchi][facei] / rho.boundaryField()[patchi][facei];
                     }
                 }
                 else if (patchName == "top")
@@ -51,7 +51,7 @@
                     forAll(curPatch, facei)
                     {
                         label faceCelli = curPatch.faceCells()[facei];
-		         outpU += phi.boundaryField()[patchi][facei] * p.boundaryField()[patchi][facei] / rho.boundaryField()[patchi][facei];
+                        outpU += phi.boundaryField()[patchi][facei] * p.boundaryField()[patchi][facei] / rho.boundaryField()[patchi][facei];
                     }
                 }
             }
