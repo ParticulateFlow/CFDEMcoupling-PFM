@@ -19,7 +19,7 @@ create_box      2 reg
 neighbor        0.001 bin
 neigh_modify    delay 0
 
-#Material properties required for granular pair styles
+# material properties required for granular pair styles
 
 fix     m1 all property/global youngsModulus peratomtype ${yM} ${yM}
 fix     m2 all property/global poissonsRatio peratomtype ${pR} ${pR}
@@ -27,11 +27,11 @@ fix     m3 all property/global coefficientRestitution peratomtypepair 2 ${rest} 
 fix     m4 all property/global coefficientFriction peratomtypepair 2 ${fric} ${fric} ${fric} ${fric}
 fix     m5 all property/global coefficientRollingFriction peratomtypepair 2 ${roll} ${roll} ${roll} ${roll}
 
-#pair style
+# pair style
 pair_style  gran model hertz tangential history rolling_friction cdt
 pair_coeff  * *
 
-#timestep, gravity
+# timestep, gravity
 timestep    0.00001
 fix     gravi all gravity 9.81 vector 0.0 0.0 -1.0
 
@@ -43,7 +43,7 @@ fix     integr all nve/sphere
 
 #fix     ts_check all check/timestep/gran 10000 0.1 0.1
 
-#screen output
+# screen output
 compute         rke all erotate/sphere
 thermo_style    custom step atoms ke c_rke vol
 thermo          5000
@@ -70,7 +70,7 @@ run     1
 
 
 #======================================================================
-#- settling
+# settling
 
 variable vcmx equal vcm(all,x)
 variable vcmy equal vcm(all,y)
@@ -82,6 +82,7 @@ print ${vave}
 run     100000
 
 #======================================================================
+
 region  delReg block -${cylrad} ${cylrad} -${cylrad} ${cylrad} 0.2 INF units box
 run     1 every 1 "delete_atoms region delReg"
 fix     zwall2   all wall/gran model hertz tangential history primitive type 1 zplane 0.2
@@ -90,3 +91,4 @@ run     1 every 1 "delete_atoms region delReg"
 run     5000
 write_restart   liggghts.restart
 write_dump      all custom/vtk ../DEM/finalState.vtk id type radius mass density x y z
+

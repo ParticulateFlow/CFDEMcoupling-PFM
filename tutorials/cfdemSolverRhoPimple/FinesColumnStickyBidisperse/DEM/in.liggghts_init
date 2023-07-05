@@ -27,54 +27,54 @@ create_box      2 reg
 neighbor        0.001 bin
 neigh_modify    delay 0
 
-#Material properties required for granular pair styles
+# material properties required for granular pair styles
 
-fix         m1 all property/global youngsModulus peratomtype ${yM} ${yM}
-fix         m2 all property/global poissonsRatio peratomtype ${pR} ${pR}
-fix         m3 all property/global coefficientRestitution peratomtypepair 2 ${rest} ${rest} ${rest} ${rest}
-fix         m4 all property/global coefficientFriction peratomtypepair 2 ${fric} ${fric} ${fric} ${fric}
-fix         m5 all property/global coefficientRollingFriction peratomtypepair 2 ${roll} ${roll} ${roll} ${roll}
+fix     m1 all property/global youngsModulus peratomtype ${yM} ${yM}
+fix     m2 all property/global poissonsRatio peratomtype ${pR} ${pR}
+fix     m3 all property/global coefficientRestitution peratomtypepair 2 ${rest} ${rest} ${rest} ${rest}
+fix     m4 all property/global coefficientFriction peratomtypepair 2 ${fric} ${fric} ${fric} ${fric}
+fix     m5 all property/global coefficientRollingFriction peratomtypepair 2 ${roll} ${roll} ${roll} ${roll}
 
-#pair style
+# pair style
 pair_style  gran model hertz tangential history rolling_friction cdt
 pair_coeff  * *
 
-#timestep, gravity
+# timestep, gravity
 timestep    ${dt}
 fix         gravi all gravity 9.81 vector 0.0 0.0 -1.0
 
-fix zwall1   all wall/gran model hertz tangential history primitive type 1 zplane 0.0
-fix cylwalls all wall/gran model hertz tangential history primitive type 1 zcylinder ${cylrad} 0. 0.
+fix     zwall1   all wall/gran model hertz tangential history primitive type 1 zplane 0.0
+fix     cylwalls all wall/gran model hertz tangential history primitive type 1 zcylinder ${cylrad} 0. 0.
 
-fix         integr all nve/sphere
+fix     integr all nve/sphere
 
-fix ts_check all check/timestep/gran 10000 0.1 0.1
+fix     ts_check all check/timestep/gran 10000 0.1 0.1
 
-#screen output
+# screen output
 compute         rke all erotate/sphere
 thermo_style    custom step atoms ke c_rke vol
 thermo          5000
 thermo_modify   lost ignore norm no
 compute_modify  thermo_temp dynamic yes
 
-dump            dmp all custom/vtk 10000 ../DEM/post/dump*.liggghts_filling.vtk id type x y z vx vy vz fx fy fz radius
+dump    dmp all custom/vtk 10000 ../DEM/post/dump*.liggghts_filling.vtk id type x y z vx vy vz fx fy fz radius
 
-fix         pts0 all particletemplate/sphere 1 atom_type 1 density constant ${partDensHeavy} radius constant ${partRad2}
-fix         pdd0 all particledistribution/discrete 1.0 1 pts0 1.0
+fix     pts0 all particletemplate/sphere 1 atom_type 1 density constant ${partDensHeavy} radius constant ${partRad2}
+fix     pdd0 all particledistribution/discrete 1.0 1 pts0 1.0
 
-fix         pts1 all particletemplate/sphere 1 atom_type 1 density constant ${partDensHeavy} radius constant ${partRad1}
-fix         pdd1 all particledistribution/discrete 1.0 1 pts1 1.0
+fix     pts1 all particletemplate/sphere 1 atom_type 1 density constant ${partDensHeavy} radius constant ${partRad1}
+fix     pdd1 all particledistribution/discrete 1.0 1 pts1 1.0
 
-region      insReg0 cylinder z 0. 0. ${cylrad} 0.0 0.5 units box
+region  insReg0 cylinder z 0. 0. ${cylrad} 0.0 0.5 units box
 
-fix ins0 all insert/pack/dense seed 123 region insReg0 distributiontemplate pdd0 volumefraction_region 0.57
-run 10000
+fix     ins0 all insert/pack/dense seed 123 region insReg0 distributiontemplate pdd0 volumefraction_region 0.57
+run     10000
 
 
-region      insReg1 cylinder z 0. 0. ${cylradInner} 0.0 0.5 units box
-run         1 every 1 "delete_atoms region insReg1"
-fix ins1 all insert/pack/dense seed 124 region insReg1 distributiontemplate pdd1 volumefraction_region 0.57
-run 1
+region  insReg1 cylinder z 0. 0. ${cylradInner} 0.0 0.5 units box
+run     1 every 1 "delete_atoms region insReg1"
+fix     ins1 all insert/pack/dense seed 124 region insReg1 distributiontemplate pdd1 volumefraction_region 0.57
+run     1
 
 region      testReg0 cylinder z 0. 0. ${cylrad} 0.0 0.2 units box
 variable    testMass0 equal mass(all,testReg0)
@@ -82,37 +82,41 @@ variable    volfrac0 equal v_testMass0/${partDensHeavy}/0.0015708
 region      testReg1 cylinder z 0. 0. ${cylrad} 0.2 0.3 units box
 variable    testMass1 equal mass(all,testReg1)
 variable    volfrac1 equal v_testMass1/${partDensHeavy}/0.0007854
-fix volfracoutput all print 1000 "volfrac_bottom = ${volfrac0}, volfrac_top = ${volfrac1}"
+fix     volfracoutput all print 1000 "volfrac_bottom = ${volfrac0}, volfrac_top = ${volfrac1}"
+
 #======================================================================
-#- settling
+# settling
 
 variable vcmx equal vcm(all,x)
 variable vcmy equal vcm(all,y)
 variable vcmz equal vcm(all,z)
 
 variable vave equal sqrt(v_vcmx*v_vcmx+v_vcmy*v_vcmy+v_vcmz*v_vcmz)
-print ${vave}
+print   ${vave}
 
 run     100000
 
 label loop
-  print "-----> Checking Velocity..."
-  if "${vave}<${vthre}" then "jump in.liggghts_init endloop"
-  print "-----> v ave ${vave}, v threshold ${vthre}, continuing run"
+    print "-----> Checking Velocity..."
+    if "${vave}<${vthre}" then "jump in.liggghts_init endloop"
+    print "-----> v ave ${vave}, v threshold ${vthre}, continuing run"
 
-  run 10000
-jump in.liggghts_init loop
+    run 10000
+    jump in.liggghts_init loop
 
 label endloop
 #======================================================================
-set group all density ${partDens}
-run 1
-region      delReg block -${cylrad} ${cylrad} -${cylrad} ${cylrad} ${fillH} INF units box
-run         1 every 1 "delete_atoms region delReg"
-fix zwall2   all wall/gran model hertz tangential history primitive type 1 zplane ${fillH}
-run 5000
-run         1 every 1 "delete_atoms region delReg"
-run 5000
+
+set     group all density ${partDens}
+run     1
+region  delReg block -${cylrad} ${cylrad} -${cylrad} ${cylrad} ${fillH} INF units box
+run     1 every 1 "delete_atoms region delReg"
+fix     zwall2   all wall/gran model hertz tangential history primitive type 1 zplane ${fillH}
+run     5000
+run     1 every 1 "delete_atoms region delReg"
+run     5000
+
 write_restart   liggghts.restart
-write_dump all custom/vtk ../DEM/finalState.vtk id type radius mass density x y z
-print "everything done"
+write_dump all  custom/vtk ../DEM/finalState.vtk id type radius mass density x y z
+
+print   "DEM initialization finished"

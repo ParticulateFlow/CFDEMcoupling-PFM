@@ -2,8 +2,8 @@
 # insertion setup
 #################
 
-fix         pts1 all particletemplate/sphere 1 atom_type 1 density constant ${partDens} radius constant ${partRad}
-fix         pdd1 all particledistribution/discrete 1.0 1 pts1 1.0
+fix     pts1 all particletemplate/sphere 1 atom_type 1 density constant ${partDens} radius constant ${partRad}
+fix     pdd1 all particledistribution/discrete 1.0 1 pts1 1.0
 
 region topRegExt cylinder z 0.0 0.0 ${cylrad} ${fillH1} ${fillH} units box
 variable nTop equal count(all,topRegExt)
@@ -20,4 +20,5 @@ fix eeIns all execute ${Nins} "../DEM/in.insert" file conditional nTop 0 0.1
 
 variable time equal step*dt
 variable np equal count(all)
-fix printN all print 2000 "${time} ${np} ${nTop}" file ../DEM/monitor/Npart.txt title "#time   n_p   n_p_top"
+
+fix     printN all print 2000 "${time} ${np} ${nTop}" file ../DEM/monitor/Npart.txt title "#time   n_p   n_p_top"

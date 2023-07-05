@@ -2,23 +2,23 @@
 # insertion setup
 #################
 
-fix         pts1 all particletemplate/sphere 1 atom_type 1 density constant ${partDens} radius constant ${partRad1}
-fix         pdd1 all particledistribution/discrete 1.0 1 pts1 1.0
+fix     pts1 all particletemplate/sphere 1 atom_type 1 density constant ${partDens} radius constant ${partRad1}
+fix     pdd1 all particledistribution/discrete 1.0 1 pts1 1.0
 
-fix         pts2 all particletemplate/sphere 1 atom_type 1 density constant ${partDens} radius constant ${partRad2}
-fix         pdd2 all particledistribution/discrete 1.0 1 pts2 1.0
+fix     pts2 all particletemplate/sphere 1 atom_type 1 density constant ${partDens} radius constant ${partRad2}
+fix     pdd2 all particledistribution/discrete 1.0 1 pts2 1.0
 
-region topRegExt cylinder z 0.0 0.0 ${cylrad} ${fillH1} ${fillH} units box
+region  topRegExt cylinder z 0.0 0.0 ${cylrad} ${fillH1} ${fillH} units box
 variable nTop equal count(all,topRegExt)
 
-region topReg cylinder z 0.0 0.0 ${cylrad} ${fillH2} ${fillH} units box
-group highestPart region topReg
+region  topReg cylinder z 0.0 0.0 ${cylrad} ${fillH2} ${fillH} units box
+group   highestPart region topReg
 write_dump highestPart custom ../DEM/highestPart id type radius mass density x y z vx vy vz
 
 variable Nins equal 1000
 variable counter loop 1000
 variable insertedMass equal mass(highestPart)
 
-fix eeIns all execute ${Nins} "../DEM/in.insert" file conditional nTop 0 0.1
+fix     eeIns all execute ${Nins} "../DEM/in.insert" file conditional nTop 0 0.1
 
-fix printN all print 2000 "${time} ${np} ${nTop}" file ../DEM/monitor/Npart.txt title "#time   n_p   n_p_top"
+fix     printN all print 2000 "${time} ${np} ${nTop}" file ../DEM/monitor/Npart.txt title "#time   n_p   n_p_top"
