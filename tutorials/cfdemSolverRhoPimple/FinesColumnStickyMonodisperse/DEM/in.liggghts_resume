@@ -25,7 +25,6 @@ fix         m2 all property/global poissonsRatio peratomtype ${pR}
 fix         m3 all property/global coefficientRestitution peratomtypepair 1 ${rest}
 fix         m4 all property/global coefficientFriction peratomtypepair 1 ${fric}
 fix         m5 all property/global coefficientRollingFriction peratomtypepair 1 ${roll}
-fix         m6 all property/global characteristicVelocity scalar ${cV}
 
 fix         ftco all property/global thermalConductivity peratomtype 1.4
 fix         ftca all property/global thermalCapacity peratomtype 840.

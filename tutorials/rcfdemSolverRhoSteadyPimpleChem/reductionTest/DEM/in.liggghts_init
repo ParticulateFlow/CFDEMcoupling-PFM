@@ -26,7 +26,6 @@ fix     m2 all property/global poissonsRatio peratomtype ${pR} ${pR}
 fix     m3 all property/global coefficientRestitution peratomtypepair 2 ${rest} ${rest} ${rest} ${rest}
 fix     m4 all property/global coefficientFriction peratomtypepair 2 ${fric} ${fric} ${fric} ${fric}
 fix     m5 all property/global coefficientRollingFriction peratomtypepair 2 ${roll} ${roll} ${roll} ${roll}
-fix     m6 all property/global characteristicVelocity scalar ${cV}
 
 #pair style
 pair_style  gran model hertz tangential history rolling_friction cdt

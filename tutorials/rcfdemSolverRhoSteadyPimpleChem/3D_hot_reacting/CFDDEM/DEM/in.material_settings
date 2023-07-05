@@ -7,7 +7,6 @@ fix     m2 all property/global poissonsRatio peratomtype ${pR_C} ${pR_C} ${pR_O}
 fix     m3 all property/global coefficientRestitution peratomtypepair 5 ${rest_C} ${rest_C} ${rest_CO} ${rest_CO} ${rest_CW} ${rest_C} ${rest_C} ${rest_CO} ${rest_CO} ${rest_CW} ${rest_CO} ${rest_CO} ${rest_O} ${rest_O} ${rest_WO}  ${rest_CO} ${rest_CO} ${rest_O} ${rest_O} ${rest_WO} ${rest_CW} ${rest_CW} ${rest_WO} ${rest_WO} ${rest_W}
 fix     m4 all property/global coefficientFriction peratomtypepair 5 ${fric_C} ${fric_C} ${fric_CO} ${fric_CO} ${fric_CW} ${fric_C} ${fric_C} ${fric_CO} ${fric_CO} ${fric_CW} ${fric_CO} ${fric_CO} ${fric_O} ${fric_O} ${fric_WO} ${fric_CO} ${fric_CO} ${fric_O} ${fric_O} ${fric_WO} ${fric_CW} ${fric_CW}  ${fric_WO} ${fric_WO} ${fric_W}
 fix     m5 all property/global coefficientRollingFriction peratomtypepair 5 ${roll_C} ${roll_C} ${roll_CO} ${roll_CO} ${roll_CW} ${roll_C} ${roll_C} ${roll_CO} ${roll_CO} ${roll_CW} ${roll_CO} ${roll_CO} ${roll_O} ${roll_O} ${roll_WO} ${roll_CO} ${roll_CO} ${roll_O} ${roll_O} ${roll_WO} ${roll_CW} ${roll_CW} ${roll_WO} ${roll_WO} ${roll_W}
-fix     m6 all property/global characteristicVelocity scalar ${cV}
 
 fix     ftco all property/global thermalConductivity peratomtype 1.7 1.7 80 80 1.0
 fix     ftca all property/global thermalCapacity peratomtype 850 850 600 600 1.0
