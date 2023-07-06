@@ -1,0 +1,32 @@
+print 'Performing insertion number ${counter} of this subcycle.' screen yes
+
+read_dump ../DEM/initOre 0 x y z radius mass density bruteadd yes retaintimestep yes exactstep no
+read_dump ../DEM/initCoke 0 x y z radius mass density bruteadd yes retaintimestep yes exactstep no
+read_dump ../DEM/initFineMix 0 x y z radius mass density bruteadd yes retaintimestep yes exactstep no
+
+# update softness factor; make sure initialization happens when particles are correctly assigned to be above or below CZ
+variable sold equal v_softnessfactor
+if "${counter} < 2" then 'variable n0 equal ${nAboveCZ}'
+variable nprev equal ${ncurr}
+variable ncurr equal ${nAboveCZ}
+variable tmp1 equal 2.0*(${n0}-${ncurr})/${ncurr}+1.0*(${nprev}-${ncurr})/${ncurr}
+variable tmp2 equal ${sold}+${tmp1}
+variable softnessfactor equal ${tmp2}*(${tmp2}>0.7)*(${tmp2}<1.3)+0.7*(${tmp2}<=0.7)+1.3*(${tmp2}>=1.3)
+print 'Softnessfactor: s = ${softnessfactor}, ncurr = ${ncurr}, nprev = ${nprev}, n0 = ${n0}' screen yes
+
+group coke type 1
+group finecoke type 2
+group ore type 3
+group fineore type 4
+group allore type >= 3
+
+# only need to update one reaction fix per group
+fix_update chem0
+fix_update chem1
+fix_update chem2
+fix_update chem4
+
+next counter
+# aborts after Ninssub insertion events
+#if "${counter} > ${Ninssub}" then 'print " " file ../CFD/REINIT'
+#if "${counter} > ${Ninssub}" then 'print " " file ../CFD/ABORT'

@@ -1,0 +1,23 @@
+##############
+# cfd coupling
+##############
+variable Tin equal 1223
+
+####
+# uncomment if molten iron to be pictured as trickling particles
+#variable vtrickle equal -0.05
+#fix execSetV all execute ${Ncouple} "set group fullyDeformed property/atom vrec 0.0 0.0 ${vtrickle}" start_of_step
+#####
+
+fix     cfd all couple/cfd couple_every 1 mpi
+fix     cfd1 all couple/cfd/force transfer_force no transfer_torque no transfer_density yes transfer_type yes # transfer_property name effvolfactor type scalar-atom
+fix     cfd1b all couple/cfd/recurrence transfer_force no transfer_fluctuations no
+fix     cfd2 all couple/cfd/convection T0 ${Tin} transfer_conduction no max_change 1.0
+fix     cfd3 all couple/cfd/parttempfield T0 ${Tin}
+fix     cfd4 all couple/cfd/chemistry n_species 3 species_names CO CO2 N2 n_diff 2 diffusant_names CO CO2 transfer_reactant no init_layer_radii no
+
+
+#fix     integr all nve/sphere/limit vlimit 0.05 omegalimit 100
+
+run     0
+velocity all set 0.0 0.0 0.0

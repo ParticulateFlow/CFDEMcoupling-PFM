@@ -1,0 +1,16 @@
+#########
+# regions
+#########
+
+# raceways
+include ../../CFDDEM/DEM/in.RWRegions
+
+# deadman
+variable DMheight equal 1
+region DM cone z 0.0 0.0 2.0 0.0 -1.0 ${DMheight}
+group DMcoke region DM
+
+# hearth
+variable DMheight05 equal ${DMheight}+0.5
+region hearth block -7 7 -7 7 -1.0 ${DMheight05}
+

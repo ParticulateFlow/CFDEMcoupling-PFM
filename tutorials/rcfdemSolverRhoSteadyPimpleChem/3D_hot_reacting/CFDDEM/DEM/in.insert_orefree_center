@@ -1,0 +1,31 @@
+print 'Performing insertion number ${counter}.' screen yes
+
+group secHighestCoke clear
+group secHighestOre clear
+group secHighestFineMix clear
+group secHighestCoke union secHighestCoke highestCoke
+group secHighestOre union secHighestOre highestOre
+group secHighestFineMix union secHighestFineMix highestFineMix
+
+group highestCoke clear
+group highestOre clear
+group highestFineMix clear
+
+if "${counter} > 1" then "unfix ins${counter}C1"
+if "${counter} > 1" then "unfix ins${counter}C2"
+if "${counter} > 1" then "unfix ins${counter}O"
+if "${counter} > 1" then "unfix ins${counter}FM"
+
+next counter
+
+fix ins${counter}C1 highestCoke insert/pack/dense seed 126 region insRegTop2 distributiontemplate pdd1 volumefraction_region 0.56
+fix ins${counter}C2 highestCoke insert/pack/dense seed 125 region insRegTop1c distributiontemplate pdd1 volumefraction_region 0.56
+fix ins${counter}O highestOre insert/pack/dense seed 124 region insRegTop1b distributiontemplate pdd2 volumefraction_region 0.56
+fix ins${counter}FM highestFineMix insert/pack/dense seed 123 region insRegTop1a distributiontemplate pdd3 volumefraction_region 0.56
+
+run 0
+
+group coke type 1
+group finecoke type 2
+group ore type 3
+group fineore type 4

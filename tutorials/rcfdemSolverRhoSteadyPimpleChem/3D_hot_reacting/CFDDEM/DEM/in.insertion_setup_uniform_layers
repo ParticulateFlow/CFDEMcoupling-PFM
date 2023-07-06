@@ -1,0 +1,38 @@
+#################
+# insertion setup
+#################
+variable outerRing equal 4.61
+variable innerRing equal 4.1
+
+variable z1 equal 26.18 #26.125
+variable z2 equal 26.95
+variable z3 equal 27.57
+
+region insRegInnerCylinderNeg cylinder z 0.0 0.0 ${innerRing} ${z1} ${z2} side out units box
+region insRegOuterCylinder cylinder z 0.0 0.0 ${outerRing} ${z1} ${z2} units box
+region insRegTop1a intersect 2 insRegInnerCylinderNeg insRegOuterCylinder
+region insRegTop1b cylinder z 0.0 0.0 ${innerRing} ${z1} ${z2} units box
+region insRegTop2 cylinder z 0.0 0.0 ${outerRing} ${z2} ${z3} units box
+
+region insReg cylinder z 0.0 0.0 ${outerRing} ${z1} ${z3} units box
+variable nTop equal count(all,insReg)
+
+group secHighestCoke empty
+group secHighestOre empty
+group secHighestFineMix empty
+group highestFineMix empty
+group highestCoke empty
+group highestOre empty
+
+# ensure reasonable initialization
+group secHighestCoke union all secHighestCoke
+group highestCoke union all highestCoke
+group highestFineMix union all highestFineMix
+variable zMaxSecHighCoke equal bound(secHighestCoke,zmax)
+
+variable Nins equal 1000
+variable counter loop 1000
+variable insertedCoke equal mass(highestCoke)
+variable insertedOre equal mass(highestOre)
+variable insertedFineMix equal mass(highestFineMix)
+fix eeIns all execute ${Nins} "../../CFDDEM/DEM/in.insert_uniform_layers" file conditional nTop 0 0.1

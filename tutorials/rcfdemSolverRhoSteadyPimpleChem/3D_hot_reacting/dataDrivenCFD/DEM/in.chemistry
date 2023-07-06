@@ -1,0 +1,77 @@
+# particle properties
+#####################
+
+# ore
+# obtain H volume fraction from initial particle density (fully unreduced); then compute volume fractions for inner layers according to Kinaci et al. CES 227 (2020) [ATTENTION: correct conversion factors are q_HM = 0.9666, q_MW = 0.9309, q_WFe = 0.7773]; set porosities = 1 - volume fraction
+
+#fix     porosity_ore        all property/atom   porosity_ore       vector yes no no 0.61 0.34 0.19 0.17  # values for ore in Kinaci et al. CES 227 (2020), corresponding to rho = 4300 for hematite
+fix     porosity_ore        all property/global porosity_ore       vector 0.71 0.48 0.38 0.37
+fix     tortuosity_ore      all property/global tortuosity_ore     scalar 3
+fix     pore_diameter_ore   all property/global pore_diameter_ore  vector 3.e-07 1.75e-05 1.1e-05
+fix     layerDensities_ore  all property/global density_ore vector 7870. 5740. 5170. 5240.
+
+# fineore
+fix     porosity_fineore        all property/global porosity_fineore       vector 0.71 0.48 0.38 0.37
+fix     tortuosity_fineore      all property/global tortuosity_fineore     scalar 3
+fix     pore_diameter_fineore   all property/global pore_diameter_fineore  vector 3.e-07 1.75e-05 1.1e-05
+fix     layerDensities_fineore  all property/global density_fineore vector 7870. 5740. 5170. 5240.
+
+# coke
+# coke porosity according to Ghosh et al. Int J Coal Sci Technol (2018) 5(4):473–485, assuming ash has similar pore structure
+fix     porosity_coke        all property/global porosity_coke       vector 0.5 0.5
+fix     pore_diameter_coke   all property/global pore_diameter_coke  scalar 1e-3
+fix     tortuosity_coke      all property/global tortuosity_coke     scalar 3
+fix     layerDensities_coke all property/global density_coke vector 500. 1900.
+
+# finecoke
+# coke porosity according to Ghosh et al. Int J Coal Sci Technol (2018) 5(4):473–485, assuming ash has similar pore structure
+fix     porosity_finecoke        all property/global porosity_finecoke       vector 0.5 0.5
+fix     pore_diameter_finecoke   all property/global pore_diameter_finecoke  scalar 1e-3
+fix     tortuosity_finecoke      all property/global tortuosity_finecoke     scalar 3
+fix     layerDensities_finecoke all property/global density_finecoke vector 500. 1900.
+
+
+# define layer properties
+fix     LayerRelRadii all property/atom relRadii vector yes no no  1.0 0.998 0.995 0.98
+
+# define fix for rho_eff and fracRed - initialize as zero
+fix     fracRed all property/atom fracRed vector yes no no 0. 0. 0.
+fix     rhoeff  all property/atom rhoeff vector yes no no 0. 0. 0. 0.
+
+# define fix for mass layer - initial testing
+fix     LayerMasses all property/atom massLayer vector yes no no 0. 0. 0. 0.
+
+
+# ore reactions
+###############
+# Activate for 3-layer unreacted core shrink model
+fix     chem0 ore chem/shrink/core speciesA CO molMassA 0.02801 speciesC CO2 molMassC 0.04401 nevery ${Nchem} screen no cg 11
+fix     chem1 fineore chem/shrink/core speciesA CO molMassA 0.02801 speciesC CO2 molMassC 0.04401 nevery ${Nchem} screen no cg 24
+
+# Material properties for chemical reaction
+fix     k0_chem0 ore property/global k0_chem0 vector 10 18 3700
+fix     Ea_chem0 ore property/global Ea_chem0 vector 69488 73674 113859
+
+fix     k0_chem1 fineore property/global k0_chem1 vector 10 18 3700
+fix     Ea_chem1 fineore property/global Ea_chem1 vector 69488 73674 113859
+
+
+# coke reactions
+################
+# values for k0 and T0 according to Shen, Fuel 90 (2011) 728–738;
+# values have been scaled with 1/(nA * mMol) [nA = molar concentration at standard conditions], b.c. Shen uses x P / PA while LIGGGHTS implementation has x P / (RT) * mMol = x P / PA * nA * mMol
+fix     chem2 coke chem/shrink/core/single speciesA O2 molMassA 0.03199 nuA 1 speciesC CO molMassC 0.02801 nuC 2 molMassB 0.01201 nuB 2 molMassD 0.001201 nuD 2 rmin 0.0075 nevery ${Nchem} screen no k 3.1e6 T 10855 Tmin 100 cg 4 layerDiffusion no heatToFluid yes shrink no
+fix     chem3 coke chem/shrink/core/single speciesA CO2 molMassA 0.04401 nuA 1 speciesC CO molMassC 0.02801 nuC 2 molMassB 0.01201 nuB 1 molMassD 0.001201 nuD 1 rmin 0.0075 nevery ${Nchem} screen no k 9.4e9 T 29018 Tmin 100 cg 4 layerDiffusion no heatToFluid yes shrink no
+
+fix     chem4 finecoke chem/shrink/core/single speciesA O2 molMassA 0.03199 nuA 1 speciesC CO molMassC 0.02801 nuC 2 molMassB 0.01201 nuB 2 molMassD 0.001201 nuD 2 rmin 0.0075 nevery ${Nchem} screen no k 3.1e6 T 10855 Tmin 100 cg 8 layerDiffusion no heatToFluid yes shrink no
+fix     chem5 finecoke chem/shrink/core/single speciesA CO2 molMassA 0.04401 nuA 1 speciesC CO molMassC 0.02801 nuC 2 molMassB 0.01201 nuB 1 molMassD 0.001201 nuD 1 rmin 0.0075 nevery ${Nchem} screen no k 9.4e9 T 29018 Tmin 100 cg 8 layerDiffusion no heatToFluid yes shrink no
+
+######
+# Zhuo and Shen, Applied Energy 261 (2020) 114456
+# with the additional assumption that all O2 is transformed into CO upon reaction with coke
+######
+#fix     chem2 coke chem/shrink/core/single speciesA O2 molMassA 0.03199 nuA 1 speciesC CO molMassC 0.02801 nuC 2 molMassB 0.01201 nuB 2 molMassD 0.001201 nuD 2 rmin 0.0075 nevery ${Nchem} screen no nPreFactor 1 k 0.685 T 9000 Tmin 100 cg 4 layerDiffusion no heatToFluid yes shrink no
+#fix     chem3 coke chem/shrink/core/single speciesA CO2 molMassA 0.04401 nuA 1 speciesC CO molMassC 0.02801 nuC 2 molMassB 0.01201 nuB 1 molMassD 0.001201 nuD 1 rmin 0.0075 nevery ${Nchem} screen no nPreFactor 1  k 589 T 26800 Tmin 100 cg 4 layerDiffusion no heatToFluid yes shrink no
+
+#fix     chem4 finecoke chem/shrink/core/single speciesA O2 molMassA 0.03199 nuA 1 speciesC CO molMassC 0.02801 nuC 2 molMassB 0.01201 nuB 2 molMassD 0.001201 nuD 2 rmin 0.0075 nevery ${Nchem} screen no nPreFactor 1 k 0.685 T 9000 Tmin 100 cg 8 layerDiffusion no heatToFluid yes shrink no
+#fix     chem5 finecoke chem/shrink/core/single speciesA CO2 molMassA 0.04401 nuA 1 speciesC CO molMassC 0.02801 nuC 2 molMassB 0.01201 nuB 1 molMassD 0.001201 nuD 1 rmin 0.0075 nevery ${Nchem} screen no nPreFactor 1 k 589 T 26800 Tmin 100 cg 8 layerDiffusion no heatToFluid yes shrink no

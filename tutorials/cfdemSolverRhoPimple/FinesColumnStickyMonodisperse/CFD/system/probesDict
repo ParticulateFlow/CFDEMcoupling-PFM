@@ -1,0 +1,54 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  6
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      probesDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+fields
+(
+    voidfraction
+    voidfractionMean_w0
+    voidfractionMean_w1
+    alphaSt
+    alphaDyn
+    p
+    U
+    uDyn
+    Sds
+    UsMean_w0
+    UsMean_w1
+);
+
+writeControl   timeStep;
+writeInterval  10;
+
+// Locations to be probed.
+probeLocations
+(
+    (0.0 0.0 0.01)
+    (0.049 0.0 0.01)
+    (0.0 0.0 0.06)
+    (0.0 0.0 0.12)
+    (0.0 0.0 0.18)
+    (0.0 0.0 0.24)
+    (0.049 0.0 0.06)
+    (0.049 0.0 0.12)
+    (0.049 0.0 0.18)
+    (0.049 0.0 0.24)
+    (-0.049 0.0 0.06)
+    (-0.049 0.0 0.12)
+    (-0.049 0.0 0.18)
+    (-0.049 0.0 0.24)
+);
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

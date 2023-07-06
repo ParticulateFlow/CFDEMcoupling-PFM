@@ -1,0 +1,448 @@
+	{
+		name RWRegs;
+		type cellSet;
+		action new;
+		source rotatedBoxToCell;
+		sourceInfo
+		{
+			origin (-0.080000 4.350000 -0.080000);
+			i (0.160000 0.000000 0.000000);
+			j (0.000000 1.700000 0.000000);
+			k (0.000000 0.000000 0.160000);
+		}
+	}
+
+	{
+		name RWRegs;
+		type cellSet;
+		action add;
+		source rotatedBoxToCell;
+		sourceInfo
+		{
+			origin (-0.927106 4.250809 -0.080000);
+			i (0.156926 0.031214 0.000000);
+			j (-0.331654 1.667335 0.000000);
+			k (0.000000 0.000000 0.160000);
+		}
+	}
+
+	{
+		name RWRegs;
+		type cellSet;
+		action add;
+		source rotatedBoxToCell;
+		sourceInfo
+		{
+			origin (-1.738583 3.988261 -0.080000);
+			i (0.147821 0.061229 0.000000);
+			j (-0.650562 1.570595 0.000000);
+			k (0.000000 0.000000 0.160000);
+		}
+	}
+
+	{
+		name RWRegs;
+		type cellSet;
+		action add;
+		source rotatedBoxToCell;
+		sourceInfo
+		{
+			origin (-2.483248 3.572447 -0.080000);
+			i (0.133035 0.088891 0.000000);
+			j (-0.944469 1.413498 0.000000);
+			k (0.000000 0.000000 0.160000);
+		}
+	}
+
+	{
+		name RWRegs;
+		type cellSet;
+		action add;
+		source rotatedBoxToCell;
+		sourceInfo
+		{
+			origin (-3.132483 3.019346 -0.080000);
+			i (0.113137 0.113137 0.000000);
+			j (-1.202082 1.202082 0.000000);
+			k (0.000000 0.000000 0.160000);
+		}
+	}
+
+	{
+		name RWRegs;
+		type cellSet;
+		action add;
+		source rotatedBoxToCell;
+		sourceInfo
+		{
+			origin (-3.661338 2.350213 -0.080000);
+			i (0.088891 0.133035 0.000000);
+			j (-1.413498 0.944469 0.000000);
+			k (0.000000 0.000000 0.160000);
+		}
+	}
+
+	{
+		name RWRegs;
+		type cellSet;
+		action add;
+		source rotatedBoxToCell;
+		sourceInfo
+		{
+			origin (-4.049491 1.590763 -0.080000);
+			i (0.061229 0.147821 0.000000);
+			j (-1.570595 0.650562 0.000000);
+			k (0.000000 0.000000 0.160000);
+		}
+	}
+
+	{
+		name RWRegs;
+		type cellSet;
+		action add;
+		source rotatedBoxToCell;
+		sourceInfo
+		{
+			origin (-4.282023 0.770180 -0.080000);
+			i (0.031214 0.156926 0.000000);
+			j (-1.667335 0.331654 0.000000);
+			k (0.000000 0.000000 0.160000);
+		}
+	}
+
+	{
+		name RWRegs;
+		type cellSet;
+		action add;
+		source rotatedBoxToCell;
+		sourceInfo
+		{
+			origin (-4.350000 -0.080000 -0.080000);
+			i (0.000000 0.160000 0.000000);
+			j (-1.700000 0.000000 0.000000);
+			k (0.000000 0.000000 0.160000);
+		}
+	}
+
+	{
+		name RWRegs;
+		type cellSet;
+		action add;
+		source rotatedBoxToCell;
+		sourceInfo
+		{
+			origin (-4.250809 -0.927106 -0.080000);
+			i (-0.031214 0.156926 0.000000);
+			j (-1.667335 -0.331654 0.000000);
+			k (-0.000000 0.000000 0.160000);
+		}
+	}
+
+	{
+		name RWRegs;
+		type cellSet;
+		action add;
+		source rotatedBoxToCell;
+		sourceInfo
+		{
+			origin (-3.988261 -1.738583 -0.080000);
+			i (-0.061229 0.147821 0.000000);
+			j (-1.570595 -0.650562 0.000000);
+			k (-0.000000 0.000000 0.160000);
+		}
+	}
+
+	{
+		name RWRegs;
+		type cellSet;
+		action add;
+		source rotatedBoxToCell;
+		sourceInfo
+		{
+			origin (-3.572447 -2.483248 -0.080000);
+			i (-0.088891 0.133035 0.000000);
+			j (-1.413498 -0.944469 0.000000);
+			k (-0.000000 0.000000 0.160000);
+		}
+	}
+
+	{
+		name RWRegs;
+		type cellSet;
+		action add;
+		source rotatedBoxToCell;
+		sourceInfo
+		{
+			origin (-3.019346 -3.132483 -0.080000);
+			i (-0.113137 0.113137 0.000000);
+			j (-1.202082 -1.202082 0.000000);
+			k (-0.000000 0.000000 0.160000);
+		}
+	}
+
+	{
+		name RWRegs;
+		type cellSet;
+		action add;
+		source rotatedBoxToCell;
+		sourceInfo
+		{
+			origin (-2.350213 -3.661338 -0.080000);
+			i (-0.133035 0.088891 0.000000);
+			j (-0.944469 -1.413498 0.000000);
+			k (-0.000000 0.000000 0.160000);
+		}
+	}
+
+	{
+		name RWRegs;
+		type cellSet;
+		action add;
+		source rotatedBoxToCell;
+		sourceInfo
+		{
+			origin (-1.590763 -4.049491 -0.080000);
+			i (-0.147821 0.061229 0.000000);
+			j (-0.650562 -1.570595 0.000000);
+			k (-0.000000 0.000000 0.160000);
+		}
+	}
+
+	{
+		name RWRegs;
+		type cellSet;
+		action add;
+		source rotatedBoxToCell;
+		sourceInfo
+		{
+			origin (-0.770180 -4.282023 -0.080000);
+			i (-0.156926 0.031214 0.000000);
+			j (-0.331654 -1.667335 0.000000);
+			k (-0.000000 0.000000 0.160000);
+		}
+	}
+
+	{
+		name RWRegs;
+		type cellSet;
+		action add;
+		source rotatedBoxToCell;
+		sourceInfo
+		{
+			origin (0.080000 -4.350000 -0.080000);
+			i (-0.160000 0.000000 0.000000);
+			j (-0.000000 -1.700000 0.000000);
+			k (-0.000000 0.000000 0.160000);
+		}
+	}
+
+	{
+		name RWRegs;
+		type cellSet;
+		action add;
+		source rotatedBoxToCell;
+		sourceInfo
+		{
+			origin (0.927106 -4.250809 -0.080000);
+			i (-0.156926 -0.031214 0.000000);
+			j (0.331654 -1.667335 0.000000);
+			k (0.000000 -0.000000 0.160000);
+		}
+	}
+
+	{
+		name RWRegs;
+		type cellSet;
+		action add;
+		source rotatedBoxToCell;
+		sourceInfo
+		{
+			origin (1.738583 -3.988261 -0.080000);
+			i (-0.147821 -0.061229 0.000000);
+			j (0.650562 -1.570595 0.000000);
+			k (0.000000 -0.000000 0.160000);
+		}
+	}
+
+	{
+		name RWRegs;
+		type cellSet;
+		action add;
+		source rotatedBoxToCell;
+		sourceInfo
+		{
+			origin (2.483248 -3.572447 -0.080000);
+			i (-0.133035 -0.088891 0.000000);
+			j (0.944469 -1.413498 0.000000);
+			k (0.000000 -0.000000 0.160000);
+		}
+	}
+
+	{
+		name RWRegs;
+		type cellSet;
+		action add;
+		source rotatedBoxToCell;
+		sourceInfo
+		{
+			origin (3.132483 -3.019346 -0.080000);
+			i (-0.113137 -0.113137 0.000000);
+			j (1.202082 -1.202082 0.000000);
+			k (0.000000 -0.000000 0.160000);
+		}
+	}
+
+	{
+		name RWRegs;
+		type cellSet;
+		action add;
+		source rotatedBoxToCell;
+		sourceInfo
+		{
+			origin (3.661338 -2.350213 -0.080000);
+			i (-0.088891 -0.133035 0.000000);
+			j (1.413498 -0.944469 0.000000);
+			k (0.000000 -0.000000 0.160000);
+		}
+	}
+
+	{
+		name RWRegs;
+		type cellSet;
+		action add;
+		source rotatedBoxToCell;
+		sourceInfo
+		{
+			origin (4.049491 -1.590763 -0.080000);
+			i (-0.061229 -0.147821 0.000000);
+			j (1.570595 -0.650562 0.000000);
+			k (0.000000 -0.000000 0.160000);
+		}
+	}
+
+	{
+		name RWRegs;
+		type cellSet;
+		action add;
+		source rotatedBoxToCell;
+		sourceInfo
+		{
+			origin (4.282023 -0.770180 -0.080000);
+			i (-0.031214 -0.156926 0.000000);
+			j (1.667335 -0.331654 0.000000);
+			k (0.000000 -0.000000 0.160000);
+		}
+	}
+
+	{
+		name RWRegs;
+		type cellSet;
+		action add;
+		source rotatedBoxToCell;
+		sourceInfo
+		{
+			origin (4.350000 0.080000 -0.080000);
+			i (-0.000000 -0.160000 0.000000);
+			j (1.700000 -0.000000 0.000000);
+			k (0.000000 -0.000000 0.160000);
+		}
+	}
+
+	{
+		name RWRegs;
+		type cellSet;
+		action add;
+		source rotatedBoxToCell;
+		sourceInfo
+		{
+			origin (4.250809 0.927106 -0.080000);
+			i (0.031214 -0.156926 0.000000);
+			j (1.667335 0.331654 0.000000);
+			k (0.000000 0.000000 0.160000);
+		}
+	}
+
+	{
+		name RWRegs;
+		type cellSet;
+		action add;
+		source rotatedBoxToCell;
+		sourceInfo
+		{
+			origin (3.988261 1.738583 -0.080000);
+			i (0.061229 -0.147821 0.000000);
+			j (1.570595 0.650562 0.000000);
+			k (0.000000 0.000000 0.160000);
+		}
+	}
+
+	{
+		name RWRegs;
+		type cellSet;
+		action add;
+		source rotatedBoxToCell;
+		sourceInfo
+		{
+			origin (3.572447 2.483248 -0.080000);
+			i (0.088891 -0.133035 0.000000);
+			j (1.413498 0.944469 0.000000);
+			k (0.000000 0.000000 0.160000);
+		}
+	}
+
+	{
+		name RWRegs;
+		type cellSet;
+		action add;
+		source rotatedBoxToCell;
+		sourceInfo
+		{
+			origin (3.019346 3.132483 -0.080000);
+			i (0.113137 -0.113137 0.000000);
+			j (1.202082 1.202082 0.000000);
+			k (0.000000 0.000000 0.160000);
+		}
+	}
+
+	{
+		name RWRegs;
+		type cellSet;
+		action add;
+		source rotatedBoxToCell;
+		sourceInfo
+		{
+			origin (2.350213 3.661338 -0.080000);
+			i (0.133035 -0.088891 0.000000);
+			j (0.944469 1.413498 0.000000);
+			k (0.000000 0.000000 0.160000);
+		}
+	}
+
+	{
+		name RWRegs;
+		type cellSet;
+		action add;
+		source rotatedBoxToCell;
+		sourceInfo
+		{
+			origin (1.590763 4.049491 -0.080000);
+			i (0.147821 -0.061229 0.000000);
+			j (0.650562 1.570595 0.000000);
+			k (0.000000 0.000000 0.160000);
+		}
+	}
+
+	{
+		name RWRegs;
+		type cellSet;
+		action add;
+		source rotatedBoxToCell;
+		sourceInfo
+		{
+			origin (0.770180 4.282023 -0.080000);
+			i (0.156926 -0.031214 0.000000);
+			j (0.331654 1.667335 0.000000);
+			k (0.000000 0.000000 0.160000);
+		}
+	}
+

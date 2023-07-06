@@ -1,0 +1,38 @@
+##############
+# cfd coupling
+##############
+variable Tin equal 293
+
+####
+# uncomment if molten iron to be pictured as trickling particles
+#variable vtrickle equal -0.05
+#fix execSetV all execute ${Ncouple} "set group fullyDeformed property/atom vrec 0.0 0.0 ${vtrickle}" start_of_step
+#####
+
+fix     cfd all couple/cfd couple_every ${Ncouple} mpi
+fix     cfd1 all couple/cfd/force transfer_force no transfer_torque no transfer_density yes transfer_type yes transfer_property name effvolfactor type scalar-atom
+fix     cfd2 all couple/cfd/recurrence transfer_force no transfer_fluctuations no
+fix     cfd3 all couple/cfd/convection T0 ${Tin} transfer_conduction yes max_change 1.0
+fix     cfd4 all couple/cfd/parttempfield T0 ${Tin}
+####
+# no trickling
+fix     cfd5 allore couple/cfd/deform rmin 0.01 monitor_heat yes use_latent_heat yes latent_heat 247000 verbose yes
+# trickling
+#fix     cfd5 allore couple/cfd/deform rmin 0.01 monitor_heat yes use_latent_heat yes latent_heat 247000 delete_fully_deformed_particles no verbose yes
+####
+fix     cfd6 all couple/cfd/chemistry n_species 4 species_names O2 CO CO2 N2 n_diff 3 diffusant_names CO O2 CO2 transfer_reactant yes init_layer_radii yes
+
+variable cokeBelowCZIndicator atom (f_partDeformations>0.99)*(type==1)
+variable finecokeBelowCZIndicator atom (f_partDeformations>0.99)*(type==2)
+variable aboveCZIndicator atom (f_partDeformations<=0.99)
+
+group cokeBelowCZ dynamic all var cokeBelowCZIndicator every ${Ncouple}
+group finecokeBelowCZ dynamic all var finecokeBelowCZIndicator every ${Ncouple}
+group aboveCZ dynamic all var aboveCZIndicator every ${Ncouple}
+
+
+fix     integr all nve/sphere/limit vlimit 0.05 omegalimit 1000.0
+fix     limV RW limit/vel 0.001
+
+run     0
+velocity all set 0.0 0.0 0.0

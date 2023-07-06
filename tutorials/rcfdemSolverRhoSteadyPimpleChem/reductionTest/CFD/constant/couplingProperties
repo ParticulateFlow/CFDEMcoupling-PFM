@@ -1,0 +1,212 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  6
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      couplingProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+// sub-models & settings
+
+modelType "A";
+
+couplingInterval 1;
+
+voidFractionModel divided;
+
+locateModel engine;
+
+meshMotionModel noMeshMotion;
+
+regionModel allRegion;
+
+IOModel "off";
+
+dataExchangeModel twoWayMPI;
+
+averagingModel dense;
+
+clockModel standardClock;
+
+smoothingModel off;
+
+probeModel off;
+
+forceModels
+(
+    freeStreaming
+    BeetstraDrag
+    gradPForce
+    viscForce
+);
+
+momCoupleModels
+(
+    implicitCouple
+);
+
+otherForceModels
+(
+);
+
+energyModels
+(
+    heatTransferGunn
+    reactionHeat
+);
+
+thermCondModel SyamlalThermCond;
+
+chemistryModels
+(
+    species
+    diffusionCoefficients
+    massTransferCoeff
+);
+
+turbulenceModelType "turbulenceProperties";
+
+coupleRecFluc false;
+coupleRecForce false;
+
+
+// sub-model properties
+
+freeStreamingProps
+{
+    critVoidfraction 1.5;
+    // density can be chosen arbitrarily
+    particleDensity 667;
+    ballisticVelLimit 0.0;
+    // operational descent velocity
+    scalingFactor 110.04;
+    interpolation true;
+}
+
+
+implicitCoupleProps
+{
+    velFieldName "U";
+    granVelFieldName "Us";
+    voidfractionFieldName "voidfraction";
+}
+
+explicitCoupleProps
+{
+    fLimit (1e3 1e3 1e3);
+}
+
+dSauterProps
+{
+
+}
+
+gradPForceProps
+{
+    pFieldName "p";
+    densityFieldName "rho";
+    voidfractionFieldName "voidfraction";
+    velocityFieldName "U";
+}
+
+heatTransferGunnProps
+{
+    partTempName "Temp";
+    partHeatFluxName "convectiveHeatFlux";
+    calcPartTempField false;
+    partRefTemp 293;
+    interpolation false;
+}
+
+viscForceProps
+{
+    velocityFieldName "U";
+    densityFieldName "rho";
+    interpolation;
+}
+
+BeetstraDragProps
+{
+    velFieldName "U";
+    granVelFieldName "Us";
+    densityFieldName "rho";
+    voidfractionFieldName "voidfraction";
+}
+
+gravityProps
+{
+}
+
+SyamlalThermCondProps
+{
+}
+
+engineProps
+{
+    treeSearch true;
+}
+
+dividedProps
+{
+    alphaMin 0.25;
+    scaleUpVol 1.0;
+    weight 1.0; //1.33;
+    verbose;
+}
+
+constDiffSmoothingProps
+{
+    verbose;
+    lowerLimit 0.25;
+    upperLimit 1.0;
+    smoothingLength 0.006;
+}
+
+twoWayMPIProps
+{
+    liggghtsPath "../DEM/in.liggghts_dataDrivenCFD";
+}
+
+
+particleProbeProps
+{
+    particleIDsToSample "0";
+}
+
+speciesProps
+{
+    ChemistryFile   "$FOAM_CASE/constant/foam.inp";
+    Nevery          1;
+    verbose         false;
+    interpolation   false;
+}
+
+diffusionCoefficientsProps
+{
+    verbose         false;
+    interpolation   false;
+    ChemistryFile   "$FOAM_CASE/constant/foam.inp";
+    diffusantGasNames       (
+                                CO CO2
+                            );
+}
+
+massTransferCoeffProps
+{
+    verbose         false;
+    interpolation   false;
+}
+
+reactionHeatProps
+{
+}
+
+// ************************************************************************* //

@@ -1,0 +1,206 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  6
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+    class           dictionary;
+    object          couplingProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+// sub-models & settings
+
+modelType "A"; // A or B or Bfull
+
+couplingInterval 10;
+
+voidFractionModel divided;
+
+locateModel engine;
+
+meshMotionModel noMeshMotion;
+
+regionModel allRegion;
+
+IOModel "off";
+
+dataExchangeModel twoWayMPI;
+
+averagingModel dense;
+
+clockModel standardClock;
+
+smoothingModel constDiffSmoothing;
+
+probeModel off;
+
+forceModels
+(
+    dSauter
+    Fines
+    FanningDynFines
+    BeetstraDragPoly
+    gradPForce
+    viscForce
+);
+
+momCoupleModels
+(
+    implicitCouple
+    explicitCouple
+);
+
+otherForceModels
+(
+    gravity
+    weightSecondaryPhase
+    expParticleForces
+);
+
+energyModels
+(
+    heatTransferGunn
+);
+
+thermCondModel SyamlalThermCond;
+
+chemistryModels
+(
+    off
+);
+
+turbulenceModelType "turbulenceProperties";
+
+
+// sub-model properties
+
+implicitCoupleProps
+{
+    velFieldName "U";
+    granVelFieldName "Us";
+    voidfractionFieldName "voidfraction";
+}
+
+explicitCoupleProps
+{
+    fLimit (1e3 1e3 1e3);
+}
+
+dSauterProps
+{
+}
+
+gradPForceProps
+{
+    pFieldName "p";
+    densityFieldName "rho";
+    voidfractionFieldName "voidfraction";
+    velocityFieldName "U";
+}
+
+heatTransferGunnProps
+{
+    partTempName "Temp";
+    partHeatFluxName "convectiveHeatFlux";
+    calcPartTempField false;
+    partRefTemp 293;
+    interpolation false;
+}
+
+viscForceProps
+{
+    velocityFieldName "U";
+    densityFieldName "rho";
+    interpolation;
+}
+
+BeetstraDragProps
+{
+    fines true;
+    dFine 0.000388;
+    velFieldName "U";
+    granVelFieldName "Us";
+    densityFieldName "rho";
+    voidfractionFieldName "voidfraction";
+}
+
+FanningDynFinesProps
+{
+    velFieldName "U";
+    granVelFieldName "Us";
+    densityFieldName "rho";
+    voidfractionFieldName "voidfraction";
+}
+
+FinesFieldsProps
+{
+    velFieldName "U";
+    granVelFieldName "Us";
+    densityFieldName "rho";
+    voidfractionFieldName "voidfraction";
+    dFine 0.000388;
+    rhoFine 1369;
+    alphaMax 0.95;
+    critVoidfraction 0.05;
+    depRate 0.05;
+    nCrit 2.25;
+    poresizeWidth 0.2;
+    verbose true;
+    diffCoeff 0.005;
+    tauRelease 0.1;
+    depositionLength 0.1;
+    kineticClogging true;
+}
+
+gravityProps
+{
+}
+
+weightSecondaryPhaseProps
+{
+    volfracFieldName "alphaDyn";
+    rho 1369;
+}
+
+SyamlalThermCondProps
+{
+}
+
+engineProps
+{
+    treeSearch true;
+}
+
+dividedProps
+{
+    alphaMin 0.25;
+    scaleUpVol 1.0;
+    weight 1.0;
+    verbose;
+}
+
+constDiffSmoothingProps
+{
+    verbose;
+    lowerLimit 0.25;
+    upperLimit 1.0;
+    smoothingLength 0.005;
+}
+
+twoWayMPIProps
+{
+    liggghtsPath "../DEM/in.liggghts_resume";
+}
+
+particleProbeProps
+{
+    particleIDsToSample "0";
+}
+
+// ************************************************************************* //

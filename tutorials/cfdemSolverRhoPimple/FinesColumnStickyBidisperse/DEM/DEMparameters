@@ -1,0 +1,27 @@
+# DEM-parameters
+variable partDens equal 1000                # density
+variable partDensHeavy equal 8000           # density
+variable partRad1 equal 0.0024              # particle radius
+variable partRad2 equal 0.0012              # particle radius
+variable partRadBig equal 0.005             # particle radius
+variable partVol equal 4*3.14/3*${partRad2}^3
+variable partVolBig equal 4*3.14/3*${partRad1}^3
+variable yM equal 5.e6                      # Young's modulus
+variable pR equal 0.25                      # Poisson ratio
+variable rest equal 0.66                    # coefficient of restitution
+variable fric equal 0.95                    # coefficient of friction
+variable roll equal 0.15                    # for particles and walls with friction
+variable noRoll equal 0                     # for frictionless walls
+variable cV equal 0.1                       # characteristic velocity
+variable coh equal 50000                    # cohesion energy density
+
+variable Tpart equal 298
+
+# Geometry
+variable cylrad equal 0.05
+variable cylradInner equal 0.045
+variable fillH equal 0.35
+variable fillH1 equal ${fillH}-0.025
+variable fillH2 equal ${fillH1}+2*0.0024
+variable fillV equal ${fillH}*${cylrad}^2*3.14
+variable nPart equal ceil(${fillV}*0.7/${partVol})

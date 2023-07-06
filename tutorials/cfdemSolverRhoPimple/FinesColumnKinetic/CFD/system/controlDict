@@ -1,0 +1,109 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  6
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+application     potentialFoam;
+
+startFrom       startTime;
+
+startTime       0;
+
+stopAt          endTime;
+
+endTime         10;
+
+deltaT          0.0005;
+
+writeControl    timeStep;
+
+writeInterval   1000;
+
+purgeWrite      0;
+
+writeFormat     ascii;
+
+writePrecision  6;
+
+writeCompression off;
+
+timeFormat      general;
+
+timePrecision   6;
+
+runTimeModifiable true;
+
+
+functions
+{
+    probes1
+    {
+        type probes;
+
+        functionObjectLibs ("libsampling.so");
+
+        #include "probesDict";
+    }
+
+    volInt
+    {
+        type            volFieldValue;
+        functionObjectLibs ("libfieldFunctionObjects.so");
+        writeControl    timeStep;
+        log             true;
+        writeFields     false;
+        regionType      all;
+        //name            all;
+        operation       volIntegrate;
+
+        fields
+        (
+            alphaSt
+        );
+    }
+
+    inflow
+    {
+        type            surfaceFieldValue;
+        libs ("libfieldFunctionObjects.so");
+        writeControl    timeStep;
+        log             true;
+        // Output field values as well
+        writeFields     false;
+        regionType      patch;
+        name            inlet;
+        operation       sum;//areaIntegrate;
+
+        fields
+        (
+            massFluxDyn
+        );
+    }
+
+    outflow
+    {
+        $inflow;
+        name      outlet;
+    }
+
+    throughflow
+    {
+        $inflow;
+        regionType    faceZone;
+        name          plane1;
+    }
+}
+
+// ************************************************************************* //

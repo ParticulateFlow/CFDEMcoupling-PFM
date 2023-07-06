@@ -1,0 +1,16 @@
+variable time   equal time
+
+variable m1 equal mass(ore)
+print 'initial mass = ${m1}'
+compute layermasses all reduce sum f_LayerMasses[1] f_LayerMasses[2] f_LayerMasses[3] f_LayerMasses[4]
+fix     layermasses    all ave/time 1 1 1 c_layermasses[1] c_layermasses[2] c_layermasses[3] c_layermasses[4]
+variable lmass1 equal f_layermasses[1]
+variable lmass2 equal f_layermasses[2]
+variable lmass3 equal f_layermasses[3]
+variable lmass4 equal f_layermasses[4]
+variable lmasstot equal f_layermasses[1]+f_layermasses[2]+f_layermasses[3]+f_layermasses[4]
+variable massloss equal ${m1}-v_lmasstot
+
+fix printmasslayer all print 80 "${time} ${massloss} ${lmass1} ${lmass2} ${lmass3} ${lmass4} ${lmasstot}" &
+    file ../DEM/monitor/mass_layer.dat title "#time massloss lmass1 lmass2 lmass3 lmass4 lmass_{tot} " screen no
+
