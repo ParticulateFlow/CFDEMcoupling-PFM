@@ -84,9 +84,9 @@ tmp<volVectorField> gravityEff::exportForceField()
             )
         )
     );
-    
-   if (propsDict_.found("rhoPart"))
-   {
+
+    if (propsDict_.found("rhoPart"))
+    {
         //Mixture (gas and solid) density based on whole domain
         dimensionedScalar rhoMix_ = fvc::domainIntegrate((1.0-voidfraction_) * rhoPart_ + voidfraction_ * rhoG_) / fvc::domainIntegrate(unity_);
         volVectorField& source = tsource.ref();

@@ -62,7 +62,7 @@ protected:
         const uniformDimensionedVectorField& g_;// ref to gravity
 
         dimensionedScalar rhoPart_;
-        
+
         const volScalarField& unity_;
 public:
 

@@ -65,7 +65,7 @@ staticPressure::staticPressure
     voidfractionFieldName_(propsDict_.lookup("voidfractionFieldName")),
     voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
     rhoPart_(readScalar(propsDict_.lookup ("rhoPart"))),
-    solidFraction_(readScalar(propsDict_.lookup ("DomainSolidVolumeFraction")))        
+    solidFraction_(readScalar(propsDict_.lookup ("DomainSolidVolumeFraction")))
 {
     // init force sub model
     setForceSubModels(propsDict_);
@@ -84,7 +84,7 @@ void staticPressure::setForce() const
 {
     #include "setupProbeModel.H"
     label cellI;
-    scalar rhoMix_ = solidFraction_*rhoPart_ + (1.0-solidFraction_)*rhoGas_;   
+    scalar rhoMix_ = solidFraction_*rhoPart_ + (1.0-solidFraction_)*rhoGas_;
     vector force;
 
     for(int index = 0; index < particleCloud_.numberOfParticles(); ++index)
@@ -96,10 +96,10 @@ void staticPressure::setForce() const
             scalar Vs = particleCloud_.particleVolume(index);
             // set force on particle
             force = -Vs * rhoMix_ * g_;
-      }
+        }
         // write particle based data to global array
         forceSubM(0).partToArray(index,force,vector::zero);
-     }    
+     }
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

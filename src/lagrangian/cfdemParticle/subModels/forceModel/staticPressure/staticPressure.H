@@ -66,15 +66,15 @@ private:
     scalar rhoGas_;
 
     vector g_;
-    
+
     word voidfractionFieldName_;
-    
+
     const volScalarField& voidfraction_;
-    
+
     scalar rhoPart_;
-    
+
     scalar solidFraction_;
-          
+
 public:
 
     //- Runtime type information
