@@ -122,6 +122,7 @@ isotropicFluctuations,
 particleDeformation,
 "pdCorrelation"_forceModel_pdCorrelation.html,
 potentialRelaxation,
+"staticPressure"_forceModel_staticPressure.html,
 "surfaceTensionForce"_forceModel_surfaceTensionForce.html,
 terminalVelocity,
 "transferFluidProperties"_forceModel_transferFluidProperties.html,
@@ -199,6 +200,7 @@ each DEM particle.
 
 expParticleForces,
 gravity,
+"gravityEff"_otherForceModel_gravityEff.html,
 secondaryPhaseInducedBuoyancy,
 weightSecondaryPhase :tb(c=2,ea=c)
 

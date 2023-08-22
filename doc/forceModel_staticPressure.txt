@@ -17,13 +17,13 @@ forceModels
    staticPressure
 );
 staticPressureProps
-{
+\{
    rhoGas number1; 
    voidfractionFieldName "voidfraction";
    rhoPart number2; 
    DomainSolidVolumeFraction number3; 
    g_DEM gravityVector; 
-} :pre
+\} :pre
 
 {number1} = density of the gas phase :ulb,l
 {voidfraction} = name of the finite volume void fraction field :l
@@ -39,17 +39,17 @@ forceModels
    staticPressure
 );
 staticPressureProps
-{
+\{
    rhoGas 1.2; 
    voidfractionFieldName "voidfraction";
    rhoPart 1500; 
    DomainSolidVolumeFraction 0.05; 
    g_DEM (0 0 -9.81); 
-} :pre
+\} :pre
 
 [Description:]
 
-As discussed in {gravityEff} otherForceModel, in case of simulating periodic boxes, it is necessary to have a gravitaional source term. 
+As discussed in "gravityEff"_otherForceModel_gravityEff.html, in case of simulating periodic boxes, it is necessary to have a gravitaional source term. 
 Since that force is added to the gas momentum equation, we need to add the same force excluding the effect of the gravitational force on the 
 particles (the gravitational force on the particles is already available on the LIGGGHTS side) to drive the particles. This force model performs the calculation of the following force acting on each DEM particle,
 
