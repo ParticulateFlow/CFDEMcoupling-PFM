@@ -4,7 +4,9 @@ tmp<fvVectorMatrix> tUEqn
 (
     fvm::ddt(voidfraction,U) - fvm::Sp(fvc::ddt(voidfraction),U)
   + fvm::div(phi,U) - fvm::Sp(fvc::div(phi),U)
-  + particleCloud.divVoidfractionTau(U, voidfraction)  // in case of doing "periodic box" simulations viscous term can be commented and the solver can be compiled 							       // again. However, the effect of this term on the results is negligible (about 1-2%). 
+    // in case of "periodic box" simulations the viscous term can be commented
+    // during testing the effect of this term on the results was negligible (about 1-2%)
+  + particleCloud.divVoidfractionTau(U, voidfraction)
   - fOther/rho
   ==
     fvOptions(U)
