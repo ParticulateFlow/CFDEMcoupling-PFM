@@ -23,7 +23,6 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "error.H"
-#include "cellSet.H"
 #include "staticPressure.H"
 #include "addToRunTimeSelectionTable.H"
 
