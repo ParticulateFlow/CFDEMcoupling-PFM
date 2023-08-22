@@ -144,25 +144,15 @@
     (
      	IOobject
      	(
-	   "unity",
-	   runTime.timeName(),
-	   mesh,
-	   IOobject::NO_READ,
-	   IOobject::NO_WRITE
+	    "unity",
+	    runTime.timeName(),
+	    mesh,
+	    IOobject::NO_READ,
+	    IOobject::NO_WRITE
      	),
      	mesh,
      	dimensionedScalar("unity", dimless, 1.0)
     );
-
-// gravity vector for periodic boundary conditions
-    dimensionedVector gN
-    (
-       "gN",
-       dimensionSet(0,1,-2,0,0,0,0),
-       vector(0,0,-9.81)
-    );
-
-
 
     label pRefCell = 0;
     scalar pRefValue = 0.0;

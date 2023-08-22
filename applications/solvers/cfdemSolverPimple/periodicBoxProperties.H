@@ -1,4 +1,4 @@
-// gravity direction should always be -z!
+dimensionedVector gN = mesh.lookupObject<uniformDimensionedVectorField> ("g");
 dimensionedScalar volume = fvc::domainIntegrate(unity);
 
 Info<< "particle_ENSTROPHY: "
