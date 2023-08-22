@@ -1,0 +1,54 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  6
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volVectorField;
+    object      U;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 1 -1 0 0 0 0];
+
+internalField   uniform (0 0 0);
+
+boundaryField
+{
+    bottom
+    {
+        type            cyclic;
+    }
+
+    top
+    {
+        type            cyclic;
+    }
+
+    lr1
+    {
+        type            cyclic;
+    }
+
+    lr2
+    {
+        type            cyclic;
+    }
+
+    vh1
+    {
+        type            cyclic;
+    }
+
+    vh2
+    {
+        type            cyclic;
+    }
+}
+
+// ************************************************************************* //
