@@ -58,6 +58,12 @@ int main(int argc, char *argv[])
     cfdemCloud particleCloud(mesh);
     #include "checkModelType.H"
 
+    // switch for periodic box simulations
+    Switch periodicBoxSwitch
+    (
+        pimple.dict().lookupOrDefault<Switch>("periodicBoxSwitch", false)
+    );
+
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
     Info<< "\nStarting time loop\n" << endl;
     while (runTime.loop())
@@ -115,6 +121,11 @@ int main(int argc, char *argv[])
         else
         {
             Info << "skipping flow solution." << endl;
+        }
+
+        if (periodicBoxSwitch)
+        {
+           #include "periodicBoxProperties.H"
         }
 
         runTime.write();
