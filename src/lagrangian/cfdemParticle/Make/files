@@ -109,6 +109,7 @@ $(forceModels)/particleDeformation/particleDeformation.C
 $(forceModels)/turbulentDispersion/turbulentDispersion.C
 $(forceModels)/terminalVelocity/terminalVelocity.C
 $(forceModels)/turbulentVelocityFluctuations/turbulentVelocityFluctuations.C
+$(forceModels)/staticPressure/staticPressure.C
 
 $(forceModelsMS)/forceModelMS/forceModelMS.C
 $(forceModelsMS)/forceModelMS/newForceModelMS.C
@@ -126,6 +127,7 @@ $(otherForceModels)/gravity/gravity.C
 $(otherForceModels)/weightSecondaryPhase/weightSecondaryPhase.C
 $(otherForceModels)/expParticleForces/expParticleForces.C
 $(otherForceModels)/secondaryPhaseInducedBuoyancy/secondaryPhaseInducedBuoyancy.C
+$(otherForceModels)/gravityEff/gravityEff.C
 
 $(probeModels)/probeModel/probeModel.C
 $(probeModels)/probeModel/newProbeModel.C
