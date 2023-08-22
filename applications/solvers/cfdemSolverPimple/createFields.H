@@ -144,11 +144,11 @@
     (
         IOobject
         (
-        "unity",
-        runTime.timeName(),
-        mesh,
-        IOobject::NO_READ,
-        IOobject::NO_WRITE
+            "unity",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
         ),
         mesh,
         dimensionedScalar("unity", dimless, 1.0)
