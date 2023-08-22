@@ -1,11 +1,7 @@
 /*---------------------------------------------------------------------------*\
     CFDEMcoupling - Open Source CFD-DEM coupling
 
-    CFDEMcoupling is part of the CFDEMproject
-    www.cfdem.com
-                                Christoph Goniva, christoph.goniva@cfdem.com
-                                Copyright 2009-2012 JKU Linz
-                                Copyright 2012-     DCS Computing GmbH, Linz
+    Copyright (C) 2023  Behrad Esgandari, JKU Linz, Austria
 -------------------------------------------------------------------------------
 License
     This file is part of CFDEMcoupling.
@@ -23,8 +19,6 @@ License
     You should have received a copy of the GNU General Public License
     along with CFDEMcoupling; if not, write to the Free Software Foundation,
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
-
-    Copyright (C) 2023- Behrad Esgandari, JKU Linz, Austria
 
 Description
     A gravitational force applied on the particles just in case of
