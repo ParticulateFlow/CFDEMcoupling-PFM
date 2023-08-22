@@ -47,8 +47,8 @@ simulating periodic boxes with assuming "Homogenous no flow condition" we will h
 
 :c,image(Eqs/otherForceModels_gravityEff_pic1.jpg)
 
-This equation depicts that in "no flow consition" static pressure gradient balances the mixture weight.
-Therefore, to derive the flow in the periodic box simulations, a dynamic pressure gradien is defined as,
+This equation depicts that in "no flow condition" static pressure gradient balances the mixture weight.
+Therefore, to derive the flow in the periodic box simulations, a dynamic pressure gradient is defined as,
 
 :c,image(Eqs/otherForceModels_gravityEff_pic2.jpg)
 
