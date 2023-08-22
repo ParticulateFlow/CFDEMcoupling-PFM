@@ -142,16 +142,16 @@
 //Periodic box
     volScalarField unity
     (
-     	IOobject
-     	(
-	    "unity",
-	    runTime.timeName(),
-	    mesh,
-	    IOobject::NO_READ,
-	    IOobject::NO_WRITE
-     	),
-     	mesh,
-     	dimensionedScalar("unity", dimless, 1.0)
+        IOobject
+        (
+        "unity",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::NO_WRITE
+        ),
+        mesh,
+        dimensionedScalar("unity", dimless, 1.0)
     );
 
     label pRefCell = 0;

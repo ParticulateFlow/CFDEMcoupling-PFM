@@ -17,15 +17,15 @@ Info<< "air_ENSTROPHY: "
 
 Info<< "slip_velocity: "
     << - ((
-		fvc::domainIntegrate(voidfraction*(U&gN)).value()
-	       /fvc::domainIntegrate(voidfraction*mag(gN)).value()
-	     )
-	   - (
-		fvc::domainIntegrate((1.0-voidfraction)*(Us&gN)).value()
-	       /fvc::domainIntegrate((1.0-voidfraction)*mag(gN)).value()
+        fvc::domainIntegrate(voidfraction*(U&gN)).value()
+           /fvc::domainIntegrate(voidfraction*mag(gN)).value()
+         )
+       - (
+        fvc::domainIntegrate((1.0-voidfraction)*(Us&gN)).value()
+           /fvc::domainIntegrate((1.0-voidfraction)*mag(gN)).value()
          ))
    << endl;
-   
+
 dimensionedVector alpha1Us = fvc::domainIntegrate((1.0-voidfraction)*(Us))/fvc::domainIntegrate((1.0-voidfraction));
 dimensionedVector alpha2U = fvc::domainIntegrate(voidfraction*(U))/fvc::domainIntegrate(voidfraction);
 dimensionedScalar alpha1M  = fvc::domainIntegrate((1.0-voidfraction))/volume;

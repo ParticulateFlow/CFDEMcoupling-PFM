@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
     Switch periodicBoxSwitch
     (
         pimple.dict().lookupOrDefault<Switch>("periodicBoxSwitch", false)
-    );    
+    );
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
     Info<< "\nStarting time loop\n" << endl;
@@ -123,11 +123,11 @@ int main(int argc, char *argv[])
             Info << "skipping flow solution." << endl;
         }
 
-        if (periodicBoxSwitch) 
-        {         
+        if (periodicBoxSwitch)
+        {
            #include "periodicBoxProperties.H"
         }
-         
+
         runTime.write();
 
         Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
