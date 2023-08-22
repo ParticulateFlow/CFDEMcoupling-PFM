@@ -24,27 +24,27 @@ boundaryField
     {
         type            cyclic;
     }
-    
+
     top
     {
         type            cyclic;
     }
-    
+
     lr1
     {
         type            cyclic;
     }
-    
+
     lr2
     {
         type            cyclic;
     }
-    
+
     vh1
     {
         type            cyclic;
     }
-    
+
     vh2
     {
         type            cyclic;

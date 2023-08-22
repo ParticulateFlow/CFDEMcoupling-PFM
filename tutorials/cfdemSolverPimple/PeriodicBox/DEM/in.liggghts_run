@@ -1,10 +1,10 @@
 ################################################################################
-# brief: Periodic box - run                       				#
+# brief: Periodic box - run                                                    #
 #                                                                              #
 # Periodic box simulations of Geldart A particles (d=0.075mm, rho=1500kg/m3)   #
-# Cf. Radl, S. and Sundaresan, S., A drag model for filtered Euler–Lagrange 	#
-#     simulations of clustered gas–particle suspensions. 			#
-#     Chemical engineering science, (2014).  					#
+# Cf. Radl, S. and Sundaresan, S., A drag model for filtered Euler–Lagrange    #
+#     simulations of clustered gas–particle suspensions.                       #
+#     Chem. Eng. Sci., (2014)                                                  #
 # mass loading = 0.05                                                          #
 # authors: Behrad Esgandari                                                    #
 # date: Aug 2023                                                               #
@@ -48,10 +48,10 @@ neigh_modify every 5 delay 0 check no
 
 # define the material properties required for granular pair styles
 # type 1 = particles with friction
-fix m1 all property/global youngsModulus peratomtype 1e6 
-fix m2 all property/global poissonsRatio peratomtype 0.42 
-fix m3 all property/global coefficientRestitution peratomtypepair 1 0.9  
-fix m4 all property/global coefficientFriction peratomtypepair 1 0.1 
+fix m1 all property/global youngsModulus peratomtype 1e6
+fix m2 all property/global poissonsRatio peratomtype 0.42
+fix m3 all property/global coefficientRestitution peratomtypepair 1 0.9
+fix m4 all property/global coefficientFriction peratomtypepair 1 0.1
 
 # specify contact model to use
 pair_style  gran model hertz tangential incremental_history limitForce on
@@ -84,7 +84,7 @@ compute_modify  thermo_temp dynamic yes
 # output particle properties (same frequency as CFD output)
 dump dmp all custom/vtk 10000 ../DEM/post/liggghts_run_*.vtk id type x y z vx vy vz &
      fx fy fz omegax omegay omegaz radius
-     
+
 dump dmp2 all custom 10000 ../DEM/post/liggghts_run_*.run id type x y z vx vy vz &
      fx fy fz omegax omegay omegaz radius
 
