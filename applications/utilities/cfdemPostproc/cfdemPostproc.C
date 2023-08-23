@@ -79,8 +79,8 @@ int main(int argc, char *argv[])
     particleCloud.get_radii(radii_);  // get ref to radii
     //particleCloud.dataExchangeM().allocateArray(radii_,0.,1);
     particleCloud.dataExchangeM().allocateArray(voidfractions_,0.,1);
-    particleCloud.dataExchangeM().allocateArray(particleWeights_,0.,1);
-    particleCloud.dataExchangeM().allocateArray(particleVolumes_,0.,1);
+    particleCloud.dataExchangeM().allocateArray(particleWeights_,0.,particleCloud.voidFractionM().maxCellsPerParticle());
+    particleCloud.dataExchangeM().allocateArray(particleVolumes_,0.,particleCloud.voidFractionM().maxCellsPerParticle());
     particleCloud.dataExchangeM().allocateArray(particleV_,0.,1);
     particleCloud.get_cellIDs(cellIDs_);  // get ref to cellIDs
     //particleCloud.dataExchangeM().allocateArray(cellIDs_,0.,1);
