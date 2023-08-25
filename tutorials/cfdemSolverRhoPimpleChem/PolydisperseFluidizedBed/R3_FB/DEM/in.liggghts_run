@@ -87,7 +87,7 @@ fix Ea_H2 ore property/global Ea_cfd6 vector 85000 71162 92092
 # particle parameters
 fix porosity        ore property/global porosity_ore        vector 0.613 0.318 0.187 0.17
 fix tortuosity      ore property/global tortuosity_ore      scalar 3
-fix pore_diameter   ore property/global pore_diameter_ore   scalar 1.e-6
+fix pore_diameter   ore property/global pore_diameter_ore   vector 1.e-6 1.e-6 1.e-6
 fix layerDensities  ore property/global density_ore         vector 7870. 5740. 5170. 5240.
 
 # define initial relative layer radii
