@@ -98,12 +98,14 @@ gradPForceProps
     voidfractionFieldName "voidfraction";
     velocityFieldName "U";
     interpolation true;
+    treatForceExplicit;
 }
 
 viscForceProps
 {
     velocityFieldName "U";
     interpolation true;
+    treatForceExplicit;
 }
 
 BeetstraDragProps
@@ -113,6 +115,7 @@ BeetstraDragProps
     rhoParticle 1500.;
     voidfractionFieldName "voidfraction";
     interpolation true;
+    implForceDEM;
 }
 
 gravityEffProps
@@ -128,6 +131,7 @@ staticPressureProps
     rhoPart 1500; //particle density
     DomainSolidVolumeFraction 0.05; // mass loading
     g_DEM (0 0 -9.81); //gravity vector compatible with the gravity direction in "g"
+    treatForceExplicit;
 }
 
 constDiffSmoothingProps
