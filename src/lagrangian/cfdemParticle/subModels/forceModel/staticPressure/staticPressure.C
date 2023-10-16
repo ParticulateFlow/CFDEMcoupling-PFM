@@ -56,7 +56,6 @@ staticPressure::staticPressure
     g_(propsDict_.lookup ("g_DEM")),
     voidfractionFieldName_(propsDict_.lookup("voidfractionFieldName")),
     voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
-    rhoPart_(readScalar(propsDict_.lookup ("rhoPart"))),
     solidFraction_(readScalar(propsDict_.lookup ("DomainSolidVolumeFraction")))
 {
     // init force sub model
@@ -76,7 +75,7 @@ void staticPressure::setForce() const
 {
     #include "setupProbeModel.H"
     label cellI;
-    scalar rhoMix_ = solidFraction_*rhoPart_ + (1.0-solidFraction_)*rhoGas_;
+    scalar rhoMix_ = solidFraction_*particleCloud_.particleDensity(0) + (1.0-solidFraction_)*rhoGas_;
     vector force;
 
     for(int index = 0; index < particleCloud_.numberOfParticles(); ++index)

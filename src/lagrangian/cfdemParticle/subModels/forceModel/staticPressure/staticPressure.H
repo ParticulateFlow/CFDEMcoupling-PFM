@@ -65,8 +65,6 @@ private:
 
     const volScalarField& voidfraction_;
 
-    scalar rhoPart_;
-
     scalar solidFraction_;
 
 public:
