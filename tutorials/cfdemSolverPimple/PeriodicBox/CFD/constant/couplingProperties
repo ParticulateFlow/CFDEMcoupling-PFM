@@ -45,6 +45,8 @@ clockModel off;
 
 smoothingModel constDiffSmoothing;
 
+getParticleDensities true;
+
 forceModels
 (
     BeetstraDrag
