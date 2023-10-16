@@ -128,7 +128,6 @@ staticPressureProps
 {
     rhoGas 1.3; // gas density
     voidfractionFieldName "voidfraction";
-    rhoPart 1500; //particle density
     DomainSolidVolumeFraction 0.05; // mass loading
     g_DEM (0 0 -9.81); //gravity vector compatible with the gravity direction in "g"
     treatForceExplicit;
