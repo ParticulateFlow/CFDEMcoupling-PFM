@@ -23,7 +23,7 @@ Description
     Transient solver for compressible flow using the flexible PIMPLE (PISO-SIMPLE)
     algorithm.
     Turbulence modelling is generic, i.e. laminar, RAS or LES may be selected.
-    The code is an evolution of the solver rhoPimpleFoam in OpenFOAM(R) 2.3,
+    The code is an evolution of the solver rhoPimpleFoam in OpenFOAM(R) 4.x,
     where additional functionality for CFD-DEM coupling is added.
 \*---------------------------------------------------------------------------*/
 
@@ -38,6 +38,9 @@ Description
 #endif
 #include "bound.H"
 #include "pimpleControl.H"
+#if OPENFOAM_VERSION_MAJOR >= 5
+#include "pressureControl.H"
+#endif
 #include "fvOptions.H"
 #include "localEulerDdtScheme.H"
 #include "fvcSmooth.H"
@@ -78,10 +81,15 @@ int main(int argc, char *argv[])
 
     turbulence->validate();
 
+    #include "compressibleCourantNo.H"
+    #include "setInitialDeltaT.H"
+
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
     Info<< "\nStarting time loop\n" << endl;
+    bool firstStep = true;
 
+    // monitor mass variables
     scalar m(0.0);
     scalar m0(0.0);
     label counter(0);
@@ -125,17 +133,28 @@ int main(int argc, char *argv[])
 
 #if OPENFOAM_VERSION_MAJOR < 6
         if (pimple.nCorrPIMPLE() <= 1)
-#else
-        if (pimple.nCorrPimple() <= 1)
-#endif
         {
             #include "rhoEqn.H"
         }
+        rhoeps = rho*voidfraction;
+#endif
 
-        rhoeps = rho * voidfraction;
         // --- Pressure-velocity PIMPLE corrector loop
         while (pimple.loop())
         {
+#if OPENFOAM_VERSION_MAJOR >= 6
+            if (pimple.firstIter())
+            {
+                #include "rhoEqn.H"
+                if (firstStep)
+                {
+                    rhoeps.oldTime() = rho.oldTime()*voidfraction.oldTime();
+                    firstStep = false;
+                }
+                rhoeps = rho*voidfraction;
+            }
+#endif
+
             #include "UEqn.H"
             #include "YEqn.H"
             #include "EEqn.H"
