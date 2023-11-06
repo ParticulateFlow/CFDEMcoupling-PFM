@@ -76,7 +76,14 @@ trilinearVoidFraction::trilinearVoidFraction
     checkWeightNporosity(propsDict_);
     if (porosity() != 1.) FatalError << "porosity not used in trilinearVoidFraction" << abort(FatalError);
 
-    Warning << "trilinearVoidFraction model is not yet complete and does not work near boundaries" << endl;
+    Warning << "Trilinear void fraction model is restricted to cubic cells and does not work near boundaries" << endl;
+
+    Pout<< "Trilinear void fraction model assumes " << nCellXYZ_ << " cells in x, y, z direction" << endl;
+
+    if (particleCloud_.mesh().nCells() != nCellXYZ_[0]*nCellXYZ_[1]*nCellXYZ_[2])
+    {
+        FatalError<< "Trilinear void fraction model found different number of cells than expexted" << exit(FatalError);
+    }
 }
 
 
