@@ -52,7 +52,6 @@
     }
     fields.add(thermo.he());
 
-    Info<< "Reading field rho\n" << endl;
     volScalarField rho
     (
         IOobject
@@ -60,7 +59,7 @@
             "rho",
             runTime.timeName(),
             mesh,
-            IOobject::READ_IF_PRESENT,
+            IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
         thermo.rho()
