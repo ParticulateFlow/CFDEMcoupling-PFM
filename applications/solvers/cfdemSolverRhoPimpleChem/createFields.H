@@ -94,8 +94,48 @@
         mesh
     );
 
-    volScalarField rhoeps ("rhoeps", rho*voidfraction);
+    volScalarField rhoeps("rhoeps", rho*voidfraction);
+    rhoeps.oldTime(); // switch on saving old time
 
+    Info<< "Reading/calculating face flux field phi\n" << endl;
+    surfaceScalarField phi
+    (
+        IOobject
+        (
+            "phi",
+            runTime.timeName(),
+             mesh,
+            IOobject::READ_IF_PRESENT,
+            IOobject::AUTO_WRITE
+         ),
+         linearInterpolate(rho*U*voidfraction) & mesh.Sf()
+    );
+
+#if OPENFOAM_VERSION_MAJOR < 5
+    dimensionedScalar rhoMax
+    (
+        dimensionedScalar::lookupOrDefault
+        (
+            "rhoMax",
+            pimple.dict(),
+            dimDensity,
+            GREAT
+        )
+    );
+
+    dimensionedScalar rhoMin
+    (
+        dimensionedScalar::lookupOrDefault
+        (
+            "rhoMin",
+            pimple.dict(),
+            dimDensity,
+            0
+        )
+    );
+#else
+    pressureControl pressureControl(p, rho, pimple.dict(), false);
+#endif
 
     Info<< "\nCreating fluid-particle heat flux field\n" << endl;
     volScalarField Qsource
@@ -158,41 +198,6 @@
         dimensionedScalar("zero", dimensionSet(0,2,-2,-1,0,0,0), 0.0)
     );
 
-    Info<< "Reading/calculating face flux field phi\n" << endl;
-    surfaceScalarField phi
-    (
-        IOobject
-        (
-            "phi",
-            runTime.timeName(),
-             mesh,
-            IOobject::READ_IF_PRESENT,
-            IOobject::AUTO_WRITE
-         ),
-         linearInterpolate(rho*U*voidfraction) & mesh.Sf()
-    );
-
-    dimensionedScalar rhoMax
-    (
-        dimensionedScalar::lookupOrDefault
-        (
-            "rhoMax",
-            pimple.dict(),
-            dimDensity,
-            GREAT
-        )
-    );
-
-    dimensionedScalar rhoMin
-    (
-        dimensionedScalar::lookupOrDefault
-        (
-            "rhoMin",
-            pimple.dict(),
-            dimDensity,
-            0
-        )
-    );
 
     Info<< "Creating turbulence model\n" << endl;
     autoPtr<compressible::turbulenceModel> turbulence
@@ -205,6 +210,8 @@
             thermo
         )
     );
+
+    mesh.setFluxRequired(p.name());
 
 #if OPENFOAM_VERSION_MAJOR >= 6
     Info<< "Creating combustion model\n" << endl;
