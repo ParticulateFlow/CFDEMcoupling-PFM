@@ -82,7 +82,7 @@ trilinearVoidFraction::trilinearVoidFraction
 
     if (particleCloud_.mesh().nCells() != nCellXYZ_[0]*nCellXYZ_[1]*nCellXYZ_[2])
     {
-        FatalError<< "Trilinear void fraction model found different number of cells than expexted" << exit(FatalError);
+        FatalError<< "Trilinear void fraction model found different number of cells than expected" << exit(FatalError);
     }
 }
 
