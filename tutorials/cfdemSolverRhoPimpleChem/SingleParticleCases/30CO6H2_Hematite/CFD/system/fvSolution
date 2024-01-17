@@ -109,8 +109,10 @@ PIMPLE
     nOuterCorrectors 5;
     nCorrectors     2;
     nNonOrthogonalCorrectors 0;
-    rhoMin          rhoMin [ 1 -3 0 0 0 ] 0.4;
-    rhoMax          rhoMax [ 1 -3 0 0 0 ] 2.0;
+    rhoMin          rhoMin [ 1 -3 0 0 0 ] 0.1; // OF4
+    rhoMax          rhoMax [ 1 -3 0 0 0 ] 2.0; // OF4
+    pMinFactor      0.5; // OF5, OF6
+    pMaxFactor      2.0; // OF5, OF6
 }
 
 relaxationFactors
