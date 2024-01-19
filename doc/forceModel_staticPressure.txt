@@ -49,9 +49,14 @@ staticPressureProps
 
 [Description:]
 
-As discussed in "gravityEff"_otherForceModel_gravityEff.html, in case of simulating periodic boxes, it is necessary to have a gravitaional source term. 
-Since that force is added to the gas momentum equation, we need to add the same force excluding the effect of the gravitational force on the 
-particles (the gravitational force on the particles is already available on the LIGGGHTS side) to drive the particles. This force model performs the calculation of the following force acting on each DEM particle,
+As discussed in "gravityEff"_otherForceModel_gravityEff.html, in case of
+simulating periodic boxes, it is necessary to have a gravitational source term.
+Since that force is added to the gas momentum equation, we need to add the same
+force excluding the effect of the gravitational force on the particles
+(the gravitational force on the particles is already available on the LIGGGHTS side)
+to drive the particles.
+This force model performs the calculation of the following force acting on each
+DEM particle,
 
 :c,image(Eqs/forceModels_staticPressure_pic1.jpg)
 

@@ -41,30 +41,34 @@ gravityEffProps
 
 [Description:]
 
-An effective gravitational source term, {gravityEff}, that is necessery to drive the flow only in
-case of periodic box simulations. This source term is added to the momentum equation. In case of
-simulating periodic boxes with assuming "Homogenous no flow condition" we will have:
+An effective gravitational source term, {gravityEff}, that is necessery to drive
+the flow only incase of periodic box simulations.
+This source term is added to the momentum equation.
+In case of simulating periodic boxes and assuming "homogeneous no-flow condition"
+we will have:
 
 :c,image(Eqs/otherForceModels_gravityEff_pic1.jpg)
 
-This equation depicts that in "no flow condition" static pressure gradient balances the mixture weight.
-Therefore, to derive the flow in the periodic box simulations, a dynamic pressure gradient is defined as,
+This equation depicts that in "no-flow condition" static pressure gradient balances the mixture weight.
+Therefore, to derive the flow in periodic box simulations, a dynamic pressure gradient is defined as
 
 :c,image(Eqs/otherForceModels_gravityEff_pic2.jpg)
 
-If one replaces the static pressure gradient of the fluid momentum equation with,
+If one replaces the static pressure gradient of the fluid momentum equation with
 
 :c,image(Eqs/otherForceModels_gravityEff_pic3.jpg)
 
-The fluid momentum equation solved in case of periodic box simulations will be,
+the fluid momentum equation solved in case of periodic box simulations will be
 
 :c,image(Eqs/otherForceModels_gravityEff_pic4.jpg)
 
-The {gravityEff} source term is the third term in the RHS of the momentum equation. Note that 
-the gravitational body force of the fluid momentum equation is considered with this source term.
+The {gravityEff} source term is the third term on the RHS of the momentum equation.
+Note that the gravitational body force of the fluid momentum equation is considered
+with this source term.
 
-In the basic implementation of {gravityEff}, first we calculate the density of the mixture and then
-the source term is calculated based on the third term in the RHS of the momentum equation.
+In the basic implementation of {gravityEff}, first we calculate the density of
+the mixture and then the source term is calculated based on the third term on the
+RHS of the momentum equation.
 
 [Restrictions:]
 

@@ -62,7 +62,7 @@ OpenFOAM\ |reg|\ (*) documentations.
 END_RST -->.
 
 Settings of the coupling routines are defined in
-$caseDir/CFD/constant/"couplingProperies"_CFDEMcoupling_dicts.html#couplingProperties
+$caseDir/CFD/constant/"couplingProperties"_CFDEMcoupling_dicts.html#couplingProperties
 (e.g. force models, data exchange model, etc.) and
 $caseDir/CFD/constant/"liggghtsCommands"_CFDEMcoupling_dicts.html#liggghtsCommands
 (allows to execute a LIGGGHTS command during a coupled simulation).
