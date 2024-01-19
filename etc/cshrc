@@ -139,9 +139,6 @@ setenv CFDEM_APP_DIR $CFDEM_PROJECT_DIR/platforms/$WM_OPTIONS/bin
 mkdir -p $CFDEM_LIB_DIR
 mkdir -p $CFDEM_APP_DIR
 
-#- path to OF version flag file
-setenv CFDEM_OFVERSION_DIR $CFDEM_PROJECT_DIR/etc/OFversion
-
 #------------------------------------------------------------------------------
 # Clean standard environment variables (PATH, LD_LIBRARY_PATH)
 #------------------------------------------------------------------------------

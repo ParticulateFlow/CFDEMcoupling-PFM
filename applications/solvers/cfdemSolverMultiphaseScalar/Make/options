@@ -5,7 +5,6 @@ include $(CFDEM_ADD_LIBS_DIR)/additionalLibs
 
 EXE_INC = \
      $(PFLAGS) \
-    -I$(CFDEM_OFVERSION_DIR) \
     -ImultiphaseMixtureScalar/lnInclude \
     -I$(LIB_SRC)/transportModels \
     -I$(LIB_SRC)/transportModels/incompressible/lnInclude \
