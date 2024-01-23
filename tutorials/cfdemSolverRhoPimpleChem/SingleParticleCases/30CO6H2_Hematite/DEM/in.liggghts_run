@@ -71,7 +71,7 @@ fix     Ea_H2 all property/global Ea_cfd6 vector 63627 71162 92092
 # particle porosity/tortuosity/pore diameter
 fix     porosity        all property/global porosity_all        vector 0.65 0.31 0.16 0.15
 fix     tortuosity      all property/global tortuosity_all      scalar 3
-fix     pore_diameter   all property/global pore_diameter_all   scalar 7e-7
+fix     pore_diameter   all property/global pore_diameter_all   vector 7e-7 7e-7 7e-7
 fix     layerDensities  all property/global density_all         vector 7870. 5740. 5170. 5240.
 
 # define layer properties

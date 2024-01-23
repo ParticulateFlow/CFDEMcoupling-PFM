@@ -42,6 +42,17 @@ Info<< "Reading thermophysical properties\n" << endl;
 
     Info<< "inert will be bounded in [" << inertLowerBound << "," << inertUpperBound << "]" << endl;
 
+    #include "OFstream.H"
+    OFstream Hf("Hf");
+    Hf << "# species  Hf (J/kg)" << endl;
+    Info << "\nspecies-specific heat of formation (J/kg):" << endl;
+    forAll(composition.species(),i)
+    {
+        Info << composition.species()[i] << " " <<  composition.Hc(i) << endl;
+        Hf << composition.species()[i] << " " <<  composition.Hc(i) << endl;
+    }
+    Info << "\n" << endl;
+
     volScalarField& p = thermo.p();
 
     multivariateSurfaceInterpolationScheme<scalar>::fieldTable fields;
@@ -120,6 +131,20 @@ Info<< "Reading thermophysical properties\n" << endl;
         ),
         mesh,
         dimensionedScalar("zero", dimensionSet(1,-1,-3,0,0,0,0), 0.0)
+    );
+
+    volScalarField Sm
+    (
+        IOobject
+        (
+            "Sm",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+         ),
+        mesh,
+        dimensionedScalar("zero",dimMass/(dimVol*dimTime),0.0)
     );
 
     Info<< "\nCreating fluid-particle heat flux field\n" << endl;

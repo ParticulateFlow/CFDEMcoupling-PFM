@@ -1,0 +1,95 @@
+################################################################################
+# brief: Bubbling fluidized bed - particles driven by air flow                 #
+#                                                                              #
+# Bubbling in a fluidized bed of Geldart D particles (d=1.2mm, rho=1000kg/m3)  #
+# Cf. Case B by Sun R. and Xiao H. Int. J. Multiph. Flow 72, 2333-247 (2015)   #
+#                                                                              #
+# authors: Behrad Esgandari                                                    #
+# date: Mar 2023                                                               #
+# copyright: 2023- JKU Linz                                                    #
+################################################################################
+
+log             ../DEM/log.liggghts
+thermo_log      ../DEM/post/thermo.txt
+
+# define the attributes associated with the particles,
+# 'granular' (or 'sphere') style uses diameter, mass and angular velocity
+atom_style      granular
+
+# use an array to map particle IDs to local storage index,
+atom_modify     map array
+
+# set simulation domain to be fixed in x y z
+boundary        f f f
+
+# save communication by turning off Newton's 3rd law for pairwise interaction,
+# note: this setting only influences communication between procs, Newton's
+# 3rd law is still used for contact force calculations
+newton          off
+
+# use a single value for ghost particle cutoff distance and
+# enable velocity to be communicated with ghost particles
+communicate     single vel yes
+
+# set unit system to SI
+units           si
+
+# specify domain decomposition for parallel execution
+processors      2 1 *
+
+# read the restart file
+read_restart    ../DEM/post/restart/liggghts.restart
+
+# specify the skin distance for neighbor list generation
+neighbor        0.0003 bin
+neigh_modify    delay 0
+
+# define the material properties required for granular pair styles
+# type 1 = particles / walls with friction
+# type 2 = frictionless walls
+fix m1 all property/global youngsModulus peratomtype 1.2e7 1.2e7
+fix m2 all property/global poissonsRatio peratomtype 0.33 0.33
+fix m3 all property/global coefficientRestitution peratomtypepair 2 0.98 0.98 0.98 0.98
+fix m4 all property/global coefficientFriction peratomtypepair 2 0.1 0.1 0.1 0.1
+
+# specify contact model to use
+pair_style  gran model hertz tangential history
+pair_coeff  * *
+
+# set the time step
+timestep    0.000004
+
+# apply gravity
+fix gravity all gravity 9.81 vector 0.0 0.0 -1.0
+
+# define walls
+fix xwall1 all wall/gran model hertz tangential history primitive type 1 xplane 0.0000
+fix xwall2 all wall/gran model hertz tangential history primitive type 1 xplane 0.0440
+fix ywall1 all wall/gran model hertz tangential history primitive type 2 yplane 0.0000
+fix ywall2 all wall/gran model hertz tangential history primitive type 2 yplane 0.0100
+fix zwall1 all wall/gran model hertz tangential history primitive type 1 zplane 0.0000
+fix zwall2 all wall/gran model hertz tangential history primitive type 1 zplane 0.5000
+# set up coupling to CFD simulation
+fix cfd  all couple/cfd couple_every 25 mpi
+fix cfd2 all couple/cfd/force/implicit
+
+# use constant NVE integration to update position, velocity and angular velocity
+fix         integr all nve/sphere
+
+# output settings, include kinetic energy
+thermo_style    custom step atoms ke
+
+# set frequency of output
+thermo          1000
+
+# ignore particles leaving the simulation domain,
+# do not normalize thermodynamic output values by the number of atoms
+thermo_modify   lost ignore norm no
+compute_modify  thermo_temp dynamic yes
+
+# output particle properties (same frequency as CFD output)
+dump dmp all custom/vtk 2500 ../DEM/post/liggghts_run_*.vtk id type x y z vx vy vz &
+     fx fy fz omegax omegay omegaz radius
+
+# run 1 time step to initialize all DEM systems
+run 1

@@ -1,0 +1,11 @@
+fix     m1 all property/global youngsModulus peratomtype ${yM} ${yM}
+fix     m2 all property/global poissonsRatio peratomtype ${pR} ${pR}
+fix     m3 all property/global coefficientRestitution peratomtypepair 2 ${rest} ${rest} ${rest} ${rest}
+fix     m4 all property/global coefficientFriction peratomtypepair 2 ${fric} ${fric} ${fric} ${fric}
+fix     m5 all property/global coefficientRollingFriction peratomtypepair 2 ${roll} ${roll} ${roll} ${roll}
+
+fix     ftco all property/global thermalConductivity peratomtype 1.7 80
+# constant Cp
+#fix     ftca all property/global thermalCapacity peratomtype 850 850 600 600 1.0
+# variable Cp
+fix     ftca all property/atom thermalCapacity scalar yes no no 600

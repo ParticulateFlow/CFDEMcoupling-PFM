@@ -99,6 +99,7 @@ $(forceModels)/granKineticEnergy/granKineticEnergy.C
 $(forceModels)/particleDeformation/particleDeformation.C
 $(forceModels)/turbulentDispersion/turbulentDispersion.C
 $(forceModels)/turbulentVelocityFluctuations/turbulentVelocityFluctuations.C
+$(forceModels)/staticPressure/staticPressure.C
 
 $(forceSubModels)/forceSubModel/newForceSubModel.C
 $(forceSubModels)/forceSubModel/forceSubModel.C
@@ -112,6 +113,7 @@ $(otherForceModels)/gravity/gravity.C
 $(otherForceModels)/weightSecondaryPhase/weightSecondaryPhase.C
 $(otherForceModels)/expParticleForces/expParticleForces.C
 $(otherForceModels)/secondaryPhaseInducedBuoyancy/secondaryPhaseInducedBuoyancy.C
+$(otherForceModels)/gravityEff/gravityEff.C
 
 $(probeModels)/probeModel/probeModel.C
 $(probeModels)/probeModel/newProbeModel.C

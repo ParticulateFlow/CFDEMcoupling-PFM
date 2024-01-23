@@ -59,4 +59,6 @@
     thermo.correct();
 
     Info<< "T max/min : " << max(T).value() << " " << min(T).value() << endl;
+
+    QFluidCond = fvc::laplacian(voidfractionRec*thCond,T);
 }

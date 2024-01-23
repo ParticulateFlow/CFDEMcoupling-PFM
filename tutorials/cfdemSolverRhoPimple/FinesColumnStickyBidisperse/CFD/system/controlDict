@@ -1,0 +1,180 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  6
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+application     potentialFoam;
+
+startFrom       startTime;
+
+startTime       0;
+
+stopAt          endTime;
+
+endTime         20;
+
+deltaT          0.00025;
+
+writeControl    timeStep;
+
+writeInterval   20000;
+
+purgeWrite      0;
+
+writeFormat     ascii;
+
+writePrecision  6;
+
+writeCompression off;
+
+timeFormat      general;
+
+timePrecision   6;
+
+runTimeModifiable true;
+
+
+functions
+{
+    fieldAverage1
+    {
+        type            fieldAverage;
+        libs            ("libfieldFunctionObjects.so");
+        writeControl    timeStep;
+        writeInterval   400;
+
+        fields
+        (
+            U
+            {
+                mean        on;
+                prime2Mean  on;
+                base        time;
+                window      2.5;
+                windowName  w0;
+            }
+            Us
+            {
+                mean        on;
+                prime2Mean  on;
+                base        time;
+                window      2.5;
+                windowName  w0;
+            }
+            voidfraction
+            {
+                mean        on;
+                prime2Mean  on;
+                base        time;
+                window      2.5;
+                windowName  w0;
+            }
+        );
+    }
+
+    probes1
+    {
+        type probes;
+
+        functionObjectLibs ("libsampling.so");
+
+        #include "probesDict";
+    }
+
+    volInt
+    {
+        type            volFieldValue;
+        functionObjectLibs ("libfieldFunctionObjects.so");
+        writeControl    timeStep;
+        writeInterval   50;
+        log             true;
+        writeFields     false;
+        regionType      all;
+        operation       volIntegrate;
+
+        fields
+        (
+            alphaSt
+            alphaDyn
+            Sds
+        );
+    }
+
+    volIntLower
+    {
+        $volInt
+        regionType      cellZone;
+        name            lowerHalf;
+    }
+
+    volIntUpper
+    {
+        $volInt
+        regionType      cellZone;
+        name            upperHalf;
+    }
+
+    inflow
+    {
+        type            surfaceFieldValue;
+        libs ("libfieldFunctionObjects.so");
+        writeControl    timeStep;
+        log             true;
+        writeFields     false;
+        regionType      patch;
+        name            inlet;
+        operation       sum;
+
+        fields
+        (
+            massFluxDyn
+            phi
+        );
+    }
+
+    outflow
+    {
+        $inflow;
+        name      outlet;
+    }
+
+    bottomflow
+    {
+        $inflow;
+        name      bottom;
+    }
+
+    wallflow
+    {
+        $inflow;
+        name      walls;
+    }
+
+    throughflow1
+    {
+        $inflow;
+        regionType    faceZone;
+        name          plane1;
+    }
+
+    throughflow2
+    {
+        $inflow;
+        regionType    faceZone;
+        name          plane2;
+    }
+}
+
+// ************************************************************************* //

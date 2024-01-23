@@ -44,7 +44,7 @@ the use of Git allows to easily update to the latest version :l
 basic documentation is provided :l
 :ule
 
-The file structure:
+The project structure:
 
 {src} directory including the source files of the coupling toolbox and models :ulb,l
 {applications} directory including the solver files for coupled CFD-DEM simulations :l
@@ -52,7 +52,8 @@ The file structure:
 {tutorials} directory including basic tutorial cases showing the functionality  :l
 :ule
 
-Details on installation are given on the "CFDEMproject Website"_lig .
+Details on installation are given in the "Installation"_CFDEMcoupling_install.html
+section.
 The functionality of this CFD-DEM framework is described via "tutorial
 cases"_CFDEMcoupling_tutorials.html showing how to use different solvers and
 models.

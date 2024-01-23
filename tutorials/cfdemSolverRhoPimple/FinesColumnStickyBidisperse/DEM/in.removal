@@ -1,0 +1,8 @@
+#########
+# removal
+#########
+
+region removalReg cylinder z 0 0 ${cylrad} 0.0 0.01 units box
+variable rMass equal 0.015
+fix delRW all remove nevery 10 massrate ${rMass} style delete seed 1234567 region removalReg verbose no restart_read no
+variable removedMass equal f_delRW[1]

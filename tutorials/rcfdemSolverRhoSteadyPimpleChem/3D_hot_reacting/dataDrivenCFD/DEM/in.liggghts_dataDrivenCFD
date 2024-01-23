@@ -1,0 +1,60 @@
+
+## material properties
+include ../DEM/DEMparameters
+
+###############################################
+atom_style      granular
+atom_modify     map array
+communicate     single vel yes
+
+boundary        f f f
+newton          off
+units           si
+processors      2 2 8
+#processors      1 1 8
+
+# either (A) start new simulation and read dump or (B) restart simulation with restart file
+# option A
+region      reg block -7.5 7.5 -7.5 7.5 -1.15 30 units box
+create_box  5 reg
+
+fix         fp all property/atom/polydispparcel effvolfactor ${poly_C} ${poly_fC} ${poly_O} ${poly_fO} 1.0
+read_dump   ../DEM/initFullState 0 x y z radius mass density bruteadd yes retaintimestep yes exactstep no
+group coke type 1
+group finecoke type 2
+group ore type 3
+group fineore type 4
+group allore type >= 3
+
+# option B
+#read_restart ../DEM/liggghts.restart
+
+
+include ../DEM/latestTimeStep
+reset_timestep ${latestTimeStep}
+
+
+neighbor        ${skin} bin
+neigh_modify    delay 0
+group fullyDeformed empty
+neigh_modify    exclude group fullyDeformed all
+
+timestep    ${dt}
+
+include ../DEM/in.material_settings
+include ../../CFDDEM/DEM/in.regions
+include ../DEM/in.chemistry
+include ../DEM/in.coupling_integration
+include ../DEM/in.singleParticleTracking
+include ../DEM/in.output
+include ../DEM/in.set_polydisp
+include ../DEM/in.RW
+#include ../DEM/in.cleanup # not yet adapted to 3D
+include ../DEM/in.insertion_setup
+include ../DEM/in.monitor
+
+########
+# limits
+########
+# particle temperatures
+fix limTpart all limit/property/atom Temp min 293 max 3500

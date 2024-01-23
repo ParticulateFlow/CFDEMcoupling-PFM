@@ -65,22 +65,22 @@ int main(int argc, char *argv[])
     int DEM_dump_Interval(particleCloud.couplingProperties().lookupOrDefault<int>("dumpInterval",1000));
     particleCloud.reAllocArrays();
 
-    double **positions_;
-    double **velocities_;
-    double **radii_;
-    double **voidfractions_;
-    double **particleWeights_;
-    double **particleVolumes_;
-    double **particleV_;
-    int **cellIDs_;
+    double **positions_=NULL;
+    double **velocities_=NULL;
+    double **radii_=NULL;
+    double **voidfractions_=NULL;
+    double **particleWeights_=NULL;
+    double **particleVolumes_=NULL;
+    double **particleV_=NULL;
+    int **cellIDs_=NULL;
 
     particleCloud.dataExchangeM().allocateArray(positions_,0.,3);
     particleCloud.dataExchangeM().allocateArray(velocities_,0.,3);
     particleCloud.get_radii(radii_);  // get ref to radii
     //particleCloud.dataExchangeM().allocateArray(radii_,0.,1);
     particleCloud.dataExchangeM().allocateArray(voidfractions_,0.,1);
-    particleCloud.dataExchangeM().allocateArray(particleWeights_,0.,1);
-    particleCloud.dataExchangeM().allocateArray(particleVolumes_,0.,1);
+    particleCloud.dataExchangeM().allocateArray(particleWeights_,0.,particleCloud.voidFractionM().maxCellsPerParticle());
+    particleCloud.dataExchangeM().allocateArray(particleVolumes_,0.,particleCloud.voidFractionM().maxCellsPerParticle());
     particleCloud.dataExchangeM().allocateArray(particleV_,0.,1);
     particleCloud.get_cellIDs(cellIDs_);  // get ref to cellIDs
     //particleCloud.dataExchangeM().allocateArray(cellIDs_,0.,1);

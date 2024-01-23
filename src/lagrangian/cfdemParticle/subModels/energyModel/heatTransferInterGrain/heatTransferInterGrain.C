@@ -295,6 +295,11 @@ void heatTransferInterGrain::calcEnergyContribution()
 
 void heatTransferInterGrain::calcPartEffThermCond()
 {
+    // clarification wrt to notation: Qian et al. define effective conductivities such that they fit into the
+    //     form \alpha_p * k * \nabla T_p, hence the multiplication with volFrac below.
+    //     Carson et al. define total bed conductivities which would not have an \alpha_p factor in the heat flux
+    //     term, therefore there is no such multiplication below.
+    //     To write down both contributions in one equation, one has to redefine the conductivity of Carson et al.
     calcPartThermCond();
     if (radiativeHeatTransfer_) calcPartThermRad();
 

@@ -1,0 +1,32 @@
+# particle properties
+#####################
+
+# ore
+# obtain H volume fraction from initial particle density (fully unreduced); then compute volume fractions for inner layers according to Kinaci et al. CES 227 (2020) [ATTENTION: correct conversion factors are q_HM = 0.9666, q_MW = 0.9309, q_WFe = 0.7773]; set porosities = 1 - volume fraction
+
+#fix     porosity_ore        all property/atom   porosity_ore       vector yes no no 0.61 0.34 0.19 0.17  # values for ore in Kinaci et al. CES 227 (2020), corresponding to rho = 4300 for hematite
+fix     porosity_ore        all property/global porosity_ore       vector 0.71 0.48 0.38 0.37
+fix     tortuosity_ore      all property/global tortuosity_ore     scalar 3
+fix     pore_diameter_ore   all property/global pore_diameter_ore  vector 3.e-07 1.75e-05 1.1e-05
+fix     layerDensities_ore  all property/global density_ore vector 7870. 5740. 5170. 5240.
+
+
+# define layer properties
+fix     LayerRelRadii all property/atom relRadii vector yes no no  1.0 0.998 0.995 0.98
+
+# define fix for rho_eff and fracRed - initialize as zero
+fix     fracRed all property/atom fracRed vector yes no no 0. 0. 0.
+fix     rhoeff  all property/atom rhoeff vector yes no no 0. 0. 0. 0.
+
+# define fix for mass layer - initial testing
+fix     LayerMasses all property/atom massLayer vector yes no no 0. 0. 0. 0.
+
+
+# ore reactions
+###############
+# Activate for 3-layer unreacted core shrink model
+fix     chem0 ore chem/shrink/core speciesA CO molMassA 0.02801 speciesC CO2 molMassC 0.04401 nevery 1 screen no cg 1 limit_reactant_consumption no
+
+# Material properties for chemical reaction
+fix     k0_chem0 ore property/global k0_chem0 vector 10 18 3700
+fix     Ea_chem0 ore property/global Ea_chem0 vector 69488 73674 113859

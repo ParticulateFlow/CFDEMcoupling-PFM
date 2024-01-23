@@ -138,6 +138,19 @@ const char* writeLiggghts::command(int commandLine)
 bool writeLiggghts::runCommand(int couplingStep)
 {
     if (!overwrite_) strCommand_ = addTimeStamp(command_);
+
+    // update time settings if restart file is only written at last step and
+    // end time has changed
+    if
+    (
+        runLast_
+        && particleCloud_.mesh().time().runTimeModifiable()
+        && particleCloud_.mesh().time().endTime().value() != endTime_
+    )
+    {
+        checkTimeSettings(dict_);
+    }
+
     return runThisCommand(couplingStep);
 }
 

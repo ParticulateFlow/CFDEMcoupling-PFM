@@ -45,6 +45,11 @@ following commands:
 apt-get install build-essential flex bison git-core cmake zlib1g-dev libboost-system-dev libboost-thread-dev libopenmpi-dev openmpi-bin gnuplot libreadline-dev libncurses-dev libxt-dev
 apt-get install libqt5x11extras5-dev libxt-dev qt5-default qttools5-dev curl :pre
 
+NOTE: Ubuntu 21.04 and newer dropped the {qt5-default} package. Instead use:
+
+apt-get install build-essential flex bison git-core cmake zlib1g-dev libboost-system-dev libboost-thread-dev libopenmpi-dev openmpi-bin gnuplot libreadline-dev libncurses-dev libxt-dev
+apt-get install libqt5x11extras5-dev libxt-dev qttools5-dev qttools5-dev-tools qtwebengine5-dev libqt5svg5-dev libqt5websockets5-dev libqt5xmlpatterns5 qtxmlpatterns5-dev-tools curl :pre
+
 2.1.2 Setup the environment :h5
 
 Open your bash startup file

@@ -1,0 +1,162 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  6
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      couplingProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+// sub-models & settings
+
+syncMode false;
+
+modelType "A";
+
+couplingInterval 50;
+
+voidFractionModel centre;
+
+locateModel engine;
+//locateModel engineSearchMany2Many;
+
+meshMotionModel noMeshMotion;
+
+regionModel allRegion;
+
+IOModel off;
+
+probeModel off;
+
+dataExchangeModel twoWayMPI;
+//dataExchangeModel twoWayOne2One;
+
+averagingModel dense;
+
+clockModel off;
+
+smoothingModel constDiffSmoothing;
+
+getParticleDensities true;
+
+forceModels
+(
+    BeetstraDrag
+    gradPForce
+    viscForce
+    staticPressure
+);
+
+otherForceModels
+(
+  gravityEff
+);
+
+momCoupleModels
+(
+    implicitCouple
+);
+
+turbulenceModelType "turbulenceProperties";
+
+
+// sub-model properties
+
+
+engineSearchMany2ManyProps
+{
+    engineProps
+    {
+        treeSearch true;
+    }
+}
+
+twoWayOne2OneProps
+{
+    liggghtsPath "../DEM/in.liggghts_run";
+    verbose true;
+}
+
+
+implicitCoupleProps
+{
+    velFieldName "U";
+    granVelFieldName "Us";
+    voidfractionFieldName "voidfraction";
+}
+
+
+gradPForceProps
+{
+    pFieldName "p";
+    voidfractionFieldName "voidfraction";
+    velocityFieldName "U";
+    interpolation true;
+    treatForceExplicit;
+}
+
+viscForceProps
+{
+    velocityFieldName "U";
+    interpolation true;
+    treatForceExplicit;
+}
+
+BeetstraDragProps
+{
+    velFieldName "U";
+    granVelFieldName "Us";
+    rhoParticle 1500.;
+    voidfractionFieldName "voidfraction";
+    interpolation true;
+    implForceDEM;
+}
+
+gravityEffProps
+{
+    voidfractionFieldName "voidfraction";
+    rhoPart 1500;
+}
+
+staticPressureProps
+{
+    rhoGas 1.3; // gas density
+    voidfractionFieldName "voidfraction";
+    DomainSolidVolumeFraction 0.05; // mass loading
+    g_DEM (0 0 -9.81); //gravity vector compatible with the gravity direction in "g"
+    treatForceExplicit;
+}
+
+constDiffSmoothingProps
+{
+    lowerLimit 0.01;
+    upperLimit 1.0;
+    smoothingLength 0.00025;
+}
+
+
+engineProps
+{
+    treeSearch true;
+}
+
+centreProps
+{
+    alphaMin 0.005;
+    scaleUpVol 1.0;
+}
+
+twoWayMPIProps
+{
+    liggghtsPath "../DEM/in.liggghts_run";
+}
+
+// ************************************************************************* //

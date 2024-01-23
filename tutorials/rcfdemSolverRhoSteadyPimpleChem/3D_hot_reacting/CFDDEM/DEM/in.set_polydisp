@@ -1,0 +1,10 @@
+################
+# polydispersity
+################
+
+set group coke property/atom/polydispparcel effvolfactor ${poly_C}
+set group finecoke property/atom/polydispparcel effvolfactor ${poly_fC}
+set group ore property/atom/polydispparcel effvolfactor ${poly_O}
+set group fineore property/atom/polydispparcel effvolfactor ${poly_fO}
+
+fix eeDM all execute ${NsetDM} "../../CFDDEM/DEM/in.DM" file

@@ -1,0 +1,42 @@
+
+## material properties
+include ../DEM/DEMparameters
+
+###############################################
+atom_style      granular
+atom_modify     map array
+communicate     single vel yes
+
+boundary        f f f
+newton          off
+units           si
+
+processors      1 1 8
+
+# option B
+read_restart ../DEM/liggghts.restart
+
+group dummy type 1
+group ore type 2
+
+reset_timestep 0
+
+
+neighbor        ${skin} bin
+neigh_modify    delay 0
+group fullyDeformed empty
+neigh_modify    exclude group fullyDeformed all
+
+timestep    0.125
+
+include ../DEM/in.material_parameters
+include ../DEM/in.chemistry
+include ../DEM/in.coupling_integration
+#include ../DEM/in.output
+include ../DEM/in.monitor
+
+########
+# limits
+########
+# particle temperatures
+fix limTpart all limit/property/atom Temp min 1222 max 1224

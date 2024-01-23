@@ -43,7 +43,6 @@ SourceFiles
 #define cfdemCloud_H
 
 // choose version
-#include "OFversion.H"
 #include <vector>
 #include <typeinfo>
 

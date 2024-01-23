@@ -1,0 +1,5 @@
+print 'Performing insertion number ${counter}.' screen yes
+
+next counter
+
+read_dump ../DEM/highestPart 0 x y z vx vy vz radius mass density bruteadd yes retaintimestep yes exactstep no

@@ -11,7 +11,6 @@ include $(CFDEM_ADD_LIBS_DIR)/additionalLibs
 EXE_INC = \
      $(PFLAGS) \
      $(PINC) \
-    -I$(CFDEM_OFVERSION_DIR) \
     -I$(LIB_SRC)/finiteVolume/lnInclude \
     -I$(LIB_SRC)/transportModels \
     -I$(LIB_SRC)/TurbulenceModels/turbulenceModels/lnInclude \

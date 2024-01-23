@@ -1,0 +1,170 @@
+region RWSphere0 sphere 0.000000 4.500000 0.118125 0.250000
+region RWSphereOuter0 sphere 0.000000 4.500000 0.118125 0.350000
+region RWSphere1 sphere 0.877906 4.413534 0.118125 0.250000
+region RWSphereOuter1 sphere 0.877906 4.413534 0.118125 0.350000
+region RWSphere2 sphere 1.722075 4.157458 0.118125 0.250000
+region RWSphereOuter2 sphere 1.722075 4.157458 0.118125 0.350000
+region RWSphere3 sphere 2.500066 3.741613 0.118125 0.250000
+region RWSphereOuter3 sphere 2.500066 3.741613 0.118125 0.350000
+region RWSphere4 sphere 3.181981 3.181981 0.118125 0.250000
+region RWSphereOuter4 sphere 3.181981 3.181981 0.118125 0.350000
+region RWSphere5 sphere 3.741613 2.500066 0.118125 0.250000
+region RWSphereOuter5 sphere 3.741613 2.500066 0.118125 0.350000
+region RWSphere6 sphere 4.157458 1.722075 0.118125 0.250000
+region RWSphereOuter6 sphere 4.157458 1.722075 0.118125 0.350000
+region RWSphere7 sphere 4.413534 0.877906 0.118125 0.250000
+region RWSphereOuter7 sphere 4.413534 0.877906 0.118125 0.350000
+region RWSphere8 sphere 4.500000 0.000000 0.118125 0.250000
+region RWSphereOuter8 sphere 4.500000 0.000000 0.118125 0.350000
+region RWSphere9 sphere 4.413534 -0.877906 0.118125 0.250000
+region RWSphereOuter9 sphere 4.413534 -0.877906 0.118125 0.350000
+region RWSphere10 sphere 4.157458 -1.722075 0.118125 0.250000
+region RWSphereOuter10 sphere 4.157458 -1.722075 0.118125 0.350000
+region RWSphere11 sphere 3.741613 -2.500066 0.118125 0.250000
+region RWSphereOuter11 sphere 3.741613 -2.500066 0.118125 0.350000
+region RWSphere12 sphere 3.181981 -3.181981 0.118125 0.250000
+region RWSphereOuter12 sphere 3.181981 -3.181981 0.118125 0.350000
+region RWSphere13 sphere 2.500066 -3.741613 0.118125 0.250000
+region RWSphereOuter13 sphere 2.500066 -3.741613 0.118125 0.350000
+region RWSphere14 sphere 1.722075 -4.157458 0.118125 0.250000
+region RWSphereOuter14 sphere 1.722075 -4.157458 0.118125 0.350000
+region RWSphere15 sphere 0.877906 -4.413534 0.118125 0.250000
+region RWSphereOuter15 sphere 0.877906 -4.413534 0.118125 0.350000
+region RWSphere16 sphere 0.000000 -4.500000 0.118125 0.250000
+region RWSphereOuter16 sphere 0.000000 -4.500000 0.118125 0.350000
+region RWSphere17 sphere -0.877906 -4.413534 0.118125 0.250000
+region RWSphereOuter17 sphere -0.877906 -4.413534 0.118125 0.350000
+region RWSphere18 sphere -1.722075 -4.157458 0.118125 0.250000
+region RWSphereOuter18 sphere -1.722075 -4.157458 0.118125 0.350000
+region RWSphere19 sphere -2.500066 -3.741613 0.118125 0.250000
+region RWSphereOuter19 sphere -2.500066 -3.741613 0.118125 0.350000
+region RWSphere20 sphere -3.181981 -3.181981 0.118125 0.250000
+region RWSphereOuter20 sphere -3.181981 -3.181981 0.118125 0.350000
+region RWSphere21 sphere -3.741613 -2.500066 0.118125 0.250000
+region RWSphereOuter21 sphere -3.741613 -2.500066 0.118125 0.350000
+region RWSphere22 sphere -4.157458 -1.722075 0.118125 0.250000
+region RWSphereOuter22 sphere -4.157458 -1.722075 0.118125 0.350000
+region RWSphere23 sphere -4.413534 -0.877906 0.118125 0.250000
+region RWSphereOuter23 sphere -4.413534 -0.877906 0.118125 0.350000
+region RWSphere24 sphere -4.500000 -0.000000 0.118125 0.250000
+region RWSphereOuter24 sphere -4.500000 -0.000000 0.118125 0.350000
+region RWSphere25 sphere -4.413534 0.877906 0.118125 0.250000
+region RWSphereOuter25 sphere -4.413534 0.877906 0.118125 0.350000
+region RWSphere26 sphere -4.157458 1.722075 0.118125 0.250000
+region RWSphereOuter26 sphere -4.157458 1.722075 0.118125 0.350000
+region RWSphere27 sphere -3.741613 2.500066 0.118125 0.250000
+region RWSphereOuter27 sphere -3.741613 2.500066 0.118125 0.350000
+region RWSphere28 sphere -3.181981 3.181981 0.118125 0.250000
+region RWSphereOuter28 sphere -3.181981 3.181981 0.118125 0.350000
+region RWSphere29 sphere -2.500066 3.741613 0.118125 0.250000
+region RWSphereOuter29 sphere -2.500066 3.741613 0.118125 0.350000
+region RWSphere30 sphere -1.722075 4.157458 0.118125 0.250000
+region RWSphereOuter30 sphere -1.722075 4.157458 0.118125 0.350000
+region RWSphere31 sphere -0.877906 4.413534 0.118125 0.250000
+region RWSphereOuter31 sphere -0.877906 4.413534 0.118125 0.350000
+
+
+variable phi0 equal 0.000000
+region RWCylinder0 cylinder x 0.0 0.000000 0.131875 4.500000 6.000000 rotate v_phi0 0 0 0 0 0 1
+region RWCylinderOuter0 cylinder x 0.0 0.000000 0.145063 4.500000 6.000000 rotate v_phi0 0 0 0 0 0 1
+variable phi1 equal 0.196350
+region RWCylinder1 cylinder x 0.0 0.000000 0.131875 4.500000 6.000000 rotate v_phi1 0 0 0 0 0 1
+region RWCylinderOuter1 cylinder x 0.0 0.000000 0.145063 4.500000 6.000000 rotate v_phi1 0 0 0 0 0 1
+variable phi2 equal 0.392699
+region RWCylinder2 cylinder x 0.0 0.000000 0.131875 4.500000 6.000000 rotate v_phi2 0 0 0 0 0 1
+region RWCylinderOuter2 cylinder x 0.0 0.000000 0.145063 4.500000 6.000000 rotate v_phi2 0 0 0 0 0 1
+variable phi3 equal 0.589049
+region RWCylinder3 cylinder x 0.0 0.000000 0.131875 4.500000 6.000000 rotate v_phi3 0 0 0 0 0 1
+region RWCylinderOuter3 cylinder x 0.0 0.000000 0.145063 4.500000 6.000000 rotate v_phi3 0 0 0 0 0 1
+variable phi4 equal 0.785398
+region RWCylinder4 cylinder x 0.0 0.000000 0.131875 4.500000 6.000000 rotate v_phi4 0 0 0 0 0 1
+region RWCylinderOuter4 cylinder x 0.0 0.000000 0.145063 4.500000 6.000000 rotate v_phi4 0 0 0 0 0 1
+variable phi5 equal 0.981748
+region RWCylinder5 cylinder x 0.0 0.000000 0.131875 4.500000 6.000000 rotate v_phi5 0 0 0 0 0 1
+region RWCylinderOuter5 cylinder x 0.0 0.000000 0.145063 4.500000 6.000000 rotate v_phi5 0 0 0 0 0 1
+variable phi6 equal 1.178097
+region RWCylinder6 cylinder x 0.0 0.000000 0.131875 4.500000 6.000000 rotate v_phi6 0 0 0 0 0 1
+region RWCylinderOuter6 cylinder x 0.0 0.000000 0.145063 4.500000 6.000000 rotate v_phi6 0 0 0 0 0 1
+variable phi7 equal 1.374447
+region RWCylinder7 cylinder x 0.0 0.000000 0.131875 4.500000 6.000000 rotate v_phi7 0 0 0 0 0 1
+region RWCylinderOuter7 cylinder x 0.0 0.000000 0.145063 4.500000 6.000000 rotate v_phi7 0 0 0 0 0 1
+variable phi8 equal 1.570796
+region RWCylinder8 cylinder x 0.0 0.000000 0.131875 4.500000 6.000000 rotate v_phi8 0 0 0 0 0 1
+region RWCylinderOuter8 cylinder x 0.0 0.000000 0.145063 4.500000 6.000000 rotate v_phi8 0 0 0 0 0 1
+variable phi9 equal 1.767146
+region RWCylinder9 cylinder x 0.0 0.000000 0.131875 4.500000 6.000000 rotate v_phi9 0 0 0 0 0 1
+region RWCylinderOuter9 cylinder x 0.0 0.000000 0.145063 4.500000 6.000000 rotate v_phi9 0 0 0 0 0 1
+variable phi10 equal 1.963495
+region RWCylinder10 cylinder x 0.0 0.000000 0.131875 4.500000 6.000000 rotate v_phi10 0 0 0 0 0 1
+region RWCylinderOuter10 cylinder x 0.0 0.000000 0.145063 4.500000 6.000000 rotate v_phi10 0 0 0 0 0 1
+variable phi11 equal 2.159845
+region RWCylinder11 cylinder x 0.0 0.000000 0.131875 4.500000 6.000000 rotate v_phi11 0 0 0 0 0 1
+region RWCylinderOuter11 cylinder x 0.0 0.000000 0.145063 4.500000 6.000000 rotate v_phi11 0 0 0 0 0 1
+variable phi12 equal 2.356194
+region RWCylinder12 cylinder x 0.0 0.000000 0.131875 4.500000 6.000000 rotate v_phi12 0 0 0 0 0 1
+region RWCylinderOuter12 cylinder x 0.0 0.000000 0.145063 4.500000 6.000000 rotate v_phi12 0 0 0 0 0 1
+variable phi13 equal 2.552544
+region RWCylinder13 cylinder x 0.0 0.000000 0.131875 4.500000 6.000000 rotate v_phi13 0 0 0 0 0 1
+region RWCylinderOuter13 cylinder x 0.0 0.000000 0.145063 4.500000 6.000000 rotate v_phi13 0 0 0 0 0 1
+variable phi14 equal 2.748894
+region RWCylinder14 cylinder x 0.0 0.000000 0.131875 4.500000 6.000000 rotate v_phi14 0 0 0 0 0 1
+region RWCylinderOuter14 cylinder x 0.0 0.000000 0.145063 4.500000 6.000000 rotate v_phi14 0 0 0 0 0 1
+variable phi15 equal 2.945243
+region RWCylinder15 cylinder x 0.0 0.000000 0.131875 4.500000 6.000000 rotate v_phi15 0 0 0 0 0 1
+region RWCylinderOuter15 cylinder x 0.0 0.000000 0.145063 4.500000 6.000000 rotate v_phi15 0 0 0 0 0 1
+variable phi16 equal 3.141593
+region RWCylinder16 cylinder x 0.0 0.000000 0.131875 4.500000 6.000000 rotate v_phi16 0 0 0 0 0 1
+region RWCylinderOuter16 cylinder x 0.0 0.000000 0.145063 4.500000 6.000000 rotate v_phi16 0 0 0 0 0 1
+variable phi17 equal 3.337942
+region RWCylinder17 cylinder x 0.0 0.000000 0.131875 4.500000 6.000000 rotate v_phi17 0 0 0 0 0 1
+region RWCylinderOuter17 cylinder x 0.0 0.000000 0.145063 4.500000 6.000000 rotate v_phi17 0 0 0 0 0 1
+variable phi18 equal 3.534292
+region RWCylinder18 cylinder x 0.0 0.000000 0.131875 4.500000 6.000000 rotate v_phi18 0 0 0 0 0 1
+region RWCylinderOuter18 cylinder x 0.0 0.000000 0.145063 4.500000 6.000000 rotate v_phi18 0 0 0 0 0 1
+variable phi19 equal 3.730641
+region RWCylinder19 cylinder x 0.0 0.000000 0.131875 4.500000 6.000000 rotate v_phi19 0 0 0 0 0 1
+region RWCylinderOuter19 cylinder x 0.0 0.000000 0.145063 4.500000 6.000000 rotate v_phi19 0 0 0 0 0 1
+variable phi20 equal 3.926991
+region RWCylinder20 cylinder x 0.0 0.000000 0.131875 4.500000 6.000000 rotate v_phi20 0 0 0 0 0 1
+region RWCylinderOuter20 cylinder x 0.0 0.000000 0.145063 4.500000 6.000000 rotate v_phi20 0 0 0 0 0 1
+variable phi21 equal 4.123340
+region RWCylinder21 cylinder x 0.0 0.000000 0.131875 4.500000 6.000000 rotate v_phi21 0 0 0 0 0 1
+region RWCylinderOuter21 cylinder x 0.0 0.000000 0.145063 4.500000 6.000000 rotate v_phi21 0 0 0 0 0 1
+variable phi22 equal 4.319690
+region RWCylinder22 cylinder x 0.0 0.000000 0.131875 4.500000 6.000000 rotate v_phi22 0 0 0 0 0 1
+region RWCylinderOuter22 cylinder x 0.0 0.000000 0.145063 4.500000 6.000000 rotate v_phi22 0 0 0 0 0 1
+variable phi23 equal 4.516039
+region RWCylinder23 cylinder x 0.0 0.000000 0.131875 4.500000 6.000000 rotate v_phi23 0 0 0 0 0 1
+region RWCylinderOuter23 cylinder x 0.0 0.000000 0.145063 4.500000 6.000000 rotate v_phi23 0 0 0 0 0 1
+variable phi24 equal 4.712389
+region RWCylinder24 cylinder x 0.0 0.000000 0.131875 4.500000 6.000000 rotate v_phi24 0 0 0 0 0 1
+region RWCylinderOuter24 cylinder x 0.0 0.000000 0.145063 4.500000 6.000000 rotate v_phi24 0 0 0 0 0 1
+variable phi25 equal 4.908739
+region RWCylinder25 cylinder x 0.0 0.000000 0.131875 4.500000 6.000000 rotate v_phi25 0 0 0 0 0 1
+region RWCylinderOuter25 cylinder x 0.0 0.000000 0.145063 4.500000 6.000000 rotate v_phi25 0 0 0 0 0 1
+variable phi26 equal 5.105088
+region RWCylinder26 cylinder x 0.0 0.000000 0.131875 4.500000 6.000000 rotate v_phi26 0 0 0 0 0 1
+region RWCylinderOuter26 cylinder x 0.0 0.000000 0.145063 4.500000 6.000000 rotate v_phi26 0 0 0 0 0 1
+variable phi27 equal 5.301438
+region RWCylinder27 cylinder x 0.0 0.000000 0.131875 4.500000 6.000000 rotate v_phi27 0 0 0 0 0 1
+region RWCylinderOuter27 cylinder x 0.0 0.000000 0.145063 4.500000 6.000000 rotate v_phi27 0 0 0 0 0 1
+variable phi28 equal 5.497787
+region RWCylinder28 cylinder x 0.0 0.000000 0.131875 4.500000 6.000000 rotate v_phi28 0 0 0 0 0 1
+region RWCylinderOuter28 cylinder x 0.0 0.000000 0.145063 4.500000 6.000000 rotate v_phi28 0 0 0 0 0 1
+variable phi29 equal 5.694137
+region RWCylinder29 cylinder x 0.0 0.000000 0.131875 4.500000 6.000000 rotate v_phi29 0 0 0 0 0 1
+region RWCylinderOuter29 cylinder x 0.0 0.000000 0.145063 4.500000 6.000000 rotate v_phi29 0 0 0 0 0 1
+variable phi30 equal 5.890486
+region RWCylinder30 cylinder x 0.0 0.000000 0.131875 4.500000 6.000000 rotate v_phi30 0 0 0 0 0 1
+region RWCylinderOuter30 cylinder x 0.0 0.000000 0.145063 4.500000 6.000000 rotate v_phi30 0 0 0 0 0 1
+variable phi31 equal 6.086836
+region RWCylinder31 cylinder x 0.0 0.000000 0.131875 4.500000 6.000000 rotate v_phi31 0 0 0 0 0 1
+region RWCylinderOuter31 cylinder x 0.0 0.000000 0.145063 4.500000 6.000000 rotate v_phi31 0 0 0 0 0 1
+
+
+region RWOuter union 64 RWSphereOuter0 RWCylinderOuter0 RWSphereOuter1 RWCylinderOuter1 RWSphereOuter2 RWCylinderOuter2 RWSphereOuter3 RWCylinderOuter3 RWSphereOuter4 RWCylinderOuter4 RWSphereOuter5 RWCylinderOuter5 RWSphereOuter6 RWCylinderOuter6 RWSphereOuter7 RWCylinderOuter7 RWSphereOuter8 RWCylinderOuter8 RWSphereOuter9 RWCylinderOuter9 RWSphereOuter10 RWCylinderOuter10 RWSphereOuter11 RWCylinderOuter11 RWSphereOuter12 RWCylinderOuter12 RWSphereOuter13 RWCylinderOuter13 RWSphereOuter14 RWCylinderOuter14 RWSphereOuter15 RWCylinderOuter15 RWSphereOuter16 RWCylinderOuter16 RWSphereOuter17 RWCylinderOuter17 RWSphereOuter18 RWCylinderOuter18 RWSphereOuter19 RWCylinderOuter19 RWSphereOuter20 RWCylinderOuter20 RWSphereOuter21 RWCylinderOuter21 RWSphereOuter22 RWCylinderOuter22 RWSphereOuter23 RWCylinderOuter23 RWSphereOuter24 RWCylinderOuter24 RWSphereOuter25 RWCylinderOuter25 RWSphereOuter26 RWCylinderOuter26 RWSphereOuter27 RWCylinderOuter27 RWSphereOuter28 RWCylinderOuter28 RWSphereOuter29 RWCylinderOuter29 RWSphereOuter30 RWCylinderOuter30 RWSphereOuter31 RWCylinderOuter31 
+
+region RW union 64 RWSphere0 RWCylinder0 RWSphere1 RWCylinder1 RWSphere2 RWCylinder2 RWSphere3 RWCylinder3 RWSphere4 RWCylinder4 RWSphere5 RWCylinder5 RWSphere6 RWCylinder6 RWSphere7 RWCylinder7 RWSphere8 RWCylinder8 RWSphere9 RWCylinder9 RWSphere10 RWCylinder10 RWSphere11 RWCylinder11 RWSphere12 RWCylinder12 RWSphere13 RWCylinder13 RWSphere14 RWCylinder14 RWSphere15 RWCylinder15 RWSphere16 RWCylinder16 RWSphere17 RWCylinder17 RWSphere18 RWCylinder18 RWSphere19 RWCylinder19 RWSphere20 RWCylinder20 RWSphere21 RWCylinder21 RWSphere22 RWCylinder22 RWSphere23 RWCylinder23 RWSphere24 RWCylinder24 RWSphere25 RWCylinder25 RWSphere26 RWCylinder26 RWSphere27 RWCylinder27 RWSphere28 RWCylinder28 RWSphere29 RWCylinder29 RWSphere30 RWCylinder30 RWSphere31 RWCylinder31 
+
+delete_atoms region RW
+group RW dynamic all region RW every 100

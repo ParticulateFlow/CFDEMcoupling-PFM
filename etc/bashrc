@@ -17,7 +17,7 @@
 #------------------------------------------------------------------------------
 
 export CFDEM_PROJECT=CFDEM
-export CFDEM_VERSION=23.02
+export CFDEM_VERSION=24.01
 
 ################################################################################
 # USER EDITABLE PART: Changes made here may be lost with the next upgrade
@@ -105,9 +105,6 @@ export CFDEM_APP_DIR=$CFDEM_PROJECT_DIR/platforms/$WM_OPTIONS/bin
 #- create directories
 mkdir -p $CFDEM_LIB_DIR
 mkdir -p $CFDEM_APP_DIR
-
-#- path to OF version flag file
-export CFDEM_OFVERSION_DIR=$CFDEM_PROJECT_DIR/etc/OFversion
 
 #------------------------------------------------------------------------------
 # Clean standard environment variables (PATH, LD_LIBRARY_PATH)

@@ -1,0 +1,59 @@
+variable Nclean equal 50
+variable Noutside equal 1
+
+# remove upwards moving particles in mid- and upper regions
+
+variable        velZ atom "vz > -1e-6"
+region regCleanUpper block -7 7 -0.8 0.8 7 40 units box
+fix eeClean1 all execute ${Nclean} " group groupVelZ variable velZ "
+fix eeClean2 all execute ${Nclean} " group groupTop region regCleanUpper "
+fix eeClean3 all execute ${Nclean} " group delUpwardsMoving intersect groupVelZ groupTop "
+fix eeClean4 all execute ${Nclean} " delete_atoms group delUpwardsMoving "
+
+# remove particles that have moved outside the walls because of fluctuations
+region delRegLowerLeft block -7.4 -6.0 INF INF INF 0.75
+region delRegLowerRight block 6.0 7.4 INF INF INF 0.75
+region delRegUpperLeft prism -7.4 -6.0 INF INF 0.75 3.9 0.0 -1.4 0.0
+region delRegUpperRight prism 6.0 7.4 INF INF 0.75 3.9 0.0 1.4 0.0
+
+region delRegBottom block -6.0 6.0 INF INF INF -2.0
+
+#region delRegOutside union 4 delRegLowerLeft delRegLowerRight delRegUpperLeft delRegUpperRight
+
+#fix eeClean5 all execute ${Nclean} " delete_atoms region delRegOutside compress no "
+
+
+# testing
+region delRegOutsideLower union 2 delRegLowerLeft delRegLowerRight
+region delRegOutsideUpper union 2 delRegUpperLeft delRegUpperRight
+
+variable NlowerOld equal 0
+variable NupperOld equal 0
+variable NbottomOld equal 0
+
+variable Nlower equal 0
+variable Nupper equal 0
+variable Nbottom equal 0
+
+fix eeOutside1a all execute ${Noutside} " variable NlowerOld delete "
+fix eeOutside1b all execute ${Noutside} " variable NupperOld delete "
+fix eeOutside1c all execute ${Noutside} " variable NbottomOld delete "
+
+fix eeOutside2a all execute ${Noutside} " variable NlowerOld equal ${Nlower} "
+fix eeOutside2b all execute ${Noutside} " variable NupperOld equal ${Nupper} "
+fix eeOutside2c all execute ${Noutside} " variable NbottomOld equal ${Nbottom} "
+
+fix eeOutside3a all execute ${Noutside} " variable Nlower delete "
+fix eeOutside3b all execute ${Noutside} " variable Nupper delete "
+fix eeOutside3c all execute ${Noutside} " variable Nbottom delete "
+
+fix eeOutside4a all execute ${Noutside} " variable Nlower equal ${NlowerOld}+count(all,delRegOutsideLower) "
+fix eeOutside4b all execute ${Noutside} " variable Nupper equal ${NupperOld}+count(all,delRegOutsideUpper) "
+fix eeOutside4c all execute ${Noutside} " variable Nbottom equal ${NbottomOld}+count(all,delRegBottom) "
+
+fix eeClean7a all execute ${Noutside} " delete_atoms region delRegOutsideLower compress no "
+fix eeClean7b all execute ${Noutside} " delete_atoms region delRegOutsideUpper compress no "
+fix eeClean7c all execute ${Noutside} " delete_atoms region delRegBottom compress no "
+
+
+fix printdeletehearth all print ${Nclean} "${time} ${Nlower} ${Nupper} ${Nbottom}" append ../DEM/monitor/Npart_accumulated_outside_walls.txt title "#time   Nlower	Nupper  Nbottom"

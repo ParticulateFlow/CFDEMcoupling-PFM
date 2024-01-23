@@ -1,0 +1,61 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  6
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      topoSetDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+actions
+(
+/*    {
+        name    nearestCellsToRWs;
+        type    cellSet;
+        action  new;
+        source  nearestToCell;
+        sourceInfo
+        {
+            points
+            (
+                #include "RWpoints"
+            );
+        }
+    }
+*/
+//    #include "RWfineRegs"
+
+
+    {
+        name    RWfaces;
+        type    faceSet;
+        action  new;
+        source  cellToFace;
+        sourceInfo
+        {
+            set RWRegs;
+            option all;
+        }
+    }
+
+    {
+        name    RWfaces;
+        type    faceSet;
+        action  subset;
+        source  cylinderAnnulusToFace;
+        sourceInfo
+        {
+            p1             (0 0 -1);
+            p2             (0 0 1);
+            outerRadius    6.01;
+            innerRadius    5.99;
+        }
+    }
+);

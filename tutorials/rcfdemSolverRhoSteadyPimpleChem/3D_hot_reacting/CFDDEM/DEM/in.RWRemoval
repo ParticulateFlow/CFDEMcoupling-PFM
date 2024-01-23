@@ -1,0 +1,9 @@
+#########
+# removal
+#########
+
+# remove material from inner RW regions to be mainly empty and additional material from corona around it
+
+variable rCMassTot equal 32*${rCMass}
+fix delRW all remove nevery ${NRW} massrate ${rCMassTot} style delete seed 1234567 region RW verbose no restart_read no
+fix delRWOuter all remove nevery ${NRW} massrate ${rCMassTot} style delete seed 1234568 region RWOuter verbose no restart_read no

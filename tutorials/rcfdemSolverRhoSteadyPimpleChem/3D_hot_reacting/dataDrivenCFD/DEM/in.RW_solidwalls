@@ -1,0 +1,37 @@
+#################################
+# remove particles from RW region
+#################################
+
+#region invRW union 64 RWSphere0 RWCylinder0 RWSphere1 RWCylinder1 RWSphere2 RWCylinder2 RWSphere3 RWCylinder3 RWSphere4 RWCylinder4 RWSphere5 RWCylinder5 RWSphere6 RWCylinder6 RWSphere7 RWCylinder7 RWSphere8 RWCylinder8 RWSphere9 RWCylinder9 RWSphere10 RWCylinder10 RWSphere11 RWCylinder11 RWSphere12 RWCylinder12 RWSphere13 RWCylinder13 RWSphere14 RWCylinder14 RWSphere15 RWCylinder15 RWSphere16 RWCylinder16 RWSphere17 RWCylinder17 RWSphere18 RWCylinder18 RWSphere19 RWCylinder19 RWSphere20 RWCylinder20 RWSphere21 RWCylinder21 RWSphere22 RWCylinder22 RWSphere23 RWCylinder23 RWSphere24 RWCylinder24 RWSphere25 RWCylinder25 RWSphere26 RWCylinder26 RWSphere27 RWCylinder27 RWSphere28 RWCylinder28 RWSphere29 RWCylinder29 RWSphere30 RWCylinder30 RWSphere31 RWCylinder31 side out
+#delete_atoms region RW
+
+fix RWwall all wall/region invRW harmonic 5000.0 0.0 0.05
+
+
+region cokeRefRegion block INF INF INF INF INF 10
+variable Nremove equal 10
+variable tau equal ${dt}*${Nremove}
+
+# coke
+
+variable nCokeRWRef equal count(coke,cokeRefRegion)
+variable nCokeRW equal ${nCokeRWRef}
+
+variable mCokePart equal 2.2
+variable massCokeRWremove1 equal ${mCokePart}*(v_nCokeRWRef-${nCokeRW})/${tau}
+variable massCokeRWremove equal ((v_massCokeRWremove1>0)-1e-10)*v_massCokeRWremove1
+fix deleteCokeRW all remove nevery ${Nremove} massratevariable massCokeRWremove style delete seed 10007143 region RW restart_read no integrated_error no atomtype 1
+fix deleteCokeRWOuter all remove nevery ${Nremove} massratevariable massCokeRWremove style delete seed 10007145 region RWOuter restart_read no integrated_error no atomtype 1
+
+# fine coke
+
+variable nFineCokeRWRef equal count(finecoke,cokeRefRegion)
+variable nFineCokeRW equal ${nFineCokeRWRef}
+
+variable mFineCokePart equal 0.8
+variable massFineCokeRWremove1 equal ${mFineCokePart}*(v_nFineCokeRWRef-${nFineCokeRW})/${tau}
+variable massFineCokeRWremove equal ((v_massFineCokeRWremove1>0)-1e-10)*v_massFineCokeRWremove1
+fix deleteFineCokeRW all remove nevery ${Nremove} massratevariable massFineCokeRWremove style delete seed 10007144 region RW restart_read no integrated_error no atomtype 2
+
+# remove excess of fine coke outside of RWs
+fix deleteFineCokeHearth all remove nevery ${Nremove} massratevariable massFineCokeRWremove style delete seed 10007145 region cokeRefRegion restart_read no integrated_error no atomtype 2

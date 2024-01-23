@@ -316,7 +316,7 @@ void readDump(std::string filename, labelList &indices, scalarList &radii, vecto
 
     const label leadingLines = 9;
     label lineCounter = 0;
-    label partIndex;
+    label partIndex = 0;
     scalar r = 1.0, x = 0.0, y = 0.0, z = 0.0;
 
     indices.clear();
