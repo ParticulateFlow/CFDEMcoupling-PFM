@@ -52,7 +52,7 @@ maxCo 0.8;
 
 functions
 {
-   fieldAverage1
+    fieldAverage1
     {
         type            fieldAverage;
         functionObjectLibs ( "libfieldFunctionObjects.so" );
@@ -61,29 +61,28 @@ functions
         (
             Us
             {
-                 mean        on;
-                 prime2Mean  off;
-                 base        time;
-                 window      18.0;
+                mean        on;
+                prime2Mean  off;
+                base        time;
+                window      18.0;
             }
-
 
             voidfraction
             {
-                 mean        on;
-                 prime2Mean  off;
-                 base        time;
-                 window      18.0;
+                mean        on;
+                prime2Mean  off;
+                base        time;
+                window      18.0;
             }
 
             p
             {
-                 mean        on;
-                 prime2Mean  off;
-                 base        time;
-                 window      18.0;
+                mean        on;
+                prime2Mean  off;
+                base        time;
+                window      18.0;
             }
-         );
-       }
+        );
+    }
 }
 // ************************************************************************* //
