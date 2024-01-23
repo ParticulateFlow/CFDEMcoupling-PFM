@@ -64,7 +64,7 @@ fix gravity all gravity 9.81 vector 0.0 0.0 -1.0
 
 # define walls
 fix xwall1 all wall/gran model hertz tangential history primitive type 1 xplane 0.0000
-fix xwall2 all wall/gran model hertz tangential history primitive type 1 xplane 0.044
+fix xwall2 all wall/gran model hertz tangential history primitive type 1 xplane 0.0440
 fix ywall1 all wall/gran model hertz tangential history primitive type 2 yplane 0.0000
 fix ywall2 all wall/gran model hertz tangential history primitive type 2 yplane 0.0100
 fix zwall1 all wall/gran model hertz tangential history primitive type 1 zplane 0.0000
